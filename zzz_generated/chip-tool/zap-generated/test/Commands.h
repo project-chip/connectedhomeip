@@ -135,7 +135,6 @@ public:
         printf("Test_TC_OO_1_1\n");
         printf("Test_TC_OO_2_1\n");
         printf("Test_TC_OO_2_2\n");
-        printf("Test_TC_OO_2_3\n");
         printf("Test_TC_OO_2_4\n");
         printf("Test_TC_PS_1_1\n");
         printf("Test_TC_PS_2_1\n");
@@ -507,6 +506,7 @@ public:
         printf("Test_TC_LCFG_3_1\n");
         printf("Test_TC_LVL_2_3\n");
         printf("Test_TC_LVL_8_1\n");
+        printf("Test_TC_OO_2_3\n");
         printf("Test_TC_OO_3_1\n");
         printf("Test_TC_OO_3_2\n");
         printf("Test_TC_RH_2_2\n");
@@ -26319,1826 +26319,6 @@ private:
         case 22: {
             LogStep(22, "Check on/off attribute value is false after off command");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_OO_2_3Suite : public TestCommand
-{
-public:
-    Test_TC_OO_2_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_2_3", 132, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_OO_2_3Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(350)); }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<uint16_t> mTimeout;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        case 0:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 1:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 2:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 3:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 1));
-            }
-            break;
-        case 4:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("globalSceneControl", value, 1));
-            }
-            break;
-        case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 6:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 7:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 0));
-            }
-            break;
-        case 8:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("globalSceneControl", value, 0));
-            }
-            break;
-        case 9:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 10:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 11:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 1));
-            }
-            break;
-        case 12:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("globalSceneControl", value, 1));
-            }
-            break;
-        case 13:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 14:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 15:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 0));
-            }
-            break;
-        case 16:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("globalSceneControl", value, 0));
-            }
-            break;
-        case 17:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 18:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 19:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 1));
-            }
-            break;
-        case 20:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("globalSceneControl", value, 1));
-            }
-            break;
-        case 21:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 22:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 23:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 0));
-            }
-            break;
-        case 24:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("globalSceneControl", value, 0));
-            }
-            break;
-        case 25:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 26:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 27:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 1));
-            }
-            break;
-        case 28:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("globalSceneControl", value, 1));
-            }
-            break;
-        case 29:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 30:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 31:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 1));
-            }
-            break;
-        case 32:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("globalSceneControl", value, 1));
-            }
-            break;
-        case 33:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 0U));
-            }
-            break;
-        case 34:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 0U));
-            }
-            break;
-        case 35:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 36:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
-            }
-            break;
-        case 37:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 300U));
-            }
-            break;
-        case 38:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 39:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 40:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 41:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 42:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 43:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 44:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 45:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 1));
-            }
-            break;
-        case 46:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
-            }
-            break;
-        case 47:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 300U));
-            }
-            break;
-        case 48:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 49:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 50:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 0));
-            }
-            break;
-        case 51:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 0U));
-            }
-            break;
-        case 52:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
-            }
-            break;
-        case 53:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 54:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 55:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 0));
-            }
-            break;
-        case 56:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 0U));
-            }
-            break;
-        case 57:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 195U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 205U));
-            }
-            break;
-        case 58:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 59:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 60:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 1));
-            }
-            break;
-        case 61:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 0U));
-            }
-            break;
-        case 62:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-            }
-            break;
-        case 63:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 64:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 65:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 66:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 67:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 0));
-            }
-            break;
-        case 68:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 0U));
-            }
-            break;
-        case 69:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
-            }
-            break;
-        case 70:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 71:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 0));
-            }
-            break;
-        case 72:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 0U));
-            }
-            break;
-        case 73:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
-            }
-            break;
-        case 74:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 75:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 76:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 0));
-            }
-            break;
-        case 77:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 0U));
-            }
-            break;
-        case 78:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
-            }
-            break;
-        case 79:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 80:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 81:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 82:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 1));
-            }
-            break;
-        case 83:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 300U));
-            }
-            break;
-        case 84:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 300U));
-            }
-            break;
-        case 85:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 86:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 0));
-            }
-            break;
-        case 87:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 0U));
-            }
-            break;
-        case 88:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
-            }
-            break;
-        case 89:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 90:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 91:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 1));
-            }
-            break;
-        case 92:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
-            }
-            break;
-        case 93:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 300U));
-            }
-            break;
-        case 94:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 95:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 96:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 97:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 98:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 1));
-            }
-            break;
-        case 99:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 195U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 205U));
-            }
-            break;
-        case 100:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 300U));
-            }
-            break;
-        case 101:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 102:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 0));
-            }
-            break;
-        case 103:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 0U));
-            }
-            break;
-        case 104:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
-            }
-            break;
-        case 105:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 106:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 0));
-            }
-            break;
-        case 107:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 0U));
-            }
-            break;
-        case 108:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 195U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 205U));
-            }
-            break;
-        case 109:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 110:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 1));
-            }
-            break;
-        case 111:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 0U));
-            }
-            break;
-        case 112:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 0U));
-            }
-            break;
-        case 113:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 114:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 115:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 116:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 0));
-            }
-            break;
-        case 117:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 0U));
-            }
-            break;
-        case 118:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
-            }
-            break;
-        case 119:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 120:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 0));
-            }
-            break;
-        case 121:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 0U));
-            }
-            break;
-        case 122:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
-            }
-            break;
-        case 123:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 124:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 1));
-            }
-            break;
-        case 125:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
-            }
-            break;
-        case 126:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("offWaitTime", value, 300U));
-            }
-            break;
-        case 127:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 128:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onOff", value, 0));
-            }
-            break;
-        case 129:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("onTime", value, 0U));
-            }
-            break;
-        case 130:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
-            }
-            break;
-        case 131:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "1: Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 1: {
-            LogStep(1, "2a: Send On Command");
-            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::On::Type value;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
-
-            );
-        }
-        case 2: {
-            LogStep(2, "Wait 1000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 1000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 3: {
-            LogStep(3, "2b: Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 4: {
-            LogStep(4, "2b:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
-                                 chip::NullOptional);
-        }
-        case 5: {
-            LogStep(5, "3a:Sends OffWithEffect command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_OFFWITHEFFECT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OffWithEffect::Type value;
-            value.effectId      = static_cast<chip::app::Clusters::OnOff::OnOffEffectIdentifier>(0);
-            value.effectVariant = static_cast<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant>(0);
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OffWithEffect::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 6: {
-            LogStep(6, "Wait 1000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 1000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 7: {
-            LogStep(7, "3b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 8: {
-            LogStep(8, "3b:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
-                                 chip::NullOptional);
-        }
-        case 9: {
-            LogStep(9, "4a:Sends OnWithRecallGlobalScene command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHRECALL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type value;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithRecallGlobalScene::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 10: {
-            LogStep(10, "Wait 1000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 1000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 11: {
-            LogStep(11, "4b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 12: {
-            LogStep(12, "4b:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
-                                 chip::NullOptional);
-        }
-        case 13: {
-            LogStep(13, "5a:Sends OffWithEffect command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_OFFWITHEFFECT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OffWithEffect::Type value;
-            value.effectId      = static_cast<chip::app::Clusters::OnOff::OnOffEffectIdentifier>(0);
-            value.effectVariant = static_cast<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant>(0);
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OffWithEffect::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 14: {
-            LogStep(14, "Wait 1000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 1000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 15: {
-            LogStep(15, "5b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 16: {
-            LogStep(16, "5b:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
-                                 chip::NullOptional);
-        }
-        case 17: {
-            LogStep(17, "5c:Send On Command");
-            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::On::Type value;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
-
-            );
-        }
-        case 18: {
-            LogStep(18, "Wait 1000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 1000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 19: {
-            LogStep(19, "5d:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 20: {
-            LogStep(20, "5d:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
-                                 chip::NullOptional);
-        }
-        case 21: {
-            LogStep(21, "6a:Sends OffWithEffect command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_OFFWITHEFFECT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OffWithEffect::Type value;
-            value.effectId      = static_cast<chip::app::Clusters::OnOff::OnOffEffectIdentifier>(1);
-            value.effectVariant = static_cast<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant>(0);
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OffWithEffect::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 22: {
-            LogStep(22, "Wait 1000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 1000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 23: {
-            LogStep(23, "6b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 24: {
-            LogStep(24, "6b:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
-                                 chip::NullOptional);
-        }
-        case 25: {
-            LogStep(25, "7a:Send On Command");
-            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::On::Type value;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
-
-            );
-        }
-        case 26: {
-            LogStep(26, "Wait 1000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 1000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 27: {
-            LogStep(27, "7b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 28: {
-            LogStep(28, "7b:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
-                                 chip::NullOptional);
-        }
-        case 29: {
-            LogStep(29, "7c:Sends OnWithRecallGlobalScene command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHRECALL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type value;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithRecallGlobalScene::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 30: {
-            LogStep(30, "Wait 1000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 1000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 31: {
-            LogStep(31, "7d:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 32: {
-            LogStep(32, "7d:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
-                                 chip::NullOptional);
-        }
-        case 33: {
-            LogStep(33, "8:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 34: {
-            LogStep(34, "8:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 35: {
-            LogStep(35, "9a:Sends OnWithTimedOff command to DUT");
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 36: {
-            LogStep(36, "9b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 37: {
-            LogStep(37, "9b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 38: {
-            LogStep(38, "10a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 39: {
-            LogStep(39, "Wait 10000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 10000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 40: {
-            LogStep(40, "10b:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 41: {
-            LogStep(41, "Wait 10000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 10000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 42: {
-            LogStep(42, "10c:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 43: {
-            LogStep(43, "Wait 10000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 10000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 44: {
-            LogStep(44, "10d:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 45: {
-            LogStep(45, "10e:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 46: {
-            LogStep(46, "10e:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 47: {
-            LogStep(47, "10e:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 48: {
-            LogStep(48, "Wait 10000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 10000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 49: {
-            LogStep(49, "11a:Sends OffWithEffect command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_OFFWITHEFFECT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OffWithEffect::Type value;
-            value.effectId      = static_cast<chip::app::Clusters::OnOff::OnOffEffectIdentifier>(0);
-            value.effectVariant = static_cast<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant>(0);
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OffWithEffect::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 50: {
-            LogStep(50, "11b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 51: {
-            LogStep(51, "11b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 52: {
-            LogStep(52, "11b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 53: {
-            LogStep(53, "Wait 10000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 10000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 54: {
-            LogStep(54, "12a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 55: {
-            LogStep(55, "12b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 56: {
-            LogStep(56, "12b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 57: {
-            LogStep(57, "12b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 58: {
-            LogStep(58, "Wait 10000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 10000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 59: {
-            LogStep(59, "13a:Send On Command");
-            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::On::Type value;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
-
-            );
-        }
-        case 60: {
-            LogStep(60, "13b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 61: {
-            LogStep(61, "13b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 62: {
-            LogStep(62, "13b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 63: {
-            LogStep(63, "Wait 10000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 10000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 64: {
-            LogStep(64, "14a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 65: {
-            LogStep(65, "Wait 10000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 10000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 66: {
-            LogStep(66, "14b:Send Off Command");
-            VerifyOrDo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::Off::Type value;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
-
-            );
-        }
-        case 67: {
-            LogStep(67, "14c:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 68: {
-            LogStep(68, "14c:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 69: {
-            LogStep(69, "14c:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 70: {
-            LogStep(70, "Wait 30000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 30000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 71: {
-            LogStep(71, "15:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 72: {
-            LogStep(72, "15:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 73: {
-            LogStep(73, "15:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 74: {
-            LogStep(74, "Wait 10000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 10000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 75: {
-            LogStep(75, "16a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 76: {
-            LogStep(76, "16b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 77: {
-            LogStep(77, "16b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 78: {
-            LogStep(78, "16b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 79: {
-            LogStep(79, "17a:Send On Command");
-            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::On::Type value;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
-
-            );
-        }
-        case 80: {
-            LogStep(80, "Wait 10000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 10000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 81: {
-            LogStep(81, "17b:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 82: {
-            LogStep(82, "17c:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 83: {
-            LogStep(83, "17c:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 84: {
-            LogStep(84, "17c:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 85: {
-            LogStep(85, "Wait 40000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 40000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 86: {
-            LogStep(86, "17d:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 87: {
-            LogStep(87, "17d:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 88: {
-            LogStep(88, "17d:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 89: {
-            LogStep(89, "Wait 10000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 10000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 90: {
-            LogStep(90, "18a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 91: {
-            LogStep(91, "18b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 92: {
-            LogStep(92, "18b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 93: {
-            LogStep(93, "18b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 94: {
-            LogStep(94, "19a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 95: {
-            LogStep(95, "Wait 10000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 10000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 96: {
-            LogStep(96, "19b:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 97: {
-            LogStep(97, "Wait 10000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 10000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 98: {
-            LogStep(98, "19c:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 99: {
-            LogStep(99, "19c:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 100: {
-            LogStep(100, "19c:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 101: {
-            LogStep(101, "20a:Send Off Command");
-            VerifyOrDo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::Off::Type value;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
-
-            );
-        }
-        case 102: {
-            LogStep(102, "20b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 103: {
-            LogStep(103, "20b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 104: {
-            LogStep(104, "20b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 105: {
-            LogStep(105, "21a:Sends OnWithimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 106: {
-            LogStep(106, "21b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 107: {
-            LogStep(107, "21b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 108: {
-            LogStep(108, "21b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 109: {
-            LogStep(109, "22a:Send On Command");
-            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::On::Type value;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
-
-            );
-        }
-        case 110: {
-            LogStep(110, "22b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 111: {
-            LogStep(111, "22b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 112: {
-            LogStep(112, "22b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 113: {
-            LogStep(113, ":Wait 10000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 10000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 114: {
-            LogStep(114, "23a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 115: {
-            LogStep(115, "23b:Send Off Command");
-            VerifyOrDo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::Off::Type value;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
-
-            );
-        }
-        case 116: {
-            LogStep(116, "23c:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 117: {
-            LogStep(117, "23c:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 118: {
-            LogStep(118, "23c:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 119: {
-            LogStep(119, "Wait 40000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 40000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 120: {
-            LogStep(120, "23d:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 121: {
-            LogStep(121, "23d:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 122: {
-            LogStep(122, "23d:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 123: {
-            LogStep(123, "24a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0);
-            value.onTime       = 300U;
-            value.offWaitTime  = 300U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
-                               chip::NullOptional
-
-            );
-        }
-        case 124: {
-            LogStep(124, "24b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 125: {
-            LogStep(125, "24b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 126: {
-            LogStep(126, "24b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 127: {
-            LogStep(127, "Wait 40000ms");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 40000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 128: {
-            LogStep(128, "24c:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
-        }
-        case 129: {
-            LogStep(129, "24c:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 130: {
-            LogStep(130, "24c:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 131: {
-            LogStep(131, "Send Off Command");
-            VerifyOrDo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::OnOff::Commands::Off::Type value;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
-
-            );
         }
         }
         return CHIP_NO_ERROR;
@@ -85138,6 +83318,1826 @@ private:
     }
 };
 
+class Test_TC_OO_2_3Suite : public TestCommand
+{
+public:
+    Test_TC_OO_2_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_2_3", 132, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_OO_2_3Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(350)); }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<uint16_t> mTimeout;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 1));
+            }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("globalSceneControl", value, 1));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 0));
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("globalSceneControl", value, 0));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 1));
+            }
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("globalSceneControl", value, 1));
+            }
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 0));
+            }
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("globalSceneControl", value, 0));
+            }
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 18:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 1));
+            }
+            break;
+        case 20:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("globalSceneControl", value, 1));
+            }
+            break;
+        case 21:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 22:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 23:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 0));
+            }
+            break;
+        case 24:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("globalSceneControl", value, 0));
+            }
+            break;
+        case 25:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 26:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 27:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 1));
+            }
+            break;
+        case 28:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("globalSceneControl", value, 1));
+            }
+            break;
+        case 29:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 30:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 31:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 1));
+            }
+            break;
+        case 32:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("globalSceneControl", value, 1));
+            }
+            break;
+        case 33:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 0U));
+            }
+            break;
+        case 34:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("offWaitTime", value, 0U));
+            }
+            break;
+        case 35:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 36:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
+            }
+            break;
+        case 37:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("offWaitTime", value, 300U));
+            }
+            break;
+        case 38:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 39:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 40:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 41:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 42:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 43:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 44:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 45:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 1));
+            }
+            break;
+        case 46:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
+            }
+            break;
+        case 47:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("offWaitTime", value, 300U));
+            }
+            break;
+        case 48:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 49:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 50:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 0));
+            }
+            break;
+        case 51:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 0U));
+            }
+            break;
+        case 52:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
+            }
+            break;
+        case 53:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 54:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 55:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 0));
+            }
+            break;
+        case 56:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 0U));
+            }
+            break;
+        case 57:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 195U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 205U));
+            }
+            break;
+        case 58:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 59:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 60:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 1));
+            }
+            break;
+        case 61:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 0U));
+            }
+            break;
+        case 62:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 63:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 64:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 65:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 66:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 67:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 0));
+            }
+            break;
+        case 68:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 0U));
+            }
+            break;
+        case 69:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
+            }
+            break;
+        case 70:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 71:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 0));
+            }
+            break;
+        case 72:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 0U));
+            }
+            break;
+        case 73:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
+            }
+            break;
+        case 74:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 75:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 76:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 0));
+            }
+            break;
+        case 77:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 0U));
+            }
+            break;
+        case 78:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
+            }
+            break;
+        case 79:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 80:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 81:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 82:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 1));
+            }
+            break;
+        case 83:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 300U));
+            }
+            break;
+        case 84:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("offWaitTime", value, 300U));
+            }
+            break;
+        case 85:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 86:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 0));
+            }
+            break;
+        case 87:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 0U));
+            }
+            break;
+        case 88:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
+            }
+            break;
+        case 89:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 90:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 91:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 1));
+            }
+            break;
+        case 92:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
+            }
+            break;
+        case 93:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("offWaitTime", value, 300U));
+            }
+            break;
+        case 94:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 95:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 96:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 97:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 98:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 1));
+            }
+            break;
+        case 99:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 195U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 205U));
+            }
+            break;
+        case 100:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("offWaitTime", value, 300U));
+            }
+            break;
+        case 101:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 102:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 0));
+            }
+            break;
+        case 103:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 0U));
+            }
+            break;
+        case 104:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
+            }
+            break;
+        case 105:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 106:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 0));
+            }
+            break;
+        case 107:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 0U));
+            }
+            break;
+        case 108:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 195U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 205U));
+            }
+            break;
+        case 109:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 110:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 1));
+            }
+            break;
+        case 111:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 0U));
+            }
+            break;
+        case 112:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("offWaitTime", value, 0U));
+            }
+            break;
+        case 113:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 114:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 115:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 116:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 0));
+            }
+            break;
+        case 117:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 0U));
+            }
+            break;
+        case 118:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
+            }
+            break;
+        case 119:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 120:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 0));
+            }
+            break;
+        case 121:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 0U));
+            }
+            break;
+        case 122:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
+            }
+            break;
+        case 123:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 124:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 1));
+            }
+            break;
+        case 125:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 295U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 305U));
+            }
+            break;
+        case 126:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("offWaitTime", value, 300U));
+            }
+            break;
+        case 127:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 128:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onOff", value, 0));
+            }
+            break;
+        case 129:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("onTime", value, 0U));
+            }
+            break;
+        case 130:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10U));
+            }
+            break;
+        case 131:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "1: Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "2a: Send On Command");
+            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::On::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
+
+            );
+        }
+        case 2: {
+            LogStep(2, "Wait 1000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 3: {
+            LogStep(3, "2b: Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 4: {
+            LogStep(4, "2b:Reads GlobalSceneControl attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
+                                 chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "3a:Sends OffWithEffect command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_OFFWITHEFFECT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OffWithEffect::Type value;
+            value.effectId      = static_cast<chip::app::Clusters::OnOff::OnOffEffectIdentifier>(0);
+            value.effectVariant = static_cast<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OffWithEffect::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 6: {
+            LogStep(6, "Wait 1000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 7: {
+            LogStep(7, "3b:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 8: {
+            LogStep(8, "3b:Reads GlobalSceneControl attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
+                                 chip::NullOptional);
+        }
+        case 9: {
+            LogStep(9, "4a:Sends OnWithRecallGlobalScene command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHRECALL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithRecallGlobalScene::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 10: {
+            LogStep(10, "Wait 1000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 11: {
+            LogStep(11, "4b:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 12: {
+            LogStep(12, "4b:Reads GlobalSceneControl attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
+                                 chip::NullOptional);
+        }
+        case 13: {
+            LogStep(13, "5a:Sends OffWithEffect command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_OFFWITHEFFECT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OffWithEffect::Type value;
+            value.effectId      = static_cast<chip::app::Clusters::OnOff::OnOffEffectIdentifier>(0);
+            value.effectVariant = static_cast<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OffWithEffect::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 14: {
+            LogStep(14, "Wait 1000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 15: {
+            LogStep(15, "5b:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 16: {
+            LogStep(16, "5b:Reads GlobalSceneControl attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
+                                 chip::NullOptional);
+        }
+        case 17: {
+            LogStep(17, "5c:Send On Command");
+            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::On::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
+
+            );
+        }
+        case 18: {
+            LogStep(18, "Wait 1000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 19: {
+            LogStep(19, "5d:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 20: {
+            LogStep(20, "5d:Reads GlobalSceneControl attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
+                                 chip::NullOptional);
+        }
+        case 21: {
+            LogStep(21, "6a:Sends OffWithEffect command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_OFFWITHEFFECT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OffWithEffect::Type value;
+            value.effectId      = static_cast<chip::app::Clusters::OnOff::OnOffEffectIdentifier>(1);
+            value.effectVariant = static_cast<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OffWithEffect::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 22: {
+            LogStep(22, "Wait 1000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 23: {
+            LogStep(23, "6b:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 24: {
+            LogStep(24, "6b:Reads GlobalSceneControl attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
+                                 chip::NullOptional);
+        }
+        case 25: {
+            LogStep(25, "7a:Send On Command");
+            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::On::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
+
+            );
+        }
+        case 26: {
+            LogStep(26, "Wait 1000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 27: {
+            LogStep(27, "7b:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 28: {
+            LogStep(28, "7b:Reads GlobalSceneControl attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
+                                 chip::NullOptional);
+        }
+        case 29: {
+            LogStep(29, "7c:Sends OnWithRecallGlobalScene command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHRECALL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithRecallGlobalScene::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 30: {
+            LogStep(30, "Wait 1000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 31: {
+            LogStep(31, "7d:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 32: {
+            LogStep(32, "7d:Reads GlobalSceneControl attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
+                                 chip::NullOptional);
+        }
+        case 33: {
+            LogStep(33, "8:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 34: {
+            LogStep(34, "8:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 35: {
+            LogStep(35, "9a:Sends OnWithTimedOff command to DUT");
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 36: {
+            LogStep(36, "9b:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 37: {
+            LogStep(37, "9b:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 38: {
+            LogStep(38, "10a:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 39: {
+            LogStep(39, "Wait 10000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 40: {
+            LogStep(40, "10b:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 41: {
+            LogStep(41, "Wait 10000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 42: {
+            LogStep(42, "10c:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 43: {
+            LogStep(43, "Wait 10000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 44: {
+            LogStep(44, "10d:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 45: {
+            LogStep(45, "10e:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 46: {
+            LogStep(46, "10e:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 47: {
+            LogStep(47, "10e:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 48: {
+            LogStep(48, "Wait 10000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 49: {
+            LogStep(49, "11a:Sends OffWithEffect command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_OFFWITHEFFECT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OffWithEffect::Type value;
+            value.effectId      = static_cast<chip::app::Clusters::OnOff::OnOffEffectIdentifier>(0);
+            value.effectVariant = static_cast<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OffWithEffect::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 50: {
+            LogStep(50, "11b:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 51: {
+            LogStep(51, "11b:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 52: {
+            LogStep(52, "11b:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 53: {
+            LogStep(53, "Wait 10000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 54: {
+            LogStep(54, "12a:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 55: {
+            LogStep(55, "12b:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 56: {
+            LogStep(56, "12b:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 57: {
+            LogStep(57, "12b:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 58: {
+            LogStep(58, "Wait 10000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 59: {
+            LogStep(59, "13a:Send On Command");
+            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::On::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
+
+            );
+        }
+        case 60: {
+            LogStep(60, "13b:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 61: {
+            LogStep(61, "13b:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 62: {
+            LogStep(62, "13b:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 63: {
+            LogStep(63, "Wait 10000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 64: {
+            LogStep(64, "14a:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 65: {
+            LogStep(65, "Wait 10000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 66: {
+            LogStep(66, "14b:Send Off Command");
+            VerifyOrDo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::Off::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
+
+            );
+        }
+        case 67: {
+            LogStep(67, "14c:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 68: {
+            LogStep(68, "14c:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 69: {
+            LogStep(69, "14c:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 70: {
+            LogStep(70, "Wait 30000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 30000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 71: {
+            LogStep(71, "15:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 72: {
+            LogStep(72, "15:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 73: {
+            LogStep(73, "15:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 74: {
+            LogStep(74, "Wait 10000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 75: {
+            LogStep(75, "16a:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 76: {
+            LogStep(76, "16b:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 77: {
+            LogStep(77, "16b:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 78: {
+            LogStep(78, "16b:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 79: {
+            LogStep(79, "17a:Send On Command");
+            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::On::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
+
+            );
+        }
+        case 80: {
+            LogStep(80, "Wait 10000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 81: {
+            LogStep(81, "17b:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 82: {
+            LogStep(82, "17c:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 83: {
+            LogStep(83, "17c:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 84: {
+            LogStep(84, "17c:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 85: {
+            LogStep(85, "Wait 40000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 40000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 86: {
+            LogStep(86, "17d:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 87: {
+            LogStep(87, "17d:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 88: {
+            LogStep(88, "17d:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 89: {
+            LogStep(89, "Wait 10000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 90: {
+            LogStep(90, "18a:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 91: {
+            LogStep(91, "18b:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 92: {
+            LogStep(92, "18b:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 93: {
+            LogStep(93, "18b:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 94: {
+            LogStep(94, "19a:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 95: {
+            LogStep(95, "Wait 10000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 96: {
+            LogStep(96, "19b:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 97: {
+            LogStep(97, "Wait 10000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 98: {
+            LogStep(98, "19c:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 99: {
+            LogStep(99, "19c:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 100: {
+            LogStep(100, "19c:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 101: {
+            LogStep(101, "20a:Send Off Command");
+            VerifyOrDo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::Off::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
+
+            );
+        }
+        case 102: {
+            LogStep(102, "20b:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 103: {
+            LogStep(103, "20b:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 104: {
+            LogStep(104, "20b:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 105: {
+            LogStep(105, "21a:Sends OnWithimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 106: {
+            LogStep(106, "21b:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 107: {
+            LogStep(107, "21b:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 108: {
+            LogStep(108, "21b:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 109: {
+            LogStep(109, "22a:Send On Command");
+            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::On::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
+
+            );
+        }
+        case 110: {
+            LogStep(110, "22b:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 111: {
+            LogStep(111, "22b:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 112: {
+            LogStep(112, "22b:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 113: {
+            LogStep(113, ":Wait 10000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 114: {
+            LogStep(114, "23a:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 115: {
+            LogStep(115, "23b:Send Off Command");
+            VerifyOrDo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::Off::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
+
+            );
+        }
+        case 116: {
+            LogStep(116, "23c:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 117: {
+            LogStep(117, "23c:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 118: {
+            LogStep(118, "23c:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 119: {
+            LogStep(119, "Wait 40000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 40000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 120: {
+            LogStep(120, "23d:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 121: {
+            LogStep(121, "23d:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 122: {
+            LogStep(122, "23d:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 123: {
+            LogStep(123, "24a:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0);
+            value.onTime       = 300U;
+            value.offWaitTime  = 300U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 124: {
+            LogStep(124, "24b:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 125: {
+            LogStep(125, "24b:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 126: {
+            LogStep(126, "24b:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 127: {
+            LogStep(127, "Wait 40000ms");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 40000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 128: {
+            LogStep(128, "24c:Reads OnOff attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
+        }
+        case 129: {
+            LogStep(129, "24c:Reads OnTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 130: {
+            LogStep(130, "24c:Reads OffWaitTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
+                                 chip::NullOptional);
+        }
+        case 131: {
+            LogStep(131, "Send Off Command");
+            VerifyOrDo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::OnOff::Commands::Off::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
+
+            );
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_OO_3_1Suite : public TestCommand
 {
 public:
@@ -87556,7 +87556,6 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_OO_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_OO_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_OO_2_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_OO_2_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_OO_2_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_PS_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_PS_2_1Suite>(credsIssuerConfig),
@@ -87917,6 +87916,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_LCFG_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_LVL_2_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_LVL_8_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_OO_2_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_OO_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_OO_3_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_RH_2_2Suite>(credsIssuerConfig),
