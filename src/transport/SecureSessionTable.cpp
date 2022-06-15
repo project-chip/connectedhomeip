@@ -136,8 +136,8 @@ SecureSession * SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Se
     ChipLogDetail(SecureChannel, "Sorted Eviction Candidates (ranked from best candidate to worst):");
     for (auto * session = sortableSessions.Get(); session != (sortableSessions.Get() + numSessions); session++)
     {
-        ChipLogDetail(SecureChannel, "\t%ld: [%p] -- State: '%s', ActivityTime: %lu", (session - sortableSessions.Get()),
-                      session->mSession, session->mSession->GetStateStr(),
+        ChipLogDetail(SecureChannel, "\t%ld: [%p] -- State: '%s', ActivityTime: %lu",
+                      static_cast<long int>(session - sortableSessions.Get()), session->mSession, session->mSession->GetStateStr(),
                       static_cast<unsigned long>(session->mSession->GetLastActivityTime().count()));
     }
 #endif

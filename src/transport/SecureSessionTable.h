@@ -19,6 +19,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Pool.h>
+#include <lib/support/SortUtils.h>
 #include <system/TimeSource.h>
 #include <transport/SecureSession.h>
 
@@ -146,7 +147,7 @@ private:
         template <typename CompareFunc>
         void Sort(CompareFunc func)
         {
-            std::sort(mSessionList.begin(), mSessionList.begin() + mSessionList.size(), func);
+            Sorting::BubbleSort(mSessionList.begin(), mSessionList.size(), func);
         }
 
         const ScopedNodeId & GetSessionEvictionHint() const { return mSessionEvictionHint; }
