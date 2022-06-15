@@ -48,7 +48,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     uint32_t read_size = kMaxKeyValueBytes;
     uint8_t buf[kMaxKeyValueBytes];
 
-	VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(read_bytes_size != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // 1. Casting away the "const" because of the difference of the interface definition. The API won't change the value
@@ -56,11 +56,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     ret = ::get_saved_wifi_network((char *) key, buf, &read_size);
     VerifyOrReturnError(ret == 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
-	if ((value == nullptr) || (value_size == 0))
-	{
-		*read_bytes_size = read_size;
-		return CHIP_ERROR_BUFFER_TOO_SMALL;
-	}
+    if ((value == nullptr) || (value_size == 0))
+    {
+        *read_bytes_size = read_size;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
 
     VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
