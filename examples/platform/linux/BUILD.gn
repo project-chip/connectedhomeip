@@ -41,6 +41,8 @@ source_set("app-main") {
     "Options.h",
     "testing/CustomCSRResponse.cpp",
     "testing/CustomCSRResponse.h",
+    "testing/CustomCSRResponseOperationalKeyStore.cpp",
+    "testing/CustomCSRResponseOperationalKeyStore.h",
   ]
 
   defines = []
