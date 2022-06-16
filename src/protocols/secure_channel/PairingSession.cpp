@@ -142,7 +142,7 @@ bool PairingSession::IsSessionEstablishmentInProgress()
     }
 
     Transport::SecureSession * secureSession = mSecureSessionHolder->AsSecureSession();
-    return secureSession->IsPairing();
+    return secureSession->IsEstablishing();
 }
 
 void PairingSession::Clear()
