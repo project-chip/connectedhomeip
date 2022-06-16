@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <stdio.h>
-
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
@@ -186,12 +184,26 @@ public:
     static PeerAddress BLE() { return PeerAddress(Type::kBle); }
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
+
+    /**
+     * Parses a PeerAddress from the given IP address string with UDP type. For example,
+     * "192.168.1.4", "fe80::2", "fe80::1%wlan0". Notably this will also include the network scope
+     * ID in either index or name form (e.g. %wlan0, %14).
+     */
+    static PeerAddress UDP(char * addrStr, uint16_t port) { return PeerAddress::FromString(addrStr, port, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId interface)
     {
         return UDP(addr).SetPort(port).SetInterface(interface);
     }
     static PeerAddress TCP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kTcp); }
     static PeerAddress TCP(const Inet::IPAddress & addr, uint16_t port) { return TCP(addr).SetPort(port); }
+
+    /**
+     * Parses a PeerAddress from the given IP address string with TCP type. For example,
+     * "192.168.1.4", "fe80::2", "fe80::1%wlan0". Notably this will also include the network scope
+     * ID in either index or name form (e.g. %wlan0, %14).
+     */
+    static PeerAddress TCP(char * addrStr, uint16_t port) { return PeerAddress::FromString(addrStr, port, Type::kTcp); }
     static PeerAddress TCP(const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId interface)
     {
         return TCP(addr).SetPort(port).SetInterface(interface);
@@ -214,6 +226,13 @@ public:
     }
 
 private:
+    static PeerAddress FromString(char * addrStr, uint16_t port, Type type)
+    {
+        Inet::IPAddress addr;
+        Inet::InterfaceId interfaceId;
+        Inet::IPAddress::FromString(addrStr, addr, interfaceId);
+        return PeerAddress(addr, type).SetPort(port).SetInterface(interfaceId);
+    }
     Inet::IPAddress mIPAddress   = {};
     Type mTransportType          = Type::kUndefined;
     uint16_t mPort               = CHIP_PORT; ///< Relevant for UDP data sending.

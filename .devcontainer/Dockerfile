@@ -35,7 +35,8 @@ RUN apt-get -fy install git vim emacs sudo \
     wget curl telnet \
     docker.io \
     iputils-ping net-tools \
-    libncurses5
+    libncurses5 \
+    libpython2.7
 
 RUN groupadd -g $USER_GID $USERNAME
 RUN useradd -s /bin/bash -u $USER_UID -g $USER_GID -G docker -m $USERNAME
@@ -83,3 +84,5 @@ RUN sed -i '/^TIZEN_SDK_DATA_PATH/d' $TIZEN_SDK_ROOT/sdk.info \
     && echo TIZEN_SDK_DATA_PATH=/home/$USERNAME/tizen-sdk-data >> $TIZEN_SDK_ROOT/sdk.info \
     && ln -sf /home/$USERNAME/.tizen-cli-config $TIZEN_SDK_ROOT/tools/.tizen-cli-config \
     && : # last line
+
+ENV TIZEN_ROOTFS /tizen_rootfs

@@ -297,6 +297,14 @@ CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddres
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceController::GetPeerAddress(NodeId nodeId, Transport::PeerAddress & addr)
+{
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(
+        PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(nodeId), addr));
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
                                                  Spake2pVerifier & outVerifier)
 {

@@ -28,7 +28,7 @@ concurrency:
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
-        timeout-minutes: 140
+        timeout-minutes: 145
 
         strategy:
             matrix:
@@ -90,7 +90,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Run Tests
-              timeout-minutes: 60
+              timeout-minutes: 65
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -121,7 +121,7 @@ jobs:
                   retention-days: 5
     test_suites_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 140
+        timeout-minutes: 150
 
         strategy:
             matrix:
@@ -190,7 +190,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Run Tests
-              timeout-minutes: 70
+              timeout-minutes: 80
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -228,7 +228,7 @@ jobs:
                   retention-days: 5
     repl_tests_linux:
         name: REPL Tests - Linux
-        timeout-minutes: 120
+        timeout-minutes: 130
 
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
@@ -278,7 +278,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Run Tests
-              timeout-minutes: 30
+              timeout-minutes: 40
               run: |
                     scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factoryreset --script-args "--log-level INFO -t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files

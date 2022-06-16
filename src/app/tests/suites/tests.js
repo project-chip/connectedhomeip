@@ -377,12 +377,6 @@ function getManualTests() {
     'Test_TC_DL_2_10',
   ];
 
-  const UserLabel = [
-    'Test_TC_LC_2_3',
-    'Test_TC_LC_2_4',
-    'Test_TC_LC_2_5',
-  ];
-
   const LocalizationConfiguration = [
     'Test_TC_LCFG_1_1',
     'Test_TC_LCFG_2_1',
@@ -395,6 +389,7 @@ function getManualTests() {
   ];
 
   const OnOff = [
+    'Test_TC_OO_2_3',
     'Test_TC_OO_3_1',
     'Test_TC_OO_3_2',
   ];
@@ -503,7 +498,6 @@ function getManualTests() {
     BooleanState,
     ColorControl,
     DoorLock,
-    UserLabel,
     LocalizationConfiguration,
     LevelControl,
     OnOff,
@@ -635,6 +629,8 @@ function getTests() {
     'Test_TC_ULABEL_1_1',
     'Test_TC_ULABEL_2_2',
     'Test_TC_ULABEL_2_3',
+    'Test_TC_ULABEL_2_4',
+    'Test_TC_ULABEL_2_5',
   ];
 
   const MediaControl = [
@@ -695,7 +691,6 @@ function getTests() {
     'Test_TC_OO_1_1',
     'Test_TC_OO_2_1',
     'Test_TC_OO_2_2',
-    'Test_TC_OO_2_3',
     'Test_TC_OO_2_4',
   ];
 

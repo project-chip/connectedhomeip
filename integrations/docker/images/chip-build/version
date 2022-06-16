@@ -1,1 +1,1 @@
-0.5.79 Version bump reason: [Ameba] Update ameba SDK to expose xPortResetHeapMinimumEverFreeHeapSize API
+0.5.80 Version bump reason: [Tizen] Add vscode debug support
