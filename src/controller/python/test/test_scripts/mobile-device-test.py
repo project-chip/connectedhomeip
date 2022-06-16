@@ -76,6 +76,19 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
                                      nodeid=device_nodeid),
               "Failed to finish key exchange")
 
+    #
+    # Run this before the MultiFabric test, since it will result in the resultant CASE session
+    # on fabric2 to be evicted (due to the stressful nature of that test) on the target.
+    #
+    # It doesn't actually evict the CASE session for fabric2 on the client, since we prioritize
+    # defunct sessions for eviction first, which means our CASE session on fabric2 remains preserved
+    # throughout the stress test. This results in a mis-match later.
+    #
+    # TODO: Once we implement fabric-adjusted LRU, we should see if this issue remains (it shouldn't)
+    #
+    logger.info("Testing CASE Eviction")
+    FailIfNot(asyncio.run(test.TestCaseEviction(device_nodeid)), "Failed TestCaseEviction")
+
     ok = asyncio.run(test.TestMultiFabric(ip=address,
                                           setuppin=20202021,
                                           nodeid=1))
@@ -156,8 +169,6 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
 
     ethernet_commissioning(test, discriminator, setup_pin, address,
                            device_nodeid)
-
-    FailIfNot(asyncio.run(test.TestCaseEviction(device_nodeid)), "Failed TestCaseEviction")
 
     logger.info("Testing resolve")
     FailIfNot(test.TestResolve(nodeid=device_nodeid),
