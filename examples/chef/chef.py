@@ -28,6 +28,7 @@ import yaml
 
 import constants
 import stateful_shell
+from sample_app_util import zap_file_parser
 
 TermColors = constants.TermColors
 
@@ -175,9 +176,11 @@ def unwrap_cmd(cmd: str) -> str:
 
 def bundle(platform: str, device_name: str) -> None:
     """Filters files from the build output folder for CD.
-    Clears the staging dir.
+    Clears _CD_STAGING_DIR.
     Calls bundle_{platform}(device_name).
     exit(1) for missing bundle_{platform}.
+    Adds .matter files into _CD_STAGING_DIR.
+    Generates metadata for device in _CD_STAGING_DIR.
 
     Args:
         platform: The platform to bundle.
@@ -194,6 +197,17 @@ def bundle(platform: str, device_name: str) -> None:
     else:
         flush_print(f"No bundle function for {platform}!")
         exit(1)
+    matter_file = f"{device_name}.matter"
+    flush_print(f"Copying {matter_file}")
+    src_item = os.path.join(_DEVICE_FOLDER, matter_file)
+    dest_item = os.path.join(_CD_STAGING_DIR, matter_file)
+    shutil.copy(src_item, dest_item)
+    flush_print(f"Generating metadata for {device_name}")
+    zap_file = os.path.join(_DEVICE_FOLDER, f"{device_name}.zap")
+    metadata_file = zap_file_parser.generate_hash_metadata_file(zap_file)
+    metadata_dest = os.path.join(_CD_STAGING_DIR,
+                                 os.path.basename(metadata_file))
+    shutil.copy(metadata_file, metadata_dest)
 
 
 #
@@ -382,6 +396,7 @@ def main(argv: Sequence[str]) -> None:
           cd ../../..
           ./examples/chef/chef.py --generate_zzz
           git add examples/chef/zzz_generated
+          git add examples/chef/devices
         Ensure you are running with the latest version of ZAP from master!
         """)
         ci_manifest = generate_device_manifest()
@@ -409,6 +424,10 @@ def main(argv: Sequence[str]) -> None:
                 if output_cached_md5 != device_md5:
                     flush_print(f"INPUT MD5 MISMATCH {help_msg}")
                     exit(1)
+            matter_file = os.path.join(_DEVICE_FOLDER, f"{device}.matter")
+            if not os.path.exists(matter_file):
+                flush_print(f"MISSING MATTER FILE {help_msg}")
+                exit(1)
         flush_print("Cached ZAP output is up to date!")
         exit(0)
 
