@@ -62,7 +62,8 @@ configuration from it. Some actions required before establishing full
 communication are described below.
 
 The example can be configured to use the secure bootloader and utilize it for
-performing over-the-air Device Firmware Upgrade using Bluetooth LE.
+performing over-the-air Device Firmware Upgrade using Bluetooth LE. The device
+works as a Thread Synchronized Sleepy End Device.
 
 ### Bluetooth LE advertising
 
@@ -387,22 +388,6 @@ features like logs and command-line interface, run the following command:
 
 Remember to replace _build-target_ with the build target name of the Nordic
 Semiconductor's kit you own.
-
-### Building with low-power configuration
-
-You can build the example using the low-power configuration, which enables
-Thread's Synchronized Sleepy End Device mode and disables debug features, such
-as the UART console or the **LED 1** usage.
-
-To build for the low-power configuration, run the following command with
-_build-target_ replaced with the build target name of the Nordic Semiconductor's
-kit you own (for example `nrf52840dk_nrf52840`):
-
-    $ west build -b build-target -- -DOVERLAY_CONFIG=overlay-low_power.conf
-
-For example, use the following command for `nrf52840dk_nrf52840`:
-
-    $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=overlay-low_power.conf
 
 ### Building with Device Firmware Upgrade support
 
