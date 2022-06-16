@@ -23,7 +23,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Extended methods for CHIPDeviceController object over XPC
+ * Extended methods for MTRDeviceController object over XPC
  */
 @interface MTRDeviceController (XPC)
 

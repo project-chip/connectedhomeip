@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * This class is in charge of making a new XPC connection and disconnecting as needed by the clients and by the report handlers.
  */
-@interface MTRDeviceControllerXPCConnection<CHIPDeviceControllerClientProtocol> : NSObject
+@interface MTRDeviceControllerXPCConnection<MTRDeviceControllerClientProtocol> : NSObject
 
 /**
  * This method is just for test purpsoe.

@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_DEVICE_CONTROLLER_H
-#define CHIP_DEVICE_CONTROLLER_H
+#ifndef MTR_DEVICE_CONTROLLER_H
+#define MTR_DEVICE_CONTROLLER_H
 
 #import <Foundation/Foundation.h>
 
@@ -137,4 +137,4 @@ typedef void (^MTRDeviceConnectionCallback)(MTRDevice * _Nullable device, NSErro
 
 NS_ASSUME_NONNULL_END
 
-#endif /* CHIP_DEVICE_CONTROLLER_H */
+#endif /* MTR_DEVICE_CONTROLLER_H */

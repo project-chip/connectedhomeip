@@ -18,7 +18,7 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTR.h>
+#import <Matter/Matter.h>
 
 // system dependencies
 #import <XCTest/XCTest.h>
@@ -74,7 +74,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     params.vendorId = @(kTestVendorId);
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -120,7 +120,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     params.vendorId = @(kTestVendorId);
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -147,7 +147,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     params.vendorId = @(kTestVendorId);
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertTrue([controller isRunning]);
     for (int i = 0; i < 5; i++) {
         [controller shutdown];
@@ -176,7 +176,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     params.vendorId = @(kTestVendorId);
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertTrue([controller isRunning]);
     [controller shutdown];
 
@@ -209,7 +209,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     params.vendorId = @(kTestVendorId);
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -244,7 +244,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     params.vendorId = @(kTestVendorId);
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -278,7 +278,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     params1.vendorId = @(kTestVendorId);
 
-    CHIPDeviceController * controller1 = [factory startControllerOnNewFabric:params1];
+    MTRDeviceController * controller1 = [factory startControllerOnNewFabric:params1];
     XCTAssertNotNil(controller1);
     XCTAssertTrue([controller1 isRunning]);
 
@@ -289,7 +289,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     params2.vendorId = @(kTestVendorId);
 
-    CHIPDeviceController * controller2 = [factory startControllerOnNewFabric:params2];
+    MTRDeviceController * controller2 = [factory startControllerOnNewFabric:params2];
     XCTAssertNotNil(controller2);
     XCTAssertTrue([controller2 isRunning]);
 
@@ -333,7 +333,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     params.vendorId = @(kTestVendorId);
     params.rootCertificate = root1;
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -399,7 +399,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     // Try to start controller when fabric id in root cert subject does not match provided fabric id.
     params.rootCertificate = root2;
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNil(controller);
 
     // Start controller when the fabric ids do match.
@@ -458,7 +458,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     // Try to start controller when there is no ICA and root cert does not match signing key.
     params.rootCertificate = root;
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNil(controller);
 
     [factory shutdown];
@@ -500,7 +500,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     // Try to start controller when there is an ICA and the ICA cert does not match signing key.
     params.rootCertificate = root;
     params.intermediateCertificate = intermediate;
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNil(controller);
 
     // Now start controller with the signing key matching the intermediate cert.
@@ -559,7 +559,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     // Invalid vendor ID ("standard").
     params.vendorId = @(0);
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNil(controller);
 
     [factory shutdown];
@@ -584,7 +584,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     params.vendorId = @(kTestVendorId);
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -626,7 +626,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     // Bring up with node id 17.
     params.nodeId = @17;
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -681,7 +681,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     // Try to bring up with node id 0.
     params.nodeId = @0;
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNil(controller);
 
     // Try to bring up with node id that is outside of the operational range.
@@ -739,7 +739,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     // Create a new fabric without the ICA.
     params.rootCertificate = root;
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -804,7 +804,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     // Create a new fabric without the ICA.
     params.rootCertificate = root;
     params.intermediateCertificate = intermediate;
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -879,7 +879,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     // Create a new fabric without the first ICA.
     params.rootCertificate = root;
     params.intermediateCertificate = intermediate1;
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -942,7 +942,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     // Pass in an intermediate but no root.  Should fail.
     params.intermediateCertificate = intermediate;
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNil(controller);
 
     [factory shutdown];
@@ -997,7 +997,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     params.vendorId = @(kTestVendorId);
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -1061,7 +1061,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     params.vendorId = @(kTestVendorId);
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -1111,7 +1111,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     params.vendorId = @(kTestVendorId);
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNil(controller);
 
     [factory shutdown];
@@ -1166,7 +1166,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     params.vendorId = @(kTestVendorId);
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNil(controller);
 
     [factory shutdown];
@@ -1195,7 +1195,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     params.vendorId = @(kTestVendorId);
     params.operationalKeypair = operationalKeys;
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 

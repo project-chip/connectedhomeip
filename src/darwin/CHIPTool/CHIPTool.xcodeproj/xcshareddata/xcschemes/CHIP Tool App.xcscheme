@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B202528C2459E34F00F97062"
-               BuildableName = "CHIP.framework"
+               BuildableName = "Matter.framework"
                BlueprintName = "Matter"
                ReferencedContainer = "container:../Framework/Matter.xcodeproj">
             </BuildableReference>

@@ -70,7 +70,7 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
 
 @interface MTRDeviceController ()
 
-// queue used to serialize all work performed by the CHIPDeviceController
+// queue used to serialize all work performed by the MTRDeviceController
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;

@@ -18,7 +18,7 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTR.h>
+#import <Matter/Matter.h>
 
 // system dependencies
 #import <XCTest/XCTest.h>
@@ -36,7 +36,7 @@
         = { 0x7c, 0x77, 0x08, 0x70, 0xeb, 0x05, 0xcc, 0x6d, 0xbe, 0xcc, 0x6d, 0x62, 0x32, 0xea, 0xb8, 0xb9 };
     const unsigned char PKSc[] = { 0xc4, 0xa3, 0x81, 0x25, 0x94, 0x77, 0x81, 0x99, 0x6e, 0xf5, 0x61, 0xdf, 0x8f, 0xb7, 0x8d, 0x23 };
     const uint16_t panID = 0x28f4;
-    CHIPThreadOperationalDataset * dataset = [[MTRThreadOperationalDataset alloc]
+    MTRThreadOperationalDataset * dataset = [[MTRThreadOperationalDataset alloc]
         initWithNetworkName:@"TestNetwork"
               extendedPANID:[NSData dataWithBytes:&extendedPANID length:CHIPSizeThreadExtendedPanId]
                   masterKey:[NSData dataWithBytes:&masterKey length:CHIPSizeThreadMasterKey]
@@ -47,7 +47,7 @@
     NSData * data = [dataset asData];
     XCTAssertNotNil(data);
 
-    CHIPThreadOperationalDataset * reconstructed = [[MTRThreadOperationalDataset alloc] initWithData:data];
+    MTRThreadOperationalDataset * reconstructed = [[MTRThreadOperationalDataset alloc] initWithData:data];
     XCTAssertNotNil(reconstructed);
     XCTAssertEqualObjects(reconstructed.networkName, dataset.networkName);
     XCTAssertEqualObjects(reconstructed.panID, dataset.panID);
@@ -63,7 +63,7 @@
     const unsigned char masterKey[] = {};
     const unsigned char PKSc[] = { 0xb7, 0x8d, 0x23 };
     const uint16_t panID = 0x0;
-    CHIPThreadOperationalDataset * dataset =
+    MTRThreadOperationalDataset * dataset =
         [[MTRThreadOperationalDataset alloc] initWithNetworkName:@"TestNetwork"
                                                     extendedPANID:[NSData dataWithBytes:&extendedPANID length:sizeof(extendedPANID)]
                                                         masterKey:[NSData dataWithBytes:&masterKey length:sizeof(masterKey)]

@@ -14,15 +14,16 @@
  *    limitations under the License.
  */
 
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPTestStorage : NSObject <CHIPPersistentStorageDelegate>
-- (nullable NSData *)storageDataForKey:(NSString *)key;
-- (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key;
-- (BOOL)removeStorageDataForKey:(NSString *)key;
+@interface MTRTestKeys : NSObject <MTRKeypair>
+
+@property (readonly, nonatomic, strong) NSData * ipk;
+
+- (instancetype)init;
 @end
 
 NS_ASSUME_NONNULL_END

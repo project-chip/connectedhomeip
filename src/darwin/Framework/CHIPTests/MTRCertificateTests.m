@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTR.h>
+#import <Matter/Matter.h>
 
 // system dependencies
 #import <XCTest/XCTest.h>

@@ -19,7 +19,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPErrorTestUtils : NSObject
+@interface MTRErrorTestUtils : NSObject
 + (uint8_t)errorToZCLErrorCode:(NSError * _Nullable)error;
 @end
 

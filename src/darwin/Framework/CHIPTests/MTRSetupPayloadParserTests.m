@@ -189,7 +189,7 @@
 - (void)testQRCodeParser_Error
 {
     NSError * error;
-    CHIPQRCodeSetupPayloadParser * parser =
+    MTRQRCodeSetupPayloadParser * parser =
         [[MTRQRCodeSetupPayloadParser alloc] initWithBase38Representation:@"MT:R5L90MP500K64J0000."];
     MTRSetupPayload * payload = [parser populatePayload:&error];
 
@@ -200,7 +200,7 @@
 - (void)testQRCodeParser
 {
     NSError * error;
-    CHIPQRCodeSetupPayloadParser * parser =
+    MTRQRCodeSetupPayloadParser * parser =
         [[MTRQRCodeSetupPayloadParser alloc] initWithBase38Representation:@"MT:R5L90MP500K64J00000"];
     MTRSetupPayload * payload = [parser populatePayload:&error];
 
@@ -219,7 +219,7 @@
 - (void)testQRCodeParserWithOptionalData
 {
     NSError * error;
-    CHIPQRCodeSetupPayloadParser * parser = [[MTRQRCodeSetupPayloadParser alloc]
+    MTRQRCodeSetupPayloadParser * parser = [[MTRQRCodeSetupPayloadParser alloc]
         initWithBase38Representation:@"MT:R5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0"];
     MTRSetupPayload * payload = [parser populatePayload:&error];
 
@@ -235,7 +235,7 @@
     XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationSoftAP);
     XCTAssertTrue([payload.serialNumber isEqualToString:@"123456789"]);
 
-    NSArray<CHIPOptionalQRCodeInfo *> * vendorOptionalInfo = [payload getAllOptionalVendorData:&error];
+    NSArray<MTROptionalQRCodeInfo *> * vendorOptionalInfo = [payload getAllOptionalVendorData:&error];
     XCTAssertNil(error);
     XCTAssertEqual([vendorOptionalInfo count], 2);
     for (MTROptionalQRCodeInfo * info in vendorOptionalInfo) {

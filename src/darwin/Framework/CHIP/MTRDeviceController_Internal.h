@@ -18,7 +18,7 @@
 #define MTR_DEVICE_CONTROLLER_INTERNAL_H
 
 /**
- * Parts of CHIPDeviceController that are not part of the framework API.  Mostly
+ * Parts of MTRDeviceController that are not part of the framework API.  Mostly
  * for use from MTRControllerFactory.
  */
 

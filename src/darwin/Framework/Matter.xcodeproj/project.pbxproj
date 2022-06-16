@@ -223,6 +223,9 @@
 		B2F53AF1245B0DCF0010745E /* MTRSetupPayloadParserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRSetupPayloadParserTests.m; sourceTree = "<group>"; };
 		BA09EB3F2474762900605257 /* libCHIP.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCHIP.a; path = lib/libCHIP.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = chip_xcode_build_connector.sh; sourceTree = "<group>"; };
+		D437613E285BDC0D0051FEA2 /* MTRErrorTestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRErrorTestUtils.h; sourceTree = "<group>"; };
+		D437613F285BDC0D0051FEA2 /* MTRTestKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestKeys.h; sourceTree = "<group>"; };
+		D4376140285BDC0D0051FEA2 /* MTRTestStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestStorage.h; sourceTree = "<group>"; };
 		D4772A45285AE98300383630 /* MTRClusterConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MTRClusterConstants.h; path = "zap-generated/MTRClusterConstants.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -380,6 +383,9 @@
 		B202529A2459E34F00F97062 /* CHIPTests */ = {
 			isa = PBXGroup;
 			children = (
+				D437613E285BDC0D0051FEA2 /* MTRErrorTestUtils.h */,
+				D437613F285BDC0D0051FEA2 /* MTRTestKeys.h */,
+				D4376140285BDC0D0051FEA2 /* MTRTestStorage.h */,
 				51E24E72274E0DAC007CCF6E /* MTRErrorTestUtils.mm */,
 				51C8E3F72825CDB600D47D00 /* MTRTestKeys.m */,
 				51D10D2D2808E2CA00E8CA3D /* MTRTestStorage.m */,

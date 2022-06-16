@@ -19,7 +19,7 @@
 
 /**
  * Parts of MTRControllerFactory that are not part of the framework API.
- * Mostly for use from CHIPDeviceController.
+ * Mostly for use from MTRDeviceController.
  */
 
 #import <Foundation/Foundation.h>

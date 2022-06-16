@@ -19,7 +19,7 @@
  */
 
 // module headers
-#import <Matter/MTR.h>
+#import <Matter/Matter.h>
 #import <Matter/MTRAttributeCacheContainer.h>
 #import <Matter/MTRClustersObjc.h>
 #import <Matter/MTRDevice.h>
@@ -50,14 +50,14 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
 // This test suite reuses a device object to speed up the test process for CI.
 // The following global variable holds the reference to the device object.
-static CHIPDevice * mConnectedDevice;
+static MTRDevice * mConnectedDevice;
 
 // Singleton controller we use.
-static CHIPDeviceController * sController = nil;
+static MTRDeviceController * sController = nil;
 
 static void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue)
 {
-    CHIPDeviceController * controller = sController;
+    MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
     [controller getConnectedDevice:kDeviceId
@@ -69,7 +69,7 @@ static void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_
                  }];
 }
 
-static CHIPDevice * GetConnectedDevice(void)
+static MTRDevice * GetConnectedDevice(void)
 {
     XCTAssertNotNil(mConnectedDevice);
     return mConnectedDevice;
@@ -160,12 +160,12 @@ static CHIPDevice * GetConnectedDevice(void)
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
     params.vendorId = @(kTestVendorId);
 
-    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
 
     sController = controller;
 
-    CHIPDeviceTestPairingDelegate * pairing = [[MTRDeviceTestPairingDelegate alloc] initWithExpectation:expectation];
+    MTRDeviceTestPairingDelegate * pairing = [[MTRDeviceTestPairingDelegate alloc] initWithExpectation:expectation];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
 
     [controller setPairingDelegate:pairing queue:callbackQueue];
@@ -189,7 +189,7 @@ static CHIPDevice * GetConnectedDevice(void)
 
 - (void)shutdownStack
 {
-    CHIPDeviceController * controller = sController;
+    MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
     [controller shutdown];
@@ -224,7 +224,7 @@ static CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"read DeviceDescriptor DeviceType attribute for all endpoints"];
 
-    CHIPDevice * device = GetConnectedDevice();
+    MTRDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     [device readAttributeWithEndpointId:nil
@@ -264,7 +264,7 @@ static CHIPDevice * GetConnectedDevice(void)
 #endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"write LevelControl Brightness attribute"];
 
-    CHIPDevice * device = GetConnectedDevice();
+    MTRDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     NSDictionary * writeValue = [NSDictionary
@@ -307,7 +307,7 @@ static CHIPDevice * GetConnectedDevice(void)
 #endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"invoke MoveToLevelWithOnOff command"];
 
-    CHIPDevice * device = GetConnectedDevice();
+    MTRDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     NSDictionary * fields = @{
@@ -355,7 +355,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self initStack];
     [self waitForCommissionee];
 #endif
-    CHIPDevice * device = GetConnectedDevice();
+    MTRDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     // Subscribe
@@ -498,7 +498,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 #endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"read failed"];
 
-    CHIPDevice * device = GetConnectedDevice();
+    MTRDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     [device
@@ -527,7 +527,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 #endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"write failed"];
 
-    CHIPDevice * device = GetConnectedDevice();
+    MTRDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     NSDictionary * writeValue = [NSDictionary
@@ -560,7 +560,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 #endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"invoke MoveToLevelWithOnOff command"];
 
-    CHIPDevice * device = GetConnectedDevice();
+    MTRDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     NSDictionary * fields = @{
@@ -607,7 +607,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [errorReportExpectation fulfill];
     };
 
-    CHIPDevice * device = GetConnectedDevice();
+    MTRDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     XCTestExpectation * cleanSubscriptionExpectation = [self expectationWithDescription:@"Previous subscriptions cleaned"];
@@ -653,7 +653,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"read DeviceDescriptor DeviceType attribute for all endpoints"];
 
-    CHIPDevice * device = GetConnectedDevice();
+    MTRDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     [device readAttributeWithEndpointId:@1
@@ -691,7 +691,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForCommissionee];
 #endif
 
-    CHIPDevice * device = GetConnectedDevice();
+    MTRDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     XCTestExpectation * cleanSubscriptionExpectation = [self expectationWithDescription:@"Previous subscriptions cleaned"];
     NSLog(@"Deregistering report handlers...");
@@ -703,7 +703,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ cleanSubscriptionExpectation ] timeout:kTimeoutInSeconds];
 
     __auto_type attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
-    CHIPDeviceController * controller = sController;
+    MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
     XCTestExpectation * subscribeExpectation = [self expectationWithDescription:@"Subscription complete"];
 
@@ -730,7 +730,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Invoke command to set the attribute to a known state
     XCTestExpectation * commandExpectation = [self expectationWithDescription:@"Command invoked"];
-    CHIPOnOff * cluster = [[MTROnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    MTROnOff * cluster = [[MTROnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
     NSLog(@"Invoking command...");
@@ -936,7 +936,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self initStack];
     [self waitForCommissionee];
 #endif
-    CHIPDevice * device = GetConnectedDevice();
+    MTRDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     XCTestExpectation * deregisterExpectation = [self expectationWithDescription:@"Report handler deregistered"];
     [device deregisterReportHandlersWithClientQueue:queue
@@ -1044,7 +1044,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self initStack];
     [self waitForCommissionee];
 #endif
-    CHIPDevice * device = GetConnectedDevice();
+    MTRDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     XCTestExpectation * cleanSubscriptionExpectation = [self expectationWithDescription:@"Previous subscriptions cleaned"];
     NSLog(@"Deregistering report handlers...");

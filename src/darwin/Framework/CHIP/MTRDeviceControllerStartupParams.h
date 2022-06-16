@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_DEVICE_CONTROLLER_STARTUP_PARAMS_H
-#define CHIP_DEVICE_CONTROLLER_STARTUP_PARAMS_H
+#ifndef MTR_DEVICE_CONTROLLER_STARTUP_PARAMS_H
+#define MTR_DEVICE_CONTROLLER_STARTUP_PARAMS_H
 
 #import <Foundation/Foundation.h>
 
@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
  * if not using an intermediate CA, the intermediate CA's keypair otherwise.
  *
  * Allowed to be nil if this controller will not be issuing operational
- * certificates.  In that case, the CHIPDeviceControllerStartupParams object
+ * certificates.  In that case, the MTRDeviceControllerStartupParams object
  * must be initialized using initWithOperationalKeypair (to provide the
  * operational credentials for the controller itself).
  */
@@ -224,4 +224,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 NS_ASSUME_NONNULL_END
 
-#endif // CHIP_DEVICE_CONTROLLER_STARTUP_PARAMS_H
+#endif // MTR_DEVICE_CONTROLLER_STARTUP_PARAMS_H

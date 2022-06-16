@@ -19,7 +19,7 @@
 
 #import "MTRErrorTestUtils.h"
 
-#import <Matter/MTR.h>
+#import <Matter/Matter.h>
 
 #import <app/util/af-enums.h>
 

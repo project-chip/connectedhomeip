@@ -19,7 +19,7 @@
  */
 
 // module headers
-#import <Matter/MTR.h>
+#import <Matter/Matter.h>
 
 #import "MTRErrorTestUtils.h"
 
@@ -929,7 +929,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
     // Inject report
-    id<CHIPDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
+    id<MTRDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
     [clientObject handleReportWithController:uuid
                                       nodeId:myNodeId
                                       values:[MTRDeviceController encodeXPCResponseValues:myReport]
@@ -1049,7 +1049,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
     // Inject report
-    id<CHIPDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
+    id<MTRDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
     [clientObject handleReportWithController:uuid
                                       nodeId:myNodeId
                                       values:[MTRDeviceController encodeXPCResponseValues:myReport]
@@ -1164,7 +1164,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
     // Inject badly formatted report
-    id<CHIPDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
+    id<MTRDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
     [clientObject handleReportWithController:uuid nodeId:myNodeId values:myReport error:nil];
 
     // Wait for report, which isn't expected.
@@ -1278,7 +1278,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
     // Inject report
-    id<CHIPDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
+    id<MTRDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
     [clientObject handleReportWithController:uuid
                                       nodeId:myNodeId
                                       values:[MTRDeviceController encodeXPCResponseValues:myReport]
@@ -1394,7 +1394,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
     // Inject report
-    id<CHIPDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
+    id<MTRDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
     [clientObject handleReportWithController:uuid
                                       nodeId:myNodeId
                                       values:[MTRDeviceController encodeXPCResponseValues:myReport]
@@ -1510,7 +1510,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
     // Inject report
-    id<CHIPDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
+    id<MTRDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
     [clientObject handleReportWithController:uuid
                                       nodeId:myNodeId
                                       values:[MTRDeviceController encodeXPCResponseValues:myReport]
@@ -1626,7 +1626,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
     // Inject report
-    id<CHIPDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
+    id<MTRDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
     [clientObject handleReportWithController:uuid
                                       nodeId:myNodeId + 1
                                       values:[MTRDeviceController encodeXPCResponseValues:myReport]
@@ -1741,7 +1741,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
     // Inject report
-    id<CHIPDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
+    id<MTRDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
     [clientObject handleReportWithController:uuid
                                       nodeId:myNodeId
                                       values:[MTRDeviceController encodeXPCResponseValues:myReport]
@@ -1856,7 +1856,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
     // Inject report
-    id<CHIPDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
+    id<MTRDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
     [clientObject handleReportWithController:uuid
                                       nodeId:myNodeId
                                       values:[MTRDeviceController encodeXPCResponseValues:myReport]
@@ -1971,7 +1971,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
     // Inject report
-    id<CHIPDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
+    id<MTRDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
     [clientObject handleReportWithController:uuid
                                       nodeId:myNodeId
                                       values:[MTRDeviceController encodeXPCResponseValues:myReport]
@@ -2097,7 +2097,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
     }
 
-    id<CHIPDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
+    id<MTRDeviceControllerClientProtocol> clientObject = _xpcConnection.remoteObjectProxy;
 
     // Inject reports
     for (int count = 0; count < 2; count++) {

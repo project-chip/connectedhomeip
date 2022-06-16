@@ -110,7 +110,7 @@ extern NSString * const KMTRArrayValueType;
  * entire subscription (with a nil "value" and non-nil "error").  If it's called
  * with an error, that will terminate the subscription.
  *
- * The array passed to reportHandler will contain CHIPAttributeReport
+ * The array passed to reportHandler will contain MTRAttributeReport
  * instances.  Errors for specific paths, not the whole subscription, will be
  * reported via those objects.
  *
@@ -141,7 +141,7 @@ extern NSString * const KMTRArrayValueType;
  * attributeReportHandler will be called any time a data update is available (with a
  * non-nil "value")
  *
- * The array passed to attributeReportHandler will contain CHIPAttributeReport
+ * The array passed to attributeReportHandler will contain MTRAttributeReport
  * instances.  Errors for specific paths, not the whole subscription, will be
  * reported via those objects.
  *

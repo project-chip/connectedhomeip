@@ -96,7 +96,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)shutdown;
 
 /**
- * Create a CHIPDeviceController on an existing fabric.  Returns nil on failure.
+ * Create a MTRDeviceController on an existing fabric.  Returns nil on failure.
  *
  * This method will fail if there is no such fabric or if there is
  * already a controller started for that fabric.
@@ -107,7 +107,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (MTRDeviceController * _Nullable)startControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams;
 
 /**
- * Create a CHIPDeviceController on a new fabric.  Returns nil on failure.
+ * Create a MTRDeviceController on a new fabric.  Returns nil on failure.
  *
  * This method will fail if the given fabric already exists.
  *

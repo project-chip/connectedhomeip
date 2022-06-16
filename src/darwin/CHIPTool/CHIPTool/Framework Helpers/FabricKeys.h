@@ -16,7 +16,7 @@
 
 #pragma once
 
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 #import <Foundation/Foundation.h>
 
 /**
@@ -25,7 +25,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface FabricKeys : NSObject <CHIPKeypair>
+@interface FabricKeys : NSObject <MTRKeypair>
 
 @property (readonly, nonatomic, strong) NSData * ipk;
 
