@@ -13774,7 +13774,7 @@ private:
             {
                 uint64_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("breadcrumb", value, 0ULL));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
             }
             break;
         case 2:
@@ -13809,12 +13809,9 @@ private:
         case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType value;
+                bool value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(
-                    CheckValue("basicCommissioningInfo.failSafeExpiryLengthSeconds", value.failSafeExpiryLengthSeconds, 60U));
-                VerifyOrReturn(
-                    CheckValue("basicCommissioningInfo.maxCumulativeFailsafeSeconds", value.maxCumulativeFailsafeSeconds, 900U));
+                VerifyOrReturn(CheckConstraintType("value", "", "bool"));
             }
             break;
         default:
@@ -13868,9 +13865,9 @@ private:
                                  GeneralCommissioning::Attributes::LocationCapability::Id, true, chip::NullOptional);
         }
         case 6: {
-            LogStep(6, "TH1 reads BasicCommissioningInfo attribute from DUT");
+            LogStep(6, "TH1 reads SupportsConcurrentConnection attribute from the DUT");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
-                                 GeneralCommissioning::Attributes::BasicCommissioningInfo::Id, true, chip::NullOptional);
+                                 GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id, true, chip::NullOptional);
         }
         }
         return CHIP_NO_ERROR;
