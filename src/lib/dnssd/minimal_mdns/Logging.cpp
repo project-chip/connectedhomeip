@@ -15,12 +15,44 @@
  *    limitations under the License.
  */
 #include <lib/dnssd/minimal_mdns/Logging.h>
-#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace mdns {
 namespace Minimal {
 namespace Logging {
+
+QNameString::QNameString(const mdns::Minimal::FullQName & name)
+{
+    for (unsigned i = 0; i < name.nameCount; i++)
+    {
+        if (i != 0)
+        {
+            mBuffer.Add(".");
+        }
+        mBuffer.Add(name.names[i]);
+    }
+}
+
+QNameString::QNameString(mdns::Minimal::SerializedQNameIterator name)
+{
+    bool first = true;
+    while (name.Next())
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            mBuffer.Add(".");
+        }
+        mBuffer.Add(name.Value());
+    }
+    if (!name.IsValid())
+    {
+        mBuffer.Add("(!INVALID!)");
+    }
+}
 
 namespace {
 
@@ -53,52 +85,6 @@ const char * QueryTypeToString(mdns::Minimal::QType type)
 }
 
 #endif // CHIP_PROGRESS_LOGGING
-
-class QNameString
-{
-public:
-    QNameString(const mdns::Minimal::FullQName & name)
-    {
-        for (unsigned i = 0; i < name.nameCount; i++)
-        {
-            if (i != 0)
-            {
-                mBuffer.Add(".");
-            }
-            mBuffer.Add(name.names[i]);
-        }
-    }
-
-    QNameString(mdns::Minimal::SerializedQNameIterator name)
-    {
-        bool first = true;
-        while (name.Next())
-        {
-            if (first)
-            {
-                first = false;
-            }
-            else
-            {
-                mBuffer.Add(".");
-            }
-            mBuffer.Add(name.Value());
-        }
-        if (!name.IsValid())
-        {
-            mBuffer.Add("(!INVALID!)");
-        }
-    }
-
-    const char * c_str() const { return mBuffer.c_str(); }
-
-    bool Fit() const { return mBuffer.Fit(); }
-
-private:
-    static constexpr size_t kMaxQNameLength = 128;
-    chip::StringBuilder<kMaxQNameLength> mBuffer;
-};
-
 } // namespace
 
 void LogSendingQuery(const mdns::Minimal::Query & query)

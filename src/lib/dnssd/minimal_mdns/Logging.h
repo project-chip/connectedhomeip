@@ -20,6 +20,7 @@
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/Query.h>
+#include <lib/support/StringBuilder.h>
 
 namespace mdns {
 namespace Minimal {
@@ -27,6 +28,23 @@ namespace Minimal {
 /// Provides potentially verbose logging for DNSSD operations when using
 /// MinMdns.
 namespace Logging {
+
+// Allows for a FullQName to be represented as a user-readable logging string
+class QNameString
+{
+public:
+    QNameString(const mdns::Minimal::FullQName & name);
+
+    QNameString(mdns::Minimal::SerializedQNameIterator name);
+
+    inline const char * c_str() const { return mBuffer.c_str(); }
+
+    inline bool Fit() const { return mBuffer.Fit(); }
+
+private:
+    static constexpr size_t kMaxQNameLength = 128;
+    chip::StringBuilder<kMaxQNameLength> mBuffer;
+};
 
 #if CHIP_MINMDNS_HIGH_VERBOSITY
 
