@@ -73,6 +73,9 @@ class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
 
     // Intentionally left blank
     void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override {}
+
+    // Intentionally left blank
+    void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
 };
 static DoorLockClusterFabricDelegate gFabricDelegate;
 

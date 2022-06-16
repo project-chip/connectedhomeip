@@ -29,8 +29,9 @@
 #include "nvs_flash.h"
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
-
 #include <lib/support/ErrorStr.h>
+#include <ota/OTAHelper.h>
+#include <shell_extension/launch.h>
 
 #include "OTAImageProcessorImpl.h"
 
@@ -41,6 +42,7 @@
 using namespace ::chip;
 using namespace ::chip::System;
 using namespace ::chip::DeviceManager;
+using namespace chip::Shell;
 
 namespace {
 const char * TAG = "ota-requester-app";
@@ -79,6 +81,11 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
+
+#if CONFIG_ENABLE_CHIP_SHELL
+    chip::LaunchShell();
+    OTARequestorCommands::GetInstance().Register();
+#endif // CONFIG_ENABLE_CHIP_SHELL
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
