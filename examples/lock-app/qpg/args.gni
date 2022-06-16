@@ -26,4 +26,4 @@ chip_openthread_ftd = false
 chip_stack_lock_tracking = "none"
 
 pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
-pw_assert_BACKEND = "$dir_pw_assert_log"
+pw_assert_BACKEND = "$dir_pw_assert_log:check_backend"

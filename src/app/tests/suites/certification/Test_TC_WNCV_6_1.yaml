@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 3.4.7. [TC-WNCV-6.1] Basic Commands Verification with client as DUT
 
@@ -28,6 +29,8 @@ tests:
     - label: "DUT sends UpOrOpen command to TH"
       verification: |
           On TestHarnes (all-cluster-app) a received up-or-open for WindowCovering looks like this
+
+          ./chip-tool windowcovering up-or-open 1 1
 
           [1646243704.407225][352796:352796] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:10452706 on exchange 27302r
           [1646243704.407277][352796:352796] CHIP:EM: Handling via exchange: 27302r, Delegate: 0x560eb84d5500
@@ -67,6 +70,7 @@ tests:
     - label: "DUT sends DownOrClose command to TH"
       verification: |
           On TestHarnes (all-cluster-app) a received down-or-close for WindowCovering looks like this
+          ./chip-tool windowcovering down-or-close 1 1
 
           [1646243773.438732][352796:352796] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:8564771 on exchange 6526r
           [1646243773.438764][352796:352796] CHIP:EM: Handling via exchange: 6526r, Delegate: 0x560eb84d5500
@@ -106,6 +110,8 @@ tests:
     - label: "DUT sends a StopMotion command to TH"
       verification: |
           On TestHarnes (all-cluster-app) a received stop-motion for WindowCovering looks like this
+
+          ./chip-tool windowcovering stop-motion 1 1
 
           1646243464.420695][352796:352796] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:3710998 on exchange 7151r
           [1646243464.420725][352796:352796] CHIP:EM: Handling via exchange: 7151r, Delegate: 0x560eb84d5500

@@ -118,6 +118,12 @@ private:
 
     /**
      * @brief
+     *  The callback function to be called when max cumulative time expires.
+     */
+    static void HandleMaxCumulativeFailSafeTimer(System::Layer * layer, void * aAppState);
+
+    /**
+     * @brief
      *  The callback function to be called asynchronously after various cleanup work has completed
      *  to actually disarm the fail-safe.
      */

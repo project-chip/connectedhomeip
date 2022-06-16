@@ -157,12 +157,12 @@ JNI_METHOD(void, preServerInit)(JNIEnv *, jobject app)
     PreServerInit();
 }
 
-JNI_METHOD(void, postServerInit)(JNIEnv *, jobject app)
+JNI_METHOD(void, postServerInit)(JNIEnv *, jobject app, jobject contentAppEndpointManager)
 {
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Zcl, "TvAppJNI::postServerInit");
 
-    InitVideoPlayerPlatform(userPrompter);
+    InitVideoPlayerPlatform(userPrompter, contentAppEndpointManager);
 }
 
 JNI_METHOD(void, setOnOffManager)(JNIEnv *, jobject, jint endpoint, jobject manager)

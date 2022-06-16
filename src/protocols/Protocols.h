@@ -58,8 +58,16 @@ public:
     constexpr VendorId GetVendorId() const { return mVendorId; }
     constexpr uint16_t GetProtocolId() const { return mProtocolId; }
 
+    static constexpr uint32_t kVendorIdShift = 16;
+
+    static Id FromFullyQualifiedSpecForm(uint32_t aSpecForm)
+    {
+        return Id(static_cast<VendorId>(aSpecForm >> kVendorIdShift),
+                  static_cast<uint16_t>(aSpecForm & ((1 << kVendorIdShift) - 1)));
+    }
+
 private:
-    constexpr uint32_t ToUint32() const { return (static_cast<uint32_t>(mVendorId) << 16) | mProtocolId; }
+    constexpr uint32_t ToUint32() const { return (static_cast<uint32_t>(mVendorId) << kVendorIdShift) | mProtocolId; }
 
     chip::VendorId mVendorId;
     uint16_t mProtocolId;

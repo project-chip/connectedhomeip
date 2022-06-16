@@ -91,7 +91,7 @@ ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeM
 
 void ReadClient::ClearActiveSubscriptionState()
 {
-    mIsInitialReport         = true;
+    mIsReporting             = false;
     mIsPrimingReports        = true;
     mPendingMoreChunks       = false;
     mMinIntervalFloorSeconds = 0;
@@ -558,24 +558,15 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     else if (err == CHIP_NO_ERROR)
     {
         TLV::TLVReader attributeReportIBsReader;
-        mSawAttributeReportsInCurrentReport = true;
         attributeReportIBs.GetReader(&attributeReportIBsReader);
-
-        if (mIsInitialReport)
-        {
-            mpCallback.OnReportBegin();
-            mIsInitialReport = false;
-        }
-
         err = ProcessAttributeReportIBs(attributeReportIBsReader);
     }
     SuccessOrExit(err);
 
-    if (mSawAttributeReportsInCurrentReport && !mPendingMoreChunks)
+    if (mIsReporting && !mPendingMoreChunks)
     {
         mpCallback.OnReportEnd();
-        mIsInitialReport                    = true;
-        mSawAttributeReportsInCurrentReport = false;
+        mIsReporting = false;
     }
 
     SuccessOrExit(err = report.ExitContainer());
@@ -633,6 +624,15 @@ CHIP_ERROR ReadClient::ProcessAttributePath(AttributePathIB::Parser & aAttribute
     return CHIP_NO_ERROR;
 }
 
+void ReadClient::NoteReportingData()
+{
+    if (!mIsReporting)
+    {
+        mpCallback.OnReportBegin();
+        mIsReporting = true;
+    }
+}
+
 CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeReportIBsReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -657,6 +657,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             ReturnErrorOnFailure(ProcessAttributePath(path, attributePath));
             ReturnErrorOnFailure(status.GetErrorStatus(&errorStatus));
             ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
+            NoteReportingData();
             mpCallback.OnAttributeData(attributePath, nullptr, statusIB);
         }
         else if (CHIP_END_OF_TLV == err)
@@ -681,6 +682,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
                 attributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             }
 
+            NoteReportingData();
             mpCallback.OnAttributeData(attributePath, &dataReader, statusIB);
         }
     }
@@ -722,6 +724,7 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
                 mReadPrepareParams.mEventNumber.SetValue(header.mEventNumber + 1);
             }
 
+            NoteReportingData();
             mpCallback.OnEventData(header, &dataReader, nullptr);
         }
         else if (err == CHIP_END_OF_TLV)
@@ -735,6 +738,7 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
             ReturnErrorOnFailure(status.GetErrorStatus(&statusIBParser));
             ReturnErrorOnFailure(statusIBParser.DecodeStatusIB(statusIB));
 
+            NoteReportingData();
             mpCallback.OnEventData(header, nullptr, &statusIB);
         }
     }

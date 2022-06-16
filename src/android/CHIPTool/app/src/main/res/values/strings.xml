@@ -95,6 +95,7 @@
     <string name="wildcard_btn_text">Wildcard</string>
 
     <string name="multi_admin_client_btn_text">Multi-admin cluster</string>
+    <string name="enter_commissioning_timeout_hint_text">Enter Commissioning timeout</string>
     <string name="basic_commissioning_method_btn_text">Basic Commissioning Method</string>
     <string name="enter_discriminator_hint_text">Enter Discriminator</string>
     <string name="enter_setup_pin_code_hint_text">Enter Setup PIN Code</string>

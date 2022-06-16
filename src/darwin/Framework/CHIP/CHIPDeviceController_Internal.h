@@ -33,7 +33,7 @@
 @class MatterControllerFactory;
 
 namespace chip {
-class FabricInfo;
+class FabricTable;
 } // namespace chip
 
 NS_ASSUME_NONNULL_BEGIN
@@ -66,16 +66,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithFactory:(MatterControllerFactory *)factory queue:(dispatch_queue_t)queue;
 
 /**
- * Check whether this controller is running on the given fabric.  The FabricInfo
- * might be from a one-off fabric table.  This method MUST be called from the
- * Matter work queue.
+ * Check whether this controller is running on the given fabric, as represented
+ * by the provided FabricTable and fabric index.  The provided fabric table may
+ * not be the same as the fabric table this controller is using. This method
+ * MUST be called from the Matter work queue.
  *
  * Might return failure, in which case we don't know whether it's running on the
  * given fabric.  Otherwise it will set *isRunning to the right boolean value.
  *
  * Only MatterControllerFactory should be calling this.
  */
-- (CHIP_ERROR)isRunningOnFabric:(chip::FabricInfo *)fabric isRunning:(BOOL *)isRunning;
+- (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
+                    fabricIndex:(chip::FabricIndex)fabricIndex
+                      isRunning:(BOOL *)isRunning;
 
 @end
 

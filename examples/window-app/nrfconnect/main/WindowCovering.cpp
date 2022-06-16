@@ -91,17 +91,15 @@ chip::Percent100ths WindowCovering::CalculateSingleStep(MoveType aMoveType)
     NPercent100ths current{};
     OperationalState opState{};
 
-    OperationalStatus opStatus = OperationalStatusGet(Endpoint());
-
     if (aMoveType == MoveType::LIFT)
     {
         status  = Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current);
-        opState = opStatus.lift;
+        opState = OperationalStateGet(Endpoint(), OperationalStatus::kLift);
     }
     else if (aMoveType == MoveType::TILT)
     {
         status  = Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current);
-        opState = opStatus.tilt;
+        opState = OperationalStateGet(Endpoint(), OperationalStatus::kTilt);
     }
 
     if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
@@ -119,26 +117,7 @@ chip::Percent100ths WindowCovering::CalculateSingleStep(MoveType aMoveType)
 
 bool WindowCovering::TargetCompleted(MoveType aMoveType, NPercent100ths aCurrent, NPercent100ths aTarget)
 {
-    OperationalStatus currentOpStatus = OperationalStatusGet(Endpoint());
-    OperationalState currentOpState   = (aMoveType == MoveType::LIFT) ? currentOpStatus.lift : currentOpStatus.tilt;
-
-    if (!aCurrent.IsNull() && !aTarget.IsNull())
-    {
-        switch (currentOpState)
-        {
-        case OperationalState::MovingDownOrClose:
-            return (aCurrent.Value() >= aTarget.Value());
-        case OperationalState::MovingUpOrOpen:
-            return (aCurrent.Value() <= aTarget.Value());
-        default:
-            return true;
-        }
-    }
-    else
-    {
-        LOG_ERR("Invalid target/current positions");
-    }
-    return false;
+    return (OperationalState::Stall == ComputeOperationalState(aTarget, aCurrent));
 }
 
 void WindowCovering::StartTimer(MoveType aMoveType, uint32_t aTimeoutMs)
@@ -230,23 +209,19 @@ void WindowCovering::SetSingleStepTarget(OperationalState aDirection)
 
 void WindowCovering::UpdateOperationalStatus(MoveType aMoveType, OperationalState aDirection)
 {
-    OperationalStatus currentOpStatus = OperationalStatusGet(Endpoint());
-
     switch (aMoveType)
     {
     case MoveType::LIFT:
-        currentOpStatus.lift = aDirection;
+        OperationalStateSet(Endpoint(), OperationalStatus::kLift, aDirection);
         break;
     case MoveType::TILT:
-        currentOpStatus.tilt = aDirection;
+        OperationalStateSet(Endpoint(), OperationalStatus::kTilt, aDirection);
         break;
     case MoveType::NONE:
         break;
     default:
         break;
     }
-
-    OperationalStatusSetWithGlobalUpdated(Endpoint(), currentOpStatus);
 }
 
 void WindowCovering::SetTargetPosition(OperationalState aDirection, chip::Percent100ths aPosition)
