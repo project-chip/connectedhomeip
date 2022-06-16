@@ -878,13 +878,13 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CONFIG_IM_BUILD_FOR_UNIT_TEST
+ * @def CONFIG_BUILD_FOR_UNIT_TEST
  *
- * @brief Defines whether we're currently building the IM for unit testing, which enables a set of features
+ * @brief Defines whether we're currently building for unit testing, which enables a set of features
  *        that are only utilized in those tests.
  */
-#ifndef CONFIG_IM_BUILD_FOR_UNIT_TEST
-#define CONFIG_IM_BUILD_FOR_UNIT_TEST 0
+#ifndef CONFIG_BUILD_FOR_UNIT_TEST
+#define CONFIG_BUILD_FOR_UNIT_TEST 0
 #endif
 
 /**
