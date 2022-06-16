@@ -161,7 +161,7 @@ CHIP_ERROR CHIPP256KeypairBridge::MatterPubKeyFromSecKeyRef(SecKeyRef pubkeyRef,
         return CHIP_ERROR_INTERNAL;
     }
     chip::FixedByteSpan<kP256_PublicKey_Length> pubkeyBytes((const uint8_t *) pubkeyData.bytes);
-    *matterPubKey = P256PublicKey(pubkeyBytes);
+    *matterPubKey = pubkeyBytes;
 
     return CHIP_NO_ERROR;
 }

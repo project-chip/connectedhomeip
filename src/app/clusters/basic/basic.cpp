@@ -91,14 +91,14 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     case VendorName::Id: {
         constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxVendorNameLength;
         char vendorName[kMaxLen + 1] = { 0 };
-        status                       = ConfigurationMgr().GetVendorName(vendorName, sizeof(vendorName));
+        status                       = GetDeviceInstanceInfoProvider()->GetVendorName(vendorName, sizeof(vendorName));
         status                       = EncodeStringOnSuccess(status, aEncoder, vendorName, kMaxLen);
         break;
     }
 
     case VendorID::Id: {
         uint16_t vendorId = 0;
-        status            = ConfigurationMgr().GetVendorId(vendorId);
+        status            = GetDeviceInstanceInfoProvider()->GetVendorId(vendorId);
         if (status == CHIP_NO_ERROR)
         {
             status = aEncoder.Encode(vendorId);
@@ -109,14 +109,14 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     case ProductName::Id: {
         constexpr size_t kMaxLen      = DeviceLayer::ConfigurationManager::kMaxProductNameLength;
         char productName[kMaxLen + 1] = { 0 };
-        status                        = ConfigurationMgr().GetProductName(productName, sizeof(productName));
+        status                        = GetDeviceInstanceInfoProvider()->GetProductName(productName, sizeof(productName));
         status                        = EncodeStringOnSuccess(status, aEncoder, productName, kMaxLen);
         break;
     }
 
     case ProductID::Id: {
         uint16_t productId = 0;
-        status             = ConfigurationMgr().GetProductId(productId);
+        status             = GetDeviceInstanceInfoProvider()->GetProductId(productId);
         if (status == CHIP_NO_ERROR)
         {
             status = aEncoder.Encode(productId);

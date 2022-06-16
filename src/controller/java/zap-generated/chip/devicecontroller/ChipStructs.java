@@ -722,9 +722,12 @@ public class ChipStructs {
 
   public static class GeneralCommissioningClusterBasicCommissioningInfo {
     public Integer failSafeExpiryLengthSeconds;
+    public Integer maxCumulativeFailsafeSeconds;
 
-    public GeneralCommissioningClusterBasicCommissioningInfo(Integer failSafeExpiryLengthSeconds) {
+    public GeneralCommissioningClusterBasicCommissioningInfo(
+        Integer failSafeExpiryLengthSeconds, Integer maxCumulativeFailsafeSeconds) {
       this.failSafeExpiryLengthSeconds = failSafeExpiryLengthSeconds;
+      this.maxCumulativeFailsafeSeconds = maxCumulativeFailsafeSeconds;
     }
 
     @Override
@@ -733,6 +736,9 @@ public class ChipStructs {
       output.append("GeneralCommissioningClusterBasicCommissioningInfo {\n");
       output.append("\tfailSafeExpiryLengthSeconds: ");
       output.append(failSafeExpiryLengthSeconds);
+      output.append("\n");
+      output.append("\tmaxCumulativeFailsafeSeconds: ");
+      output.append(maxCumulativeFailsafeSeconds);
       output.append("\n");
       output.append("}\n");
       return output.toString();

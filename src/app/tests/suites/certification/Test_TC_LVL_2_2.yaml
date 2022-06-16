@@ -50,17 +50,12 @@ tests:
           constraints:
               type: uint16
 
-    - label: "writes default value of OnOffTransitionTime attribute"
-      command: "writeAttribute"
-      attribute: "on off transition time"
-      arguments:
-          value: 0
-
     #Issue 13414
     - label: "Reads the OnLevel attribute from the DUT"
       command: "readAttribute"
       attribute: "on level"
       response:
+          saveAs: OnLevelValue
           constraints:
               type: uint8
 
@@ -77,12 +72,14 @@ tests:
           value: 254
           constraints:
               type: uint8
+              notValue: OnLevelValue
 
     #Issue 13414
     - label: "Reads the OnTransitionTime attribute from the DUT"
       command: "readAttribute"
       attribute: "on transition time"
       response:
+          saveAs: OnTransitionTimeValue
           constraints:
               type: uint16
 
@@ -99,12 +96,14 @@ tests:
           value: 100
           constraints:
               type: uint16
+              notValue: OnTransitionTimeValue
 
     #Issue -13414
     - label: "Reads the OffTransitionTime attribute from the DUT"
       command: "readAttribute"
       attribute: "off transition time"
       response:
+          saveAs: OffTransitionTimeValue
           constraints:
               type: uint16
 
@@ -121,6 +120,7 @@ tests:
           value: 100
           constraints:
               type: uint16
+              notValue: OffTransitionTimeValue
 
     - label: "Reads the DefaultMoveRate attribute from the DUT"
       command: "readAttribute"
@@ -149,6 +149,7 @@ tests:
       command: "readAttribute"
       attribute: "start up current level"
       response:
+          saveAs: StartUpCurrentLevelValue
           constraints:
               type: uint8
 
@@ -165,3 +166,10 @@ tests:
           value: 254
           constraints:
               type: uint8
+              notValue: StartUpCurrentLevelValue
+
+    - label: "writes back default value of OnOffTransitionTime attribute"
+      command: "writeAttribute"
+      attribute: "on off transition time"
+      arguments:
+          value: 0

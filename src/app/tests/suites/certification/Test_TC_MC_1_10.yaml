@@ -36,13 +36,16 @@ tests:
       attribute: "ClusterRevision"
       response:
           value: 1
-
-    - label: "Read the global attribute constraints: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
           constraints:
               type: uint16
+
+    - label: "Read FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
 
     #Issue 10988
     - label: "Read the global attribute: AttributeList"
@@ -50,7 +53,7 @@ tests:
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 2, 3, 4, 5, 6, 7, 65528, 65529, 65531, 65532, 65533]
+          value: [2, 4, 5, 6, 7, 65528, 65529, 65531, 65532, 65533]
           constraints:
               type: list
 
@@ -89,20 +92,3 @@ tests:
           value: [2]
           constraints:
               type: list
-
-    - label:
-          "Read FeatureMap attribute from the DUT and verify response has the
-          value 0 or throws a general error if the attribute is not supported.."
-      verification: |
-          ./chip-tool  targetnavigator read  feature-map 1 3
-          [1646117330.365338][8706:8711] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86
-          [1646117330.365410][8706:8711] CHIP:EM: Sending Standalone Ack for MessageCounter:10744435 on exchange 3932i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"

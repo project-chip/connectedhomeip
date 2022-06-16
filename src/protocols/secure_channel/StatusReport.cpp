@@ -32,14 +32,15 @@ namespace chip {
 namespace Protocols {
 namespace SecureChannel {
 
-StatusReport::StatusReport() : mGeneralCode(GeneralStatusCode::kSuccess), mProtocolId(0), mProtocolCode(0), mProtocolData(nullptr)
+StatusReport::StatusReport() :
+    mGeneralCode(GeneralStatusCode::kSuccess), mProtocolId(SecureChannel::Id), mProtocolCode(0), mProtocolData(nullptr)
 {}
 
-StatusReport::StatusReport(GeneralStatusCode generalCode, uint32_t protocolId, uint16_t protocolCode) :
+StatusReport::StatusReport(GeneralStatusCode generalCode, Protocols::Id protocolId, uint16_t protocolCode) :
     mGeneralCode(generalCode), mProtocolId(protocolId), mProtocolCode(protocolCode), mProtocolData(nullptr)
 {}
 
-StatusReport::StatusReport(GeneralStatusCode generalCode, uint32_t protocolId, uint16_t protocolCode,
+StatusReport::StatusReport(GeneralStatusCode generalCode, Protocols::Id protocolId, uint16_t protocolCode,
                            System::PacketBufferHandle protocolData) :
     mGeneralCode(generalCode),
     mProtocolId(protocolId), mProtocolCode(protocolCode), mProtocolData(std::move(protocolData))
@@ -54,7 +55,9 @@ CHIP_ERROR StatusReport::Parse(System::PacketBufferHandle buf)
     uint8_t * bufStart = buf->Start();
     LittleEndian::Reader bufReader(bufStart, buf->DataLength());
 
-    ReturnErrorOnFailure(bufReader.Read16(&tempGeneralCode).Read32(&mProtocolId).Read16(&mProtocolCode).StatusCode());
+    uint32_t protocolId;
+    ReturnErrorOnFailure(bufReader.Read16(&tempGeneralCode).Read32(&protocolId).Read16(&mProtocolCode).StatusCode());
+    mProtocolId  = Protocols::Id::FromFullyQualifiedSpecForm(protocolId);
     mGeneralCode = static_cast<GeneralStatusCode>(tempGeneralCode);
 
     // Any data that exists after the required fields is considered protocol-specific data.
@@ -78,7 +81,7 @@ CHIP_ERROR StatusReport::Parse(System::PacketBufferHandle buf)
 
 Encoding::LittleEndian::BufferWriter & StatusReport::WriteToBuffer(Encoding::LittleEndian::BufferWriter & buf) const
 {
-    buf.Put16(to_underlying(mGeneralCode)).Put32(mProtocolId).Put16(mProtocolCode);
+    buf.Put16(to_underlying(mGeneralCode)).Put32(mProtocolId.ToFullyQualifiedSpecForm()).Put16(mProtocolCode);
     if (!mProtocolData.IsNull())
     {
         buf.Put(mProtocolData->Start(), mProtocolData->DataLength());

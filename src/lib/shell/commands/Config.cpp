@@ -45,7 +45,7 @@ static CHIP_ERROR ConfigGetVendorId(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetVendorId(value16));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(value16));
     if (printHeader)
     {
         streamer_printf(sout, "VendorId:        ");
@@ -64,7 +64,7 @@ static CHIP_ERROR ConfigGetProductId(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetProductId(value16));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(value16));
     if (printHeader)
     {
         streamer_printf(sout, "ProductId:       ");

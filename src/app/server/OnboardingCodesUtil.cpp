@@ -26,6 +26,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
@@ -121,17 +122,17 @@ CHIP_ERROR GetPayloadContents(chip::PayloadContents & aPayload, chip::Rendezvous
         return err;
     }
 
-    err = ConfigurationMgr().GetVendorId(aPayload.vendorID);
+    err = chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(aPayload.vendorID);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "ConfigurationMgr().GetVendorId() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "GetDeviceInstanceInfoProvider()->GetVendorId() failed: %s", chip::ErrorStr(err));
         return err;
     }
 
-    err = ConfigurationMgr().GetProductId(aPayload.productID);
+    err = chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(aPayload.productID);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "ConfigurationMgr().GetProductId() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "GetDeviceInstanceInfoProvider()->GetProductId() failed: %s", chip::ErrorStr(err));
         return err;
     }
 

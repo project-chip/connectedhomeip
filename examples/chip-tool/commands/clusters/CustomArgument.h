@@ -22,6 +22,8 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeInt.h>
 
+#include "JsonParser.h"
+
 namespace {
 static constexpr char kPayloadHexPrefix[]         = "hex:";
 static constexpr char kPayloadSignedPrefix[]      = "s:";
@@ -230,9 +232,30 @@ public:
 
     CHIP_ERROR Parse(const char * label, const char * json)
     {
-        Json::Reader reader;
         Json::Value value;
-        reader.parse(json, value);
+        constexpr const char kHexNumPrefix[] = "0x";
+        constexpr size_t kHexNumPrefixLen    = ArraySize(kHexNumPrefix) - 1;
+        if (strncmp(json, kPayloadHexPrefix, kPayloadHexPrefixLen) == 0 ||
+            strncmp(json, kPayloadSignedPrefix, kPayloadSignedPrefixLen) == 0 ||
+            strncmp(json, kPayloadUnsignedPrefix, kPayloadUnsignedPrefixLen) == 0 ||
+            strncmp(json, kPayloadFloatPrefix, kPayloadFloatPrefixLen) == 0 ||
+            strncmp(json, kPayloadDoublePrefix, kPayloadDoublePrefixLen) == 0)
+        {
+            value = Json::Value(json);
+        }
+        else if (strncmp(json, kHexNumPrefix, kHexNumPrefixLen) == 0)
+        {
+            // Assume that hex numbers are unsigned.  Prepend
+            // kPayloadUnsignedPrefix and then let the rest of the logic handle
+            // things.
+            std::string str(kPayloadUnsignedPrefix);
+            str += json;
+            value = Json::Value(str);
+        }
+        else if (!JsonParser::ParseCustomArgument(label, json, value))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
 
         mData = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(sizeof(uint8_t), mDataMaxLen));
         VerifyOrReturnError(mData != nullptr, CHIP_ERROR_NO_MEMORY);

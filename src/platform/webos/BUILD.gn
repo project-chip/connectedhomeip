@@ -80,6 +80,8 @@ static_library("webos") {
     "ConnectivityUtils.h",
     "DeviceInfoProviderImpl.cpp",
     "DeviceInfoProviderImpl.h",
+    "DeviceInstanceInfoProviderImpl.cpp",
+    "DeviceInstanceInfoProviderImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",

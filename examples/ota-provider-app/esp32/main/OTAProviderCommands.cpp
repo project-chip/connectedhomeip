@@ -21,6 +21,8 @@
 #include <lib/shell/commands/Help.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
+
 namespace chip {
 namespace Shell {
 namespace {
@@ -36,6 +38,26 @@ CHIP_ERROR DelayedActionTimeHandler(int argc, char ** argv)
     const uint32_t delay = strtoul(argv[0], nullptr, 10);
     exampleOTAProvider->SetDelayedQueryActionTimeSec(delay);
     exampleOTAProvider->SetDelayedApplyActionTimeSec(delay);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ApplyUpdateActionHandler(int argc, char ** argv)
+{
+    VerifyOrReturnError(argc == 1, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(exampleOTAProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    if (strcmp(argv[0], "proceed") == 0)
+    {
+        exampleOTAProvider->SetApplyUpdateAction(OTAApplyUpdateAction::kProceed);
+    }
+    else if (strcmp(argv[0], "awaitNextAction") == 0)
+    {
+        exampleOTAProvider->SetApplyUpdateAction(OTAApplyUpdateAction::kAwaitNextAction);
+    }
+    else if (strcmp(argv[0], "discontinue") == 0)
+    {
+        exampleOTAProvider->SetApplyUpdateAction(OTAApplyUpdateAction::kDiscontinue);
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -68,6 +90,9 @@ void OTAProviderCommands::Register()
         { &DelayedActionTimeHandler, "delay",
           "Set delayed action time for QueryImageResponse and ApplyUpdateResponse\n"
           "Usage: OTAProvider delay <delay in seconds>" },
+        { &ApplyUpdateActionHandler, "applyUpdateAction",
+          "Set apply update action in the apply ApplyUpdateResponse\n"
+          "Usage: OTAProvider applyUpdateAction <proceed/awaitNextAction/discontinue>" },
     };
 
     sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));

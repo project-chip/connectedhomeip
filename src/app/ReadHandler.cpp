@@ -41,10 +41,10 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
                          InteractionType aInteractionType) :
     mManagementCallback(apCallback)
 {
-    mpExchangeCtx                = apExchangeContext;
-    mInteractionType             = aInteractionType;
-    mLastWrittenEventsBytes      = 0;
-    mSubscriptionStartGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
+    mpExchangeCtx               = apExchangeContext;
+    mInteractionType            = aInteractionType;
+    mLastWrittenEventsBytes     = 0;
+    mTransactionStartGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
     mFlags.ClearAll();
     mFlags.Set(ReadHandlerFlags::PrimingReports, true);
     if (apExchangeContext != nullptr)
@@ -384,10 +384,6 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
         }
     }
     ReturnErrorOnFailure(err);
-
-    // Ensure the read transaction doesn't exceed the resources dedicated to
-    // read transactions.
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->CanEstablishReadTransaction(this));
 
     bool isFabricFiltered;
     ReturnErrorOnFailure(readRequestParser.GetIsFabricFiltered(&isFabricFiltered));

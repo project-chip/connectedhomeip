@@ -44,6 +44,7 @@ RUN set -x \
     http://download.tizen.org/sdk/tizenstudio/official/binary/certificate-generator_0.1.3_ubuntu-64.zip \
     http://download.tizen.org/sdk/tizenstudio/official/binary/new-common-cli_2.5.7_ubuntu-64.zip \
     http://download.tizen.org/sdk/tizenstudio/official/binary/new-native-cli_2.5.7_ubuntu-64.zip \
+    http://download.tizen.org/sdk/tizenstudio/official/binary/sdb_4.2.23_ubuntu-64.zip \
     # Install tizen studio CLI
     && unzip -o '*.zip' \
     && cp -rf data/* $TIZEN_SDK_ROOT \
@@ -56,7 +57,7 @@ RUN set -x \
 
 COPY secret-tool.py $TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool
 RUN chmod 0755 $TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool
-ENV PATH="$TIZEN_SDK_ROOT/tools/ide/bin:$PATH"
+ENV PATH="$TIZEN_SDK_ROOT/tools/ide/bin:$TIZEN_SDK_ROOT/tools:$PATH"
 
 # ------------------------------------------------------------------------------
 # Get toolchain
@@ -94,8 +95,11 @@ RUN set -x \
     -A 'libffi-devel-*.armv7l.rpm' \
     -A 'liblzma-*.armv7l.rpm' \
     -A 'libmount-devel-*.armv7l.rpm' \
+    -A 'libncurses6-*.armv7l.rpm' \
+    -A 'libreadline-*.armv7l.rpm' \
     -A 'libuuid-*.armv7l.rpm' \
     -A 'pcre-devel-*.armv7l.rpm' \
+    -A 'readline-devel-*.armv7l.rpm' \
     -A 'xdgmime-*.armv7l.rpm' \
     # Unified packages
     && wget --progress=dot:mega -r -nd --no-parent \
@@ -115,6 +119,7 @@ RUN set -x \
     -A 'libcynara-commons-*.armv7l.rpm' \
     -A 'libdns_sd-*.armv7l.rpm' \
     -A 'libjson-glib-*.armv7l.rpm' \
+    -A 'libsessiond-0*.armv7l.rpm' \
     -A 'libsystemd-*.armv7l.rpm' \
     -A 'libtzplatform-config-*.armv7l.rpm' \
     -A 'parcel-0*.armv7l.rpm' \
@@ -134,10 +139,10 @@ RUN set -x \
     # Install packages
     && unrpm *.rpm \
     && cp -rf lib usr $TIZEN_SDK_SYSROOT \
-    # Fix some symbolic links
-    && ln -sf libcap.so.2 $TIZEN_SDK_SYSROOT/usr/lib/libcap.so \
-    && ln -sf libdns_sd.so.878.70.2 $TIZEN_SDK_SYSROOT/usr/lib/libdns_sd.so \
-    && ln -sf libdns_sd.so.878.70.2 $TIZEN_SDK_SYSROOT/usr/lib/libdns_sd.so.878 \
+    # Make symbolic links relative
+    && for LNK in $(find $TIZEN_SDK_SYSROOT/usr/lib -maxdepth 1 -type l); \
+    do ln -sf $(basename $(readlink "$LNK")) "$LNK" ; done \
+    && ln -sf ../../lib/libcap.so.2 $TIZEN_SDK_SYSROOT/usr/lib/libcap.so \
     && ln -sf openssl1.1.pc $TIZEN_SDK_SYSROOT/usr/lib/pkgconfig/openssl.pc \
     # Cleanup
     && rm -rf /tmp/workdir \
