@@ -50,15 +50,7 @@ static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 static_assert(kUndefinedFabricIndex < chip::kMinValidFabricIndex, "Undefined fabric index should not be valid");
 
 /**
- * Defines state of a pairing established by a fabric.
- * Node ID is only settable using the device operational credentials.
- *
- * Information contained within the state:
- *   - Fabric identification
- *   - Node Id assigned by the fabric to the device
- *   - Vendor Id
- *   - Fabric Id
- *   - Device operational credentials
+ * Provides access to the core metadata for a given fabric to which a node is joined.
  */
 class DLL_EXPORT FabricInfo
 {
@@ -133,9 +125,6 @@ public:
      */
     CHIP_ERROR SetExternallyOwnedOperationalKeypair(Crypto::P256Keypair * keyPair);
 
-    // TODO - Update these APIs to take ownership of the buffer, instead of copying
-    //        internally.
-    // TODO - Optimize persistent storage of NOC and Root Cert in FabricInfo.
     CHIP_ERROR SetRootCert(const chip::ByteSpan & cert) { return SetCert(mRootCert, cert); }
     CHIP_ERROR SetICACert(const chip::ByteSpan & cert) { return SetCert(mICACert, cert); }
     CHIP_ERROR SetICACert(const Optional<ByteSpan> & cert) { return SetICACert(cert.ValueOr(ByteSpan())); }
@@ -144,39 +133,6 @@ public:
     bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
 
     bool HasOperationalKey() const { return mOperationalKey != nullptr; }
-
-    // TODO - Refactor storing and loading of fabric info from persistent storage.
-    //        The op cert array doesn't need to be in RAM except when it's being
-    //        transmitted to peer node during CASE session setup.
-    CHIP_ERROR GetRootCert(ByteSpan & cert) const
-    {
-        ReturnErrorCodeIf(mRootCert.empty(), CHIP_ERROR_INCORRECT_STATE);
-        cert = mRootCert;
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR GetICACert(ByteSpan & cert) const
-    {
-        cert = mICACert;
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR GetNOCCert(ByteSpan & cert) const
-    {
-        ReturnErrorCodeIf(mNOCCert.empty(), CHIP_ERROR_INCORRECT_STATE);
-        cert = mNOCCert;
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR GetTrustedRootId(Credentials::CertificateKeyId & skid) const
-    {
-        return Credentials::ExtractSKIDFromChipCert(mRootCert, skid);
-    }
-
-    CHIP_ERROR GetRootPubkey(Credentials::P256PublicKeySpan & publicKey) const
-    {
-        return Credentials::ExtractPublicKeyFromChipCert(mRootCert, publicKey);
-    }
 
     // Verifies credentials, using this fabric info's root certificate.
     CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, Credentials::ValidationContext & context,
@@ -246,6 +202,30 @@ protected:
      * @return CHIP_NO_ERROR on success or another CHIP_ERROR on crypto internal errors
      */
     CHIP_ERROR SignWithOpKeypair(ByteSpan message, Crypto::P256ECDSASignature & outSignature) const;
+
+    CHIP_ERROR FetchRootCert(MutableByteSpan & outCert) const
+    {
+        ReturnErrorCodeIf(mRootCert.empty(), CHIP_ERROR_INCORRECT_STATE);
+        return CopySpanToMutableSpan(mRootCert, outCert);
+    }
+
+    CHIP_ERROR FetchICACert(MutableByteSpan & outCert) const
+    {
+        if (mICACert.empty())
+        {
+            outCert.reduce_size(0);
+            return CHIP_NO_ERROR;
+        }
+        return CopySpanToMutableSpan(mICACert, outCert);
+    }
+
+    CHIP_ERROR FetchNOCCert(MutableByteSpan & outCert) const
+    {
+        ReturnErrorCodeIf(mNOCCert.empty(), CHIP_ERROR_INCORRECT_STATE);
+        return CopySpanToMutableSpan(mNOCCert, outCert);
+    }
+
+    CHIP_ERROR FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) const;
 
     static constexpr size_t MetadataTLVMaxSize()
     {
@@ -424,7 +404,7 @@ public:
      */
     CHIP_ERROR UpdateFabric(FabricIndex fabricIndex, FabricInfo & fabricInfo);
 
-    FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
+    FabricInfo * FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
     const FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex) const;
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
@@ -488,6 +468,11 @@ public:
     ConstFabricIterator cend() const { return ConstFabricIterator(mStates, CHIP_CONFIG_MAX_FABRICS, CHIP_CONFIG_MAX_FABRICS); }
     ConstFabricIterator begin() const { return cbegin(); }
     ConstFabricIterator end() const { return cend(); }
+
+    CHIP_ERROR FetchRootCert(FabricIndex fabricIndex, MutableByteSpan & outCert) const;
+    CHIP_ERROR FetchICACert(FabricIndex fabricIndex, MutableByteSpan & outCert) const;
+    CHIP_ERROR FetchNOCCert(FabricIndex fabricIndex, MutableByteSpan & outCert) const;
+    CHIP_ERROR FetchRootPubkey(FabricIndex fabricIndex, Crypto::P256PublicKey & outPublicKey) const;
 
     /**
      * @brief Sign a message with a given fabric's operational keypair. This is used for

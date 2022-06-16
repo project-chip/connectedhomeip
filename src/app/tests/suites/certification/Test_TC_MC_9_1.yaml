@@ -70,9 +70,7 @@ tests:
           constraints:
               type: uint16
 
-    #Issue 18103
     - label: "Reads the Application attribute"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "Application"
       response:

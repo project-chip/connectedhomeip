@@ -565,7 +565,7 @@ void DefaultOTARequestor::NotifyUpdateApplied()
 {
     // Log the VersionApplied event
     uint16_t productId;
-    if (DeviceLayer::ConfigurationMgr().GetProductId(productId) != CHIP_NO_ERROR)
+    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(productId) != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Cannot get Product ID");
         RecordErrorUpdateState(CHIP_ERROR_INCORRECT_STATE);
@@ -722,10 +722,10 @@ CHIP_ERROR DefaultOTARequestor::SendQueryImageRequest(OperationalDeviceProxy & d
     QueryImage::Type args;
 
     uint16_t vendorId;
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetVendorId(vendorId));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(vendorId));
     args.vendorId = static_cast<VendorId>(vendorId);
 
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetProductId(args.productId));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(args.productId));
 
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(args.softwareVersion));
 

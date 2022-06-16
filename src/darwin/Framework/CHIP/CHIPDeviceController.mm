@@ -730,7 +730,9 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
     return fabricIdx;
 }
 
-- (CHIP_ERROR)isRunningOnFabric:(chip::FabricInfo *)fabric isRunning:(BOOL *)isRunning
+- (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
+                    fabricIndex:(chip::FabricIndex)fabricIndex
+                      isRunning:(BOOL *)isRunning
 {
     if (![self isRunning]) {
         *isRunning = NO;
@@ -743,16 +745,28 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    if (ourFabric->GetFabricId() != fabric->GetFabricId()) {
+    chip::FabricInfo * otherFabric = fabricTable->FindFabricWithIndex(fabricIndex);
+    if (!otherFabric) {
+        // Also surprising!
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if (ourFabric->GetFabricId() != otherFabric->GetFabricId()) {
         *isRunning = NO;
         return CHIP_NO_ERROR;
     }
 
-    chip::Credentials::P256PublicKeySpan ourRootPublicKey, otherRootPublicKey;
-    ReturnErrorOnFailure(ourFabric->GetRootPubkey(ourRootPublicKey));
-    ReturnErrorOnFailure(fabric->GetRootPubkey(otherRootPublicKey));
+    const chip::FabricTable * ourFabricTable = _cppCommissioner->GetFabricTable();
+    if (!ourFabricTable) {
+        // Surprising as well!
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
-    *isRunning = (ourRootPublicKey.data_equal(otherRootPublicKey));
+    chip::Crypto::P256PublicKey ourRootPublicKey, otherRootPublicKey;
+    ReturnErrorOnFailure(ourFabricTable->FetchRootPubkey(ourFabric->GetFabricIndex(), ourRootPublicKey));
+    ReturnErrorOnFailure(fabricTable->FetchRootPubkey(otherFabric->GetFabricIndex(), otherRootPublicKey));
+
+    *isRunning = (ourRootPublicKey.Matches(otherRootPublicKey));
     return CHIP_NO_ERROR;
 }
 

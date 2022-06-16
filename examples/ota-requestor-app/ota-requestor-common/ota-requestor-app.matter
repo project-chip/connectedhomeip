@@ -175,6 +175,7 @@ server cluster GeneralCommissioning = 48 {
 
   struct BasicCommissioningInfo {
     int16u failSafeExpiryLengthSeconds = 0;
+    int16u maxCumulativeFailsafeSeconds = 1;
   }
 
   attribute access(write: administer) int64u breadcrumb = 0;
@@ -939,6 +940,22 @@ endpoint 0 {
     callback attribute labelList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
+  }
+}
+endpoint 65534 {
+  device type anonymousEndpointType = 61442;
+
+  server cluster NetworkCommissioning {
+    callback attribute maxNetworks;
+    callback attribute networks;
+    callback attribute scanMaxTimeSeconds;
+    callback attribute connectMaxTimeSeconds;
+    callback attribute interfaceEnabled;
+    callback attribute lastNetworkingStatus;
+    callback attribute lastNetworkID;
+    callback attribute lastConnectErrorValue;
+    callback attribute featureMap;
+    callback attribute clusterRevision default = 1;
   }
 }
 

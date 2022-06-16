@@ -18,27 +18,103 @@
 
 set -e
 set -x
-if [ "$#" != 2 ]; then
+if [ "$#" != 2 && "$#" != 3 ]; then
     exit -1
 fi
 
 source "$(dirname "$0")/../../scripts/activate.sh"
 
-if [ "$IMX_SDK_ROOT" = "" ]; then
-    echo "the Yocto SDK path is not specified with the shell env IMX_SDK_ROOT"
+if [ "$IMX_SDK_ROOT" = "" -o ! -d "$IMX_SDK_ROOT" ]; then
+    echo "the Yocto SDK path is not specified with the shell env IMX_SDK_ROOT or an invalid path is specified"
     exit -1
 fi
 env
 
+entries="$(echo "$(ls "$IMX_SDK_ROOT")" | tr -s '\n' ',')"
+IFS=',' read -ra entry_array <<<"$entries"
+for entry in "${entry_array[@]}"; do
+    if [ "$(echo "$entry" | grep -E "^environment-setup-")" != "" ]; then
+        env_setup_script=$entry
+        break
+    fi
+done
+
+if [ -z "$env_setup_script" ]; then
+    echo "The SDK environment setup script is not found, make sure the env IMX_SDK_ROOT is correctly set."
+    exit 1
+fi
+
+while read line; do
+    # trim the potential whitespaces
+    line=$(echo "$line" | xargs)
+
+    if [ "$(echo "$line" | grep -E "^export SDKTARGETSYSROOT=")" != "" ]; then
+        sdk_target_sysroot=${line#"export SDKTARGETSYSROOT="}
+    fi
+
+    if [ "$(echo "$line" | grep -E "^export CC=")" != "" ]; then
+        cc=${line#"export CC="}
+        cc=${cc#"\""}
+        cc=${cc%"\""}
+        cc=${cc/"\$SDKTARGETSYSROOT"/$sdk_target_sysroot}
+    fi
+
+    if [ "$(echo "$line" | grep -E "^export CXX=")" != "" ]; then
+        cxx=${line#"export CXX="}
+        cxx=${cxx#"\""}
+        cxx=${cxx%"\""}
+        cxx=${cxx/"\$SDKTARGETSYSROOT"/$sdk_target_sysroot}
+    fi
+
+    if [ "$(echo "$line" | grep -E "^export ARCH=")" != "" ]; then
+        target_cpu=${line#"export ARCH="}
+
+        if [ "$target_cpu" = "arm64" ]; then
+            arm_arch="armv8-a"
+        elif [ "$target_cpu" = "arm" ]; then
+            arm_arch="armv7ve"
+        else
+            echo "ARCH should be arm64 or arm in the SDK environment setup script."
+            exit 1
+        fi
+    fi
+
+    if [ "$(echo "$line" | grep -E "^export CROSS_COMPILE=")" != "" ]; then
+        cross_compile=${line#"export CROSS_COMPILE="}
+        cross_compile=${cross_compile%"-"}
+    fi
+done <"$IMX_SDK_ROOT/$env_setup_script"
+
+if [ -z "$sdk_target_sysroot" ]; then
+    echo "SDKTARGETSYSROOT is not found in the SDK environment setup script."
+    exit 1
+fi
+
+if [ -z "$cc" -o -z "$cxx" ]; then
+    echo "CC and/or CXX are not found in the SDK environment setup script."
+    exit 1
+fi
+
+if [ -z "$target_cpu" -o -z "$cross_compile" ]; then
+    echo "ARCH and/or CROSS_COMPILE are not found in the SDK environment setup script."
+    exit 1
+fi
+
+release_build=true
+if [ "$3" = "debug" ]; then
+    release_build=false
+fi
+
 PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"'
-PKG_CONFIG_PATH=$IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig \
-    gn gen --check --fail-on-unused-args --root="$1" "$2" --args="target_os=\"linux\" target_cpu=\"arm64\" arm_arch=\"armv8-a\"
+gn gen --check --fail-on-unused-args --root="$1" "$2" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\"
+treat_warnings_as_errors=false
 import(\"//build_overrides/build.gni\")
-sysroot=\"$IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux\"
+sysroot=\"$sdk_target_sysroot\"
 target_cflags=[ \"$PLATFORM_CFLAGS\" ]
 custom_toolchain=\"\${build_root}/toolchain/custom\"
-target_cc=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc\"
-target_cxx=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++\"
-target_ar=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar\""
+target_cc=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/$cross_compile/$cc\"
+target_cxx=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/$cross_compile/$cxx\"
+target_ar=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/$cross_compile/$cross_compile-ar\"
+$(if [ "$release_build" = "true" ]; then echo "is_debug=false"; else echo "optimize_debug=true"; fi)"
 
 ninja -C "$2"

@@ -24,12 +24,15 @@
 #include <stdint.h>
 
 #include <functional>
+#include <vector>
+
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::BridgedActions;
 
 class Device
 {
 public:
-    static const int kDeviceNameSize     = 32;
-    static const int kDeviceLocationSize = 32;
+    static const int kDeviceNameSize = 32;
 
     enum Changed_t
     {
@@ -39,17 +42,21 @@ public:
         kChanged_Last      = kChanged_Name,
     } Changed;
 
-    Device(const char * szDeviceName, const char * szLocation);
+    Device(const char * szDeviceName, std::string szLocation);
     virtual ~Device() {}
 
     bool IsReachable();
     void SetReachable(bool aReachable);
     void SetName(const char * szDeviceName);
-    void SetLocation(const char * szLocation);
+    void SetLocation(std::string szLocation);
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
+    inline void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; };
+    inline chip::EndpointId GetParentEndpointId() { return mParentEndpointId; };
     inline char * GetName() { return mName; };
-    inline char * GetLocation() { return mLocation; };
+    inline std::string GetLocation() { return mLocation; };
+    inline std::string GetZone() { return mZone; };
+    inline void SetZone(std::string zone) { mZone = zone; };
 
 private:
     virtual void HandleDeviceChange(Device * device, Device::Changed_t changeMask) = 0;
@@ -57,8 +64,10 @@ private:
 protected:
     bool mReachable;
     char mName[kDeviceNameSize];
-    char mLocation[kDeviceLocationSize];
+    std::string mLocation;
     chip::EndpointId mEndpointId;
+    chip::EndpointId mParentEndpointId;
+    std::string mZone;
 };
 
 class DeviceOnOff : public Device
@@ -69,7 +78,7 @@ public:
         kChanged_OnOff = kChanged_Last << 1,
     } Changed;
 
-    DeviceOnOff(const char * szDeviceName, const char * szLocation);
+    DeviceOnOff(const char * szDeviceName, std::string szLocation);
 
     bool IsOn();
     void SetOnOff(bool aOn);
@@ -96,7 +105,7 @@ public:
         kChanged_MultiPressMax     = kChanged_Last << 3,
     } Changed;
 
-    DeviceSwitch(const char * szDeviceName, const char * szLocation, uint32_t aFeatureMap);
+    DeviceSwitch(const char * szDeviceName, std::string szLocation, uint32_t aFeatureMap);
 
     void SetNumberOfPositions(uint8_t aNumberOfPositions);
     void SetCurrentPosition(uint8_t aCurrentPosition);
@@ -124,7 +133,7 @@ private:
 class ComposedDevice : public Device
 {
 public:
-    ComposedDevice(const char * szDeviceName, const char * szLocation) : Device(szDeviceName, szLocation){};
+    ComposedDevice(const char * szDeviceName, std::string szLocation) : Device(szDeviceName, szLocation){};
 
     using DeviceCallback_fn = std::function<void(ComposedDevice *, ComposedDevice::Changed_t)>;
 
@@ -146,7 +155,7 @@ public:
         kChanged_Description = kChanged_Last << 2,
     } Changed;
 
-    DevicePowerSource(const char * szDeviceName, const char * szLocation, uint32_t aFeatureMap) :
+    DevicePowerSource(const char * szDeviceName, std::string szLocation, uint32_t aFeatureMap) :
         Device(szDeviceName, szLocation), mFeatureMap(aFeatureMap){};
 
     using DeviceCallback_fn = std::function<void(DevicePowerSource *, DevicePowerSource::Changed_t)>;
@@ -171,4 +180,41 @@ private:
     std::string mDescription = "Primary Battery";
     uint32_t mFeatureMap;
     DeviceCallback_fn mChanged_CB;
+};
+
+class EndpointListInfo
+{
+public:
+    EndpointListInfo(uint16_t endpointListId, std::string name, EndpointListTypeEnum type);
+    EndpointListInfo(uint16_t endpointListId, std::string name, EndpointListTypeEnum type, chip::EndpointId endpointId);
+    void AddEndpointId(chip::EndpointId endpointId);
+    inline uint16_t GetEndpointListId() { return mEndpointListId; };
+    std::string GetName() { return mName; };
+    inline EndpointListTypeEnum GetType() { return mType; };
+    inline chip::EndpointId * GetEndpointListData() { return mEndpoints.data(); };
+    inline size_t GetEndpointListSize() { return mEndpoints.size(); };
+
+private:
+    uint16_t mEndpointListId = static_cast<uint16_t>(0);
+    std::string mName;
+    EndpointListTypeEnum mType = static_cast<EndpointListTypeEnum>(0);
+    std::vector<chip::EndpointId> mEndpoints;
+};
+
+class Room
+{
+public:
+    Room(std::string name, uint16_t endpointListId, EndpointListTypeEnum type, bool isVisible);
+    inline void setIsVisible(bool isVisible) { mIsVisible = isVisible; };
+    inline bool getIsVisible() { return mIsVisible; };
+    inline void setName(std::string name) { mName = name; };
+    inline std::string getName() { return mName; };
+    inline EndpointListTypeEnum getType() { return mType; };
+    inline uint16_t getEndpointListId() { return mEndpointListId; };
+
+private:
+    bool mIsVisible;
+    std::string mName;
+    uint16_t mEndpointListId;
+    EndpointListTypeEnum mType;
 };
