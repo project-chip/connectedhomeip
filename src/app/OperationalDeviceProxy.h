@@ -199,7 +199,7 @@ public:
     }
 
     /**
-     * @brief Get the raw Fabric ID assigned to the device.
+     * @brief Get the fabricIndex
      */
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 

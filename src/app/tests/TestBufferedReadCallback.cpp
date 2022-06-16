@@ -185,7 +185,7 @@ void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPat
         while (iter.Next() && index < expectedListLength)
         {
             auto & iterValue = iter.GetValue();
-            NL_TEST_ASSERT(gSuite, iterValue.fabricIndex == (index));
+            NL_TEST_ASSERT(gSuite, iterValue.member1 == (index));
             index++;
         }
 
@@ -353,7 +353,7 @@ void DataSeriesGenerator::Generate()
             uint8_t index2 = 0;
             for (auto & item : listData)
             {
-                item.fabricIndex = index2;
+                item.member1 = index2;
                 index2++;
             }
 
@@ -446,7 +446,7 @@ void DataSeriesGenerator::Generate()
                 path.mAttributeId = Clusters::TestCluster::Attributes::ListStructOctetString::Id;
                 path.mListOp      = ConcreteDataAttributePath::ListOperation::AppendItem;
 
-                listItem.fabricIndex = (uint64_t) i;
+                listItem.member1 = (uint64_t) i;
 
                 NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), listItem) == CHIP_NO_ERROR);
 

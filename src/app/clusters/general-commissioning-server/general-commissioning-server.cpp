@@ -129,7 +129,10 @@ CHIP_ERROR GeneralCommissioningAttrAccess::ReadBasicCommissioningInfo(AttributeV
 
     // TODO: The commissioner might use the critical parameters in BasicCommissioningInfo to initialize
     // the CommissioningParameters at the beginning of commissioning flow.
-    basicCommissioningInfo.failSafeExpiryLengthSeconds = CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC;
+    basicCommissioningInfo.failSafeExpiryLengthSeconds  = CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC;
+    basicCommissioningInfo.maxCumulativeFailsafeSeconds = CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC;
+    static_assert(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC >= CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC,
+                  "Max cumulative failsafe seconds must be larger than failsafe expiry length seconds");
 
     return aEncoder.Encode(basicCommissioningInfo);
 }
@@ -140,7 +143,7 @@ CHIP_ERROR GeneralCommissioningAttrAccess::ReadSupportsConcurrentConnection(Attr
 
     // TODO: The commissioner might use the critical parameters in BasicCommissioningInfo to initialize
     // the CommissioningParameters at the beginning of commissioning flow.
-    supportsConcurrentConnection = (CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC) != 0;
+    supportsConcurrentConnection = (CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION) != 0;
 
     return aEncoder.Encode(supportsConcurrentConnection);
 }
@@ -154,6 +157,9 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
     MATTER_TRACE_EVENT_SCOPE("ArmFailSafe", "GeneralCommissioning");
     FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
+
+    ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
+                    static_cast<unsigned>(commandData.expiryLengthSeconds));
 
     /*
      * If the fail-safe timer is not fully disarmed, don't allow arming a new fail-safe.
@@ -214,7 +220,10 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     MATTER_TRACE_EVENT_SCOPE("CommissioningComplete", "GeneralCommissioning");
 
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    const auto & failSafe        = server->GetFailSafeContext();
+    auto & failSafe              = server->GetFailSafeContext();
+    auto & fabricTable           = Server::GetInstance().GetFabricTable();
+
+    ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
 
     Commands::CommissioningCompleteResponse::Type response;
     if (!failSafe.IsFailSafeArmed())
@@ -231,16 +240,34 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
             !failSafe.MatchesFabricIndex(commandObj->GetAccessingFabricIndex()))
         {
             response.errorCode = CommissioningError::kInvalidAuthentication;
+            ChipLogError(FailSafe, "GeneralCommissioning: Got commissioning complete in invalid security context");
         }
         else
         {
+            if (failSafe.NocCommandHasBeenInvoked())
+            {
+                CHIP_ERROR err = fabricTable.CommitPendingFabricData();
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit pending fabric data: %" CHIP_ERROR_FORMAT,
+                                 err.Format());
+                }
+                else
+                {
+                    ChipLogProgress(FailSafe, "GeneralCommissioning: Successfully commited pending fabric data");
+                }
+                CheckSuccess(err, Failure);
+            }
+
             /*
              * Pass fabric of commissioner to DeviceControlSvr.
              * This allows device to send messages back to commissioner.
              * Once bindings are implemented, this may no longer be needed.
              */
-            CheckSuccess(server->CommissioningComplete(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
-                         Failure);
+            failSafe.DisarmFailSafe();
+            CheckSuccess(
+                server->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
+                Failure);
 
             Breadcrumb::Set(commandPath.mEndpointId, 0);
             response.errorCode = CommissioningError::kOk;

@@ -271,12 +271,12 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
     if (commandHandler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for Invoke interaction");
-        aStatus = Protocols::InteractionModel::Status::Busy;
+        aStatus = Status::Busy;
         return CHIP_ERROR_NO_MEMORY;
     }
     ReturnErrorOnFailure(
         commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), aIsTimedInvoke));
-    aStatus = Protocols::InteractionModel::Status::Success;
+    aStatus = Status::Success;
     return CHIP_NO_ERROR;
 }
 
@@ -384,18 +384,53 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         }
     }
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    size_t handlerPoolCapacity = mReadHandlers.Capacity();
-    if (mReadHandlerCapacityOverride != -1)
+    if (aInteractionType == ReadHandler::InteractionType::Read)
     {
-        handlerPoolCapacity = (size_t) mReadHandlerCapacityOverride;
-    }
+        System::PacketBufferTLVReader reader;
+        reader.Init(aPayload.Retain());
 
-    if ((handlerPoolCapacity - GetNumActiveReadHandlers()) == 0)
-    {
-        return Status::ResourceExhausted;
+        ReadRequestMessage::Parser readRequestParser;
+        VerifyOrReturnError(readRequestParser.Init(reader) == CHIP_NO_ERROR, Status::Failure);
+
+        {
+            size_t requestedAttributePathCount = 0;
+            size_t requestedEventPathCount     = 0;
+            AttributePathIBs::Parser attributePathListParser;
+            CHIP_ERROR err = readRequestParser.GetAttributeRequests(&attributePathListParser);
+            if (err == CHIP_NO_ERROR)
+            {
+                TLV::TLVReader pathReader;
+                attributePathListParser.GetReader(&pathReader);
+                ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedAttributePathCount, false) != CHIP_NO_ERROR,
+                                  Status::InvalidAction);
+            }
+            else if (err != CHIP_ERROR_END_OF_TLV)
+            {
+                return Status::InvalidAction;
+            }
+            EventPathIBs::Parser eventpathListParser;
+            err = readRequestParser.GetEventRequests(&eventpathListParser);
+            if (err == CHIP_NO_ERROR)
+            {
+                TLV::TLVReader pathReader;
+                eventpathListParser.GetReader(&pathReader);
+                ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedEventPathCount, false) != CHIP_NO_ERROR,
+                                  Status::InvalidAction);
+            }
+            else if (err != CHIP_ERROR_END_OF_TLV)
+            {
+                return Status::InvalidAction;
+            }
+
+            // The following cast is safe, since we can only hold a few tens of paths in one request.
+            Status checkResult = EnsureResourceForRead(apExchangeContext->GetSessionHandle()->GetFabricIndex(),
+                                                       requestedAttributePathCount, requestedEventPathCount);
+            if (checkResult != Status::Success)
+            {
+                return checkResult;
+            }
+        }
     }
-#endif
 
     // We have already reserved enough resources for read requests, and have granted enough resources for current subscriptions, so
     // we should be able to allocate resources requested by this request.
@@ -445,13 +480,13 @@ CHIP_ERROR InteractionModelEngine::OnTimedRequest(Messaging::ExchangeContext * a
     if (handler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for Timed interaction");
-        aStatus = Protocols::InteractionModel::Status::Busy;
+        aStatus = Status::Busy;
         return CHIP_ERROR_NO_MEMORY;
     }
 
     // The timed handler takes over handling of this exchange and will do its
     // own status reporting as needed.
-    aStatus = Protocols::InteractionModel::Status::Success;
+    aStatus = Status::Success;
     apExchangeContext->SetDelegate(handler);
     return handler->OnMessageReceived(apExchangeContext, aPayloadHeader, std::move(aPayload));
 }
@@ -502,7 +537,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 {
     using namespace Protocols::InteractionModel;
 
-    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Failure;
+    Protocols::InteractionModel::Status status = Status::Failure;
 
     // Group Message can only be an InvokeCommandRequest or WriteRequest
     if (apExchangeContext->IsGroupExchangeContext() &&
@@ -533,7 +568,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
         ReturnErrorOnFailure(OnUnsolicitedReportData(apExchangeContext, aPayloadHeader, std::move(aPayload)));
-        status = Protocols::InteractionModel::Status::Success;
+        status = Status::Success;
     }
     else if (aPayloadHeader.HasMessageType(MsgType::TimedRequest))
     {
@@ -544,7 +579,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
         ChipLogProgress(InteractionModel, "Msg type %d not supported", aPayloadHeader.GetMessageType());
     }
 
-    if (status != Protocols::InteractionModel::Status::Success && !apExchangeContext->IsGroupExchangeContext())
+    if (status != Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
         return StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
     }
@@ -564,10 +599,10 @@ void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
     mpActiveReadClientList = apReadClient;
 }
 
-bool InteractionModelEngine::TrimFabric(FabricIndex aFabricIndex, bool aForceEvict)
+bool InteractionModelEngine::TrimFabricForSubscriptions(FabricIndex aFabricIndex, bool aForceEvict)
 {
-    const size_t pathPoolCapacity        = GetPathPoolCapacity();
-    const size_t readHandlerPoolCapacity = GetReadHandlerPoolCapacity();
+    const size_t pathPoolCapacity        = GetPathPoolCapacityForSubscriptions();
+    const size_t readHandlerPoolCapacity = GetReadHandlerPoolCapacityForSubscriptions();
 
     uint8_t fabricCount                            = mpFabricTable->FabricCount();
     size_t attributePathsSubscribedByCurrentFabric = 0;
@@ -579,14 +614,14 @@ bool InteractionModelEngine::TrimFabric(FabricIndex aFabricIndex, bool aForceEvi
         return false;
     }
 
-    size_t perFabricPathCapacity =
-        static_cast<size_t>(pathPoolCapacity - kReservedPathsForReads) / static_cast<size_t>(fabricCount);
-    size_t perFabricSubscriptionCapacity =
-        static_cast<size_t>(readHandlerPoolCapacity - kReservedHandlersForReads) / static_cast<size_t>(fabricCount);
+    // Note: This is OK only when we have assumed the fabricCount is not zero. Should be revised when adding support to
+    // subscriptions on PASE sessions.
+    size_t perFabricPathCapacity         = pathPoolCapacity / static_cast<size_t>(fabricCount);
+    size_t perFabricSubscriptionCapacity = readHandlerPoolCapacity / static_cast<size_t>(fabricCount);
 
     ReadHandler * candidate            = nullptr;
-    size_t candicateAttributePathsUsed = 0;
-    size_t candicateEventPathsUsed     = 0;
+    size_t candidateAttributePathsUsed = 0;
+    size_t candidateEventPathsUsed     = 0;
 
     // It is safe to use & here since this function will be called on current stack.
     mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
@@ -608,17 +643,17 @@ bool InteractionModelEngine::TrimFabric(FabricIndex aFabricIndex, bool aForceEvi
         }
         // This handler uses more resources than the one we picked before.
         else if ((attributePathsUsed > perFabricPathCapacity || eventPathsUsed > perFabricPathCapacity) &&
-                 (candicateAttributePathsUsed <= perFabricPathCapacity && candicateEventPathsUsed <= perFabricPathCapacity))
+                 (candidateAttributePathsUsed <= perFabricPathCapacity && candidateEventPathsUsed <= perFabricPathCapacity))
         {
             candidate                   = handler;
-            candicateAttributePathsUsed = attributePathsUsed;
-            candicateEventPathsUsed     = eventPathsUsed;
+            candidateAttributePathsUsed = attributePathsUsed;
+            candidateEventPathsUsed     = eventPathsUsed;
         }
         // This handler is older than the one we picked before.
-        else if (handler->GetSubscriptionStartGeneration() < candidate->GetSubscriptionStartGeneration() &&
+        else if (handler->GetTransactionStartGeneration() < candidate->GetTransactionStartGeneration() &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
                  ((attributePathsUsed > perFabricPathCapacity || eventPathsUsed > perFabricPathCapacity) ==
-                  (candicateAttributePathsUsed > perFabricPathCapacity || candicateEventPathsUsed > perFabricPathCapacity)))
+                  (candidateAttributePathsUsed > perFabricPathCapacity || candidateEventPathsUsed > perFabricPathCapacity)))
         {
             candidate = handler;
         }
@@ -652,14 +687,13 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
 
     // Don't couple with read requests, always reserve enough resource for read requests.
 
-    const size_t pathPoolCapacity        = GetPathPoolCapacity();
-    const size_t readHandlerPoolCapacity = GetReadHandlerPoolCapacity();
+    const size_t pathPoolCapacity        = GetPathPoolCapacityForSubscriptions();
+    const size_t readHandlerPoolCapacity = GetReadHandlerPoolCapacityForSubscriptions();
 
     // If we return early here, the compiler will complain about the unreachable code, so we add a always-true check.
-    const size_t attributePathCap = allowUnlimited ? SIZE_MAX : static_cast<size_t>(pathPoolCapacity - kReservedPathsForReads);
-    const size_t eventPathCap     = allowUnlimited ? SIZE_MAX : static_cast<size_t>(pathPoolCapacity - kReservedPathsForReads);
-    const size_t readHandlerCap =
-        allowUnlimited ? SIZE_MAX : static_cast<size_t>(readHandlerPoolCapacity - kReservedHandlersForReads);
+    const size_t attributePathCap = allowUnlimited ? SIZE_MAX : pathPoolCapacity;
+    const size_t eventPathCap     = allowUnlimited ? SIZE_MAX : pathPoolCapacity;
+    const size_t readHandlerCap   = allowUnlimited ? SIZE_MAX : readHandlerPoolCapacity;
 
     size_t usedAttributePaths = 0;
     size_t usedEventPaths     = 0;
@@ -699,7 +733,7 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
     }
 
     const auto evictAndUpdateResourceUsage = [&](FabricIndex fabricIndex, bool forceEvict) {
-        bool ret = TrimFabric(fabricIndex, forceEvict);
+        bool ret = TrimFabricForSubscriptions(fabricIndex, forceEvict);
         countResourceUsage();
         return ret;
     };
@@ -751,7 +785,78 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
     return true;
 }
 
-CHIP_ERROR InteractionModelEngine::CanEstablishReadTransaction(const ReadHandler * apReadHandler)
+bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
+{
+    const size_t guaranteedReadRequestsPerFabric   = GetGuaranteedReadRequestsPerFabric();
+    const size_t minSupportedPathsPerFabricForRead = guaranteedReadRequestsPerFabric * kMinSupportedPathsPerReadRequest;
+
+    size_t attributePathsUsedByCurrentFabric = 0;
+    size_t eventPathsUsedByCurrentFabric     = 0;
+    size_t readTransactionsOnCurrentFabric   = 0;
+
+    ReadHandler * candidate            = nullptr;
+    size_t candidateAttributePathsUsed = 0;
+    size_t candidateEventPathsUsed     = 0;
+
+    // It is safe to use & here since this function will be called on current stack.
+    mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
+        if (handler->GetAccessingFabricIndex() != aFabricIndex || !handler->IsType(ReadHandler::InteractionType::Read))
+        {
+            return Loop::Continue;
+        }
+
+        size_t attributePathsUsed = handler->GetAttributePathCount();
+        size_t eventPathsUsed     = handler->GetEventPathCount();
+
+        attributePathsUsedByCurrentFabric += attributePathsUsed;
+        eventPathsUsedByCurrentFabric += eventPathsUsed;
+        readTransactionsOnCurrentFabric++;
+
+        if (candidate == nullptr)
+        {
+            candidate = handler;
+        }
+        // Oversized read handlers will be evicted first.
+        else if ((attributePathsUsed > kMinSupportedPathsPerReadRequest || eventPathsUsed > kMinSupportedPathsPerReadRequest) &&
+                 (candidateAttributePathsUsed <= kMinSupportedPathsPerReadRequest &&
+                  candidateEventPathsUsed <= kMinSupportedPathsPerReadRequest))
+        {
+            candidate = handler;
+        }
+        // Read Handlers are "first come first served", so we give eariler read transactions a higher priority.
+        else if (handler->GetTransactionStartGeneration() > candidate->GetTransactionStartGeneration() &&
+                 // And the level of resource usage is the same (both exceed or neither exceed)
+                 ((attributePathsUsed > kMinSupportedPathsPerReadRequest || eventPathsUsed > kMinSupportedPathsPerReadRequest) ==
+                  (candidateAttributePathsUsed > kMinSupportedPathsPerReadRequest ||
+                   candidateEventPathsUsed > kMinSupportedPathsPerReadRequest)))
+        {
+            candidate = handler;
+        }
+
+        if (candidate == handler)
+        {
+            candidateAttributePathsUsed = attributePathsUsed;
+            candidateEventPathsUsed     = eventPathsUsed;
+        }
+        return Loop::Continue;
+    });
+
+    if (candidate != nullptr &&
+        ((attributePathsUsedByCurrentFabric > minSupportedPathsPerFabricForRead ||
+          eventPathsUsedByCurrentFabric > minSupportedPathsPerFabricForRead ||
+          readTransactionsOnCurrentFabric > guaranteedReadRequestsPerFabric) ||
+         // Always evict the transactions on PASE sessions if the fabric table is full.
+         (aFabricIndex == kUndefinedFabricIndex && mpFabricTable->FabricCount() == GetConfigMaxFabrics())))
+    {
+        candidate->Abort();
+        return true;
+    }
+    return false;
+}
+
+Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRead(FabricIndex aFabricIndex,
+                                                                                  size_t aRequestedAttributePathCount,
+                                                                                  size_t aRequestedEventPathCount)
 {
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
@@ -764,34 +869,126 @@ CHIP_ERROR InteractionModelEngine::CanEstablishReadTransaction(const ReadHandler
     const bool allowUnlimited = false;
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
 
-    FabricIndex currentFabricIndex           = apReadHandler->GetAccessingFabricIndex();
-    size_t activeReadHandlersOnCurrentFabric = 0;
+    // If we return early here, the compiler will complain about the unreachable code, so we add a always-true check.
+    const size_t attributePathCap = allowUnlimited ? SIZE_MAX : GetPathPoolCapacityForReads();
+    const size_t eventPathCap     = allowUnlimited ? SIZE_MAX : GetPathPoolCapacityForReads();
+    const size_t readHandlerCap   = allowUnlimited ? SIZE_MAX : GetReadHandlerPoolCapacityForReads();
 
-    // It is safe to use & here since this function will be called on current stack.
-    if (apReadHandler->GetAttributePathCount() > kReservedPathsPerReadRequest ||
-        apReadHandler->GetEventPathCount() > kReservedPathsPerReadRequest ||
-        apReadHandler->GetDataVersionFilterCount() > kReservedPathsPerReadRequest)
+    const size_t guaranteedReadRequestsPerFabric = GetGuaranteedReadRequestsPerFabric();
+    const size_t guaranteedPathsPerFabric        = kMinSupportedPathsPerReadRequest * guaranteedReadRequestsPerFabric;
+
+    size_t usedAttributePaths = 0;
+    size_t usedEventPaths     = 0;
+    size_t usedReadHandlers   = 0;
+
+    auto countResourceUsage = [&]() {
+        usedAttributePaths = 0;
+        usedEventPaths     = 0;
+        usedReadHandlers   = 0;
+        mReadHandlers.ForEachActiveObject([&](auto * handler) {
+            if (!handler->IsType(ReadHandler::InteractionType::Read))
+            {
+                return Loop::Continue;
+            }
+            usedAttributePaths += handler->GetAttributePathCount();
+            usedEventPaths += handler->GetEventPathCount();
+            usedReadHandlers++;
+            return Loop::Continue;
+        });
+    };
+
+    auto haveEnoughResourcesForTheRequest = [&]() {
+        return usedAttributePaths + aRequestedAttributePathCount <= attributePathCap &&
+            usedEventPaths + aRequestedEventPathCount <= eventPathCap && usedReadHandlers < readHandlerCap;
+    };
+
+    countResourceUsage();
+
+    if (haveEnoughResourcesForTheRequest())
     {
-        // Doesn't matter how many other reads are in progress; we are not
-        // going to handle this request.
-        return (allowUnlimited ? CHIP_NO_ERROR : CHIP_IM_GLOBAL_STATUS(PathsExhausted));
+        // We have enough resources, then we serve the requests in a best-effort manner.
+        return Status::Success;
     }
 
-    mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
-        if (handler->GetAccessingFabricIndex() == currentFabricIndex && handler->IsType(ReadHandler::InteractionType::Read))
+    if ((aRequestedAttributePathCount > kMinSupportedPathsPerReadRequest &&
+         usedAttributePaths + aRequestedAttributePathCount > attributePathCap) ||
+        (aRequestedEventPathCount > kMinSupportedPathsPerReadRequest && usedEventPaths + aRequestedEventPathCount > eventPathCap))
+    {
+        // We cannot offer enough resources, and the read transaction is requesting more than the spec limit.
+        return Status::PathsExhausted;
+    }
+
+    // If we have commissioned CHIP_CONFIG_MAX_FABRICS already, and this transaction doesn't have an associated fabric index, reject
+    // the request if we don't have sufficient resources for this request.
+    if (mpFabricTable->FabricCount() == GetConfigMaxFabrics() && aFabricIndex == kUndefinedFabricIndex)
+    {
+        return Status::Busy;
+    }
+
+    size_t usedAttributePathsInFabric = 0;
+    size_t usedEventPathsInFabric     = 0;
+    size_t usedReadHandlersInFabric   = 0;
+    mReadHandlers.ForEachActiveObject([&](auto * handler) {
+        if (!handler->IsType(ReadHandler::InteractionType::Read) || handler->GetAccessingFabricIndex() != aFabricIndex)
         {
-            activeReadHandlersOnCurrentFabric++;
+            return Loop::Continue;
         }
+        usedAttributePathsInFabric += handler->GetAttributePathCount();
+        usedEventPathsInFabric += handler->GetEventPathCount();
+        usedReadHandlersInFabric++;
         return Loop::Continue;
     });
 
-    // The incoming read handler here is also counted above.
-    if (activeReadHandlersOnCurrentFabric > kReservedReadHandlersPerFabricForReadRequests)
+    // Busy, since there are already some read requests ongoing on this fabric, please retry later.
+    if (usedAttributePathsInFabric + aRequestedAttributePathCount > guaranteedPathsPerFabric ||
+        usedEventPathsInFabric + aRequestedEventPathCount > guaranteedPathsPerFabric ||
+        usedReadHandlersInFabric >= guaranteedReadRequestsPerFabric)
     {
-        return (allowUnlimited ? CHIP_NO_ERROR : CHIP_IM_GLOBAL_STATUS(Busy));
+        return Status::Busy;
     }
 
-    return CHIP_NO_ERROR;
+    const auto evictAndUpdateResourceUsage = [&](FabricIndex fabricIndex) {
+        bool ret = TrimFabricForRead(fabricIndex);
+        countResourceUsage();
+        return ret;
+    };
+
+    //
+    // At this point, we have an inbound request that respects minimas but we still don't have enough resources to handle it. Which
+    // means that we definitely have handlers on existing fabrics that are over limits and need to evict at least one of them to
+    // make space.
+    //
+    bool didEvictHandler = true;
+    while (didEvictHandler)
+    {
+        didEvictHandler = false;
+        didEvictHandler = didEvictHandler || evictAndUpdateResourceUsage(kUndefinedFabricIndex);
+        if (haveEnoughResourcesForTheRequest())
+        {
+            break;
+        }
+        // If the fabric table is full, we won't evict read requests from normal fabrics before we have evicted all read requests
+        // from PASE sessions.
+        if (mpFabricTable->FabricCount() == GetConfigMaxFabrics() && didEvictHandler)
+        {
+            continue;
+        }
+        for (const auto & fabric : *mpFabricTable)
+        {
+            didEvictHandler = didEvictHandler || evictAndUpdateResourceUsage(fabric.GetFabricIndex());
+            // If we now have enough resources to serve this request, stop evicting things.
+            if (haveEnoughResourcesForTheRequest())
+            {
+                break;
+            }
+        }
+    }
+
+    // Now all fabrics are not oversized (since we have trimmed the oversized fabrics in the loop above), and the read handler is
+    // also not oversized, we should be able to handle this read transaction.
+    VerifyOrDie(haveEnoughResourcesForTheRequest());
+
+    return Status::Success;
 }
 
 void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)
@@ -1178,14 +1375,14 @@ bool InteractionModelEngine::HasActiveRead()
 uint16_t InteractionModelEngine::GetMinSubscriptionsPerFabric() const
 {
     uint8_t fabricCount                  = mpFabricTable->FabricCount();
-    const size_t readHandlerPoolCapacity = GetReadHandlerPoolCapacity();
+    const size_t readHandlerPoolCapacity = GetReadHandlerPoolCapacityForSubscriptions();
 
     if (fabricCount == 0)
     {
         return kMinSupportedSubscriptionsPerFabric;
     }
 
-    size_t perFabricSubscriptionCapacity = static_cast<size_t>(readHandlerPoolCapacity - kReservedPathsForReads) / fabricCount;
+    size_t perFabricSubscriptionCapacity = readHandlerPoolCapacity / fabricCount;
 
     return static_cast<uint16_t>(perFabricSubscriptionCapacity);
 }

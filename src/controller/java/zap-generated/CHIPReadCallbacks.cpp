@@ -20141,17 +20141,17 @@ void CHIPTestClusterListStructOctetStringAttributeCallback::CallbackFn(
     {
         auto & entry_0 = iter_arrayListObj_0.GetValue();
         jobject newElement_0;
-        jobject newElement_0_fabricIndex;
-        std::string newElement_0_fabricIndexClassName     = "java/lang/Long";
-        std::string newElement_0_fabricIndexCtorSignature = "(J)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_0_fabricIndexClassName.c_str(),
-                                                                       newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                       entry_0.fabricIndex, newElement_0_fabricIndex);
-        jobject newElement_0_operationalCert;
-        jbyteArray newElement_0_operationalCertByteArray = env->NewByteArray(static_cast<jsize>(entry_0.operationalCert.size()));
-        env->SetByteArrayRegion(newElement_0_operationalCertByteArray, 0, static_cast<jsize>(entry_0.operationalCert.size()),
-                                reinterpret_cast<const jbyte *>(entry_0.operationalCert.data()));
-        newElement_0_operationalCert = newElement_0_operationalCertByteArray;
+        jobject newElement_0_member1;
+        std::string newElement_0_member1ClassName     = "java/lang/Long";
+        std::string newElement_0_member1CtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_0_member1ClassName.c_str(),
+                                                                       newElement_0_member1CtorSignature.c_str(), entry_0.member1,
+                                                                       newElement_0_member1);
+        jobject newElement_0_member2;
+        jbyteArray newElement_0_member2ByteArray = env->NewByteArray(static_cast<jsize>(entry_0.member2.size()));
+        env->SetByteArrayRegion(newElement_0_member2ByteArray, 0, static_cast<jsize>(entry_0.member2.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.member2.data()));
+        newElement_0_member2 = newElement_0_member2ByteArray;
 
         jclass testListStructOctetStructClass;
         err = chip::JniReferences::GetInstance().GetClassRef(
@@ -20169,8 +20169,8 @@ void CHIPTestClusterListStructOctetStringAttributeCallback::CallbackFn(
             return;
         }
 
-        newElement_0 = env->NewObject(testListStructOctetStructClass, testListStructOctetStructCtor, newElement_0_fabricIndex,
-                                      newElement_0_operationalCert);
+        newElement_0 = env->NewObject(testListStructOctetStructClass, testListStructOctetStructCtor, newElement_0_member1,
+                                      newElement_0_member2);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 

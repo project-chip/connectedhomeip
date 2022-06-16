@@ -29,7 +29,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Read the global attribute constraints: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -37,13 +37,21 @@ tests:
           constraints:
               type: uint16
 
+    - label: "Read FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
+
     #Issue 10988
     - label: "Read the global attribute: AttributeList"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 65528, 65529, 65531, 65533]
+          value: [0, 1, 65528, 65529, 65531, 65532, 65533]
           constraints:
               type: list
 
@@ -78,20 +86,3 @@ tests:
           value: []
           constraints:
               type: list
-
-    #Issue 10988
-    - label:
-          "Read FeatureMap attribute from the DUT and Verify that the DUT
-          response"
-      verification: |
-          ./chip-tool lowpower read feature-map 1 1
-          [1645780669.465220][5069:5074] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"

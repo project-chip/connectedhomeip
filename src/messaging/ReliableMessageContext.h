@@ -121,6 +121,9 @@ public:
     /// Determine whether this exchange is requesting Sleepy End Device active mode
     bool IsRequestingActiveMode() const;
 
+    /// Determine whether this exchange is a EphemeralExchange for replying a StandaloneAck
+    bool IsEphemeralExchange() const;
+
     /**
      * Get the reliable message manager that corresponds to this reliable
      * message context.
@@ -158,6 +161,9 @@ protected:
 
         /// When set, signifies that the exchange is requesting Sleepy End Device active mode.
         kFlagActiveMode = (1u << 8),
+
+        /// When set, signifies that the exchange created sorely for replying a StandaloneAck
+        kFlagEphemeralExchange = (1u << 9),
     };
 
     BitFlags<Flags> mFlags; // Internal state flags
@@ -232,6 +238,11 @@ inline void ReliableMessageContext::SetMessageNotAcked(bool messageNotAcked)
 inline void ReliableMessageContext::SetRequestingActiveMode(bool activeMode)
 {
     mFlags.Set(Flags::kFlagActiveMode, activeMode);
+}
+
+inline bool ReliableMessageContext::IsEphemeralExchange() const
+{
+    return mFlags.Has(Flags::kFlagEphemeralExchange);
 }
 
 } // namespace Messaging

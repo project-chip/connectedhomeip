@@ -25,7 +25,6 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/Ameba/DiagnosticDataProviderImpl.h>
-#include <platform/DiagnosticDataProvider.h>
 
 #include <lwip_netconf.h>
 
@@ -54,6 +53,70 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
 {
     currentHeapHighWatermark = xPortGetTotalHeapSize() - xPortGetMinimumEverFreeHeapSize();
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+    // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
+    // value of the CurrentHeapUsed.
+
+    xPortResetHeapMinimumEverFreeHeapSize();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
+{
+    /* Obtain all available task information */
+    TaskStatus_t * taskStatusArray;
+    ThreadMetrics * head = nullptr;
+    unsigned long arraySize, x, dummy;
+
+    arraySize = uxTaskGetNumberOfTasks();
+
+    taskStatusArray = (TaskStatus_t *) pvPortMalloc(arraySize * sizeof(TaskStatus_t));
+
+    if (taskStatusArray != NULL)
+    {
+        /* Generate raw status information about each task. */
+        arraySize = uxTaskGetSystemState(taskStatusArray, arraySize, &dummy);
+        /* For each populated position in the taskStatusArray array,
+           format the raw data as human readable ASCII data. */
+
+        for (x = 0; x < arraySize; x++)
+        {
+            ThreadMetrics * thread = (ThreadMetrics *) pvPortMalloc(sizeof(ThreadMetrics));
+
+            strncpy(thread->NameBuf, taskStatusArray[x].pcTaskName, kMaxThreadNameLength - 1);
+            thread->NameBuf[kMaxThreadNameLength] = '\0';
+            thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
+            thread->id = taskStatusArray[x].xTaskNumber;
+
+            thread->stackFreeMinimum.Emplace(taskStatusArray[x].usStackHighWaterMark);
+            /* Unsupported metrics */
+            // thread->stackSize;
+            // thread->stackFreeCurrent;
+
+            thread->Next = head;
+            head         = thread;
+        }
+
+        *threadMetricsOut = head;
+        /* The array is no longer needed, free the memory it consumes. */
+        vPortFree(taskStatusArray);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
+{
+    while (threadMetrics)
+    {
+        ThreadMetrics * del = threadMetrics;
+        threadMetrics       = threadMetrics->Next;
+        vPortFree(del);
+    }
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)

@@ -32,6 +32,7 @@
 
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
+using namespace ::chip::DeviceLayer;
 
 LEDWidget AppLED;
 

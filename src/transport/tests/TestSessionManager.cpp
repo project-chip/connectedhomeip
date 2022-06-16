@@ -656,7 +656,9 @@ static void RandomSessionIdAllocatorOffset(nlTestSuite * inSuite, SessionManager
     const int bound = rand() % max;
     for (int i = 0; i < bound; ++i)
     {
-        auto handle = sessionManager.AllocateSession(Transport::SecureSession::Type::kPASE);
+        auto handle = sessionManager.AllocateSession(
+            Transport::SecureSession::Type::kPASE,
+            ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
         NL_TEST_ASSERT(inSuite, handle.HasValue());
         sessionManager.ExpirePairing(handle.Value());
     }
@@ -669,7 +671,9 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     // Allocate a session.
     uint16_t sessionId1;
     {
-        auto handle = sessionManager.AllocateSession(Transport::SecureSession::Type::kPASE);
+        auto handle = sessionManager.AllocateSession(
+            Transport::SecureSession::Type::kPASE,
+            ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
         NL_TEST_ASSERT(inSuite, handle.HasValue());
         SessionHolder session;
         session.GrabPairingSession(handle.Value());
@@ -681,7 +685,9 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     auto prevSessionId = sessionId1;
     for (uint32_t i = 0; i < 10; ++i)
     {
-        auto handle = sessionManager.AllocateSession(Transport::SecureSession::Type::kPASE);
+        auto handle = sessionManager.AllocateSession(
+            Transport::SecureSession::Type::kPASE,
+            ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
         if (!handle.HasValue())
         {
             break;
@@ -702,7 +708,9 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     // sessions are immediately freed.
     for (uint32_t i = 0; i < UINT16_MAX + 10; ++i)
     {
-        auto handle = sessionManager.AllocateSession(Transport::SecureSession::Type::kPASE);
+        auto handle = sessionManager.AllocateSession(
+            Transport::SecureSession::Type::kPASE,
+            ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
         NL_TEST_ASSERT(inSuite, handle.HasValue());
         auto sessionId = handle.Value()->AsSecureSession()->GetLocalSessionId();
         NL_TEST_ASSERT(inSuite, sessionId - prevSessionId == 1 || (sessionId == 1 && prevSessionId == 65535));
@@ -717,13 +725,15 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     {
         // Allocate some session handles at pseudo-random offsets in the session
         // ID space.
-        constexpr size_t numHandles = CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE - 1;
+        constexpr size_t numHandles = CHIP_CONFIG_SECURE_SESSION_POOL_SIZE - 1;
         Optional<SessionHandle> handles[numHandles];
         uint16_t sessionIds[numHandles];
         for (size_t h = 0; h < numHandles; ++h)
         {
             constexpr int maxOffset = 5000;
-            handles[h]              = sessionManager.AllocateSession(Transport::SecureSession::Type::kPASE);
+            handles[h]              = sessionManager.AllocateSession(
+                Transport::SecureSession::Type::kPASE,
+                ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
             NL_TEST_ASSERT(inSuite, handles[h].HasValue());
             sessionIds[h] = handles[h].Value()->AsSecureSession()->GetLocalSessionId();
             RandomSessionIdAllocatorOffset(inSuite, sessionManager, maxOffset);
@@ -739,7 +749,9 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
         // these collide either.
         for (int j = 0; j < UINT16_MAX; ++j)
         {
-            auto handle = sessionManager.AllocateSession(Transport::SecureSession::Type::kPASE);
+            auto handle = sessionManager.AllocateSession(
+                Transport::SecureSession::Type::kPASE,
+                ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
             NL_TEST_ASSERT(inSuite, handle.HasValue());
             auto potentialCollision = handle.Value()->AsSecureSession()->GetLocalSessionId();
             for (size_t h = 0; h < numHandles; ++h)
@@ -759,6 +771,83 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     sessionManager.Shutdown();
 }
 
+void SessionCounterExhaustedTest(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    FabricTable fabricTable;
+    SessionManager sessionManager;
+    secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                           &fabricTable));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    FabricIndex aliceFabricIndex;
+    FabricInfo aliceFabric;
+    aliceFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA1CertAsset().mCert,
+                                    GetNodeA1CertAsset().mKey);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabricForTest(aliceFabric, &aliceFabricIndex));
+
+    FabricIndex bobFabricIndex;
+    FabricInfo bobFabric;
+    bobFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA2CertAsset().mCert,
+                                  GetNodeA2CertAsset().mKey);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabricForTest(bobFabric, &bobFabricIndex));
+
+    SessionHolder aliceToBobSession;
+    err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, 2,
+                                                      fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(), 1,
+                                                      aliceFabricIndex, peer, CryptoContext::SessionRole::kInitiator);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SessionHolder bobToAliceSession;
+    err = sessionManager.InjectPaseSessionWithTestKey(bobToAliceSession, 1,
+                                                      fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(), 2,
+                                                      bobFabricIndex, peer, CryptoContext::SessionRole::kResponder);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // ==== Set counter value to max ====
+    LocalSessionMessageCounter & counter = static_cast<LocalSessionMessageCounter &>(
+        aliceToBobSession.Get().Value()->AsSecureSession()->GetSessionMessageCounter().GetLocalMessageCounter());
+    counter.TestSetCounter(LocalSessionMessageCounter::kMessageCounterMax - 1);
+
+    // ==== Build a valid message with max counter value ====
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    PayloadHeader payloadHeader;
+
+    // Set the exchange ID for this header.
+    payloadHeader.SetExchangeID(0);
+
+    // Set the protocol ID and message type for this header.
+    payloadHeader.SetMessageType(chip::Protocols::Echo::MsgType::EchoRequest);
+
+    EncryptedPacketBufferHandle preparedMessage;
+    err = sessionManager.PrepareMessage(aliceToBobSession.Get().Value(), payloadHeader, std::move(buffer), preparedMessage);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // ==== Build another message which will fail becuase message counter is exhausted ====
+    chip::System::PacketBufferHandle buffer2 = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer2.IsNull());
+
+    EncryptedPacketBufferHandle preparedMessage2;
+    err = sessionManager.PrepareMessage(aliceToBobSession.Get().Value(), payloadHeader, std::move(buffer2), preparedMessage2);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_MESSAGE_COUNTER_EXHAUSTED);
+
+    sessionManager.Shutdown();
+}
+
 // Test Suite
 
 /**
@@ -774,6 +863,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Old counter Test",               SendPacketWithOldCounterTest),
     NL_TEST_DEF("Too-old counter Test",           SendPacketWithTooOldCounterTest),
     NL_TEST_DEF("Session Allocation Test",        SessionAllocationTest),
+    NL_TEST_DEF("Session Counter Exhausted Test", SessionCounterExhaustedTest),
 
     NL_TEST_SENTINEL()
 };

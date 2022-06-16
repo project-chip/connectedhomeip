@@ -42,7 +42,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     wiced_result_t result;
 
     // Initialize the configuration system.
-    err = Internal::CYW30739Config::Init();
+    err = PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());

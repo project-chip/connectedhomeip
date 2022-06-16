@@ -27,13 +27,15 @@ namespace Dnssd {
  * that implements chip.devicecontroller.mdns.ServiceResolver interface, and an object of a class that implements
  * chip.devicecontroller.mdns.ChipMdnsCallback interface.
  */
-void InitializeWithObjects(jobject resolverObject, jobject chipMdnsCallbackObject);
+void InitializeWithObjects(jobject resolverObject, jobject browserObject, jobject chipMdnsCallbackObject);
 
 /**
  * Pass results of the service resolution to the CHIP stack.
  */
-void HandleResolve(jstring instanceName, jstring serviceType, jstring address, jint port, jobject textEntries, jlong callbackHandle,
-                   jlong contextHandle);
+void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, jstring address, jint port, jobject textEntries,
+                   jlong callbackHandle, jlong contextHandle);
+
+void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callbackHandle, jlong contextHandle);
 
 } // namespace Dnssd
 } // namespace chip

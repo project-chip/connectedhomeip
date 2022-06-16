@@ -46,7 +46,7 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionManager * sessionManager,
                                                 bool isReliableTransmission, Protocols::Id protocol, uint8_t type,
                                                 System::PacketBufferHandle && message)
 {
-    ReturnErrorCodeIf(!MessagePermitted(protocol.GetProtocolId(), type), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!MessagePermitted(protocol, type), CHIP_ERROR_INVALID_ARGUMENT);
 
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(exchangeId).SetMessageType(protocol, type).SetInitiator(isInitiator);
@@ -108,31 +108,6 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionManager * sessionManager,
         EncryptedPacketBufferHandle preparedMessage;
         ReturnErrorOnFailure(sessionManager->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage));
         ReturnErrorOnFailure(sessionManager->SendPreparedMessage(session, preparedMessage));
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
-                                                      MessageFlags msgFlags, ReliableMessageContext * reliableMessageContext)
-{
-    ReturnErrorCodeIf(!MessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()),
-                      CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (IsReliableTransmissionAllowed() && !reliableMessageContext->GetExchangeContext()->IsGroupExchangeContext())
-    {
-        if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() &&
-            payloadHeader.GetAckMessageCounter().HasValue())
-        {
-            reliableMessageContext->HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value());
-        }
-
-        if (payloadHeader.NeedsAck())
-        {
-            // An acknowledgment needs to be sent back to the peer for this message on this exchange,
-
-            ReturnErrorOnFailure(reliableMessageContext->HandleNeedsAck(messageCounter, msgFlags));
-        }
     }
 
     return CHIP_NO_ERROR;

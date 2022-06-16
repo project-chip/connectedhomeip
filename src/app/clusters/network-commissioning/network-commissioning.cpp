@@ -486,7 +486,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     }
     if (commissioningError == Status::kSuccess)
     {
-        DeviceLayer::DeviceControlServer::DeviceControlSvr().ConnectNetworkForOperational(
+        DeviceLayer::DeviceControlServer::DeviceControlSvr().PostConnectedToOperationalNetworkEvent(
             ByteSpan(mLastNetworkID, mLastNetworkIDLen));
         mLastConnectErrorValue.SetNull();
     }

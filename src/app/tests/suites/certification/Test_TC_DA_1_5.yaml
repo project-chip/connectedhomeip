@@ -1,0 +1,95 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 17.1.5. [TC-DA-1.5] NOCSR Procedure Validation [DUT - Commissionee]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH1 Completes the Attestation procedure"
+      verification: |
+
+      disabled: true
+
+    - label: "TH1 generates 32-byte CSRNonce"
+      verification: |
+
+      disabled: true
+
+    - label: "TH1 sends CSRRequest Command with CSRNonce as field to the DUT."
+      verification: |
+          Verify that the DUT generates the NOCSR Information using CSRResponse Command
+      disabled: true
+
+    - label:
+          "Save following information that is sent by the DUT in the CSRResponse
+          Command NOCSRElement Node Operational Key Pair as Key 1"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 sends AddTrustedRootCertificate command to DUT to install the
+          Root CA Certificate to the trust store"
+      verification: |
+          Verify that AddTrustedRootCertificate Command succeeds by sending the status code as SUCCESS
+      disabled: true
+
+    - label: "TH1 Sends AddNOC Command to DUT"
+      verification: |
+          Verify that DUT responds with NOCResponse command with status code OK
+      disabled: true
+
+    - label: "Read the NOCs List from the DUT"
+      verification: |
+          Verify that Key1 is present in the NOCs list
+      disabled: true
+
+    - label: "Factory Reset TH1 so that it is commissionable again"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Start the commissioning process of TH1 on DUT. Device attestation
+          procedure is completed"
+      verification: |
+
+      disabled: true
+
+    - label: "TH1 generates 32-byte CSRNonce"
+      verification: |
+          Verify that the DUT generates the NOCSR Information using CSRResponse Command.
+      disabled: true
+
+    - label: "TH1 sends CSRRequest Command with CSRNonce as field to the DUT."
+      verification: |
+
+      disabled: true
+
+    - label: "TH1 generates 32-byte CSRNonce"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Save Node Operational Key Pair sent by the DUT in the CSRResponse
+          Command as Key 2"
+      verification: |
+          Verify that Key 2 does not match any other existing Node Operational Key Pair on the device
+      disabled: true

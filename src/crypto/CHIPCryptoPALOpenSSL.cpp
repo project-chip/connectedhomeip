@@ -913,6 +913,11 @@ void ClearSecretData(uint8_t * buf, size_t len)
     OPENSSL_cleanse(buf, len);
 }
 
+bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n)
+{
+    return CRYPTO_memcmp(a, b, n) == 0;
+}
+
 static CHIP_ERROR P256PublicKeyFromECKey(EC_KEY * ec_key, P256PublicKey & pubkey)
 {
     ERR_clear_error();

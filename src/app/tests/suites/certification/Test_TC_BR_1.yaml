@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 25.1.1. [TC-BR-1] Basics of bridging
+name: 3.1.1. [TC-BR-1] Basics of Bridging
 
 config:
     nodeId: 0x12344321
@@ -73,35 +73,8 @@ tests:
       disabled: true
 
     - label:
-          "For each of the endpoints found in this PartsList attribute, read the
-          DeviceTypeList attribute in the Descriptor cluster on such endpoint,
-          and select those endpoints which have (at least) a device type of
-          Bridged Node in their DeviceTypeList"
-      verification: |
-          no Matter messages for this step
-      disabled: true
-
-    - label:
-          "For each of the endpoints for the bridged devices found in step 2b,
-          perform the tests for Bridged Device Basic Information cluster"
-      verification: |
-          ref to test plan for Bridged Device Basic Information cluster
-      disabled: true
-
-    - label:
-          "For each of the endpoints found in step 2b, if a Power Source
-          Configuration cluster is present on this endpoint, perform the tests
-          for this Power Source Configuration cluster plus the tests for the
-          Power Source clusters at the endpoint(s) which this Power Source
-          Configuration cluster refers to"
-      verification: |
-          ref to test plan for Power Source Configuration and Power Source clusters
-      disabled: true
-
-    - label:
-          "For each of the endpoints found in step 2b, from the DeviceTypeList
-          attributute in their Descriptor cluster, derive the (application)
-          device type(s) of the bridged device"
+          "For each of the endpoints read in step 1b, read attribute
+          DeviceTypeList of the Descriptor cluster on that endpoint"
       verification: |
           ./chip-tool  descriptor read device-list 1 2
 
@@ -181,6 +154,158 @@ tests:
           [1635664306.627301][3418:3423] CHIP:TOO: DeviceType[1]:
           [1635664306.627335][3418:3423] CHIP:TOO:   type: 0
           [1635664306.627366][3418:3423] CHIP:TOO:   revision: 1
+          [1635664306.627460][3418:3423] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 40894i
+      disabled: true
+
+    - label:
+          "Read attribute PartsList of the Descriptor cluster on endpoint found
+          in step 1c"
+      verification: |
+          ./chip-tool  descriptor read parts-list 1 1
+
+          CHIP:DMG: ReportData =
+          [1635663946.174100][3392:3397] CHIP:DMG: {
+          [1635663946.174131][3392:3397] CHIP:DMG:         AttributeDataList =
+          [1635663946.174169][3392:3397] CHIP:DMG:         [
+          [1635663946.174205][3392:3397] CHIP:DMG:                 AttributeDataElement =
+          [1635663946.174249][3392:3397] CHIP:DMG:                 {
+          [1635663946.174288][3392:3397] CHIP:DMG:                         AttributePath =
+          [1635663946.174329][3392:3397] CHIP:DMG:                         {
+          [1635663946.174366][3392:3397] CHIP:DMG:                                 NodeId = 0x1,
+          [1635663946.174409][3392:3397] CHIP:DMG:                                 EndpointId = 0x0,
+          [1635663946.174449][3392:3397] CHIP:DMG:                                 ClusterId = 0x1d,
+          [1635663946.174493][3392:3397] CHIP:DMG:                                 FieldTag = 0x0000_0003,
+          [1635663946.174535][3392:3397] CHIP:DMG:                         }
+          [1635663946.174584][3392:3397] CHIP:DMG:
+          [1635663946.174633][3392:3397] CHIP:DMG:                         Data = [
+          [1635663946.174681][3392:3397] CHIP:DMG:                                 1, 2,
+          [1635663946.174733][3392:3397] CHIP:DMG:                         ],
+          [1635663946.174778][3392:3397] CHIP:DMG:                         DataElementVersion = 0x0,
+          [1635663946.174822][3392:3397] CHIP:DMG:                 },
+          [1635663946.174866][3392:3397] CHIP:DMG:
+          [1635663946.174896][3392:3397] CHIP:DMG:         ],
+          [1635663946.174940][3392:3397] CHIP:DMG:
+          [1635663946.174972][3392:3397] CHIP:DMG: }
+          [1635663946.175079][3392:3397] CHIP:ZCL: ReadAttributesResponse:
+          [1635663946.175112][3392:3397] CHIP:ZCL:   ClusterId: 0x0000_001D
+          [1635663946.175145][3392:3397] CHIP:ZCL:   attributeId: 0x0000_0003
+          [1635663946.175176][3392:3397] CHIP:ZCL:   status: Success                (0x0000)
+          [1635663946.175207][3392:3397] CHIP:ZCL:   attribute TLV Type: 0x16
+          [1635663946.175245][3392:3397] CHIP:TOO: OnDescriptorPartsListListAttributeResponse: 2 entries
+          [1635663946.175280][3392:3397] CHIP:TOO: ENDPOINT_NO[1]: 1
+          [1635663946.175312][3392:3397] CHIP:TOO: ENDPOINT_NO[2]: 2
+          [1635663946.175400][3392:3397] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 27126i
+      disabled: true
+
+    - label:
+          "For each of the endpoints found in this PartsList attribute, read the
+          DeviceTypeList attribute in the Descriptor cluster on such endpoint,
+          and select those endpoints which have (at least) a device type of
+          Bridged Node in their DeviceTypeList"
+      verification: |
+          no Matter messages for this step
+      disabled: true
+
+    - label:
+          "For each of the endpoints for the bridged devices found in step 2b,
+          perform the tests for Bridged Device Basic Information cluster"
+      verification: |
+          ref to test plan for Bridged Device Basic Information cluster
+      disabled: true
+
+    - label:
+          "For each of the endpoints found in step 2b, if a Power Source
+          Configuration cluster is present on this endpoint, perform the tests
+          for this Power Source Configuration cluster plus the tests for the
+          Power Source clusters at the endpoint(s) which this Power Source
+          Configuration cluster refers to"
+      verification: |
+          ref to test plan for Power Source Configuration and Power Source clusters
+      disabled: true
+
+    - label:
+          "For each of the endpoints found in step 2b, from the DeviceTypeList
+          attributute in their Descriptor cluster, derive the (application)
+          device type(s) of the bridged device"
+      verification: |
+          ./chip-tool descriptor read device-list 1 2
+
+          CHIP:DMG: ReportData =
+          [1635664190.971564][3410:3415] CHIP:DMG: {
+          [1635664190.971611][3410:3415] CHIP:DMG: AttributeDataList =
+          [1635664190.971650][3410:3415] CHIP:DMG: [
+          [1635664190.971748][3410:3415] CHIP:DMG: AttributeDataElement =
+          [1635664190.971809][3410:3415] CHIP:DMG: {
+          [1635664190.971895][3410:3415] CHIP:DMG: AttributePath =
+          [1635664190.971959][3410:3415] CHIP:DMG: {
+          [1635664190.972007][3410:3415] CHIP:DMG: NodeId = 0x1,
+          [1635664190.972108][3410:3415] CHIP:DMG: EndpointId = 0x1,
+          [1635664190.972177][3410:3415] CHIP:DMG: ClusterId = 0x1d,
+          [1635664190.972269][3410:3415] CHIP:DMG: FieldTag = 0x0000_0000,
+          [1635664190.972328][3410:3415] CHIP:DMG: }
+          [1635664190.972380][3410:3415] CHIP:DMG:
+          [1635664190.972469][3410:3415] CHIP:DMG: Data = [
+          [1635664190.972533][3410:3415] CHIP:DMG:
+          [1635664190.972593][3410:3415] CHIP:DMG: {
+          [1635664190.972721][3410:3415] CHIP:DMG: 0x0 = 0,
+          [1635664190.972828][3410:3415] CHIP:DMG: 0x1 = 1,
+          [1635664190.972900][3410:3415] CHIP:DMG: },
+          [1635664190.972954][3410:3415] CHIP:DMG: ],
+          [1635664190.973046][3410:3415] CHIP:DMG: DataElementVersion = 0x0,
+          [1635664190.973104][3410:3415] CHIP:DMG: },
+          [1635664190.973200][3410:3415] CHIP:DMG:
+          [1635664190.973250][3410:3415] CHIP:DMG: ],
+          [1635664190.973296][3410:3415] CHIP:DMG:
+          [1635664190.973340][3410:3415] CHIP:DMG: }
+          [1635664190.973513][3410:3415] CHIP:ZCL: ReadAttributesResponse:
+          [1635664190.973591][3410:3415] CHIP:ZCL: ClusterId: 0x0000_001D
+          [1635664190.973626][3410:3415] CHIP:ZCL: attributeId: 0x0000_0000
+          [1635664190.973658][3410:3415] CHIP:ZCL: status: Success (0x0000)
+          [1635664190.973723][3410:3415] CHIP:ZCL: attribute TLV Type: 0x16
+          [1635664190.973778][3410:3415] CHIP:TOO: OnDescriptorDeviceListListAttributeResponse: 1 entries
+          [1635664190.973855][3410:3415] CHIP:TOO: DeviceType[1]:
+          [1635664190.973889][3410:3415] CHIP:TOO: type: 0
+          [1635664190.973964][3410:3415] CHIP:TOO: revision: 1
+          [1635664190.974074][3410:3415] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 1814i
+
+          ./chip-tool descriptor read device-list 1 2
+
+          CHIP:DMG: ReportData =
+          [1635664306.625866][3418:3423] CHIP:DMG: {
+          [1635664306.625898][3418:3423] CHIP:DMG: AttributeDataList =
+          [1635664306.625936][3418:3423] CHIP:DMG: [
+          [1635664306.625972][3418:3423] CHIP:DMG: AttributeDataElement =
+          [1635664306.626018][3418:3423] CHIP:DMG: {
+          [1635664306.626056][3418:3423] CHIP:DMG: AttributePath =
+          [1635664306.626101][3418:3423] CHIP:DMG: {
+          [1635664306.626147][3418:3423] CHIP:DMG: NodeId = 0x1,
+          [1635664306.626197][3418:3423] CHIP:DMG: EndpointId = 0x2,
+          [1635664306.626247][3418:3423] CHIP:DMG: ClusterId = 0x1d,
+          [1635664306.626293][3418:3423] CHIP:DMG: FieldTag = 0x0000_0000,
+          [1635664306.626342][3418:3423] CHIP:DMG: }
+          [1635664306.626392][3418:3423] CHIP:DMG:
+          [1635664306.626430][3418:3423] CHIP:DMG: Data = [
+          [1635664306.626471][3418:3423] CHIP:DMG:
+          [1635664306.626522][3418:3423] CHIP:DMG: {
+          [1635664306.626572][3418:3423] CHIP:DMG: 0x0 = 0,
+          [1635664306.626624][3418:3423] CHIP:DMG: 0x1 = 1,
+          [1635664306.626670][3418:3423] CHIP:DMG: },
+          [1635664306.626720][3418:3423] CHIP:DMG: ],
+          [1635664306.626762][3418:3423] CHIP:DMG: DataElementVersion = 0x0,
+          [1635664306.626809][3418:3423] CHIP:DMG: },
+          [1635664306.626856][3418:3423] CHIP:DMG:
+          [1635664306.626891][3418:3423] CHIP:DMG: ],
+          [1635664306.626935][3418:3423] CHIP:DMG:
+          [1635664306.626965][3418:3423] CHIP:DMG: }
+          [1635664306.627075][3418:3423] CHIP:ZCL: ReadAttributesResponse:
+          [1635664306.627108][3418:3423] CHIP:ZCL: ClusterId: 0x0000_001D
+          [1635664306.627143][3418:3423] CHIP:ZCL: attributeId: 0x0000_0000
+          [1635664306.627170][3418:3423] CHIP:ZCL: status: Success (0x0000)
+          [1635664306.627201][3418:3423] CHIP:ZCL: attribute TLV Type: 0x16
+          [1635664306.627237][3418:3423] CHIP:TOO: OnDescriptorDeviceListListAttributeResponse: 1 entries
+          [1635664306.627301][3418:3423] CHIP:TOO: DeviceType[1]:
+          [1635664306.627335][3418:3423] CHIP:TOO: type: 0
+          [1635664306.627366][3418:3423] CHIP:TOO: revision: 1
           [1635664306.627460][3418:3423] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 40894i
       disabled: true
 

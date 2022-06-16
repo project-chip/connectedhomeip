@@ -24,9 +24,6 @@ assert(p6_target_project != "", "p6_target_project must be specified")
 
 # Add includes, cflags, asmflags, etc in config
 config("p6_sdk_config") {
-  # This is ugly but I'm unsure of any other way to forward (non-global) vars from the ota examples BUILD.gn file to this config object
-  ota_app = p6_target_project == "//:ota_requestor_app_sdk_sources"
-
   # Pull out includes from generated json
   # Treat these includes as system includes, so warnings in them are not fatal.
   _include_dirs = []
@@ -66,7 +63,7 @@ config("p6_sdk_config") {
 
   # Pull out linker flags with paths (-T flags) and make paths absolute
   # OTA app provides it's own linker script
-  if (!ota_app) {
+  if (!chip_enable_ota_requestor) {
     linker_script_flags = filter_include(mtb_json.ldflags, [ "-T*" ])
     foreach(flag, linker_script_flags) {
       ldflags += [ "-T/" + rebase_path(string_replace(flag, "-T", "", 1),

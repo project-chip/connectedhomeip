@@ -36,7 +36,7 @@ tests:
 
     - label: "Operate on DUT to change the occupancy status"
       verification: |
-
+          DUT Action needed.
       disabled: true
 
     - label: "after a few seconds, TH reads Occupancy attribute from DUT"

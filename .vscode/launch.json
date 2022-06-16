@@ -90,6 +90,39 @@
                 }
             ]
         },
+        {
+            "name": "LightingApp (Tizen) [remote]",
+            "type": "cppdbg",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/out/tizen-arm-light",
+            "program": "${workspaceFolder}/out/tizen-arm-light/chip-lighting-app",
+            "miDebuggerPath": "${env:TIZEN_SDK_ROOT}/tools/arm-linux-gnueabi-gcc-9.2/bin/arm-linux-gnueabi-gdb",
+            "additionalSOLibSearchPath": "${env:TIZEN_ROOTFS}",
+            "preLaunchTask": "Launch LightingApp with gdbserver attached (Tizen)",
+            "miDebuggerServerAddress": "localhost:9999",
+            "linux": {
+                "MIMode": "gdb"
+            },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "set solib-absolute-prefix ${env:TIZEN_ROOTFS}"
+                },
+                {
+                    "text": "set sysroot ${env:TIZEN_SDK_SYSROOT}"
+                },
+                {
+                    "text": "set debug-file-directory {env:TIZEN_SDK_SYSROOT}/usr/lib/debug"
+                },
+                {
+                    "text": "set solib-search-path ${workspaceFolder}/out/tizen-arm-light"
+                }
+            ]
+        },
 
         {
             "name": "Debug Mbed examples",

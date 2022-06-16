@@ -5174,18 +5174,16 @@ JNI_METHOD(void, TestClusterCluster, writeListStructOctetStringAttribute)
             {
                 jobject element_0;
                 chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
-                jobject element_0_fabricIndexItem_1;
-                chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricIndex", "Ljava/lang/Long;",
-                                                                  element_0_fabricIndexItem_1);
-                listHolder_0->mList[i_0].fabricIndex =
-                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricIndex)>>(
-                        chip::JniReferences::GetInstance().LongToPrimitive(element_0_fabricIndexItem_1));
-                jobject element_0_operationalCertItem_1;
-                chip::JniReferences::GetInstance().GetObjectField(element_0, "operationalCert", "[B",
-                                                                  element_0_operationalCertItem_1);
+                jobject element_0_member1Item_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "member1", "Ljava/lang/Long;",
+                                                                  element_0_member1Item_1);
+                listHolder_0->mList[i_0].member1 = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].member1)>>(
+                    chip::JniReferences::GetInstance().LongToPrimitive(element_0_member1Item_1));
+                jobject element_0_member2Item_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "member2", "[B", element_0_member2Item_1);
                 cleanupByteArrays.push_back(
-                    chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0_operationalCertItem_1)));
-                listHolder_0->mList[i_0].operationalCert = cleanupByteArrays.back()->byteSpan();
+                    chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0_member2Item_1)));
+                listHolder_0->mList[i_0].member2 = cleanupByteArrays.back()->byteSpan();
             }
             cppValue = ListType_0(listHolder_0->mList, valueSize);
         }

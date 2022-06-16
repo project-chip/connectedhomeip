@@ -28,31 +28,29 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label:
-          "Read ClusterRevision attribute from the DUT and Verify that the DUT
-          response indicates ClusterRevision attribute has the value 4"
-      verification: |
-          chip-tool temperaturemeasurement read cluster-revision 12345 1
-          verify that you see something like this:
-          [1643287333.135402][12177:12182] CHIP:DMG:   Data = 4,
-          [1643287333.135504][12177:12182] CHIP:DMG:                         }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter ClusterRevision attribute value"
-              - name: "expectedValue"
-                value: 4
+    - label: "Read ClusterRevision attribute from the DUT"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 4
+          constraints:
+              type: unit16
+
+    - label: "Read FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
 
     #Issue 17463
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && A_TEMPERATURE_TOLERANCE
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 2, 3]
+          value: [0, 1, 2, 3, 65528, 65529, 65530, 65531, 65532, 65533]
           constraints:
               type: list
 
@@ -71,37 +69,17 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label:
-          "Read AcceptedCommandList attribute from the DUT and Verify that the
-          DUT response provides a list of supported commands,This list SHALL
-          include all the mandatory commands."
-      verification: |
-          ./chip-tool temperaturemeasurement read -command-list 12345 1
-          [1646099169.759707][39879:39884] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0402 Attribute 0x0000_FFF9DataVersion: 1905470969
-          [1646099169.759782][39879:39884] CHIP:TOO:   AcceptedCommandList: 0 entries
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Read AcceptedCommandList attribute from the DUT"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
 
-    - label:
-          "Read GeneratedCommandList attribute from the DUT and Verify that the
-          DUT response provides a list of supported commands."
-      verification: |
-          ./chip-tool temperaturemeasurement read generated-command-list 12345 1
-          [1646099269.732363][39895:39900] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0402 Attribute 0x0000_FFF8DataVersion: 1905470969
-          [1646099269.732449][39895:39900] CHIP:TOO:   GeneratedCommandList: 0 entries
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Read GeneratedCommandList attribute from the DUT"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

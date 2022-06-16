@@ -23,9 +23,9 @@
 
 namespace chip {
 
-CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager)
+CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager, const ScopedNodeId & sessionEvictionHint)
 {
-    auto handle = sessionManager.AllocateSession(GetSecureSessionType());
+    auto handle = sessionManager.AllocateSession(GetSecureSessionType(), sessionEvictionHint);
     VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(mSecureSessionHolder.GrabPairingSession(handle.Value()), CHIP_ERROR_INTERNAL);
     mSessionManager = &sessionManager;
@@ -44,7 +44,7 @@ CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & 
     ReturnErrorOnFailure(DeriveSecureSession(secureSession->GetCryptoContext()));
     uint16_t peerSessionId = GetPeerSessionId();
     secureSession->SetPeerAddress(peerAddress);
-    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
+    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(Transport::PeerMessageCounter::kInitialSyncValue);
 
     // Call Activate last, otherwise errors on anything after would lead to
     // a partially valid session.

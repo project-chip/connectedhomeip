@@ -17450,7 +17450,7 @@ public class ChipClusters {
   }
 
   public static class TestClusterCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1295L;
+    public static final long CLUSTER_ID = 4294048773L;
 
     public TestClusterCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);

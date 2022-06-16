@@ -18,7 +18,7 @@ name:
 
 config:
     nodeId: 0x12344321
-    timeout: 550
+    timeout: 700
     nodeIdForDuplicateCommissioning:
         type: NODE_ID
         defaultValue: 0x11
