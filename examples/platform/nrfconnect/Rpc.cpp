@@ -16,10 +16,13 @@
  *    limitations under the License.
  */
 
+#if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 #include "AppTask.h"
+#endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
 #include "pw_sys_io_nrfconnect/init.h"
+#include <logging/log.h>
 
 #include <kernel.h>
 

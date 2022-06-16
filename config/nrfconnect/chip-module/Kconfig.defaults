@@ -185,6 +185,11 @@ config CHIP_QSPI_NOR
     bool
     default y
 
+# Enable extended discovery
+config CHIP_EXTENDED_DISCOVERY
+    bool
+    default y
+
 # Enable OpenThread
 
 config NET_L2_OPENTHREAD

@@ -24,7 +24,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <ChipShellCollection.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -33,6 +32,18 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+
+#include <logging/log.h>
+
+#if CONFIG_ENABLE_CHIP_SHELL || CONFIG_CHIP_LIB_SHELL
+#include <ChipShellCollection.h>
+#endif
+
+#ifdef CONFIG_ENABLE_PW_RPC
+#include "Rpc.h"
+#endif
+
+LOG_MODULE_REGISTER(app, CONFIG_MATTER_LOG_LEVEL);
 
 using namespace chip;
 using namespace chip::Shell;
@@ -44,7 +55,13 @@ constexpr int kExtDiscoveryTimeoutSecs = 20;
 
 CHIP_ERROR main()
 {
-    CHIP_ERROR err = chip::Platform::MemoryInit();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+#ifdef CONFIG_ENABLE_PW_RPC
+    rpc::Init();
+#endif
+
+    err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Platform::MemoryInit() failed");
@@ -84,7 +101,9 @@ CHIP_ERROR main()
 
     // Device Attestation & Onboarding codes
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(kExtDiscoveryTimeoutSecs);
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY */
 
     // Start IM server
     static chip::CommonCaseDeviceServerInitParams initParams;

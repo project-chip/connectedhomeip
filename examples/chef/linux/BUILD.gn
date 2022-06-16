@@ -13,10 +13,9 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/openthread.gni")
+
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
-import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/common_flags.gni")
 
 assert(chip_build_tools)
@@ -34,27 +33,19 @@ project_dir = "./.."
 
 chip_data_model("chef-data-model") {
   zap_file = "${project_dir}/devices/${sample_zap_file}"
+
   zap_pregenerated_dir =
       "${chip_root}/examples/chef/out/${sample_name}/zap-generated/"
   is_server = true
 }
 
 executable("${sample_name}") {
-  sources = [
-    "${project_dir}/common/stubs.cpp",
-    "${project_dir}/linux/main.cpp",
-  ]
+  sources = [ "${project_dir}/linux/main.cpp" ]
 
   deps = [
     ":chef-data-model",
     "${chip_root}/examples/platform/linux:app-main",
-    "${chip_root}/examples/platform/linux:app-main",
-    "${chip_root}/src/controller",
-    "${chip_root}/src/credentials",
     "${chip_root}/src/lib",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/lib/shell",
-    "${chip_root}/src/platform",
     "${project_dir}/shell_common:shell_common",
   ]
 
@@ -62,11 +53,13 @@ executable("${sample_name}") {
 
   if (chip_enable_pw_rpc) {
     defines = [
+      "PW_RPC_ENABLED",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
       "PW_RPC_BUTTON_SERVICE=1",
       "PW_RPC_DESCRIPTOR_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
       "PW_RPC_LIGHTING_SERVICE=1",
+      "PW_RPC_TRACING_SERVICE=1",
     ]
 
     sources += [
@@ -83,6 +76,9 @@ executable("${sample_name}") {
       "$dir_pw_stream:socket_stream",
       "$dir_pw_stream:sys_io_stream",
       "$dir_pw_sync:mutex",
+      "$dir_pw_trace",
+      "$dir_pw_trace_tokenized",
+      "$dir_pw_trace_tokenized:trace_rpc_service",
       "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
@@ -93,6 +89,10 @@ executable("${sample_name}") {
     ]
 
     deps += pw_build_LINK_DEPS
+
+    cflags = [ "-Wno-gnu-designator" ]
+
+    include_dirs += [ "${chip_root}/examples/common" ]
   } else {
     # The system_rpc_server.cc file is in pigweed and doesn't compile with
     # -Wconversion, remove check for RPC build only.

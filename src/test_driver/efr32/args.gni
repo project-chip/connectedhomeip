@@ -31,3 +31,5 @@ chip_monolithic_tests = true
 # Problem : Linker issue if set to true
 chip_system_config_use_open_thread_inet_endpoints = false
 chip_with_lwip = true
+
+pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"
