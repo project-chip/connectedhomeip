@@ -1439,6 +1439,16 @@ enum class ConfigStatus : uint8_t
     kTiltEncoderControlled = 0x40,
 };
 
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kLift              = 0x1,
+    kTilt              = 0x2,
+    kPositionAwareLift = 0x4,
+    kAbsolutePosition  = 0x8,
+    kPositionAwareTilt = 0x10,
+};
+
 // Bitmap for Mode
 enum class Mode : uint8_t
 {
@@ -1448,26 +1458,16 @@ enum class Mode : uint8_t
     kLedFeedback            = 0x8,
 };
 
-// Bitmap for WcFeature
-enum class WcFeature : uint32_t
-{
-    kLift              = 0x1,
-    kTilt              = 0x2,
-    kPositionAwareLift = 0x4,
-    kAbsolutePosition  = 0x8,
-    kPositionAwareTilt = 0x10,
-};
-
-// Bitmap for WcOperationalStatus
-enum class WcOperationalStatus : uint8_t
+// Bitmap for OperationalStatus
+enum class OperationalStatus : uint8_t
 {
     kGlobal = 0x3,
     kLift   = 0xC,
     kTilt   = 0x30,
 };
 
-// Bitmap for WcSafetyStatus
-enum class WcSafetyStatus : uint16_t
+// Bitmap for SafetyStatus
+enum class SafetyStatus : uint16_t
 {
     kRemoteLockout       = 0x1,
     kTamperDetection     = 0x2,
@@ -1931,197 +1931,6 @@ namespace ChloroformConcentrationMeasurement {
 
 namespace SodiumConcentrationMeasurement {
 } // namespace SodiumConcentrationMeasurement
-
-namespace IasZone {
-
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for IasEnrollResponseCode
-enum class IasEnrollResponseCode : uint8_t
-{
-    kSuccess        = 0x00,
-    kNotSupported   = 0x01,
-    kNoEnrollPermit = 0x02,
-    kTooManyZones   = 0x03,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasEnrollResponseCode           = EmberAfIasEnrollResponseCode;
-#endif
-
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for IasZoneType
-enum class IasZoneType : uint16_t
-{
-    kStandardCie             = 0x00,
-    kMotionSensor            = 0x0D,
-    kContactSwitch           = 0x15,
-    kFireSensor              = 0x28,
-    kWaterSensor             = 0x2A,
-    kGasSensor               = 0x2B,
-    kPersonalEmergencyDevice = 0x2C,
-    kVibrationMovementSensor = 0x2D,
-    kRemoteControl           = 0x10F,
-    kKeyFob                  = 0x115,
-    kKeypad                  = 0x21D,
-    kStandardWarningDevice   = 0x225,
-    kGlassBreakSensor        = 0x226,
-    kCarbonMonoxideSensor    = 0x227,
-    kSecurityRepeater        = 0x229,
-    kInvalidZoneType         = 0xFFFF,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasZoneType                     = EmberAfIasZoneType;
-#endif
-
-// Bitmap for IasZoneStatus
-enum class IasZoneStatus : uint16_t
-{
-    kAlarm1             = 0x1,
-    kAlarm2             = 0x2,
-    kTamper             = 0x4,
-    kBattery            = 0x8,
-    kSupervisionReports = 0x10,
-    kRestoreReports     = 0x20,
-    kTrouble            = 0x40,
-    kAc                 = 0x80,
-    kTest               = 0x100,
-    kBatteryDefect      = 0x200,
-};
-} // namespace IasZone
-
-namespace IasAce {
-
-// Enum for IasAceAlarmStatus
-enum class IasAceAlarmStatus : uint8_t
-{
-    kNoAlarm        = 0x00,
-    kBurglar        = 0x01,
-    kFire           = 0x02,
-    kEmergency      = 0x03,
-    kPolicePanic    = 0x04,
-    kFirePanic      = 0x05,
-    kEmergencyPanic = 0x06,
-};
-
-// Enum for IasAceArmMode
-enum class IasAceArmMode : uint8_t
-{
-    kDisarm                 = 0x00,
-    kArmDayHomeZonesOnly    = 0x01,
-    kArmNightSleepZonesOnly = 0x02,
-    kArmAllZones            = 0x03,
-};
-
-// Enum for IasAceArmNotification
-enum class IasAceArmNotification : uint8_t
-{
-    kAllZonesDisarmed         = 0x00,
-    kOnlyDayHomeZonesArmed    = 0x01,
-    kOnlyNightSleepZonesArmed = 0x02,
-    kAllZonesArmed            = 0x03,
-    kInvalidArmDisarmCode     = 0x04,
-    kNotReadyToArm            = 0x05,
-    kAlreadyDisarmed          = 0x06,
-};
-
-// Enum for IasAceAudibleNotification
-enum class IasAceAudibleNotification : uint8_t
-{
-    kMute         = 0x00,
-    kDefaultSound = 0x01,
-};
-
-// Enum for IasAceBypassResult
-enum class IasAceBypassResult : uint8_t
-{
-    kZoneBypassed         = 0x00,
-    kZoneNotBypassed      = 0x01,
-    kNotAllowed           = 0x02,
-    kInvalidZoneId        = 0x03,
-    kUnknownZoneId        = 0x04,
-    kInvalidArmDisarmCode = 0x05,
-};
-
-// Enum for IasAcePanelStatus
-enum class IasAcePanelStatus : uint8_t
-{
-    kPanelDisarmed = 0x00,
-    kArmedStay     = 0x01,
-    kArmedNight    = 0x02,
-    kArmedAway     = 0x03,
-    kExitDelay     = 0x04,
-    kEntryDelay    = 0x05,
-    kNotReadyToArm = 0x06,
-    kInAlarm       = 0x07,
-    kArmingStay    = 0x08,
-    kArmingNight   = 0x09,
-    kArmingAway    = 0x0A,
-};
-
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for IasZoneType
-enum class IasZoneType : uint16_t
-{
-    kStandardCie             = 0x00,
-    kMotionSensor            = 0x0D,
-    kContactSwitch           = 0x15,
-    kFireSensor              = 0x28,
-    kWaterSensor             = 0x2A,
-    kGasSensor               = 0x2B,
-    kPersonalEmergencyDevice = 0x2C,
-    kVibrationMovementSensor = 0x2D,
-    kRemoteControl           = 0x10F,
-    kKeyFob                  = 0x115,
-    kKeypad                  = 0x21D,
-    kStandardWarningDevice   = 0x225,
-    kGlassBreakSensor        = 0x226,
-    kCarbonMonoxideSensor    = 0x227,
-    kSecurityRepeater        = 0x229,
-    kInvalidZoneType         = 0xFFFF,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasZoneType                     = EmberAfIasZoneType;
-#endif
-
-// Bitmap for IasZoneStatus
-enum class IasZoneStatus : uint16_t
-{
-    kAlarm1             = 0x1,
-    kAlarm2             = 0x2,
-    kTamper             = 0x4,
-    kBattery            = 0x8,
-    kSupervisionReports = 0x10,
-    kRestoreReports     = 0x20,
-    kTrouble            = 0x40,
-    kAc                 = 0x80,
-    kTest               = 0x100,
-    kBatteryDefect      = 0x200,
-};
-} // namespace IasAce
-
-namespace IasWd {
-
-// Bitmap for SquawkInfo
-enum class SquawkInfo : uint8_t
-{
-    kMode   = 0xF0,
-    kStrobe = 0x8,
-    kLevel  = 0x3,
-};
-
-// Bitmap for WarningInfo
-enum class WarningInfo : uint8_t
-{
-    kMode       = 0xF0,
-    kStrobe     = 0xC,
-    kSirenLevel = 0x3,
-};
-} // namespace IasWd
 
 namespace WakeOnLan {
 } // namespace WakeOnLan

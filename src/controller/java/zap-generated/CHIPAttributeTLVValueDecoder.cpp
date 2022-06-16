@@ -6508,6 +6508,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
                 value_failSafeExpiryLengthSecondsClassName.c_str(), value_failSafeExpiryLengthSecondsCtorSignature.c_str(),
                 cppValue.failSafeExpiryLengthSeconds, value_failSafeExpiryLengthSeconds);
+            jobject value_maxCumulativeFailsafeSeconds;
+            std::string value_maxCumulativeFailsafeSecondsClassName     = "java/lang/Integer";
+            std::string value_maxCumulativeFailsafeSecondsCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                value_maxCumulativeFailsafeSecondsClassName.c_str(), value_maxCumulativeFailsafeSecondsCtorSignature.c_str(),
+                cppValue.maxCumulativeFailsafeSeconds, value_maxCumulativeFailsafeSeconds);
 
             jclass basicCommissioningInfoStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
@@ -6519,7 +6525,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jmethodID basicCommissioningInfoStructCtor =
-                env->GetMethodID(basicCommissioningInfoStructClass, "<init>", "(Ljava/lang/Integer;)V");
+                env->GetMethodID(basicCommissioningInfoStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
             if (basicCommissioningInfoStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$GeneralCommissioningClusterBasicCommissioningInfo constructor");
@@ -6527,7 +6533,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
 
             value = env->NewObject(basicCommissioningInfoStructClass, basicCommissioningInfoStructCtor,
-                                   value_failSafeExpiryLengthSeconds);
+                                   value_failSafeExpiryLengthSeconds, value_maxCumulativeFailsafeSeconds);
             return value;
         }
         case Attributes::RegulatoryConfig::Id: {
@@ -18678,7 +18684,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+                                                                          cppValue.Raw(), value);
             return value;
         }
         case Attributes::TargetPositionLiftPercent100ths::Id: {
@@ -18871,7 +18877,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+                                                                           cppValue.Raw(), value);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {

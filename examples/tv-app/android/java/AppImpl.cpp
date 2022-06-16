@@ -21,11 +21,13 @@
 
 #include "AppImpl.h"
 
+#include "ContentAppCommandDelegate.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
+#include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
@@ -328,12 +330,12 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
     {
         auto & app = mContentApps.at(i);
 
-        ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
-        if (app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
+        ChipLogProgress(DeviceLayer, " Looking next=%s ", app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
+        if (app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
         {
-            ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, Span<DataVersion>(gDataVersions[i]),
+            ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(gDataVersions[i]),
                                                             Span<const EmberAfDeviceType>(gContentAppDeviceType));
-            return &app;
+            return app;
         }
     }
     ChipLogProgress(DeviceLayer, "LoadContentAppByAppId NOT FOUND catalogVendorId=%d applicationId=%s ", vendorApp.catalogVendorId,
@@ -342,13 +344,13 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
     return nullptr;
 }
 
-EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl & app)
+EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl * app)
 {
     DataVersion dataVersionBuf[ArraySize(contentAppClusters)];
-    EndpointId epId = ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf),
+    EndpointId epId = ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf),
                                                                       Span<const EmberAfDeviceType>(gContentAppDeviceType));
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
-                    app.GetEndpointId());
+                    app->GetEndpointId());
     mContentApps.push_back(app);
     return epId;
 }
@@ -380,9 +382,9 @@ void ContentAppFactoryImpl::SendTestMessage(EndpointId epId, const char * messag
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl SendTestMessage called with message %s & endpointId %d", message, epId);
     for (size_t i = 0; i < mContentApps.size(); ++i)
     {
-        ContentAppImpl app = mContentApps.at(i);
-        ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl checking app with endpointId %d", app.ContentApp::GetEndpointId());
-        if (app.GetEndpointId() == epId)
+        ContentAppImpl * app = mContentApps.at(i);
+        ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl checking app with endpointId %d", app->GetEndpointId());
+        if (app->GetEndpointId() == epId)
         {
             ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl SendTestMessage endpoint found");
             app::ConcreteCommandPath commandPath(epId, app::Clusters::ContentLauncher::Id,
@@ -391,8 +393,8 @@ void ContentAppFactoryImpl::SendTestMessage(EndpointId epId, const char * messag
             app::CommandHandler commandHandler(&callback);
             CommandResponseHelper<LaunchResponseType> helper(&commandHandler, commandPath);
             chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type branding;
-            app.GetContentLauncherDelegate()->HandleLaunchUrl(helper, CharSpan::fromCharString(message),
-                                                              CharSpan::fromCharString("Temp Display"), branding);
+            app->GetContentLauncherDelegate()->HandleLaunchUrl(helper, CharSpan::fromCharString(message),
+                                                               CharSpan::fromCharString("Temp Display"), branding);
         }
     }
 }
@@ -402,11 +404,21 @@ void ContentAppFactoryImpl::SendTestMessage(EndpointId epId, const char * messag
 
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter)
+CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter, jobject contentAppEndpointManager)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentAppPlatform::GetInstance().SetupAppPlatform();
     ContentAppPlatform::GetInstance().SetContentAppFactory(&gFactory);
+
+    ChipLogProgress(AppServer, "Starting registration of command handler delegates");
+    for (size_t i = 0; i < ArraySize(contentAppClusters); i++)
+    {
+        ContentAppCommandDelegate * delegate =
+            new ContentAppCommandDelegate(contentAppEndpointManager, contentAppClusters[i].clusterId);
+        chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(delegate);
+        ChipLogProgress(AppServer, "Registered command handler delegate for cluster %d", contentAppClusters[i].clusterId);
+    }
+
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
@@ -443,8 +455,8 @@ EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const cha
                          const char * szApplicationVersion, jobject manager)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ContentAppImpl app =
-        ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "34567890", manager);
+    ContentAppImpl * app =
+        new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "20202021", manager);
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
     return gFactory.AddContentApp(app);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

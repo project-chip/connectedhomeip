@@ -117,6 +117,12 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                             continue;
                         }
 
+                        if (ConnectivityManagerImpl::GetWiFiIfName() == nullptr)
+                        {
+                            ChipLogDetail(DeviceLayer, "No wifi interface name. Ignoring IP update event.");
+                            continue;
+                        }
+
                         if (strcmp(name, ConnectivityManagerImpl::GetWiFiIfName()) != 0)
                         {
                             continue;

@@ -27,7 +27,7 @@
 #include <inttypes.h>
 #include <jni.h>
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace DeviceLayer {
