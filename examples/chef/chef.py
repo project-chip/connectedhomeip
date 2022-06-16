@@ -231,7 +231,8 @@ def main(argv: Sequence[str]) -> None:
     parser.add_option("-g", "--zapgui", help="runs zap GUI display to allow editing of data model",
                       action="store_true", dest="do_run_gui")
     parser.add_option("-d", "--device", dest="sample_device_type_name",
-                      help="specifies device type. Default is lighting. See info above for supported device types", metavar="TARGET", default="lighting")
+                      help="specifies device type. Default is lighting. See info above for supported device types",
+                      metavar="TARGET", choices=_DEVICE_LIST)
     parser.add_option("-t", "--target", type='choice',
                       action='store',
                       dest="build_target",
