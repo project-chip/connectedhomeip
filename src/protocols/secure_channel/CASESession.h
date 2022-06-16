@@ -58,6 +58,7 @@ namespace chip {
 // when implementing concurrent CASE session.
 class DLL_EXPORT CASESession : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
+                               public FabricTable::Delegate,
                                public PairingSession
 {
 public:
@@ -73,7 +74,7 @@ public:
      *   Initialize using configured fabrics and wait for session establishment requests.
      *
      * @param sessionManager                session manager from which to allocate a secure session object
-     * @param fabrics                       Table of fabrics that are currently configured on the device
+     * @param fabricTable                   Table of fabrics that are currently configured on the device
      * @param policy                        Optional application-provided certificate validity policy
      * @param delegate                      Callback object
      * @param previouslyEstablishedPeer     If a session had previously been established successfully to a peer, this should
@@ -84,7 +85,7 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR PrepareForSessionEstablishment(
-        SessionManager & sessionManager, FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
+        SessionManager & sessionManager, FabricTable * fabricTable, SessionResumptionStorage * sessionResumptionStorage,
         Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
         ScopedNodeId previouslyEstablishedPeer,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
@@ -166,6 +167,28 @@ public:
     //// SessionDelegate ////
     void OnSessionReleased() override;
 
+    //// FabricTable::Delegate Implementation ////
+    void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        (void) fabricTable;
+        InvalidateIfPendingEstablishmentOnFabric(fabricIndex);
+    }
+    void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        (void) fabricTable;
+        (void) fabricIndex;
+    }
+    void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        (void) fabricTable;
+        (void) fabricIndex;
+    }
+    void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+    {
+        (void) fabricTable;
+        InvalidateIfPendingEstablishmentOnFabric(fabricIndex);
+    }
+
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
@@ -174,6 +197,7 @@ public:
     void Clear();
 
 private:
+    friend class CASESessionForTest;
     enum class State : uint8_t
     {
         kInitialized       = 0,
@@ -237,12 +261,20 @@ private:
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
 
+    void AbortPendingEstablish(CHIP_ERROR err);
+
     CHIP_ERROR GetHardcodedTime();
 
     CHIP_ERROR SetEffectiveTime();
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                        const System::PacketBufferHandle & msg);
+
+    void InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex);
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    void SetStopSigmaHandshakeAt(Optional<State> state) { mStopHandshakeAtState = state; }
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
 
     Crypto::Hash_SHA256_stream mCommissioningHash;
     Crypto::P256PublicKey mRemotePubKey;
@@ -272,6 +304,10 @@ private:
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
 
     State mState;
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    Optional<State> mStopHandshakeAtState = Optional<State>::Missing();
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
 };
 
 } // namespace chip
