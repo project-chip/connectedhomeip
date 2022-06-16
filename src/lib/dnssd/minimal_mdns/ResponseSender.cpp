@@ -117,6 +117,8 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
         }
     }
 
+    const ResponseConfiguration defaultResponseConfiguration;
+
     // send all 'Answer' replies
     {
         const chip::System::Clock::Timestamp kTimeNow = chip::System::SystemClock().GetMonotonicTimestamp();
@@ -142,7 +144,7 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
             }
             for (auto it = (*responder)->begin(&responseFilter); it != (*responder)->end(); it++)
             {
-                it->responder->AddAllResponses(querySource, this);
+                it->responder->AddAllResponses(querySource, this, defaultResponseConfiguration);
                 ReturnErrorOnFailure(mSendState.GetError());
 
                 (*responder)->MarkAdditionalRepliesFor(it);
@@ -175,7 +177,7 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
             }
             for (auto it = (*responder)->begin(&responseFilter); it != (*responder)->end(); it++)
             {
-                it->responder->AddAllResponses(querySource, this);
+                it->responder->AddAllResponses(querySource, this, defaultResponseConfiguration);
                 ReturnErrorOnFailure(mSendState.GetError());
             }
         }

@@ -147,6 +147,12 @@ private:
     Allocator * mAllocator = nullptr;
 };
 
+enum BroadcastAdvertiseType
+{
+    kStarted,     // Advertise at startup of all records added, as required by RFC 6762.
+    kRemovingAll, // sent a TTL 0 for all records, as records are removed
+};
+
 class AdvertiserMinMdns : public ServiceAdvertiser,
                           public MdnsPacketDelegate, // receive query packets
                           public ParserDelegate      // parses queries
@@ -190,10 +196,12 @@ public:
     void OnQuery(const QueryData & data) override;
 
 private:
-    /// Advertise available records configured within the server
+    /// Advertise available records configured within the server.
     ///
-    /// Usable as boot-time advertisement of available SRV records.
-    void AdvertiseRecords();
+    /// Establishes a type of 'Advertise all currently configured items'
+    /// for a specific purpose (e.g. boot time advertises everything, shut-down
+    /// removes all records by advertising a 0 TTL)
+    void AdvertiseRecords(BroadcastAdvertiseType type);
 
     /// Determine if advertisement on the specified interface/address is ok given the
     /// interfaces on which the mDNS server is listening
@@ -339,7 +347,7 @@ CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::EndPointManager<chip::Inet::UDPEn
 
     ChipLogProgress(Discovery, "CHIP minimal mDNS started advertising.");
 
-    AdvertiseRecords();
+    AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
     mIsInitialized = true;
 
@@ -510,9 +518,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
     ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Operational device'.");
 
-    // Advertise the records we just added as required by RFC 6762.
-    // TODO - Don't announce records that haven't been updated.
-    AdvertiseRecords();
+    AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
     ChipLogProgress(Discovery, "mDNS service published: %s.%s", instanceName.names[1], instanceName.names[2]);
 
@@ -709,9 +715,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Commissioner device'.");
     }
 
-    // Advertise the records we just added as required by RFC 6762.
-    // TODO - Don't announce records that haven't been updated.
-    AdvertiseRecords();
+    AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
     ChipLogProgress(Discovery, "mDNS service published: %s.%s", instanceName.names[1], instanceName.names[2]);
 
@@ -841,7 +845,7 @@ bool AdvertiserMinMdns::ShouldAdvertiseOn(const chip::Inet::InterfaceId id, cons
     return result;
 }
 
-void AdvertiserMinMdns::AdvertiseRecords()
+void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
 {
     chip::Inet::InterfaceAddressIterator interfaceAddress;
 
@@ -883,8 +887,10 @@ void AdvertiserMinMdns::AdvertiseRecords()
         packetInfo.DestPort  = kMdnsPort;
         packetInfo.Interface = interfaceAddress.GetInterfaceId();
 
+        // Advertise all records
+        // TODO: for kStarted,  don't announce records that haven't been updated.
         QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
-        queryData.SetIsBootAdvertising(true);
+        queryData.SetIsInternalBroadcast(true);
 
         for (auto & it : mOperationalResponders)
         {
