@@ -423,8 +423,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             }
 
             // The following cast is safe, since we can only hold a few tens of paths in one request.
-            Protocols::InteractionModel::Status checkResult = EnsureResourceForRead(
-                apExchangeContext->GetSessionHandle()->GetFabricIndex(), requestedAttributePathCount, requestedEventPathCount);
+            Status checkResult = EnsureResourceForRead(apExchangeContext->GetSessionHandle()->GetFabricIndex(),
+                                                       requestedAttributePathCount, requestedEventPathCount);
             if (checkResult != Status::Success)
             {
                 return checkResult;
@@ -976,7 +976,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
         for (const auto & fabric : *mpFabricTable)
         {
             didEvictHandler = didEvictHandler || evictAndUpdateResourceUsage(fabric.GetFabricIndex());
-            // The resources are enough to serve this request, do not evict anything.
+            // If we now have enough resources to serve this request, stop evicting things.
             if (haveEnoughResourcesForTheRequest())
             {
                 break;
