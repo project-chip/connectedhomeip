@@ -23,6 +23,10 @@
 
 @interface CastingServerBridge : NSObject
 
+@property void (^_Nullable commissioningCompleteCallback)(bool);
+
+@property void (^_Nullable launchUrlResponseCallback)(bool);
+
 + (CastingServerBridge * _Nullable)getSharedInstance;
 
 - (void)discoverCommissioners:(dispatch_queue_t _Nonnull)clientQueue
@@ -38,6 +42,15 @@
                                  clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                        udcRequestSentHandler:(nullable void (^)(bool))udcRequestSentHandler;
 
+- (void)openBasicCommissioningWindow:(nullable void (^)(bool))commissioningCompleteCallback
+                         clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    commisisoningWindowOpenedHandler:(nullable void (^)(bool))commisisoningWindowOpenedHandler;
+
+- (void)contentLauncherLaunchUrl:(NSString * _Nonnull)contentUrl
+               contentDisplayStr:(NSString * _Nonnull)contentDisplayStr
+       launchUrlResponseCallback:(nullable void (^)(bool))launchUrlResponseCallback
+                     clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+      launcUrlRequestSentHandler:(nullable void (^)(bool))launcUrlRequestSentHandler;
 @end
 
 #endif /* CastingServerBridge_h */

@@ -48,3 +48,6 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test TV casting app"
 
 #define CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART 0
+
+// Enable some test-only interaction model APIs.
+#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
