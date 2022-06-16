@@ -26,15 +26,9 @@ using namespace chip::app::Clusters;
 {{#chip_client_clusters includeAll=true}}
 
 @interface MTRTest{{asUpperCamelCase name}} ()
-@property (readonly) chip::Controller::{{asUpperCamelCase name}}Cluster cppCluster;
 @end
 
 @implementation MTRTest{{asUpperCamelCase name}}
-
-- (chip::Controller::ClusterBase *)getCluster
-{
-    return &_cppCluster;
-}
 
 {{#chip_server_cluster_attributes}}
 {{#unless isWritableAttribute}}

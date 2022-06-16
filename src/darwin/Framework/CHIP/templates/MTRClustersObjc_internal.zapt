@@ -7,7 +7,6 @@
 {{#chip_client_clusters includeAll=true}}
 
 @interface MTR{{asUpperCamelCase name}} ()
-@property (readonly) chip::Controller::{{asUpperCamelCase name}}Cluster cppCluster;
 @end
 
 {{/chip_client_clusters}}

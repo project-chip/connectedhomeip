@@ -21,9 +21,21 @@ using namespace chip::app::Clusters;
 {{#chip_client_clusters includeAll=true}}
 @implementation MTR{{asUpperCamelCase name}}
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset(&[device internalDevice]->GetExchangeManager(), [device internalDevice]->GetSecureSession().Value(), endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::{{asUpperCamelCase name}}Cluster) cppCluster
+{
+    return *_cppCluster.get();
 }
 
 {{#chip_cluster_commands}}
