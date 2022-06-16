@@ -37,20 +37,12 @@ tests:
               type: uint16
 
     - label: "Read the global attribute: FeatureMap"
-      verification: |
-          ./chip-tool generalcommissioning read feature-map 1 0
-          [1651128263.185162][4511:4516] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_FFFC DataVersion: 3151774871
-          [1651128263.185227][4511:4516] CHIP:TOO:   FeatureMap: 6
-          [1651128263.185320][4511:4516] CHIP:EM: Sending Standalone Ack for MessageCounter:13202966 on exchange 62574i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
 
     #Issue 18002
     - label: "Read the global attribute: AttributeList"
@@ -58,7 +50,7 @@ tests:
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 2, 3, 65528, 65529, 65531, 65532, 65533]
+          value: [0, 1, 2, 3, 4, 65528, 65529, 65531, 65531, 65532, 65533]
           constraints:
               type: list
 

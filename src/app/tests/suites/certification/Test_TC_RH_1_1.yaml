@@ -28,23 +28,13 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label:
-          "Read ClusterRevision attribute from the DUT and Verify that the DUT
-          response indicates ClusterRevision attribute has the value 3"
-      verification: |
-          ./chip-tool relativehumiditymeasurement read cluster-revision 1 1
-          verify that you see something like this:
-          [1643287333.135402][12177:12182] CHIP:DMG:  Data = 3,
-          [1643287333.135504][12177:12182] CHIP:DMG:                         }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter the Value"
-              - name: "expectedValue"
-                value: 3
+    - label: "Read ClusterRevision attribute from the DUT"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 3
+          constraints:
+              type: list
 
     #Disabled due to issue 17462
     - label: "Read the global attribute: AttributeList"
@@ -75,7 +65,6 @@ tests:
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
-          value: []
           constraints:
               type: list
 
@@ -83,22 +72,13 @@ tests:
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: []
           constraints:
               type: list
 
-    - label:
-          "Read FeatureMap attribute from the DUT and Verify that the DUT
-          response"
-      verification: |
-          ./chip-tool lowpower read feature-map 1 1
-          [1645780669.465220][5069:5074] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter FeatureMap attribute value"
-              - name: "expectedValue"
-                value: 0
+    - label: "Read FeatureMap attribute from the DUT and Verify that the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
