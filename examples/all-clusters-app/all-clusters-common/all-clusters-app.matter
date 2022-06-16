@@ -1461,6 +1461,7 @@ server cluster GeneralCommissioning = 48 {
 
   struct BasicCommissioningInfo {
     int16u failSafeExpiryLengthSeconds = 0;
+    int16u maxCumulativeFailsafeSeconds = 1;
   }
 
   attribute access(write: administer) int64u breadcrumb = 0;
@@ -1726,74 +1727,6 @@ server cluster Groups = 4 {
   command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
   command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
   command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
-}
-
-server cluster IasZone = 1280 {
-  enum IasEnrollResponseCode : ENUM8 {
-    kSuccess = 0;
-    kNotSupported = 1;
-    kNoEnrollPermit = 2;
-    kTooManyZones = 3;
-  }
-
-  enum IasZoneType : ENUM16 {
-    kStandardCie = 0;
-    kMotionSensor = 13;
-    kContactSwitch = 21;
-    kFireSensor = 40;
-    kWaterSensor = 42;
-    kGasSensor = 43;
-    kPersonalEmergencyDevice = 44;
-    kVibrationMovementSensor = 45;
-    kRemoteControl = 271;
-    kKeyFob = 277;
-    kKeypad = 541;
-    kStandardWarningDevice = 549;
-    kGlassBreakSensor = 550;
-    kCarbonMonoxideSensor = 551;
-    kSecurityRepeater = 553;
-    kInvalidZoneType = 65535;
-  }
-
-  bitmap IasZoneStatus : BITMAP16 {
-    kAlarm1 = 0x1;
-    kAlarm2 = 0x2;
-    kTamper = 0x4;
-    kBattery = 0x8;
-    kSupervisionReports = 0x10;
-    kRestoreReports = 0x20;
-    kTrouble = 0x40;
-    kAc = 0x80;
-    kTest = 0x100;
-    kBatteryDefect = 0x200;
-  }
-
-  readonly attribute enum8 zoneState = 0;
-  readonly attribute enum16 zoneType = 1;
-  readonly attribute bitmap16 zoneStatus = 2;
-  attribute node_id iasCieAddress = 16;
-  readonly attribute int8u zoneId = 17;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct ZoneEnrollResponseRequest {
-    IasEnrollResponseCode enrollResponseCode = 0;
-    INT8U zoneId = 1;
-  }
-
-  response struct ZoneStatusChangeNotification = 0 {
-    IasZoneStatus zoneStatus = 0;
-    BITMAP8 extendedStatus = 1;
-    INT8U zoneId = 2;
-    INT16U delay = 3;
-  }
-
-  response struct ZoneEnrollRequest = 1 {
-    IasZoneType zoneType = 0;
-    INT16U manufacturerCode = 1;
-  }
-
-  command ZoneEnrollResponse(ZoneEnrollResponseRequest): DefaultSuccess = 0;
 }
 
 server cluster Identify = 3 {
@@ -2170,6 +2103,7 @@ server cluster ModeSelect = 80 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  readonly attribute int8u manufacturerExtension = 4293984257;
 
   request struct ChangeToModeRequest {
     INT8U newMode = 0;
@@ -3431,11 +3365,15 @@ server cluster Thermostat = 513 {
   attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
   attribute access(write: manage) enum8 systemMode = 28;
   readonly attribute enum8 thermostatRunningMode = 30;
-  readonly attribute enum8 startOfWeek = 32;
-  readonly attribute int8u numberOfWeeklyTransitions = 33;
-  readonly attribute int8u numberOfDailyTransitions = 34;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetpointRaiseLowerRequest {
+    SetpointAdjustMode mode = 0;
+    INT8S amount = 1;
+  }
+
+  command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
 }
 
 server cluster ThermostatUserInterfaceConfiguration = 516 {
@@ -3774,14 +3712,7 @@ server cluster WindowCovering = 258 {
     kTiltEncoderControlled = 0x40;
   }
 
-  bitmap Mode : BITMAP8 {
-    kMotorDirectionReversed = 0x1;
-    kCalibrationMode = 0x2;
-    kMaintenanceMode = 0x4;
-    kLedFeedback = 0x8;
-  }
-
-  bitmap WcFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kLift = 0x1;
     kTilt = 0x2;
     kPositionAwareLift = 0x4;
@@ -3789,13 +3720,20 @@ server cluster WindowCovering = 258 {
     kPositionAwareTilt = 0x10;
   }
 
-  bitmap WcOperationalStatus : BITMAP8 {
+  bitmap Mode : BITMAP8 {
+    kMotorDirectionReversed = 0x1;
+    kCalibrationMode = 0x2;
+    kMaintenanceMode = 0x4;
+    kLedFeedback = 0x8;
+  }
+
+  bitmap OperationalStatus : BITMAP8 {
     kGlobal = 0x3;
     kLift = 0xC;
     kTilt = 0x30;
   }
 
-  bitmap WcSafetyStatus : BITMAP16 {
+  bitmap SafetyStatus : BITMAP16 {
     kRemoteLockout = 0x1;
     kTamperDetection = 0x2;
     kFailedCommunication = 0x4;
@@ -3820,7 +3758,7 @@ server cluster WindowCovering = 258 {
   readonly attribute ConfigStatus configStatus = 7;
   readonly attribute nullable Percent currentPositionLiftPercentage = 8;
   readonly attribute nullable Percent currentPositionTiltPercentage = 9;
-  readonly attribute bitmap8 operationalStatus = 10;
+  readonly attribute OperationalStatus operationalStatus = 10;
   readonly attribute nullable Percent100ths targetPositionLiftPercent100ths = 11;
   readonly attribute nullable Percent100ths targetPositionTiltPercent100ths = 12;
   readonly attribute EndProductType endProductType = 13;
@@ -3831,7 +3769,7 @@ server cluster WindowCovering = 258 {
   readonly attribute int16u installedOpenLimitTilt = 18;
   readonly attribute int16u installedClosedLimitTilt = 19;
   attribute access(write: manage) Mode mode = 23;
-  readonly attribute bitmap16 safetyStatus = 26;
+  readonly attribute SafetyStatus safetyStatus = 26;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -4324,6 +4262,7 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
+    ram      attribute manufacturerExtension default = 255;
   }
 
   server cluster DoorLock {
@@ -4445,10 +4384,7 @@ endpoint 1 {
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;
     ram      attribute thermostatRunningMode;
-    ram      attribute startOfWeek;
-    ram      attribute numberOfWeeklyTransitions default = 7;
-    ram      attribute numberOfDailyTransitions default = 4;
-    ram      attribute featureMap default = 0x002b;
+    ram      attribute featureMap default = 0x0023;
     ram      attribute clusterRevision default = 5;
   }
 
@@ -4584,16 +4520,6 @@ endpoint 1 {
     ram      attribute occupancySensorTypeBitmap;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 3;
-  }
-
-  server cluster IasZone {
-    ram      attribute zoneState;
-    ram      attribute zoneType;
-    ram      attribute zoneStatus;
-    ram      attribute iasCieAddress;
-    ram      attribute zoneId default = 0xff;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 2;
   }
 
   server cluster WakeOnLan {

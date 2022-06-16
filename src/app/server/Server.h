@@ -30,6 +30,7 @@
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/DefaultAclStorage.h>
+#include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -45,6 +46,7 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/secure_channel/UnsolicitedStatusHandler.h>
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
 #include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
 #endif
@@ -118,6 +120,42 @@ struct ServerInitParams
     Crypto::OperationalKeystore * operationalKeystore = nullptr;
 };
 
+class IgnoreCertificateValidityPolicy : public Credentials::CertificateValidityPolicy
+{
+public:
+    IgnoreCertificateValidityPolicy() {}
+
+    /**
+     * @brief
+     *
+     * This certificate validity policy does not validate NotBefore or
+     * NotAfter to accommodate platforms that may have wall clock time, but
+     * where it is unreliable.
+     *
+     * Last Known Good Time is also not considered in this policy.
+     *
+     * @param cert CHIP Certificate for which we are evaluating validity
+     * @param depth the depth of the certificate in the chain, where the leaf is at depth 0
+     * @return CHIP_NO_ERROR if CHIPCert should accept the certificate; an appropriate CHIP_ERROR if it should be rejected
+     */
+    CHIP_ERROR ApplyCertificateValidityPolicy(const Credentials::ChipCertificateData * cert, uint8_t depth,
+                                              Credentials::CertificateValidityResult result) override
+    {
+        switch (result)
+        {
+        case Credentials::CertificateValidityResult::kValid:
+        case Credentials::CertificateValidityResult::kNotYetValid:
+        case Credentials::CertificateValidityResult::kExpired:
+        case Credentials::CertificateValidityResult::kNotExpiredAtLastKnownGoodTime:
+        case Credentials::CertificateValidityResult::kExpiredAtLastKnownGoodTime:
+        case Credentials::CertificateValidityResult::kTimeUnknown:
+            return CHIP_NO_ERROR;
+        default:
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    }
+};
+
 /**
  * Transitional version of ServerInitParams to assist SDK integrators in
  * transitioning to injecting product/platform-owned resources. This version
@@ -167,6 +205,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         static chip::KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
         static chip::PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
         static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
+        static IgnoreCertificateValidityPolicy sDefaultCertValidityPolicy;
+
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
         static chip::SimpleSessionResumptionStorage sSessionResumptionStorage;
 #endif
@@ -207,6 +247,10 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 
         // Inject ACL storage. (Don't initialize it.)
         this->aclStorage = &sAclStorage;
+
+        // Inject certificate validation policy compatible with non-wall-clock-time-synced
+        // embedded systems.
+        this->certificateValidityPolicy = &sDefaultCertValidityPolicy;
 
         return CHIP_NO_ERROR;
     }
@@ -409,6 +453,7 @@ private:
     CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
     OperationalDeviceProxyPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES> mDevicePool;
 
+    Protocols::SecureChannel::UnsolicitedStatusHandler mUnsolicitedStatusHandler;
     Messaging::ExchangeManager mExchangeMgr;
     FabricTable mFabrics;
     secure_channel::MessageCounterManager mMessageCounterManager;

@@ -78,6 +78,7 @@ shared_library("jni") {
     "${chip_root}/examples/tv-app/tv-common",
     "${chip_root}/src/app/server/java:jni",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/third_party/inipp",
   ]
 
@@ -108,7 +109,6 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/ChannelManagerStub.java",
     "java/src/com/tcl/chip/tvapp/Clusters.java",
     "java/src/com/tcl/chip/tvapp/ContentAppEndpointManager.java",
-    "java/src/com/tcl/chip/tvapp/ContentAppEndpointManagerStub.java",
     "java/src/com/tcl/chip/tvapp/ContentLaunchBrandingInformation.java",
     "java/src/com/tcl/chip/tvapp/ContentLaunchManager.java",
     "java/src/com/tcl/chip/tvapp/ContentLaunchManagerStub.java",

@@ -36,6 +36,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
+#include <protocols/secure_channel/UnsolicitedStatusHandler.h>
 
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
@@ -82,17 +83,18 @@ struct DeviceControllerSystemStateParams
 
     // Params that will be deallocated via Platform::Delete in
     // DeviceControllerSystemState::Shutdown.
-    DeviceTransportMgr * transportMgr                                  = nullptr;
-    SessionResumptionStorage * sessionResumptionStorage                = nullptr;
-    Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
-    SessionManager * sessionMgr                                        = nullptr;
-    Messaging::ExchangeManager * exchangeMgr                           = nullptr;
-    secure_channel::MessageCounterManager * messageCounterManager      = nullptr;
-    CASEServer * caseServer                                            = nullptr;
-    CASESessionManager * caseSessionManager                            = nullptr;
-    OperationalDevicePool * operationalDevicePool                      = nullptr;
-    CASEClientPool * caseClientPool                                    = nullptr;
-    FabricTable::Delegate * fabricTableDelegate                        = nullptr;
+    DeviceTransportMgr * transportMgr                                             = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage                           = nullptr;
+    Credentials::CertificateValidityPolicy * certificateValidityPolicy            = nullptr;
+    SessionManager * sessionMgr                                                   = nullptr;
+    Protocols::SecureChannel::UnsolicitedStatusHandler * unsolicitedStatusHandler = nullptr;
+    Messaging::ExchangeManager * exchangeMgr                                      = nullptr;
+    secure_channel::MessageCounterManager * messageCounterManager                 = nullptr;
+    CASEServer * caseServer                                                       = nullptr;
+    CASESessionManager * caseSessionManager                                       = nullptr;
+    OperationalDevicePool * operationalDevicePool                                 = nullptr;
+    CASEClientPool * caseClientPool                                               = nullptr;
+    FabricTable::Delegate * fabricTableDelegate                                   = nullptr;
 };
 
 // A representation of the internal state maintained by the DeviceControllerFactory
@@ -108,10 +110,11 @@ public:
     DeviceControllerSystemState(DeviceControllerSystemStateParams params) :
         mSystemLayer(params.systemLayer), mTCPEndPointManager(params.tcpEndPointManager),
         mUDPEndPointManager(params.udpEndPointManager), mTransportMgr(params.transportMgr), mSessionMgr(params.sessionMgr),
-        mExchangeMgr(params.exchangeMgr), mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable),
-        mCASEServer(params.caseServer), mCASESessionManager(params.caseSessionManager),
-        mOperationalDevicePool(params.operationalDevicePool), mCASEClientPool(params.caseClientPool),
-        mGroupDataProvider(params.groupDataProvider), mFabricTableDelegate(params.fabricTableDelegate)
+        mUnsolicitedStatusHandler(params.unsolicitedStatusHandler), mExchangeMgr(params.exchangeMgr),
+        mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable), mCASEServer(params.caseServer),
+        mCASESessionManager(params.caseSessionManager), mOperationalDevicePool(params.operationalDevicePool),
+        mCASEClientPool(params.caseClientPool), mGroupDataProvider(params.groupDataProvider),
+        mFabricTableDelegate(params.fabricTableDelegate)
     {
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
@@ -143,8 +146,9 @@ public:
     bool IsInitialized()
     {
         return mSystemLayer != nullptr && mUDPEndPointManager != nullptr && mTransportMgr != nullptr && mSessionMgr != nullptr &&
-            mExchangeMgr != nullptr && mMessageCounterManager != nullptr && mFabrics != nullptr && mCASESessionManager != nullptr &&
-            mOperationalDevicePool != nullptr && mCASEClientPool != nullptr && mGroupDataProvider != nullptr;
+            mUnsolicitedStatusHandler != nullptr && mExchangeMgr != nullptr && mMessageCounterManager != nullptr &&
+            mFabrics != nullptr && mCASESessionManager != nullptr && mOperationalDevicePool != nullptr &&
+            mCASEClientPool != nullptr && mGroupDataProvider != nullptr;
     };
 
     System::Layer * SystemLayer() const { return mSystemLayer; };
@@ -171,17 +175,18 @@ private:
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
-    DeviceTransportMgr * mTransportMgr                             = nullptr;
-    SessionManager * mSessionMgr                                   = nullptr;
-    Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
-    secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
-    FabricTable * mFabrics                                         = nullptr;
-    CASEServer * mCASEServer                                       = nullptr;
-    CASESessionManager * mCASESessionManager                       = nullptr;
-    OperationalDevicePool * mOperationalDevicePool                 = nullptr;
-    CASEClientPool * mCASEClientPool                               = nullptr;
-    Credentials::GroupDataProvider * mGroupDataProvider            = nullptr;
-    FabricTable::Delegate * mFabricTableDelegate                   = nullptr;
+    DeviceTransportMgr * mTransportMgr                                             = nullptr;
+    SessionManager * mSessionMgr                                                   = nullptr;
+    Protocols::SecureChannel::UnsolicitedStatusHandler * mUnsolicitedStatusHandler = nullptr;
+    Messaging::ExchangeManager * mExchangeMgr                                      = nullptr;
+    secure_channel::MessageCounterManager * mMessageCounterManager                 = nullptr;
+    FabricTable * mFabrics                                                         = nullptr;
+    CASEServer * mCASEServer                                                       = nullptr;
+    CASESessionManager * mCASESessionManager                                       = nullptr;
+    OperationalDevicePool * mOperationalDevicePool                                 = nullptr;
+    CASEClientPool * mCASEClientPool                                               = nullptr;
+    Credentials::GroupDataProvider * mGroupDataProvider                            = nullptr;
+    FabricTable::Delegate * mFabricTableDelegate                                   = nullptr;
 
     // If mTempFabricTable is not null, it was created during
     // DeviceControllerFactory::InitSystemState and needs to be

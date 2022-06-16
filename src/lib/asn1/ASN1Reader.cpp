@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -53,7 +53,9 @@ CHIP_ERROR ASN1Reader::Next()
     ReturnErrorCodeIf(EndOfContents, ASN1_END);
     ReturnErrorCodeIf(IndefiniteLen, ASN1_ERROR_UNSUPPORTED_ENCODING);
 
-    mElemStart += (mHeadLen + ValueLen);
+    // Note: avoid using addition assignment operator (+=), which may result in integer overflow
+    // in the right hand side of an assignment (mHeadLen + ValueLen).
+    mElemStart = mElemStart + mHeadLen + ValueLen;
 
     ResetElementState();
 
@@ -113,6 +115,8 @@ CHIP_ERROR ASN1Reader::EnterContainer(uint32_t offset)
     mElemStart = Value + offset;
     if (!IndefiniteLen)
     {
+        VerifyOrReturnError(CanCastTo<uint32_t>(mBufEnd - Value), ASN1_ERROR_VALUE_OVERFLOW);
+        VerifyOrReturnError(static_cast<uint32_t>(mBufEnd - Value) >= ValueLen, ASN1_ERROR_VALUE_OVERFLOW);
         mContainerEnd = Value + ValueLen;
     }
 
@@ -303,8 +307,9 @@ CHIP_ERROR ASN1Reader::DecodeHead()
         IndefiniteLen = false;
     }
 
+    VerifyOrReturnError(CanCastTo<uint32_t>(mBufEnd - p), ASN1_ERROR_VALUE_OVERFLOW);
+    VerifyOrReturnError(static_cast<uint32_t>(mBufEnd - p) >= ValueLen, ASN1_ERROR_VALUE_OVERFLOW);
     VerifyOrReturnError(CanCastTo<uint32_t>(p - mElemStart), ASN1_ERROR_VALUE_OVERFLOW);
-
     mHeadLen = static_cast<uint32_t>(p - mElemStart);
 
     EndOfContents = (Class == kASN1TagClass_Universal && Tag == 0 && !Constructed && ValueLen == 0);

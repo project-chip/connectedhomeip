@@ -240,6 +240,15 @@ public:
 
     FabricInfo * GetFabricInfo() { return mFabricInfo; }
 
+    const FabricTable * GetFabricTable() const
+    {
+        if (mSystemState == nullptr)
+        {
+            return nullptr;
+        }
+        return mSystemState->Fabrics();
+    }
+
     void ReleaseOperationalDevice(NodeId remoteDeviceId);
 
     OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }

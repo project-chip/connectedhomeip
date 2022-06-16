@@ -107,10 +107,10 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-#ifdef CONFIG_OPENTHREAD_MTD_SED
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#elif CONFIG_CHIP_THREAD_SSED
+#if CONFIG_CHIP_THREAD_SSED
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice);
+#elif CONFIG_OPENTHREAD_MTD_SED
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #else
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #endif

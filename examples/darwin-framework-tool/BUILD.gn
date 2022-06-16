@@ -27,12 +27,19 @@ config("config") {
     "${chip_root}/examples/chip-tool/commands/clusters/ComplexArgument.h",
   ]
 
-  defines = [ "CONFIG_ENABLE_YAML_TESTS=${config_enable_yaml_tests}" ]
+  defines = [
+    "CONFIG_ENABLE_YAML_TESTS=${config_enable_yaml_tests}",
+    "CONFIG_USE_INTERACTIVE_MODE=${config_use_interactive_mode}",
+  ]
 
   cflags = [
     "-Wconversion",
     "-fobjc-arc",
   ]
+
+  if (config_use_interactive_mode) {
+    libs = [ "readline" ]
+  }
 }
 
 executable("darwin-framework-tool") {
@@ -54,6 +61,10 @@ executable("darwin-framework-tool") {
     "commands/storage/StorageManagementCommand.mm",
     "main.mm",
   ]
+
+  if (config_use_interactive_mode) {
+    sources += [ "commands/interactive/InteractiveCommands.mm" ]
+  }
 
   if (config_enable_yaml_tests) {
     sources += [ "${chip_root}/zzz_generated/darwin-framework-tool/zap-generated/cluster/CHIPTestClustersObjc.mm" ]

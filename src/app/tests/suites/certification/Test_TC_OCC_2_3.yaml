@@ -32,14 +32,16 @@ tests:
       verification: |
           ./chip-tool occupancysensing read occupancy-sensor-type 1 1
 
-          Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001DataVersion: 289401399
-          [1646129490.492433][2997:3002] CHIP:TOO:   occupancy sensor type: 0
+          [1648461912.765825][9300:9306] CHIP:DMG: }
+          [1648461912.766013][9300:9306] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 3082917122
+          [1648461912.766089][9300:9306] CHIP:TOO:   occupancy sensor type: 0
       disabled: true
 
     - label: "TH reads OccupancySensorTypeBitmap attribute from DUT"
       verification: |
           ./chip-tool occupancysensing read occupancy-sensor-type-bitmap 1 1
 
-          Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0002DataVersion: 289401399
-          [1646129577.158531][3007:3013] CHIP:TOO:   occupancy sensor type bitmap: 1
+          [1648461918.499009][9307:9312] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0002 DataVersion: 3082917122
+          [1648461918.499082][9307:9312] CHIP:TOO:   occupancy sensor type bitmap: 1
+          [1648461918.499192][9307:9312] CHIP:EM: Sending Standalone Ack for MessageCounter:14798084 on exchange 49320i
       disabled: true

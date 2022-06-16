@@ -132,24 +132,25 @@ public:
         params.keepPreviousSubscriptions
             = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
         [device subscribeAttributeWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
-                                       clusterId:[NSNumber numberWithUnsignedInteger:mClusterId]
-                                     attributeId:[NSNumber numberWithUnsignedInteger:mAttributeId]
-                                     minInterval:[NSNumber numberWithUnsignedInteger:mMinInterval]
-                                     maxInterval:[NSNumber numberWithUnsignedInteger:mMaxInterval]
-                                          params:params
-                                     clientQueue:callbackQueue
-                                   reportHandler:^(
-                                       NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                       if (values) {
-                                           for (id item in values) {
-                                               NSLog(@"Response Item: %@", [item description]);
-                                           }
-                                       }
-                                       if (error || !mWait) {
-                                           SetCommandExitStatus(error);
-                                       }
-                                   }
-                         subscriptionEstablished:nil];
+            clusterId:[NSNumber numberWithUnsignedInteger:mClusterId]
+            attributeId:[NSNumber numberWithUnsignedInteger:mAttributeId]
+            minInterval:[NSNumber numberWithUnsignedInteger:mMinInterval]
+            maxInterval:[NSNumber numberWithUnsignedInteger:mMaxInterval]
+            params:params
+            clientQueue:callbackQueue
+            reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                if (values) {
+                    for (id item in values) {
+                        NSLog(@"Response Item: %@", [item description]);
+                    }
+                }
+                if (error || !mWait) {
+                    SetCommandExitStatus(error);
+                }
+            }
+            subscriptionEstablished:^() {
+                mSubscriptionEstablished = YES;
+            }];
 
         return CHIP_NO_ERROR;
     }
@@ -162,9 +163,18 @@ public:
 protected:
     chip::Optional<bool> mKeepSubscriptions;
     chip::Optional<bool> mFabricFiltered;
+    bool mSubscriptionEstablished = NO;
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+
+    void Shutdown() override
+    {
+        mSubscriptionEstablished = NO;
+        ModelCommand::Shutdown();
+    }
+
+    bool DeferInteractiveCleanup() override { return mSubscriptionEstablished; }
 
 private:
     chip::ClusterId mClusterId;
@@ -216,6 +226,7 @@ public:
                 }
             }
             subscriptionEstablished:^() {
+                mSubscriptionEstablished = YES;
             }];
 
         return CHIP_NO_ERROR;
@@ -229,6 +240,7 @@ public:
 protected:
     chip::Optional<bool> mKeepSubscriptions;
     chip::Optional<chip::EventNumber> mEventNumber;
+    bool mSubscriptionEstablished = NO;
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;

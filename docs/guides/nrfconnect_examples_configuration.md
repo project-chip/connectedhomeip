@@ -179,6 +179,12 @@ following Kconfig options:
 -   `CONFIG_OPENTHREAD_MTD`
 -   `CONFIG_CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT`
 
+The following Kconfig options can be used to tune Thread Sleepy End Device wake
+intervals:
+
+-   `CONFIG_CHIP_SED_IDLE_INTERVAL`
+-   `CONFIG_CHIP_SED_ACTIVE_INTERVAL`
+
 **Commissioning with NFC support**
 
 You can configure the Matter protocol to use an NFC tag for commissioning,

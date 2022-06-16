@@ -676,10 +676,7 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
 
     SubscribeResponseMessage::Builder response;
     ReturnErrorOnFailure(response.Init(&writer));
-    response.SubscriptionId(mSubscriptionId)
-        .MinIntervalFloorSeconds(mMinIntervalFloorSeconds)
-        .MaxIntervalCeilingSeconds(mMaxIntervalCeilingSeconds)
-        .EndOfSubscribeResponseMessage();
+    response.SubscriptionId(mSubscriptionId).MaxInterval(mMaxInterval).EndOfSubscribeResponseMessage();
     ReturnErrorOnFailure(response.GetError());
 
     ReturnErrorOnFailure(writer.Finalize(&packet));
@@ -747,8 +744,8 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(err);
 
     ReturnErrorOnFailure(subscribeRequestParser.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
-    ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
-    VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxIntervalCeilingSeconds, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mMaxInterval));
+    VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
 
     //
     // Notify the application (if requested) of the impending subscription and check whether we should still proceed to set it up.
@@ -764,7 +761,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     }
 
     ChipLogProgress(DataManagement, "Final negotiated min/max parameters: Min = %ds, Max = %ds", mMinIntervalFloorSeconds,
-                    mMaxIntervalCeilingSeconds);
+                    mMaxInterval);
 
     bool isFabricFiltered;
     ReturnErrorOnFailure(subscribeRequestParser.GetIsFabricFiltered(&isFabricFiltered));
@@ -789,7 +786,7 @@ void ReadHandler::OnUnblockHoldReportCallback(System::Layer * apSystemLayer, voi
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        System::Clock::Seconds16(readHandler->mMaxIntervalCeilingSeconds - readHandler->mMinIntervalFloorSeconds),
+        System::Clock::Seconds16(readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds),
         OnRefreshSubscribeTimerSyncCallback, readHandler);
 }
 
@@ -799,13 +796,13 @@ void ReadHandler::OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLa
     ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
     readHandler->mFlags.Set(ReadHandlerFlags::HoldSync, false);
     ChipLogDetail(DataManagement, "Refresh subscribe timer sync after %d seconds",
-                  readHandler->mMaxIntervalCeilingSeconds - readHandler->mMinIntervalFloorSeconds);
+                  readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds);
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 }
 
 CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
 {
-    ChipLogDetail(DataManagement, "Refresh Subscribe Sync Timer with max %d seconds", mMaxIntervalCeilingSeconds);
+    ChipLogDetail(DataManagement, "Refresh Subscribe Sync Timer with max %d seconds", mMaxInterval);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnUnblockHoldReportCallback, this);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(

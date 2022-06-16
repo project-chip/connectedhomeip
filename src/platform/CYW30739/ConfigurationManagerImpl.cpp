@@ -26,10 +26,10 @@
 
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
+#include <hal/wiced_hal_wdog.h>
 #include <platform/CYW30739/CYW30739Config.h>
 #include <platform/ConfigurationManager.h>
-
-#include <hal/wiced_hal_wdog.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/KeyValueStoreManager.h>
 
 namespace chip {
@@ -62,6 +62,12 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
+    if (!CYW30739Config::ConfigValueExists(CYW30739Config::kConfigKey_BootReason))
+    {
+        err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
+        SuccessOrExit(err);
+    }
+
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<CYW30739Config>::Init();
     SuccessOrExit(err);
@@ -78,6 +84,16 @@ CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
 {
     return WriteConfigValue(CYW30739Config::kConfigKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
+{
+    return ReadConfigValue(CYW30739Config::kConfigKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
+{
+    return WriteConfigValue(CYW30739Config::kConfigKey_BootReason, bootReason);
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset(void)
