@@ -94,6 +94,17 @@ These additional files will be used by the CI jobs to validate whether the cache
 must be regenerated i.e. regeneration is needed when ZAP or the input ZAP files
 change.
 
+`--generate_zzz` also creates `{device_name}.matter` and `{device_name}.MATTERMD5`
+in `/devices`.
+
+`--validate_zzz` will ensure that the `.matter` file exists, and ensure that
+the `.MATTERMD5` file contains a hash matching the dynamically calcualted hash
+of the respective device's ZAP file.
+
+Note that this check only requests regeneration of `.matter` files when a ZAP
+file changes. Changes to the code that generate the `.matter` files will not
+cause the validation job to fail.
+
 ### Workflow
 
 All CI jobs for chef can be found in `.github/workflows/chef.yaml`.
@@ -103,10 +114,11 @@ All CI jobs for chef can be found in `.github/workflows/chef.yaml`.
 The workflow begins by calling chef with `--validate_zzz`.
 
 `--validate_zzz` will recalculate the current ZAP commit and the md5 of all
-example ZAP files and compare with what is committed to `zzz_generated`.
+example ZAP files and compare with what is committed to `/zzz_generated` and
+`/devices`.
 
 If the validation job fails, it will provide instructions to repair
-`zzz_generated` and no builds will run.
+the repo  and no builds will run.
 
 #### Build
 

@@ -41,6 +41,7 @@ _DEVICE_LIST = [file[:-4] for file in os.listdir(_DEVICE_FOLDER) if file.endswit
 _CHEF_ZZZ_ROOT = os.path.join(_CHEF_SCRIPT_PATH, "zzz_generated")
 _CI_DEVICE_MANIFEST_NAME = "INPUTMD5.txt"
 _CI_ZAP_MANIFEST_NAME = "ZAPSHA.txt"
+_CI_MATTER_MD5_EXT = ".MATTERMD5"
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
 _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 
@@ -145,6 +146,10 @@ def generate_device_manifest(
             device_zzz_zap_sha_file = os.path.join(device_zzz_dir, _CI_ZAP_MANIFEST_NAME)
             with open(device_zzz_zap_sha_file, "w+") as zap_sha_file:
                 zap_sha_file.write(zap_sha)
+            device_matter_md5_file_path = os.path.join(_DEVICE_FOLDER,
+                                                  device_name+_CI_MATTER_MD5_EXT)
+            with open(device_matter_md5_file_path, "w+") as matter_md5_file:
+                matter_md5_file.write(device_file_md5)
     return ci_manifest
 
 
@@ -186,24 +191,25 @@ def bundle(platform: str, device_name: str) -> None:
         platform: The platform to bundle.
         device_name: The example to bundle.
     """
+    bundler_name = f"bundle_{platform}"
+    matter_file = f"{device_name}.matter"
+    zap_file = os.path.join(_DEVICE_FOLDER, f"{device_name}.zap")
     flush_print(f"Bundling {platform}", with_border=True)
     flush_print(f"Cleaning {_CD_STAGING_DIR}")
     shutil.rmtree(_CD_STAGING_DIR, ignore_errors=True)
     os.mkdir(_CD_STAGING_DIR)
-    bundler_name = f"bundle_{platform}"
+    flush_print(f"Checking for {bundler_name}")
     if bundler_name in globals():
         flush_print(f"Found {bundler_name}")
         globals()[bundler_name](device_name)
     else:
         flush_print(f"No bundle function for {platform}!")
         exit(1)
-    matter_file = f"{device_name}.matter"
     flush_print(f"Copying {matter_file}")
     src_item = os.path.join(_DEVICE_FOLDER, matter_file)
     dest_item = os.path.join(_CD_STAGING_DIR, matter_file)
     shutil.copy(src_item, dest_item)
     flush_print(f"Generating metadata for {device_name}")
-    zap_file = os.path.join(_DEVICE_FOLDER, f"{device_name}.zap")
     metadata_file = zap_file_parser.generate_hash_metadata_file(zap_file)
     metadata_dest = os.path.join(_CD_STAGING_DIR,
                                  os.path.basename(metadata_file))
@@ -405,6 +411,9 @@ def main(argv: Sequence[str]) -> None:
             zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device)
             device_zap_sha_file = os.path.join(zzz_dir, _CI_ZAP_MANIFEST_NAME)
             device_md5_file = os.path.join(zzz_dir, _CI_DEVICE_MANIFEST_NAME)
+            matter_file = os.path.join(_DEVICE_FOLDER, f"{device}.matter")
+            device_matter_md5_file = os.path.join(_DEVICE_FOLDER,
+                                                  device+_CI_MATTER_MD5_EXT)
             help_msg = f"{device}: {fix_instructions}"
             if not os.path.exists(device_zap_sha_file):
                 flush_print(f"ZAP VERSION MISSING {help_msg}")
@@ -424,10 +433,18 @@ def main(argv: Sequence[str]) -> None:
                 if output_cached_md5 != device_md5:
                     flush_print(f"INPUT MD5 MISMATCH {help_msg}")
                     exit(1)
-            matter_file = os.path.join(_DEVICE_FOLDER, f"{device}.matter")
             if not os.path.exists(matter_file):
                 flush_print(f"MISSING MATTER FILE {help_msg}")
                 exit(1)
+            if not os.path.exists(device_matter_md5_file):
+                flush_print(f"MISSING MATTER MD5 {help_msg}")
+                exit(1)
+            else:
+                with open(device_matter_md5_file) as matter_md5:
+                    output_cached_md5 = matter_md5.read()
+                if output_cached_md5 != device_md5:
+                    flush_print(f"MATTER MD5 MISMATCH {help_msg}")
+                    exit(1)
         flush_print("Cached ZAP output is up to date!")
         exit(0)
 
