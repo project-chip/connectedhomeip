@@ -5,6 +5,6 @@
       location = "group:CHIPTool/CHIPTool.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:Framework/CHIP.xcodeproj">
+      location = "group:/Users/terafin/Source/connectedhomeip-woody-apple/src/darwin/Framework/Matter.xcodeproj">
    </FileRef>
 </Workspace>

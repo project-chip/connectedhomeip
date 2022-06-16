@@ -24,7 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol CHIPKeypair;
+@protocol MTRKeypair;
 
 @interface MTRCertificates : NSObject
 
@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
  */
-+ (nullable NSData *)generateRootCertificate:(id<CHIPKeypair>)keypair
++ (nullable NSData *)generateRootCertificate:(id<MTRKeypair>)keypair
                                     issuerId:(nullable NSNumber *)issuerId
                                     fabricId:(nullable NSNumber *)fabricId
                                        error:(NSError * __autoreleasing _Nullable * _Nullable)error;
@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
  */
-+ (nullable NSData *)generateIntermediateCertificate:(id<CHIPKeypair>)rootKeypair
++ (nullable NSData *)generateIntermediateCertificate:(id<MTRKeypair>)rootKeypair
                                      rootCertificate:(NSData *)rootCertificate
                                intermediatePublicKey:(SecKeyRef)intermediatePublicKey
                                             issuerId:(nullable NSNumber *)issuerId
@@ -87,7 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
  */
-+ (nullable NSData *)generateOperationalCertificate:(id<CHIPKeypair>)signingKeypair
++ (nullable NSData *)generateOperationalCertificate:(id<MTRKeypair>)signingKeypair
                                  signingCertificate:(NSData *)signingCertificate
                                operationalPublicKey:(SecKeyRef)operationalPublicKey
                                            fabricId:(NSNumber *)fabricId
@@ -102,7 +102,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Will return NO on failures to extract public keys from the objects.
  */
-+ (BOOL)keypair:(id<CHIPKeypair>)keypair matchesCertificate:(NSData *)certificate;
++ (BOOL)keypair:(id<MTRKeypair>)keypair matchesCertificate:(NSData *)certificate;
 
 /**
  * Check whether two X.509 DER encoded certificates are equivalent, in the sense
@@ -112,7 +112,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)isCertificate:(NSData *)certificate1 equalTo:(NSData *)certificate2;
 
 /**
- * Generate a PKCS#10 certificate signing request from a CHIPKeypair.  This can
+ * Generate a PKCS#10 certificate signing request from a MTRKeypair.  This can
  * then be used to request an operational or ICA certificate from an external
  * certificate authority.
  *
@@ -124,7 +124,7 @@ NS_ASSUME_NONNULL_BEGIN
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
  */
-+ (nullable NSData *)generateCertificateSigningRequest:(id<CHIPKeypair>)keypair
++ (nullable NSData *)generateCertificateSigningRequest:(id<MTRKeypair>)keypair
                                                  error:(NSError * __autoreleasing _Nullable * _Nullable)error;
 
 @end

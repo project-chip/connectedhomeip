@@ -17,8 +17,8 @@
             "path": "../../../../../src/app/zap-templates/partials/header.zapt"
         },
         {
-            "name": "CHIPCallbackBridge",
-            "path": "partials/CHIPCallbackBridge.zapt"
+            "name": "MTRCallbackBridge",
+            "path": "partials/MTRCallbackBridge.zapt"
         },
         {
             "name": "encode_value",
@@ -43,64 +43,64 @@
     ],
     "templates": [
         {
-            "path": "CHIPCallbackBridge_internal.zapt",
-            "name": "Objc CHIPCallbackBridge Internal header",
-            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPCallbackBridge_internal.h"
+            "path": "MTRCallbackBridge_internal.zapt",
+            "name": "Objc MTRCallbackBridge Internal header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCallbackBridge_internal.h"
         },
         {
-            "path": "CHIPCallbackBridge-src.zapt",
-            "name": "Objc CHIPCallbackBridge",
-            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPCallbackBridge.mm"
+            "path": "MTRCallbackBridge-src.zapt",
+            "name": "Objc MTRCallbackBridge",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCallbackBridge.mm"
         },
         {
-            "path": "CHIPClustersObjc_internal.zapt",
+            "path": "MTRClustersObjc_internal.zapt",
             "name": "Objc ZCL API Internal Header",
-            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPClustersObjc_internal.h"
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClustersObjc_internal.h"
         },
         {
-            "path": "CHIPClustersObjc.zapt",
+            "path": "MTRClustersObjc.zapt",
             "name": "Objc ZCL API Header",
-            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPClustersObjc.h"
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClustersObjc.h"
         },
         {
-            "path": "CHIPClustersObjc-src.zapt",
+            "path": "MTRClustersObjc-src.zapt",
             "name": "Objc ZCL API",
-            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPClustersObjc.mm"
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClustersObjc.mm"
         },
         {
-            "path": "CHIPStructsObjc.zapt",
-            "name": "Objc reflections of CHIP spec structs header",
-            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPStructsObjc.h"
+            "path": "MTRStructsObjc.zapt",
+            "name": "Objc reflections of MTR spec structs header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRStructsObjc.h"
         },
         {
-            "path": "CHIPStructsObjc-src.zapt",
-            "name": "Objc reflections of CHIP spec structs",
-            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPStructsObjc.mm"
+            "path": "MTRStructsObjc-src.zapt",
+            "name": "Objc reflections of MTR spec structs",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRStructsObjc.mm"
         },
         {
-            "path": "CHIPCommandPayloadsObjc.zapt",
-            "name": "Objc reflections of CHIP command payloads header",
-            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPCommandPayloadsObjc.h"
+            "path": "MTRCommandPayloadsObjc.zapt",
+            "name": "Objc reflections of MTR command payloads header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloadsObjc.h"
         },
         {
-            "path": "CHIPCommandPayloadsObjc-src.zapt",
-            "name": "Objc reflections of CHIP command payloads header",
-            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPCommandPayloadsObjc.mm"
+            "path": "MTRCommandPayloadsObjc-src.zapt",
+            "name": "Objc reflections of MTR command payloads header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloadsObjc.mm"
         },
         {
-            "path": "CHIPAttributeTLVValueDecoder-src.zapt",
+            "path": "MTRAttributeTLVValueDecoder-src.zapt",
             "name": "Decode TLV attribute values into Objc objects",
-            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPAttributeTLVValueDecoder.mm"
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeTLVValueDecoder.mm"
         },
         {
-            "path": "CHIPEventTLVValueDecoder-src.zapt",
+            "path": "MTREventTLVValueDecoder-src.zapt",
             "name": "Decode TLV event values into Objc objects",
-            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPEventTLVValueDecoder.mm"
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTREventTLVValueDecoder.mm"
         },
         {
-            "path": "MatterClusterConstants.zapt",
+            "path": "MTRClusterConstants.zapt",
             "name": "Constants for cluster IDs",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MatterClusterConstants.h"
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterConstants.h"
         }
     ]
 }
