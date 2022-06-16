@@ -29,6 +29,7 @@
     switch (status) {
     case kSecurePairingSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");
+        ChipLogProgress(chipTool, "CASE establishment successful");
         break;
     case kSecurePairingFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
@@ -42,10 +43,12 @@
 - (void)onPairingComplete:(NSError *)error
 {
     if (error != nil) {
+        ChipLogProgress(chipTool, "PASE establishment failed");
         _commandBridge->SetCommandExitStatus(error);
         return;
     }
-    ChipLogProgress(chipTool, "Pairing Complete");
+    ChipLogProgress(chipTool, "Pairing Success");
+    ChipLogProgress(chipTool, "PASE establishment successful");
     NSError * commissionError;
     [_commissioner commissionDevice:_deviceID commissioningParams:_params error:&commissionError];
     if (commissionError != nil) {

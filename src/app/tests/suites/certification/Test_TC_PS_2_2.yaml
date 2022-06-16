@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 60.2.2. [TC-PS-2.2] Event reporting with server as DUT
+name: 33.2.2. [TC-PRS-2.2] Primary functionality with server as DUT
 
 config:
     nodeId: 0x12344321
@@ -33,27 +33,56 @@ tests:
 
     - label: "TH reads the ActiveWiredFaults attribute from the DUT"
       verification: |
-          ./apps/chip-tool powersource read active-wired-faults 12345 1
+          ./chip-tool powersource read active-wired-faults 1 1
+
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label: "Set up subscription to WiredFaultChange event"
       verification: |
-          ./apps/chip-tool powersource subscribe-event-by-id 0 120 3600 1 54321 1
+          ./chip-tool interactive start
+
+          powersource subscribe-event-by-id 120 3600 1  1
+
+          [1651671151.484803][6266:6266] CHIP:DMG: SubscribeRequestMessage =
+          [1651671151.484857][6266:6266] CHIP:DMG: {
+          [1651671151.484907][6266:6266] CHIP:DMG:         KeepSubscriptions = false,
+          [1651671151.484968][6266:6266] CHIP:DMG:         MinIntervalFloorSeconds = 0x78,
+          [1651671151.485025][6266:6266] CHIP:DMG:         MaxIntervalCeilingSeconds = 0xe10,
+          [1651671151.485069][6266:6266] CHIP:DMG:         EventPathIBs =
+          [1651671151.485134][6266:6266] CHIP:DMG:         [
+          [1651671151.485185][6266:6266] CHIP:DMG:                 EventPath =
+          [1651671151.485246][6266:6266] CHIP:DMG:                 {
+          [1651671151.485303][6266:6266] CHIP:DMG:                         Endpoint = 0x1,
+          [1651671151.485368][6266:6266] CHIP:DMG:                         Cluster = 0x2f,
+          [1651671151.485439][6266:6266] CHIP:DMG:                         Event = 0x0,
+          [1651671151.485510][6266:6266] CHIP:DMG:                 },
+          [1651671151.485570][6266:6266] CHIP:DMG:
+          [1651671151.485620][6266:6266] CHIP:DMG:         ],
+          [1651671151.485679][6266:6266] CHIP:DMG:
+          [1651671151.485731][6266:6266] CHIP:DMG:         isFabricFiltered = true,
+          [1651671151.485784][6266:6266] CHIP:DMG:         InteractionModelRevision = 1
+          [1651671151.485827][6266:6266] CHIP:DMG: },
+          [1651671151.485956][6266:6266] CHIP:DMG: Final negotiated min/max parameters: Min = 120s, Max = 3600s
       disabled: true
 
     - label: "Bring the DUT into a wired fault state."
       verification: |
-
+          DUT ACTION REQUIRED
       disabled: true
 
     - label: "TH reads the ActiveWiredFaults attribute from the DUT"
       verification: |
-          ./apps/chip-tool powersource read active-wired-faults 12345 1
+          ./chip-tool powersource read active-wired-faults 1 1
+
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label: "Bring the DUT back into a clean state."
       verification: |
-
+          DUT ACTION REQUIRED
       disabled: true
 
     - label: "Bring the DUT into a state without any battery faults."
@@ -64,26 +93,53 @@ tests:
     - label: "TH reads the ActiveBatFaults attribute from the DUT"
       verification: |
           ./apps/chip-tool powersource read active-battery-faults 12345 1
+
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label: "Set up subscription to BatFaultChange event"
       verification: |
-          ./apps/chip-tool powersource subscribe-event-by-id 1 120 3600 1 54321 1
+          ./chip-tool interactive start
+           powersource subscribe-event-by-id  0 100 1  1
+
+           SubscribeRequestMessage =
+          [1651667556.522349][6266:6266] CHIP:DMG: {
+          [1651667556.522399][6266:6266] CHIP:DMG:         KeepSubscriptions = false,
+          [1651667556.522454][6266:6266] CHIP:DMG:         MinIntervalFloorSeconds = 0x0,
+          [1651667556.522512][6266:6266] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x64,
+          [1651667556.522564][6266:6266] CHIP:DMG:         EventPathIBs =
+          [1651667556.522619][6266:6266] CHIP:DMG:         [
+          [1651667556.522670][6266:6266] CHIP:DMG:                 EventPath =
+          [1651667556.522730][6266:6266] CHIP:DMG:                 {
+          [1651667556.522789][6266:6266] CHIP:DMG:                         Endpoint = 0x1,
+          [1651667556.522897][6266:6266] CHIP:DMG:                         Cluster = 0x2f,
+          [1651667556.522965][6266:6266] CHIP:DMG:                         Event = 0x1,
+          [1651667556.523026][6266:6266] CHIP:DMG:                 },
+          [1651667556.523090][6266:6266] CHIP:DMG:
+          [1651667556.523140][6266:6266] CHIP:DMG:         ],
+          [1651667556.523199][6266:6266] CHIP:DMG:
+          [1651667556.523243][6266:6266] CHIP:DMG:         isFabricFiltered = true,
+          [1651667556.523296][6266:6266] CHIP:DMG:         InteractionModelRevision = 1
+          [1651667556.523344][6266:6266] CHIP:DMG: },
+          [1651667556.523471][6266:6266] CHIP:DMG: Final negotiated min/max parameters: Min = 0s, Max = 100s
       disabled: true
 
     - label: "Bring the DUT into a battery fault state."
       verification: |
-
+          DUT ACTION REQUIRED
       disabled: true
 
     - label: "TH reads the ActiveBatFaults attribute from the DUT"
       verification: |
-          ./apps/chip-tool powersource read active-battery-faults 12345 1
+          ./chip-tool powersource read active-battery-faults 1 1
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label: "Bring the DUT back into a clean state."
       verification: |
-
+          DUT ACTION REQUIRED
       disabled: true
 
     - label: "Bring the DUT into a state without any charge faults."
@@ -93,25 +149,53 @@ tests:
 
     - label: "TH reads the ActiveBatChargeFaults attribute from the DUT"
       verification: |
-          ./apps/chip-tool powersource read active-battery-charge-faults 12345 1
+          ./chip-tool powersource read active-battery-charge-faults 1 1
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label: "Set up subscription to BatChargeFaultChange event"
       verification: |
-          ./apps/chip-tool powersource subscribe-event-by-id 2 120 3600 1 54321 1
+          ./chip-tool interactive start
+
+           powersource subscribe-event-by-id 1 100 1000 1 1
+
+          [1651671068.817350][6266:6266] CHIP:IM: Received Subscribe request
+          [1651671068.817489][6266:6266] CHIP:DMG: SubscribeRequestMessage =
+          [1651671068.817529][6266:6266] CHIP:DMG: {
+          [1651671068.817553][6266:6266] CHIP:DMG:         KeepSubscriptions = false,
+          [1651671068.817612][6266:6266] CHIP:DMG:         MinIntervalFloorSeconds = 0x0,
+          [1651671068.817672][6266:6266] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x64,
+          [1651671068.817707][6266:6266] CHIP:DMG:         EventPathIBs =
+          [1651671068.817734][6266:6266] CHIP:DMG:         [
+          [1651671068.817769][6266:6266] CHIP:DMG:                 EventPath =
+          [1651671068.817830][6266:6266] CHIP:DMG:                 {
+          [1651671068.817883][6266:6266] CHIP:DMG:                         Endpoint = 0x1,
+          [1651671068.817923][6266:6266] CHIP:DMG:                         Cluster = 0x2f,
+          [1651671068.817985][6266:6266] CHIP:DMG:                         Event = 0x2,
+          [1651671068.818013][6266:6266] CHIP:DMG:                 },
+          [1651671068.818074][6266:6266] CHIP:DMG:
+          [1651671068.818129][6266:6266] CHIP:DMG:         ],
+          [1651671068.818159][6266:6266] CHIP:DMG:
+          [1651671068.818228][6266:6266] CHIP:DMG:         isFabricFiltered = true,
+          [1651671068.818310][6266:6266] CHIP:DMG:         InteractionModelRevision = 1
+          [1651671068.818336][6266:6266] CHIP:DMG: },
+          [1651671068.818414][6266:6266] CHIP:DMG: Final negotiated min/max parameters: Min = 0s, Max = 100s
       disabled: true
 
     - label: "Bring the DUT into a charge fault state."
       verification: |
-
+          DUT ACTION REQUIRED
       disabled: true
 
     - label: "TH reads the ActiveBatChargeFaults attribute from the DUT"
       verification: |
-          ./apps/chip-tool powersource read active-battery-charge-faults 12345 1
+          ./apps/chip-tool powersource read active-battery-charge-faults 1 1
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label: "Bring the DUT back into a clean state."
       verification: |
-
+          DUT ACTION REQUIRED
       disabled: true

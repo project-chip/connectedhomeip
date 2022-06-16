@@ -41,10 +41,12 @@ int Commands::Run(int argc, char ** argv)
     err = chip::Platform::MemoryInit();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Memory failure: %s", chip::ErrorStr(err)));
 
+#ifdef CONFIG_USE_LOCAL_STORAGE
     err = mStorage.Init();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
 
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
+#endif // CONFIG_USE_LOCAL_STORAGE
 
     err = RunCommand(argc, argv);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err)));
@@ -56,7 +58,12 @@ exit:
 int Commands::RunInteractive(int argc, char ** argv)
 {
     CHIP_ERROR err = RunCommand(argc, argv, true);
-    return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
+    if (err == CHIP_NO_ERROR)
+    {
+        return EXIT_SUCCESS;
+    }
+    ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));
+    return EXIT_FAILURE;
 }
 
 CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)

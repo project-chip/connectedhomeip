@@ -19,7 +19,7 @@
 
 CHIPPersistentStorageDelegateBridge::CHIPPersistentStorageDelegateBridge(id<CHIPPersistentStorageDelegate> delegate)
     : mDelegate(delegate)
-    , mWorkQueue(dispatch_queue_create("com.zigbee.chip.framework.storage.workqueue", DISPATCH_QUEUE_SERIAL))
+    , mWorkQueue(dispatch_queue_create("com.csa.matter.framework.storage.workqueue", DISPATCH_QUEUE_SERIAL))
 {
 }
 

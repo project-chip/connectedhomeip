@@ -314,6 +314,22 @@ public class ChipDeviceController {
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode);
   }
 
+  public boolean openPairingWindowCallback(
+      long devicePtr, int duration, OpenCommissioningCallback callback) {
+    return openPairingWindowCallback(deviceControllerPtr, devicePtr, duration, callback);
+  }
+
+  public boolean openPairingWindowWithPINCallback(
+      long devicePtr,
+      int duration,
+      long iteration,
+      int discriminator,
+      long setupPinCode,
+      OpenCommissioningCallback callback) {
+    return openPairingWindowWithPINCallback(
+        deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode, callback);
+  }
+
   /* Shutdown all cluster attribute subscriptions for a given device */
   public void shutdownSubscriptions(long devicePtr) {
     shutdownSubscriptions(deviceControllerPtr, devicePtr);
@@ -461,6 +477,18 @@ public class ChipDeviceController {
       long iteration,
       int discriminator,
       long setupPinCode);
+
+  private native boolean openPairingWindowCallback(
+      long deviceControllerPtr, long devicePtr, int duration, OpenCommissioningCallback callback);
+
+  private native boolean openPairingWindowWithPINCallback(
+      long deviceControllerPtr,
+      long devicePtr,
+      int duration,
+      long iteration,
+      int discriminator,
+      long setupPinCode,
+      OpenCommissioningCallback callback);
 
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
 

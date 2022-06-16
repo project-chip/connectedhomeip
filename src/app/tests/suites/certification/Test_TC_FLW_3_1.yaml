@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.3.1. [TC-FLW-3.1] Attributes with client as DUT
+name: 30.3.1. [TC-FLW-3.1] Attributes with client as DUT
 
 config:
     nodeId: 0x12344321
@@ -21,27 +21,247 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
-
-      disabled: true
-
-    - label: "DUT reads attribute value from TH."
+    - label:
+          "DUT reads all supported mandatory attributes from TH one at a time in
+          a manufacturer specific order"
       verification: |
           ./chip-tool flowmeasurement read measured-value 1 1
+          Verify on TestHarnes (all-cluster-app) a received read of measured-value printing the cluster ID endpoint used and attribute ID which is read in logs
+
+          CHIP:DMG: ReadRequestMessage =
+          [1649661041.321892][8204:8204] CHIP:DMG: {
+          [1649661041.321946][8204:8204] CHIP:DMG:         AttributePathIBs =
+          [1649661041.322010][8204:8204] CHIP:DMG:         [
+          [1649661041.322093][8204:8204] CHIP:DMG:                 AttributePathIB =
+          [1649661041.322171][8204:8204] CHIP:DMG:                 {
+          [1649661041.322263][8204:8204] CHIP:DMG:                         Endpoint = 0x1,
+          [1649661041.322375][8204:8204] CHIP:DMG:                         Cluster = 0x404,
+          [1649661041.322457][8204:8204] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1649661041.322554][8204:8204] CHIP:DMG:                 }
+          [1649661041.322631][8204:8204] CHIP:DMG:
+          [1649661041.322809][8204:8204] CHIP:DMG:         ],
+          [1649661041.322908][8204:8204] CHIP:DMG:
+          [1649661041.322974][8204:8204] CHIP:DMG:         isFabricFiltered = true,
+          [1649661041.323057][8204:8204] CHIP:DMG:         InteractionModelRevision = 1
+          [1649661041.323117][8204:8204] CHIP:DMG: },
+
+          Verify DUT log
+          Verify the measured-value should be in range of uint16
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_0000 DataVersion: 1049406897
+          [1649660205.780337][7845:7850] CHIP:TOO:   MeasuredValue: 0
+
+
+
+
+          "./chip-tool flowmeasurement read min-measured-value 1 1
+          Verify on TestHarnes (all-cluster-app) a received read of min-measured-value printing the cluster ID endpoint used and attribute ID which is read in logs
+
+          CHIP:DMG: ReadRequestMessage =
+          [1649661242.186926][8204:8204] CHIP:DMG: {
+          [1649661242.186979][8204:8204] CHIP:DMG:         AttributePathIBs =
+          [1649661242.187045][8204:8204] CHIP:DMG:         [
+          [1649661242.187125][8204:8204] CHIP:DMG:                 AttributePathIB =
+          [1649661242.187212][8204:8204] CHIP:DMG:                 {
+          [1649661242.187308][8204:8204] CHIP:DMG:                         Endpoint = 0x1,
+          [1649661242.187410][8204:8204] CHIP:DMG:                         Cluster = 0x404,
+          [1649661242.187493][8204:8204] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1649661242.187588][8204:8204] CHIP:DMG:                 }
+          [1649661242.187665][8204:8204] CHIP:DMG:
+          [1649661242.187754][8204:8204] CHIP:DMG:         ],
+          [1649661242.187828][8204:8204] CHIP:DMG:
+          [1649661242.187916][8204:8204] CHIP:DMG:         isFabricFiltered = true,
+          [1649661242.187978][8204:8204] CHIP:DMG:         InteractionModelRevision = 1
+          [1649661242.188057][8204:8204] CHIP:DMG: },
+
+
+          Verify DUT log
+          Verify the min-measured-value should be in range of uint16
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_0001 DataVersion: 1049406897
+          [1649660217.629973][7852:7857] CHIP:TOO:   MinMeasuredValue: 0"
+
+
+
+          "./chip-tool flowmeasurement read max-measured-value 1 1
+          Verify on TestHarnes (all-cluster-app) a received read of max-measured-value printing the cluster ID endpoint used and attribute ID which is read in logs
+
+
+          CHIP:DMG: ReadRequestMessage =
+          [1649661278.363869][8204:8204] CHIP:DMG: {
+          [1649661278.363923][8204:8204] CHIP:DMG:         AttributePathIBs =
+          [1649661278.364011][8204:8204] CHIP:DMG:         [
+          [1649661278.364073][8204:8204] CHIP:DMG:                 AttributePathIB =
+          [1649661278.364179][8204:8204] CHIP:DMG:                 {
+          [1649661278.364252][8204:8204] CHIP:DMG:                         Endpoint = 0x1,
+          [1649661278.364356][8204:8204] CHIP:DMG:                         Cluster = 0x404,
+          [1649661278.364464][8204:8204] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1649661278.364540][8204:8204] CHIP:DMG:                 }
+          [1649661278.364635][8204:8204] CHIP:DMG:
+          [1649661278.364704][8204:8204] CHIP:DMG:         ],
+          [1649661278.364795][8204:8204] CHIP:DMG:
+          [1649661278.364863][8204:8204] CHIP:DMG:         isFabricFiltered = true,
+          [1649661278.364945][8204:8204] CHIP:DMG:         InteractionModelRevision = 1
+          [1649661278.365005][8204:8204] CHIP:DMG: },
+
+
+          Verify DUT log
+          Verify the min-measured-value should be in range of uint16
+
+           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_0002 DataVersion: 1049406897
+          [1649660223.190482][7858:7863] CHIP:TOO:   MaxMeasuredValue: 0"
       disabled: true
 
-    - label: "DUT reads attribute value from TH."
-      verification: |
-          ./chip-tool flowmeasurement read min-measured-value 1 1
-      disabled: true
-
-    - label: "DUT reads attribute value from TH."
-      verification: |
-          ./chip-tool flowmeasurement read max-measured-value 1 1
-      disabled: true
-
-    - label: "DUT reads attribute value from TH."
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
       verification: |
           chip-tool flowmeasurement read tolerance 1 1
+          Verify on TestHarnes (all-cluster-app) a received read of tolerance-value printing the cluster ID endpoint used and attribute ID which is read in logs
+
+          CHIP:DMG: ReadRequestMessage =
+          [1649661278.363869][8204:8204] CHIP:DMG: {
+          [1649661278.363923][8204:8204] CHIP:DMG:         AttributePathIBs =
+          [1649661278.364011][8204:8204] CHIP:DMG:         [
+          [1649661278.364073][8204:8204] CHIP:DMG:                 AttributePathIB =
+          [1649661278.364179][8204:8204] CHIP:DMG:                 {
+          [1649661278.364252][8204:8204] CHIP:DMG:                         Endpoint = 0x1,
+          [1649661278.364356][8204:8204] CHIP:DMG:                         Cluster = 0x404,
+          [1649661278.364464][8204:8204] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1649661278.364540][8204:8204] CHIP:DMG:                 }
+          [1649661278.364635][8204:8204] CHIP:DMG:
+          [1649661278.364704][8204:8204] CHIP:DMG:         ],
+          [1649661278.364795][8204:8204] CHIP:DMG:
+          [1649661278.364863][8204:8204] CHIP:DMG:         isFabricFiltered = true,
+          [1649661278.364945][8204:8204] CHIP:DMG:         InteractionModelRevision = 1
+          [1649661278.365005][8204:8204] CHIP:DMG: },
+
+
+          Verify DUT log
+          Verify the measured-value should be in range 0 to 2048
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_0003 DataVersion: 1049406897
+          [1649660232.522084][7865:7870] CHIP:TOO:   Tolerance: 0
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported mandatory attributes on
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          No writeable attribute
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          No writeable attribute
+      disabled: true
+
+    - label:
+          "Configure TH such that it implements mandatory and none of the
+          optional attributes of the server-side of the cluster, and that it
+          also reflects this in global attributes such as FeatureMap and
+          AttributeList. Commission DUT to TH again"
+      verification: |
+          ./chip-tool flowmeasurement read measured-value 1 1
+          Verify on TestHarnes (all-cluster-app) a received read of measured-value printing the cluster ID endpoint used and attribute ID which is read in logs
+
+          CHIP:DMG: ReadRequestMessage =
+          [1649661041.321892][8204:8204] CHIP:DMG: {
+          [1649661041.321946][8204:8204] CHIP:DMG:         AttributePathIBs =
+          [1649661041.322010][8204:8204] CHIP:DMG:         [
+          [1649661041.322093][8204:8204] CHIP:DMG:                 AttributePathIB =
+          [1649661041.322171][8204:8204] CHIP:DMG:                 {
+          [1649661041.322263][8204:8204] CHIP:DMG:                         Endpoint = 0x1,
+          [1649661041.322375][8204:8204] CHIP:DMG:                         Cluster = 0x404,
+          [1649661041.322457][8204:8204] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1649661041.322554][8204:8204] CHIP:DMG:                 }
+          [1649661041.322631][8204:8204] CHIP:DMG:
+          [1649661041.322809][8204:8204] CHIP:DMG:         ],
+          [1649661041.322908][8204:8204] CHIP:DMG:
+          [1649661041.322974][8204:8204] CHIP:DMG:         isFabricFiltered = true,
+          [1649661041.323057][8204:8204] CHIP:DMG:         InteractionModelRevision = 1
+          [1649661041.323117][8204:8204] CHIP:DMG: },
+
+          Verify DUT log
+          Verify the measured-value should be in range of uint16
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_0000 DataVersion: 1049406897
+          [1649660205.780337][7845:7850] CHIP:TOO:   MeasuredValue: 0
+
+
+
+
+          "./chip-tool flowmeasurement read min-measured-value 1 1
+          Verify on TestHarnes (all-cluster-app) a received read of min-measured-value printing the cluster ID endpoint used and attribute ID which is read in logs
+
+          CHIP:DMG: ReadRequestMessage =
+          [1649661242.186926][8204:8204] CHIP:DMG: {
+          [1649661242.186979][8204:8204] CHIP:DMG:         AttributePathIBs =
+          [1649661242.187045][8204:8204] CHIP:DMG:         [
+          [1649661242.187125][8204:8204] CHIP:DMG:                 AttributePathIB =
+          [1649661242.187212][8204:8204] CHIP:DMG:                 {
+          [1649661242.187308][8204:8204] CHIP:DMG:                         Endpoint = 0x1,
+          [1649661242.187410][8204:8204] CHIP:DMG:                         Cluster = 0x404,
+          [1649661242.187493][8204:8204] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1649661242.187588][8204:8204] CHIP:DMG:                 }
+          [1649661242.187665][8204:8204] CHIP:DMG:
+          [1649661242.187754][8204:8204] CHIP:DMG:         ],
+          [1649661242.187828][8204:8204] CHIP:DMG:
+          [1649661242.187916][8204:8204] CHIP:DMG:         isFabricFiltered = true,
+          [1649661242.187978][8204:8204] CHIP:DMG:         InteractionModelRevision = 1
+          [1649661242.188057][8204:8204] CHIP:DMG: },
+
+
+          Verify DUT log
+          Verify the min-measured-value should be in range of uint16
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_0001 DataVersion: 1049406897
+          [1649660217.629973][7852:7857] CHIP:TOO:   MinMeasuredValue: 0"
+
+
+
+          "./chip-tool flowmeasurement read max-measured-value 1 1
+          Verify on TestHarnes (all-cluster-app) a received read of max-measured-value printing the cluster ID endpoint used and attribute ID which is read in logs
+
+
+          CHIP:DMG: ReadRequestMessage =
+          [1649661278.363869][8204:8204] CHIP:DMG: {
+          [1649661278.363923][8204:8204] CHIP:DMG:         AttributePathIBs =
+          [1649661278.364011][8204:8204] CHIP:DMG:         [
+          [1649661278.364073][8204:8204] CHIP:DMG:                 AttributePathIB =
+          [1649661278.364179][8204:8204] CHIP:DMG:                 {
+          [1649661278.364252][8204:8204] CHIP:DMG:                         Endpoint = 0x1,
+          [1649661278.364356][8204:8204] CHIP:DMG:                         Cluster = 0x404,
+          [1649661278.364464][8204:8204] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1649661278.364540][8204:8204] CHIP:DMG:                 }
+          [1649661278.364635][8204:8204] CHIP:DMG:
+          [1649661278.364704][8204:8204] CHIP:DMG:         ],
+          [1649661278.364795][8204:8204] CHIP:DMG:
+          [1649661278.364863][8204:8204] CHIP:DMG:         isFabricFiltered = true,
+          [1649661278.364945][8204:8204] CHIP:DMG:         InteractionModelRevision = 1
+          [1649661278.365005][8204:8204] CHIP:DMG: },
+
+
+          Verify DUT log
+          Verify the min-measured-value should be in range of uint16
+
+           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_0002 DataVersion: 1049406897
+          [1649660223.190482][7858:7863] CHIP:TOO:   MaxMeasuredValue: 0"
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          chip-tool flowmeasurement read tolerance 1 1
+           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          No writeable attribute
       disabled: true

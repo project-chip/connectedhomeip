@@ -29,6 +29,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::LowPower;
@@ -87,22 +88,23 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 bool emberAfLowPowerClusterSleepCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                          const Commands::Sleep::DecodableType & commandData)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
+    using Protocols::InteractionModel::Status;
+
     EndpointId endpoint = commandPath.mEndpointId;
 
     Delegate * delegate = GetDelegate(endpoint);
-    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
-
-exit:
-    if (err != CHIP_NO_ERROR)
+    Status status;
+    if (isDelegateNull(delegate, endpoint))
     {
-        ChipLogError(Zcl, "emberAfLowPowerClusterSleepCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        ChipLogError(Zcl, "emberAfLowPowerClusterSleepCallback: no delegate");
+        status = Status::Failure;
     }
-
-    bool success         = delegate->HandleSleep();
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
+    else
+    {
+        bool success = delegate->HandleSleep();
+        status       = success ? Status::Success : Status::Failure;
+    }
+    command->AddStatus(commandPath, status);
     return true;
 }
 

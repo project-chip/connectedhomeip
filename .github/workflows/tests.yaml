@@ -28,7 +28,7 @@ concurrency:
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
-        timeout-minutes: 120
+        timeout-minutes: 140
 
         strategy:
             matrix:
@@ -43,7 +43,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.77
+            image: connectedhomeip/chip-build:0.5.79
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -90,7 +90,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Run Tests
-              timeout-minutes: 40
+              timeout-minutes: 60
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -121,7 +121,7 @@ jobs:
                   retention-days: 5
     test_suites_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 120
+        timeout-minutes: 140
 
         strategy:
             matrix:
@@ -190,7 +190,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Run Tests
-              timeout-minutes: 50
+              timeout-minutes: 70
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -237,7 +237,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.77
+            image: connectedhomeip/chip-build:0.5.79
             options:
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"

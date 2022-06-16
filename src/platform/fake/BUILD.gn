@@ -25,6 +25,7 @@ static_library("fake") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "DeviceInstanceInfoProviderImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "DnssdImpl.cpp",

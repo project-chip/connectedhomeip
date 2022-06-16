@@ -250,14 +250,6 @@ protected:
         return ConstraintsChecker::CheckConstraintIsHexString(itemName, value, expectHexString);
     }
 
-    bool CheckConstraintNotValue(
-        const char * _Nonnull itemName, const NSString * _Nonnull current, const NSString * _Nonnull expected)
-    {
-        const chip::CharSpan currentValue([current UTF8String], [current lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
-        const chip::CharSpan expectedValue([expected UTF8String], [expected lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
-        return ConstraintsChecker::CheckConstraintNotValue(itemName, currentValue, expectedValue);
-    }
-
     template <typename T> bool CheckConstraintContains(const char * _Nonnull itemName, const NSArray * _Nonnull current, T expected)
     {
         for (id currentElement in current) {
@@ -283,8 +275,31 @@ protected:
         return true;
     }
 
-    bool CheckConstraintNotValue(const char * _Nonnull itemName, const NSData * _Nonnull current, const NSData * _Nonnull expected)
+    bool CheckConstraintNotValue(
+        const char * _Nonnull itemName, const NSString * _Nullable current, const NSString * _Nullable expected)
     {
+        if (current == nil && expected == nil) {
+            Exit(std::string(itemName) + " got unexpected value. Both values are nil.");
+            return false;
+        }
+        if ((current == nil) != (expected == nil)) {
+            return true;
+        }
+        const chip::CharSpan currentValue([current UTF8String], [current lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+        const chip::CharSpan expectedValue([expected UTF8String], [expected lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+        return ConstraintsChecker::CheckConstraintNotValue(itemName, currentValue, expectedValue);
+    }
+
+    bool CheckConstraintNotValue(
+        const char * _Nonnull itemName, const NSData * _Nullable current, const NSData * _Nullable expected)
+    {
+        if (current == nil && expected == nil) {
+            Exit(std::string(itemName) + " got unexpected value. Both values are nil.");
+            return false;
+        }
+        if ((current == nil) != (expected == nil)) {
+            return true;
+        }
         const chip::ByteSpan currentValue(static_cast<const uint8_t *>([current bytes]), [current length]);
         const chip::ByteSpan expectedValue(static_cast<const uint8_t *>([expected bytes]), [expected length]);
         return ConstraintsChecker::CheckConstraintNotValue(itemName, currentValue, expectedValue);
@@ -308,7 +323,7 @@ protected:
     }
 
     template <typename T>
-    bool CheckConstraintNotValue(const char * _Nonnull itemName, const NSNumber * _Nonnull current, T expected)
+    bool CheckConstraintNotValue(const char * _Nonnull itemName, const NSNumber * _Nullable current, T expected)
     {
         return CheckConstraintNotValue(itemName, current, @(expected));
     }
@@ -349,6 +364,21 @@ protected:
     bool CheckConstraintMaxValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
     {
         return ConstraintsChecker::CheckConstraintMaxValue(itemName, current, [expected unsignedLongLongValue]);
+    }
+
+    bool CheckConstraintHasValue(const char * _Nonnull itemName, id _Nullable current, bool shouldHaveValue)
+    {
+        if (shouldHaveValue && (current == nil)) {
+            Exit(std::string(itemName) + " expected to have a value but doesn't");
+            return false;
+        }
+
+        if (!shouldHaveValue && (current != nil)) {
+            Exit(std::string(itemName) + " not expected to have a value but does");
+            return false;
+        }
+
+        return true;
     }
 
     bool CheckValueAsString(const char * _Nonnull itemName, const id _Nonnull current, const NSString * _Nonnull expected)

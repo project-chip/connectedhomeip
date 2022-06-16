@@ -40,6 +40,8 @@
 
 #define CHIP_CONFIG_MAX_SOFTWARE_VERSION_LENGTH 128
 
+#ifndef CHIP_CONFIG_KVS_PATH
 #define CHIP_CONFIG_KVS_PATH "chip.store"
+#endif
 
 #endif /* CHIPPROJECTCONFIG_H */

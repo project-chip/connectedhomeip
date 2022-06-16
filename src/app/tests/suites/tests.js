@@ -77,10 +77,17 @@ function getManualTests() {
   ];
 
   const BulkDataExchangeProtocol = [
+    'Test_TC_BDX_1_1',
     'Test_TC_BDX_1_2',
+    'Test_TC_BDX_1_3',
     'Test_TC_BDX_1_4',
+    'Test_TC_BDX_1_5',
+    'Test_TC_BDX_1_6',
     'Test_TC_BDX_2_1',
     'Test_TC_BDX_2_2',
+    'Test_TC_BDX_2_3',
+    'Test_TC_BDX_2_4',
+    'Test_TC_BDX_2_5',
   ];
 
   const bridge = [
@@ -96,7 +103,12 @@ function getManualTests() {
   ];
 
   const DeviceAttestation = [
+    'Test_TC_DA_1_1',
+    'Test_TC_DA_1_2',
     'Test_TC_DA_1_3',
+    'Test_TC_DA_1_4',
+    'Test_TC_DA_1_5',
+    'Test_TC_DA_1_6',
   ];
 
   const DeviceManagement = [
@@ -140,7 +152,6 @@ function getManualTests() {
   ];
 
   const Descriptor = [
-    'Test_TC_DESC_1_1',
     'Test_TC_DESC_2_1',
     'Test_TC_DESC_2_2',
   ];
@@ -158,13 +169,10 @@ function getManualTests() {
   ];
 
   const GeneralDiagnostics = [
-    'Test_TC_GENDIAG_1_1',
     'Test_TC_GENDIAG_1_2',
-    'Test_TC_GENDIAG_2_1',
   ];
 
   const Identify = [
-    'Test_TC_I_2_2',
     'Test_TC_I_3_1',
     'Test_TC_I_3_2',
   ];
@@ -191,6 +199,7 @@ function getManualTests() {
     'Test_TC_IDM_6_3',
     'Test_TC_IDM_6_4',
     'Test_TC_IDM_7_1',
+    'Test_TC_IDM_8_1',
   ];
 
   const MediaControl = [
@@ -228,8 +237,6 @@ function getManualTests() {
     'Test_TC_MF_1_2',
     'Test_TC_MF_1_7',
     'Test_TC_MF_1_8',
-    'Test_TC_MF_1_9',
-    'Test_TC_MF_1_10',
     'Test_TC_MF_1_11',
     'Test_TC_MF_1_12',
     'Test_TC_MF_1_13',
@@ -284,6 +291,18 @@ function getManualTests() {
   ];
 
   const SecureChannel = [
+    'Test_TC_SC_1_1',
+    'Test_TC_SC_1_2',
+    'Test_TC_SC_1_3',
+    'Test_TC_SC_1_4',
+    'Test_TC_SC_2_1',
+    'Test_TC_SC_2_2',
+    'Test_TC_SC_2_3',
+    'Test_TC_SC_2_4',
+    'Test_TC_SC_3_1',
+    'Test_TC_SC_3_2',
+    'Test_TC_SC_3_3',
+    'Test_TC_SC_3_4',
     'Test_TC_SC_4_1',
     'Test_TC_SC_4_3',
     'Test_TC_SC_4_4',
@@ -444,6 +463,14 @@ function getManualTests() {
     'Test_TC_BIND_2_1',
   ];
 
+  const Scenes = [
+    'Test_TC_S_1_1',
+    'Test_TC_S_2_1',
+    'Test_TC_S_2_2',
+    'Test_TC_S_2_3',
+    'Test_TC_S_3_1',
+  ];
+
   const tests = [
     DeviceDiscovery,
     Groups,
@@ -491,6 +518,7 @@ function getManualTests() {
     UnitLocalization,
     FixedLabel,
     Binding,
+    Scenes,
   ].flat(1);
 
   tests.disable = disable.bind(tests);
@@ -547,6 +575,11 @@ function getTests() {
     'Test_TC_DM_2_1',
   ];
 
+  const Descriptor = [
+    'Test_TC_DESC_1_1',
+  ];
+
+
   const ElectricalMeasurement = [
     'Test_TC_EMR_1_1',
   ];
@@ -566,9 +599,15 @@ function getTests() {
     'Test_TC_CGEN_2_1',
   ];
 
+  const GeneralDiagnostics = [
+    'Test_TC_DGGEN_1_1',
+    'Test_TC_DGGEN_2_1',
+  ];
+
   const Identify = [
     'Test_TC_I_1_1',
     'Test_TC_I_2_1',
+    'Test_TC_I_2_2',
     'Test_TC_I_2_3',
   ];
 
@@ -595,6 +634,7 @@ function getTests() {
   const UserLabel = [
     'Test_TC_ULABEL_1_1',
     'Test_TC_ULABEL_2_2',
+    'Test_TC_ULABEL_2_3',
   ];
 
   const MediaControl = [
@@ -642,6 +682,8 @@ function getTests() {
     'Test_TC_MF_1_4',
     'Test_TC_MF_1_5',
     'Test_TC_MF_1_6',
+    'Test_TC_MF_1_9',
+    'Test_TC_MF_1_10',
     'Test_TC_MF_1_15',
   ];
 
@@ -818,10 +860,12 @@ function getTests() {
     BridgedActions,
     ColorControl,
     DeviceManagement,
+    Descriptor,
     ElectricalMeasurement,
     EthernetNetworkDiagnostics,
     FlowMeasurement,
     GeneralCommissioning,
+    GeneralDiagnostics,
     Identify,
     IlluminanceMeasurement,
     LevelControl,
