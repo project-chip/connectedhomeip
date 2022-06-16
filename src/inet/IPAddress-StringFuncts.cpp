@@ -157,15 +157,13 @@ bool IPAddress::FromString(const char * str, IPAddress & addrOutput, class Inter
         ifaceOutput = Inet::InterfaceId();
         return Inet::IPAddress::FromString(addrStr, addrOutput);
     }
-    else
+
+    CHIP_ERROR err = Inet::InterfaceId::InterfaceNameToId(scopePart, ifaceOutput);
+    if (err != CHIP_NO_ERROR)
     {
-        CHIP_ERROR err = Inet::InterfaceId::InterfaceNameToId(scopePart, ifaceOutput);
-        if (err != CHIP_NO_ERROR)
-        {
-            return false;
-        }
-        return Inet::IPAddress::FromString(addrPart, addrOutput);
+        return false;
     }
+    return Inet::IPAddress::FromString(addrPart, addrOutput);
 }
 
 } // namespace Inet
