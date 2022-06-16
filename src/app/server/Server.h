@@ -46,6 +46,7 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/secure_channel/UnsolicitedStatusHandler.h>
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
 #include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
 #endif
@@ -452,6 +453,7 @@ private:
     CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
     OperationalDeviceProxyPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES> mDevicePool;
 
+    Protocols::SecureChannel::UnsolicitedStatusHandler mUnsolicitedStatusHandler;
     Messaging::ExchangeManager mExchangeMgr;
     FabricTable mFabrics;
     secure_channel::MessageCounterManager mMessageCounterManager;
