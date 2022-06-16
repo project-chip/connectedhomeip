@@ -26,7 +26,6 @@
 
 @interface CHIPCluster ()
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
-- (chip::Controller::ClusterBase *)getCluster;
 - (chip::ByteSpan)asByteSpan:(NSData *)value;
 - (chip::CharSpan)asCharSpan:(NSString *)value;
 @end

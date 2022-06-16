@@ -33,14 +33,19 @@ namespace Controller {
 class DLL_EXPORT ScenesCluster : public ClusterBase
 {
 public:
-    ScenesCluster() : ClusterBase(app::Clusters::Scenes::Id) {}
+    ScenesCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Scenes::Id, endpoint)
+    {}
     ~ScenesCluster() {}
 };
 
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
-    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
+    OtaSoftwareUpdateProviderCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                     EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OtaSoftwareUpdateProvider::Id, endpoint)
+    {}
     ~OtaSoftwareUpdateProviderCluster() {}
 };
 

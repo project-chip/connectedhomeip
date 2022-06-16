@@ -512,8 +512,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
     ChipLogProgress(Controller, "Attempting to update Binding list");
     BindingListType bindingList(bindings.data(), bindings.size());
 
-    chip::Controller::BindingCluster cluster;
-    ReturnErrorOnFailure(cluster.Associate(targetDeviceProxy, kTargetBindingClusterEndpointId));
+    chip::Controller::BindingCluster cluster(targetDeviceProxy, kTargetBindingClusterEndpointId);
 
     ReturnErrorOnFailure(
         cluster.WriteAttribute<Binding::Attributes::Binding::TypeInfo>(bindingList, nullptr, successCb, failureCb));

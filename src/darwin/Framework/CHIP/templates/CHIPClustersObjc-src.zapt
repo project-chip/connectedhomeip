@@ -21,11 +21,6 @@ using namespace chip::app::Clusters;
 {{#chip_client_clusters includeAll=true}}
 @implementation CHIP{{asUpperCamelCase name}}
 
-- (chip::Controller::ClusterBase *)getCluster
-{
-    return &_cppCluster;
-}
-
 {{#chip_cluster_commands}}
 {{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}CommandSuccess{{/if}}{{/inline}}
 {{#unless (hasArguments)}}

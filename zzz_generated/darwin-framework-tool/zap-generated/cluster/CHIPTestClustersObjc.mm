@@ -37,10 +37,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestIdentify
+std::unique_ptr<chip::Controller::IdentifyCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::IdentifyCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeIdentifyTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -221,10 +234,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestGroups
+std::unique_ptr<chip::Controller::GroupsCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::GroupsCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeNameSupportWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -405,10 +431,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestScenes
+std::unique_ptr<chip::Controller::ScenesCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::ScenesCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeSceneCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -684,10 +723,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestOnOff
+std::unique_ptr<chip::Controller::OnOffCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::OnOffCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeOnOffWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -886,10 +938,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestOnOffSwitchConfiguration
+std::unique_ptr<chip::Controller::OnOffSwitchConfigurationCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::OnOffSwitchConfigurationCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeSwitchTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -1070,10 +1135,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestLevelControl
+std::unique_ptr<chip::Controller::LevelControlCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::LevelControlCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeCurrentLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -1362,10 +1440,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestBinaryInputBasic
+std::unique_ptr<chip::Controller::BinaryInputBasicCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::BinaryInputBasicCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributePolarityWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -1582,10 +1673,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestDescriptor
+std::unique_ptr<chip::Controller::DescriptorCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::DescriptorCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeDeviceListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -1905,10 +2009,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestBinding
+std::unique_ptr<chip::Controller::BindingCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::BindingCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -2071,10 +2188,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestAccessControl
+std::unique_ptr<chip::Controller::AccessControlCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::AccessControlCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeSubjectsPerAccessControlEntryWithValue:(NSNumber * _Nonnull)value
@@ -2294,10 +2424,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestBridgedActions
+std::unique_ptr<chip::Controller::BridgedActionsCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::BridgedActionsCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeActionListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -2591,10 +2734,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestBasic
+std::unique_ptr<chip::Controller::BasicCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::BasicCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeDataModelRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -3067,10 +3223,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestOtaSoftwareUpdateProvider
+std::unique_ptr<chip::Controller::OtaSoftwareUpdateProviderCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::OtaSoftwareUpdateProviderCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -3233,10 +3402,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestOtaSoftwareUpdateRequestor
+std::unique_ptr<chip::Controller::OtaSoftwareUpdateRequestorCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::OtaSoftwareUpdateRequestorCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeUpdatePossibleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -3458,10 +3640,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestLocalizationConfiguration
+std::unique_ptr<chip::Controller::LocalizationConfigurationCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::LocalizationConfigurationCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeSupportedLocalesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -3663,10 +3858,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestTimeFormatLocalization
+std::unique_ptr<chip::Controller::TimeFormatLocalizationCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::TimeFormatLocalizationCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeSupportedCalendarTypesWithValue:(NSArray * _Nonnull)value
@@ -3870,10 +4078,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestUnitLocalization
+std::unique_ptr<chip::Controller::UnitLocalizationCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::UnitLocalizationCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -4036,10 +4257,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestPowerSourceConfiguration
+std::unique_ptr<chip::Controller::PowerSourceConfigurationCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::PowerSourceConfigurationCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeSourcesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -4241,10 +4475,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestPowerSource
+std::unique_ptr<chip::Controller::PowerSourceCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::PowerSourceCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -5042,10 +5289,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestGeneralCommissioning
+std::unique_ptr<chip::Controller::GeneralCommissioningCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::GeneralCommissioningCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeBasicCommissioningInfoWithValue:(CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nonnull)value
@@ -5283,10 +5543,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestNetworkCommissioning
+std::unique_ptr<chip::Controller::NetworkCommissioningCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::NetworkCommissioningCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeMaxNetworksWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -5615,10 +5888,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestDiagnosticLogs
+std::unique_ptr<chip::Controller::DiagnosticLogsCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::DiagnosticLogsCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -5781,10 +6067,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestGeneralDiagnostics
+std::unique_ptr<chip::Controller::GeneralDiagnosticsCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::GeneralDiagnosticsCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeNetworkInterfacesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -6258,10 +6557,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestSoftwareDiagnostics
+std::unique_ptr<chip::Controller::SoftwareDiagnosticsCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::SoftwareDiagnosticsCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeThreadMetricsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -6534,10 +6846,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestThreadNetworkDiagnostics
+std::unique_ptr<chip::Controller::ThreadNetworkDiagnosticsCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::ThreadNetworkDiagnosticsCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeChannelWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
@@ -8041,10 +8366,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestWiFiNetworkDiagnostics
+std::unique_ptr<chip::Controller::WiFiNetworkDiagnosticsCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::WiFiNetworkDiagnosticsCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeBssidWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler
@@ -8468,10 +8806,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestEthernetNetworkDiagnostics
+std::unique_ptr<chip::Controller::EthernetNetworkDiagnosticsCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::EthernetNetworkDiagnosticsCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributePHYRateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
@@ -8811,10 +9162,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestBridgedDeviceBasic
+std::unique_ptr<chip::Controller::BridgedDeviceBasicCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::BridgedDeviceBasicCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeVendorNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -9231,10 +9595,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestSwitch
+std::unique_ptr<chip::Controller::SwitchCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::SwitchCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeNumberOfPositionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -9451,10 +9828,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestAdministratorCommissioning
+std::unique_ptr<chip::Controller::AdministratorCommissioningCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::AdministratorCommissioningCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeWindowStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -9671,10 +10061,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestOperationalCredentials
+std::unique_ptr<chip::Controller::OperationalCredentialsCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::OperationalCredentialsCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeNOCsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -10023,10 +10426,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestGroupKeyManagement
+std::unique_ptr<chip::Controller::GroupKeyManagementCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::GroupKeyManagementCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeGroupTableWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -10292,10 +10708,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestFixedLabel
+std::unique_ptr<chip::Controller::FixedLabelCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::FixedLabelCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeLabelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -10498,10 +10927,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestUserLabel
+std::unique_ptr<chip::Controller::UserLabelCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::UserLabelCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -10664,10 +11106,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestBooleanState
+std::unique_ptr<chip::Controller::BooleanStateCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::BooleanStateCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeStateValueWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -10848,10 +11303,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestModeSelect
+std::unique_ptr<chip::Controller::ModeSelectCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::ModeSelectCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeDescriptionWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -11137,10 +11605,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestDoorLock
+std::unique_ptr<chip::Controller::DoorLockCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::DoorLockCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeLockStateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
@@ -11647,10 +12128,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestWindowCovering
+std::unique_ptr<chip::Controller::WindowCoveringCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::WindowCoveringCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -12245,10 +12739,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestBarrierControl
+std::unique_ptr<chip::Controller::BarrierControlCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::BarrierControlCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeBarrierMovingStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -12483,10 +12990,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestPumpConfigurationAndControl
+std::unique_ptr<chip::Controller::PumpConfigurationAndControlCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::PumpConfigurationAndControlCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeMaxPressureWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
@@ -13072,10 +13592,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestThermostat
+std::unique_ptr<chip::Controller::ThermostatCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::ThermostatCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeLocalTemperatureWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
@@ -13686,10 +14219,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestFanControl
+std::unique_ptr<chip::Controller::FanControlCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::FanControlCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributePercentCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -13942,10 +14488,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestThermostatUserInterfaceConfiguration
+std::unique_ptr<chip::Controller::ThermostatUserInterfaceConfigurationCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::ThermostatUserInterfaceConfigurationCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -14108,10 +14667,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestColorControl
+std::unique_ptr<chip::Controller::ColorControlCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::ColorControlCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeCurrentHueWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -15016,10 +15588,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestIlluminanceMeasurement
+std::unique_ptr<chip::Controller::IlluminanceMeasurementCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::IlluminanceMeasurementCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
@@ -15292,10 +15877,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestTemperatureMeasurement
+std::unique_ptr<chip::Controller::TemperatureMeasurementCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::TemperatureMeasurementCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
@@ -15545,10 +16143,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestPressureMeasurement
+std::unique_ptr<chip::Controller::PressureMeasurementCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::PressureMeasurementCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
@@ -15903,10 +16514,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestFlowMeasurement
+std::unique_ptr<chip::Controller::FlowMeasurementCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::FlowMeasurementCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
@@ -16156,10 +16780,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestRelativeHumidityMeasurement
+std::unique_ptr<chip::Controller::RelativeHumidityMeasurementCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::RelativeHumidityMeasurementCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
@@ -16409,10 +17046,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestOccupancySensing
+std::unique_ptr<chip::Controller::OccupancySensingCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::OccupancySensingCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeOccupancyWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -16630,10 +17280,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestWakeOnLan
+std::unique_ptr<chip::Controller::WakeOnLanCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::WakeOnLanCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeMACAddressWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -16814,10 +17477,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestChannel
+std::unique_ptr<chip::Controller::ChannelCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::ChannelCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeChannelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -17103,10 +17779,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestTargetNavigator
+std::unique_ptr<chip::Controller::TargetNavigatorCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::TargetNavigatorCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeTargetListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -17327,10 +18016,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestMediaPlayback
+std::unique_ptr<chip::Controller::MediaPlaybackCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::MediaPlaybackCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeCurrentStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -17651,10 +18353,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestMediaInput
+std::unique_ptr<chip::Controller::MediaInputCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::MediaInputCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeInputListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -17879,10 +18594,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestLowPower
+std::unique_ptr<chip::Controller::LowPowerCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::LowPowerCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -18045,10 +18773,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestKeypadInput
+std::unique_ptr<chip::Controller::KeypadInputCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::KeypadInputCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -18211,10 +18952,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestContentLauncher
+std::unique_ptr<chip::Controller::ContentLauncherCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::ContentLauncherCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeAcceptHeaderWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -18416,10 +19170,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestAudioOutput
+std::unique_ptr<chip::Controller::AudioOutputCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::AudioOutputCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeOutputListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -18643,10 +19410,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestApplicationLauncher
+std::unique_ptr<chip::Controller::ApplicationLauncherCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::ApplicationLauncherCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeCatalogListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -18848,10 +19628,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestApplicationBasic
+std::unique_ptr<chip::Controller::ApplicationBasicCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::ApplicationBasicCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeVendorNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -19182,10 +19975,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestAccountLogin
+std::unique_ptr<chip::Controller::AccountLoginCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::AccountLoginCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -19348,10 +20154,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestElectricalMeasurement
+std::unique_ptr<chip::Controller::ElectricalMeasurementCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::ElectricalMeasurementCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeMeasurementTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -21714,10 +22533,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTestTestCluster
+std::unique_ptr<chip::Controller::TestClusterCluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::TestClusterCluster)cppCluster
+{
+    return *_cppCluster.get();
 }
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler

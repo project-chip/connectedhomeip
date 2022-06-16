@@ -22,10 +22,23 @@ using namespace chip::app::Clusters;
 @end
 
 @implementation CHIPTest{{asUpperCamelCase name}}
+std::unique_ptr<chip::Controller::{{asUpperCamelCase name}}Cluster> _cppCluster;
 
-- (chip::Controller::ClusterBase *)getCluster
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
-    return &_cppCluster;
+    if (self = [super initWithQueue:queue]) {
+        if (device == nullptr) {
+            return nil;
+        }
+
+        _cppCluster.reset([device internalDevice], endpoint);
+    }
+    return self;
+}
+
+- (chip::Controller::{{asUpperCamelCase name}}Cluster) cppCluster
+{
+    return *_cppCluster.get();
 }
 
 {{#chip_server_cluster_attributes}}
