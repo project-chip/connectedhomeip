@@ -381,9 +381,9 @@ CHIP_ERROR CASESession::SendSigma1()
         ReturnErrorOnFailure(RecoverInitiatorIpk());
 
         FabricId fabricId = fabricInfo->GetFabricId();
-        uint8_t rootPubKeyBuf[Crypto::kP256_Point_Length];
-        Credentials::P256PublicKeySpan rootPubKeySpan(rootPubKeyBuf);
-        ReturnErrorOnFailure(fabricInfo->GetRootPubkey(rootPubKeySpan));
+        Crypto::P256PublicKey rootPubKey;
+        ReturnErrorOnFailure(mFabricsTable->FetchRootPubkey(mFabricIndex, rootPubKey));
+        Credentials::P256PublicKeySpan rootPubKeySpan{ rootPubKey.ConstBytes() };
 
         MutableByteSpan destinationIdSpan(destinationIdentifier);
         ReturnErrorOnFailure(GenerateCaseDestinationId(ByteSpan(mIPK), ByteSpan(mInitiatorRandom), rootPubKeySpan, fabricId,
@@ -457,9 +457,9 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destina
         // Basic data for candidate fabric, used to compute candidate destination identifiers
         FabricId fabricId = fabricInfo.GetFabricId();
         NodeId nodeId     = fabricInfo.GetNodeId();
-        uint8_t rootPubKeyBuf[Crypto::kP256_Point_Length];
-        Credentials::P256PublicKeySpan rootPubKeySpan(rootPubKeyBuf);
-        ReturnErrorOnFailure(fabricInfo.GetRootPubkey(rootPubKeySpan));
+        Crypto::P256PublicKey rootPubKey;
+        ReturnErrorOnFailure(mFabricsTable->FetchRootPubkey(fabricInfo.GetFabricIndex(), rootPubKey));
+        Credentials::P256PublicKeySpan rootPubKeySpan{ rootPubKey.ConstBytes() };
 
         // Get IPK operational group key set for current candidate fabric
         GroupDataProvider::KeySet ipkKeySet;
@@ -667,14 +667,18 @@ CHIP_ERROR CASESession::SendSigma2()
 
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
-    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    ByteSpan icaCert;
-    ReturnErrorOnFailure(fabricInfo->GetICACert(icaCert));
+    chip::Platform::ScopedMemoryBuffer<uint8_t> icacBuf;
+    VerifyOrReturnError(icacBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
 
-    ByteSpan nocCert;
-    ReturnErrorOnFailure(fabricInfo->GetNOCCert(nocCert));
+    chip::Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
+    VerifyOrReturnError(nocBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
+
+    MutableByteSpan icaCert{ icacBuf.Get(), kMaxCHIPCertLength };
+    ReturnErrorOnFailure(mFabricsTable->FetchICACert(mFabricIndex, icaCert));
+
+    MutableByteSpan nocCert{ nocBuf.Get(), kMaxCHIPCertLength };
+    ReturnErrorOnFailure(mFabricsTable->FetchNOCCert(mFabricIndex, nocCert));
 
     // Fill in the random value
     uint8_t msg_rand[kSigmaParamRandomNumberSize];
@@ -701,7 +705,7 @@ CHIP_ERROR CASESession::SendSigma2()
 
     // Construct Sigma2 TBS Data
     size_t msg_r2_signed_len =
-        TLV::EstimateStructOverhead(nocCert.size(), icaCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
+        TLV::EstimateStructOverhead(kMaxCHIPCertLength, kMaxCHIPCertLength, kP256_PublicKey_Length, kP256_PublicKey_Length);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R2_Signed;
     VerifyOrReturnError(msg_R2_Signed.Alloc(msg_r2_signed_len), CHIP_ERROR_NO_MEMORY);
@@ -732,6 +736,16 @@ CHIP_ERROR CASESession::SendSigma2()
     {
         ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kTag_TBEData_SenderICAC), icaCert));
     }
+
+    // We are now done with ICAC and NOC certs so we can release the memory.
+    {
+        icacBuf.Free();
+        icaCert = MutableByteSpan{};
+
+        nocBuf.Free();
+        nocCert = MutableByteSpan{};
+    }
+
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(kTag_TBEData_Signature), tbsData2Signature,
                                             static_cast<uint32_t>(tbsData2Signature.Length())));
 
@@ -1025,8 +1039,7 @@ exit:
 CHIP_ERROR CASESession::SendSigma3()
 {
     MATTER_TRACE_EVENT_SCOPE("SendSigma3", "CASESession");
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    FabricInfo * fabricInfo = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     MutableByteSpan messageDigestSpan(mMessageDigest);
     System::PacketBufferHandle msg_R3;
@@ -1044,17 +1057,24 @@ CHIP_ERROR CASESession::SendSigma3()
 
     P256ECDSASignature tbsData3Signature;
 
+    chip::Platform::ScopedMemoryBuffer<uint8_t> icacBuf;
+    MutableByteSpan icaCert;
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
+    MutableByteSpan nocCert;
+
     ChipLogDetail(SecureChannel, "Sending Sigma3");
 
-    ByteSpan icaCert;
-    ByteSpan nocCert;
+    VerifyOrExit(icacBuf.Alloc(kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
+    icaCert = MutableByteSpan{ icacBuf.Get(), kMaxCHIPCertLength };
+
+    VerifyOrExit(nocBuf.Alloc(kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
+    nocCert = MutableByteSpan{ nocBuf.Get(), kMaxCHIPCertLength };
 
     VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
-    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(err = fabricInfo->GetICACert(icaCert));
-    SuccessOrExit(err = fabricInfo->GetNOCCert(nocCert));
+    SuccessOrExit(err = mFabricsTable->FetchICACert(mFabricIndex, icaCert));
+    SuccessOrExit(err = mFabricsTable->FetchNOCCert(mFabricIndex, nocCert));
 
     // Prepare Sigma3 TBS Data Blob
     msg_r3_signed_len = TLV::EstimateStructOverhead(icaCert.size(), nocCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
@@ -1084,6 +1104,16 @@ CHIP_ERROR CASESession::SendSigma3()
         {
             SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(kTag_TBEData_SenderICAC), icaCert));
         }
+
+        // We are now done with ICAC and NOC certs so we can release the memory.
+        {
+            icacBuf.Free();
+            icaCert = MutableByteSpan{};
+
+            nocBuf.Free();
+            nocCert = MutableByteSpan{};
+        }
+
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(kTag_TBEData_Signature), tbsData3Signature,
                                                static_cast<uint32_t>(tbsData3Signature.Length())));
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));

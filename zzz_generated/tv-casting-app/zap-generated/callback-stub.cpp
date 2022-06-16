@@ -89,9 +89,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_GROUPS_CLUSTER_ID:
         emberAfGroupsClusterInitCallback(endpoint);
         break;
-    case ZCL_IAS_ZONE_CLUSTER_ID:
-        emberAfIasZoneClusterInitCallback(endpoint);
-        break;
     case ZCL_IDENTIFY_CLUSTER_ID:
         emberAfIdentifyClusterInitCallback(endpoint);
         break;
@@ -257,11 +254,6 @@ void __attribute__((weak)) emberAfGroupKeyManagementClusterInitCallback(Endpoint
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfGroupsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfIasZoneClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

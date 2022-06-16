@@ -14,4 +14,5 @@ pw_add_module_library(pw_sys_io.nrfconnect
     PRIVATE_DEPS
       pw_sys_io
       suppress_zephyr_warnings
+      pw_sys_io.default_putget_bytes
 )

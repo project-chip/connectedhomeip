@@ -28,47 +28,21 @@ tests:
 
       disabled: true
 
-    - label: "TH reads OccupancySensorType attribute from DUT"
+    - label: "DUT reads OccupancySensorType attribute from TH"
       verification: |
           ./chip-tool occupancysensing read occupancy-sensor-type 1 1
-          [1646207157.076863][2190:2190] CHIP:IM: Received Read request
-          [1646207157.076920][2190:2190] CHIP:DMG: ReadRequestMessage =
-          [1646207157.076949][2190:2190] CHIP:DMG: {
-          [1646207157.076974][2190:2190] CHIP:DMG:        AttributePathIBs =
-          [1646207157.077003][2190:2190] CHIP:DMG:        [
-          [1646207157.077029][2190:2190] CHIP:DMG:                AttributePathIB =
-          [1646207157.077074][2190:2190] CHIP:DMG:                {
-          [1646207157.077125][2190:2190] CHIP:DMG:                        Endpoint = 0x1,
-          [1646207157.077165][2190:2190] CHIP:DMG:                        Cluster = 0x406,
-          [1646207157.077202][2190:2190] CHIP:DMG:                        Attribute = 0x0000_0001,
-          [1646207157.077239][2190:2190] CHIP:DMG:                }
-          [1646207157.077271][2190:2190] CHIP:DMG:
-          [1646207157.077299][2190:2190] CHIP:DMG:        ],
-          [1646207157.077329][2190:2190] CHIP:DMG:
-          [1646207157.077358][2190:2190] CHIP:DMG:        isFabricFiltered = false,
-          [1646207157.077393][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
-          [1646207157.077417][2190:2190] CHIP:DMG: },
-          [1646207157.077486][2190:2190] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+          [1648461912.765825][9300:9306] CHIP:DMG: }
+          [1648461912.766013][9300:9306] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 3082917122
+          [1648461912.766089][9300:9306] CHIP:TOO:   occupancy sensor type: 0
+          [1648461912.766203][9300:9306] CHIP:EM: Sending Standalone Ack for MessageCounter:12865747 on exchange 64494i
       disabled: true
 
-    - label: "TH reads OccupancySensorTypeBitmap attribute from DUT"
+    - label: "DUT reads OccupancySensorTypeBitmap attribute from TH"
       verification: |
           ./chip-tool occupancysensing read occupancy-sensor-type-bitmap 1 1
-          [1646207177.525045][2190:2190] CHIP:IM: Received Read request
-          [1646207177.525107][2190:2190] CHIP:DMG: ReadRequestMessage =
-          [1646207177.525139][2190:2190] CHIP:DMG: {
-          [1646207177.525165][2190:2190] CHIP:DMG:        AttributePathIBs =
-          [1646207177.525202][2190:2190] CHIP:DMG:        [
-          [1646207177.525232][2190:2190] CHIP:DMG:                AttributePathIB =
-          [1646207177.525268][2190:2190] CHIP:DMG:                {
-          [1646207177.525304][2190:2190] CHIP:DMG:                        Endpoint = 0x1,
-          [1646207177.525346][2190:2190] CHIP:DMG:                        Cluster = 0x406,
-          [1646207177.525385][2190:2190] CHIP:DMG:                        Attribute = 0x0000_0002,
-          [1646207177.525425][2190:2190] CHIP:DMG:                }
-          [1646207177.525461][2190:2190] CHIP:DMG:
-          [1646207177.525494][2190:2190] CHIP:DMG:        ],
-          [1646207177.525529][2190:2190] CHIP:DMG:
-          [1646207177.525561][2190:2190] CHIP:DMG:        isFabricFiltered = false,
-          [1646207177.525591][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
-          [1646207177.525619][2190:2190] CHIP:DMG: },
+
+          [1648461918.499009][9307:9312] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0002 DataVersion: 3082917122
+          [1648461918.499082][9307:9312] CHIP:TOO:   occupancy sensor type bitmap: 1
+          [1648461918.499192][9307:9312] CHIP:EM: Sending Standalone Ack for MessageCounter:14798084 on exchange 49320i
       disabled: true

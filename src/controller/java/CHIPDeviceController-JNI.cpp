@@ -22,6 +22,7 @@
  *
  */
 #include "AndroidCallbacks.h"
+#include "AndroidCommissioningWindowOpener.h"
 #include "AndroidDeviceControllerWrapper.h"
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -161,28 +162,20 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
 
     ChipLogProgress(Controller, "newDeviceController() called");
 
-
     // Retrieve initialization params.
     jmethodID getUdpListenPort;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getUdpListenPort",
-                                                        "()Lchip/devicecontroller/ControllerParams;",
-                                                        &getUdpListenPort);
+                                                        "()Lchip/devicecontroller/ControllerParams;", &getUdpListenPort);
     SuccessOrExit(err);
     {
-      uint16_t listenPort = env->CallIntMethod(controllerParams, getUdpListenPort);
+        uint16_t listenPort = env->CallIntMethod(controllerParams, getUdpListenPort);
 
-      std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
-          new chip::Controller::AndroidOperationalCredentialsIssuer());
-      wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM,
-                                                            self,
-                                                            kLocalDeviceId,chip::kUndefinedCATs,
-                                                            &DeviceLayer::SystemLayer(),
-                                                            DeviceLayer::TCPEndPointManager(),
-                                                            DeviceLayer::UDPEndPointManager(),
-                                                            std::move(opCredsIssuer),
-                                                            listenPort,
-                                                            &err);
-      SuccessOrExit(err);
+        std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
+            new chip::Controller::AndroidOperationalCredentialsIssuer());
+        wrapper = AndroidDeviceControllerWrapper::AllocateNew(
+            sJVM, self, kLocalDeviceId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(), DeviceLayer::TCPEndPointManager(),
+            DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), listenPort, &err);
+        SuccessOrExit(err);
     }
 
     // Create and start the IO thread. Must be called after Controller()->Init
@@ -686,6 +679,63 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     err = AutoCommissioningWindowOpener::OpenCommissioningWindow(
         wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), iteration, discriminator,
         MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, setupPayload);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "OpenPairingWindow failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+
+    return true;
+}
+
+JNI_METHOD(jboolean, openPairingWindowCallback)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jobject jcallback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
+    if (chipDevice == nullptr)
+    {
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
+        return false;
+    }
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    err = AndroidCommissioningWindowOpener::OpenBasicCommissioningWindow(wrapper->Controller(), chipDevice->GetDeviceId(),
+                                                                         System::Clock::Seconds16(duration), jcallback);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "OpenPairingWindow failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+
+    return true;
+}
+
+JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jlong setupPinCode,
+ jobject jcallback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
+    if (chipDevice == nullptr)
+    {
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
+        return false;
+    }
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    chip::SetupPayload setupPayload;
+    err = AndroidCommissioningWindowOpener::OpenCommissioningWindow(
+        wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), iteration, discriminator,
+        MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, jcallback, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {

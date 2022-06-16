@@ -305,7 +305,8 @@ static NSString * const kErrorKeystoreInit = @"Init failure while initializing p
 
         for (CHIPDeviceController * existing in _controllers) {
             BOOL isRunning = YES; // assume the worst
-            if ([existing isRunningOnFabric:fabric isRunning:&isRunning] != CHIP_NO_ERROR) {
+            if ([existing isRunningOnFabric:&fabricTable fabricIndex:fabric->GetFabricIndex() isRunning:&isRunning]
+                != CHIP_NO_ERROR) {
                 CHIP_LOG_ERROR("Can't tell what fabric a controller is running on.  Not safe to start.");
                 return;
             }
@@ -448,7 +449,7 @@ static NSString * const kErrorKeystoreInit = @"Init failure while initializing p
         }
     }
 
-    *fabric = fabricTable.FindFabric(Credentials::P256PublicKeySpan(pubKey.ConstBytes()), params.fabricId);
+    *fabric = fabricTable.FindFabric(pubKey, params.fabricId);
     return YES;
 }
 

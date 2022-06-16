@@ -1,1 +1,1 @@
-0.5.78 Version bump reason: [Tizen] Fix environment variable order, add missing tizen dependencies
+0.5.80 Version bump reason: [Tizen] Add vscode debug support

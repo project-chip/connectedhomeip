@@ -29,6 +29,7 @@ declare_args() {
   chip_with_OM15082 = 0
   chip_with_ot_cli = 0
   chip_with_low_power = 0
+  mbedtls_use_tinycrypt = false
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")

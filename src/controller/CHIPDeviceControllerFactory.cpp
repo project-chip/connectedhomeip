@@ -154,6 +154,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     SimpleSessionResumptionStorage * sessionResumptionStorage = chip::Platform::New<SimpleSessionResumptionStorage>();
     stateParams.sessionResumptionStorage                      = sessionResumptionStorage;
     stateParams.certificateValidityPolicy                     = params.certificateValidityPolicy;
+    stateParams.unsolicitedStatusHandler                      = Platform::New<Protocols::SecureChannel::UnsolicitedStatusHandler>();
     stateParams.exchangeMgr                                   = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager                         = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider                             = params.groupDataProvider;
@@ -179,6 +180,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                       stateParams.fabricTable));
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
+    ReturnErrorOnFailure(stateParams.unsolicitedStatusHandler->Init(stateParams.exchangeMgr));
 
     InitDataModelHandler(stateParams.exchangeMgr);
 
@@ -422,6 +424,12 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     {
         chip::Platform::Delete(mExchangeMgr);
         mExchangeMgr = nullptr;
+    }
+
+    if (mUnsolicitedStatusHandler != nullptr)
+    {
+        Platform::Delete(mUnsolicitedStatusHandler);
+        mUnsolicitedStatusHandler = nullptr;
     }
 
     if (mSessionMgr != nullptr)
