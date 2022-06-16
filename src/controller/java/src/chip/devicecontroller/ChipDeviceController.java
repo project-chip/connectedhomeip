@@ -39,6 +39,10 @@ public class ChipDeviceController {
     return;
   }
 
+  public ChipDeviceController() {
+    this(new ControllerParams());
+  }
+
   public ChipDeviceController(ControllerParams params) {
     deviceControllerPtr = newDeviceController(params);
   }
