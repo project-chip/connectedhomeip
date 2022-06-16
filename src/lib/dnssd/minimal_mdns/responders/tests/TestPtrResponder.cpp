@@ -102,7 +102,7 @@ void TestPtrResponse(nlTestSuite * inSuite, void * inContext)
     packetInfo.DestPort    = kMdnsPort;
     packetInfo.Interface   = InterfaceId::Null();
 
-    responder.AddAllResponses(&packetInfo, &acc);
+    responder.AddAllResponses(&packetInfo, &acc, ResponseConfiguration());
 }
 
 const nlTest sTests[] = {
