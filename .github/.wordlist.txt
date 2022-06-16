@@ -626,7 +626,6 @@ IlluminanceMeasurement
 IM
 imager
 imagetool
-ImageURI
 imageUri
 img
 Impl
@@ -1278,6 +1277,7 @@ timedInteractionTimeoutMs
 TimeFormatLocalization
 timeoutMs
 TimeSynchronization
+tinycrypt
 Tizen
 TKIP
 tlsr

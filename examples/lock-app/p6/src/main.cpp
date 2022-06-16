@@ -34,6 +34,7 @@
 #include <AppTask.h>
 
 #include "AppConfig.h"
+#include "cyhal_wdt.h"
 #include "init_p6Platform.h"
 #include <app/server/Server.h>
 
@@ -95,7 +96,14 @@ static void main_task(void * pvParameters)
         P6_LOG("PlatformMgr().InitChipStack() failed");
         appError(ret);
     }
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("P6_LOCK");
+
+    ret = chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("P6_LOCK");
+    if (ret != CHIP_NO_ERROR)
+    {
+        P6_LOG("ConnectivityMgr().SetBLEDeviceName() failed");
+        appError(ret);
+    }
+
     P6_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
@@ -120,6 +128,12 @@ static void main_task(void * pvParameters)
 int main(void)
 {
     init_p6Platform();
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    // Clear watchdog timer (started by bootloader) so that it doesn't trigger a reset
+    cyhal_wdt_t wdt_obj;
+    cyhal_wdt_init(&wdt_obj, cyhal_wdt_get_max_timeout_ms());
+    cyhal_wdt_free(&wdt_obj);
+#endif
 
     P6_LOG("==================================================\r\n");
     P6_LOG("chip-p6-lock-example starting\r\n");

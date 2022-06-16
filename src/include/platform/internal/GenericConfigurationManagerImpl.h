@@ -40,10 +40,8 @@ class ProvisioningDataSet;
 
 namespace Internal {
 
-#if CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
 template <class ConfigClass>
-class LegacyDeviceInstanceInfoProvider;
-#endif // CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
+class GenericDeviceInstanceInfoProvider;
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
 template <class ConfigClass>
@@ -64,10 +62,6 @@ public:
     // ===== Methods that implement the ConfigurationManager abstract interface.
 
     CHIP_ERROR Init() override;
-    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
-    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetProductId(uint16_t & productId) override;
     CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer) override;
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
@@ -129,9 +123,7 @@ protected:
     uint8_t mRotatingDeviceIdUniqueId[kRotatingDeviceIDUniqueIDLength] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
 #endif
 
-#if CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
-    friend LegacyDeviceInstanceInfoProvider<ConfigClass>;
-#endif // CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
+    friend GenericDeviceInstanceInfoProvider<ConfigClass>;
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
     friend LegacyTemporaryCommissionableDataProvider<ConfigClass>;

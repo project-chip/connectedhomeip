@@ -1,0 +1,44 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 14.3.2. [TC-SC-3.2] CASE Session Resumption [DUT - Responder]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "Initiator constructs and sends a TLV-encoded Sigma1 message to
+          Responder with resumption containing initiatorRandom
+          initiatorSessionId destinationId resumptionID initiatorResumeMIC
+          initiatorEphPubKey initiatorSEDParams"
+      verification: |
+          Verify that the Responder receives the Sigma1 message from Initiator
+      disabled: true
+
+    - label:
+          "Initiator receives the Sigma2_Resume message and extracts the
+          following values resumptionID responderSessionID sigma2ResumeMIC
+          responderMRPParams"
+      verification: |
+          Verify that the message is properly formatted: I Flag is set to 0 S flag and DIZ fields of message flags are set to 0 Encryption Type of security flags is set to 0 The Session Key Type field is set to 0 The Protocol ID field is set to 0x0000 and The Protocol Opcode field is set to 0x33 Verify that the resumptionID is of Octet String maximum of length 16 bytes Verify that the responderSessionID is of uint16 Verify that the sigma2ResumeMIC is of Octet String maximum of length 16 bytes Verify that the responderSEDParams is from any one of the following: SLEEPY_IDLE_INTERVAL Verify that it is of uint32 SLEEPY_ACTIVE_INTERVAL Verify that it is of uint32
+      disabled: true
+
+    - label: "Initiator sends SigmaFinished message to Responder"
+      verification: |
+
+      disabled: true

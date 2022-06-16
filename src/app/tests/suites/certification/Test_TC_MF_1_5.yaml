@@ -76,31 +76,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 54000
-
-    - label: "Wait for PIXIT_COMM_WIN(180) + 10 seconds"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 54000
-
-    - label: "Wait for PIXIT_COMM_WIN(180) + 10 seconds"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 54000
-
-    - label: "Wait for PIXIT_COMM_WIN(180) + 10 seconds"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 28000
+                value: 190000
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"

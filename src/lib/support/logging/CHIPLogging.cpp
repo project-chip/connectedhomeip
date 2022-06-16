@@ -100,7 +100,7 @@ const char ModuleNames[] = "-\0\0" // None
                            "SD\0"  // ServiceDirectory
                            "SP\0"  // ServiceProvisioning
                            "SWU"   // SoftwareUpdate
-                           "TP\0"  // TokenPairing
+                           "FS\0"  // FailSafe
                            "TS\0"  // TimeService
                            "HB\0"  // Heartbeat
                            "CSL"   // chipSystemLayer

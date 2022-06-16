@@ -40,9 +40,10 @@ declare_args() {
 }
 
 config("p6_ota_config") {
-  ldflags = [ "-T/" + rebase_path("src/cy8c6xxa_cm4_dual_ota_int.ld",
-                                  "/",
-                                  "${p6_project_dir}") ]
+  ldflags = [ "-T/" + rebase_path(
+                  "${chip_root}/third_party/p6/p6_sdk/ota/cy8c6xxa_cm4_dual_ota_int.ld",
+                  "/",
+                  "${p6_project_dir}") ]
 
   ldflags += [ "-Wl,--defsym,MCUBOOT_HEADER_SIZE=0x400,--defsym,MCUBOOT_BOOTLOADER_SIZE=0x18000,--defsym,CY_BOOT_PRIMARY_1_SIZE=0x1C0000" ]
 
@@ -87,7 +88,7 @@ p6_sdk_sources("ota_requestor_app_sdk_sources") {
     "${chip_root}/src/platform/P6",
     "${p6_project_dir}/include",
     "${examples_plat_dir}",
-    "${p6_project_dir}/config",
+    "${chip_root}/third_party/p6/p6_sdk/ota/config",
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/",
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/mem_config/",
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/include/",

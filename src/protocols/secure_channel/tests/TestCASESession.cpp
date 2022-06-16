@@ -27,6 +27,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/ScopedNodeId.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -53,27 +54,6 @@ using namespace chip::Protocols;
 using TestContext = Test::LoopbackMessagingContext;
 
 namespace {
-#if CHIP_CONFIG_SLOW_CRYPTO
-constexpr uint32_t sTestCaseMessageCount           = 8;
-constexpr uint32_t sTestCaseResumptionMessageCount = 6;
-#else  // CHIP_CONFIG_SLOW_CRYPTO
-constexpr uint32_t sTestCaseMessageCount           = 5;
-constexpr uint32_t sTestCaseResumptionMessageCount = 4;
-#endif // CHIP_CONFIG_SLOW_CRYPTO
-
-FabricTable gCommissionerFabrics;
-FabricIndex gCommissionerFabricIndex;
-GroupDataProviderImpl gCommissionerGroupDataProvider;
-TestPersistentStorageDelegate gCommissionerStorageDelegate;
-
-FabricTable gDeviceFabrics;
-FabricIndex gDeviceFabricIndex;
-GroupDataProviderImpl gDeviceGroupDataProvider;
-TestPersistentStorageDelegate gDeviceStorageDelegate;
-
-NodeId Node01_01 = 0xDEDEDEDE00010001;
-NodeId Node01_02 = 0xDEDEDEDE00010002;
-
 class TestCASESecurePairingDelegate : public SessionEstablishmentDelegate
 {
 public:
@@ -102,6 +82,68 @@ public:
 private:
     CASESession mCaseSession;
 };
+
+class TestOperationalKeystore : public chip::Crypto::OperationalKeystore
+{
+public:
+    void Init(FabricIndex fabricIndex, Platform::UniquePtr<P256Keypair> keypair)
+    {
+        mSingleFabricIndex = fabricIndex;
+        mKeypair           = std::move(keypair);
+    }
+
+    bool HasPendingOpKeypair() const override { return false; }
+    bool HasOpKeypairForFabric(FabricIndex fabricIndex) const override { return mSingleFabricIndex != kUndefinedFabricIndex; }
+
+    CHIP_ERROR NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    CHIP_ERROR ActivateOpKeypairForFabric(FabricIndex fabricIndex, const Crypto::P256PublicKey & nocPublicKey) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    CHIP_ERROR CommitOpKeypairForFabric(FabricIndex fabricIndex) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR RemoveOpKeypairForFabric(FabricIndex fabricIndex) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    void RevertPendingKeypair() override {}
+
+    CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
+                                 Crypto::P256ECDSASignature & outSignature) const override
+    {
+        VerifyOrReturnError(mKeypair != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(fabricIndex == mSingleFabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
+        return mKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
+    }
+
+protected:
+    Platform::UniquePtr<P256Keypair> mKeypair;
+    FabricIndex mSingleFabricIndex = kUndefinedFabricIndex;
+};
+
+#if CHIP_CONFIG_SLOW_CRYPTO
+constexpr uint32_t sTestCaseMessageCount           = 8;
+constexpr uint32_t sTestCaseResumptionMessageCount = 6;
+#else  // CHIP_CONFIG_SLOW_CRYPTO
+constexpr uint32_t sTestCaseMessageCount           = 5;
+constexpr uint32_t sTestCaseResumptionMessageCount = 4;
+#endif // CHIP_CONFIG_SLOW_CRYPTO
+
+FabricTable gCommissionerFabrics;
+FabricIndex gCommissionerFabricIndex;
+GroupDataProviderImpl gCommissionerGroupDataProvider;
+TestPersistentStorageDelegate gCommissionerStorageDelegate;
+
+FabricTable gDeviceFabrics;
+FabricIndex gDeviceFabricIndex;
+GroupDataProviderImpl gDeviceGroupDataProvider;
+TestPersistentStorageDelegate gDeviceStorageDelegate;
+TestOperationalKeystore gDeviceOperationalKeystore;
+
+NodeId Node01_01 = 0xDEDEDEDE00010001;
+NodeId Node01_02 = 0xDEDEDEDE00010002;
 
 CHIP_ERROR InitTestIpk(GroupDataProvider & groupDataProvider, const FabricInfo & fabricInfo, size_t numIpks)
 {
@@ -160,14 +202,17 @@ CHIP_ERROR InitCredentialSets()
     ReturnErrorOnFailure(gDeviceGroupDataProvider.Init());
     FabricInfo deviceFabric;
 
+    auto deviceOpKey = Platform::MakeUnique<Crypto::P256Keypair>();
     memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
     memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
            sTestCert_Node01_01_PrivateKey_Len);
 
     ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));
 
-    ReturnErrorOnFailure(opKey.Deserialize(opKeysSerialized));
-    ReturnErrorOnFailure(deviceFabric.SetOperationalKeypair(&opKey));
+    ReturnErrorOnFailure(deviceOpKey->Deserialize(opKeysSerialized));
+
+    gDeviceOperationalKeystore.Init(1, std::move(deviceOpKey));
+    ReturnErrorOnFailure(gDeviceFabrics.Init(&gDeviceStorageDelegate, &gDeviceOperationalKeystore));
 
     ReturnErrorOnFailure(deviceFabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)));
     ReturnErrorOnFailure(deviceFabric.SetICACert(ByteSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len)));
@@ -221,18 +266,20 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * context = ctx.NewUnauthenticatedExchangeToBob(&pairing);
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(sessionManager, nullptr, gCommissionerFabricIndex, Node01_01, nullptr, nullptr, nullptr,
-                                            nullptr) != CHIP_NO_ERROR);
-    ctx.DrainAndServiceIO();
-
-    NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(sessionManager, &gCommissionerFabrics, gCommissionerFabricIndex, Node01_01, nullptr,
+                   pairing.EstablishSession(sessionManager, nullptr, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, nullptr,
                                             nullptr, nullptr, nullptr) != CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(sessionManager, &gCommissionerFabrics, gCommissionerFabricIndex, Node01_01, context,
-                                            nullptr, nullptr, &delegate) == CHIP_NO_ERROR);
+                   pairing.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                            ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, nullptr, nullptr, nullptr,
+                                            nullptr) != CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(inSuite,
+                   pairing.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                            ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, context, nullptr, nullptr,
+                                            &delegate) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     auto & loopback = ctx.GetLoopback();
@@ -252,8 +299,9 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * context1 = ctx.NewUnauthenticatedExchangeToBob(&pairing1);
 
     NL_TEST_ASSERT(inSuite,
-                   pairing1.EstablishSession(sessionManager, &gCommissionerFabrics, gCommissionerFabricIndex, Node01_01, context1,
-                                             nullptr, nullptr, &delegate) == CHIP_ERROR_BAD_REQUEST);
+                   pairing1.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                             ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, context1, nullptr, nullptr,
+                                             &delegate) == CHIP_ERROR_BAD_REQUEST);
     ctx.DrainAndServiceIO();
 
     loopback.mMessageSendError = CHIP_NO_ERROR;
@@ -287,8 +335,9 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
                                                                    &delegateAccessory, ScopedNodeId(),
                                                                    MakeOptional(verySleepyAccessoryRmpConfig)) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.EstablishSession(sessionManager, &gCommissionerFabrics, gCommissionerFabricIndex, Node01_01,
-                                                        contextCommissioner, nullptr, nullptr, &delegateCommissioner,
+                   pairingCommissioner.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                                        ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                        nullptr, nullptr, &delegateCommissioner,
                                                         MakeOptional(nonSleepyCommissionerRmpConfig)) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
@@ -336,13 +385,10 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner);
 
-    FabricInfo * fabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
-    NL_TEST_ASSERT(inSuite, fabric != nullptr);
-
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner->EstablishSession(ctx.GetSecureSessionManager(), &gCommissionerFabrics,
-                                                         gCommissionerFabricIndex, Node01_01, contextCommissioner, nullptr, nullptr,
-                                                         &delegateCommissioner) == CHIP_NO_ERROR);
+                                                         ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                         nullptr, nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == sTestCaseMessageCount);
@@ -351,7 +397,8 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     // Validate that secure session is created
     SessionHolder & holder = delegateCommissioner.GetSessionHolder();
     NL_TEST_ASSERT(inSuite, bool(holder));
-    NL_TEST_ASSERT(inSuite, holder->GetPeer() == fabric->GetScopedNodeIdForNode(Node01_01));
+
+    NL_TEST_ASSERT(inSuite, (holder->GetPeer() == chip::ScopedNodeId{ Node01_01, gCommissionerFabricIndex }));
 
     auto * pairingCommissioner1 = chip::Platform::New<CASESession>();
     pairingCommissioner1->SetGroupDataProvider(&gCommissionerGroupDataProvider);
@@ -359,8 +406,8 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner1->EstablishSession(ctx.GetSecureSessionManager(), &gCommissionerFabrics,
-                                                          gCommissionerFabricIndex, Node01_01, contextCommissioner1, nullptr,
-                                                          nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
+                                                          ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner1,
+                                                          nullptr, nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     chip::Platform::Delete(pairingCommissioner);
@@ -699,10 +746,10 @@ static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContex
     chip::Crypto::P256ECDHDerivedSecret sharedSecretB;
 
     // Create our fabric-scoped node IDs.
-    FabricInfo * fabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
-    NL_TEST_ASSERT(inSuite, fabric != nullptr);
-    ScopedNodeId initiator = fabric->GetScopedNodeIdForNode(Node01_02);
-    ScopedNodeId responder = fabric->GetScopedNodeIdForNode(Node01_01);
+    const FabricInfo * fabricInfo = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
+    NL_TEST_ASSERT(inSuite, fabricInfo != nullptr);
+    ScopedNodeId initiator = fabricInfo->GetScopedNodeIdForNode(Node01_02);
+    ScopedNodeId responder = fabricInfo->GetScopedNodeIdForNode(Node01_01);
 
     // Generate a resumption IDs.
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == chip::Crypto::DRBG_get_bytes(resumptionIdA.data(), resumptionIdA.size()));
@@ -764,15 +811,15 @@ static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContex
                                                                     &gDeviceGroupDataProvider) == CHIP_NO_ERROR);
         ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner);
         auto establishmentReturnVal           = pairingCommissioner->EstablishSession(
-            ctx.GetSecureSessionManager(), &gCommissionerFabrics, gCommissionerFabricIndex, Node01_01, contextCommissioner,
-            &testVectors[i].initiatorStorage, nullptr, &delegateCommissioner);
+            ctx.GetSecureSessionManager(), &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
+            contextCommissioner, &testVectors[i].initiatorStorage, nullptr, &delegateCommissioner);
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(inSuite, establishmentReturnVal == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == testVectors[i].expectedSentMessageCount);
         NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == i + 1);
         SessionHolder & holder = delegateCommissioner.GetSessionHolder();
         NL_TEST_ASSERT(inSuite, bool(holder));
-        NL_TEST_ASSERT(inSuite, holder->GetPeer() == fabric->GetScopedNodeIdForNode(Node01_01));
+        NL_TEST_ASSERT(inSuite, holder->GetPeer() == fabricInfo->GetScopedNodeIdForNode(Node01_01));
         chip::Platform::Delete(pairingCommissioner);
     }
 }
@@ -822,7 +869,6 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
     ReturnErrorOnFailure(ctx.Init());
 
     gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
-    gDeviceFabrics.Init(&gDeviceStorageDelegate);
 
     return InitCredentialSets();
 }
@@ -833,6 +879,8 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
  */
 int CASE_TestSecurePairing_Setup(void * inContext)
 {
+    chip::Platform::MemoryInit();
+
     CHIP_ERROR err = CASETestSecurePairingSetup(inContext);
     if (err != CHIP_NO_ERROR)
     {

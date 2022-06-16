@@ -18,6 +18,11 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
+
+#include <commands/common/CHIPCommand.h>
+#include <commands/common/Commands.h>
+
 class ShutdownSubscription : public CHIPCommand
 {
 public:

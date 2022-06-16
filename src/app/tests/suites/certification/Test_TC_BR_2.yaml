@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 25.1.2. [TC-BR-2] Changing the set of bridged devices
+name: 3.1.2. [TC-BR-2] Changing the set of Bridged Devices
 
 config:
     nodeId: 0x12344321
@@ -21,44 +21,50 @@ config:
     endpoint: 0
 
 tests:
-    - label: "- Read Descriptor cluster of endpoint 0- Read Descriptor cluster
-          of all endpoints listed\
-          in the PartsList attribute in the Descriptor cluster of endpoint 0"
+    - label:
+          "- Read Descriptor cluster of endpoint 0 - Read Descriptor cluster of
+          all endpoints listed in the PartsList attribute in the Descriptor
+          cluster of endpoint 0"
       verification: |
-          ./chip-tool  descriptor read parts-list 1 0
+          ./chip-tool descriptor read parts-list 1 0
 
           CHIP:DMG: ReportData =
           [1635666145.010326][3692:3697] CHIP:DMG: {
-          [1635666145.010374][3692:3697] CHIP:DMG:         AttributeDataList =
-          [1635666145.010414][3692:3697] CHIP:DMG:         [
-          [1635666145.010463][3692:3697] CHIP:DMG:                 AttributeDataElement =
-          [1635666145.010585][3692:3697] CHIP:DMG:                 {
-          [1635666145.010665][3692:3697] CHIP:DMG:                         AttributePath =
-          [1635666145.010726][3692:3697] CHIP:DMG:                         {
-          [1635666145.010816][3692:3697] CHIP:DMG:                                 NodeId = 0x1,
-          [1635666145.010905][3692:3697] CHIP:DMG:                                 EndpointId = 0x0,
-          [1635666145.010998][3692:3697] CHIP:DMG:                                 ClusterId = 0x1d,
-          [1635666145.011054][3692:3697] CHIP:DMG:                                 FieldTag = 0x0000_0003,
-          [1635666145.011144][3692:3697] CHIP:DMG:                         }
+          [1635666145.010374][3692:3697] CHIP:DMG: AttributeDataList =
+          [1635666145.010414][3692:3697] CHIP:DMG: [
+          [1635666145.010463][3692:3697] CHIP:DMG: AttributeDataElement =
+          [1635666145.010585][3692:3697] CHIP:DMG: {
+          [1635666145.010665][3692:3697] CHIP:DMG: AttributePath =
+          [1635666145.010726][3692:3697] CHIP:DMG: {
+          [1635666145.010816][3692:3697] CHIP:DMG: NodeId = 0x1,
+          [1635666145.010905][3692:3697] CHIP:DMG: EndpointId = 0x0,
+          [1635666145.010998][3692:3697] CHIP:DMG: ClusterId = 0x1d,
+          [1635666145.011054][3692:3697] CHIP:DMG: FieldTag = 0x0000_0003,
+          [1635666145.011144][3692:3697] CHIP:DMG: }
           [1635666145.011284][3692:3697] CHIP:DMG:
-          [1635666145.011334][3692:3697] CHIP:DMG:                         Data = [
-          [1635666145.011474][3692:3697] CHIP:DMG:                                 1, 2,
-          [1635666145.011572][3692:3697] CHIP:DMG:                         ],
-          [1635666145.011663][3692:3697] CHIP:DMG:                         DataElementVersion = 0x0,
-          [1635666145.011710][3692:3697] CHIP:DMG:                 },
+          [1635666145.011334][3692:3697] CHIP:DMG: Data = [
+          [1635666145.011474][3692:3697] CHIP:DMG: 1, 2,
+          [1635666145.011572][3692:3697] CHIP:DMG: ],
+          [1635666145.011663][3692:3697] CHIP:DMG: DataElementVersion = 0x0,
+          [1635666145.011710][3692:3697] CHIP:DMG: },
           [1635666145.011803][3692:3697] CHIP:DMG:
-          [1635666145.011889][3692:3697] CHIP:DMG:         ],
+          [1635666145.011889][3692:3697] CHIP:DMG: ],
           [1635666145.011980][3692:3697] CHIP:DMG:
           [1635666145.012060][3692:3697] CHIP:DMG: }
           [1635666145.012259][3692:3697] CHIP:ZCL: ReadAttributesResponse:
-          [1635666145.012336][3692:3697] CHIP:ZCL:   ClusterId: 0x0000_001D
-          [1635666145.012406][3692:3697] CHIP:ZCL:   attributeId: 0x0000_0003
-          [1635666145.012439][3692:3697] CHIP:ZCL:   status: Success                (0x0000)
-          [1635666145.012470][3692:3697] CHIP:ZCL:   attribute TLV Type: 0x16
+          [1635666145.012336][3692:3697] CHIP:ZCL: ClusterId: 0x0000_001D
+          [1635666145.012406][3692:3697] CHIP:ZCL: attributeId: 0x0000_0003
+          [1635666145.012439][3692:3697] CHIP:ZCL: status: Success (0x0000)
+          [1635666145.012470][3692:3697] CHIP:ZCL: attribute TLV Type: 0x16
           [1635666145.012523][3692:3697] CHIP:TOO: OnDescriptorPartsListListAttributeResponse: 2 entries
           [1635666145.012600][3692:3697] CHIP:TOO: ENDPOINT_NO[1]: 1
           [1635666145.012639][3692:3697] CHIP:TOO: ENDPOINT_NO[2]: 2
           [1635666145.012850][3692:3697] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 48783i
+      disabled: true
+
+    - label: "- Determine which endpoint has a device type of Aggregator"
+      verification: |
+
       disabled: true
 
     - label:
@@ -70,36 +76,74 @@ tests:
     - label:
           "Read the PartsList attribute in the Descriptor cluster on endpoint 0"
       verification: |
-          ./chip-tool  descriptor read parts-list 1 0
+          ./chip-tool descriptor read parts-list 1 0
 
           CHIP:DMG: ReportData =
           [1635666145.010326][3692:3697] CHIP:DMG: {
-          [1635666145.010374][3692:3697] CHIP:DMG:         AttributeDataList =
-          [1635666145.010414][3692:3697] CHIP:DMG:         [
-          [1635666145.010463][3692:3697] CHIP:DMG:                 AttributeDataElement =
-          [1635666145.010585][3692:3697] CHIP:DMG:                 {
-          [1635666145.010665][3692:3697] CHIP:DMG:                         AttributePath =
-          [1635666145.010726][3692:3697] CHIP:DMG:                         {
-          [1635666145.010816][3692:3697] CHIP:DMG:                                 NodeId = 0x1,
-          [1635666145.010905][3692:3697] CHIP:DMG:                                 EndpointId = 0x0,
-          [1635666145.010998][3692:3697] CHIP:DMG:                                 ClusterId = 0x1d,
-          [1635666145.011054][3692:3697] CHIP:DMG:                                 FieldTag = 0x0000_0003,
-          [1635666145.011144][3692:3697] CHIP:DMG:                         }
+          [1635666145.010374][3692:3697] CHIP:DMG: AttributeDataList =
+          [1635666145.010414][3692:3697] CHIP:DMG: [
+          [1635666145.010463][3692:3697] CHIP:DMG: AttributeDataElement =
+          [1635666145.010585][3692:3697] CHIP:DMG: {
+          [1635666145.010665][3692:3697] CHIP:DMG: AttributePath =
+          [1635666145.010726][3692:3697] CHIP:DMG: {
+          [1635666145.010816][3692:3697] CHIP:DMG: NodeId = 0x1,
+          [1635666145.010905][3692:3697] CHIP:DMG: EndpointId = 0x0,
+          [1635666145.010998][3692:3697] CHIP:DMG: ClusterId = 0x1d,
+          [1635666145.011054][3692:3697] CHIP:DMG: FieldTag = 0x0000_0003,
+          [1635666145.011144][3692:3697] CHIP:DMG: }
           [1635666145.011284][3692:3697] CHIP:DMG:
-          [1635666145.011334][3692:3697] CHIP:DMG:                         Data = [
-          [1635666145.011474][3692:3697] CHIP:DMG:                                 1, 2,
-          [1635666145.011572][3692:3697] CHIP:DMG:                         ],
-          [1635666145.011663][3692:3697] CHIP:DMG:                         DataElementVersion = 0x0,
-          [1635666145.011710][3692:3697] CHIP:DMG:                 },
+          [1635666145.011334][3692:3697] CHIP:DMG: Data = [
+          [1635666145.011474][3692:3697] CHIP:DMG: 1, 2,
+          [1635666145.011572][3692:3697] CHIP:DMG: ],
+          [1635666145.011663][3692:3697] CHIP:DMG: DataElementVersion = 0x0,
+          [1635666145.011710][3692:3697] CHIP:DMG: },
           [1635666145.011803][3692:3697] CHIP:DMG:
-          [1635666145.011889][3692:3697] CHIP:DMG:         ],
+          [1635666145.011889][3692:3697] CHIP:DMG: ],
           [1635666145.011980][3692:3697] CHIP:DMG:
           [1635666145.012060][3692:3697] CHIP:DMG: }
           [1635666145.012259][3692:3697] CHIP:ZCL: ReadAttributesResponse:
-          [1635666145.012336][3692:3697] CHIP:ZCL:   ClusterId: 0x0000_001D
-          [1635666145.012406][3692:3697] CHIP:ZCL:   attributeId: 0x0000_0003
-          [1635666145.012439][3692:3697] CHIP:ZCL:   status: Success                (0x0000)
-          [1635666145.012470][3692:3697] CHIP:ZCL:   attribute TLV Type: 0x16
+          [1635666145.012336][3692:3697] CHIP:ZCL: ClusterId: 0x0000_001D
+          [1635666145.012406][3692:3697] CHIP:ZCL: attributeId: 0x0000_0003
+          [1635666145.012439][3692:3697] CHIP:ZCL: status: Success (0x0000)
+          [1635666145.012470][3692:3697] CHIP:ZCL: attribute TLV Type: 0x16
+          [1635666145.012523][3692:3697] CHIP:TOO: OnDescriptorPartsListListAttributeResponse: 2 entries
+          [1635666145.012600][3692:3697] CHIP:TOO: ENDPOINT_NO[1]: 1
+          [1635666145.012639][3692:3697] CHIP:TOO: ENDPOINT_NO[2]: 2
+          [1635666145.012850][3692:3697] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 48783i
+      disabled: true
+
+    - label: "Repeat step 2b for endpoint found in step 1b"
+      verification: |
+          ./chip-tool descriptor read parts-list 1 0
+
+          CHIP:DMG: ReportData =
+          [1635666145.010326][3692:3697] CHIP:DMG: {
+          [1635666145.010374][3692:3697] CHIP:DMG: AttributeDataList =
+          [1635666145.010414][3692:3697] CHIP:DMG: [
+          [1635666145.010463][3692:3697] CHIP:DMG: AttributeDataElement =
+          [1635666145.010585][3692:3697] CHIP:DMG: {
+          [1635666145.010665][3692:3697] CHIP:DMG: AttributePath =
+          [1635666145.010726][3692:3697] CHIP:DMG: {
+          [1635666145.010816][3692:3697] CHIP:DMG: NodeId = 0x1,
+          [1635666145.010905][3692:3697] CHIP:DMG: EndpointId = 0x0,
+          [1635666145.010998][3692:3697] CHIP:DMG: ClusterId = 0x1d,
+          [1635666145.011054][3692:3697] CHIP:DMG: FieldTag = 0x0000_0003,
+          [1635666145.011144][3692:3697] CHIP:DMG: }
+          [1635666145.011284][3692:3697] CHIP:DMG:
+          [1635666145.011334][3692:3697] CHIP:DMG: Data = [
+          [1635666145.011474][3692:3697] CHIP:DMG: 1, 2,
+          [1635666145.011572][3692:3697] CHIP:DMG: ],
+          [1635666145.011663][3692:3697] CHIP:DMG: DataElementVersion = 0x0,
+          [1635666145.011710][3692:3697] CHIP:DMG: },
+          [1635666145.011803][3692:3697] CHIP:DMG:
+          [1635666145.011889][3692:3697] CHIP:DMG: ],
+          [1635666145.011980][3692:3697] CHIP:DMG:
+          [1635666145.012060][3692:3697] CHIP:DMG: }
+          [1635666145.012259][3692:3697] CHIP:ZCL: ReadAttributesResponse:
+          [1635666145.012336][3692:3697] CHIP:ZCL: ClusterId: 0x0000_001D
+          [1635666145.012406][3692:3697] CHIP:ZCL: attributeId: 0x0000_0003
+          [1635666145.012439][3692:3697] CHIP:ZCL: status: Success (0x0000)
+          [1635666145.012470][3692:3697] CHIP:ZCL: attribute TLV Type: 0x16
           [1635666145.012523][3692:3697] CHIP:TOO: OnDescriptorPartsListListAttributeResponse: 2 entries
           [1635666145.012600][3692:3697] CHIP:TOO: ENDPOINT_NO[1]: 1
           [1635666145.012639][3692:3697] CHIP:TOO: ENDPOINT_NO[2]: 2
@@ -130,36 +174,75 @@ tests:
     - label:
           "Read the PartsList attribute in the Descriptor cluster on endpoint 0"
       verification: |
-          ./chip-tool  descriptor read parts-list 1 0
+
+          ./chip-tool descriptor read parts-list 1 0
 
           CHIP:DMG: ReportData =
           [1635668330.265352][3951:3956] CHIP:DMG: {
-          [1635668330.265385][3951:3956] CHIP:DMG:         AttributeDataList =
-          [1635668330.265424][3951:3956] CHIP:DMG:         [
-          [1635668330.265460][3951:3956] CHIP:DMG:                 AttributeDataElement =
-          [1635668330.265512][3951:3956] CHIP:DMG:                 {
-          [1635668330.265551][3951:3956] CHIP:DMG:                         AttributePath =
-          [1635668330.265596][3951:3956] CHIP:DMG:                         {
-          [1635668330.265644][3951:3956] CHIP:DMG:                                 NodeId = 0x1,
-          [1635668330.265699][3951:3956] CHIP:DMG:                                 EndpointId = 0x0,
-          [1635668330.265754][3951:3956] CHIP:DMG:                                 ClusterId = 0x1d,
-          [1635668330.265808][3951:3956] CHIP:DMG:                                 FieldTag = 0x0000_0003,
-          [1635668330.265854][3951:3956] CHIP:DMG:                         }
+          [1635668330.265385][3951:3956] CHIP:DMG: AttributeDataList =
+          [1635668330.265424][3951:3956] CHIP:DMG: [
+          [1635668330.265460][3951:3956] CHIP:DMG: AttributeDataElement =
+          [1635668330.265512][3951:3956] CHIP:DMG: {
+          [1635668330.265551][3951:3956] CHIP:DMG: AttributePath =
+          [1635668330.265596][3951:3956] CHIP:DMG: {
+          [1635668330.265644][3951:3956] CHIP:DMG: NodeId = 0x1,
+          [1635668330.265699][3951:3956] CHIP:DMG: EndpointId = 0x0,
+          [1635668330.265754][3951:3956] CHIP:DMG: ClusterId = 0x1d,
+          [1635668330.265808][3951:3956] CHIP:DMG: FieldTag = 0x0000_0003,
+          [1635668330.265854][3951:3956] CHIP:DMG: }
           [1635668330.265903][3951:3956] CHIP:DMG:
-          [1635668330.265953][3951:3956] CHIP:DMG:                         Data = [
-          [1635668330.266003][3951:3956] CHIP:DMG:                                 1, 2,
-          [1635668330.266052][3951:3956] CHIP:DMG:                         ],
-          [1635668330.266099][3951:3956] CHIP:DMG:                         DataElementVersion = 0x0,
-          [1635668330.266142][3951:3956] CHIP:DMG:                 },
+          [1635668330.265953][3951:3956] CHIP:DMG: Data = [
+          [1635668330.266003][3951:3956] CHIP:DMG: 1, 2,
+          [1635668330.266052][3951:3956] CHIP:DMG: ],
+          [1635668330.266099][3951:3956] CHIP:DMG: DataElementVersion = 0x0,
+          [1635668330.266142][3951:3956] CHIP:DMG: },
           [1635668330.266192][3951:3956] CHIP:DMG:
-          [1635668330.266229][3951:3956] CHIP:DMG:         ],
+          [1635668330.266229][3951:3956] CHIP:DMG: ],
           [1635668330.266272][3951:3956] CHIP:DMG:
           [1635668330.266306][3951:3956] CHIP:DMG: }
           [1635668330.266412][3951:3956] CHIP:ZCL: ReadAttributesResponse:
-          [1635668330.266446][3951:3956] CHIP:ZCL:   ClusterId: 0x0000_001D
-          [1635668330.266481][3951:3956] CHIP:ZCL:   attributeId: 0x0000_0003
-          [1635668330.266514][3951:3956] CHIP:ZCL:   status: Success                (0x0000)
-          [1635668330.266546][3951:3956] CHIP:ZCL:   attribute TLV Type: 0x16
+          [1635668330.266446][3951:3956] CHIP:ZCL: ClusterId: 0x0000_001D
+          [1635668330.266481][3951:3956] CHIP:ZCL: attributeId: 0x0000_0003
+          [1635668330.266514][3951:3956] CHIP:ZCL: status: Success (0x0000)
+          [1635668330.266546][3951:3956] CHIP:ZCL: attribute TLV Type: 0x16
+          [1635668330.266586][3951:3956] CHIP:TOO: OnDescriptorPartsListListAttributeResponse: 2 entries
+          [1635668330.266622][3951:3956] CHIP:TOO: ENDPOINT_NO[1]: 1
+          [1635668330.266656][3951:3956] CHIP:TOO: ENDPOINT_NO[2]: 2
+          [1635668330.266741][3951:3956] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 35287i
+      disabled: true
+
+    - label: "Repeat step 4b for endpoint found in step 1b"
+      verification: |
+          ./chip-tool descriptor read parts-list 1 0
+
+          CHIP:DMG: ReportData =
+          [1635668330.265352][3951:3956] CHIP:DMG: {
+          [1635668330.265385][3951:3956] CHIP:DMG: AttributeDataList =
+          [1635668330.265424][3951:3956] CHIP:DMG: [
+          [1635668330.265460][3951:3956] CHIP:DMG: AttributeDataElement =
+          [1635668330.265512][3951:3956] CHIP:DMG: {
+          [1635668330.265551][3951:3956] CHIP:DMG: AttributePath =
+          [1635668330.265596][3951:3956] CHIP:DMG: {
+          [1635668330.265644][3951:3956] CHIP:DMG: NodeId = 0x1,
+          [1635668330.265699][3951:3956] CHIP:DMG: EndpointId = 0x0,
+          [1635668330.265754][3951:3956] CHIP:DMG: ClusterId = 0x1d,
+          [1635668330.265808][3951:3956] CHIP:DMG: FieldTag = 0x0000_0003,
+          [1635668330.265854][3951:3956] CHIP:DMG: }
+          [1635668330.265903][3951:3956] CHIP:DMG:
+          [1635668330.265953][3951:3956] CHIP:DMG: Data = [
+          [1635668330.266003][3951:3956] CHIP:DMG: 1, 2,
+          [1635668330.266052][3951:3956] CHIP:DMG: ],
+          [1635668330.266099][3951:3956] CHIP:DMG: DataElementVersion = 0x0,
+          [1635668330.266142][3951:3956] CHIP:DMG: },
+          [1635668330.266192][3951:3956] CHIP:DMG:
+          [1635668330.266229][3951:3956] CHIP:DMG: ],
+          [1635668330.266272][3951:3956] CHIP:DMG:
+          [1635668330.266306][3951:3956] CHIP:DMG: }
+          [1635668330.266412][3951:3956] CHIP:ZCL: ReadAttributesResponse:
+          [1635668330.266446][3951:3956] CHIP:ZCL: ClusterId: 0x0000_001D
+          [1635668330.266481][3951:3956] CHIP:ZCL: attributeId: 0x0000_0003
+          [1635668330.266514][3951:3956] CHIP:ZCL: status: Success (0x0000)
+          [1635668330.266546][3951:3956] CHIP:ZCL: attribute TLV Type: 0x16
           [1635668330.266586][3951:3956] CHIP:TOO: OnDescriptorPartsListListAttributeResponse: 2 entries
           [1635668330.266622][3951:3956] CHIP:TOO: ENDPOINT_NO[1]: 1
           [1635668330.266656][3951:3956] CHIP:TOO: ENDPOINT_NO[2]: 2
@@ -183,36 +266,74 @@ tests:
     - label:
           "Read the PartsList attribute in the Descriptor cluster on endpoint 0"
       verification: |
-          ./chip-tool  descriptor read parts-list 1 0
+          ./chip-tool descriptor read parts-list 1 0
 
           CHIP:DMG: ReportData =
           [1635668360.031302][3959:3964] CHIP:DMG: {
-          [1635668360.031334][3959:3964] CHIP:DMG:         AttributeDataList =
-          [1635668360.031373][3959:3964] CHIP:DMG:         [
-          [1635668360.031408][3959:3964] CHIP:DMG:                 AttributeDataElement =
-          [1635668360.031458][3959:3964] CHIP:DMG:                 {
-          [1635668360.031497][3959:3964] CHIP:DMG:                         AttributePath =
-          [1635668360.031541][3959:3964] CHIP:DMG:                         {
-          [1635668360.031587][3959:3964] CHIP:DMG:                                 NodeId = 0x1,
-          [1635668360.031638][3959:3964] CHIP:DMG:                                 EndpointId = 0x0,
-          [1635668360.031687][3959:3964] CHIP:DMG:                                 ClusterId = 0x1d,
-          [1635668360.031742][3959:3964] CHIP:DMG:                                 FieldTag = 0x0000_0003,
-          [1635668360.031789][3959:3964] CHIP:DMG:                         }
+          [1635668360.031334][3959:3964] CHIP:DMG: AttributeDataList =
+          [1635668360.031373][3959:3964] CHIP:DMG: [
+          [1635668360.031408][3959:3964] CHIP:DMG: AttributeDataElement =
+          [1635668360.031458][3959:3964] CHIP:DMG: {
+          [1635668360.031497][3959:3964] CHIP:DMG: AttributePath =
+          [1635668360.031541][3959:3964] CHIP:DMG: {
+          [1635668360.031587][3959:3964] CHIP:DMG: NodeId = 0x1,
+          [1635668360.031638][3959:3964] CHIP:DMG: EndpointId = 0x0,
+          [1635668360.031687][3959:3964] CHIP:DMG: ClusterId = 0x1d,
+          [1635668360.031742][3959:3964] CHIP:DMG: FieldTag = 0x0000_0003,
+          [1635668360.031789][3959:3964] CHIP:DMG: }
           [1635668360.031839][3959:3964] CHIP:DMG:
-          [1635668360.031887][3959:3964] CHIP:DMG:                         Data = [
-          [1635668360.031937][3959:3964] CHIP:DMG:                                 1, 2,
-          [1635668360.031987][3959:3964] CHIP:DMG:                         ],
-          [1635668360.032032][3959:3964] CHIP:DMG:                         DataElementVersion = 0x0,
-          [1635668360.032075][3959:3964] CHIP:DMG:                 },
+          [1635668360.031887][3959:3964] CHIP:DMG: Data = [
+          [1635668360.031937][3959:3964] CHIP:DMG: 1, 2,
+          [1635668360.031987][3959:3964] CHIP:DMG: ],
+          [1635668360.032032][3959:3964] CHIP:DMG: DataElementVersion = 0x0,
+          [1635668360.032075][3959:3964] CHIP:DMG: },
           [1635668360.032123][3959:3964] CHIP:DMG:
-          [1635668360.032159][3959:3964] CHIP:DMG:         ],
+          [1635668360.032159][3959:3964] CHIP:DMG: ],
           [1635668360.032203][3959:3964] CHIP:DMG:
           [1635668360.032236][3959:3964] CHIP:DMG: }
           [1635668360.032342][3959:3964] CHIP:ZCL: ReadAttributesResponse:
-          [1635668360.032375][3959:3964] CHIP:ZCL:   ClusterId: 0x0000_001D
-          [1635668360.032408][3959:3964] CHIP:ZCL:   attributeId: 0x0000_0003
-          [1635668360.032439][3959:3964] CHIP:ZCL:   status: Success                (0x0000)
-          [1635668360.032469][3959:3964] CHIP:ZCL:   attribute TLV Type: 0x16
+          [1635668360.032375][3959:3964] CHIP:ZCL: ClusterId: 0x0000_001D
+          [1635668360.032408][3959:3964] CHIP:ZCL: attributeId: 0x0000_0003
+          [1635668360.032439][3959:3964] CHIP:ZCL: status: Success (0x0000)
+          [1635668360.032469][3959:3964] CHIP:ZCL: attribute TLV Type: 0x16
+          [1635668360.032508][3959:3964] CHIP:TOO: OnDescriptorPartsListListAttributeResponse: 2 entries
+          [1635668360.032542][3959:3964] CHIP:TOO: ENDPOINT_NO[1]: 1
+          [1635668360.032575][3959:3964] CHIP:TOO: ENDPOINT_NO[2]: 2
+          [1635668360.032686][3959:3964] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 8102i
+      disabled: true
+
+    - label: "Repeat step 5b for endpoint found in step 1b"
+      verification: |
+          ./chip-tool descriptor read parts-list 1 0
+
+          CHIP:DMG: ReportData =
+          [1635668360.031302][3959:3964] CHIP:DMG: {
+          [1635668360.031334][3959:3964] CHIP:DMG: AttributeDataList =
+          [1635668360.031373][3959:3964] CHIP:DMG: [
+          [1635668360.031408][3959:3964] CHIP:DMG: AttributeDataElement =
+          [1635668360.031458][3959:3964] CHIP:DMG: {
+          [1635668360.031497][3959:3964] CHIP:DMG: AttributePath =
+          [1635668360.031541][3959:3964] CHIP:DMG: {
+          [1635668360.031587][3959:3964] CHIP:DMG: NodeId = 0x1,
+          [1635668360.031638][3959:3964] CHIP:DMG: EndpointId = 0x0,
+          [1635668360.031687][3959:3964] CHIP:DMG: ClusterId = 0x1d,
+          [1635668360.031742][3959:3964] CHIP:DMG: FieldTag = 0x0000_0003,
+          [1635668360.031789][3959:3964] CHIP:DMG: }
+          [1635668360.031839][3959:3964] CHIP:DMG:
+          [1635668360.031887][3959:3964] CHIP:DMG: Data = [
+          [1635668360.031937][3959:3964] CHIP:DMG: 1, 2,
+          [1635668360.031987][3959:3964] CHIP:DMG: ],
+          [1635668360.032032][3959:3964] CHIP:DMG: DataElementVersion = 0x0,
+          [1635668360.032075][3959:3964] CHIP:DMG: },
+          [1635668360.032123][3959:3964] CHIP:DMG:
+          [1635668360.032159][3959:3964] CHIP:DMG: ],
+          [1635668360.032203][3959:3964] CHIP:DMG:
+          [1635668360.032236][3959:3964] CHIP:DMG: }
+          [1635668360.032342][3959:3964] CHIP:ZCL: ReadAttributesResponse:
+          [1635668360.032375][3959:3964] CHIP:ZCL: ClusterId: 0x0000_001D
+          [1635668360.032408][3959:3964] CHIP:ZCL: attributeId: 0x0000_0003
+          [1635668360.032439][3959:3964] CHIP:ZCL: status: Success (0x0000)
+          [1635668360.032469][3959:3964] CHIP:ZCL: attribute TLV Type: 0x16
           [1635668360.032508][3959:3964] CHIP:TOO: OnDescriptorPartsListListAttributeResponse: 2 entries
           [1635668360.032542][3959:3964] CHIP:TOO: ENDPOINT_NO[1]: 1
           [1635668360.032575][3959:3964] CHIP:TOO: ENDPOINT_NO[2]: 2
