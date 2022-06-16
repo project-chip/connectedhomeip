@@ -82,8 +82,8 @@ public:
 
         auto onFailureCb = [context, failureCb](CHIP_ERROR aError) { failureCb(context, aError); };
 
-        return InvokeCommandRequest(&mExchangeManager, mSession, mEndpoint, requestData,
-                                    onSuccessCb, onFailureCb, timedInvokeTimeoutMs, mTimeout);
+        return InvokeCommandRequest(&mExchangeManager, mSession, mEndpoint, requestData, onSuccessCb, onFailureCb,
+                                    timedInvokeTimeoutMs, mTimeout);
     }
 
     template <typename RequestDataT>
@@ -136,9 +136,8 @@ public:
             }
         };
 
-        return chip::Controller::WriteAttribute<AttrType>(mSession, mEndpoint, clusterId, attributeId,
-                                                          requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb,
-                                                          aDataVersion);
+        return chip::Controller::WriteAttribute<AttrType>(mSession, mEndpoint, clusterId, attributeId, requestData, onSuccessCb,
+                                                          onFailureCb, aTimedWriteTimeoutMs, onDoneCb, aDataVersion);
     }
 
     template <typename AttrType>
@@ -243,9 +242,8 @@ public:
             }
         };
 
-        return Controller::ReadAttribute<DecodableType>(&mExchangeManager, mSession,
-                                                        mEndpoint, clusterId, attributeId, onSuccessCb, onFailureCb,
-                                                        aIsFabricFiltered);
+        return Controller::ReadAttribute<DecodableType>(&mExchangeManager, mSession, mEndpoint, clusterId, attributeId, onSuccessCb,
+                                                        onFailureCb, aIsFabricFiltered);
     }
 
     /**
@@ -305,9 +303,9 @@ public:
         };
 
         return Controller::SubscribeAttribute<DecodableType>(
-            &mExchangeManager, mSession, mEndpoint, clusterId, attributeId, onReportCb,
-            onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb, onResubscriptionAttemptCb,
-            aIsFabricFiltered, aKeepPreviousSubscriptions, aDataVersion);
+            &mExchangeManager, mSession, mEndpoint, clusterId, attributeId, onReportCb, onFailureCb, minIntervalFloorSeconds,
+            maxIntervalCeilingSeconds, onSubscriptionEstablishedCb, onResubscriptionAttemptCb, aIsFabricFiltered,
+            aKeepPreviousSubscriptions, aDataVersion);
     }
 
     /**
@@ -382,14 +380,17 @@ public:
             }
         };
 
-        return Controller::SubscribeEvent<DecodableType>(&mExchangeManager, mSession,
-                                                         mEndpoint, onReportCb, onFailureCb, minIntervalFloorSeconds,
-                                                         maxIntervalCeilingSeconds, onSubscriptionEstablishedCb,
-                                                         onResubscriptionAttemptCb, aKeepPreviousSubscriptions, aIsUrgentEvent);
+        return Controller::SubscribeEvent<DecodableType>(
+            &mExchangeManager, mSession, mEndpoint, onReportCb, onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds,
+            onSubscriptionEstablishedCb, onResubscriptionAttemptCb, aKeepPreviousSubscriptions, aIsUrgentEvent);
     }
 
 protected:
-    ClusterBase(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, ClusterId cluster, EndpointId endpoint) : mExchangeManager(exchangeManager), mSession(session), mClusterId(cluster), mEndpoint(endpoint) {}
+    ClusterBase(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, ClusterId cluster,
+                EndpointId endpoint) :
+        mExchangeManager(exchangeManager),
+        mSession(session), mClusterId(cluster), mEndpoint(endpoint)
+    {}
 
     Messaging::ExchangeManager & mExchangeManager;
     const SessionHandle & mSession;

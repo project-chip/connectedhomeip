@@ -187,7 +187,8 @@ CHIP_ERROR CastingServer::ContentLauncherLaunchURL(const char * contentUrl, cons
         return CHIP_ERROR_PEER_NODE_NOT_FOUND;
     }
 
-    ContentLauncherCluster cluster(operationalDeviceProxy->GetExchangeManager(), operationalDeviceProxy->GetSecureSession().Value(), kTvEndpoint);
+    ContentLauncherCluster cluster(operationalDeviceProxy->GetExchangeManager(), operationalDeviceProxy->GetSecureSession().Value(),
+                                   kTvEndpoint);
     CastingServer::GetInstance()->mLaunchURLResponseCallback = launchURLResponseCallback;
     LaunchURL::Type request;
     request.contentURL          = chip::CharSpan::fromCharString(contentUrl);

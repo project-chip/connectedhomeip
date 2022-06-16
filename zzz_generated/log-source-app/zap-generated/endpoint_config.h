@@ -70,7 +70,8 @@
 // This is an array of EmberAfAttributeMinMaxValue structures.
 #define GENERATED_MIN_MAX_DEFAULT_COUNT 0
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
-    {}
+    {                                                                                                                              \
+    }
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
@@ -296,7 +297,8 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 
 // Array of device types
 #define FIXED_DEVICE_TYPES                                                                                                         \
-    {}
+    {                                                                                                                              \
+    }
 
 // Array of device type offsets
 #define FIXED_DEVICE_TYPE_OFFSETS                                                                                                  \
