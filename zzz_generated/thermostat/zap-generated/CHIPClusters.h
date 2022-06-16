@@ -33,7 +33,11 @@ namespace Controller {
 class DLL_EXPORT IdentifyCluster : public ClusterBase
 {
 public:
-    IdentifyCluster() : ClusterBase(app::Clusters::Identify::Id) {}
+    IdentifyCluster(DeviceProxy * device, EndpointId endpoint) :
+        ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(), app::Clusters::Identify::Id, endpoint)
+    {}
+    // IdentifyCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    // ClusterBase(exchangeManager, session, app::Clusters::Identify::Id, endpoint) {}
     ~IdentifyCluster() {}
 };
 

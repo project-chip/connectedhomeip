@@ -113,9 +113,7 @@ using namespace chip::Controller;
 JNI_METHOD(jlong, {{cluster.name | capitalcase}}Cluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
-    {{cluster.name |  capitalcase}}Cluster * cppCluster = new {{cluster.name | capitalcase}}Cluster();
-
-    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
+    {{cluster.name |  capitalcase}}Cluster * cppCluster = new {{cluster.name | capitalcase}}Cluster(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 

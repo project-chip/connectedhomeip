@@ -33,7 +33,11 @@ namespace Controller {
 class DLL_EXPORT AccessControlCluster : public ClusterBase
 {
 public:
-    AccessControlCluster() : ClusterBase(app::Clusters::AccessControl::Id) {}
+    AccessControlCluster(DeviceProxy * device, EndpointId endpoint) :
+        ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(), app::Clusters::AccessControl::Id, endpoint)
+    {}
+    // AccessControlCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    // ClusterBase(exchangeManager, session, app::Clusters::AccessControl::Id, endpoint) {}
     ~AccessControlCluster() {}
 };
 

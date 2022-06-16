@@ -777,8 +777,7 @@ private:
                            CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
                            CommandResponseFailureCallback failureCb, EndpointId endpoint, Optional<System::Clock::Timeout> timeout)
     {
-        ClusterObjectT cluster;
-        cluster.Associate(device, endpoint);
+        ClusterObjectT cluster(device, endpoint);
         cluster.SetCommandTimeout(timeout);
 
         return cluster.InvokeCommand(request, this, successCb, failureCb);

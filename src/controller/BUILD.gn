@@ -27,7 +27,6 @@ static_library("controller") {
   output_name = "libChipController"
 
   sources = [
-    "CHIPCluster.cpp",
     "CHIPCluster.h",
   ]
 

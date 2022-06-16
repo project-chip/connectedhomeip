@@ -33,7 +33,12 @@ namespace Controller {
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
-    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
+    OtaSoftwareUpdateProviderCluster(DeviceProxy * device, EndpointId endpoint) :
+        ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(), app::Clusters::OtaSoftwareUpdateProvider::Id,
+                    endpoint)
+    {}
+    // OtaSoftwareUpdateProviderCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId
+    // endpoint) : ClusterBase(exchangeManager, session, app::Clusters::OtaSoftwareUpdateProvider::Id, endpoint) {}
     ~OtaSoftwareUpdateProviderCluster() {}
 };
 

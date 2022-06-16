@@ -125,8 +125,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Operationa
 
     constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
 
-    AdministratorCommissioningCluster cluster;
-    cluster.Associate(device, kAdministratorCommissioningClusterEndpoint);
+    AdministratorCommissioningCluster cluster(device, kAdministratorCommissioningClusterEndpoint);
 
     if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {
@@ -248,8 +247,7 @@ void CommissioningWindowOpener::OnDeviceConnectedCallback(void * context, Operat
     {
     case Step::kReadVID: {
         constexpr EndpointId kBasicClusterEndpoint = 0;
-        BasicCluster cluster;
-        cluster.Associate(device, kBasicClusterEndpoint);
+        BasicCluster cluster(device, kBasicClusterEndpoint);
         err = cluster.ReadAttribute<app::Clusters::Basic::Attributes::VendorID::TypeInfo>(context, OnVIDReadResponse,
                                                                                           OnVIDPIDReadFailureResponse);
 #if CHIP_ERROR_LOGGING
@@ -259,8 +257,7 @@ void CommissioningWindowOpener::OnDeviceConnectedCallback(void * context, Operat
     }
     case Step::kReadPID: {
         constexpr EndpointId kBasicClusterEndpoint = 0;
-        chip::Controller::BasicCluster cluster;
-        cluster.Associate(device, kBasicClusterEndpoint);
+        BasicCluster cluster(device, kBasicClusterEndpoint);
         err = cluster.ReadAttribute<app::Clusters::Basic::Attributes::ProductID::TypeInfo>(context, OnPIDReadResponse,
                                                                                            OnVIDPIDReadFailureResponse);
 #if CHIP_ERROR_LOGGING

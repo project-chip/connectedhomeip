@@ -33,42 +33,70 @@ namespace Controller {
 class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
 {
 public:
-    FlowMeasurementCluster() : ClusterBase(app::Clusters::FlowMeasurement::Id) {}
+    FlowMeasurementCluster(DeviceProxy * device, EndpointId endpoint) :
+        ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(), app::Clusters::FlowMeasurement::Id, endpoint)
+    {}
+    // FlowMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    // ClusterBase(exchangeManager, session, app::Clusters::FlowMeasurement::Id, endpoint) {}
     ~FlowMeasurementCluster() {}
 };
 
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
-    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
+    OtaSoftwareUpdateProviderCluster(DeviceProxy * device, EndpointId endpoint) :
+        ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(), app::Clusters::OtaSoftwareUpdateProvider::Id,
+                    endpoint)
+    {}
+    // OtaSoftwareUpdateProviderCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId
+    // endpoint) : ClusterBase(exchangeManager, session, app::Clusters::OtaSoftwareUpdateProvider::Id, endpoint) {}
     ~OtaSoftwareUpdateProviderCluster() {}
 };
 
 class DLL_EXPORT OnOffCluster : public ClusterBase
 {
 public:
-    OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
+    OnOffCluster(DeviceProxy * device, EndpointId endpoint) :
+        ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(), app::Clusters::OnOff::Id, endpoint)
+    {}
+    // OnOffCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    // ClusterBase(exchangeManager, session, app::Clusters::OnOff::Id, endpoint) {}
     ~OnOffCluster() {}
 };
 
 class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
 {
 public:
-    PressureMeasurementCluster() : ClusterBase(app::Clusters::PressureMeasurement::Id) {}
+    PressureMeasurementCluster(DeviceProxy * device, EndpointId endpoint) :
+        ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(), app::Clusters::PressureMeasurement::Id,
+                    endpoint)
+    {}
+    // PressureMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint)
+    // : ClusterBase(exchangeManager, session, app::Clusters::PressureMeasurement::Id, endpoint) {}
     ~PressureMeasurementCluster() {}
 };
 
 class DLL_EXPORT PumpConfigurationAndControlCluster : public ClusterBase
 {
 public:
-    PumpConfigurationAndControlCluster() : ClusterBase(app::Clusters::PumpConfigurationAndControl::Id) {}
+    PumpConfigurationAndControlCluster(DeviceProxy * device, EndpointId endpoint) :
+        ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(),
+                    app::Clusters::PumpConfigurationAndControl::Id, endpoint)
+    {}
+    // PumpConfigurationAndControlCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId
+    // endpoint) : ClusterBase(exchangeManager, session, app::Clusters::PumpConfigurationAndControl::Id, endpoint) {}
     ~PumpConfigurationAndControlCluster() {}
 };
 
 class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
 {
 public:
-    TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
+    TemperatureMeasurementCluster(DeviceProxy * device, EndpointId endpoint) :
+        ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(), app::Clusters::TemperatureMeasurement::Id,
+                    endpoint)
+    {}
+    // TemperatureMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId
+    // endpoint) : ClusterBase(exchangeManager, session, app::Clusters::TemperatureMeasurement::Id, endpoint) {}
     ~TemperatureMeasurementCluster() {}
 };
 

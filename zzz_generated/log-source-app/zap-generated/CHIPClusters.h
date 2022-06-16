@@ -33,7 +33,11 @@ namespace Controller {
 class DLL_EXPORT DiagnosticLogsCluster : public ClusterBase
 {
 public:
-    DiagnosticLogsCluster() : ClusterBase(app::Clusters::DiagnosticLogs::Id) {}
+    DiagnosticLogsCluster(DeviceProxy * device, EndpointId endpoint) :
+        ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(), app::Clusters::DiagnosticLogs::Id, endpoint)
+    {}
+    // DiagnosticLogsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    // ClusterBase(exchangeManager, session, app::Clusters::DiagnosticLogs::Id, endpoint) {}
     ~DiagnosticLogsCluster() {}
 };
 

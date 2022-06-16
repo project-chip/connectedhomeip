@@ -33,28 +33,47 @@ namespace Controller {
 class DLL_EXPORT BindingCluster : public ClusterBase
 {
 public:
-    BindingCluster() : ClusterBase(app::Clusters::Binding::Id) {}
+    BindingCluster(DeviceProxy * device, EndpointId endpoint) :
+        ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(), app::Clusters::Binding::Id, endpoint)
+    {}
+    // BindingCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    // ClusterBase(exchangeManager, session, app::Clusters::Binding::Id, endpoint) {}
     ~BindingCluster() {}
 };
 
 class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
 {
 public:
-    GeneralCommissioningCluster() : ClusterBase(app::Clusters::GeneralCommissioning::Id) {}
+    GeneralCommissioningCluster(DeviceProxy * device, EndpointId endpoint) :
+        ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(), app::Clusters::GeneralCommissioning::Id,
+                    endpoint)
+    {}
+    // GeneralCommissioningCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint)
+    // : ClusterBase(exchangeManager, session, app::Clusters::GeneralCommissioning::Id, endpoint) {}
     ~GeneralCommissioningCluster() {}
 };
 
 class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase
 {
 public:
-    NetworkCommissioningCluster() : ClusterBase(app::Clusters::NetworkCommissioning::Id) {}
+    NetworkCommissioningCluster(DeviceProxy * device, EndpointId endpoint) :
+        ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(), app::Clusters::NetworkCommissioning::Id,
+                    endpoint)
+    {}
+    // NetworkCommissioningCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint)
+    // : ClusterBase(exchangeManager, session, app::Clusters::NetworkCommissioning::Id, endpoint) {}
     ~NetworkCommissioningCluster() {}
 };
 
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:
-    OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
+    OperationalCredentialsCluster(DeviceProxy * device, EndpointId endpoint) :
+        ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(), app::Clusters::OperationalCredentials::Id,
+                    endpoint)
+    {}
+    // OperationalCredentialsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId
+    // endpoint) : ClusterBase(exchangeManager, session, app::Clusters::OperationalCredentials::Id, endpoint) {}
     ~OperationalCredentialsCluster() {}
 };
 
