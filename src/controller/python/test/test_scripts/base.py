@@ -846,10 +846,14 @@ class BaseTestHelper:
 
             # thread changes 5 times, and sleeps for 3 seconds in between. Add an additional 3 seconds of slack. Timeout is in seconds.
             changeThread.join(18.0)
+
+            subscription.Shutdown()
+
             if changeThread.is_alive():
                 # Thread join timed out
                 self.logger.error(f"Failed to join change thread")
                 return False
+
             return True if receivedUpdate == 5 else False
 
         except Exception as ex:
