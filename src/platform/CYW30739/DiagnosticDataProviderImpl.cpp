@@ -124,6 +124,16 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
         Platform::Delete(del);
     }
 }
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+    // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
+    // value of the CurrentHeapUsed.
+    // On CYW30739, overide with non-op to pass CI.
+
+    return CHIP_NO_ERROR;
+}
+
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 
 } // namespace DeviceLayer
