@@ -94,12 +94,12 @@ These additional files will be used by the CI jobs to validate whether the cache
 must be regenerated i.e. regeneration is needed when ZAP or the input ZAP files
 change.
 
-`--generate_zzz` also creates `{device_name}.matter` and `{device_name}.MATTERMD5`
-in `/devices`.
+`--generate_zzz` also creates `{device_name}.matter` and
+`{device_name}.MATTERMD5` in `/devices`.
 
-`--validate_zzz` will ensure that the `.matter` file exists, and ensure that
-the `.MATTERMD5` file contains a hash matching the dynamically calcualted hash
-of the respective device's ZAP file.
+`--validate_zzz` will ensure that the `.matter` file exists, and ensure that the
+`.MATTERMD5` file contains a hash matching the dynamically calculated hash of
+the respective device's ZAP file.
 
 Note that this check only requests regeneration of `.matter` files when a ZAP
 file changes. Changes to the code that generate the `.matter` files will not
@@ -117,8 +117,8 @@ The workflow begins by calling chef with `--validate_zzz`.
 example ZAP files and compare with what is committed to `/zzz_generated` and
 `/devices`.
 
-If the validation job fails, it will provide instructions to repair
-the repo  and no builds will run.
+If the validation job fails, it will provide instructions to repair the repo and
+no builds will run.
 
 #### Build
 

@@ -147,7 +147,7 @@ def generate_device_manifest(
             with open(device_zzz_zap_sha_file, "w+") as zap_sha_file:
                 zap_sha_file.write(zap_sha)
             device_matter_md5_file_path = os.path.join(_DEVICE_FOLDER,
-                                                  device_name+_CI_MATTER_MD5_EXT)
+                                                       device_name+_CI_MATTER_MD5_EXT)
             with open(device_matter_md5_file_path, "w+") as matter_md5_file:
                 matter_md5_file.write(device_file_md5)
     return ci_manifest
