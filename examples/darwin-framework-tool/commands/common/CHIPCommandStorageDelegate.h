@@ -1,9 +1,9 @@
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPToolPersistentStorageDelegate : NSObject <CHIPPersistentStorageDelegate>
+@interface CHIPToolPersistentStorageDelegate : NSObject <MTRPersistentStorageDelegate>
 - (nullable NSData *)storageDataForKey:(NSString *)key;
 - (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key;
 - (BOOL)removeStorageDataForKey:(NSString *)key;

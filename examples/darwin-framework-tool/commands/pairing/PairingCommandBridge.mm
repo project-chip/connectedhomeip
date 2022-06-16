@@ -16,8 +16,8 @@
  *
  */
 
-#import <CHIP/CHIP.h>
-#import <CHIP/CHIPError_Internal.h>
+#import <Matter/Matter.h>
+#import <Matter/MTRError_Internal.h>
 
 #include "../common/CHIPCommandBridge.h"
 #include "PairingCommandBridge.h"
@@ -30,8 +30,8 @@ using namespace ::chip::Controller;
 void PairingCommandBridge::SetUpPairingDelegate()
 {
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
-    CHIPToolPairingDelegate * pairing = [[CHIPToolPairingDelegate alloc] init];
-    CHIPCommissioningParameters * params = [[CHIPCommissioningParameters alloc] init];
+    MTRToolPairingDelegate * pairing = [[MTRToolPairingDelegate alloc] init];
+    MTRCommissioningParameters * params = [[MTRCommissioningParameters alloc] init];
 
     [pairing setDeviceID:mNodeId];
     switch (mNetworkType) {
@@ -108,10 +108,10 @@ void PairingCommandBridge::Unpair()
     [CurrentCommissioner()
         getConnectedDevice:mNodeId
                      queue:callbackQueue
-         completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+         completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
              CHIP_ERROR err = CHIP_NO_ERROR;
              if (error) {
-                 err = [CHIPError errorToCHIPErrorCode:error];
+                 err = [MTRError errorToCHIPErrorCode:error];
                  LogNSError("Error: ", error);
                  SetCommandExitStatus(err);
              } else if (device == nil) {
@@ -119,26 +119,26 @@ void PairingCommandBridge::Unpair()
                  SetCommandExitStatus(CHIP_ERROR_INTERNAL);
              } else {
                  ChipLogProgress(chipTool, "Attempting to unpair device %llu", mNodeId);
-                 CHIPOperationalCredentials * opCredsCluster = [[CHIPOperationalCredentials alloc] initWithDevice:device
+                 MTROperationalCredentials * opCredsCluster = [[MTROperationalCredentials alloc] initWithDevice:device
                                                                                                          endpoint:0
                                                                                                             queue:callbackQueue];
                  [opCredsCluster readAttributeCurrentFabricIndexWithCompletionHandler:^(
                      NSNumber * _Nullable value, NSError * _Nullable readError) {
                      if (readError) {
-                         CHIP_ERROR readErr = [CHIPError errorToCHIPErrorCode:readError];
+                         CHIP_ERROR readErr = [MTRError errorToCHIPErrorCode:readError];
                          LogNSError("Failed to get current fabric: ", readError);
                          SetCommandExitStatus(readErr);
                          return;
                      }
-                     CHIPOperationalCredentialsClusterRemoveFabricParams * params =
-                         [[CHIPOperationalCredentialsClusterRemoveFabricParams alloc] init];
+                     MTROperationalCredentialsClusterRemoveFabricParams * params =
+                         [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
                      params.fabricIndex = value;
                      [opCredsCluster removeFabricWithParams:params
-                                          completionHandler:^(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                          completionHandler:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                               NSError * _Nullable removeError) {
                                               CHIP_ERROR removeErr = CHIP_NO_ERROR;
                                               if (removeError) {
-                                                  removeErr = [CHIPError errorToCHIPErrorCode:removeError];
+                                                  removeErr = [MTRError errorToCHIPErrorCode:removeError];
                                                   LogNSError("Failed to remove current fabric: ", removeError);
                                               } else {
                                                   ChipLogProgress(chipTool, "Successfully unpaired deviceId %llu", mNodeId);

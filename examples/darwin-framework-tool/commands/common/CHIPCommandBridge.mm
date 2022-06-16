@@ -19,8 +19,8 @@
 #include "CHIPCommandBridge.h"
 
 #import "CHIPToolKeypair.h"
-#import <CHIP/CHIP.h>
-#import <CHIP/CHIPError_Internal.h>
+#import <Matter/Matter.h>
+#import <Matter/MTRError_Internal.h>
 
 #include <core/CHIPBuildConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
@@ -28,7 +28,7 @@
 const uint16_t kListenPort = 5541;
 static CHIPToolPersistentStorageDelegate * storage = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
-std::map<std::string, CHIPDeviceController *> CHIPCommandBridge::mControllers;
+std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;
 
 CHIP_ERROR CHIPCommandBridge::Run()
 {
@@ -58,8 +58,8 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
         return CHIP_NO_ERROR;
     }
     NSData * ipk;
-    CHIPToolKeypair * nocSigner = [[CHIPToolKeypair alloc] init];
-    storage = [[CHIPToolPersistentStorageDelegate alloc] init];
+    MTRToolKeypair * nocSigner = [[MTRToolKeypair alloc] init];
+    storage = [[MTRToolPersistentStorageDelegate alloc] init];
 
     auto factory = [MatterControllerFactory sharedInstance];
     if (factory == nil) {
@@ -82,7 +82,7 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
 
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     for (size_t i = 0; i < ArraySize(identities); ++i) {
-        auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:nocSigner
+        auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:nocSigner
                                                                                          fabricId:(i + 1)
                                                                                               ipk:ipk];
 
@@ -126,9 +126,9 @@ void CHIPCommandBridge::SetIdentity(const char * identity)
     mCurrentController = mControllers[name];
 }
 
-CHIPDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrentController; }
+MTRDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrentController; }
 
-CHIPDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
+MTRDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
 
 CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
 {
@@ -171,13 +171,13 @@ void CHIPCommandBridge::SetCommandExitStatus(NSError * error, const char * logSt
     if (logString != nullptr) {
         LogNSError(logString, error);
     }
-    CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+    CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
     SetCommandExitStatus(err);
 }
 
 void CHIPCommandBridge::LogNSError(const char * logString, NSError * error)
 {
-    CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+    CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
     if (err == CHIP_NO_ERROR) {
         ChipLogProgress(chipTool, "%s: %s", logString, chip::ErrorStr(err));
     } else {

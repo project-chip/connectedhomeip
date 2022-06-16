@@ -28,7 +28,7 @@ CHIP_ERROR ModelCommand::RunCommand()
     ChipLogProgress(chipTool, "Sending command to node 0x" ChipLogFormatX64, ChipLogValueX64(mNodeId));
     [CurrentCommissioner() getConnectedDevice:mNodeId
                                         queue:callbackQueue
-                            completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                            completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
                                 if (error != nil) {
                                     SetCommandExitStatus(error, "Error getting connected device");
                                     return;
