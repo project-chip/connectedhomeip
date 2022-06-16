@@ -357,6 +357,8 @@ CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::EndPointManager<chip::Inet::UDPEn
 
 void AdvertiserMinMdns::Shutdown()
 {
+    AdvertiseRecords(BroadcastAdvertiseType::kRemovingAll);
+
     GlobalMinimalMdnsServer::Server().Shutdown();
     mIsInitialized = false;
 }
@@ -427,10 +429,14 @@ OperationalQueryAllocator::Allocator * AdvertiserMinMdns::FindEmptyOperationalAl
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
 {
+
     char nameBuffer[Operational::kInstanceNameMaxLength + 1] = "";
 
     /// need to set server name
     ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetPeerId()));
+
+    // about to clear all records below, clear them
+    AdvertiseRecords(BroadcastAdvertiseType::kRemovingAll);
 
     QNamePart nameCheckParts[]  = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
     FullQName nameCheck         = FullQName(nameCheckParts);
@@ -547,6 +553,9 @@ CHIP_ERROR AdvertiserMinMdns::UpdateCommissionableInstanceName()
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
 {
+    // about to override a new advertising type
+    AdvertiseRecords(BroadcastAdvertiseType::kRemovingAll);
+
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         mQueryResponderAllocatorCommissionable.Clear();
