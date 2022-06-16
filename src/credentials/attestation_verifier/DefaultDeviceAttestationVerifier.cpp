@@ -145,31 +145,7 @@ CHIP_ERROR GetCertificationDeclarationCertificate(const ByteSpan & skid, Mutable
     return CopySpanToMutableSpan(ByteSpan{ sCertChainLookupTable[certChainLookupTableIdx].mCertificate }, outCertificate);
 }
 
-class DefaultDACVerifier : public DeviceAttestationVerifier
-{
-public:
-    DefaultDACVerifier(const AttestationTrustStore * paaRootStore) : mAttestationTrustStore(paaRootStore) {}
-
-    void VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
-                                      Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
-
-    AttestationVerificationResult ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
-                                                                            ByteSpan & certDeclBuffer) override;
-
-    AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
-                                                                        const ByteSpan & firmwareInfo,
-                                                                        const DeviceInfoForAttestation & deviceInfo) override;
-
-    CHIP_ERROR VerifyNodeOperationalCSRInformation(const ByteSpan & nocsrElementsBuffer,
-                                                   const ByteSpan & attestationChallengeBuffer,
-                                                   const ByteSpan & attestationSignatureBuffer, const P256PublicKey & dacPublicKey,
-                                                   const ByteSpan & csrNonce) override;
-
-protected:
-    DefaultDACVerifier() {}
-
-    const AttestationTrustStore * mAttestationTrustStore;
-};
+} // namespace
 
 void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion)
@@ -442,8 +418,6 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
 
     return CHIP_NO_ERROR;
 }
-
-} // namespace
 
 const AttestationTrustStore * GetTestAttestationTrustStore()
 {

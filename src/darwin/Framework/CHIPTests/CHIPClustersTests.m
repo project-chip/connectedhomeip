@@ -103,8 +103,17 @@ static CHIPDeviceController * sController = nil;
     __auto_type * storage = [[CHIPTestStorage alloc] init];
     __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
     factoryParams.port = @(kLocalPort);
+    // For our first startup, use a dummy paaCerts array.
+    factoryParams.paaCerts = [[NSArray alloc] init];
 
     BOOL ok = [factory startup:factoryParams];
+    XCTAssertTrue(ok);
+
+    // Test that things still work right if we then shut down and
+    // restart the factory.
+    [factory shutdown];
+    factoryParams.paaCerts = nil;
+    ok = [factory startup:factoryParams];
     XCTAssertTrue(ok);
 
     __auto_type * testKeys = [[CHIPTestKeys alloc] init];
