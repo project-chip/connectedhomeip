@@ -386,6 +386,8 @@ class BaseTestHelper:
         self.devCtrl.CloseSession(nodeid)
         await asyncio.sleep(4)
 
+        sub.Shutdown()
+
         return True
 
     async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
