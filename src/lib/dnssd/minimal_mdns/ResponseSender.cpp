@@ -100,7 +100,8 @@ bool ResponseSender::HasQueryResponders() const
     return false;
 }
 
-CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource)
+CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource,
+                                   const ResponseConfiguration & configuration)
 {
     mSendState.Reset(messageId, query, querySource);
 
@@ -116,8 +117,6 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
             }
         }
     }
-
-    const ResponseConfiguration defaultResponseConfiguration;
 
     // send all 'Answer' replies
     {
@@ -144,7 +143,7 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
             }
             for (auto it = (*responder)->begin(&responseFilter); it != (*responder)->end(); it++)
             {
-                it->responder->AddAllResponses(querySource, this, defaultResponseConfiguration);
+                it->responder->AddAllResponses(querySource, this, configuration);
                 ReturnErrorOnFailure(mSendState.GetError());
 
                 (*responder)->MarkAdditionalRepliesFor(it);
@@ -177,7 +176,7 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
             }
             for (auto it = (*responder)->begin(&responseFilter); it != (*responder)->end(); it++)
             {
-                it->responder->AddAllResponses(querySource, this, defaultResponseConfiguration);
+                it->responder->AddAllResponses(querySource, this, configuration);
                 ReturnErrorOnFailure(mSendState.GetError());
             }
         }

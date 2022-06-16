@@ -319,7 +319,8 @@ void AdvertiserMinMdns::OnQuery(const QueryData & data)
 
     LogQuery(data);
 
-    CHIP_ERROR err = mResponseSender.Respond(mMessageId, data, mCurrentSource);
+    const ResponseConfiguration defaultResponseConfiguration;
+    CHIP_ERROR err = mResponseSender.Respond(mMessageId, data, mCurrentSource, defaultResponseConfiguration);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to reply to query: %s", ErrorStr(err));
@@ -854,6 +855,13 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
         return;
     }
 
+    ResponseConfiguration responseConfiguration;
+    if (type == BroadcastAdvertiseType::kRemovingAll)
+    {
+        // make a "remove all records now" broadcast
+        responseConfiguration.SetTtlSecondsOverride(0);
+    }
+
     for (; interfaceAddress.HasCurrent(); interfaceAddress.Next())
     {
         if (!Internal::IsCurrentInterfaceUsable(interfaceAddress))
@@ -899,7 +907,7 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
         mQueryResponderAllocatorCommissionable.GetQueryResponder()->ClearBroadcastThrottle();
         mQueryResponderAllocatorCommissioner.GetQueryResponder()->ClearBroadcastThrottle();
 
-        CHIP_ERROR err = mResponseSender.Respond(0, queryData, &packetInfo);
+        CHIP_ERROR err = mResponseSender.Respond(0, queryData, &packetInfo, responseConfiguration);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Failed to advertise records: %s", ErrorStr(err));
