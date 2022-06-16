@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 63.3.1. [TC-PSCFG-3.1] Attributes with client as DUT
+name: 64.3.1. [TC-PSCFG-3.1] Attributes with client as DUT
 
 config:
     nodeId: 0x12344321
@@ -27,36 +27,36 @@ tests:
       verification: |
           On TestHarnes (all-cluster-app) a received read of the Sources attribute (id 0) looks like this:
 
-          [1646159106.338144][33190:33190] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:15430892 on exchange 55596r
-          [1646159106.338186][33190:33190] CHIP:EM: Handling via exchange: 55596r, Delegate: 0xaaaace1730c8
-          [1646159106.338646][33190:33190] CHIP:IM: Received Read request
-          [1646159106.338735][33190:33190] CHIP:DMG: ReadRequestMessage =
-          [1646159106.338767][33190:33190] CHIP:DMG: {
-          [1646159106.338788][33190:33190] CHIP:DMG: 	AttributePathIBs =
-          [1646159106.338815][33190:33190] CHIP:DMG: 	[
-          [1646159106.338838][33190:33190] CHIP:DMG: 		AttributePathIB =
-          [1646159106.338870][33190:33190] CHIP:DMG: 		{
-          [1646159106.338899][33190:33190] CHIP:DMG: 			Endpoint = 0x0,
-          [1646159106.338935][33190:33190] CHIP:DMG: 			Cluster = 0x2e,
-          [1646159106.338969][33190:33190] CHIP:DMG: 			Attribute = 0x0000_0000,
-          [1646159106.339001][33190:33190] CHIP:DMG: 		}
-          [1646159106.339031][33190:33190] CHIP:DMG:
-          [1646159106.339058][33190:33190] CHIP:DMG: 	],
-          [1646159106.339085][33190:33190] CHIP:DMG:
-          [1646159106.339111][33190:33190] CHIP:DMG: 	isFabricFiltered = false,
-          [1646159106.339138][33190:33190] CHIP:DMG: 	InteractionModelRevision = 1
-          [1646159106.339160][33190:33190] CHIP:DMG: },
-          [1646159106.339244][33190:33190] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1646159106.340134][33190:33190] CHIP:DMG: <RE:Run> Cluster 2e, Attribute 0 is dirty
-          [1646159106.340201][33190:33190] CHIP:DMG: Reading attribute: Cluster=0x0000_002E Endpoint=0 AttributeId=0x0000_0000 (expanded=0)
-          [1646159106.340234][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_002E e=0 p=v
+          ./chip-tool powersourceconfiguration read sources 1 0
+
+          [1650881032.387446][2715:2715] CHIP:IM: Received Read request
+          [1650881032.387500][2715:2715] CHIP:DMG: ReadRequestMessage =
+          [1650881032.387527][2715:2715] CHIP:DMG: {
+          [1650881032.387549][2715:2715] CHIP:DMG:         AttributePathIBs =
+          [1650881032.387578][2715:2715] CHIP:DMG:         [
+          [1650881032.387602][2715:2715] CHIP:DMG:                 AttributePathIB =
+          [1650881032.387629][2715:2715] CHIP:DMG:                 {
+          [1650881032.387657][2715:2715] CHIP:DMG:                         Endpoint = 0x0,
+          [1650881032.387690][2715:2715] CHIP:DMG:                         Cluster = 0x2e,
+          [1650881032.387722][2715:2715] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1650881032.387750][2715:2715] CHIP:DMG:                 }
+          [1650881032.387781][2715:2715] CHIP:DMG:
+          [1650881032.387807][2715:2715] CHIP:DMG:         ],
+          [1650881032.387836][2715:2715] CHIP:DMG:
+          [1650881032.387862][2715:2715] CHIP:DMG:         isFabricFiltered = true,
+          [1650881032.387887][2715:2715] CHIP:DMG:         InteractionModelRevision = 1
+          [1650881032.387910][2715:2715] CHIP:DMG: },
+          [1650881032.387979][2715:2715] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1650881032.388058][2715:2715] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1650881032.388087][2715:2715] CHIP:DMG: <RE:Run> Cluster 2e, Attribute 0 is dirty
+          [1650881032.388109][2715:2715] CHIP:DMG: Reading attribute: Cluster=0x0000_002E Endpoint=0 AttributeId=0x0000_0000 (expanded=0)
       disabled: true
 
     - label:
           "DUT reads all supported optional attributes from TH once at a time in
           a manufacturer specific order"
       verification: |
-          see above
+          No optional attributes
       disabled: true
 
     - label:

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the DiagnosticDataProvider object
- *          for Zephy platform.
+ *          for Zephyr platform.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -114,6 +114,15 @@ inline DiagnosticDataProviderImpl::DiagnosticDataProviderImpl() : mBootReason(De
     ChipLogDetail(DeviceLayer, "Boot reason: %u", static_cast<uint16_t>(mBootReason));
 }
 
+bool DiagnosticDataProviderImpl::SupportsWatermarks()
+{
+#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+    return true;
+#else
+    return false;
+#endif
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
 #ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
@@ -153,14 +162,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     Malloc::Stats stats;
     ReturnErrorOnFailure(Malloc::GetStats(stats));
 
-    // TODO: use the maximum usage once that is implemented in Zephyr
-    currentHeapHighWatermark = stats.used;
+    currentHeapHighWatermark = stats.maxUsed;
     return CHIP_NO_ERROR;
-#elif CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
-    // ARM newlib does not provide a way to obtain the peak heap usage, so for now just return
-    // the amount of memory allocated from the system which should be an upper bound of the peak
-    // usage provided that the heap is not very fragmented.
-    currentHeapHighWatermark = mallinfo().arena;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+    Malloc::ResetMaxStats();
     return CHIP_NO_ERROR;
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

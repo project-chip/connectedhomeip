@@ -34,10 +34,8 @@ DeviceControlServer & DeviceControlServer::DeviceControlSvr()
     return sInstance;
 }
 
-CHIP_ERROR DeviceControlServer::CommissioningComplete(NodeId peerNodeId, FabricIndex accessingFabricIndex)
+CHIP_ERROR DeviceControlServer::PostCommissioningCompleteEvent(NodeId peerNodeId, FabricIndex accessingFabricIndex)
 {
-    VerifyOrReturnError(CHIP_NO_ERROR == mFailSafeContext.DisarmFailSafe(), CHIP_ERROR_INTERNAL);
-
     ChipDeviceEvent event;
 
     event.Type                              = DeviceEventType::kCommissioningComplete;
@@ -66,14 +64,13 @@ exit:
     return err;
 }
 
-CHIP_ERROR DeviceControlServer::ConnectNetworkForOperational(ByteSpan networkID)
+CHIP_ERROR DeviceControlServer::PostConnectedToOperationalNetworkEvent(ByteSpan networkID)
 {
     ChipDeviceEvent event;
     event.Type = DeviceEventType::kOperationalNetworkEnabled;
     // TODO(cecille): This should be some way to specify thread or wifi.
     event.OperationalNetwork.network = 0;
-    PlatformMgr().DispatchEvent(&event);
-    return CHIP_NO_ERROR;
+    return PlatformMgr().PostEvent(&event);
 }
 
 } // namespace DeviceLayer

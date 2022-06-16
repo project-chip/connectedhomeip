@@ -33,14 +33,16 @@ project_dir = "./.."
 
 chip_data_model("chef-data-model") {
   zap_file = "${project_dir}/devices/${sample_zap_file}"
-
   zap_pregenerated_dir =
       "${chip_root}/examples/chef/out/${sample_name}/zap-generated/"
   is_server = true
 }
 
 executable("${sample_name}") {
-  sources = [ "${project_dir}/linux/main.cpp" ]
+  sources = [
+    "${project_dir}/common/stubs.cpp",
+    "${project_dir}/linux/main.cpp",
+  ]
 
   deps = [
     ":chef-data-model",

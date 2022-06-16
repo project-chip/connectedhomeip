@@ -98,8 +98,23 @@ void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackRe
 void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    if (mPlaybackSpeed == kPlaybackMaxForwardSpeed)
+    {
+        // if already at max speed, return error
+        Commands::PlaybackResponse::Type response;
+        response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+        response.status = MediaPlaybackStatusEnum::kSpeedOutOfRange;
+        helper.Success(response);
+        return;
+    }
+
     mCurrentState  = PlaybackStateEnum::kPlaying;
     mPlaybackSpeed = (mPlaybackSpeed <= 0 ? 1 : mPlaybackSpeed * 2);
+    if (mPlaybackSpeed > kPlaybackMaxForwardSpeed)
+    {
+        // don't exceed max speed
+        mPlaybackSpeed = kPlaybackMaxForwardSpeed;
+    }
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -123,8 +138,23 @@ void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::Playba
 void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    if (mPlaybackSpeed == kPlaybackMaxRewindSpeed)
+    {
+        // if already at max speed in reverse, return error
+        Commands::PlaybackResponse::Type response;
+        response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+        response.status = MediaPlaybackStatusEnum::kSpeedOutOfRange;
+        helper.Success(response);
+        return;
+    }
+
     mCurrentState  = PlaybackStateEnum::kPlaying;
     mPlaybackSpeed = (mPlaybackSpeed >= 0 ? -1 : mPlaybackSpeed * 2);
+    if (mPlaybackSpeed < kPlaybackMaxRewindSpeed)
+    {
+        // don't exceed max rewind speed
+        mPlaybackSpeed = kPlaybackMaxRewindSpeed;
+    }
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));

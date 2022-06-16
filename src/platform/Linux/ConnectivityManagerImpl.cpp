@@ -1346,6 +1346,12 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     std::unique_ptr<GError, GErrorDeleter> err;
 
+    if (mWpaSupplicant.iface == nullptr)
+    {
+        ChipLogDetail(DeviceLayer, "Wifi network not currently connected");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     const gchar * networkPath = wpa_fi_w1_wpa_supplicant1_interface_get_current_network(mWpaSupplicant.iface);
 
     // wpa_supplicant DBus API: if network path of current network is "/", means no networks is currently selected.

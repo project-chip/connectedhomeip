@@ -1282,8 +1282,8 @@ void ParseSubscribeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & 
     DataVersionFilterIBs::Parser dataVersionFilterIBsParser;
     EventPathIBs::Parser eventPathListParser;
     EventFilterIBs::Parser eventFiltersParser;
-    uint16_t MinIntervalFloorSeconds   = 0;
-    uint16_t MaxIntervalCeilingSeconds = 0;
+    uint16_t minIntervalFloorSeconds   = 0;
+    uint16_t maxIntervalCeilingSeconds = 0;
     bool keepExistingSubscription      = false;
     bool isFabricFiltered              = false;
 
@@ -1305,11 +1305,11 @@ void ParseSubscribeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & 
     err = subscribeRequestParser.GetEventFilters(&eventFiltersParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = subscribeRequestParser.GetMinIntervalFloorSeconds(&MinIntervalFloorSeconds);
-    NL_TEST_ASSERT(apSuite, MinIntervalFloorSeconds == 2 && err == CHIP_NO_ERROR);
+    err = subscribeRequestParser.GetMinIntervalFloorSeconds(&minIntervalFloorSeconds);
+    NL_TEST_ASSERT(apSuite, minIntervalFloorSeconds == 2 && err == CHIP_NO_ERROR);
 
-    err = subscribeRequestParser.GetMaxIntervalCeilingSeconds(&MaxIntervalCeilingSeconds);
-    NL_TEST_ASSERT(apSuite, MaxIntervalCeilingSeconds == 3 && err == CHIP_NO_ERROR);
+    err = subscribeRequestParser.GetMaxIntervalCeilingSeconds(&maxIntervalCeilingSeconds);
+    NL_TEST_ASSERT(apSuite, maxIntervalCeilingSeconds == 3 && err == CHIP_NO_ERROR);
 
     err = subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscription);
     NL_TEST_ASSERT(apSuite, keepExistingSubscription && err == CHIP_NO_ERROR);
@@ -1330,10 +1330,7 @@ void BuildSubscribeResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter &
     subscribeResponseBuilder.SubscriptionId(1);
     NL_TEST_ASSERT(apSuite, subscribeResponseBuilder.GetError() == CHIP_NO_ERROR);
 
-    subscribeResponseBuilder.MinIntervalFloorSeconds(1);
-    NL_TEST_ASSERT(apSuite, subscribeResponseBuilder.GetError() == CHIP_NO_ERROR);
-
-    subscribeResponseBuilder.MaxIntervalCeilingSeconds(2);
+    subscribeResponseBuilder.MaxInterval(2);
     NL_TEST_ASSERT(apSuite, subscribeResponseBuilder.GetError() == CHIP_NO_ERROR);
 
     subscribeResponseBuilder.EndOfSubscribeResponseMessage();
@@ -1346,8 +1343,7 @@ void ParseSubscribeResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader &
 
     SubscribeResponseMessage::Parser subscribeResponseParser;
     chip::SubscriptionId subscriptionId = 0;
-    uint16_t minIntervalFloorSeconds    = 0;
-    uint16_t maxIntervalCeilingSeconds  = 0;
+    uint16_t maxInterval                = 0;
     err                                 = subscribeResponseParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -1357,11 +1353,8 @@ void ParseSubscribeResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader &
     err = subscribeResponseParser.GetSubscriptionId(&subscriptionId);
     NL_TEST_ASSERT(apSuite, subscriptionId == 1 && err == CHIP_NO_ERROR);
 
-    err = subscribeResponseParser.GetMinIntervalFloorSeconds(&minIntervalFloorSeconds);
-    NL_TEST_ASSERT(apSuite, minIntervalFloorSeconds == 1 && err == CHIP_NO_ERROR);
-
-    err = subscribeResponseParser.GetMaxIntervalCeilingSeconds(&maxIntervalCeilingSeconds);
-    NL_TEST_ASSERT(apSuite, maxIntervalCeilingSeconds == 2 && err == CHIP_NO_ERROR);
+    err = subscribeResponseParser.GetMaxInterval(&maxInterval);
+    NL_TEST_ASSERT(apSuite, maxInterval == 2 && err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, subscribeResponseParser.ExitContainer() == CHIP_NO_ERROR);
 }

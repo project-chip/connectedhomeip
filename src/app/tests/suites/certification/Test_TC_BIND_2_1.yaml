@@ -1,0 +1,140 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 117.2.1. [TC-BIND-2.1] Binding Cluster Attributes [DUT-Controller]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Factory Reset DUT"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 writes Binding cluster entries into DUT as per precondition TH1
+          enables DUT as Controller"
+      verification: |
+          ./chip-tool binding write binding '[{"node" : 1 , "cluster" : "0x0006" , "endpoint" : 1 }, { "group" : "0x0001" }]' 1 0
+
+          [1652941260.571580][5157:5162] CHIP:DMG:                        StatusIB =
+          [1652941260.571625][5157:5162] CHIP:DMG:                        {
+          [1652941260.571670][5157:5162] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1652941260.571720][5157:5162] CHIP:DMG:                        },
+      disabled: true
+
+    - label: "DUT and TH2 are commissioned"
+      verification: |
+
+      disabled: true
+
+    - label: "TH1 reads the Binding entries from DUT"
+      verification: |
+          ./chip-tool binding read binding 1 0
+
+          [1653895089.593475][5416:5421] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_0000 DataVersion: 3570434286
+          [1653895089.593580][5416:5421] CHIP:TOO:   Binding: 2 entries
+          [1653895089.593781][5416:5421] CHIP:TOO:     [1]: {
+          [1653895089.593839][5416:5421] CHIP:TOO:       Node: 1
+          [1653895089.593908][5416:5421] CHIP:TOO:       Endpoint: 1
+          [1653895089.593954][5416:5421] CHIP:TOO:       Cluster: 6
+          [1653895089.593987][5416:5421] CHIP:TOO:       FabricIndex: 1
+          [1653895089.594019][5416:5421] CHIP:TOO:      }
+          [1653895089.594073][5416:5421] CHIP:TOO:     [2]: {
+          [1653895089.594108][5416:5421] CHIP:TOO:       Group: 1
+          [1653895089.594152][5416:5421] CHIP:TOO:       FabricIndex: 1
+          [1653895089.594183][5416:5421] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "If Node Field is readable, DUT sends On command for the Node and
+          Endpoint1"
+      verification: |
+          ./chip-tool onoff on 1 1
+
+          [1653045100.385974][2688:2693] CHIP:DMG:                                StatusIB =
+          [1653045100.386048][2688:2693] CHIP:DMG:                                {
+          [1653045100.386125][2688:2693] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1653045100.386200][2688:2693] CHIP:DMG:                                },
+      disabled: true
+
+    - label: "DUT reads OnOff attribute on the respective Endpoint1"
+      verification: |
+          ./chip-tool onoff read on-off 1 1
+
+          [1653045143.391779][2698:2703] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 4174089266
+          [1653045143.393401][2698:2703] CHIP:TOO:   OnOff: TRUE
+      disabled: true
+
+    - label:
+          "If Group field is readable,DUT sends a multicast On command to Node
+          and Endpoint1"
+      verification: |
+          ./chip-tool onoff on 0x0001 1
+
+          [1653045301.383221][2725:2730] CHIP:DMG:                                StatusIB =
+          [1653045301.383280][2725:2730] CHIP:DMG:                                {
+          [1653045301.383335][2725:2730] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1653045301.383393][2725:2730] CHIP:DMG:                                },
+      disabled: true
+
+    - label: "DUT reads OnOff attribute on the above Endpoint1"
+      verification: |
+          ./chip-tool onoff read on-off 1 1
+
+          [1653045340.155414][2734:2739] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 4174089266
+          [1653045340.155481][2734:2739] CHIP:TOO:   OnOff: TRUE
+      disabled: true
+
+    - label: "DUT removes entry from the Binding for the Node and EndPoint1"
+      verification: |
+          ./chip-tool binding write binding [] 1 0
+
+          [1653567762.886755][4839:4844] CHIP:DMG:                        StatusIB =
+          [1653567762.886829][4839:4844] CHIP:DMG:                        {
+          [1653567762.886888][4839:4844] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1653567762.886966][4839:4844] CHIP:DMG:                        },
+      disabled: true
+
+    - label:
+          "If Node Field is readable, DUT sends On command for the above Node
+          and Endpoint 1"
+      verification: |
+          ./chip-tool onoff on 1 1
+
+          [1653567890.077539][4867:4872] CHIP:DMG:                                StatusIB =
+          [1653567890.077584][4867:4872] CHIP:DMG:                                {
+          [1653567890.077626][4867:4872] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1653567890.077670][4867:4872] CHIP:DMG:                                },
+      disabled: true
+
+    - label: "Read SupportedFabrics from the DUT."
+      verification: |
+          ./chip-tool operationalcredentials read supported-fabrics 1 0
+
+          [1653045735.101037][2767:2772] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0002 DataVersion: 38458521
+          [1653045735.101214][2767:2772] CHIP:TOO:   SupportedFabrics: 16
+      disabled: true
+
+    - label:
+          "TH1 writes Binding entries into DUT for all the clusters that support
+          Binding Run TC-BC-1.1 to make sure all mandatory attributes/commands
+          are implemented for all the binding clusters"
+      verification: |
+
+      disabled: true

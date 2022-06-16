@@ -149,14 +149,21 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     FabricInfo newFabric;
     constexpr uint32_t chipCertAllocatedLen = kMaxCHIPCertLength;
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
-    Credentials::P256PublicKeySpan rootPublicKey;
+    Credentials::P256PublicKeySpan rootPublicKeySpan;
     FabricId fabricId;
 
+    // There are three possibilities here in terms of what happens with our
+    // operational key:
+    // 1) We have an externally owned operational keypair.
+    // 2) We have an operational keypair that the fabric table should clone via
+    //    serialize/deserialize.
+    // 3) We have no keypair at all, and the fabric table has been initialized
+    //    with a key store.
     if (params.hasExternallyOwnedOperationalKeypair)
     {
         ReturnErrorOnFailure(newFabric.SetExternallyOwnedOperationalKeypair(params.operationalKeypair));
     }
-    else
+    else if (params.operationalKeypair)
     {
         ReturnErrorOnFailure(newFabric.SetOperationalKeypair(params.operationalKeypair));
     }
@@ -168,6 +175,8 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
 
     ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerRCAC, chipCertSpan));
     ReturnErrorOnFailure(newFabric.SetRootCert(chipCertSpan));
+    ReturnErrorOnFailure(Credentials::ExtractPublicKeyFromChipCert(chipCertSpan, rootPublicKeySpan));
+    Crypto::P256PublicKey rootPublicKey{ rootPublicKeySpan };
 
     if (params.controllerICAC.empty())
     {
@@ -187,7 +196,6 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     ReturnErrorOnFailure(newFabric.SetNOCCert(chipCertSpan));
     ReturnErrorOnFailure(ExtractFabricIdFromCert(chipCertSpan, &fabricId));
 
-    ReturnErrorOnFailure(newFabric.GetRootPubkey(rootPublicKey));
     mFabricInfo = params.systemState->Fabrics()->FindFabric(rootPublicKey, fabricId);
     if (mFabricInfo != nullptr)
     {

@@ -677,14 +677,17 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _failSafeExpiryLengthSeconds = @(0);
+
+        _maxCumulativeFailsafeSeconds = @(0);
     }
     return self;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: failSafeExpiryLengthSeconds:%@; >", NSStringFromClass([self class]), _failSafeExpiryLengthSeconds];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: failSafeExpiryLengthSeconds:%@; maxCumulativeFailsafeSeconds:%@; >",
+                  NSStringFromClass([self class]), _failSafeExpiryLengthSeconds, _maxCumulativeFailsafeSeconds];
     return descriptionString;
 }
 
@@ -2103,27 +2106,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation CHIPIasAceClusterIasAceZoneStatusResult
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _zoneId = @(0);
-
-        _zoneStatus = @(0);
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: zoneId:%@; zoneStatus:%@; >", NSStringFromClass([self class]), _zoneId, _zoneStatus];
-    return descriptionString;
-}
-
-@end
-
 @implementation CHIPChannelClusterChannelInfo
 - (instancetype)init
 {
@@ -2665,18 +2647,17 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _fabricIndex = @(0);
+        _member1 = @(0);
 
-        _operationalCert = [NSData data];
+        _member2 = [NSData data];
     }
     return self;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: fabricIndex:%@; operationalCert:%@; >", NSStringFromClass([self class]), _fabricIndex,
-                  [_operationalCert base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: member1:%@; member2:%@; >", NSStringFromClass([self class]),
+                                             _member1, [_member2 base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 

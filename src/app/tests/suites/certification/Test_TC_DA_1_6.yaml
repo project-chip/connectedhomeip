@@ -1,0 +1,80 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 17.1.6. [TC-DA-1.6] NOCSR Procedure Validation [DUT - Commissioner]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "DUT completes the attestation procedure"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "DUT generates 32-byte CSRNonce and is sent to TH1 through CSRRequest
+          Command"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 generates Invalid NOCSR Information and sends the CSRResponse
+          Command. Refer Steps 6.1 to 6.8"
+      verification: |
+          Verify that DUT reports error
+      disabled: true
+
+    - label: "Factory Reset DUT so that it is commissionable again"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Repeat Step1 to Step 4 multiple times. For each time in Step 3 TH1
+          generates the following error:"
+      verification: |
+
+      disabled: true
+
+    - label: "CSR is not of the type OCTET string"
+      verification: |
+
+      disabled: true
+
+    - label: "CSRNonce is OCTET string of length > 32"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "CSRNonce value does not match the value CSR Nonce field in the
+          corresponding CSRRequest Command"
+      verification: |
+
+      disabled: true
+
+    - label: "NOCSRElement size is greater than RESP_MAX"
+      verification: |
+
+      disabled: true
+
+    - label: "AttestationSignature is not an octet string"
+      verification: |
+
+      disabled: true

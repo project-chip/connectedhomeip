@@ -28,11 +28,10 @@ namespace chip {
 
 using namespace Messaging;
 
-bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, uint8_t type)
+bool SessionEstablishmentExchangeDispatch::MessagePermitted(Protocols::Id protocol, uint8_t type)
 {
-    switch (protocol)
+    if (protocol == Protocols::SecureChannel::Id)
     {
-    case Protocols::SecureChannel::Id.GetProtocolId():
         switch (type)
         {
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StandaloneAck):
@@ -52,11 +51,8 @@ bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, u
         default:
             break;
         }
-        break;
-
-    default:
-        break;
     }
+
     return false;
 }
 

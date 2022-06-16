@@ -3143,13 +3143,19 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
     }
     else
     {
-        // appclusters.pdf 5.3.4.1:
-        // If the RequirePINforRemoteOperation attribute is True then PINCode field SHALL be provided and the door lock SHALL NOT
-        // grant access if it is not provided.
         bool requirePin = false;
-        VerifyOrExit(GetAttribute(endpoint, Attributes::RequirePINforRemoteOperation::Id,
-                                  Attributes::RequirePINforRemoteOperation::Get, requirePin),
-                     /* credentialsOk is false here */);
+
+        // appclusters.pdf 5.3.4.1:
+        // If the RequirePINForRemoteOperation attribute is True then PINCode field SHALL be provided and the door lock SHALL NOT
+        // grant access if it is not provided. This attribute exists when COTA and PIN features are both enabled. Otherwise we
+        // assume PIN to be OK.
+        if (SupportsCredentialsOTA(endpoint) && SupportsPIN(endpoint))
+        {
+            auto status = Attributes::RequirePINforRemoteOperation::Get(endpoint, &requirePin);
+            VerifyOrExit(
+                EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status || EMBER_ZCL_STATUS_SUCCESS == status,
+                ChipLogError(Zcl, "Failed to read Require PIN For Remote Operation attribute, status=0x%x", to_underlying(status)));
+        }
         credentialsOk = !requirePin;
     }
 

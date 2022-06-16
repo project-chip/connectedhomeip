@@ -654,9 +654,10 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         ChipLogProgress(DeviceLayer, "Avahi browse: remove");
         if (strcmp("local", domain) == 0)
         {
-            std::remove_if(context->mServices.begin(), context->mServices.end(), [name, type](const DnssdService & service) {
-                return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
-            });
+            context->mServices.erase(
+                std::remove_if(context->mServices.begin(), context->mServices.end(), [name, type](const DnssdService & service) {
+                    return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
+                }));
         }
         break;
     case AVAHI_BROWSER_CACHE_EXHAUSTED:

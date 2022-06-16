@@ -111,9 +111,6 @@ ALLOW: Dict[str, Set[str]] = {
     'src/lib/support/CHIPListUtils.h': {'set'},
     'src/platform/DeviceSafeQueue.h': {'queue'},
 
-    # libevent itself is unsuitable for small platforms.
-    'src/system/SystemLayerImplLibevent.h': {'list', 'vector'},
-
     # Only uses <chrono> for zero-cost types.
     'src/system/SystemClock.h': {'chrono'},
     'src/platform/mbed/MbedEventTimeout.h': {'chrono'},

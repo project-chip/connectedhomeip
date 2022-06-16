@@ -299,6 +299,7 @@ private:
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override;
 
+    void ReportData();
     void ReportError(CHIP_ERROR err);
     void ReportError(const StatusIB & status);
     void ReportError(NSError * _Nullable err);
@@ -1393,7 +1394,8 @@ void SubscriptionCallback::OnReportBegin()
     mEventReports = [NSMutableArray new];
 }
 
-void SubscriptionCallback::OnReportEnd()
+// Reports attribute and event data if any exists
+void SubscriptionCallback::ReportData()
 {
     __block NSArray * attributeReports = mAttributeReports;
     mAttributeReports = nil;
@@ -1409,8 +1411,9 @@ void SubscriptionCallback::OnReportEnd()
             mEventReportCallback(eventReports);
         });
     }
-    // Else we have a pending error already.
 }
+
+void SubscriptionCallback::OnReportEnd() { ReportData(); }
 
 void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
 {
@@ -1485,7 +1488,12 @@ void SubscriptionCallback::OnAttributeData(
     [mAttributeReports addObject:[[CHIPAttributeReport alloc] initWithPath:aPath value:value error:error]];
 }
 
-void SubscriptionCallback::OnError(CHIP_ERROR aError) { ReportError([CHIPError errorForCHIPErrorCode:aError]); }
+void SubscriptionCallback::OnError(CHIP_ERROR aError)
+{
+    // If OnError is called after OnReportBegin, we should report the collected data
+    ReportData();
+    ReportError([CHIPError errorForCHIPErrorCode:aError]);
+}
 
 void SubscriptionCallback::OnDone(ReadClient *)
 {

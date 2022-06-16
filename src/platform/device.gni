@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/ble/ble.gni")
 
 declare_args() {
-  # Device platform layer: cc13x2_26x2, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w0, qpg, tizen, cyw30739, bl602, none.
+  # Device platform layer: cc13x2_26x2, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w0, qpg, tizen, cyw30739, bl602, zephyr, none.
 
   chip_device_platform = "auto"
   chip_platform_target = ""
@@ -38,6 +38,8 @@ if (chip_device_platform == "auto") {
     chip_device_platform = "android"
   } else if (current_os == "webos") {
     chip_device_platform = "webos"
+  } else if (current_os == "zephyr") {
+    chip_device_platform = "zephyr"
   } else {
     chip_device_platform = "none"
   }
@@ -125,6 +127,8 @@ if (chip_device_platform == "cc13x2_26x2") {
   _chip_device_layer = "CYW30739"
 } else if (chip_device_platform == "webos") {
   _chip_device_layer = "webos"
+} else if (chip_device_platform == "zephyr") {
+  _chip_device_layer = "Zephyr"
 }
 
 if (chip_device_platform != "external") {
@@ -182,5 +186,6 @@ assert(
         chip_device_platform == "telink" || chip_device_platform == "mbed" ||
         chip_device_platform == "p6" || chip_device_platform == "android" ||
         chip_device_platform == "ameba" || chip_device_platform == "cyw30739" ||
-        chip_device_platform == "webos" || chip_device_platform == "bl602",
+        chip_device_platform == "webos" || chip_device_platform == "bl602" ||
+        chip_device_platform == "zephyr",
     "Please select a valid value for chip_device_platform")

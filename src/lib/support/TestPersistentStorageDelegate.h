@@ -59,7 +59,7 @@ public:
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
 
-        bool contains = mStorage.find(key) != mStorage.end();
+        bool contains = HasKey(key);
         VerifyOrReturnError(contains, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
         std::vector<uint8_t> & value = mStorage[key];
@@ -109,7 +109,7 @@ public:
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
 
-        bool contains = mStorage.find(key) != mStorage.end();
+        bool contains = HasKey(key);
         VerifyOrReturnError(contains, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         mStorage.erase(key);
         return CHIP_NO_ERROR;
@@ -134,6 +134,34 @@ public:
      *
      */
     virtual void ClearStorage() { mStorage.clear(); }
+
+    /**
+     * @return the number of keys currently written in storage
+     */
+    virtual size_t GetNumKeys() { return mStorage.size(); }
+
+    /**
+     * @return a set of all the keys stored
+     */
+    virtual std::set<std::string> GetKeys()
+    {
+        std::set<std::string> keys;
+
+        for (auto it = mStorage.begin(); it != mStorage.end(); ++it)
+        {
+            keys.insert(it->first);
+        }
+
+        return keys;
+    }
+
+    /**
+     * @brief Determine if storage has a given key
+     *
+     * @param key - key to find (case-sensitive)
+     * @return true if key is present in storage, false otherwise
+     */
+    virtual bool HasKey(const std::string & key) { return (mStorage.find(key) != mStorage.end()); }
 
 protected:
     std::map<std::string, std::vector<uint8_t>> mStorage;

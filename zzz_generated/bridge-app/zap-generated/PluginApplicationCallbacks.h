@@ -26,12 +26,15 @@
     MatterAccessControlPluginServerInitCallback();                                                                                 \
     MatterAdministratorCommissioningPluginServerInitCallback();                                                                    \
     MatterBasicPluginServerInitCallback();                                                                                         \
+    MatterBindingPluginClientInitCallback();                                                                                       \
+    MatterBridgedActionsPluginServerInitCallback();                                                                                \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
-    MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
+    MatterGroupKeyManagementPluginServerInitCallback();                                                                            \
+    MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
     MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
