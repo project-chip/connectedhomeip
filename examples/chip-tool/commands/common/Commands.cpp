@@ -58,7 +58,12 @@ exit:
 int Commands::RunInteractive(int argc, char ** argv)
 {
     CHIP_ERROR err = RunCommand(argc, argv, true);
-    return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
+    if (err == CHIP_NO_ERROR)
+    {
+        return EXIT_SUCCESS;
+    }
+    ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));
+    return EXIT_FAILURE;
 }
 
 CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)

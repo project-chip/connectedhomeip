@@ -136,12 +136,11 @@ protected:
         Protocols::SecureChannel::GeneralStatusCode generalCode = (protocolCode == Protocols::SecureChannel::kProtocolCodeSuccess)
             ? Protocols::SecureChannel::GeneralStatusCode::kSuccess
             : Protocols::SecureChannel::GeneralStatusCode::kFailure;
-        uint32_t protocolId = Protocols::SecureChannel::Id.ToFullyQualifiedSpecForm();
 
         ChipLogDetail(SecureChannel, "Sending status report. Protocol code %d, exchange %d", protocolCode,
                       exchangeCtxt->GetExchangeId());
 
-        Protocols::SecureChannel::StatusReport statusReport(generalCode, protocolId, protocolCode);
+        Protocols::SecureChannel::StatusReport statusReport(generalCode, Protocols::SecureChannel::Id, protocolCode);
 
         Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(statusReport.Size()));
         statusReport.WriteToBuffer(bbuf);
@@ -161,8 +160,7 @@ protected:
         Protocols::SecureChannel::StatusReport report;
         CHIP_ERROR err = report.Parse(std::move(msg));
         ReturnErrorOnFailure(err);
-        VerifyOrReturnError(report.GetProtocolId() == Protocols::SecureChannel::Id.ToFullyQualifiedSpecForm(),
-                            CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(report.GetProtocolId() == Protocols::SecureChannel::Id, CHIP_ERROR_INVALID_ARGUMENT);
 
         if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kSuccess &&
             report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeSuccess && successExpected)

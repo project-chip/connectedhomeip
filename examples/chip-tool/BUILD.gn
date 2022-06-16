@@ -65,6 +65,8 @@ static_library("chip-tool-utils") {
     # TODO - enable CommissionedListCommand once DNS Cache is implemented
     #    "commands/pairing/CommissionedListCommand.cpp",
     #    "commands/pairing/CommissionedListCommand.h",
+    "commands/pairing/CloseSessionCommand.cpp",
+    "commands/pairing/CloseSessionCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
