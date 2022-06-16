@@ -75,7 +75,7 @@ public:
         mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mMRPConfig(config)
     {
         MoveToState(State::kActive);
-        Retain(); // Put the test session in Active state. This ref is released inside MarkForRemoval
+        Retain(); // Put the test session in Active state. This ref is released inside MarkForEviction
         SetFabricIndex(fabric);
         ChipLogDetail(Inet, "SecureSession[%p]: Allocated for Test Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
                       mLocalSessionId);
@@ -121,7 +121,7 @@ public:
         mMRPConfig     = config;
         SetFabricIndex(peerNode.GetFabricIndex());
 
-        Retain(); // This ref is released inside MarkForRemoval
+        Retain(); // This ref is released inside MarkForEviction
         MoveToState(State::kActive);
         ChipLogDetail(Inet, "SecureSession[%p]: Activated - Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
                       mLocalSessionId);

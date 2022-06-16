@@ -136,7 +136,7 @@ void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyE
                 CHIP_NO_ERROR);
 
     //
-    // PairingSession::mSecureSessionHolder is a weak-reference. If MarkForRemoval is called on this session, the session is
+    // PairingSession::mSecureSessionHolder is a weak-reference. If MarkForEviction is called on this session, the session is
     // going to get de-allocated from underneath us. This session that has just been allocated should *never* get evicted, and
     // remain available till the next hand-shake is received.
     //

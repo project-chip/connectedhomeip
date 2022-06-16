@@ -52,7 +52,7 @@ CHIP_ERROR UnsolicitedStatusHandler::OnMessageReceived(ExchangeContext * ec, con
     if (report.GetGeneralCode() == GeneralStatusCode::kSuccess && report.GetProtocolCode() == kProtocolCodeCloseSession)
     {
         ChipLogProgress(ExchangeManager, "Received CloseSession status message, closing session");
-        session->AsSecureSession()->MarkForRemoval();
+        session->AsSecureSession()->MarkForEviction();
         return CHIP_NO_ERROR;
     }
 
