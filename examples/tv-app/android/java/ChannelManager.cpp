@@ -385,7 +385,8 @@ void ChannelManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 
-    mChangeChannelMethod = env->GetMethodID(managerClass, "changeChannel", "(Ljava/lang/String;)Lcom/matter/tv/server/tvapp/ChannelInfo;");
+    mChangeChannelMethod =
+        env->GetMethodID(managerClass, "changeChannel", "(Ljava/lang/String;)Lcom/matter/tv/server/tvapp/ChannelInfo;");
     if (mChangeChannelMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ChannelManager 'changeChannel' method");
