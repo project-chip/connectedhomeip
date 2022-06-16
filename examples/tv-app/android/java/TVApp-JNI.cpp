@@ -46,7 +46,7 @@ using namespace chip::app;
 using namespace chip::AppPlatform;
 using namespace chip::Credentials;
 
-#define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_tcl_chip_tvapp_TvApp_##METHOD_NAME
+#define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_matter_tv_server_tvapp_TvApp_##METHOD_NAME
 
 TvAppJNI TvAppJNI::sInstance;
 JNIMyUserPrompter * userPrompter = nullptr;
