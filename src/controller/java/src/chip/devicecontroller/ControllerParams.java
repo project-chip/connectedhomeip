@@ -4,9 +4,11 @@ package chip.devicecontroller;
 public final class ControllerParams {
   private final int udpListenPort;
 
+  private static final int LEGACY_GLOBAL_CHIP_PORT = 5540;
+
   /** Creates a {@link ControllerParams} with default values. */
   public ControllerParams() {
-    this(5543 + 1 /* To match old behavior of CHIP_PORT + 1 */);
+    this(LEGACY_GLOBAL_CHIP_PORT + 1 /* To match old behavior of CHIP_PORT + 1 */);
   }
 
   /** @param udpListenPort the UDP listening port, or 0 to pick any available port. */
