@@ -1,6 +1,5 @@
 package chip.devicecontroller;
 
-
 /** Parameters representing initialization arguments for {@link ChipDeviceController}. */
 public final class ControllerParams {
   private final int udpListenPort;
