@@ -54,7 +54,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         ChipLogProgress(AppServer, "Commissioning completed successfully");
         DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
         mCommissioningTimeoutTimerArmed = false;
-        Cleanup();
+        Cleanup(/* expireFailSafeTimer */ true);
         mServer->GetSecureSessionManager().ExpireAllPASEPairings();
         // That should have cleared out mPASESession.
 #if CONFIG_NETWORK_LAYER_BLE
@@ -100,10 +100,13 @@ void CommissioningWindowManager::ResetState()
     mCommissioningTimeoutTimerArmed = false;
 }
 
-void CommissioningWindowManager::Cleanup()
+void CommissioningWindowManager::Cleanup(bool expireFailSafeTimer)
 {
     StopAdvertisement(/* aShuttingDown = */ false);
-    ExpireFailSafeIfArmed();
+    if (expireFailSafeTimer)
+    {
+        ExpireFailSafeIfArmed();
+    }
 
     ResetState();
 }
@@ -132,7 +135,7 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
     {
         // The commissioning attempts limit was exceeded, or listening for
         // commmissioning connections failed.
-        Cleanup();
+        Cleanup(/* expireFailSafeTimer */ true);
 
         if (mAppDelegate != nullptr)
         {
@@ -274,7 +277,7 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds16 co
     CHIP_ERROR err = OpenCommissioningWindow(commissioningTimeout);
     if (err != CHIP_NO_ERROR)
     {
-        Cleanup();
+        Cleanup(/* expireFailSafeTimer */ true);
     }
 
     return err;
@@ -305,7 +308,7 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(Seconds16
     CHIP_ERROR err = OpenCommissioningWindow(commissioningTimeout);
     if (err != CHIP_NO_ERROR)
     {
-        Cleanup();
+        Cleanup(/* expireFailSafeTimer */ true);
     }
     return err;
 }
@@ -324,7 +327,7 @@ void CommissioningWindowManager::CloseCommissioningWindow()
         }
 #endif
         ChipLogProgress(AppServer, "Closing pairing window");
-        Cleanup();
+        Cleanup(/* expireFailSafeTimer */ false);
     }
 }
 

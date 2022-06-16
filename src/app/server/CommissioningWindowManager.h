@@ -90,7 +90,7 @@ public:
     void OnSessionEstablished(const SessionHandle & session) override;
 
     void Shutdown();
-    void Cleanup();
+    void Cleanup(bool expireFailSafeTimer);
 
     void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event);
 
