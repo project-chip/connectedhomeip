@@ -38,13 +38,13 @@ void MTRDevicePairingDelegateBridge::setDelegate(id<MTRDevicePairingDelegate> de
 
 MTRPairingStatus MTRDevicePairingDelegateBridge::MapStatus(chip::Controller::DevicePairingDelegate::Status status)
 {
-    MTRPairingStatus rv = kUnknownStatus;
+    MTRPairingStatus rv = MTRPairingStatusUnknown;
     switch (status) {
     case chip::Controller::DevicePairingDelegate::Status::SecurePairingSuccess:
-        rv = kSecurePairingSuccess;
+        rv = MTRPairingStatusSuccess;
         break;
     case chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed:
-        rv = kSecurePairingFailed;
+        rv = MTRPairingStatusFailed;
         break;
     }
     return rv;

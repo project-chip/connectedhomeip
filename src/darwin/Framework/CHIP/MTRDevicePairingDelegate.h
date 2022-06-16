@@ -20,9 +20,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, MTRPairingStatus) {
-    kSecurePairingSuccess = 0,
-    kSecurePairingFailed,
-    kUnknownStatus,
+    MTRPairingStatusUnknown = 0,
+    MTRPairingStatusSuccess = 1,
+    MTRPairingStatusFailed  = 2
 };
 
 /**

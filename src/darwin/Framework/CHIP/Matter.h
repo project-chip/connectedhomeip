@@ -15,7 +15,8 @@
  *    limitations under the License.
  */
 
-// pull together CHIP headers
+#import <Foundation/Foundation.h>
+
 #import <Matter/MTRAttributeCacheContainer.h>
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRClustersObjc.h>
@@ -38,12 +39,3 @@
 #import <Matter/MTRCertificates.h>
 #import <Matter/MTRClusterConstants.h>
 #import <Matter/MTRControllerFactory.h>
-
-#import <Foundation/Foundation.h>
-//! Project version number for CHIP.
-FOUNDATION_EXPORT double CHIPVersionNumber;
-
-//! Project version string for CHIP.
-FOUNDATION_EXPORT const unsigned char CHIPVersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <Matter/PublicHeader.h>

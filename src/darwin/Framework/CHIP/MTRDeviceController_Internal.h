@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#ifndef MATTER_DEVICE_CONTROLLER_INTERNAL_H
-#define MATTER_DEVICE_CONTROLLER_INTERNAL_H
+#ifndef MTR_DEVICE_CONTROLLER_INTERNAL_H
+#define MTR_DEVICE_CONTROLLER_INTERNAL_H
 
 /**
  * Parts of CHIPDeviceController that are not part of the framework API.  Mostly
@@ -84,4 +84,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 NS_ASSUME_NONNULL_END
 
-#endif // MATTER_DEVICE_CONTROLLER_INTERNAL_H
+#endif // MTR_DEVICE_CONTROLLER_INTERNAL_H
