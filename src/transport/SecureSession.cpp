@@ -50,9 +50,9 @@ void SecureSession::MarkForRemoval()
     }
 }
 
-void SecureSession::MarkForInactive()
+void SecureSession::MarkInactive()
 {
-    ChipLogDetail(Inet, "SecureSession[%p]: MarkForInactive Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
+    ChipLogDetail(Inet, "SecureSession[%p]: MarkInactive Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
                   mLocalSessionId);
     ReferenceCountedHandle<Transport::Session> ref(*this);
     switch (mState)

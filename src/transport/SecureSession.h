@@ -145,7 +145,7 @@ public:
     void MarkForRemoval();
 
     // Used to prevent any new exchange created on the session while the existing exchanges finish their work.
-    void MarkForInactive();
+    void MarkInactive();
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kSecure; }
 #if CHIP_PROGRESS_LOGGING
@@ -254,7 +254,7 @@ private:
         kPendingRemoval = 3,
 
         // The session is still functional, but it can't yield any new exchanges,
-        // This is meant to be used in conjunction with 
+        // This is meant to be used in conjunction with
         // ExchangeManager::AbortExchangesForFabricExceptOne, with the one
         // exceptional exchange handling moving this session out of this state when
         // it finishes whatever it needs the session for.

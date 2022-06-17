@@ -325,7 +325,7 @@ ExchangeContext::~ExchangeContext()
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
     VerifyOrDie(!IsAckPending());
 
-    if (IsAutoReleaseSession() && mSession)
+    if (ReleaseSessionOnDestruction() && mSession)
         mSession->AsSecureSession()->MarkForRemoval();
 
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED

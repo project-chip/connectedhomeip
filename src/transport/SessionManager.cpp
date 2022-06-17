@@ -389,11 +389,14 @@ void SessionManager::ExpireAllPASEPairings()
 
 void SessionManager::ReleaseSessionsForFabricExceptOne(FabricIndex fabricIndex, const SessionHandle & deferred)
 {
+    VerifyOrDie(deferred->IsSecureSession());
+    SecureSession * deferredSecureSession = deferred->AsSecureSession();
+
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetPeer().GetFabricIndex() == fabricIndex)
         {
-            if (session == deferred->AsSecureSession())
-                session->MarkForInactive();
+            if (session == deferredSecureSession)
+                session->MarkInactive();
             else
                 session->MarkForRemoval();
         }

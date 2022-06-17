@@ -378,6 +378,8 @@ void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * deleg
 
 void ExchangeManager::AbortExchangesForFabricExceptOne(FabricIndex fabricIndex, ExchangeContext * deferred)
 {
+    VerifyOrDie(deferred->HasSessionHandle() && deferred->GetSessionHandle()->IsSecureSession());
+
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->HasSessionHandle() && ec->GetSessionHandle()->GetFabricIndex() == fabricIndex)
         {
@@ -388,6 +390,8 @@ void ExchangeManager::AbortExchangesForFabricExceptOne(FabricIndex fabricIndex, 
         }
         return Loop::Continue;
     });
+
+    mSessionManager->ReleaseSessionsForFabricExceptOne(fabricIndex, deferred->GetSessionHandle());
 }
 
 } // namespace Messaging

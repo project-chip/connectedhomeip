@@ -258,7 +258,7 @@ inline void ReliableMessageContext::SetAutoReleaseSession()
     mFlags.Set(Flags::kFlagAutoReleaseSession, true);
 }
 
-inline bool ReliableMessageContext::IsAutoReleaseSession()
+inline bool ReliableMessageContext::ReleaseSessionOnDestruction()
 {
     return mFlags.Has(Flags::kFlagAutoReleaseSession);
 }
