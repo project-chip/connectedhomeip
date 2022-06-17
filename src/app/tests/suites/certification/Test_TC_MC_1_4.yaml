@@ -46,9 +46,10 @@ tests:
           constraints:
               type: map32
 
-    #Issue 10988 0,1,655
+    #Issue 10988
     - label: "Read the global attribute: AttributeList"
-      PICS: MC_MEDIAINPUT.S.A0000 && MC_MEDIAINPUT.S.A0001
+      PICS:
+          PICS_SKIP_SAMPLE_APP && MC_MEDIAINPUT.S.A0000 && MC_MEDIAINPUT.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
