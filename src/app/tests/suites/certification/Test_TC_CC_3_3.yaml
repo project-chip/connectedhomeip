@@ -40,6 +40,7 @@ tests:
           value: 1
 
     - label: "Reads CurrentHue attribute from DUT"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -49,6 +50,7 @@ tests:
               maxValue: 254
 
     - label: "Step hue up command"
+      PICS: CC.S.C02.Rsp
       command: "StepHue"
       arguments:
           values:
@@ -73,6 +75,7 @@ tests:
                 value: 25
 
     - label: "Over TransitionTime,Read CurrentHue attribute from DUT"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -82,6 +85,7 @@ tests:
               maxValue: 254
 
     - label: "Step hue down command"
+      PICS: CC.S.C02.Rsp
       command: "StepHue"
       arguments:
           values:
@@ -105,6 +109,7 @@ tests:
                 value: 25
 
     - label: "Over TransitionTime,Read CurrentHue attribute from DUT"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
