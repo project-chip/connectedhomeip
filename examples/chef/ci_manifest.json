@@ -1,0 +1,70 @@
+{
+    "devices": {
+        "rootnode_humiditysensor_bCXcaZPQ1O": {
+            "matter_hash": "2bdf0695a9dfd455e62969c24f802f63",
+            "zap_hash": "8f86b354d5a8eee7ea019e65a64eb8cb",
+            "zzz_gen_hash": "b0e215ff085e9ca6e69da8d4715e58da"
+        },
+        "rootnode_flowsensor_nRfPWc0i3j": {
+            "matter_hash": "9898e9ecf7c1eb9626cd729a45cb5165",
+            "zap_hash": "ea021cad6e2ccc4f67e4dbeeb4ca9288",
+            "zzz_gen_hash": "e043a7b7f5b92e2a1e56a1b125b930be"
+        },
+        "rootnode_contactsensor_DreXRHtsq9": {
+            "matter_hash": "fed1bc29a5f1ba1dbf46225bdf62efa9",
+            "zap_hash": "de97c937bf519ecc46bf43912799a7c7",
+            "zzz_gen_hash": "2727424d8d5874f246d69c38c9167d30"
+        },
+        "rootnode_thermostat_dtbxxgX9aj": {
+            "matter_hash": "f8741833f6f59ecc89a2cde043261b89",
+            "zap_hash": "d538157c8174fec70905dc9580dd0b58",
+            "zzz_gen_hash": "2d972905b45ec7210fc991f86d82445c"
+        },
+        "rootnode_pressuresensor_fBO7Lvhj9j": {
+            "matter_hash": "e2ab6d5b0d7d0580518382d3cb48e936",
+            "zap_hash": "61a2657bb47c1a836b5d657f5bb452f8",
+            "zzz_gen_hash": "ef9ed84e9a19168e6d182c1a014e2fd5"
+        },
+        "rootnode_occupancysensor_52g0FarxiO": {
+            "matter_hash": "b92540dac41414e9f6b517f330dc75dd",
+            "zap_hash": "278e7ee5dd14e648844e75934e4d4302",
+            "zzz_gen_hash": "e9ffc6db6f5606ef7d2622bc1cd42e0c"
+        },
+        "rootnode_onoffpluginunit_Jgnh29qK1p": {
+            "matter_hash": "3d10ca8be19cfd08f12bce7c7a555251",
+            "zap_hash": "7d462526927251ecf6841784ca3dca9a",
+            "zzz_gen_hash": "f2d219fded8362f451a27e7685d3804d"
+        },
+        "rootnode_dimmablelight_gY80DaqEUL": {
+            "matter_hash": "5162a6b1e13abec0f3c27493bfaf53c3",
+            "zap_hash": "065e9334527a21bab8cb3a3dd24ff135",
+            "zzz_gen_hash": "4fceccc339c1e0477de276542784d800"
+        },
+        "rootnode_heatingcoolingunit_Yt3sl2ssuP": {
+            "matter_hash": "6b2aa8f8e029e706a3e6373178cc2cc7",
+            "zap_hash": "c31f5d478acdf1cffe218788559cf2af",
+            "zzz_gen_hash": "47d5bb1d17b75747eca59fe2196abe8c"
+        },
+        "rootnode_speaker_TlTVZFjAlM": {
+            "matter_hash": "e3ca89c92cf2777da85ec5d0934063e1",
+            "zap_hash": "fa2b7db458e1330b1d2a079965c26d93",
+            "zzz_gen_hash": "ecd02da8bef2277cd35470b04f05af92"
+        },
+        "rootnode_windowcovering_hv8WSnPgSV": {
+            "matter_hash": "0aa6fbe2a61f6e4b78c7a1b6508d1599",
+            "zap_hash": "1ca223c176344ab1387c70db782a7210",
+            "zzz_gen_hash": "a0313a5d88d85c46dd4ad1ae70374443"
+        },
+        "rootnode_onofflightswitch_zbddTYGOPV": {
+            "matter_hash": "347f32d5be1eab7763fecc820cd5257b",
+            "zap_hash": "d7e83aa5dfc0d2939fd1d4c6fa869b3f",
+            "zzz_gen_hash": "0509c1fbca200cd011c296504200663e"
+        },
+        "rootnode_temperaturesensor_19A4msmCzW": {
+            "matter_hash": "b29722d66ef029619303fb4202bf495a",
+            "zap_hash": "8b338275f9ff4e14f99896b083b0debc",
+            "zzz_gen_hash": "14a3feeb7e80c5bc1c7e2441d97eeaa9"
+        }
+    },
+    "zap_commit": "ca9cbecbc36228db65349864a77402075c39d9d2"
+}
