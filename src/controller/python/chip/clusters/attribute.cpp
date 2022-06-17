@@ -461,6 +461,7 @@ chip::ChipError::StorageType pychip_ReadClient_Read(void * appContext, ReadClien
             params.mResubscribePolicy         = PythonResubscribePolicy;
             attributePaths.release();
             eventPaths.release();
+            dataVersionFilters.release();
             err = readClient->SendAutoResubscribeRequest(std::move(params));
             SuccessOrExit(err);
         }
