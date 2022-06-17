@@ -209,6 +209,24 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_MISSING_SECURE_SESSION.AsInteger():
         desc = "Missing secure session";
         break;
+    case CHIP_ERROR_INVALID_ADMIN_SUBJECT.AsInteger():
+        desc = "CaseAdminSubject is not valid";
+        break;
+    case CHIP_ERROR_INSUFFICIENT_PRIVILEGE.AsInteger():
+        desc = "Required privilege was insufficient during an operation";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_IB.AsInteger():
+        desc = "Malformed Interacton Model Attribute Report IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB.AsInteger():
+        desc = "Malformed Interacton Model Command Data IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_EVENT_STATUS_IB.AsInteger():
+        desc = "Malformed Interacton Model Event Status IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE.AsInteger():
+        desc = "Malformed Interacton Model Status Response IB";
+        break;
     case CHIP_ERROR_INVALID_PATH_LIST.AsInteger():
         desc = "Invalid TLV path list";
         break;
@@ -419,6 +437,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED.AsInteger():
         desc = "DRBG entropy source failed to generate entropy data";
         break;
+    case CHIP_ERROR_MESSAGE_COUNTER_EXHAUSTED.AsInteger():
+        desc = "Message counter exhausted";
+        break;
     case CHIP_ERROR_FABRIC_EXISTS.AsInteger():
         desc = "Trying to add a NOC for a fabric that already exists";
         break;
@@ -509,8 +530,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES.AsInteger():
         desc = "Too many shared session end nodes";
         break;
-    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_ELEMENT.AsInteger():
-        desc = "Malformed Interaction Model Attribute DataElement";
+    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_IB.AsInteger():
+        desc = "Malformed Interaction Model Attribute Data IB";
         break;
     case CHIP_ERROR_WRONG_CERT_TYPE.AsInteger():
         desc = "Wrong certificate type";
@@ -581,26 +602,23 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_MDNS_COLLISION.AsInteger():
         desc = "mDNS collision";
         break;
-    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH.AsInteger():
-        desc = "Malformed Interacton Model Attribute Path";
+    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB.AsInteger():
+        desc = "Malformed Interacton Model Attribute Path IB";
         break;
-    case CHIP_ERROR_IM_MALFORMED_EVENT_PATH.AsInteger():
-        desc = "Malformed Interacton Model Event Path";
+    case CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB.AsInteger():
+        desc = "Malformed Interacton Model Event Path IB";
         break;
-    case CHIP_ERROR_IM_MALFORMED_COMMAND_PATH.AsInteger():
-        desc = "Malformed Interacton Model Command Path";
+    case CHIP_ERROR_IM_MALFORMED_COMMAND_PATH_IB.AsInteger():
+        desc = "Malformed Interacton Model Command Path IB";
         break;
-    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_ELEMENT.AsInteger():
-        desc = "Malformed Interacton Model Attribute DataElement";
+    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_IB.AsInteger():
+        desc = "Malformed Interacton Model Attribute Status IB";
         break;
-    case CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT.AsInteger():
-        desc = "Malformed Interacton Model Attribute DataElement";
+    case CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB.AsInteger():
+        desc = "Malformed Interacton Model Event Data IB";
         break;
-    case CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT.AsInteger():
-        desc = "Malformed Interacton Model Event DataElement";
-        break;
-    case CHIP_ERROR_IM_MALFORMED_STATUS_CODE.AsInteger():
-        desc = "Malformed Interacton Model Status Code";
+    case CHIP_ERROR_IM_MALFORMED_STATUS_IB.AsInteger():
+        desc = "Malformed Interacton Model Status IB";
         break;
     case CHIP_ERROR_PEER_NODE_NOT_FOUND.AsInteger():
         desc = "Unable to find the peer node";
@@ -651,10 +669,10 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         desc = "Malformed Interaction Model Command Status IB";
         break;
     case CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB.AsInteger():
-        desc = "Malformed Interaction Model Invoke Response code IB";
+        desc = "Malformed Interaction Model Invoke Response IB";
         break;
     case CHIP_ERROR_IM_MALFORMED_INVOKE_REQUEST_MESSAGE.AsInteger():
-        desc = "Malformed Interaction Model Invoke Response Message";
+        desc = "Malformed Interaction Model Invoke Request Message";
         break;
     case CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE.AsInteger():
         desc = "Malformed Interaction Model Invoke Response Message";
@@ -665,8 +683,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_IM_MALFORMED_WRITE_REQUEST_MESSAGE.AsInteger():
         desc = "Malformed Interaction Model Write Request Message";
         break;
-    case CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE.AsInteger():
-        desc = "Malformed Interaction Model Write Response Message";
+    case CHIP_ERROR_IM_MALFORMED_EVENT_FILTER_IB.AsInteger():
+        desc = "Malformed Interaction Model Event Filter IB";
         break;
     case CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE.AsInteger():
         desc = "Malformed Interaction Model Read Request Message";
@@ -712,9 +730,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         break;
     case CHIP_ERROR_MISSING_URI_SEPARATOR.AsInteger():
         desc = "The URI separator is missing";
-        break;
-    case CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE.AsInteger():
-        desc = "Malformed Interaction Model Status Response Message";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

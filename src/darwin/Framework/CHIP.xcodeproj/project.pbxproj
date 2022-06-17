@@ -41,6 +41,8 @@
 		513DDB8A2761F6F900DAA01A /* CHIPAttributeTLVValueDecoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 513DDB892761F6F900DAA01A /* CHIPAttributeTLVValueDecoder.mm */; };
 		51431AF927D2973E008A7943 /* CHIPIMDispatch.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51431AF827D2973E008A7943 /* CHIPIMDispatch.mm */; };
 		51431AFB27D29CA4008A7943 /* ota-provider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51431AFA27D29CA4008A7943 /* ota-provider.cpp */; };
+		515C1C6F284F9FFB00A48F0C /* MTRMemory.mm in Sources */ = {isa = PBXBuildFile; fileRef = 515C1C6D284F9FFB00A48F0C /* MTRMemory.mm */; };
+		515C1C70284F9FFB00A48F0C /* MTRMemory.h in Headers */ = {isa = PBXBuildFile; fileRef = 515C1C6E284F9FFB00A48F0C /* MTRMemory.h */; };
 		517BF3F0282B62B800A8B7DB /* MTRCertificates.h in Headers */ = {isa = PBXBuildFile; fileRef = 517BF3EE282B62B800A8B7DB /* MTRCertificates.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		517BF3F1282B62B800A8B7DB /* MTRCertificates.mm in Sources */ = {isa = PBXBuildFile; fileRef = 517BF3EF282B62B800A8B7DB /* MTRCertificates.mm */; };
 		517BF3F3282B62CB00A8B7DB /* MatterCertificateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 517BF3F2282B62CB00A8B7DB /* MatterCertificateTests.m */; };
@@ -152,6 +154,8 @@
 		513DDB892761F6F900DAA01A /* CHIPAttributeTLVValueDecoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPAttributeTLVValueDecoder.mm; path = "zap-generated/CHIPAttributeTLVValueDecoder.mm"; sourceTree = "<group>"; };
 		51431AF827D2973E008A7943 /* CHIPIMDispatch.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPIMDispatch.mm; sourceTree = "<group>"; };
 		51431AFA27D29CA4008A7943 /* ota-provider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ota-provider.cpp"; path = "../../../app/clusters/ota-provider/ota-provider.cpp"; sourceTree = "<group>"; };
+		515C1C6D284F9FFB00A48F0C /* MTRMemory.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRMemory.mm; sourceTree = "<group>"; };
+		515C1C6E284F9FFB00A48F0C /* MTRMemory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRMemory.h; sourceTree = "<group>"; };
 		517BF3EE282B62B800A8B7DB /* MTRCertificates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCertificates.h; sourceTree = "<group>"; };
 		517BF3EF282B62B800A8B7DB /* MTRCertificates.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRCertificates.mm; sourceTree = "<group>"; };
 		517BF3F2282B62CB00A8B7DB /* MatterCertificateTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MatterCertificateTests.m; sourceTree = "<group>"; };
@@ -355,6 +359,8 @@
 				5A7947E227C0101200434CF2 /* CHIPDeviceController+XPC.h */,
 				517BF3EE282B62B800A8B7DB /* MTRCertificates.h */,
 				517BF3EF282B62B800A8B7DB /* MTRCertificates.mm */,
+				515C1C6E284F9FFB00A48F0C /* MTRMemory.h */,
+				515C1C6D284F9FFB00A48F0C /* MTRMemory.mm */,
 				5A7947E327C0129500434CF2 /* CHIPDeviceController+XPC.m */,
 				B20252912459E34F00F97062 /* Info.plist */,
 				998F286C26D55E10001846C6 /* CHIPKeypair.h */,
@@ -419,6 +425,7 @@
 				99D466E12798936D0089A18F /* CHIPCommissioningParameters.h in Headers */,
 				5136661528067D550025EDAE /* MatterControllerFactory_Internal.h in Headers */,
 				75C645A42825AAC3007E2C29 /* MatterClusterConstants.h in Headers */,
+				515C1C70284F9FFB00A48F0C /* MTRMemory.h in Headers */,
 				B289D4212639C0D300D4E314 /* CHIPOnboardingPayloadParser.h in Headers */,
 				513DDB862761F69300DAA01A /* CHIPAttributeTLVValueDecoder_Internal.h in Headers */,
 				2CB7163F252F731E0026E2BB /* CHIPDevicePairingDelegate.h in Headers */,
@@ -580,6 +587,7 @@
 				99AECC802798A57F00B6355B /* CHIPCommissioningParameters.m in Sources */,
 				2CB7163C252E8A7C0026E2BB /* CHIPDevicePairingDelegateBridge.mm in Sources */,
 				997DED162695343400975E97 /* CHIPThreadOperationalDataset.mm in Sources */,
+				515C1C6F284F9FFB00A48F0C /* MTRMemory.mm in Sources */,
 				27A53C1827FBC6920053F131 /* CHIPAttestationTrustStoreBridge.mm in Sources */,
 				998F287126D56940001846C6 /* CHIPP256KeypairBridge.mm in Sources */,
 				5136661428067D550025EDAE /* MatterControllerFactory.mm in Sources */,

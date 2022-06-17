@@ -49,6 +49,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -289,6 +290,7 @@ CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
 
     // Back-up context as we are about to finalize the hash to extract digest.
     mbedtls_sha256_context previous_ctx;
+    mbedtls_sha256_init(&previous_ctx);
     mbedtls_sha256_clone(&previous_ctx, context);
 
     // Pad + compute digest, then finalize context. It is restored next line to continue.
@@ -296,6 +298,7 @@ CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
 
     // Restore context prior to finalization.
     mbedtls_sha256_clone(context, &previous_ctx);
+    mbedtls_sha256_free(&previous_ctx);
 
     return result;
 }
@@ -694,6 +697,32 @@ void ClearSecretData(uint8_t * buf, size_t len)
     mbedtls_platform_zeroize(buf, len);
 }
 
+// THE BELOW IS FROM `third_party/openthread/repo/third_party/mbedtls/repo/library/constant_time.c` since
+// mbedtls_ct_memcmp is not available on Linux somehow :(
+int mbedtls_ct_memcmp_copy(const void * a, const void * b, size_t n)
+{
+    size_t i;
+    volatile const unsigned char * A = (volatile const unsigned char *) a;
+    volatile const unsigned char * B = (volatile const unsigned char *) b;
+    volatile unsigned char diff      = 0;
+
+    for (i = 0; i < n; i++)
+    {
+        /* Read volatile data in order before computing diff.
+         * This avoids IAR compiler warning:
+         * 'the order of volatile accesses is undefined ..' */
+        unsigned char x = A[i], y = B[i];
+        diff |= x ^ y;
+    }
+
+    return ((int) diff);
+}
+
+bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n)
+{
+    return mbedtls_ct_memcmp_copy(a, b, n) == 0;
+}
+
 CHIP_ERROR P256Keypair::Initialize()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -815,28 +844,18 @@ P256Keypair::~P256Keypair()
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-
-    int result = 0;
-
+    int result       = 0;
     size_t out_length;
-
-    const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
 
     mbedtls_x509write_csr csr;
     mbedtls_x509write_csr_init(&csr);
 
     mbedtls_pk_context pk;
-    mbedtls_pk_init(&pk);
-
-    const mbedtls_pk_info_t * pk_info = mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY);
-    VerifyOrExit(pk_info != nullptr, error = CHIP_ERROR_INTERNAL);
+    pk.CHIP_CRYPTO_PAL_PRIVATE(pk_info) = mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY);
+    pk.CHIP_CRYPTO_PAL_PRIVATE(pk_ctx)  = to_keypair(&mKeypair);
+    VerifyOrExit(pk.CHIP_CRYPTO_PAL_PRIVATE(pk_info) != nullptr, error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
-
-    result = mbedtls_pk_setup(&pk, pk_info);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    memcpy(mbedtls_pk_ec(pk), keypair, sizeof(mbedtls_ecp_keypair));
 
     mbedtls_x509write_csr_set_key(&csr, &pk);
 
@@ -850,8 +869,9 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
 
     result = mbedtls_x509write_csr_der(&csr, out_csr, csr_length, CryptoRNG, nullptr);
     VerifyOrExit(result > 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(CanCastTo<size_t>(result), error = CHIP_ERROR_INTERNAL);
 
-    out_length = (size_t) result;
+    out_length = static_cast<size_t>(result);
     result     = 0;
     VerifyOrExit(out_length <= csr_length, error = CHIP_ERROR_INTERNAL);
 
@@ -867,12 +887,6 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
 
 exit:
     mbedtls_x509write_csr_free(&csr);
-
-    // TODO: Figure-out why the next 2 lines are OK. Valgrind complains or crash occurs if either is deleted.
-    // Oddly, the following `mbedtls_ecp_keypair_init` is needed to avoid a double-free
-    // with the following pk_free, which is needed.
-    mbedtls_ecp_keypair_init(mbedtls_pk_ec(pk));
-    mbedtls_pk_free(&pk);
 
     _log_mbedTLS_error(result);
     return error;
@@ -1044,24 +1058,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_le
     return CHIP_NO_ERROR;
 }
 
-/**
- * This function implements constant time memcmp. It's good practice
- * to use constant time functions for cryptographic functions.
- */
-static inline int constant_time_memcmp(const void * a, const void * b, size_t n)
-{
-    const uint8_t * A = (const uint8_t *) a;
-    const uint8_t * B = (const uint8_t *) b;
-    uint8_t diff      = 0;
-
-    for (size_t i = 0; i < n; i++)
-    {
-        diff |= (A[i] ^ B[i]);
-    }
-
-    return diff;
-}
-
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len,
                                                     const uint8_t * in, size_t in_len)
 {
@@ -1075,7 +1071,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const uint8_t * key, size_t 
     SuccessOrExit(error = Mac(key, key_len, in, in_len, computed_mac_span));
     VerifyOrExit(computed_mac_span.size() == mac_len, error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(constant_time_memcmp(mac, computed_mac, kSHA256_Hash_Length) == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(IsBufferContentEqualConstantTime(mac, computed_mac, kSHA256_Hash_Length), error = CHIP_ERROR_INTERNAL);
 
 exit:
     _log_mbedTLS_error(result);

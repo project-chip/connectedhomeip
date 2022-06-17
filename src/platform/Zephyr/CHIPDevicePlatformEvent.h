@@ -49,8 +49,8 @@ enum InternalPlatformSpecificEventTypes
     kPlatformZephyrBleConnected,
     kPlatformZephyrBleDisconnected,
     kPlatformZephyrBleCCCWrite,
-    kPlatformZephyrBleRXWrite,
-    kPlatformZephyrBleTXComplete,
+    kPlatformZephyrBleC1WriteEvent,
+    kPlatformZephyrBleC2IndDoneEvent,
     kPlatformZephyrBleOutOfBuffersEvent,
 };
 
@@ -68,15 +68,16 @@ struct BleCCCWriteEventType
     uint16_t Value;
 };
 
-struct BleRXWriteEventType
+struct BleC1WriteEventType
 {
     bt_conn * BtConn;
     ::chip::System::PacketBuffer * Data;
 };
 
-struct BleTXCompleteEventType
+struct BleC2IndDoneEventType
 {
     bt_conn * BtConn;
+    uint8_t Result;
 };
 
 /**
@@ -88,8 +89,8 @@ struct ChipDevicePlatformEvent final
     {
         BleConnEventType BleConnEvent;
         BleCCCWriteEventType BleCCCWriteEvent;
-        BleRXWriteEventType BleRXWriteEvent;
-        BleTXCompleteEventType BleTXCompleteEvent;
+        BleC1WriteEventType BleC1WriteEvent;
+        BleC2IndDoneEventType BleC2IndDoneEvent;
     };
 };
 

@@ -65,6 +65,7 @@ CHIP_IM_STATUS_CODE(NoUpstreamSubscription, NO_UPSTREAM_SUBSCRIPTION, 0xc5)
 CHIP_IM_STATUS_CODE(NeedsTimedInteraction , NEEDS_TIMED_INTERACTION , 0xc6)
 CHIP_IM_STATUS_CODE(UnsupportedEvent      , UNSUPPORTED_EVENT       , 0xc7)
 CHIP_IM_STATUS_CODE(PathsExhausted        , PATHS_EXHAUSTED         , 0xc8)
-CHIP_IM_STATUS_CODE(WriteIgnored          , WRITE_IGNORED           , 0xc9) // non-spec error code and use only internally
-
+CHIP_IM_STATUS_CODE(TimedRequestMismatch  , TIMED_REQUEST_MISMATCH  , 0xc9)
+CHIP_IM_STATUS_CODE(FailsafeRequired      , FAILSAFE_REQUIRED       , 0xca)
+CHIP_IM_STATUS_CODE(WriteIgnored          , WRITE_IGNORED           , 0xF0) // non-spec error code and use only internally
 // clang-format on

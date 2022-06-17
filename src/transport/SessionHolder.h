@@ -28,7 +28,7 @@ namespace chip {
  *    released when the underlying session is released. One must verify it is available before use. The object can be
  *    created using SessionHandle.Grab()
  */
-class SessionHolder : public SessionDelegate, public IntrusiveListNodeBase
+class SessionHolder : public SessionDelegate, public IntrusiveListNodeBase<>
 {
 public:
     SessionHolder() {}
@@ -47,7 +47,7 @@ public:
         return mSession.HasValue() && &mSession.Value().Get() == &session.mSession.Get();
     }
 
-    bool GrabPairing(const SessionHandle & session); // Should be only used inside CASE/PASE pairing.
+    bool GrabPairingSession(const SessionHandle & session); // Should be only used inside CASE/PASE pairing.
     bool Grab(const SessionHandle & session);
     void Release();
 
@@ -66,11 +66,14 @@ public:
 
     Transport::Session * operator->() const { return &mSession.Value().Get(); }
 
+    // There is not delegate, nothing to do here
+    virtual void DispatchSessionEvent(SessionDelegate::Event event) {}
+
 private:
     Optional<ReferenceCountedHandle<Transport::Session>> mSession;
 };
 
-// @brief Extends SessionHolder to allow propagate OnSessionReleased event to an extra given destination
+/// @brief Extends SessionHolder to allow propagate SessionDelegate::* events to a given destination
 class SessionHolderWithDelegate : public SessionHolder
 {
 public:
@@ -85,6 +88,8 @@ public:
         // Note, the session is already cleared during mDelegate.OnSessionReleased
         mDelegate.OnSessionReleased();
     }
+
+    void DispatchSessionEvent(SessionDelegate::Event event) override { (mDelegate.*event)(); }
 
 private:
     SessionDelegate & mDelegate;

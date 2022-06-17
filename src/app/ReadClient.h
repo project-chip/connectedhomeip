@@ -118,6 +118,7 @@ public:
 
         /**
          * OnSubscriptionEstablished will be called when a subscription is established for the given subscription transaction.
+         * If using auto resubscription, OnSubscriptionEstablished will be called whenever resubscription is established.
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
@@ -125,6 +126,16 @@ public:
          * @param[in] aSubscriptionId The identifier of the subscription that was established.
          */
         virtual void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) {}
+
+        /**
+         * OnResubscriptionAttempt will be called when a re-subscription has been scheduled as a result of the termination of an
+         * in-progress or previously active subscription. This object MUST continue to exist after this call is completed. The
+         * application shall wait until it receives an OnDone call to destroy the object.
+         *
+         * @param[in] aTerminationCause The cause of failure of the subscription that just terminated.
+         * @param[in] aNextResubscribeIntervalMsec How long we will wait before trying to auto-resubscribe.
+         */
+        virtual void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) {}
 
         /**
          * OnError will be called when an error occurs *after* a successful call to SendRequest(). The following
@@ -276,7 +287,7 @@ public:
     CHIP_ERROR GetReportingIntervals(uint16_t & aMinIntervalFloorSeconds, uint16_t & aMaxIntervalCeilingSeconds) const
     {
         VerifyOrReturnError(IsSubscriptionType(), CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(IsSubscriptionIdle(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsSubscriptionActive(), CHIP_ERROR_INCORRECT_STATE);
 
         aMinIntervalFloorSeconds   = mMinIntervalFloorSeconds;
         aMaxIntervalCeilingSeconds = mMaxIntervalCeilingSeconds;
@@ -301,6 +312,16 @@ public:
     // OnDeallocatePaths when OnDone is called. SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since
     // that's the only case when the consumer moved a ReadParams into the client.
     CHIP_ERROR SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams);
+
+    // Like SendSubscribeRequest, but allows sending certain forms of invalid
+    // subscribe requests that servers are expected to reject, for testing
+    // purposes.  Should only be called from tests.
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    CHIP_ERROR SendSubscribeRequestWithoutValidation(const ReadPrepareParams & aReadPrepareParams)
+    {
+        return SendSubscribeRequestImpl(aReadPrepareParams);
+    }
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
 
 private:
     friend class TestReadInteraction;
@@ -328,7 +349,7 @@ private:
      *
      */
     bool IsIdle() const { return mState == ClientState::Idle; }
-    bool IsSubscriptionIdle() const { return mState == ClientState::SubscriptionActive; }
+    bool IsSubscriptionActive() const { return mState == ClientState::SubscriptionActive; }
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
 
@@ -355,10 +376,23 @@ private:
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     const char * GetStateStr() const;
-    bool ResubscribeIfNeeded();
+
+    /*
+     * Checks if we should re-subscribe based on the specified re-subscription policy. If we should, re-subscription is scheduled
+     * aNextResubscribeIntervalMsec is updated accordingly, and true is returned.
+     *
+     * If we should not resubscribe, false is returned.
+     *
+     *  @param[out]    aNextResubscribeIntervalMsec    How long we will wait before trying to auto-resubscribe.
+     */
+    bool ResubscribeIfNeeded(uint32_t & aNextResubscribeIntervalMsec);
+
     // Specialized request-sending functions.
     CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
-    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
+    // SendSubscribeRequest performs som validation on aSubscribePrepareParams
+    // and then calls SendSubscribeRequestImpl.
+    CHIP_ERROR SendSubscribeRequest(const ReadPrepareParams & aSubscribePrepareParams);
+    CHIP_ERROR SendSubscribeRequestImpl(const ReadPrepareParams & aSubscribePrepareParams);
     void UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath);
     static void OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 

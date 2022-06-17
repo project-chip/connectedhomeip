@@ -430,6 +430,7 @@ DS
 duplicative
 DUT
 DV
+DVK
 dynload
 eabi
 EB
@@ -532,6 +533,7 @@ fsync
 ftd
 fullclean
 fuzzer
+FW
 gbl
 gcloud
 GDB
@@ -879,6 +881,7 @@ nongnu
 nordicsemi
 NotAvailable
 notValue
+npm
 nRF
 nrfconnect
 nrfdks
@@ -1103,6 +1106,7 @@ RPi
 RPis
 rsn
 RSSI
+RST
 rsync
 RTL
 rtld
@@ -1308,6 +1312,7 @@ ttyACMx
 ttymxc
 ttyUSB
 TurbidityConcentrationMeasurement
+TvCasting
 TXD
 txt
 uargument

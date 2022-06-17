@@ -30,8 +30,6 @@
 #define BLE_ADVERTISEMENT_START_BUTTON_MASK DK_BTN4_MSK
 
 #define SYSTEM_STATE_LED DK_LED1 // led0 in device tree
-#define LIGHTING_PWM_DEVICE DEVICE_DT_GET(DT_PWMS_CTLR(DT_ALIAS(pwm_led1)))
-#define LIGHTING_PWM_CHANNEL DT_PWMS_CHANNEL(DT_ALIAS(pwm_led1))
 
 // Time it takes in ms for the simulated actuator to move from one state to another.
 #define ACTUATOR_MOVEMENT_PERIOS_MS 2000

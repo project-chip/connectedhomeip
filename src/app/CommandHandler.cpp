@@ -302,7 +302,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         return AddStatus(concretePath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
-    err = aCommandElement.GetData(&commandDataReader);
+    err = aCommandElement.GetFields(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
     {
         ChipLogDetail(DataManagement,
@@ -359,7 +359,7 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     ChipLogDetail(DataManagement, "Received group command for Group=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                   groupId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
 
-    err = aCommandElement.GetData(&commandDataReader);
+    err = aCommandElement.GetFields(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
     {
         ChipLogDetail(DataManagement,
@@ -488,7 +488,7 @@ CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aCommandPa
     ReturnErrorOnFailure(path.Encode(aCommandPath));
     if (aStartDataStruct)
     {
-        ReturnErrorOnFailure(commandData.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)),
+        ReturnErrorOnFailure(commandData.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kFields)),
                                                                      TLV::kTLVType_Structure, mDataElementContainerType));
     }
     MoveToState(State::AddingCommand);

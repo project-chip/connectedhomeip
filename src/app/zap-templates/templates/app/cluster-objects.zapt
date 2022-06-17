@@ -11,7 +11,7 @@
 #include <app/EventLoggingTypes.h>
 #include <app/util/basic-types.h>
 #include <lib/core/ClusterEnums.h>
-#include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
 #include <protocols/interaction_model/Constants.h>
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -33,6 +33,19 @@ namespace Structs {
 {{/zcl_structs}}
 } // namespace Structs
 } // namespace detail
+
+namespace Globals {
+namespace Attributes {
+{{#zcl_attributes_server}}
+{{#unless clusterRef}}
+namespace {{asUpperCamelCase label}} {
+  {{> cluster_objects_attribute_typeinfo ns=""}}
+} // namespace {{asUpperCamelCase label}}
+
+{{/unless}}
+{{/zcl_attributes_server}}
+} // namespace Attributes
+} // namespace Globals
 
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {
@@ -120,30 +133,13 @@ namespace Attributes {
 
 {{#zcl_attributes_server}}
 namespace {{asUpperCamelCase label}} {
-    struct TypeInfo {
-    {{! forceNotOptional=true because the optionality is on the attribute
-        itself, but we want just the type of the attribute. }}
-    {{#if entryType}}
-        using Type = {{zapTypeToEncodableClusterObjectType entryType ns=parent.name forceNotOptional=true}};
-        using DecodableType = {{zapTypeToDecodableClusterObjectType entryType ns=parent.name forceNotOptional=true}};
-        using DecodableArgType = {{zapTypeToDecodableClusterObjectType entryType ns=parent.name forceNotOptional=true isArgument=true}};
+    {{#if clusterRef}}
+      {{> cluster_objects_attribute_typeinfo ns=parent.name}}
     {{else}}
-        using Type = {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}};
-        using DecodableType = {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotOptional=true}};
-        using DecodableArgType = {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotOptional=true isArgument=true}};
+      struct TypeInfo : public Clusters::Globals::Attributes::{{asUpperCamelCase label}}::TypeInfo {
+          static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
+      };
     {{/if}}
-
-        static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
-        static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
-        static constexpr bool MustUseTimedWrite() { return {{mustUseTimedWrite}}; }
-        {{#unless isArray}}
-        {{#if (isString type)}}
-        {{#if maxLength}}
-        static constexpr size_t MaxLength() { return {{maxLength}}; }
-        {{/if}}
-        {{/if}}
-        {{/unless}}
-    };
 } // namespace {{asUpperCamelCase label}}
 {{/zcl_attributes_server}}
 

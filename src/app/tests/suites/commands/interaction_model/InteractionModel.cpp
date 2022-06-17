@@ -125,6 +125,8 @@ void InteractionModel::OnSubscriptionEstablished(SubscriptionId subscriptionId)
     ContinueOnChipMainThread(CHIP_NO_ERROR);
 }
 
+void InteractionModel::OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) {}
+
 /////////// WriteClient Callback Interface /////////
 void InteractionModel::OnResponse(const WriteClient * client, const ConcreteDataAttributePath & path, StatusIB status)
 {
@@ -300,7 +302,16 @@ CHIP_ERROR InteractionModelReports::ReportAttribute(DeviceProxy * device, std::v
 
     auto client = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
                                                mBufferedReadAdapter, interactionType);
-    ReturnErrorOnFailure(client->SendRequest(params));
+    if (interactionType == ReadClient::InteractionType::Read)
+    {
+        ReturnErrorOnFailure(client->SendRequest(params));
+    }
+    else
+    {
+        // We want to allow certain kinds of spec-invalid subscriptions so we
+        // can test how the server reacts to them.
+        ReturnErrorOnFailure(client->SendSubscribeRequestWithoutValidation(params));
+    }
     mReadClients.push_back(std::move(client));
     return CHIP_NO_ERROR;
 }
@@ -309,15 +320,18 @@ CHIP_ERROR InteractionModelReports::ReportEvent(DeviceProxy * device, std::vecto
                                                 std::vector<ClusterId> clusterIds, std::vector<EventId> eventIds,
                                                 ReadClient::InteractionType interactionType, uint16_t minInterval,
                                                 uint16_t maxInterval, const Optional<bool> & fabricFiltered,
-                                                const Optional<EventNumber> & eventNumber, const Optional<bool> & keepSubscriptions)
+                                                const Optional<EventNumber> & eventNumber, const Optional<bool> & keepSubscriptions,
+                                                const Optional<std::vector<bool>> & isUrgents)
 {
     const size_t clusterCount  = clusterIds.size();
     const size_t eventCount    = eventIds.size();
     const size_t endpointCount = endpointIds.size();
+    const size_t isUrgentCount = isUrgents.HasValue() ? isUrgents.Value().size() : 0;
 
     VerifyOrReturnError(clusterCount > 0 && clusterCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(eventCount > 0 && eventCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(endpointCount > 0 && endpointCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(isUrgentCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
 
     const bool hasSameIdsCount   = (clusterCount == eventCount) && (clusterCount == endpointCount);
     const bool multipleClusters  = clusterCount > 1 && eventCount == 1 && endpointCount == 1;
@@ -379,6 +393,11 @@ CHIP_ERROR InteractionModelReports::ReportEvent(DeviceProxy * device, std::vecto
         if (endpointId != kInvalidEndpointId)
         {
             eventPathParams[i].mEndpointId = endpointId;
+        }
+
+        if (isUrgents.HasValue() && isUrgents.Value().size() > i)
+        {
+            eventPathParams[i].mIsUrgentEvent = isUrgents.Value().at(i);
         }
     }
 

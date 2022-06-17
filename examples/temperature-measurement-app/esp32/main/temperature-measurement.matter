@@ -223,6 +223,8 @@ server cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute int64u timeSinceReset = 8;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 server cluster FixedLabel = 64 {
@@ -377,8 +379,83 @@ server cluster GeneralDiagnostics = 51 {
   readonly attribute ENUM8 activeHardwareFaults[] = 5;
   readonly attribute ENUM8 activeRadioFaults[] = 6;
   readonly attribute ENUM8 activeNetworkFaults[] = 7;
+  readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct TestEventTriggerRequest {
+    OCTET_STRING enableKey = 0;
+    INT64U eventTrigger = 1;
+  }
+
+  command TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
+}
+
+server cluster GroupKeyManagement = 63 {
+  enum GroupKeySecurityPolicy : ENUM8 {
+    kTrustFirst = 0;
+    kCacheAndSync = 1;
+  }
+
+  struct GroupKeyMapStruct {
+    group_id groupId = 1;
+    int16u groupKeySetID = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct GroupInfoMapStruct {
+    group_id groupId = 1;
+    endpoint_no endpoints[] = 2;
+    optional char_string<16> groupName = 3;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct GroupKeySetStruct {
+    int16u groupKeySetID = 0;
+    GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
+    nullable octet_string<16> epochKey0 = 2;
+    nullable epoch_us epochStartTime0 = 3;
+    nullable octet_string<16> epochKey1 = 4;
+    nullable epoch_us epochStartTime1 = 5;
+    nullable octet_string<16> epochKey2 = 6;
+    nullable epoch_us epochStartTime2 = 7;
+  }
+
+  attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
+  readonly attribute GroupInfoMapStruct groupTable[] = 1;
+  readonly attribute int16u maxGroupsPerFabric = 2;
+  readonly attribute int16u maxGroupKeysPerFabric = 3;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct KeySetWriteRequest {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct KeySetReadRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetRemoveRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetReadAllIndicesRequest {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  response struct KeySetReadResponse = 2 {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  response struct KeySetReadAllIndicesResponse = 5 {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+  command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
 }
 
 server cluster LocalizationConfiguration = 43 {
@@ -524,6 +601,7 @@ server cluster OperationalCredentials = 62 {
     kInvalidNOC = 3;
     kMissingCsr = 4;
     kTableFull = 5;
+    kInvalidAdminSubject = 6;
     kInsufficientPrivilege = 8;
     kFabricConflict = 9;
     kLabelConflict = 10;
@@ -564,13 +642,14 @@ server cluster OperationalCredentials = 62 {
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
+    optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
     OCTET_STRING NOCValue = 0;
     optional OCTET_STRING ICACValue = 1;
     OCTET_STRING IPKValue = 2;
-    NODE_ID caseAdminNode = 3;
+    Int64u caseAdminSubject = 3;
     VENDOR_ID adminVendorId = 4;
   }
 
@@ -589,10 +668,6 @@ server cluster OperationalCredentials = 62 {
 
   request struct AddTrustedRootCertificateRequest {
     OCTET_STRING rootCertificate = 0;
-  }
-
-  request struct RemoveTrustedRootCertificateRequest {
-    OCTET_STRING trustedRootIdentifier = 0;
   }
 
   response struct AttestationResponse = 1 {
@@ -623,10 +698,13 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  command access(invoke: administer) RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
 }
 
 server cluster SoftwareDiagnostics = 52 {
+  bitmap SoftwareDiagnosticsFeature : BITMAP32 {
+    kWaterMarks = 0x1;
+  }
+
   info event SoftwareFault = 0 {
     SoftwareFaultStruct softwareFault = 0;
   }
@@ -755,8 +833,8 @@ server cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-
 endpoint 0 {
+  device type rootdevice = 22;
 
   server cluster Descriptor {
     callback attribute deviceList;
@@ -861,6 +939,7 @@ endpoint 0 {
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
+    callback attribute testEventTriggersEnabled;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -922,6 +1001,15 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster GroupKeyManagement {
+    callback attribute groupKeyMap;
+    callback attribute groupTable;
+    callback attribute maxGroupsPerFabric;
+    callback attribute maxGroupKeysPerFabric;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster FixedLabel {
     callback attribute labelList;
     ram      attribute featureMap;
@@ -934,8 +1022,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 1 {
+  device type tempsensor = 770;
 
   server cluster Descriptor {
     callback attribute deviceList;

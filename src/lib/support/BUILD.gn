@@ -61,6 +61,7 @@ static_library("support") {
     "Base64.cpp",
     "Base64.h",
     "BitFlags.h",
+    "BitMask.h",
     "BufferReader.cpp",
     "BufferReader.h",
     "BufferWriter.cpp",

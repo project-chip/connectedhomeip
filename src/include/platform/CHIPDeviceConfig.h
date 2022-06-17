@@ -1176,8 +1176,8 @@
  *
  * Specifies the date of the build. Useful for deterministic builds.
  */
-#ifndef CHIP_DEVICE_CONFIG_FIRWMARE_BUILD_DATE
-#define CHIP_DEVICE_CONFIG_FIRWMARE_BUILD_DATE __DATE__
+#ifndef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE
+#define CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE __DATE__
 #endif
 
 /**

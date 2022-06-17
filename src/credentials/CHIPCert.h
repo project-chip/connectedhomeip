@@ -173,18 +173,6 @@ enum class CertDecodeFlags : uint8_t
     kIsTrustAnchor = 0x02,   /**< Indicates that the corresponding certificate is trust anchor. */
 };
 
-/** CHIP Certificate Validate Flags
- *
- * Contains information specifying how a certificate should be validated.
- */
-enum class CertValidateFlags : uint8_t
-{
-    kIgnoreNotBefore = 0x01, /**< Indicate that a Not Before field should be ignored when doing certificate validation. This
-                                flag applies to all certificates in the validation chain. */
-    kIgnoreNotAfter = 0x02,  /**< Indicate that a Not After field should be ignored when doing certificate validation. This
-                                flag applies to all certificates in the validation chain. */
-};
-
 enum
 {
     kNullCertTime = 0
@@ -455,225 +443,6 @@ struct ChipCertificateData
 };
 
 /**
- *  @struct ValidationContext
- *
- *  @brief
- *    Context information used during certification validation.
- */
-struct ValidationContext
-{
-    uint32_t mEffectiveTime;                        /**< Current CHIP Epoch UTC time. */
-    const ChipCertificateData * mTrustAnchor;       /**< Pointer to the Trust Anchor Certificate data structure.
-                                                       This value is set during certificate validation process
-                                                       to indicate to the caller the trust anchor of the
-                                                       validated certificate. */
-    BitFlags<KeyUsageFlags> mRequiredKeyUsages;     /**< Key usage extensions that should be present in the
-                                                       validated certificate. */
-    BitFlags<KeyPurposeFlags> mRequiredKeyPurposes; /**< Extended Key usage extensions that should be present
-                                                       in the validated certificate. */
-    BitFlags<CertValidateFlags> mValidateFlags;     /**< Certificate validation flags, specifying how a certificate
-                                                       should be validated. */
-    uint8_t mRequiredCertType;                      /**< Required certificate type. */
-
-    void Reset();
-};
-
-/**
- *  @class ChipCertificateSet
- *
- *  @brief
- *    Collection of CHIP certificate data providing methods for
- *    certificate validation and signature verification.
- */
-class DLL_EXPORT ChipCertificateSet
-{
-public:
-    ChipCertificateSet();
-    ~ChipCertificateSet();
-
-    ChipCertificateSet & operator=(ChipCertificateSet && aOther)
-    {
-        mCerts               = aOther.mCerts;
-        aOther.mCerts        = nullptr;
-        mCertCount           = aOther.mCertCount;
-        mMaxCerts            = aOther.mMaxCerts;
-        mMemoryAllocInternal = aOther.mMemoryAllocInternal;
-
-        return *this;
-    }
-
-    /**
-     * @brief Initialize ChipCertificateSet.
-     *        This initialization method is used when all memory structures needed for operation are
-     *        allocated internally using chip::Platform::MemoryAlloc() and freed with chip::Platform::MemoryFree().
-     *
-     * @param maxCertsArraySize  Maximum number of CHIP certificates to be loaded to the set.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR Init(uint8_t maxCertsArraySize);
-
-    /**
-     * @brief Initialize ChipCertificateSet.
-     *        This initialization method is used when all memory structures needed for operation are
-     *        allocated externally and methods in this class don't need to deal with memory allocations.
-     *
-     * @param certsArray      A pointer to the array of the ChipCertificateData structures.
-     * @param certsArraySize  Number of ChipCertificateData entries in the array.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR Init(ChipCertificateData * certsArray, uint8_t certsArraySize);
-
-    /**
-     * @brief Release resources allocated by this class.
-     **/
-    void Release();
-
-    /**
-     * @brief Clear certificate data loaded into this set.
-     **/
-    void Clear();
-
-    /**
-     * @brief Load CHIP certificate into set.
-     *        It is required that the CHIP certificate in the chipCert buffer stays valid while
-     *        the certificate data in the set is used.
-     *        In case of an error the certificate set is left in the same state as prior to this call.
-     *
-     * @param chipCert     Buffer containing certificate encoded in CHIP format.
-     * @param decodeFlags  Certificate decoding option flags.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR LoadCert(const ByteSpan chipCert, BitFlags<CertDecodeFlags> decodeFlags);
-
-    /**
-     * @brief Load CHIP certificate into set.
-     *        It is required that the CHIP certificate in the reader's underlying buffer stays valid while
-     *        the certificate data in the set is used.
-     *        In case of an error the certificate set is left in the same state as prior to this call.
-     *
-     * @param reader       A TLVReader positioned at the CHIP certificate TLV structure.
-     * @param decodeFlags  Certificate decoding option flags.
-     * @param chipCert     Buffer containing certificate encoded on CHIP format. It is required that this CHIP certificate
-     *                     in chipCert ByteSpan stays valid while the certificate data in the set is used.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR LoadCert(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags, ByteSpan chipCert = ByteSpan());
-
-    CHIP_ERROR ReleaseLastCert();
-
-    /**
-     * @brief Find certificate in the set.
-     *
-     * @param subjectKeyId  Subject key identifier of the certificate to be found in the set.
-     *
-     * @return A pointer to the certificate data On success. Otherwise, NULL if no certificate found.
-     **/
-    const ChipCertificateData * FindCert(const CertificateKeyId & subjectKeyId) const;
-
-    /**
-     * @return A pointer to the set of certificate data entries.
-     **/
-    const ChipCertificateData * GetCertSet() const { return mCerts; }
-
-    /**
-     * @return A pointer to the last certificate data in the set. Returns NULL if certificate set is empty.
-     **/
-    const ChipCertificateData * GetLastCert() const { return (mCertCount > 0) ? &mCerts[mCertCount - 1] : nullptr; }
-
-    /**
-     * @return Number of certificates loaded into the set.
-     **/
-    uint8_t GetCertCount() const { return mCertCount; }
-
-    /**
-     * @brief Check whether certificate is in the set.
-     *
-     * @param cert  Pointer to the ChipCertificateData structures.
-     *
-     * @return True if certificate is in the set, false otherwise.
-     **/
-    bool IsCertInTheSet(const ChipCertificateData * cert) const;
-
-    /**
-     * @brief Validate CHIP certificate.
-     *
-     * @param cert     Pointer to the CHIP certificate to be validated. The certificate is
-     *                 required to be in this set, otherwise this function returns error.
-     * @param context  Certificate validation context.
-     *
-     * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR ValidateCert(const ChipCertificateData * cert, ValidationContext & context);
-
-    /**
-     * @brief Find and validate CHIP certificate.
-     *
-     * @param[in]  subjectDN     Subject distinguished name to use as certificate search parameter.
-     * @param[in]  subjectKeyId  Subject key identifier to use as certificate search parameter.
-     * @param[in]  context       Certificate validation context.
-     * @param[out] certData      A slot to write a pointer to the CHIP certificate data that matches search criteria.
-     *
-     * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId, ValidationContext & context,
-                             const ChipCertificateData ** certData);
-
-    /**
-     * @brief Verify CHIP certificate signature.
-     *
-     * @param cert    Pointer to the CHIP certificate which signature should be validated.
-     * @param caCert  Pointer to the CA certificate of the verified certificate.
-     *
-     * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
-     **/
-    static CHIP_ERROR VerifySignature(const ChipCertificateData * cert, const ChipCertificateData * caCert);
-
-private:
-    ChipCertificateData * mCerts; /**< Pointer to an array of certificate data. */
-    uint8_t mCertCount;           /**< Number of certificates in mCerts
-                                     array. We maintain the invariant that all
-                                     the slots at indices less than
-                                     mCertCount have been constructed and slots
-                                     at indices >= mCertCount have either never
-                                     had their constructor called, or have had
-                                     their destructor called since then. */
-    uint8_t mMaxCerts;            /**< Length of mCerts array. */
-    bool mMemoryAllocInternal;    /**< Indicates whether temporary memory buffers are allocated internally. */
-
-    /**
-     * @brief Find and validate CHIP certificate.
-     *
-     * @param[in]  subjectDN      Subject distinguished name to use as certificate search parameter.
-     * @param[in]  subjectKeyId   Subject key identifier to use as certificate search parameter.
-     * @param[in]  context        Certificate validation context.
-     * @param[in]  validateFlags  Certificate validation flags.
-     * @param[in]  depth          Depth of the current certificate in the certificate validation chain.
-     * @param[out] certData       A slot to write a pointer to the CHIP certificate data that matches search criteria.
-     *
-     * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId, ValidationContext & context,
-                             BitFlags<CertValidateFlags> validateFlags, uint8_t depth, const ChipCertificateData ** certData);
-
-    /**
-     * @brief Validate CHIP certificate.
-     *
-     * @param cert           Pointer to the CHIP certificate to be validated.
-     * @param context        Certificate validation context.
-     * @param validateFlags  Certificate validation flags.
-     * @param depth          Depth of the current certificate in the certificate validation chain.
-     *
-     * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR ValidateCert(const ChipCertificateData * cert, ValidationContext & context,
-                            BitFlags<CertValidateFlags> validateFlags, uint8_t depth);
-};
-
-/**
  * @brief Decode CHIP certificate.
  *        It is required that the CHIP certificate in the chipCert buffer stays valid while
  *        the certData is used.
@@ -778,14 +547,14 @@ CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParam
 
 /**
  * @brief
- *   Convert a certificate date/time (in the form of an ASN.1 universal time structure) into a CHIP Epoch UTC time.
+ *   Convert a certificate date/time (in the form of an ASN.1 universal time structure) into a CHIP Epoch time.
  *
  * @note
  *   This function makes no attempt to verify the correct range of the input time other than year.
  *   Therefore callers must make sure the supplied values are valid prior to invocation.
  *
  * @param asn1Time   The calendar date/time to be converted.
- * @param epochTime  A reference to an integer that will receive CHIP Epoch UTC time.
+ * @param epochTime  A reference to an integer that will receive CHIP Epoch time.
  *
  * @retval  #CHIP_NO_ERROR                      If the input time was successfully converted.
  * @retval  #ASN1_ERROR_UNSUPPORTED_ENCODING    If the input time contained a year value that could not
@@ -966,6 +735,25 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nod
  * Can return any error that can be returned from parsing the cert.
  */
 CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKeySpan & publicKey);
+
+/**
+ * Extract Not Before Time from a chip certificate in ByteSpan TLV-encoded form.
+ * Output format is seconds referenced from the CHIP epoch.
+ *
+ * Special value 0 corresponds to the X.509/RFC5280 defined special time value
+ * 99991231235959Z meaning 'no well-defined expiration date'.  However, as a
+ * NotBefore time, this does not require special handling when comparing to
+ * a CHIP epoch time source, as 0 (the epoch) is also the earliest representable
+ * uint32 time.
+
+ * This does not perform any sort of validation on the certificate structure
+ * other than parsing it.
+ *
+ * @param chipCert CHIP certificate in TLV-encoded form
+ * @param notBeforeChipEpochTime (out) certificate NotBefore time as seconds from the CHIP epoch
+ * @return CHIP_NO_ERROR if certificate parsing was successful, else an appropriate CHIP_ERROR
+ */
+CHIP_ERROR ExtractNotBeforeFromChipCert(const ByteSpan & chipCert, chip::System::Clock::Seconds32 & notBeforeChipEpochTime);
 
 /**
  * Extract Subject Key Identifier from a chip certificate in ByteSpan TLV-encoded form.

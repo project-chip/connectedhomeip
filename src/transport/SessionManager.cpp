@@ -95,8 +95,6 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
 
     ReturnErrorOnFailure(mGroupClientCounter.Init(storageDelegate));
 
-    ScheduleExpiryTimer();
-
     mTransportMgr->SetSessionManager(this);
 
     return CHIP_NO_ERROR;
@@ -104,10 +102,6 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
 
 void SessionManager::Shutdown()
 {
-    CancelExpiryTimer();
-
-    mSessionRecoveryDelegates.ReleaseAll();
-
     mMessageCounterManager = nullptr;
 
     mState        = State::kNotReady;
@@ -193,7 +187,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         }
 
         MessageCounter & counter = session->GetSessionMessageCounter().GetLocalMessageCounter();
-        uint32_t messageCounter  = counter.Value();
+        uint32_t messageCounter;
+        ReturnErrorOnFailure(counter.AdvanceAndConsume(messageCounter));
         packetHeader
             .SetMessageCounter(messageCounter)         //
             .SetSessionId(session->GetPeerSessionId()) //
@@ -207,7 +202,6 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), messageCounter, sourceNodeId);
 
         ReturnErrorOnFailure(SecureMessageCodec::Encrypt(session->GetCryptoContext(), nonce, payloadHeader, packetHeader, message));
-        ReturnErrorOnFailure(counter.Advance());
 
 #if CHIP_PROGRESS_LOGGING
         destination = session->GetPeerNodeId();
@@ -217,8 +211,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     break;
     case Transport::Session::SessionType::kUnauthenticated: {
         MessageCounter & counter = mGlobalUnencryptedMessageCounter;
-        uint32_t messageCounter  = counter.Value();
-        ReturnErrorOnFailure(counter.Advance());
+        uint32_t messageCounter;
+        ReturnErrorOnFailure(counter.AdvanceAndConsume(messageCounter));
         packetHeader.SetMessageCounter(messageCounter);
         Transport::UnauthenticatedSession * session = sessionHandle->AsUnauthenticatedSession();
         switch (session->GetSessionRole())
@@ -273,15 +267,19 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     {
     case Transport::Session::SessionType::kGroupOutgoing: {
         auto groupSession = sessionHandle->AsOutgoingGroupSession();
-        multicastAddress  = Transport::PeerAddress::Multicast(groupSession->GetFabricIndex(), groupSession->GetGroupId());
-        destination       = &multicastAddress;
+
+        FabricInfo * fabric = mFabricTable->FindFabricWithIndex(groupSession->GetFabricIndex());
+        VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+        multicastAddress = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
+        destination      = &multicastAddress;
         char addressStr[Transport::PeerAddress::kMaxToStringSize];
         multicastAddress.ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
 
         ChipLogProgress(Inet,
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to %d"
                         " at monotonic time: " ChipLogFormatX64
-                        " msec to Multicast IPV6 address : %s with GroupID of %d and fabric Id of %d",
+                        " msec to Multicast IPV6 address : %s with GroupID of %d and fabric index of %x",
                         "encrypted group", &preparedMessage, preparedMessage.GetMessageCounter(), groupSession->GetGroupId(),
                         ChipLogValueX64(System::SystemClock().GetMonotonicMilliseconds64().count()), addressStr,
                         groupSession->GetGroupId(), groupSession->GetFabricIndex());
@@ -389,8 +387,14 @@ void SessionManager::ExpireAllPASEPairings()
     });
 }
 
-Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType)
+Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,
+                                                        const ScopedNodeId & sessionEvictionHint)
 {
+    //
+    // This is currently not being utilized yet but will be once session eviction logic is added.
+    //
+    (void) sessionEvictionHint;
+
     return mSecureSessions.CreateNewSecureSession(secureSessionType);
 }
 
@@ -410,25 +414,9 @@ CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionH
     ByteSpan secret(reinterpret_cast<const uint8_t *>(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE), secretLen);
     ReturnErrorOnFailure(secureSession->GetCryptoContext().InitFromSecret(
         secret, ByteSpan(nullptr, 0), CryptoContext::SessionInfoType::kSessionEstablishment, role));
-    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
+    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(Transport::PeerMessageCounter::kInitialSyncValue);
     sessionHolder.Grab(session.Value());
     return CHIP_NO_ERROR;
-}
-
-void SessionManager::ScheduleExpiryTimer()
-{
-    CHIP_ERROR err = mSystemLayer->StartTimer(System::Clock::Milliseconds32(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS),
-                                              SessionManager::ExpiryTimerCallback, this);
-
-    VerifyOrDie(err == CHIP_NO_ERROR);
-}
-
-void SessionManager::CancelExpiryTimer()
-{
-    if (mSystemLayer != nullptr)
-    {
-        mSystemLayer->CancelTimer(SessionManager::ExpiryTimerCallback, this);
-    }
 }
 
 void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg)
@@ -453,38 +441,6 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
     {
         UnauthenticatedMessageDispatch(packetHeader, peerAddress, std::move(msg));
     }
-}
-
-void SessionManager::RegisterRecoveryDelegate(SessionRecoveryDelegate & cb)
-{
-#ifndef NDEBUG
-    mSessionRecoveryDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionRecoveryDelegate> * i) {
-        VerifyOrDie(std::addressof(cb) != std::addressof(i->get()));
-        return Loop::Continue;
-    });
-#endif
-    std::reference_wrapper<SessionRecoveryDelegate> * slot = mSessionRecoveryDelegates.CreateObject(cb);
-    VerifyOrDie(slot != nullptr);
-}
-
-void SessionManager::UnregisterRecoveryDelegate(SessionRecoveryDelegate & cb)
-{
-    mSessionRecoveryDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionRecoveryDelegate> * i) {
-        if (std::addressof(cb) == std::addressof(i->get()))
-        {
-            mSessionRecoveryDelegates.ReleaseObject(i);
-            return Loop::Break;
-        }
-        return Loop::Continue;
-    });
-}
-
-void SessionManager::RefreshSessionOperationalData(const SessionHandle & sessionHandle)
-{
-    mSessionRecoveryDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionRecoveryDelegate> * cb) {
-        cb->get().OnFirstMessageDeliveryFailed(sessionHandle);
-        return Loop::Continue;
-    });
 }
 
 void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
@@ -725,7 +681,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 
     // Handle Group message counter here spec 4.7.3
     // spec 4.5.1.2 for msg counter
-    chip::Transport::PeerMessageCounter * counter = nullptr;
+    Transport::PeerMessageCounter * counter = nullptr;
 
     if (CHIP_NO_ERROR ==
         mGroupPeerMsgCounter.FindOrAddPeer(groupContext.fabric_index, packetHeader.GetSourceNodeId().Value(),
@@ -772,12 +728,6 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(groupSession),
                                SessionMessageDelegate::DuplicateMessage::No, std::move(msg));
     }
-}
-
-void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
-{
-    SessionManager * mgr = reinterpret_cast<SessionManager *>(param);
-    mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }
 
 Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId peerNodeId,

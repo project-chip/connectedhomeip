@@ -245,9 +245,18 @@ CHIP_ERROR AppTask::Init()
                      endpointId);
         maxCredentialsPerUser = 5;
     }
+
+    uint16_t numberOfSupportedUsers = 0;
+    if (!DoorLockServer::Instance().GetNumberOfUserSupported(endpointId, numberOfSupportedUsers))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of supported users when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+                     endpointId);
+        numberOfSupportedUsers = 10;
+    }
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    err = LockMgr().Init(state, maxCredentialsPerUser);
+    err = LockMgr().Init(state, maxCredentialsPerUser, numberOfSupportedUsers);
     if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("LockMgr().Init() failed");
@@ -275,7 +284,7 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
 
 // Print setup info on LCD if available
-#ifdef DISPLAY_ENABLED
+#ifdef QR_CODE_ENABLED
     // Create buffer for QR code that can fit max size and null terminator.
     char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan QRCode(qrCodeBuffer);
@@ -290,7 +299,7 @@ CHIP_ERROR AppTask::Init()
     }
 #else
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-#endif
+#endif // QR_CODE_ENABLED
 
     return err;
 }

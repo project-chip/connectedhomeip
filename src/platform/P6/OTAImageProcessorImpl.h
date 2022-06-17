@@ -19,10 +19,10 @@
 #pragma once
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <fstream>
+#include <lib/core/OTAImageHeader.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
-
-#include <fstream>
 
 #ifdef P6_OTA
 extern "C" {
@@ -66,10 +66,18 @@ private:
      */
     CHIP_ERROR ReleaseBlock();
 
+    /**
+     * Call to skip over any OTAImageHeader bytes in the downloaded image.
+     */
+    CHIP_ERROR ProcessHeader(ByteSpan & block);
+
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
 
     const struct flash_area * mFlashArea;
+
+    // Parser is used to remove the OTAImageHeader from the incoming image.
+    OTAImageHeaderParser mHeaderParser;
 };
 
 } // namespace chip

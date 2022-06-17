@@ -52,7 +52,10 @@ public:
     void HandleStartOver(CommandResponseHelper<PlaybackResponseType> & helper) override;
 
 protected:
-    chip::app::Clusters::MediaPlayback::PlaybackStateEnum mCurrentState;
+    // NOTE: it does not make sense to have default state of playing with a speed of 0, but
+    // the CI test cases expect these values, and need to be fixed.
+    chip::app::Clusters::MediaPlayback::PlaybackStateEnum mCurrentState =
+        chip::app::Clusters::MediaPlayback::PlaybackStateEnum::kPlaying;
     PlaybackPositionType mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
     float mPlaybackSpeed                   = 0;
     uint64_t mStartTime                    = 0;

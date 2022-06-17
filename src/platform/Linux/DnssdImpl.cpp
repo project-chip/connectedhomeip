@@ -328,6 +328,11 @@ CHIP_ERROR MdnsAvahi::Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncRetu
     CHIP_ERROR error = CHIP_NO_ERROR;
     int avahiError   = 0;
 
+    if (Shutdown() != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Shutdown() failed, continue anyway...");
+    }
+
     VerifyOrExit(initCallback != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(errorCallback != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mClient == nullptr && mGroup == nullptr, error = CHIP_ERROR_INCORRECT_STATE);
@@ -649,9 +654,10 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         ChipLogProgress(DeviceLayer, "Avahi browse: remove");
         if (strcmp("local", domain) == 0)
         {
-            std::remove_if(context->mServices.begin(), context->mServices.end(), [name, type](const DnssdService & service) {
-                return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
-            });
+            context->mServices.erase(
+                std::remove_if(context->mServices.begin(), context->mServices.end(), [name, type](const DnssdService & service) {
+                    return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
+                }));
         }
         break;
     case AVAHI_BROWSER_CACHE_EXHAUSTED:

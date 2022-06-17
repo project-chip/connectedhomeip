@@ -281,10 +281,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPSoftwareDiagnosticsClusterThreadMetrics : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull id;
-@property (strong, nonatomic) NSString * _Nonnull name;
-@property (strong, nonatomic) NSNumber * _Nonnull stackFreeCurrent;
-@property (strong, nonatomic) NSNumber * _Nonnull stackFreeMinimum;
-@property (strong, nonatomic) NSNumber * _Nonnull stackSize;
+@property (strong, nonatomic) NSString * _Nullable name;
+@property (strong, nonatomic) NSNumber * _Nullable stackFreeCurrent;
+@property (strong, nonatomic) NSNumber * _Nullable stackFreeMinimum;
+@property (strong, nonatomic) NSNumber * _Nullable stackSize;
 - (instancetype)init;
 @end
 
@@ -755,8 +755,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPTestClusterClusterTestListStructOctet : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
-@property (strong, nonatomic) NSData * _Nonnull operationalCert;
+@property (strong, nonatomic) NSNumber * _Nonnull member1;
+@property (strong, nonatomic) NSData * _Nonnull member2;
 - (instancetype)init;
 @end
 

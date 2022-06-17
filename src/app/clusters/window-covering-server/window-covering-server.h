@@ -99,9 +99,9 @@ bool HasFeaturePaTilt(chip::EndpointId endpoint);
 void TypeSet(chip::EndpointId endpoint, Type type);
 Type TypeGet(chip::EndpointId endpoint);
 
-void ConfigStatusPrint(const chip::BitFlags<ConfigStatus> & configStatus);
-void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitFlags<ConfigStatus> & status);
-chip::BitFlags<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint);
+void ConfigStatusPrint(const chip::BitMask<ConfigStatus> & configStatus);
+void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitMask<ConfigStatus> & status);
+chip::BitMask<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint);
 void ConfigStatusUpdateFeatures(chip::EndpointId endpoint);
 
 void OperationalStatusSet(chip::EndpointId endpoint, const OperationalStatus & status);
@@ -115,9 +115,9 @@ Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths
 void EndProductTypeSet(chip::EndpointId endpoint, EndProductType type);
 EndProductType EndProductTypeGet(chip::EndpointId endpoint);
 
-void ModePrint(const chip::BitFlags<Mode> & mode);
-void ModeSet(chip::EndpointId endpoint, chip::BitFlags<Mode> & mode);
-chip::BitFlags<Mode> ModeGet(chip::EndpointId endpoint);
+void ModePrint(const chip::BitMask<Mode> & mode);
+void ModeSet(chip::EndpointId endpoint, chip::BitMask<Mode> & mode);
+chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint);
 
 void SafetyStatusSet(chip::EndpointId endpoint, SafetyStatus & status);
 const SafetyStatus SafetyStatusGet(chip::EndpointId endpoint);
@@ -140,7 +140,11 @@ void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths position);
 EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint);
 
 /**
- * @brief PostAttributeChange is called when an Attribute is modified
+ * @brief PostAttributeChange is called when an Attribute is modified.
+ *
+ * The method is called by MatterWindowCoveringClusterServerAttributeChangedCallback
+ * to update cluster attributes values. If the application overrides MatterWindowCoveringClusterServerAttributeChangedCallback,
+ * it should call the PostAttributeChange on its own.
  *
  * @param[in] endpoint
  * @param[in] attributeId

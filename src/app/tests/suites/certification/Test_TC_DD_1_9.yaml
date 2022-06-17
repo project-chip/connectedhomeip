@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    7.1.9. [TC-DD-1.9] Manual Pairing Code Payload Verification [DUT -
+    3.1.9. [TC-DD-1.9] Manual Pairing Code Payload Verification [DUT -
     Commissioner]
 
 config:
@@ -23,32 +23,51 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Precondition"
-      cluster: "LogCommands"
-      command: "Log"
-      arguments:
-          values:
-              - name: "message"
-                value:
-                    "Verify that the manual pairing code is printed on the
-                    device or in additional provided materials"
+    - label:
+          "Provide the 11-digit/21-digit Manual Pairing Code from the TH Device
+          in text, speech or any format supported by DUT"
+      verification: |
+          1. Launch all-clusters-app on the raspi , get the Manual Pairing code from the log, Controller should be able to parse the Manual Pairing code
 
-    - label: "Step 1"
-      cluster: "LogCommands"
-      command: "Log"
-      arguments:
-          values:
-              - name: "message"
-                value:
-                    "Provide the 11 digit or 21 digit pairing code from the
-                    Device in text speech or any format supported by DUT"
+          ubuntu@matter-7:~/Apr18_dut/connectedhomeip/examples/all-clusters-app/linux/out/all-clusters-app$ sudo ./chip-all-clusters-app --wifi --discriminator 3841
 
-    - label: "Step 1 verification"
-      cluster: "LogCommands"
-      command: "Log"
-      arguments:
-          values:
-              - name: "message"
-                value:
-                    "Verify that the manual pairing code can be provided to DUT
-                    and parsed to onboard the device onto the CHIP network"
+          CHIP:SPT: PASE PBKDF iterations set to 1000
+          CHIP:SPT: LinuxCommissionableDataProvider didn't get a PASE salt, generating one.
+          CHIP:DL: Device Configuration:
+          CHIP:DL:   Serial Number: TEST_SN
+          CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          CHIP:DL:   Product Id: 32769 (0x8001)
+          CHIP:DL:   Hardware Version: 0
+          CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3841 (0xF01)
+          CHIP:DL:   Manufacturing Date: (not set)
+          CHIP:DL:   Device Type: 65535 (0xFFFF)
+          CHIP:SVR: SetupQRCode: [MT:-24J0CEK01KA0648G00]
+          CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0CEK01KA0648G00
+          CHIP:SVR: Manual pairing code: [34970112332]
+          CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
+           CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+           CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
+
+
+          ubuntu@matter-7:~/Apr18_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload 34970112332
+          CHIP:SPL: Parsing decimalRepresentation: 34970112332
+          CHIP:SPL: CommissioningFlow: 0
+          CHIP:SPL: VendorID: 0
+          CHIP:SPL: Version: 0
+          CHIP:SPL: ProductID: 0
+          CHIP:SPL: Discriminator: 3840
+          CHIP:SPL: SetUpPINCode: 20202021
+          CHIP:SPL: RendezvousInformation: 0
+
+          ubuntu@matter-7:~/Apr18_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload 749701123365521327694
+          CHIP:SPL: Parsing decimalRepresentation: 749701123365521327694
+          CHIP:SPL: CommissioningFlow: 2
+          CHIP:SPL: VendorID: 65521
+          CHIP:SPL: Version: 0
+          CHIP:SPL: ProductID: 32769
+          CHIP:SPL: Discriminator: 3840
+          CHIP:SPL: SetUpPINCode: 20202021
+          CHIP:SPL: RendezvousInformation: 0
+      disabled: true

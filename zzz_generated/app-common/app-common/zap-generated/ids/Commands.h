@@ -234,6 +234,10 @@ namespace StopWithOnOff {
 static constexpr CommandId Id = 0x00000007;
 } // namespace StopWithOnOff
 
+namespace MoveToClosestFrequency {
+static constexpr CommandId Id = 0x00000008;
+} // namespace MoveToClosestFrequency
+
 } // namespace Commands
 } // namespace LevelControl
 
@@ -607,6 +611,16 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace DiagnosticLogs
 
+namespace GeneralDiagnostics {
+namespace Commands {
+
+namespace TestEventTrigger {
+static constexpr CommandId Id = 0x00000000;
+} // namespace TestEventTrigger
+
+} // namespace Commands
+} // namespace GeneralDiagnostics
+
 namespace SoftwareDiagnostics {
 namespace Commands {
 
@@ -716,10 +730,6 @@ namespace AddTrustedRootCertificate {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace AddTrustedRootCertificate
 
-namespace RemoveTrustedRootCertificate {
-static constexpr CommandId Id = 0x0000000C;
-} // namespace RemoveTrustedRootCertificate
-
 } // namespace Commands
 } // namespace OperationalCredentials
 
@@ -778,46 +788,6 @@ namespace UnlockWithTimeout {
 static constexpr CommandId Id = 0x00000003;
 } // namespace UnlockWithTimeout
 
-namespace GetLogRecord {
-static constexpr CommandId Id = 0x00000004;
-} // namespace GetLogRecord
-
-namespace GetLogRecordResponse {
-static constexpr CommandId Id = 0x00000004;
-} // namespace GetLogRecordResponse
-
-namespace SetPINCode {
-static constexpr CommandId Id = 0x00000005;
-} // namespace SetPINCode
-
-namespace GetPINCode {
-static constexpr CommandId Id = 0x00000006;
-} // namespace GetPINCode
-
-namespace GetPINCodeResponse {
-static constexpr CommandId Id = 0x00000006;
-} // namespace GetPINCodeResponse
-
-namespace ClearPINCode {
-static constexpr CommandId Id = 0x00000007;
-} // namespace ClearPINCode
-
-namespace ClearAllPINCodes {
-static constexpr CommandId Id = 0x00000008;
-} // namespace ClearAllPINCodes
-
-namespace SetUserStatus {
-static constexpr CommandId Id = 0x00000009;
-} // namespace SetUserStatus
-
-namespace GetUserStatus {
-static constexpr CommandId Id = 0x0000000A;
-} // namespace GetUserStatus
-
-namespace GetUserStatusResponse {
-static constexpr CommandId Id = 0x0000000A;
-} // namespace GetUserStatusResponse
-
 namespace SetWeekDaySchedule {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace SetWeekDaySchedule
@@ -866,38 +836,6 @@ namespace ClearHolidaySchedule {
 static constexpr CommandId Id = 0x00000013;
 } // namespace ClearHolidaySchedule
 
-namespace SetUserType {
-static constexpr CommandId Id = 0x00000014;
-} // namespace SetUserType
-
-namespace GetUserType {
-static constexpr CommandId Id = 0x00000015;
-} // namespace GetUserType
-
-namespace GetUserTypeResponse {
-static constexpr CommandId Id = 0x00000015;
-} // namespace GetUserTypeResponse
-
-namespace SetRFIDCode {
-static constexpr CommandId Id = 0x00000016;
-} // namespace SetRFIDCode
-
-namespace GetRFIDCode {
-static constexpr CommandId Id = 0x00000017;
-} // namespace GetRFIDCode
-
-namespace GetRFIDCodeResponse {
-static constexpr CommandId Id = 0x00000017;
-} // namespace GetRFIDCodeResponse
-
-namespace ClearRFIDCode {
-static constexpr CommandId Id = 0x00000018;
-} // namespace ClearRFIDCode
-
-namespace ClearAllRFIDCodes {
-static constexpr CommandId Id = 0x00000019;
-} // namespace ClearAllRFIDCodes
-
 namespace SetUser {
 static constexpr CommandId Id = 0x0000001A;
 } // namespace SetUser
@@ -913,14 +851,6 @@ static constexpr CommandId Id = 0x0000001C;
 namespace ClearUser {
 static constexpr CommandId Id = 0x0000001D;
 } // namespace ClearUser
-
-namespace OperatingEventNotification {
-static constexpr CommandId Id = 0x00000020;
-} // namespace OperatingEventNotification
-
-namespace ProgrammingEventNotification {
-static constexpr CommandId Id = 0x00000021;
-} // namespace ProgrammingEventNotification
 
 namespace SetCredential {
 static constexpr CommandId Id = 0x00000022;
@@ -1008,10 +938,6 @@ namespace SetWeeklySchedule {
 static constexpr CommandId Id = 0x00000001;
 } // namespace SetWeeklySchedule
 
-namespace GetRelayStatusLogResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetRelayStatusLogResponse
-
 namespace GetWeeklySchedule {
 static constexpr CommandId Id = 0x00000002;
 } // namespace GetWeeklySchedule
@@ -1019,10 +945,6 @@ static constexpr CommandId Id = 0x00000002;
 namespace ClearWeeklySchedule {
 static constexpr CommandId Id = 0x00000003;
 } // namespace ClearWeeklySchedule
-
-namespace GetRelayStatusLog {
-static constexpr CommandId Id = 0x00000004;
-} // namespace GetRelayStatusLog
 
 } // namespace Commands
 } // namespace Thermostat
@@ -1451,6 +1373,114 @@ static constexpr CommandId Id = 0x00000003;
 } // namespace Commands
 } // namespace AccountLogin
 
+namespace Messaging {
+namespace Commands {
+
+namespace DisplayMessage {
+static constexpr CommandId Id = 0x00000000;
+} // namespace DisplayMessage
+
+namespace GetLastMessage {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetLastMessage
+
+namespace CancelMessage {
+static constexpr CommandId Id = 0x00000001;
+} // namespace CancelMessage
+
+namespace MessageConfirmation {
+static constexpr CommandId Id = 0x00000001;
+} // namespace MessageConfirmation
+
+namespace DisplayProtectedMessage {
+static constexpr CommandId Id = 0x00000002;
+} // namespace DisplayProtectedMessage
+
+namespace GetMessageCancellation {
+static constexpr CommandId Id = 0x00000002;
+} // namespace GetMessageCancellation
+
+namespace CancelAllMessages {
+static constexpr CommandId Id = 0x00000003;
+} // namespace CancelAllMessages
+
+} // namespace Commands
+} // namespace Messaging
+
+namespace ApplianceEventsAndAlert {
+namespace Commands {
+
+namespace GetAlerts {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetAlerts
+
+namespace GetAlertsResponse {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetAlertsResponse
+
+namespace AlertsNotification {
+static constexpr CommandId Id = 0x00000001;
+} // namespace AlertsNotification
+
+namespace EventsNotification {
+static constexpr CommandId Id = 0x00000002;
+} // namespace EventsNotification
+
+} // namespace Commands
+} // namespace ApplianceEventsAndAlert
+
+namespace ApplianceStatistics {
+namespace Commands {
+
+namespace LogNotification {
+static constexpr CommandId Id = 0x00000000;
+} // namespace LogNotification
+
+namespace LogRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace LogRequest
+
+namespace LogResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace LogResponse
+
+namespace LogQueueRequest {
+static constexpr CommandId Id = 0x00000001;
+} // namespace LogQueueRequest
+
+namespace LogQueueResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace LogQueueResponse
+
+namespace StatisticsAvailable {
+static constexpr CommandId Id = 0x00000003;
+} // namespace StatisticsAvailable
+
+} // namespace Commands
+} // namespace ApplianceStatistics
+
+namespace ElectricalMeasurement {
+namespace Commands {
+
+namespace GetProfileInfoResponseCommand {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetProfileInfoResponseCommand
+
+namespace GetProfileInfoCommand {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetProfileInfoCommand
+
+namespace GetMeasurementProfileResponseCommand {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetMeasurementProfileResponseCommand
+
+namespace GetMeasurementProfileCommand {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetMeasurementProfileCommand
+
+} // namespace Commands
+} // namespace ElectricalMeasurement
+
 namespace TestCluster {
 namespace Commands {
 
@@ -1592,114 +1622,6 @@ static constexpr CommandId Id = 0x00000015;
 
 } // namespace Commands
 } // namespace TestCluster
-
-namespace Messaging {
-namespace Commands {
-
-namespace DisplayMessage {
-static constexpr CommandId Id = 0x00000000;
-} // namespace DisplayMessage
-
-namespace GetLastMessage {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetLastMessage
-
-namespace CancelMessage {
-static constexpr CommandId Id = 0x00000001;
-} // namespace CancelMessage
-
-namespace MessageConfirmation {
-static constexpr CommandId Id = 0x00000001;
-} // namespace MessageConfirmation
-
-namespace DisplayProtectedMessage {
-static constexpr CommandId Id = 0x00000002;
-} // namespace DisplayProtectedMessage
-
-namespace GetMessageCancellation {
-static constexpr CommandId Id = 0x00000002;
-} // namespace GetMessageCancellation
-
-namespace CancelAllMessages {
-static constexpr CommandId Id = 0x00000003;
-} // namespace CancelAllMessages
-
-} // namespace Commands
-} // namespace Messaging
-
-namespace ApplianceEventsAndAlert {
-namespace Commands {
-
-namespace GetAlerts {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetAlerts
-
-namespace GetAlertsResponse {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetAlertsResponse
-
-namespace AlertsNotification {
-static constexpr CommandId Id = 0x00000001;
-} // namespace AlertsNotification
-
-namespace EventsNotification {
-static constexpr CommandId Id = 0x00000002;
-} // namespace EventsNotification
-
-} // namespace Commands
-} // namespace ApplianceEventsAndAlert
-
-namespace ApplianceStatistics {
-namespace Commands {
-
-namespace LogNotification {
-static constexpr CommandId Id = 0x00000000;
-} // namespace LogNotification
-
-namespace LogRequest {
-static constexpr CommandId Id = 0x00000000;
-} // namespace LogRequest
-
-namespace LogResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace LogResponse
-
-namespace LogQueueRequest {
-static constexpr CommandId Id = 0x00000001;
-} // namespace LogQueueRequest
-
-namespace LogQueueResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace LogQueueResponse
-
-namespace StatisticsAvailable {
-static constexpr CommandId Id = 0x00000003;
-} // namespace StatisticsAvailable
-
-} // namespace Commands
-} // namespace ApplianceStatistics
-
-namespace ElectricalMeasurement {
-namespace Commands {
-
-namespace GetProfileInfoResponseCommand {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetProfileInfoResponseCommand
-
-namespace GetProfileInfoCommand {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetProfileInfoCommand
-
-namespace GetMeasurementProfileResponseCommand {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetMeasurementProfileResponseCommand
-
-namespace GetMeasurementProfileCommand {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetMeasurementProfileCommand
-
-} // namespace Commands
-} // namespace ElectricalMeasurement
 
 } // namespace Clusters
 } // namespace app

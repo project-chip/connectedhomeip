@@ -210,7 +210,7 @@ CHIP_ERROR JniReferences::GetOptionalValue(jobject optionalObj, jobject & option
 
     jmethodID isPresentMethod = env->GetMethodID(optionalCls, "isPresent", "()Z");
     VerifyOrReturnError(isPresentMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
-    jboolean isPresent = env->CallBooleanMethod(optionalObj, isPresentMethod);
+    jboolean isPresent = optionalObj && env->CallBooleanMethod(optionalObj, isPresentMethod);
 
     if (!isPresent)
     {

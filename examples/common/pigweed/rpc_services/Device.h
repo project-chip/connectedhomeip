@@ -21,6 +21,7 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CommissionableDataProvider.h>
 
+#include "app/clusters/ota-requestor/OTARequestorInterface.h"
 #include "app/server/OnboardingCodesUtil.h"
 #include "app/server/Server.h"
 #include "credentials/FabricTable.h"
@@ -28,6 +29,7 @@
 #include "platform/ConfigurationManager.h"
 #include "platform/DiagnosticDataProvider.h"
 #include "platform/PlatformManager.h"
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 namespace chip {
@@ -51,8 +53,20 @@ public:
 
     virtual pw::Status TriggerOta(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
-        // TODO: auto err = DeviceLayer::SoftwareUpdateMgr().CheckNow();
-        return pw::Status::Unimplemented();
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) {
+                chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
+                if (requestor == nullptr)
+                {
+                    ChipLogError(SoftwareUpdate, "Can't get the CASESessionManager");
+                }
+                else
+                {
+                    requestor->TriggerImmediateQuery();
+                }
+            },
+            reinterpret_cast<intptr_t>(nullptr));
+        return pw::OkStatus();
     }
 
     virtual pw::Status SetPairingState(const chip_rpc_PairingState & request, pw_protobuf_Empty & response)
@@ -141,7 +155,7 @@ public:
             response.has_pairing_info           = true;
         }
 
-        if (DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number)) ==
+        if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetSerialNumber(response.serial_number, sizeof(response.serial_number)) ==
             CHIP_NO_ERROR)
         {
             snprintf(response.serial_number, sizeof(response.serial_number), CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);

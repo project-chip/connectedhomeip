@@ -1,0 +1,99 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 55.1.1. [TC-DLOG-1.1] Global Attributes [DUT-Server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads the ClusterRevision from DUT"
+      verification: |
+          sudo ./chip-tool diagnosticlogs read cluster-revision 1 0
+
+
+          [1649670811.424717][3655:3660] CHIP:DMG:
+          [1649670811.424750][3655:3660] CHIP:DMG:        SuppressResponse = true,
+          [1649670811.424783][3655:3660] CHIP:DMG:        InteractionModelRevision = 1
+          [1649670811.424814][3655:3660] CHIP:DMG: }
+          [1649670811.424949][3655:3660] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      disabled: true
+
+    - label: "TH reads the FeatureMap from DUT"
+      verification: |
+          sudo ./chip-tool diagnosticlogs read feature-map 1 0
+
+
+          [1649670512.997198][3591:3596] CHIP:DMG:
+          [1649670512.997231][3591:3596] CHIP:DMG:        SuppressResponse = true,
+          [1649670512.997265][3591:3596] CHIP:DMG:        InteractionModelRevision = 1
+          [1649670512.997329][3591:3596] CHIP:DMG: }
+          [1649670512.997468][3591:3596] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      disabled: true
+
+    - label: "TH reads AttributeList from DUT"
+      verification: |
+          sudo ./chip-tool diagnosticlogs read attribute-list 1 0
+
+
+          [1649670392.536999][3576:3581] CHIP:DMG:
+          [1649670392.537040][3576:3581] CHIP:DMG:        SuppressResponse = true,
+          [1649670392.537081][3576:3581] CHIP:DMG:        InteractionModelRevision = 1
+          [1649670392.537119][3576:3581] CHIP:DMG: }
+          [1649670392.537695][3576:3581] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0032 Attribute 0x0000_FFFB DataVersion: 1216963889
+          [1649670392.537917][3576:3581] CHIP:TOO:   AttributeList: 3 entries
+          [1649670392.537985][3576:3581] CHIP:TOO:     [1]: 65528
+          [1649670392.538030][3576:3581] CHIP:TOO:     [2]: 65529
+          [1649670392.538071][3576:3581] CHIP:TOO:     [3]: 65531
+      disabled: true
+
+    - label: "TH reads AcceptedCommandList from DUT"
+      verification: |
+          sudo ./chip-tool diagnosticlogs read accepted-command-list 1 0
+
+
+          [1649670700.139000][3624:3629] CHIP:DMG:
+          [1649670700.139033][3624:3629] CHIP:DMG:        SuppressResponse = true,
+          [1649670700.139066][3624:3629] CHIP:DMG:        InteractionModelRevision = 1
+          [1649670700.139097][3624:3629] CHIP:DMG: }
+          [1649670700.139387][3624:3629] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0032 Attribute 0x0000_FFF9 DataVersion: 1216963889
+          [1649670700.139473][3624:3629] CHIP:TOO:   AcceptedCommandList: 1 entries
+          [1649670700.139528][3624:3629] CHIP:TOO:     [1]: 0
+      disabled: true
+
+    - label: "TH reads GeneratedCommandList from DUT"
+      verification: |
+          sudo ./chip-tool diagnosticlogs read generated-command-list 1 0
+
+
+          [1649670576.965898][3602:3607] CHIP:DMG:
+          [1649670576.965927][3602:3607] CHIP:DMG:        SuppressResponse = true,
+          [1649670576.965955][3602:3607] CHIP:DMG:        InteractionModelRevision = 1
+          [1649670576.965987][3602:3607] CHIP:DMG: }
+          [1649670576.966225][3602:3607] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0032 Attribute 0x0000_FFF8 DataVersion: 1216963889
+          [1649670576.966330][3602:3607] CHIP:TOO:   GeneratedCommandList: 0 entries
+      disabled: true
+
+    - label: "TH reads EventList from DUT"
+      verification: |
+          Event-list is not implemented
+      disabled: true

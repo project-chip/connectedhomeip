@@ -3719,7 +3719,7 @@ void CHIPDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPDoorLockCredentialRulesSupportAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -3743,7 +3743,7 @@ void CHIPDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge::OnSu
 }
 
 void CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -3767,7 +3767,7 @@ void CHIPDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -3791,7 +3791,7 @@ void CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge
 }
 
 void CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value)
+    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -3801,198 +3801,6 @@ void CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackBridge::OnSuccessFn(
 void CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPDoorLockAlarmMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPDoorLockAlarmMaskAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPDoorLockAlarmMaskAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPDoorLockKeypadOperationEventMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPDoorLockKeypadOperationEventMaskAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPDoorLockKeypadOperationEventMaskAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPDoorLockRemoteOperationEventMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPDoorLockRemoteOperationEventMaskAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPDoorLockRemoteOperationEventMaskAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPDoorLockManualOperationEventMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPDoorLockManualOperationEventMaskAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPDoorLockManualOperationEventMaskAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPDoorLockRFIDOperationEventMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPDoorLockRFIDOperationEventMaskAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPDoorLockRFIDOperationEventMaskAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPDoorLockKeypadProgrammingEventMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPDoorLockKeypadProgrammingEventMaskAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPDoorLockKeypadProgrammingEventMaskAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPDoorLockRemoteProgrammingEventMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPDoorLockRemoteProgrammingEventMaskAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPDoorLockRemoteProgrammingEventMaskAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPDoorLockRFIDProgrammingEventMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPDoorLockRFIDProgrammingEventMaskAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPDoorLockRFIDProgrammingEventMaskAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -8359,7 +8167,7 @@ void CHIPPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge
 }
 
 void CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value)
+    void * context, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -8752,12 +8560,28 @@ void CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessF
             CHIPSoftwareDiagnosticsClusterThreadMetrics * newElement_0;
             newElement_0 = [CHIPSoftwareDiagnosticsClusterThreadMetrics new];
             newElement_0.id = [NSNumber numberWithUnsignedLongLong:entry_0.id];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
-            newElement_0.stackFreeCurrent = [NSNumber numberWithUnsignedInt:entry_0.stackFreeCurrent];
-            newElement_0.stackFreeMinimum = [NSNumber numberWithUnsignedInt:entry_0.stackFreeMinimum];
-            newElement_0.stackSize = [NSNumber numberWithUnsignedInt:entry_0.stackSize];
+            if (entry_0.name.HasValue()) {
+                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
+                                                             length:entry_0.name.Value().size()
+                                                           encoding:NSUTF8StringEncoding];
+            } else {
+                newElement_0.name = nil;
+            }
+            if (entry_0.stackFreeCurrent.HasValue()) {
+                newElement_0.stackFreeCurrent = [NSNumber numberWithUnsignedInt:entry_0.stackFreeCurrent.Value()];
+            } else {
+                newElement_0.stackFreeCurrent = nil;
+            }
+            if (entry_0.stackFreeMinimum.HasValue()) {
+                newElement_0.stackFreeMinimum = [NSNumber numberWithUnsignedInt:entry_0.stackFreeMinimum.Value()];
+            } else {
+                newElement_0.stackFreeMinimum = nil;
+            }
+            if (entry_0.stackSize.HasValue()) {
+                newElement_0.stackSize = [NSNumber numberWithUnsignedInt:entry_0.stackSize.Value()];
+            } else {
+                newElement_0.stackSize = nil;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -9299,7 +9123,7 @@ void CHIPTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBri
 }
 
 void CHIPTestClusterBitmap8AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value)
+    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -9323,7 +9147,7 @@ void CHIPTestClusterBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEs
 }
 
 void CHIPTestClusterBitmap16AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value)
+    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -9347,7 +9171,7 @@ void CHIPTestClusterBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionE
 }
 
 void CHIPTestClusterBitmap32AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value)
+    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -9371,7 +9195,7 @@ void CHIPTestClusterBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionE
 }
 
 void CHIPTestClusterBitmap64AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value)
+    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedLongLong:value.Raw()];
@@ -9484,9 +9308,8 @@ void CHIPTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessF
             auto & entry_0 = iter_0.GetValue();
             CHIPTestClusterClusterTestListStructOctet * newElement_0;
             newElement_0 = [CHIPTestClusterClusterTestListStructOctet new];
-            newElement_0.fabricIndex = [NSNumber numberWithUnsignedLongLong:entry_0.fabricIndex];
-            newElement_0.operationalCert = [NSData dataWithBytes:entry_0.operationalCert.data()
-                                                          length:entry_0.operationalCert.size()];
+            newElement_0.member1 = [NSNumber numberWithUnsignedLongLong:entry_0.member1];
+            newElement_0.member2 = [NSData dataWithBytes:entry_0.member2.data() length:entry_0.member2.size()];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -9895,7 +9718,7 @@ void CHIPTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPTestClusterNullableBitmap8AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -9923,7 +9746,7 @@ void CHIPTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void CHIPTestClusterNullableBitmap16AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -9951,7 +9774,7 @@ void CHIPTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge::OnSubsc
 }
 
 void CHIPTestClusterNullableBitmap32AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -9979,7 +9802,7 @@ void CHIPTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge::OnSubsc
 }
 
 void CHIPTestClusterNullableBitmap64AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -10514,35 +10337,24 @@ void CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscription
     }
 }
 
-void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value)
+void CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> &
+        value)
 {
-    NSArray * _Nonnull objCValue;
-    { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = value.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * newElement_0;
-            newElement_0 = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
-            newElement_0.rotationTime = [NSNumber numberWithUnsignedShort:entry_0.rotationTime];
-            newElement_0.flags = [NSNumber numberWithUnsignedShort:entry_0.flags];
-            [array_0 addObject:newElement_0];
-        }
-        CHIP_ERROR err = iter_0.GetStatus();
-        if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, err);
-            return;
-        }
-        objCValue = array_0;
+    CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
+        objCValue.rotationTime = [NSNumber numberWithUnsignedShort:value.Value().rotationTime];
+        objCValue.flags = [NSNumber numberWithUnsignedShort:value.Value().flags];
     }
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10556,47 +10368,36 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackSubscription
     }
 }
 
-void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
+void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value)
 {
-    NSArray * _Nonnull objCValue;
-    { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = value.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * newElement_0;
-            newElement_0 = [CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents new];
-            newElement_0.activeTimestampPresent = [NSNumber numberWithBool:entry_0.activeTimestampPresent];
-            newElement_0.pendingTimestampPresent = [NSNumber numberWithBool:entry_0.pendingTimestampPresent];
-            newElement_0.masterKeyPresent = [NSNumber numberWithBool:entry_0.masterKeyPresent];
-            newElement_0.networkNamePresent = [NSNumber numberWithBool:entry_0.networkNamePresent];
-            newElement_0.extendedPanIdPresent = [NSNumber numberWithBool:entry_0.extendedPanIdPresent];
-            newElement_0.meshLocalPrefixPresent = [NSNumber numberWithBool:entry_0.meshLocalPrefixPresent];
-            newElement_0.delayPresent = [NSNumber numberWithBool:entry_0.delayPresent];
-            newElement_0.panIdPresent = [NSNumber numberWithBool:entry_0.panIdPresent];
-            newElement_0.channelPresent = [NSNumber numberWithBool:entry_0.channelPresent];
-            newElement_0.pskcPresent = [NSNumber numberWithBool:entry_0.pskcPresent];
-            newElement_0.securityPolicyPresent = [NSNumber numberWithBool:entry_0.securityPolicyPresent];
-            newElement_0.channelMaskPresent = [NSNumber numberWithBool:entry_0.channelMaskPresent];
-            [array_0 addObject:newElement_0];
-        }
-        CHIP_ERROR err = iter_0.GetStatus();
-        if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, err);
-            return;
-        }
-        objCValue = array_0;
+    CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents new];
+        objCValue.activeTimestampPresent = [NSNumber numberWithBool:value.Value().activeTimestampPresent];
+        objCValue.pendingTimestampPresent = [NSNumber numberWithBool:value.Value().pendingTimestampPresent];
+        objCValue.masterKeyPresent = [NSNumber numberWithBool:value.Value().masterKeyPresent];
+        objCValue.networkNamePresent = [NSNumber numberWithBool:value.Value().networkNamePresent];
+        objCValue.extendedPanIdPresent = [NSNumber numberWithBool:value.Value().extendedPanIdPresent];
+        objCValue.meshLocalPrefixPresent = [NSNumber numberWithBool:value.Value().meshLocalPrefixPresent];
+        objCValue.delayPresent = [NSNumber numberWithBool:value.Value().delayPresent];
+        objCValue.panIdPresent = [NSNumber numberWithBool:value.Value().panIdPresent];
+        objCValue.channelPresent = [NSNumber numberWithBool:value.Value().channelPresent];
+        objCValue.pskcPresent = [NSNumber numberWithBool:value.Value().pskcPresent];
+        objCValue.securityPolicyPresent = [NSNumber numberWithBool:value.Value().securityPolicyPresent];
+        objCValue.channelMaskPresent = [NSNumber numberWithBool:value.Value().channelMaskPresent];
     }
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
-        = static_cast<CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackSubscriptionBridge *>(context);
+        = static_cast<CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11443,7 +11244,7 @@ void CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBri
 }
 
 void CHIPWindowCoveringConfigStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value)
+    void * context, chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -11467,7 +11268,7 @@ void CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void CHIPWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value)
+    void * context, chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -11689,78 +11490,6 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPDoorLockClusterGetLogRecordResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterGetLogRecordResponseParams new];
-    {
-        response.logEntryId = [NSNumber numberWithUnsignedShort:data.logEntryId];
-    }
-    {
-        response.timestamp = [NSNumber numberWithUnsignedInt:data.timestamp];
-    }
-    {
-        response.eventType = [NSNumber numberWithUnsignedChar:data.eventType];
-    }
-    {
-        response.source = [NSNumber numberWithUnsignedChar:data.source];
-    }
-    {
-        response.eventIdOrAlarmCode = [NSNumber numberWithUnsignedChar:data.eventIdOrAlarmCode];
-    }
-    {
-        response.userId = [NSNumber numberWithUnsignedShort:data.userId];
-    }
-    {
-        response.pin = [NSData dataWithBytes:data.pin.data() length:data.pin.size()];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterGetPINCodeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterGetPINCodeResponseParams new];
-    {
-        response.userId = [NSNumber numberWithUnsignedShort:data.userId];
-    }
-    {
-        if (data.userStatus.IsNull()) {
-            response.userStatus = nil;
-        } else {
-            response.userStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus.Value())];
-        }
-    }
-    {
-        if (data.userType.IsNull()) {
-            response.userType = nil;
-        } else {
-            response.userType = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType.Value())];
-        }
-    }
-    {
-        if (data.pin.IsNull()) {
-            response.pin = nil;
-        } else {
-            response.pin = [NSData dataWithBytes:data.pin.Value().data() length:data.pin.Value().size()];
-        }
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterGetUserStatusResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetUserStatusResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterGetUserStatusResponseParams new];
-    {
-        response.userId = [NSNumber numberWithUnsignedShort:data.userId];
-    }
-    {
-        response.userStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
 void CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data)
 {
@@ -11871,50 +11600,6 @@ void CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
             response.operatingMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.operatingMode.Value())];
         } else {
             response.operatingMode = nil;
-        }
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterGetUserTypeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterGetUserTypeResponseParams new];
-    {
-        response.userId = [NSNumber numberWithUnsignedShort:data.userId];
-    }
-    {
-        response.userType = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterGetRFIDCodeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterGetRFIDCodeResponseParams new];
-    {
-        response.userId = [NSNumber numberWithUnsignedShort:data.userId];
-    }
-    {
-        if (data.userStatus.IsNull()) {
-            response.userStatus = nil;
-        } else {
-            response.userStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus.Value())];
-        }
-    }
-    {
-        if (data.userType.IsNull()) {
-            response.userType = nil;
-        } else {
-            response.userType = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType.Value())];
-        }
-    }
-    {
-        if (data.rfidCode.IsNull()) {
-            response.rfidCode = nil;
-        } else {
-            response.rfidCode = [NSData dataWithBytes:data.rfidCode.Value().data() length:data.rfidCode.Value().size()];
         }
     }
     DispatchSuccess(context, response);
@@ -13521,31 +13206,6 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
             }
             response.transitions = array_0;
         }
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data)
-{
-    auto * response = [CHIPThermostatClusterGetRelayStatusLogResponseParams new];
-    {
-        response.timeOfDay = [NSNumber numberWithUnsignedShort:data.timeOfDay];
-    }
-    {
-        response.relayStatus = [NSNumber numberWithUnsignedChar:data.relayStatus];
-    }
-    {
-        response.localTemperature = [NSNumber numberWithShort:data.localTemperature];
-    }
-    {
-        response.humidityInPercentage = [NSNumber numberWithUnsignedChar:data.humidityInPercentage];
-    }
-    {
-        response.setpoint = [NSNumber numberWithShort:data.setpoint];
-    }
-    {
-        response.unreadEntries = [NSNumber numberWithUnsignedShort:data.unreadEntries];
     }
     DispatchSuccess(context, response);
 };
@@ -20010,58 +19670,6 @@ void CHIPNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSu
     }
 }
 
-void CHIPTestClusterClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TestCluster::SimpleEnum value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableTestClusterClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
 void CHIPMessagingClusterEventIdAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Messaging::EventId value)
 {
     NSNumber * _Nonnull objCValue;
@@ -20373,6 +19981,58 @@ void CHIPNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallb
 {
     auto * self
         = static_cast<CHIPNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPTestClusterClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TestCluster::SimpleEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableTestClusterClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

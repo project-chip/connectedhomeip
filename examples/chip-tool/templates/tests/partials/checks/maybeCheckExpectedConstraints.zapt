@@ -28,6 +28,18 @@
 
     {{~#if (hasProperty expectedConstraints "maxValue")}}VerifyOrReturn(CheckConstraintMaxValue("{{asPropertyValue}}", {{asPropertyValue}}, {{asTypedLiteral expectedConstraints.maxValue type}}));{{/if}}
 
+    {{~#if (hasProperty expectedConstraints "contains")}}
+        {{#chip_tests_iterate_expected_list expectedConstraints.contains}}
+    VerifyOrReturn(CheckConstraintContains("{{asPropertyValue}}", {{asPropertyValue}}, {{asTypedLiteral value type}}));
+        {{/chip_tests_iterate_expected_list}}
+    {{/if}}
+
+    {{~#if (hasProperty expectedConstraints "excludes")}}
+        {{#chip_tests_iterate_expected_list expectedConstraints.excludes}}
+    VerifyOrReturn(CheckConstraintExcludes("{{asPropertyValue}}", {{asPropertyValue}}, {{asTypedLiteral value type}}));
+        {{/chip_tests_iterate_expected_list}}
+    {{/if}}
+
     {{~#if (hasProperty expectedConstraints "notValue")}}
         {{#if (isLiteralNull expectedConstraints.notValue)}}
             VerifyOrReturn(CheckValueNonNull("{{asPropertyValue}}", {{asPropertyValue}}));

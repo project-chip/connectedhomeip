@@ -55,8 +55,12 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
     user.userUniqueId   = userInDb.userUniqueId;
     user.userType       = userInDb.userType;
     user.credentialRule = userInDb.credentialRule;
-    user.createdBy      = userInDb.createdBy;
-    user.lastModifiedBy = userInDb.lastModifiedBy;
+    // So far there's no way to actually create the credential outside the matter, so here we always set the creation/modification
+    // source to Matter
+    user.creationSource     = DlAssetSource::kMatterIM;
+    user.createdBy          = userInDb.createdBy;
+    user.modificationSource = DlAssetSource::kMatterIM;
+    user.lastModifiedBy     = userInDb.lastModifiedBy;
 
     ChipLogDetail(Zcl,
                   "Found occupied user "
@@ -151,8 +155,12 @@ bool LockEndpoint::GetCredential(uint16_t credentialIndex, DlCredentialType cred
     }
     credential.credentialType = credentialInStorage.credentialType;
     credential.credentialData = chip::ByteSpan(credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
-    credential.createdBy      = credentialInStorage.createdBy;
-    credential.lastModifiedBy = credentialInStorage.modifiedBy;
+    // So far there's no way to actually create the credential outside the matter, so here we always set the creation/modification
+    // source to Matter
+    credential.creationSource     = DlAssetSource::kMatterIM;
+    credential.createdBy          = credentialInStorage.createdBy;
+    credential.modificationSource = DlAssetSource::kMatterIM;
+    credential.lastModifiedBy     = credentialInStorage.modifiedBy;
 
     ChipLogDetail(Zcl, "Found occupied credential [endpoint=%d,index=%u,type=%u,dataSize=%u,createdBy=%u,modifiedBy=%u]",
                   mEndpointId, credentialIndex, to_underlying(credential.credentialType),
@@ -289,6 +297,40 @@ DlStatus LockEndpoint::SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlS
     auto & scheduleInStorage                  = mYearDaySchedules.at(userIndex - 1).at(yearDayIndex - 1);
     scheduleInStorage.schedule.localStartTime = localStartTime;
     scheduleInStorage.schedule.localEndTime   = localEndTime;
+    scheduleInStorage.status                  = status;
+
+    return DlStatus::kSuccess;
+}
+
+DlStatus LockEndpoint::GetSchedule(uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule)
+{
+    if (0 == holidayIndex || holidayIndex > mHolidaySchedules.size())
+    {
+        return DlStatus::kFailure;
+    }
+
+    const auto & scheduleInStorage = mHolidaySchedules[holidayIndex - 1];
+    if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
+    {
+        return DlStatus::kNotFound;
+    }
+
+    schedule = scheduleInStorage.schedule;
+    return DlStatus::kSuccess;
+}
+
+DlStatus LockEndpoint::SetSchedule(uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
+                                   DlOperatingMode operatingMode)
+{
+    if (0 == holidayIndex || holidayIndex > mHolidaySchedules.size())
+    {
+        return DlStatus::kFailure;
+    }
+
+    auto & scheduleInStorage                  = mHolidaySchedules[holidayIndex - 1];
+    scheduleInStorage.schedule.localStartTime = localStartTime;
+    scheduleInStorage.schedule.localEndTime   = localEndTime;
+    scheduleInStorage.schedule.operatingMode  = operatingMode;
     scheduleInStorage.status                  = status;
 
     return DlStatus::kSuccess;

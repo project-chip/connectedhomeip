@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.3.4. [TC-DM-3.4] Network Commissioning Attributes [DUT - Commissioner]
+name: 10.3.4. [TC-DM-3.4] UpdateNOC-Error Condition [DUT-Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -21,12 +21,74 @@ config:
     endpoint: 0
 
 tests:
-    - label: "if (PICS_WIFI) DUT reads MaxNetworks attribute on TH"
+    - label:
+          "Modify the contents of NOC_Tests Subject and save the certificate TH1
+          sends UpdateNOC Command with NOC_Test to DUT"
       verification: |
-          ./chip-tool networkcommissioning read max-networks 1 0
+          Not Verifiable
       disabled: true
 
-    - label: "if (PICS_WIFI) DUT reads Networks attribute on TH"
+    - label:
+          "From TH1 Read the NOCs (NOCStruct) list from DUT Extract the NOC from
+          NOCStruct"
       verification: |
-          ./chip-tool networkcommissioning read networks 1 0
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "Modify the public key to a value different from Key 1 in the NOC_Test
+          and save the certificate TH1 sends UpdateNOC Command with NOC_Test to
+          DUT"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "Modify the Node Operational ID in the NOC_Test and save the
+          certificate TH1 sends UpdateNOC Command with NOC_Test to DUT"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "Extract a NOC that is not in the TrustedRootCertificates of DUT and
+          save the certificate as NOC_Test TH1 sends UpdateNOC Command with
+          NOC_Test to DUT"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "Modify the NOC_Test certificate with corrupt CSR value and save the
+          certificate TH1 sends UpdateNOC Command with NOC_Test to DUT"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "Start the Commissioning process of TH on DUT TH1 sends ADDNOC Command
+          with missing CaseAdminNode field to DUT"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "Start the Commissioning process of TH on DUT TH1 sends ADDNOC Command
+          with missing IpkValue field to DUT"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "Start the Commissioning process of TH on DUT TH1 sends ADDNOC Command
+          with valid fields to DUT"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "TH1 sends ADDNOC Command with valid fields same as previous step to
+          DUT"
+      verification: |
+          Not Verifiable
       disabled: true

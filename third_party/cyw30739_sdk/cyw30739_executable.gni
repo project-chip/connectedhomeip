@@ -27,23 +27,29 @@ template("cyw30739_executable") {
   output_base_name = get_path_info(invoker.output_name, "name")
   ldscript_file = "${root_build_dir}/${output_base_name}.ld"
   flashable_target = "${target_name}.flashable"
+  pre_build_target = "${target_name}.pre_build"
+  post_build_target = "${target_name}.post_build"
+  ota_image_target = "${target_name}.ota_image"
 
-  cyw30739_sdk_pre_build("${target_name}.pre_build") {
+  cyw30739_sdk_pre_build(pre_build_target) {
   }
 
-  cyw30739_sdk_post_build("${target_name}.post_build") {
-    executable_target = ":${flashable_target}.executable"
+  cyw30739_sdk_post_build(post_build_target) {
+    executable_target = "${flashable_target}.executable"
   }
 
-  cyw30739_sdk_ota_image("${target_name}.ota_image") {
-    deps = [ ":${invoker.target_name}.post_build" ]
+  cyw30739_sdk_ota_image(ota_image_target) {
+    deps = [ ":${post_build_target}" ]
   }
 
   group(target_name) {
-    deps = [
-      ":${flashable_target}",
-      ":${target_name}.ota_image",
-    ]
+    deps = [ ":${flashable_target}" ]
+
+    if (chip_enable_ota_requestor) {
+      deps += [ ":${ota_image_target}" ]
+    } else {
+      deps += [ ":${post_build_target}" ]
+    }
   }
 
   # Copy flashing dependencies to the output directory so that the output
@@ -76,7 +82,7 @@ template("cyw30739_executable") {
     forward_variables_from(invoker, "*")
     data_deps = [ ":${flashing_runtime_target}" ]
 
-    deps += [ ":${target_name}.pre_build" ]
+    deps += [ ":${pre_build_target}" ]
 
     inputs = [ ldscript_file ]
 

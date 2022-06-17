@@ -22,10 +22,120 @@ config:
 
 tests:
     - label:
+          "TH sends a write request for the DefaultOTAProviders Attribute on the
+          first fabric to the DUT. TH2 is set as the default Provider for the
+          fabric."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]' 0x0000001234567890 0
+
+          status = 0x00 (SUCCESS),
+      disabled: true
+
+    - label:
+          "TH sends a read request to read the DefaultOTAProviders Attribute on
+          the first fabric to the DUT."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890 0
+
+          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
+          [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
+          [1651277342848] [26860:35431852] CHIP: [TOO]       ProviderNodeID: 1
+          [1651277342848] [26860:35431852] CHIP: [TOO]       Endpoint: 0
+          [1651277342848] [26860:35431852] CHIP: [TOO]       FabricIndex: 1
+          [1651277342848] [26860:35431852] CHIP: [TOO]      }
+      disabled: true
+
+    - label:
+          "TH sends a write request for the DefaultOTAProviders Attribute on the
+          second fabric to the DUT. TH3 is set as the default Provider for the
+          fabric."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 2, "providerNodeID": 1, "endpoint": 0}]' 0x858 0 --commissioner-name beta
+      disabled: true
+
+    - label:
+          "TH sends a read request to read the DefaultOTAProviders Attribute on
+          the first and second fabric to the DUT."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890 0
+
+          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
+          [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
+          [1651277342848] [26860:35431852] CHIP: [TOO]       ProviderNodeID: 1
+          [1651277342848] [26860:35431852] CHIP: [TOO]       Endpoint: 0
+          [1651277342848] [26860:35431852] CHIP: [TOO]       FabricIndex: 1
+          [1651277342848] [26860:35431852] CHIP: [TOO]      }
+
+          ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x858 0 --commissioner-name beta
+
+          [1651277543492] [26864:35434761] CHIP: [TOO]   DefaultOtaProviders: 1 entries
+          [1651277543492] [26864:35434761] CHIP: [TOO]     [1]: {
+          [1651277543492] [26864:35434761] CHIP: [TOO]       ProviderNodeID: 5
+          [1651277543492] [26864:35434761] CHIP: [TOO]       Endpoint: 0
+          [1651277543492] [26864:35434761] CHIP: [TOO]       FabricIndex: 2
+          [1651277543492] [26864:35434761] CHIP: [TOO]      }
+      disabled: true
+
+    - label:
+          "TH sends a write request for the DefaultOTAProviders Attribute on the
+          first fabric to the DUT. TH4 is the first Provider location and TH2 is
+          the second Provider location in the same write request on the first
+          fabric. TH sends a read request to read the DefaultOTAProviders
+          Attribute on the first and second fabric to the DUT."
+      verification: |
+          chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 10, "endpoint": 0}, {"fabricIndex": 1, "providerNodeID": 20, "endpoint": 0}]' 0x0000001234567890 0
+
+          [1651278243153] [27005:35448520] CHIP: [TOO] Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+
+          chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890 0
+
+          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
+          [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
+          [1651277342848] [26860:35431852] CHIP: [TOO]       ProviderNodeID: 10
+          [1651277342848] [26860:35431852] CHIP: [TOO]       Endpoint: 0
+          [1651277342848] [26860:35431852] CHIP: [TOO]       FabricIndex: 1
+          [1651277342848] [26860:35431852] CHIP: [TOO]      }
+
+          chip-tool otasoftwareupdaterequestor read default-ota-providers 0x858 0 --commissioner-name beta
+
+          [1651277543492] [26864:35434761] CHIP: [TOO]   DefaultOtaProviders: 1 entries
+          [1651277543492] [26864:35434761] CHIP: [TOO]     [1]: {
+          [1651277543492] [26864:35434761] CHIP: [TOO]       ProviderNodeID: 5
+          [1651277543492] [26864:35434761] CHIP: [TOO]       Endpoint: 0
+          [1651277543492] [26864:35434761] CHIP: [TOO]       FabricIndex: 2
+          [1651277543492] [26864:35434761] CHIP: [TOO]      }
+      disabled: true
+
+    - label:
+          "TH sends a write request for the DefaultOTAProviders Attribute with
+          an empty provider list on the second fabric to the DUT. TH sends a
+          read request to read the DefaultOTAProviders Attribute on the first
+          and second fabric to the DUT."
+      verification: |
+          chip-tool otasoftwareupdaterequestor write default-ota-providers '[]' 0x858 0 --commissioner-name beta
+
+          status = 0x00 (SUCCESS),
+
+
+          chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890 0
+
+          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
+          [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
+          [1651277342848] [26860:35431852] CHIP: [TOO]       ProviderNodeID: 10
+          [1651277342848] [26860:35431852] CHIP: [TOO]       Endpoint: 0
+          [1651277342848] [26860:35431852] CHIP: [TOO]       FabricIndex: 1
+          [1651277342848] [26860:35431852] CHIP: [TOO]      }
+
+          chip-tool otasoftwareupdaterequestor read default-ota-providers 0x858 0 --commissioner-name beta
+
+          [1651280268033] [27804:35481732] CHIP: [TOO]   DefaultOtaProviders: 0 entries
+      disabled: true
+
+    - label:
           "TH sends a read request to read the UpdatePossible attribute from the
           DUT."
       verification: |
-          chip-tool otasoftwareupdaterequestor read update-possible 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor read update-possible 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID
 
@@ -63,7 +173,7 @@ tests:
           "TH sends a read request to read the UpdateState attribute from the
           DUT"
       verification: |
-          chip-tool otasoftwareupdaterequestor read update-state 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor read update-state 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID
 
@@ -102,7 +212,7 @@ tests:
           DUT is downloading the image, TH sends a read request to read the
           UpdateStateProgress attribute from the DUT"
       verification: |
-          chip-tool otasoftwareupdaterequestor read update-state-progress 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor read update-state-progress 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID
 
@@ -110,57 +220,57 @@ tests:
 
           [1645823750592] [22938:21245247] CHIP: [DMG] ReportDataMessage =
           [1645823750592] [22938:21245247] CHIP: [DMG] {
-          [1645823750592] [22938:21245247] CHIP: [DMG] 	AttributeReportIBs =
-          [1645823750592] [22938:21245247] CHIP: [DMG] 	[
-          [1645823750592] [22938:21245247] CHIP: [DMG] 		AttributeReportIB =
-          [1645823750592] [22938:21245247] CHIP: [DMG] 		{
-          [1645823750592] [22938:21245247] CHIP: [DMG] 			AttributeDataIB =
-          [1645823750592] [22938:21245247] CHIP: [DMG] 			{
-          [1645823750592] [22938:21245247] CHIP: [DMG] 				DataVersion = 0x3873a963,
-          [1645823750592] [22938:21245247] CHIP: [DMG] 				AttributePathIB =
-          [1645823750592] [22938:21245247] CHIP: [DMG] 				{
-          [1645823750592] [22938:21245247] CHIP: [DMG] 					Endpoint = 0x0,
-          [1645823750592] [22938:21245247] CHIP: [DMG] 					Cluster = 0x2a,
-          [1645823750592] [22938:21245247] CHIP: [DMG] 					Attribute = 0x0000_0003,
-          [1645823750592] [22938:21245247] CHIP: [DMG] 				}
+          [1645823750592] [22938:21245247] CHIP: [DMG]         AttributeReportIBs =
+          [1645823750592] [22938:21245247] CHIP: [DMG]         [
+          [1645823750592] [22938:21245247] CHIP: [DMG]                 AttributeReportIB =
+          [1645823750592] [22938:21245247] CHIP: [DMG]                 {
+          [1645823750592] [22938:21245247] CHIP: [DMG]                         AttributeDataIB =
+          [1645823750592] [22938:21245247] CHIP: [DMG]                         {
+          [1645823750592] [22938:21245247] CHIP: [DMG]                                 DataVersion = 0x3873a963,
+          [1645823750592] [22938:21245247] CHIP: [DMG]                                 AttributePathIB =
+          [1645823750592] [22938:21245247] CHIP: [DMG]                                 {
+          [1645823750592] [22938:21245247] CHIP: [DMG]                                         Endpoint = 0x0,
+          [1645823750592] [22938:21245247] CHIP: [DMG]                                         Cluster = 0x2a,
+          [1645823750592] [22938:21245247] CHIP: [DMG]                                         Attribute = 0x0000_0003,
+          [1645823750592] [22938:21245247] CHIP: [DMG]                                 }
           [1645823750592] [22938:21245247] CHIP: [DMG]
-          [1645823750592] [22938:21245247] CHIP: [DMG] 					Data = NULL
-          [1645823750592] [22938:21245247] CHIP: [DMG] 			},
+          [1645823750592] [22938:21245247] CHIP: [DMG]                                         Data = NULL
+          [1645823750592] [22938:21245247] CHIP: [DMG]                         },
           [1645823750592] [22938:21245247] CHIP: [DMG]
-          [1645823750592] [22938:21245247] CHIP: [DMG] 		},
+          [1645823750592] [22938:21245247] CHIP: [DMG]                 },
           [1645823750592] [22938:21245247] CHIP: [DMG]
-          [1645823750592] [22938:21245247] CHIP: [DMG] 	],
+          [1645823750592] [22938:21245247] CHIP: [DMG]         ],
           [1645823750592] [22938:21245247] CHIP: [DMG]
-          [1645823750592] [22938:21245247] CHIP: [DMG] 	SuppressResponse = true,
-          [1645823750592] [22938:21245247] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1645823750592] [22938:21245247] CHIP: [DMG]         SuppressResponse = true,
+          [1645823750592] [22938:21245247] CHIP: [DMG]         InteractionModelRevision = 1
           [1645823750592] [22938:21245247] CHIP: [DMG] }
 
           Verify that the field value is anything between 1 to 100 for an ongoing update on the chip-tool logs
 
           [1645823829292] [22944:21246546] CHIP: [DMG] ReportDataMessage =
           [1645823829292] [22944:21246546] CHIP: [DMG] {
-          [1645823829292] [22944:21246546] CHIP: [DMG] 	AttributeReportIBs =
-          [1645823829292] [22944:21246546] CHIP: [DMG] 	[
-          [1645823829292] [22944:21246546] CHIP: [DMG] 		AttributeReportIB =
-          [1645823829292] [22944:21246546] CHIP: [DMG] 		{
-          [1645823829292] [22944:21246546] CHIP: [DMG] 			AttributeDataIB =
-          [1645823829292] [22944:21246546] CHIP: [DMG] 			{
-          [1645823829292] [22944:21246546] CHIP: [DMG] 				DataVersion = 0x3873a966,
-          [1645823829292] [22944:21246546] CHIP: [DMG] 				AttributePathIB =
-          [1645823829292] [22944:21246546] CHIP: [DMG] 				{
-          [1645823829292] [22944:21246546] CHIP: [DMG] 					Endpoint = 0x0,
-          [1645823829292] [22944:21246546] CHIP: [DMG] 					Cluster = 0x2a,
-          [1645823829292] [22944:21246546] CHIP: [DMG] 					Attribute = 0x0000_0003,
-          [1645823829292] [22944:21246546] CHIP: [DMG] 				}
+          [1645823829292] [22944:21246546] CHIP: [DMG]         AttributeReportIBs =
+          [1645823829292] [22944:21246546] CHIP: [DMG]         [
+          [1645823829292] [22944:21246546] CHIP: [DMG]                 AttributeReportIB =
+          [1645823829292] [22944:21246546] CHIP: [DMG]                 {
+          [1645823829292] [22944:21246546] CHIP: [DMG]                         AttributeDataIB =
+          [1645823829292] [22944:21246546] CHIP: [DMG]                         {
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                 DataVersion = 0x3873a966,
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                 AttributePathIB =
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                 {
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                         Endpoint = 0x0,
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                         Cluster = 0x2a,
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                         Attribute = 0x0000_0003,
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                 }
           [1645823829292] [22944:21246546] CHIP: [DMG]
-          [1645823829292] [22944:21246546] CHIP: [DMG] 					Data = 20,
-          [1645823829292] [22944:21246546] CHIP: [DMG] 			},
+          [1645823829292] [22944:21246546] CHIP: [DMG]                                         Data = 20,
+          [1645823829292] [22944:21246546] CHIP: [DMG]                         },
           [1645823829292] [22944:21246546] CHIP: [DMG]
-          [1645823829292] [22944:21246546] CHIP: [DMG] 		},
+          [1645823829292] [22944:21246546] CHIP: [DMG]                 },
           [1645823829292] [22944:21246546] CHIP: [DMG]
-          [1645823829292] [22944:21246546] CHIP: [DMG] 	],
+          [1645823829292] [22944:21246546] CHIP: [DMG]         ],
           [1645823829292] [22944:21246546] CHIP: [DMG]
-          [1645823829292] [22944:21246546] CHIP: [DMG] 	SuppressResponse = true,
-          [1645823829292] [22944:21246546] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1645823829292] [22944:21246546] CHIP: [DMG]         SuppressResponse = true,
+          [1645823829292] [22944:21246546] CHIP: [DMG]         InteractionModelRevision = 1
           [1645823829292] [22944:21246546] CHIP: [DMG] }
       disabled: true

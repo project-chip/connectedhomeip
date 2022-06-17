@@ -39,6 +39,7 @@
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ApplicationExchangeDispatch.h>
+#include <messaging/EphemeralExchangeDispatch.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
@@ -77,6 +78,11 @@ bool ExchangeContext::IsResponseExpected() const
 void ExchangeContext::SetResponseExpected(bool inResponseExpected)
 {
     mFlags.Set(Flags::kFlagResponseExpected, inResponseExpected);
+}
+
+void ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
+{
+    SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout));
 }
 
 void ExchangeContext::SetResponseTimeout(Timeout timeout)
@@ -285,8 +291,8 @@ void ExchangeContextDeletor::Release(ExchangeContext * ec)
 }
 
 ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
-                                 ExchangeDelegate * delegate) :
-    mDispatch((delegate != nullptr) ? delegate->GetMessageDispatch() : ApplicationExchangeDispatch::Instance()),
+                                 ExchangeDelegate * delegate, bool isEphemeralExchange) :
+    mDispatch(GetMessageDispatch(isEphemeralExchange, delegate)),
     mSession(*this)
 {
     VerifyOrDie(mExchangeMgr == nullptr);
@@ -295,9 +301,9 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     mExchangeId  = ExchangeId;
     mSession.Grab(session);
     mFlags.Set(Flags::kFlagInitiator, Initiator);
+    mFlags.Set(Flags::kFlagEphemeralExchange, isEphemeralExchange);
     mDelegate = delegate;
 
-    SetDropAckDebug(false);
     SetAckPending(false);
 
     // Do not request Ack for multicast
@@ -365,6 +371,8 @@ void ExchangeContext::OnSessionReleased()
         return;
     }
 
+    // Hold a ref to ourselves so we can make calls into our delegate that might
+    // decrease our refcount without worrying about use-after-free.
     ExchangeHandle ref(*this);
 
     if (IsResponseExpected())
@@ -372,11 +380,25 @@ void ExchangeContext::OnSessionReleased()
         // If we're waiting on a response, we now know it's never going to show up
         // and we should notify our delegate accordingly.
         CancelResponseTimer();
-        SetResponseExpected(false);
-        NotifyResponseTimeout();
+        // We want to Abort, not just Close, so that RMP bits are cleared, so
+        // don't let NotifyResponseTimeout close us.
+        NotifyResponseTimeout(/* aCloseIfNeeded = */ false);
+        Abort();
     }
-
-    DoClose(true /* clearRetransTable */);
+    else
+    {
+        // Either we're expecting a send or we are in our "just allocated, first
+        // send has not happened yet" state.
+        //
+        // Just mark ourselves as closed.  The consumer is responsible for
+        // releasing us.  See documentation for
+        // ExchangeDelegate::OnExchangeClosing.
+        if (IsSendExpected())
+        {
+            mFlags.Clear(Flags::kFlagWillSendMessage);
+        }
+        DoClose(true /* clearRetransTable */);
+    }
 }
 
 CHIP_ERROR ExchangeContext::StartResponseTimer()
@@ -410,10 +432,10 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
     if (ec == nullptr)
         return;
 
-    ec->NotifyResponseTimeout();
+    ec->NotifyResponseTimeout(/* aCloseIfNeeded = */ true);
 }
 
-void ExchangeContext::NotifyResponseTimeout()
+void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
 {
     SetResponseExpected(false);
 
@@ -425,7 +447,10 @@ void ExchangeContext::NotifyResponseTimeout()
         delegate->OnResponseTimeout(this);
     }
 
-    MessageHandled();
+    if (aCloseIfNeeded)
+    {
+        MessageHandled();
+    }
 }
 
 CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader, MessageFlags msgFlags,
@@ -454,7 +479,21 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         MessageHandled();
     });
 
-    ReturnErrorOnFailure(mDispatch.OnMessageReceived(messageCounter, payloadHeader, msgFlags, GetReliableMessageContext()));
+    if (mDispatch.IsReliableTransmissionAllowed() && !IsGroupExchangeContext())
+    {
+        if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() &&
+            payloadHeader.GetAckMessageCounter().HasValue())
+        {
+            HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value());
+        }
+
+        if (payloadHeader.NeedsAck())
+        {
+            // An acknowledgment needs to be sent back to the peer for this message on this exchange,
+
+            HandleNeedsAck(messageCounter, msgFlags);
+        }
+    }
 
     if (IsAckPending() && !mDelegate)
     {
@@ -476,6 +515,12 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         return CHIP_NO_ERROR;
     }
 
+    if (IsEphemeralExchange())
+    {
+        // The EphemeralExchange has done its job, since StandaloneAck is sent in previous FlushAcks() call.
+        return CHIP_NO_ERROR;
+    }
+
     // Since we got the response, cancel the response timer.
     CancelResponseTimer();
 
@@ -483,7 +528,9 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     // is implicitly that response.
     SetResponseExpected(false);
 
-    if (mDelegate != nullptr)
+    // Don't send messages on to our delegate if our dispatch does not allow
+    // those messages.
+    if (mDelegate != nullptr && mDispatch.MessagePermitted(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType()))
     {
         return mDelegate->OnMessageReceived(this, payloadHeader, std::move(msgBuf));
     }
@@ -505,6 +552,17 @@ void ExchangeContext::MessageHandled()
     }
 
     Close();
+}
+
+ExchangeMessageDispatch & ExchangeContext::GetMessageDispatch(bool isEphemeralExchange, ExchangeDelegate * delegate)
+{
+    if (isEphemeralExchange)
+        return EphemeralExchangeDispatch::Instance();
+
+    if (delegate != nullptr)
+        return delegate->GetMessageDispatch();
+
+    return ApplicationExchangeDispatch::Instance();
 }
 
 } // namespace Messaging

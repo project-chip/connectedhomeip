@@ -143,13 +143,13 @@
 | ApplicationLauncher                                                 | 0x050C |
 | ApplicationBasic                                                    | 0x050D |
 | AccountLogin                                                        | 0x050E |
-| TestCluster                                                         | 0x050F |
 | Messaging                                                           | 0x0703 |
 | ApplianceIdentification                                             | 0x0B00 |
 | MeterIdentification                                                 | 0x0B01 |
 | ApplianceEventsAndAlert                                             | 0x0B02 |
 | ApplianceStatistics                                                 | 0x0B03 |
 | ElectricalMeasurement                                               | 0x0B04 |
+| TestCluster                                                         | 0xFFF1FC05|
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -2633,6 +2633,7 @@ private:
 | * MoveWithOnOff                                                     |   0x05 |
 | * StepWithOnOff                                                     |   0x06 |
 | * StopWithOnOff                                                     |   0x07 |
+| * MoveToClosestFrequency                                            |   0x08 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * CurrentLevel                                                      | 0x0000 |
@@ -2911,6 +2912,37 @@ public:
 
 private:
     chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type mRequest;
+};
+
+/*
+ * Command MoveToClosestFrequency
+ */
+class LevelControlMoveToClosestFrequency : public ClusterCommand
+{
+public:
+    LevelControlMoveToClosestFrequency(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("move-to-closest-frequency", credsIssuerConfig)
+    {
+        AddArgument("Frequency", 0, UINT16_MAX, &mRequest.frequency);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000008) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000008, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000008) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000008, 0x00000008, mRequest);
+    }
+
+private:
+    chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::Type mRequest;
 };
 
 class WriteLevelControlOptions : public WriteAttribute
@@ -5991,6 +6023,7 @@ private:
 | Cluster GeneralDiagnostics                                          | 0x0033 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * TestEventTrigger                                                  |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NetworkInterfaces                                                 | 0x0000 |
@@ -6001,6 +6034,7 @@ private:
 | * ActiveHardwareFaults                                              | 0x0005 |
 | * ActiveRadioFaults                                                 | 0x0006 |
 | * ActiveNetworkFaults                                               | 0x0007 |
+| * TestEventTriggersEnabled                                          | 0x0008 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -6013,6 +6047,38 @@ private:
 | * NetworkFaultChange                                                | 0x0002 |
 | * BootReason                                                        | 0x0003 |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command TestEventTrigger
+ */
+class GeneralDiagnosticsTestEventTrigger : public ClusterCommand
+{
+public:
+    GeneralDiagnosticsTestEventTrigger(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-event-trigger", credsIssuerConfig)
+    {
+        AddArgument("EnableKey", &mRequest.enableKey);
+        AddArgument("EventTrigger", 0, UINT64_MAX, &mRequest.eventTrigger);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000033, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000033) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000033, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::GeneralDiagnostics::Commands::TestEventTrigger::Type mRequest;
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster SoftwareDiagnostics                                         | 0x0034 |
@@ -6521,7 +6587,6 @@ private:
 | * UpdateFabricLabel                                                 |   0x09 |
 | * RemoveFabric                                                      |   0x0A |
 | * AddTrustedRootCertificate                                         |   0x0B |
-| * RemoveTrustedRootCertificate                                      |   0x0C |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NOCs                                                              | 0x0000 |
@@ -6610,6 +6675,7 @@ public:
     OperationalCredentialsCSRRequest(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("csrrequest", credsIssuerConfig)
     {
         AddArgument("CSRNonce", &mRequest.CSRNonce);
+        AddArgument("IsForUpdateNOC", 0, 1, &mRequest.isForUpdateNOC);
         ClusterCommand::AddArguments();
     }
 
@@ -6642,7 +6708,7 @@ public:
         AddArgument("NOCValue", &mRequest.NOCValue);
         AddArgument("ICACValue", &mRequest.ICACValue);
         AddArgument("IPKValue", &mRequest.IPKValue);
-        AddArgument("CaseAdminNode", 0, UINT64_MAX, &mRequest.caseAdminNode);
+        AddArgument("CaseAdminSubject", 0, UINT64_MAX, &mRequest.caseAdminSubject);
         AddArgument("AdminVendorId", 0, UINT16_MAX, &mRequest.adminVendorId);
         ClusterCommand::AddArguments();
     }
@@ -6787,37 +6853,6 @@ public:
 
 private:
     chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type mRequest;
-};
-
-/*
- * Command RemoveTrustedRootCertificate
- */
-class OperationalCredentialsRemoveTrustedRootCertificate : public ClusterCommand
-{
-public:
-    OperationalCredentialsRemoveTrustedRootCertificate(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("remove-trusted-root-certificate", credsIssuerConfig)
-    {
-        AddArgument("TrustedRootIdentifier", &mRequest.trustedRootIdentifier);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000C) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000003E, 0x0000000C, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000C) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000003E, 0x0000000C, mRequest);
-    }
-
-private:
-    chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -7330,13 +7365,6 @@ private:
 | * LockDoor                                                          |   0x00 |
 | * UnlockDoor                                                        |   0x01 |
 | * UnlockWithTimeout                                                 |   0x03 |
-| * GetLogRecord                                                      |   0x04 |
-| * SetPINCode                                                        |   0x05 |
-| * GetPINCode                                                        |   0x06 |
-| * ClearPINCode                                                      |   0x07 |
-| * ClearAllPINCodes                                                  |   0x08 |
-| * SetUserStatus                                                     |   0x09 |
-| * GetUserStatus                                                     |   0x0A |
 | * SetWeekDaySchedule                                                |   0x0B |
 | * GetWeekDaySchedule                                                |   0x0C |
 | * ClearWeekDaySchedule                                              |   0x0D |
@@ -7346,12 +7374,6 @@ private:
 | * SetHolidaySchedule                                                |   0x11 |
 | * GetHolidaySchedule                                                |   0x12 |
 | * ClearHolidaySchedule                                              |   0x13 |
-| * SetUserType                                                       |   0x14 |
-| * GetUserType                                                       |   0x15 |
-| * SetRFIDCode                                                       |   0x16 |
-| * GetRFIDCode                                                       |   0x17 |
-| * ClearRFIDCode                                                     |   0x18 |
-| * ClearAllRFIDCodes                                                 |   0x19 |
 | * SetUser                                                           |   0x1A |
 | * GetUser                                                           |   0x1B |
 | * ClearUser                                                         |   0x1D |
@@ -7367,7 +7389,6 @@ private:
 | * DoorOpenEvents                                                    | 0x0004 |
 | * DoorClosedEvents                                                  | 0x0005 |
 | * OpenPeriod                                                        | 0x0006 |
-| * NumberOfLogRecordsSupported                                       | 0x0010 |
 | * NumberOfTotalUsersSupported                                       | 0x0011 |
 | * NumberOfPINUsersSupported                                         | 0x0012 |
 | * NumberOfRFIDUsersSupported                                        | 0x0013 |
@@ -7380,7 +7401,6 @@ private:
 | * MinRFIDCodeLength                                                 | 0x001A |
 | * CredentialRulesSupport                                            | 0x001B |
 | * NumberOfCredentialsSupportedPerUser                               | 0x001C |
-| * EnableLogging                                                     | 0x0020 |
 | * Language                                                          | 0x0021 |
 | * LEDSettings                                                       | 0x0022 |
 | * AutoRelockTime                                                    | 0x0023 |
@@ -7398,14 +7418,6 @@ private:
 | * SendPINOverTheAir                                                 | 0x0032 |
 | * RequirePINforRemoteOperation                                      | 0x0033 |
 | * ExpiringUserTimeout                                               | 0x0035 |
-| * AlarmMask                                                         | 0x0040 |
-| * KeypadOperationEventMask                                          | 0x0041 |
-| * RemoteOperationEventMask                                          | 0x0042 |
-| * ManualOperationEventMask                                          | 0x0043 |
-| * RFIDOperationEventMask                                            | 0x0044 |
-| * KeypadProgrammingEventMask                                        | 0x0045 |
-| * RemoteProgrammingEventMask                                        | 0x0046 |
-| * RFIDProgrammingEventMask                                          | 0x0047 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -7510,219 +7522,6 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type mRequest;
-};
-
-/*
- * Command GetLogRecord
- */
-class DoorLockGetLogRecord : public ClusterCommand
-{
-public:
-    DoorLockGetLogRecord(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-log-record", credsIssuerConfig)
-    {
-        AddArgument("LogIndex", 0, UINT16_MAX, &mRequest.logIndex);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000004) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000004, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000004) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000004, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetLogRecord::Type mRequest;
-};
-
-/*
- * Command SetPINCode
- */
-class DoorLockSetPINCode : public ClusterCommand
-{
-public:
-    DoorLockSetPINCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-pincode", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
-        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
-        AddArgument("Pin", &mRequest.pin);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000005) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000005, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000005) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000005, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetPINCode::Type mRequest;
-};
-
-/*
- * Command GetPINCode
- */
-class DoorLockGetPINCode : public ClusterCommand
-{
-public:
-    DoorLockGetPINCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-pincode", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000006) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000006, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000006) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000006, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetPINCode::Type mRequest;
-};
-
-/*
- * Command ClearPINCode
- */
-class DoorLockClearPINCode : public ClusterCommand
-{
-public:
-    DoorLockClearPINCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("clear-pincode", credsIssuerConfig)
-    {
-        AddArgument("PinSlotIndex", 0, UINT16_MAX, &mRequest.pinSlotIndex);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000007) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000007, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000007) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000007, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearPINCode::Type mRequest;
-};
-
-/*
- * Command ClearAllPINCodes
- */
-class DoorLockClearAllPINCodes : public ClusterCommand
-{
-public:
-    DoorLockClearAllPINCodes(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("clear-all-pincodes", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000008) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000008, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000008) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000008, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearAllPINCodes::Type mRequest;
-};
-
-/*
- * Command SetUserStatus
- */
-class DoorLockSetUserStatus : public ClusterCommand
-{
-public:
-    DoorLockSetUserStatus(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-user-status", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000009) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000009, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000009) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000009, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetUserStatus::Type mRequest;
-};
-
-/*
- * Command GetUserStatus
- */
-class DoorLockGetUserStatus : public ClusterCommand
-{
-public:
-    DoorLockGetUserStatus(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-user-status", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000A) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000000A, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000A) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x0000000A, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetUserStatus::Type mRequest;
 };
 
 /*
@@ -8021,190 +7820,6 @@ private:
 };
 
 /*
- * Command SetUserType
- */
-class DoorLockSetUserType : public ClusterCommand
-{
-public:
-    DoorLockSetUserType(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-user-type", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000014) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000014, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000014) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000014, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetUserType::Type mRequest;
-};
-
-/*
- * Command GetUserType
- */
-class DoorLockGetUserType : public ClusterCommand
-{
-public:
-    DoorLockGetUserType(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-user-type", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000015) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000015, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000015) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000015, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetUserType::Type mRequest;
-};
-
-/*
- * Command SetRFIDCode
- */
-class DoorLockSetRFIDCode : public ClusterCommand
-{
-public:
-    DoorLockSetRFIDCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-rfidcode", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
-        AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
-        AddArgument("RfidCode", &mRequest.rfidCode);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000016) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000016, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000016) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000016, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetRFIDCode::Type mRequest;
-};
-
-/*
- * Command GetRFIDCode
- */
-class DoorLockGetRFIDCode : public ClusterCommand
-{
-public:
-    DoorLockGetRFIDCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-rfidcode", credsIssuerConfig)
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000017) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000017, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000017) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000017, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetRFIDCode::Type mRequest;
-};
-
-/*
- * Command ClearRFIDCode
- */
-class DoorLockClearRFIDCode : public ClusterCommand
-{
-public:
-    DoorLockClearRFIDCode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("clear-rfidcode", credsIssuerConfig)
-    {
-        AddArgument("RfidSlotIndex", 0, UINT16_MAX, &mRequest.rfidSlotIndex);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000018) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000018, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000018) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000018, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearRFIDCode::Type mRequest;
-};
-
-/*
- * Command ClearAllRFIDCodes
- */
-class DoorLockClearAllRFIDCodes : public ClusterCommand
-{
-public:
-    DoorLockClearAllRFIDCodes(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("clear-all-rfidcodes", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000019) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000019, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000019) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000019, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearAllRFIDCodes::Type mRequest;
-};
-
-/*
  * Command SetUser
  */
 class DoorLockSetUser : public ClusterCommand
@@ -8481,32 +8096,6 @@ private:
     uint16_t mValue;
 };
 
-class WriteDoorLockEnableLogging : public WriteAttribute
-{
-public:
-    WriteDoorLockEnableLogging(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("EnableLogging", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "enable-logging");
-        AddArgument("attr-value", 0, 1, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockEnableLogging() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000020, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000020, mValue);
-    }
-
-private:
-    bool mValue;
-};
-
 class WriteDoorLockLanguage : public WriteAttribute
 {
 public:
@@ -8769,7 +8358,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> mValue;
+    chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> mValue;
 };
 
 class WriteDoorLockWrongCodeEntryLimit : public WriteAttribute
@@ -8905,221 +8494,6 @@ public:
 
 private:
     uint16_t mValue;
-};
-
-class WriteDoorLockAlarmMask : public WriteAttribute
-{
-public:
-    WriteDoorLockAlarmMask(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("AlarmMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "alarm-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockAlarmMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000040, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000040, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> mValue;
-};
-
-class WriteDoorLockKeypadOperationEventMask : public WriteAttribute
-{
-public:
-    WriteDoorLockKeypadOperationEventMask(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("KeypadOperationEventMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "keypad-operation-event-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockKeypadOperationEventMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000041, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000041, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> mValue;
-};
-
-class WriteDoorLockRemoteOperationEventMask : public WriteAttribute
-{
-public:
-    WriteDoorLockRemoteOperationEventMask(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("RemoteOperationEventMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "remote-operation-event-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockRemoteOperationEventMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000042, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000042, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> mValue;
-};
-
-class WriteDoorLockManualOperationEventMask : public WriteAttribute
-{
-public:
-    WriteDoorLockManualOperationEventMask(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("ManualOperationEventMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "manual-operation-event-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockManualOperationEventMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000043, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000043, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> mValue;
-};
-
-class WriteDoorLockRFIDOperationEventMask : public WriteAttribute
-{
-public:
-    WriteDoorLockRFIDOperationEventMask(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("RFIDOperationEventMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "rfidoperation-event-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockRFIDOperationEventMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000044, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000044, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> mValue;
-};
-
-class WriteDoorLockKeypadProgrammingEventMask : public WriteAttribute
-{
-public:
-    WriteDoorLockKeypadProgrammingEventMask(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("KeypadProgrammingEventMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "keypad-programming-event-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockKeypadProgrammingEventMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000045, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000045, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> mValue;
-};
-
-class WriteDoorLockRemoteProgrammingEventMask : public WriteAttribute
-{
-public:
-    WriteDoorLockRemoteProgrammingEventMask(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("RemoteProgrammingEventMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "remote-programming-event-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockRemoteProgrammingEventMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000046, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000046, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> mValue;
-};
-
-class WriteDoorLockRFIDProgrammingEventMask : public WriteAttribute
-{
-public:
-    WriteDoorLockRFIDProgrammingEventMask(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("RFIDProgrammingEventMask", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "rfidprogramming-event-mask");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteDoorLockRFIDProgrammingEventMask() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000047, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000047, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -9400,7 +8774,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> mValue;
+    chip::BitMask<chip::app::Clusters::WindowCovering::Mode> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -9824,7 +9198,6 @@ private:
 | * SetWeeklySchedule                                                 |   0x01 |
 | * GetWeeklySchedule                                                 |   0x02 |
 | * ClearWeeklySchedule                                               |   0x03 |
-| * GetRelayStatusLog                                                 |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LocalTemperature                                                  | 0x0000 |
@@ -9850,7 +9223,6 @@ private:
 | * RemoteSensing                                                     | 0x001A |
 | * ControlSequenceOfOperation                                        | 0x001B |
 | * SystemMode                                                        | 0x001C |
-| * AlarmMask                                                         | 0x001D |
 | * ThermostatRunningMode                                             | 0x001E |
 | * StartOfWeek                                                       | 0x0020 |
 | * NumberOfWeeklyTransitions                                         | 0x0021 |
@@ -10015,36 +9387,6 @@ public:
 
 private:
     chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Type mRequest;
-};
-
-/*
- * Command GetRelayStatusLog
- */
-class ThermostatGetRelayStatusLog : public ClusterCommand
-{
-public:
-    ThermostatGetRelayStatusLog(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("get-relay-status-log", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000004, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000201, 0x00000004, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::Type mRequest;
 };
 
 class WriteThermostatHVACSystemTypeConfiguration : public WriteAttribute
@@ -15457,3018 +14799,6 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster TestCluster                                                 | 0x050F |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * Test                                                              |   0x00 |
-| * TestNotHandled                                                    |   0x01 |
-| * TestSpecific                                                      |   0x02 |
-| * TestUnknownCommand                                                |   0x03 |
-| * TestAddArguments                                                  |   0x04 |
-| * TestSimpleArgumentRequest                                         |   0x05 |
-| * TestStructArrayArgumentRequest                                    |   0x06 |
-| * TestStructArgumentRequest                                         |   0x07 |
-| * TestNestedStructArgumentRequest                                   |   0x08 |
-| * TestListStructArgumentRequest                                     |   0x09 |
-| * TestListInt8UArgumentRequest                                      |   0x0A |
-| * TestNestedStructListArgumentRequest                               |   0x0B |
-| * TestListNestedStructListArgumentRequest                           |   0x0C |
-| * TestListInt8UReverseRequest                                       |   0x0D |
-| * TestEnumsRequest                                                  |   0x0E |
-| * TestNullableOptionalRequest                                       |   0x0F |
-| * TestComplexNullableOptionalRequest                                |   0x10 |
-| * SimpleStructEchoRequest                                           |   0x11 |
-| * TimedInvokeRequest                                                |   0x12 |
-| * TestSimpleOptionalArgumentRequest                                 |   0x13 |
-| * TestEmitTestEventRequest                                          |   0x14 |
-| * TestEmitTestFabricScopedEventRequest                              |   0x15 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * Boolean                                                           | 0x0000 |
-| * Bitmap8                                                           | 0x0001 |
-| * Bitmap16                                                          | 0x0002 |
-| * Bitmap32                                                          | 0x0003 |
-| * Bitmap64                                                          | 0x0004 |
-| * Int8u                                                             | 0x0005 |
-| * Int16u                                                            | 0x0006 |
-| * Int24u                                                            | 0x0007 |
-| * Int32u                                                            | 0x0008 |
-| * Int40u                                                            | 0x0009 |
-| * Int48u                                                            | 0x000A |
-| * Int56u                                                            | 0x000B |
-| * Int64u                                                            | 0x000C |
-| * Int8s                                                             | 0x000D |
-| * Int16s                                                            | 0x000E |
-| * Int24s                                                            | 0x000F |
-| * Int32s                                                            | 0x0010 |
-| * Int40s                                                            | 0x0011 |
-| * Int48s                                                            | 0x0012 |
-| * Int56s                                                            | 0x0013 |
-| * Int64s                                                            | 0x0014 |
-| * Enum8                                                             | 0x0015 |
-| * Enum16                                                            | 0x0016 |
-| * FloatSingle                                                       | 0x0017 |
-| * FloatDouble                                                       | 0x0018 |
-| * OctetString                                                       | 0x0019 |
-| * ListInt8u                                                         | 0x001A |
-| * ListOctetString                                                   | 0x001B |
-| * ListStructOctetString                                             | 0x001C |
-| * LongOctetString                                                   | 0x001D |
-| * CharString                                                        | 0x001E |
-| * LongCharString                                                    | 0x001F |
-| * EpochUs                                                           | 0x0020 |
-| * EpochS                                                            | 0x0021 |
-| * VendorId                                                          | 0x0022 |
-| * ListNullablesAndOptionalsStruct                                   | 0x0023 |
-| * EnumAttr                                                          | 0x0024 |
-| * StructAttr                                                        | 0x0025 |
-| * RangeRestrictedInt8u                                              | 0x0026 |
-| * RangeRestrictedInt8s                                              | 0x0027 |
-| * RangeRestrictedInt16u                                             | 0x0028 |
-| * RangeRestrictedInt16s                                             | 0x0029 |
-| * ListLongOctetString                                               | 0x002A |
-| * ListFabricScoped                                                  | 0x002B |
-| * TimedWriteBoolean                                                 | 0x0030 |
-| * GeneralErrorBoolean                                               | 0x0031 |
-| * ClusterErrorBoolean                                               | 0x0032 |
-| * Unsupported                                                       | 0x00FF |
-| * NullableBoolean                                                   | 0x4000 |
-| * NullableBitmap8                                                   | 0x4001 |
-| * NullableBitmap16                                                  | 0x4002 |
-| * NullableBitmap32                                                  | 0x4003 |
-| * NullableBitmap64                                                  | 0x4004 |
-| * NullableInt8u                                                     | 0x4005 |
-| * NullableInt16u                                                    | 0x4006 |
-| * NullableInt24u                                                    | 0x4007 |
-| * NullableInt32u                                                    | 0x4008 |
-| * NullableInt40u                                                    | 0x4009 |
-| * NullableInt48u                                                    | 0x400A |
-| * NullableInt56u                                                    | 0x400B |
-| * NullableInt64u                                                    | 0x400C |
-| * NullableInt8s                                                     | 0x400D |
-| * NullableInt16s                                                    | 0x400E |
-| * NullableInt24s                                                    | 0x400F |
-| * NullableInt32s                                                    | 0x4010 |
-| * NullableInt40s                                                    | 0x4011 |
-| * NullableInt48s                                                    | 0x4012 |
-| * NullableInt56s                                                    | 0x4013 |
-| * NullableInt64s                                                    | 0x4014 |
-| * NullableEnum8                                                     | 0x4015 |
-| * NullableEnum16                                                    | 0x4016 |
-| * NullableFloatSingle                                               | 0x4017 |
-| * NullableFloatDouble                                               | 0x4018 |
-| * NullableOctetString                                               | 0x4019 |
-| * NullableCharString                                                | 0x401E |
-| * NullableEnumAttr                                                  | 0x4024 |
-| * NullableStruct                                                    | 0x4025 |
-| * NullableRangeRestrictedInt8u                                      | 0x4026 |
-| * NullableRangeRestrictedInt8s                                      | 0x4027 |
-| * NullableRangeRestrictedInt16u                                     | 0x4028 |
-| * NullableRangeRestrictedInt16s                                     | 0x4029 |
-| * GeneratedCommandList                                              | 0xFFF8 |
-| * AcceptedCommandList                                               | 0xFFF9 |
-| * AttributeList                                                     | 0xFFFB |
-| * FeatureMap                                                        | 0xFFFC |
-| * ClusterRevision                                                   | 0xFFFD |
-|------------------------------------------------------------------------------|
-| Events:                                                             |        |
-| * TestEvent                                                         | 0x0001 |
-| * TestFabricScopedEvent                                             | 0x0002 |
-\*----------------------------------------------------------------------------*/
-
-/*
- * Command Test
- */
-class TestClusterTest : public ClusterCommand
-{
-public:
-    TestClusterTest(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000000) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000000, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000000) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000000, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::Test::Type mRequest;
-};
-
-/*
- * Command TestNotHandled
- */
-class TestClusterTestNotHandled : public ClusterCommand
-{
-public:
-    TestClusterTestNotHandled(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test-not-handled", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000001) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000001, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000001) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000001, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type mRequest;
-};
-
-/*
- * Command TestSpecific
- */
-class TestClusterTestSpecific : public ClusterCommand
-{
-public:
-    TestClusterTestSpecific(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test-specific", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000002) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000002, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000002) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000002, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestSpecific::Type mRequest;
-};
-
-/*
- * Command TestUnknownCommand
- */
-class TestClusterTestUnknownCommand : public ClusterCommand
-{
-public:
-    TestClusterTestUnknownCommand(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-unknown-command", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000003) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000003, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000003) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000003, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type mRequest;
-};
-
-/*
- * Command TestAddArguments
- */
-class TestClusterTestAddArguments : public ClusterCommand
-{
-public:
-    TestClusterTestAddArguments(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-add-arguments", credsIssuerConfig)
-    {
-        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
-        AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000004) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000004, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000004) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000004, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type mRequest;
-};
-
-/*
- * Command TestSimpleArgumentRequest
- */
-class TestClusterTestSimpleArgumentRequest : public ClusterCommand
-{
-public:
-    TestClusterTestSimpleArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-simple-argument-request", credsIssuerConfig)
-    {
-        AddArgument("Arg1", 0, 1, &mRequest.arg1);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000005) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000005, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000005) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000005, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentRequest::Type mRequest;
-};
-
-/*
- * Command TestStructArrayArgumentRequest
- */
-class TestClusterTestStructArrayArgumentRequest : public ClusterCommand
-{
-public:
-    TestClusterTestStructArrayArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-struct-array-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1),
-        mComplex_Arg2(&mRequest.arg2), mComplex_Arg3(&mRequest.arg3), mComplex_Arg4(&mRequest.arg4)
-    {
-        AddArgument("Arg1", &mComplex_Arg1);
-        AddArgument("Arg2", &mComplex_Arg2);
-        AddArgument("Arg3", &mComplex_Arg3);
-        AddArgument("Arg4", &mComplex_Arg4);
-        AddArgument("Arg5", 0, UINT8_MAX, &mRequest.arg5);
-        AddArgument("Arg6", 0, 1, &mRequest.arg6);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000006) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000006, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000006) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000006, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NestedStructList::Type>>
-        mComplex_Arg1;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>
-        mComplex_Arg2;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>> mComplex_Arg3;
-    TypedComplexArgument<chip::app::DataModel::List<const bool>> mComplex_Arg4;
-};
-
-/*
- * Command TestStructArgumentRequest
- */
-class TestClusterTestStructArgumentRequest : public ClusterCommand
-{
-public:
-    TestClusterTestStructArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-struct-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
-    {
-        AddArgument("Arg1", &mComplex_Arg1);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000007) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000007, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000007) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000007, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mComplex_Arg1;
-};
-
-/*
- * Command TestNestedStructArgumentRequest
- */
-class TestClusterTestNestedStructArgumentRequest : public ClusterCommand
-{
-public:
-    TestClusterTestNestedStructArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-nested-struct-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
-    {
-        AddArgument("Arg1", &mComplex_Arg1);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000008) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000008, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000008) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000008, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::NestedStruct::Type> mComplex_Arg1;
-};
-
-/*
- * Command TestListStructArgumentRequest
- */
-class TestClusterTestListStructArgumentRequest : public ClusterCommand
-{
-public:
-    TestClusterTestListStructArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-list-struct-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
-    {
-        AddArgument("Arg1", &mComplex_Arg1);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000009) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000009, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000009) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000009, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>
-        mComplex_Arg1;
-};
-
-/*
- * Command TestListInt8UArgumentRequest
- */
-class TestClusterTestListInt8UArgumentRequest : public ClusterCommand
-{
-public:
-    TestClusterTestListInt8UArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-list-int8uargument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
-    {
-        AddArgument("Arg1", &mComplex_Arg1);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000A) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000A, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000A) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000A, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex_Arg1;
-};
-
-/*
- * Command TestNestedStructListArgumentRequest
- */
-class TestClusterTestNestedStructListArgumentRequest : public ClusterCommand
-{
-public:
-    TestClusterTestNestedStructListArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-nested-struct-list-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
-    {
-        AddArgument("Arg1", &mComplex_Arg1);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000B) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000B, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000B) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000B, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::NestedStructList::Type> mComplex_Arg1;
-};
-
-/*
- * Command TestListNestedStructListArgumentRequest
- */
-class TestClusterTestListNestedStructListArgumentRequest : public ClusterCommand
-{
-public:
-    TestClusterTestListNestedStructListArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-list-nested-struct-list-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
-    {
-        AddArgument("Arg1", &mComplex_Arg1);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000C) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000C, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000C) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000C, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NestedStructList::Type>>
-        mComplex_Arg1;
-};
-
-/*
- * Command TestListInt8UReverseRequest
- */
-class TestClusterTestListInt8UReverseRequest : public ClusterCommand
-{
-public:
-    TestClusterTestListInt8UReverseRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-list-int8ureverse-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
-    {
-        AddArgument("Arg1", &mComplex_Arg1);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000D) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000D, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000D) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000D, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex_Arg1;
-};
-
-/*
- * Command TestEnumsRequest
- */
-class TestClusterTestEnumsRequest : public ClusterCommand
-{
-public:
-    TestClusterTestEnumsRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-enums-request", credsIssuerConfig)
-    {
-        AddArgument("Arg1", 0, UINT16_MAX, &mRequest.arg1);
-        AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000E) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000E, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000E) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000E, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type mRequest;
-};
-
-/*
- * Command TestNullableOptionalRequest
- */
-class TestClusterTestNullableOptionalRequest : public ClusterCommand
-{
-public:
-    TestClusterTestNullableOptionalRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-nullable-optional-request", credsIssuerConfig)
-    {
-        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000F) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000F, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000F) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000F, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type mRequest;
-};
-
-/*
- * Command TestComplexNullableOptionalRequest
- */
-class TestClusterTestComplexNullableOptionalRequest : public ClusterCommand
-{
-public:
-    TestClusterTestComplexNullableOptionalRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-complex-nullable-optional-request", credsIssuerConfig),
-        mComplex_NullableStruct(&mRequest.nullableStruct), mComplex_OptionalStruct(&mRequest.optionalStruct),
-        mComplex_NullableOptionalStruct(&mRequest.nullableOptionalStruct), mComplex_NullableList(&mRequest.nullableList),
-        mComplex_OptionalList(&mRequest.optionalList), mComplex_NullableOptionalList(&mRequest.nullableOptionalList)
-    {
-        AddArgument("NullableInt", 0, UINT16_MAX, &mRequest.nullableInt);
-        AddArgument("OptionalInt", 0, UINT16_MAX, &mRequest.optionalInt);
-        AddArgument("NullableOptionalInt", 0, UINT16_MAX, &mRequest.nullableOptionalInt);
-        AddArgument("NullableString", &mRequest.nullableString);
-        AddArgument("OptionalString", &mRequest.optionalString);
-        AddArgument("NullableOptionalString", &mRequest.nullableOptionalString);
-        AddArgument("NullableStruct", &mComplex_NullableStruct);
-        AddArgument("OptionalStruct", &mComplex_OptionalStruct);
-        AddArgument("NullableOptionalStruct", &mComplex_NullableOptionalStruct);
-        AddArgument("NullableList", &mComplex_NullableList);
-        AddArgument("OptionalList", &mComplex_OptionalList);
-        AddArgument("NullableOptionalList", &mComplex_NullableOptionalList);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000010) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000010, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000010) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000010, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>
-        mComplex_NullableStruct;
-    TypedComplexArgument<chip::Optional<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>> mComplex_OptionalStruct;
-    TypedComplexArgument<
-        chip::Optional<chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>>
-        mComplex_NullableOptionalStruct;
-    TypedComplexArgument<
-        chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>
-        mComplex_NullableList;
-    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>
-        mComplex_OptionalList;
-    TypedComplexArgument<chip::Optional<
-        chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>>
-        mComplex_NullableOptionalList;
-};
-
-/*
- * Command SimpleStructEchoRequest
- */
-class TestClusterSimpleStructEchoRequest : public ClusterCommand
-{
-public:
-    TestClusterSimpleStructEchoRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("simple-struct-echo-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
-    {
-        AddArgument("Arg1", &mComplex_Arg1);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000011) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000011, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000011) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000011, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mComplex_Arg1;
-};
-
-/*
- * Command TimedInvokeRequest
- */
-class TestClusterTimedInvokeRequest : public ClusterCommand
-{
-public:
-    TestClusterTimedInvokeRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("timed-invoke-request", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000012) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000012, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000012) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000012, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type mRequest;
-};
-
-/*
- * Command TestSimpleOptionalArgumentRequest
- */
-class TestClusterTestSimpleOptionalArgumentRequest : public ClusterCommand
-{
-public:
-    TestClusterTestSimpleOptionalArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-simple-optional-argument-request", credsIssuerConfig)
-    {
-        AddArgument("Arg1", 0, 1, &mRequest.arg1);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000013) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000013, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000013) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000013, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type mRequest;
-};
-
-/*
- * Command TestEmitTestEventRequest
- */
-class TestClusterTestEmitTestEventRequest : public ClusterCommand
-{
-public:
-    TestClusterTestEmitTestEventRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-emit-test-event-request", credsIssuerConfig)
-    {
-        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
-        AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2);
-        AddArgument("Arg3", 0, 1, &mRequest.arg3);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000014) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000014, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000014) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000014, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type mRequest;
-};
-
-/*
- * Command TestEmitTestFabricScopedEventRequest
- */
-class TestClusterTestEmitTestFabricScopedEventRequest : public ClusterCommand
-{
-public:
-    TestClusterTestEmitTestFabricScopedEventRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-emit-test-fabric-scoped-event-request", credsIssuerConfig)
-    {
-        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000015) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000015, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000015) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000015, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventRequest::Type mRequest;
-};
-
-class WriteTestClusterBoolean : public WriteAttribute
-{
-public:
-    WriteTestClusterBoolean(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Boolean", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "boolean");
-        AddArgument("attr-value", 0, 1, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterBoolean() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000000, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000000, mValue);
-    }
-
-private:
-    bool mValue;
-};
-
-class WriteTestClusterBitmap8 : public WriteAttribute
-{
-public:
-    WriteTestClusterBitmap8(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Bitmap8", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "bitmap8");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterBitmap8() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000001, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000001, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> mValue;
-};
-
-class WriteTestClusterBitmap16 : public WriteAttribute
-{
-public:
-    WriteTestClusterBitmap16(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Bitmap16", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "bitmap16");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterBitmap16() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000002, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000002, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> mValue;
-};
-
-class WriteTestClusterBitmap32 : public WriteAttribute
-{
-public:
-    WriteTestClusterBitmap32(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Bitmap32", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "bitmap32");
-        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterBitmap32() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000003, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000003, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> mValue;
-};
-
-class WriteTestClusterBitmap64 : public WriteAttribute
-{
-public:
-    WriteTestClusterBitmap64(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Bitmap64", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "bitmap64");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterBitmap64() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000004, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000004, mValue);
-    }
-
-private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> mValue;
-};
-
-class WriteTestClusterInt8u : public WriteAttribute
-{
-public:
-    WriteTestClusterInt8u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int8u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int8u");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt8u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000005, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000005, mValue);
-    }
-
-private:
-    uint8_t mValue;
-};
-
-class WriteTestClusterInt16u : public WriteAttribute
-{
-public:
-    WriteTestClusterInt16u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int16u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int16u");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt16u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000006, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000006, mValue);
-    }
-
-private:
-    uint16_t mValue;
-};
-
-class WriteTestClusterInt24u : public WriteAttribute
-{
-public:
-    WriteTestClusterInt24u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int24u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int24u");
-        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt24u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000007, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000007, mValue);
-    }
-
-private:
-    uint32_t mValue;
-};
-
-class WriteTestClusterInt32u : public WriteAttribute
-{
-public:
-    WriteTestClusterInt32u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int32u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int32u");
-        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt32u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000008, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000008, mValue);
-    }
-
-private:
-    uint32_t mValue;
-};
-
-class WriteTestClusterInt40u : public WriteAttribute
-{
-public:
-    WriteTestClusterInt40u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int40u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int40u");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt40u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000009, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000009, mValue);
-    }
-
-private:
-    uint64_t mValue;
-};
-
-class WriteTestClusterInt48u : public WriteAttribute
-{
-public:
-    WriteTestClusterInt48u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int48u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int48u");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt48u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000A, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000A, mValue);
-    }
-
-private:
-    uint64_t mValue;
-};
-
-class WriteTestClusterInt56u : public WriteAttribute
-{
-public:
-    WriteTestClusterInt56u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int56u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int56u");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt56u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000B, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000B, mValue);
-    }
-
-private:
-    uint64_t mValue;
-};
-
-class WriteTestClusterInt64u : public WriteAttribute
-{
-public:
-    WriteTestClusterInt64u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int64u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int64u");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt64u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000C, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000C, mValue);
-    }
-
-private:
-    uint64_t mValue;
-};
-
-class WriteTestClusterInt8s : public WriteAttribute
-{
-public:
-    WriteTestClusterInt8s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int8s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int8s");
-        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt8s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000D, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000D, mValue);
-    }
-
-private:
-    int8_t mValue;
-};
-
-class WriteTestClusterInt16s : public WriteAttribute
-{
-public:
-    WriteTestClusterInt16s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int16s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int16s");
-        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt16s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000E, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000E, mValue);
-    }
-
-private:
-    int16_t mValue;
-};
-
-class WriteTestClusterInt24s : public WriteAttribute
-{
-public:
-    WriteTestClusterInt24s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int24s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int24s");
-        AddArgument("attr-value", INT32_MIN, INT32_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt24s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000F, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000000F, mValue);
-    }
-
-private:
-    int32_t mValue;
-};
-
-class WriteTestClusterInt32s : public WriteAttribute
-{
-public:
-    WriteTestClusterInt32s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int32s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int32s");
-        AddArgument("attr-value", INT32_MIN, INT32_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt32s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000010, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000010, mValue);
-    }
-
-private:
-    int32_t mValue;
-};
-
-class WriteTestClusterInt40s : public WriteAttribute
-{
-public:
-    WriteTestClusterInt40s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int40s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int40s");
-        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt40s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000011, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000011, mValue);
-    }
-
-private:
-    int64_t mValue;
-};
-
-class WriteTestClusterInt48s : public WriteAttribute
-{
-public:
-    WriteTestClusterInt48s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int48s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int48s");
-        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt48s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000012, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000012, mValue);
-    }
-
-private:
-    int64_t mValue;
-};
-
-class WriteTestClusterInt56s : public WriteAttribute
-{
-public:
-    WriteTestClusterInt56s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int56s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int56s");
-        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt56s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000013, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000013, mValue);
-    }
-
-private:
-    int64_t mValue;
-};
-
-class WriteTestClusterInt64s : public WriteAttribute
-{
-public:
-    WriteTestClusterInt64s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int64s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "int64s");
-        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterInt64s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000014, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000014, mValue);
-    }
-
-private:
-    int64_t mValue;
-};
-
-class WriteTestClusterEnum8 : public WriteAttribute
-{
-public:
-    WriteTestClusterEnum8(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Enum8", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "enum8");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterEnum8() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000015, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000015, mValue);
-    }
-
-private:
-    uint8_t mValue;
-};
-
-class WriteTestClusterEnum16 : public WriteAttribute
-{
-public:
-    WriteTestClusterEnum16(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Enum16", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "enum16");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterEnum16() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000016, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000016, mValue);
-    }
-
-private:
-    uint16_t mValue;
-};
-
-class WriteTestClusterFloatSingle : public WriteAttribute
-{
-public:
-    WriteTestClusterFloatSingle(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("FloatSingle", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "float-single");
-        AddArgument("attr-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterFloatSingle() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000017, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000017, mValue);
-    }
-
-private:
-    float mValue;
-};
-
-class WriteTestClusterFloatDouble : public WriteAttribute
-{
-public:
-    WriteTestClusterFloatDouble(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("FloatDouble", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "float-double");
-        AddArgument("attr-value", -std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterFloatDouble() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000018, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000018, mValue);
-    }
-
-private:
-    double mValue;
-};
-
-class WriteTestClusterOctetString : public WriteAttribute
-{
-public:
-    WriteTestClusterOctetString(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("OctetString", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "octet-string");
-        AddArgument("attr-value", &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterOctetString() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000019, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000019, mValue);
-    }
-
-private:
-    chip::ByteSpan mValue;
-};
-
-class WriteTestClusterListInt8u : public WriteAttribute
-{
-public:
-    WriteTestClusterListInt8u(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("ListInt8u", credsIssuerConfig), mComplex(&mValue)
-    {
-        AddArgument("attr-name", "list-int8u");
-        AddArgument("attr-value", &mComplex);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterListInt8u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001A, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000001A, mValue);
-    }
-
-private:
-    chip::app::DataModel::List<const uint8_t> mValue;
-    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex;
-};
-
-class WriteTestClusterListOctetString : public WriteAttribute
-{
-public:
-    WriteTestClusterListOctetString(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("ListOctetString", credsIssuerConfig), mComplex(&mValue)
-    {
-        AddArgument("attr-name", "list-octet-string");
-        AddArgument("attr-value", &mComplex);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterListOctetString() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001B, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000001B, mValue);
-    }
-
-private:
-    chip::app::DataModel::List<const chip::ByteSpan> mValue;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex;
-};
-
-class WriteTestClusterListStructOctetString : public WriteAttribute
-{
-public:
-    WriteTestClusterListStructOctetString(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("ListStructOctetString", credsIssuerConfig), mComplex(&mValue)
-    {
-        AddArgument("attr-name", "list-struct-octet-string");
-        AddArgument("attr-value", &mComplex);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterListStructOctetString() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001C, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000001C, mValue);
-    }
-
-private:
-    chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type> mValue;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type>>
-        mComplex;
-};
-
-class WriteTestClusterLongOctetString : public WriteAttribute
-{
-public:
-    WriteTestClusterLongOctetString(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("LongOctetString", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "long-octet-string");
-        AddArgument("attr-value", &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterLongOctetString() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001D, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000001D, mValue);
-    }
-
-private:
-    chip::ByteSpan mValue;
-};
-
-class WriteTestClusterCharString : public WriteAttribute
-{
-public:
-    WriteTestClusterCharString(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("CharString", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "char-string");
-        AddArgument("attr-value", &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterCharString() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001E, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000001E, mValue);
-    }
-
-private:
-    chip::CharSpan mValue;
-};
-
-class WriteTestClusterLongCharString : public WriteAttribute
-{
-public:
-    WriteTestClusterLongCharString(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("LongCharString", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "long-char-string");
-        AddArgument("attr-value", &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterLongCharString() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001F, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000001F, mValue);
-    }
-
-private:
-    chip::CharSpan mValue;
-};
-
-class WriteTestClusterEpochUs : public WriteAttribute
-{
-public:
-    WriteTestClusterEpochUs(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("EpochUs", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "epoch-us");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterEpochUs() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000020, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000020, mValue);
-    }
-
-private:
-    uint64_t mValue;
-};
-
-class WriteTestClusterEpochS : public WriteAttribute
-{
-public:
-    WriteTestClusterEpochS(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("EpochS", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "epoch-s");
-        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterEpochS() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000021, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000021, mValue);
-    }
-
-private:
-    uint32_t mValue;
-};
-
-class WriteTestClusterVendorId : public WriteAttribute
-{
-public:
-    WriteTestClusterVendorId(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("VendorId", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "vendor-id");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterVendorId() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000022, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000022, mValue);
-    }
-
-private:
-    chip::VendorId mValue;
-};
-
-class WriteTestClusterListNullablesAndOptionalsStruct : public WriteAttribute
-{
-public:
-    WriteTestClusterListNullablesAndOptionalsStruct(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("ListNullablesAndOptionalsStruct", credsIssuerConfig), mComplex(&mValue)
-    {
-        AddArgument("attr-name", "list-nullables-and-optionals-struct");
-        AddArgument("attr-value", &mComplex);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterListNullablesAndOptionalsStruct() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000023, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000023, mValue);
-    }
-
-private:
-    chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type> mValue;
-    TypedComplexArgument<
-        chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type>>
-        mComplex;
-};
-
-class WriteTestClusterEnumAttr : public WriteAttribute
-{
-public:
-    WriteTestClusterEnumAttr(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("EnumAttr", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "enum-attr");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterEnumAttr() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000024, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000024, mValue);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::SimpleEnum mValue;
-};
-
-class WriteTestClusterStructAttr : public WriteAttribute
-{
-public:
-    WriteTestClusterStructAttr(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("StructAttr", credsIssuerConfig), mComplex(&mValue)
-    {
-        AddArgument("attr-name", "struct-attr");
-        AddArgument("attr-value", &mComplex);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterStructAttr() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000025, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000025, mValue);
-    }
-
-private:
-    chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type mValue;
-    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mComplex;
-};
-
-class WriteTestClusterRangeRestrictedInt8u : public WriteAttribute
-{
-public:
-    WriteTestClusterRangeRestrictedInt8u(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("RangeRestrictedInt8u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "range-restricted-int8u");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterRangeRestrictedInt8u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000026, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000026, mValue);
-    }
-
-private:
-    uint8_t mValue;
-};
-
-class WriteTestClusterRangeRestrictedInt8s : public WriteAttribute
-{
-public:
-    WriteTestClusterRangeRestrictedInt8s(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("RangeRestrictedInt8s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "range-restricted-int8s");
-        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterRangeRestrictedInt8s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000027, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000027, mValue);
-    }
-
-private:
-    int8_t mValue;
-};
-
-class WriteTestClusterRangeRestrictedInt16u : public WriteAttribute
-{
-public:
-    WriteTestClusterRangeRestrictedInt16u(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("RangeRestrictedInt16u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "range-restricted-int16u");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterRangeRestrictedInt16u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000028, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000028, mValue);
-    }
-
-private:
-    uint16_t mValue;
-};
-
-class WriteTestClusterRangeRestrictedInt16s : public WriteAttribute
-{
-public:
-    WriteTestClusterRangeRestrictedInt16s(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("RangeRestrictedInt16s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "range-restricted-int16s");
-        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterRangeRestrictedInt16s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000029, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000029, mValue);
-    }
-
-private:
-    int16_t mValue;
-};
-
-class WriteTestClusterListLongOctetString : public WriteAttribute
-{
-public:
-    WriteTestClusterListLongOctetString(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("ListLongOctetString", credsIssuerConfig), mComplex(&mValue)
-    {
-        AddArgument("attr-name", "list-long-octet-string");
-        AddArgument("attr-value", &mComplex);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterListLongOctetString() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000002A, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000002A, mValue);
-    }
-
-private:
-    chip::app::DataModel::List<const chip::ByteSpan> mValue;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex;
-};
-
-class WriteTestClusterListFabricScoped : public WriteAttribute
-{
-public:
-    WriteTestClusterListFabricScoped(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("ListFabricScoped", credsIssuerConfig), mComplex(&mValue)
-    {
-        AddArgument("attr-name", "list-fabric-scoped");
-        AddArgument("attr-value", &mComplex);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterListFabricScoped() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000002B, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000002B, mValue);
-    }
-
-private:
-    chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type> mValue;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type>>
-        mComplex;
-};
-
-class WriteTestClusterTimedWriteBoolean : public WriteAttribute
-{
-public:
-    WriteTestClusterTimedWriteBoolean(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("TimedWriteBoolean", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "timed-write-boolean");
-        AddArgument("attr-value", 0, 1, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterTimedWriteBoolean() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000030, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000030, mValue);
-    }
-
-private:
-    bool mValue;
-};
-
-class WriteTestClusterGeneralErrorBoolean : public WriteAttribute
-{
-public:
-    WriteTestClusterGeneralErrorBoolean(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("GeneralErrorBoolean", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "general-error-boolean");
-        AddArgument("attr-value", 0, 1, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterGeneralErrorBoolean() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000031, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000031, mValue);
-    }
-
-private:
-    bool mValue;
-};
-
-class WriteTestClusterClusterErrorBoolean : public WriteAttribute
-{
-public:
-    WriteTestClusterClusterErrorBoolean(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("ClusterErrorBoolean", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "cluster-error-boolean");
-        AddArgument("attr-value", 0, 1, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterClusterErrorBoolean() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000032, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00000032, mValue);
-    }
-
-private:
-    bool mValue;
-};
-
-class WriteTestClusterUnsupported : public WriteAttribute
-{
-public:
-    WriteTestClusterUnsupported(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Unsupported", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "unsupported");
-        AddArgument("attr-value", 0, 1, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterUnsupported() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x000000FF, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x000000FF, mValue);
-    }
-
-private:
-    bool mValue;
-};
-
-class WriteTestClusterNullableBoolean : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableBoolean(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableBoolean", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-boolean");
-        AddArgument("attr-value", 0, 1, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableBoolean() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004000, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004000, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<bool> mValue;
-};
-
-class WriteTestClusterNullableBitmap8 : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableBitmap8(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableBitmap8", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-bitmap8");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableBitmap8() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004001, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004001, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> mValue;
-};
-
-class WriteTestClusterNullableBitmap16 : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableBitmap16(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableBitmap16", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-bitmap16");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableBitmap16() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004002, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004002, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> mValue;
-};
-
-class WriteTestClusterNullableBitmap32 : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableBitmap32(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableBitmap32", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-bitmap32");
-        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableBitmap32() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004003, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004003, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> mValue;
-};
-
-class WriteTestClusterNullableBitmap64 : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableBitmap64(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableBitmap64", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-bitmap64");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableBitmap64() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004004, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004004, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> mValue;
-};
-
-class WriteTestClusterNullableInt8u : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt8u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("NullableInt8u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int8u");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt8u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004005, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004005, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<uint8_t> mValue;
-};
-
-class WriteTestClusterNullableInt16u : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt16u(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableInt16u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int16u");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt16u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004006, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004006, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<uint16_t> mValue;
-};
-
-class WriteTestClusterNullableInt24u : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt24u(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableInt24u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int24u");
-        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt24u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004007, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004007, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<uint32_t> mValue;
-};
-
-class WriteTestClusterNullableInt32u : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt32u(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableInt32u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int32u");
-        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt32u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004008, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004008, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<uint32_t> mValue;
-};
-
-class WriteTestClusterNullableInt40u : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt40u(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableInt40u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int40u");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt40u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004009, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004009, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<uint64_t> mValue;
-};
-
-class WriteTestClusterNullableInt48u : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt48u(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableInt48u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int48u");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt48u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400A, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000400A, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<uint64_t> mValue;
-};
-
-class WriteTestClusterNullableInt56u : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt56u(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableInt56u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int56u");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt56u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400B, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000400B, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<uint64_t> mValue;
-};
-
-class WriteTestClusterNullableInt64u : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt64u(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableInt64u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int64u");
-        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt64u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400C, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000400C, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<uint64_t> mValue;
-};
-
-class WriteTestClusterNullableInt8s : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt8s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("NullableInt8s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int8s");
-        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt8s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400D, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000400D, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<int8_t> mValue;
-};
-
-class WriteTestClusterNullableInt16s : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt16s(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableInt16s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int16s");
-        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt16s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400E, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000400E, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<int16_t> mValue;
-};
-
-class WriteTestClusterNullableInt24s : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt24s(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableInt24s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int24s");
-        AddArgument("attr-value", INT32_MIN, INT32_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt24s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400F, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000400F, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<int32_t> mValue;
-};
-
-class WriteTestClusterNullableInt32s : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt32s(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableInt32s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int32s");
-        AddArgument("attr-value", INT32_MIN, INT32_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt32s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004010, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004010, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<int32_t> mValue;
-};
-
-class WriteTestClusterNullableInt40s : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt40s(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableInt40s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int40s");
-        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt40s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004011, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004011, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<int64_t> mValue;
-};
-
-class WriteTestClusterNullableInt48s : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt48s(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableInt48s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int48s");
-        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt48s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004012, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004012, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<int64_t> mValue;
-};
-
-class WriteTestClusterNullableInt56s : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt56s(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableInt56s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int56s");
-        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt56s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004013, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004013, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<int64_t> mValue;
-};
-
-class WriteTestClusterNullableInt64s : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableInt64s(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableInt64s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-int64s");
-        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableInt64s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004014, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004014, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<int64_t> mValue;
-};
-
-class WriteTestClusterNullableEnum8 : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableEnum8(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("NullableEnum8", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-enum8");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableEnum8() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004015, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004015, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<uint8_t> mValue;
-};
-
-class WriteTestClusterNullableEnum16 : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableEnum16(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableEnum16", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-enum16");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableEnum16() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004016, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004016, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<uint16_t> mValue;
-};
-
-class WriteTestClusterNullableFloatSingle : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableFloatSingle(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableFloatSingle", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-float-single");
-        AddArgument("attr-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableFloatSingle() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004017, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004017, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<float> mValue;
-};
-
-class WriteTestClusterNullableFloatDouble : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableFloatDouble(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableFloatDouble", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-float-double");
-        AddArgument("attr-value", -std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableFloatDouble() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004018, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004018, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<double> mValue;
-};
-
-class WriteTestClusterNullableOctetString : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableOctetString(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableOctetString", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-octet-string");
-        AddArgument("attr-value", &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableOctetString() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004019, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004019, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<chip::ByteSpan> mValue;
-};
-
-class WriteTestClusterNullableCharString : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableCharString(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableCharString", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-char-string");
-        AddArgument("attr-value", &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableCharString() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000401E, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000401E, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<chip::CharSpan> mValue;
-};
-
-class WriteTestClusterNullableEnumAttr : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableEnumAttr(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableEnumAttr", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-enum-attr");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableEnumAttr() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004024, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004024, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> mValue;
-};
-
-class WriteTestClusterNullableStruct : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableStruct(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableStruct", credsIssuerConfig), mComplex(&mValue)
-    {
-        AddArgument("attr-name", "nullable-struct");
-        AddArgument("attr-value", &mComplex);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableStruct() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004025, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004025, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mValue;
-    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>> mComplex;
-};
-
-class WriteTestClusterNullableRangeRestrictedInt8u : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableRangeRestrictedInt8u(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableRangeRestrictedInt8u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-range-restricted-int8u");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableRangeRestrictedInt8u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004026, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004026, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<uint8_t> mValue;
-};
-
-class WriteTestClusterNullableRangeRestrictedInt8s : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableRangeRestrictedInt8s(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableRangeRestrictedInt8s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-range-restricted-int8s");
-        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableRangeRestrictedInt8s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004027, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004027, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<int8_t> mValue;
-};
-
-class WriteTestClusterNullableRangeRestrictedInt16u : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableRangeRestrictedInt16u(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableRangeRestrictedInt16u", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-range-restricted-int16u");
-        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableRangeRestrictedInt16u() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004028, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004028, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<uint16_t> mValue;
-};
-
-class WriteTestClusterNullableRangeRestrictedInt16s : public WriteAttribute
-{
-public:
-    WriteTestClusterNullableRangeRestrictedInt16s(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("NullableRangeRestrictedInt16s", credsIssuerConfig)
-    {
-        AddArgument("attr-name", "nullable-range-restricted-int16s");
-        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteTestClusterNullableRangeRestrictedInt16s() {}
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004029, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004029, mValue);
-    }
-
-private:
-    chip::app::DataModel::Nullable<int16_t> mValue;
-};
-
-/*----------------------------------------------------------------------------*\
 | Cluster Messaging                                                   | 0x0703 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -19210,6 +15540,3018 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster TestCluster                                                 | 0xFFF1FC05|
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * Test                                                              |   0x00 |
+| * TestNotHandled                                                    |   0x01 |
+| * TestSpecific                                                      |   0x02 |
+| * TestUnknownCommand                                                |   0x03 |
+| * TestAddArguments                                                  |   0x04 |
+| * TestSimpleArgumentRequest                                         |   0x05 |
+| * TestStructArrayArgumentRequest                                    |   0x06 |
+| * TestStructArgumentRequest                                         |   0x07 |
+| * TestNestedStructArgumentRequest                                   |   0x08 |
+| * TestListStructArgumentRequest                                     |   0x09 |
+| * TestListInt8UArgumentRequest                                      |   0x0A |
+| * TestNestedStructListArgumentRequest                               |   0x0B |
+| * TestListNestedStructListArgumentRequest                           |   0x0C |
+| * TestListInt8UReverseRequest                                       |   0x0D |
+| * TestEnumsRequest                                                  |   0x0E |
+| * TestNullableOptionalRequest                                       |   0x0F |
+| * TestComplexNullableOptionalRequest                                |   0x10 |
+| * SimpleStructEchoRequest                                           |   0x11 |
+| * TimedInvokeRequest                                                |   0x12 |
+| * TestSimpleOptionalArgumentRequest                                 |   0x13 |
+| * TestEmitTestEventRequest                                          |   0x14 |
+| * TestEmitTestFabricScopedEventRequest                              |   0x15 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Boolean                                                           | 0x0000 |
+| * Bitmap8                                                           | 0x0001 |
+| * Bitmap16                                                          | 0x0002 |
+| * Bitmap32                                                          | 0x0003 |
+| * Bitmap64                                                          | 0x0004 |
+| * Int8u                                                             | 0x0005 |
+| * Int16u                                                            | 0x0006 |
+| * Int24u                                                            | 0x0007 |
+| * Int32u                                                            | 0x0008 |
+| * Int40u                                                            | 0x0009 |
+| * Int48u                                                            | 0x000A |
+| * Int56u                                                            | 0x000B |
+| * Int64u                                                            | 0x000C |
+| * Int8s                                                             | 0x000D |
+| * Int16s                                                            | 0x000E |
+| * Int24s                                                            | 0x000F |
+| * Int32s                                                            | 0x0010 |
+| * Int40s                                                            | 0x0011 |
+| * Int48s                                                            | 0x0012 |
+| * Int56s                                                            | 0x0013 |
+| * Int64s                                                            | 0x0014 |
+| * Enum8                                                             | 0x0015 |
+| * Enum16                                                            | 0x0016 |
+| * FloatSingle                                                       | 0x0017 |
+| * FloatDouble                                                       | 0x0018 |
+| * OctetString                                                       | 0x0019 |
+| * ListInt8u                                                         | 0x001A |
+| * ListOctetString                                                   | 0x001B |
+| * ListStructOctetString                                             | 0x001C |
+| * LongOctetString                                                   | 0x001D |
+| * CharString                                                        | 0x001E |
+| * LongCharString                                                    | 0x001F |
+| * EpochUs                                                           | 0x0020 |
+| * EpochS                                                            | 0x0021 |
+| * VendorId                                                          | 0x0022 |
+| * ListNullablesAndOptionalsStruct                                   | 0x0023 |
+| * EnumAttr                                                          | 0x0024 |
+| * StructAttr                                                        | 0x0025 |
+| * RangeRestrictedInt8u                                              | 0x0026 |
+| * RangeRestrictedInt8s                                              | 0x0027 |
+| * RangeRestrictedInt16u                                             | 0x0028 |
+| * RangeRestrictedInt16s                                             | 0x0029 |
+| * ListLongOctetString                                               | 0x002A |
+| * ListFabricScoped                                                  | 0x002B |
+| * TimedWriteBoolean                                                 | 0x0030 |
+| * GeneralErrorBoolean                                               | 0x0031 |
+| * ClusterErrorBoolean                                               | 0x0032 |
+| * Unsupported                                                       | 0x00FF |
+| * NullableBoolean                                                   | 0x4000 |
+| * NullableBitmap8                                                   | 0x4001 |
+| * NullableBitmap16                                                  | 0x4002 |
+| * NullableBitmap32                                                  | 0x4003 |
+| * NullableBitmap64                                                  | 0x4004 |
+| * NullableInt8u                                                     | 0x4005 |
+| * NullableInt16u                                                    | 0x4006 |
+| * NullableInt24u                                                    | 0x4007 |
+| * NullableInt32u                                                    | 0x4008 |
+| * NullableInt40u                                                    | 0x4009 |
+| * NullableInt48u                                                    | 0x400A |
+| * NullableInt56u                                                    | 0x400B |
+| * NullableInt64u                                                    | 0x400C |
+| * NullableInt8s                                                     | 0x400D |
+| * NullableInt16s                                                    | 0x400E |
+| * NullableInt24s                                                    | 0x400F |
+| * NullableInt32s                                                    | 0x4010 |
+| * NullableInt40s                                                    | 0x4011 |
+| * NullableInt48s                                                    | 0x4012 |
+| * NullableInt56s                                                    | 0x4013 |
+| * NullableInt64s                                                    | 0x4014 |
+| * NullableEnum8                                                     | 0x4015 |
+| * NullableEnum16                                                    | 0x4016 |
+| * NullableFloatSingle                                               | 0x4017 |
+| * NullableFloatDouble                                               | 0x4018 |
+| * NullableOctetString                                               | 0x4019 |
+| * NullableCharString                                                | 0x401E |
+| * NullableEnumAttr                                                  | 0x4024 |
+| * NullableStruct                                                    | 0x4025 |
+| * NullableRangeRestrictedInt8u                                      | 0x4026 |
+| * NullableRangeRestrictedInt8s                                      | 0x4027 |
+| * NullableRangeRestrictedInt16u                                     | 0x4028 |
+| * NullableRangeRestrictedInt16s                                     | 0x4029 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * TestEvent                                                         | 0x0001 |
+| * TestFabricScopedEvent                                             | 0x0002 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command Test
+ */
+class TestClusterTest : public ClusterCommand
+{
+public:
+    TestClusterTest(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::Test::Type mRequest;
+};
+
+/*
+ * Command TestNotHandled
+ */
+class TestClusterTestNotHandled : public ClusterCommand
+{
+public:
+    TestClusterTestNotHandled(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test-not-handled", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000001) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000001, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000001) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000001, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type mRequest;
+};
+
+/*
+ * Command TestSpecific
+ */
+class TestClusterTestSpecific : public ClusterCommand
+{
+public:
+    TestClusterTestSpecific(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test-specific", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000002) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000002, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000002) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000002, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestSpecific::Type mRequest;
+};
+
+/*
+ * Command TestUnknownCommand
+ */
+class TestClusterTestUnknownCommand : public ClusterCommand
+{
+public:
+    TestClusterTestUnknownCommand(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-unknown-command", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000003) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000003, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000003) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000003, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type mRequest;
+};
+
+/*
+ * Command TestAddArguments
+ */
+class TestClusterTestAddArguments : public ClusterCommand
+{
+public:
+    TestClusterTestAddArguments(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-add-arguments", credsIssuerConfig)
+    {
+        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
+        AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000004) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000004, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000004) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000004, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type mRequest;
+};
+
+/*
+ * Command TestSimpleArgumentRequest
+ */
+class TestClusterTestSimpleArgumentRequest : public ClusterCommand
+{
+public:
+    TestClusterTestSimpleArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-simple-argument-request", credsIssuerConfig)
+    {
+        AddArgument("Arg1", 0, 1, &mRequest.arg1);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000005) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000005, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000005) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000005, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentRequest::Type mRequest;
+};
+
+/*
+ * Command TestStructArrayArgumentRequest
+ */
+class TestClusterTestStructArrayArgumentRequest : public ClusterCommand
+{
+public:
+    TestClusterTestStructArrayArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-struct-array-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1),
+        mComplex_Arg2(&mRequest.arg2), mComplex_Arg3(&mRequest.arg3), mComplex_Arg4(&mRequest.arg4)
+    {
+        AddArgument("Arg1", &mComplex_Arg1);
+        AddArgument("Arg2", &mComplex_Arg2);
+        AddArgument("Arg3", &mComplex_Arg3);
+        AddArgument("Arg4", &mComplex_Arg4);
+        AddArgument("Arg5", 0, UINT8_MAX, &mRequest.arg5);
+        AddArgument("Arg6", 0, 1, &mRequest.arg6);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000006) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000006, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000006) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000006, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NestedStructList::Type>>
+        mComplex_Arg1;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>
+        mComplex_Arg2;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>> mComplex_Arg3;
+    TypedComplexArgument<chip::app::DataModel::List<const bool>> mComplex_Arg4;
+};
+
+/*
+ * Command TestStructArgumentRequest
+ */
+class TestClusterTestStructArgumentRequest : public ClusterCommand
+{
+public:
+    TestClusterTestStructArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-struct-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
+    {
+        AddArgument("Arg1", &mComplex_Arg1);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000007) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000007, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000007) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000007, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mComplex_Arg1;
+};
+
+/*
+ * Command TestNestedStructArgumentRequest
+ */
+class TestClusterTestNestedStructArgumentRequest : public ClusterCommand
+{
+public:
+    TestClusterTestNestedStructArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-nested-struct-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
+    {
+        AddArgument("Arg1", &mComplex_Arg1);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000008) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000008, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000008) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000008, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::NestedStruct::Type> mComplex_Arg1;
+};
+
+/*
+ * Command TestListStructArgumentRequest
+ */
+class TestClusterTestListStructArgumentRequest : public ClusterCommand
+{
+public:
+    TestClusterTestListStructArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-list-struct-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
+    {
+        AddArgument("Arg1", &mComplex_Arg1);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000009) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000009, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000009) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000009, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>
+        mComplex_Arg1;
+};
+
+/*
+ * Command TestListInt8UArgumentRequest
+ */
+class TestClusterTestListInt8UArgumentRequest : public ClusterCommand
+{
+public:
+    TestClusterTestListInt8UArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-list-int8uargument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
+    {
+        AddArgument("Arg1", &mComplex_Arg1);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x0000000A) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000000A, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x0000000A) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000000A, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex_Arg1;
+};
+
+/*
+ * Command TestNestedStructListArgumentRequest
+ */
+class TestClusterTestNestedStructListArgumentRequest : public ClusterCommand
+{
+public:
+    TestClusterTestNestedStructListArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-nested-struct-list-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
+    {
+        AddArgument("Arg1", &mComplex_Arg1);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x0000000B) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000000B, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x0000000B) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000000B, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::NestedStructList::Type> mComplex_Arg1;
+};
+
+/*
+ * Command TestListNestedStructListArgumentRequest
+ */
+class TestClusterTestListNestedStructListArgumentRequest : public ClusterCommand
+{
+public:
+    TestClusterTestListNestedStructListArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-list-nested-struct-list-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
+    {
+        AddArgument("Arg1", &mComplex_Arg1);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x0000000C) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000000C, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x0000000C) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000000C, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NestedStructList::Type>>
+        mComplex_Arg1;
+};
+
+/*
+ * Command TestListInt8UReverseRequest
+ */
+class TestClusterTestListInt8UReverseRequest : public ClusterCommand
+{
+public:
+    TestClusterTestListInt8UReverseRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-list-int8ureverse-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
+    {
+        AddArgument("Arg1", &mComplex_Arg1);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x0000000D) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000000D, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x0000000D) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000000D, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex_Arg1;
+};
+
+/*
+ * Command TestEnumsRequest
+ */
+class TestClusterTestEnumsRequest : public ClusterCommand
+{
+public:
+    TestClusterTestEnumsRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-enums-request", credsIssuerConfig)
+    {
+        AddArgument("Arg1", 0, UINT16_MAX, &mRequest.arg1);
+        AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x0000000E) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000000E, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x0000000E) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000000E, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type mRequest;
+};
+
+/*
+ * Command TestNullableOptionalRequest
+ */
+class TestClusterTestNullableOptionalRequest : public ClusterCommand
+{
+public:
+    TestClusterTestNullableOptionalRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-nullable-optional-request", credsIssuerConfig)
+    {
+        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x0000000F) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000000F, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x0000000F) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000000F, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type mRequest;
+};
+
+/*
+ * Command TestComplexNullableOptionalRequest
+ */
+class TestClusterTestComplexNullableOptionalRequest : public ClusterCommand
+{
+public:
+    TestClusterTestComplexNullableOptionalRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-complex-nullable-optional-request", credsIssuerConfig),
+        mComplex_NullableStruct(&mRequest.nullableStruct), mComplex_OptionalStruct(&mRequest.optionalStruct),
+        mComplex_NullableOptionalStruct(&mRequest.nullableOptionalStruct), mComplex_NullableList(&mRequest.nullableList),
+        mComplex_OptionalList(&mRequest.optionalList), mComplex_NullableOptionalList(&mRequest.nullableOptionalList)
+    {
+        AddArgument("NullableInt", 0, UINT16_MAX, &mRequest.nullableInt);
+        AddArgument("OptionalInt", 0, UINT16_MAX, &mRequest.optionalInt);
+        AddArgument("NullableOptionalInt", 0, UINT16_MAX, &mRequest.nullableOptionalInt);
+        AddArgument("NullableString", &mRequest.nullableString);
+        AddArgument("OptionalString", &mRequest.optionalString);
+        AddArgument("NullableOptionalString", &mRequest.nullableOptionalString);
+        AddArgument("NullableStruct", &mComplex_NullableStruct);
+        AddArgument("OptionalStruct", &mComplex_OptionalStruct);
+        AddArgument("NullableOptionalStruct", &mComplex_NullableOptionalStruct);
+        AddArgument("NullableList", &mComplex_NullableList);
+        AddArgument("OptionalList", &mComplex_OptionalList);
+        AddArgument("NullableOptionalList", &mComplex_NullableOptionalList);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000010) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000010, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000010) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000010, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>
+        mComplex_NullableStruct;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>> mComplex_OptionalStruct;
+    TypedComplexArgument<
+        chip::Optional<chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>>
+        mComplex_NullableOptionalStruct;
+    TypedComplexArgument<
+        chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>
+        mComplex_NullableList;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>
+        mComplex_OptionalList;
+    TypedComplexArgument<chip::Optional<
+        chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>>
+        mComplex_NullableOptionalList;
+};
+
+/*
+ * Command SimpleStructEchoRequest
+ */
+class TestClusterSimpleStructEchoRequest : public ClusterCommand
+{
+public:
+    TestClusterSimpleStructEchoRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("simple-struct-echo-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
+    {
+        AddArgument("Arg1", &mComplex_Arg1);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000011) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000011, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000011) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000011, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mComplex_Arg1;
+};
+
+/*
+ * Command TimedInvokeRequest
+ */
+class TestClusterTimedInvokeRequest : public ClusterCommand
+{
+public:
+    TestClusterTimedInvokeRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("timed-invoke-request", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000012) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000012, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000012) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000012, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type mRequest;
+};
+
+/*
+ * Command TestSimpleOptionalArgumentRequest
+ */
+class TestClusterTestSimpleOptionalArgumentRequest : public ClusterCommand
+{
+public:
+    TestClusterTestSimpleOptionalArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-simple-optional-argument-request", credsIssuerConfig)
+    {
+        AddArgument("Arg1", 0, 1, &mRequest.arg1);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000013) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000013, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000013) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000013, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type mRequest;
+};
+
+/*
+ * Command TestEmitTestEventRequest
+ */
+class TestClusterTestEmitTestEventRequest : public ClusterCommand
+{
+public:
+    TestClusterTestEmitTestEventRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-emit-test-event-request", credsIssuerConfig)
+    {
+        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
+        AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2);
+        AddArgument("Arg3", 0, 1, &mRequest.arg3);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000014) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000014, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000014) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000014, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type mRequest;
+};
+
+/*
+ * Command TestEmitTestFabricScopedEventRequest
+ */
+class TestClusterTestEmitTestFabricScopedEventRequest : public ClusterCommand
+{
+public:
+    TestClusterTestEmitTestFabricScopedEventRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-emit-test-fabric-scoped-event-request", credsIssuerConfig)
+    {
+        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000015) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000015, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0xFFF1FC05) command (0x00000015) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000015, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventRequest::Type mRequest;
+};
+
+class WriteTestClusterBoolean : public WriteAttribute
+{
+public:
+    WriteTestClusterBoolean(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Boolean", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "boolean");
+        AddArgument("attr-value", 0, 1, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterBoolean() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000000, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000000, mValue);
+    }
+
+private:
+    bool mValue;
+};
+
+class WriteTestClusterBitmap8 : public WriteAttribute
+{
+public:
+    WriteTestClusterBitmap8(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Bitmap8", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "bitmap8");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterBitmap8() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000001, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000001, mValue);
+    }
+
+private:
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> mValue;
+};
+
+class WriteTestClusterBitmap16 : public WriteAttribute
+{
+public:
+    WriteTestClusterBitmap16(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Bitmap16", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "bitmap16");
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterBitmap16() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000002, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000002, mValue);
+    }
+
+private:
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> mValue;
+};
+
+class WriteTestClusterBitmap32 : public WriteAttribute
+{
+public:
+    WriteTestClusterBitmap32(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Bitmap32", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "bitmap32");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterBitmap32() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000003, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000003, mValue);
+    }
+
+private:
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> mValue;
+};
+
+class WriteTestClusterBitmap64 : public WriteAttribute
+{
+public:
+    WriteTestClusterBitmap64(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Bitmap64", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "bitmap64");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterBitmap64() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000004, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000004, mValue);
+    }
+
+private:
+    chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> mValue;
+};
+
+class WriteTestClusterInt8u : public WriteAttribute
+{
+public:
+    WriteTestClusterInt8u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int8u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int8u");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt8u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000005, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000005, mValue);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class WriteTestClusterInt16u : public WriteAttribute
+{
+public:
+    WriteTestClusterInt16u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int16u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int16u");
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt16u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000006, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000006, mValue);
+    }
+
+private:
+    uint16_t mValue;
+};
+
+class WriteTestClusterInt24u : public WriteAttribute
+{
+public:
+    WriteTestClusterInt24u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int24u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int24u");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt24u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000007, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000007, mValue);
+    }
+
+private:
+    uint32_t mValue;
+};
+
+class WriteTestClusterInt32u : public WriteAttribute
+{
+public:
+    WriteTestClusterInt32u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int32u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int32u");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt32u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000008, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000008, mValue);
+    }
+
+private:
+    uint32_t mValue;
+};
+
+class WriteTestClusterInt40u : public WriteAttribute
+{
+public:
+    WriteTestClusterInt40u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int40u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int40u");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt40u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000009, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000009, mValue);
+    }
+
+private:
+    uint64_t mValue;
+};
+
+class WriteTestClusterInt48u : public WriteAttribute
+{
+public:
+    WriteTestClusterInt48u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int48u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int48u");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt48u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000000A, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000000A, mValue);
+    }
+
+private:
+    uint64_t mValue;
+};
+
+class WriteTestClusterInt56u : public WriteAttribute
+{
+public:
+    WriteTestClusterInt56u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int56u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int56u");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt56u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000000B, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000000B, mValue);
+    }
+
+private:
+    uint64_t mValue;
+};
+
+class WriteTestClusterInt64u : public WriteAttribute
+{
+public:
+    WriteTestClusterInt64u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int64u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int64u");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt64u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000000C, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000000C, mValue);
+    }
+
+private:
+    uint64_t mValue;
+};
+
+class WriteTestClusterInt8s : public WriteAttribute
+{
+public:
+    WriteTestClusterInt8s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int8s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int8s");
+        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt8s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000000D, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000000D, mValue);
+    }
+
+private:
+    int8_t mValue;
+};
+
+class WriteTestClusterInt16s : public WriteAttribute
+{
+public:
+    WriteTestClusterInt16s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int16s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int16s");
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt16s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000000E, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000000E, mValue);
+    }
+
+private:
+    int16_t mValue;
+};
+
+class WriteTestClusterInt24s : public WriteAttribute
+{
+public:
+    WriteTestClusterInt24s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int24s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int24s");
+        AddArgument("attr-value", INT32_MIN, INT32_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt24s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000000F, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000000F, mValue);
+    }
+
+private:
+    int32_t mValue;
+};
+
+class WriteTestClusterInt32s : public WriteAttribute
+{
+public:
+    WriteTestClusterInt32s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int32s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int32s");
+        AddArgument("attr-value", INT32_MIN, INT32_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt32s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000010, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000010, mValue);
+    }
+
+private:
+    int32_t mValue;
+};
+
+class WriteTestClusterInt40s : public WriteAttribute
+{
+public:
+    WriteTestClusterInt40s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int40s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int40s");
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt40s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000011, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000011, mValue);
+    }
+
+private:
+    int64_t mValue;
+};
+
+class WriteTestClusterInt48s : public WriteAttribute
+{
+public:
+    WriteTestClusterInt48s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int48s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int48s");
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt48s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000012, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000012, mValue);
+    }
+
+private:
+    int64_t mValue;
+};
+
+class WriteTestClusterInt56s : public WriteAttribute
+{
+public:
+    WriteTestClusterInt56s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int56s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int56s");
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt56s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000013, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000013, mValue);
+    }
+
+private:
+    int64_t mValue;
+};
+
+class WriteTestClusterInt64s : public WriteAttribute
+{
+public:
+    WriteTestClusterInt64s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Int64s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "int64s");
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterInt64s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000014, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000014, mValue);
+    }
+
+private:
+    int64_t mValue;
+};
+
+class WriteTestClusterEnum8 : public WriteAttribute
+{
+public:
+    WriteTestClusterEnum8(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Enum8", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "enum8");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterEnum8() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000015, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000015, mValue);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class WriteTestClusterEnum16 : public WriteAttribute
+{
+public:
+    WriteTestClusterEnum16(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Enum16", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "enum16");
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterEnum16() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000016, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000016, mValue);
+    }
+
+private:
+    uint16_t mValue;
+};
+
+class WriteTestClusterFloatSingle : public WriteAttribute
+{
+public:
+    WriteTestClusterFloatSingle(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("FloatSingle", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "float-single");
+        AddArgument("attr-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterFloatSingle() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000017, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000017, mValue);
+    }
+
+private:
+    float mValue;
+};
+
+class WriteTestClusterFloatDouble : public WriteAttribute
+{
+public:
+    WriteTestClusterFloatDouble(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("FloatDouble", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "float-double");
+        AddArgument("attr-value", -std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterFloatDouble() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000018, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000018, mValue);
+    }
+
+private:
+    double mValue;
+};
+
+class WriteTestClusterOctetString : public WriteAttribute
+{
+public:
+    WriteTestClusterOctetString(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("OctetString", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "octet-string");
+        AddArgument("attr-value", &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterOctetString() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000019, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000019, mValue);
+    }
+
+private:
+    chip::ByteSpan mValue;
+};
+
+class WriteTestClusterListInt8u : public WriteAttribute
+{
+public:
+    WriteTestClusterListInt8u(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ListInt8u", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "list-int8u");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterListInt8u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000001A, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000001A, mValue);
+    }
+
+private:
+    chip::app::DataModel::List<const uint8_t> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex;
+};
+
+class WriteTestClusterListOctetString : public WriteAttribute
+{
+public:
+    WriteTestClusterListOctetString(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ListOctetString", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "list-octet-string");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterListOctetString() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000001B, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000001B, mValue);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::ByteSpan> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex;
+};
+
+class WriteTestClusterListStructOctetString : public WriteAttribute
+{
+public:
+    WriteTestClusterListStructOctetString(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ListStructOctetString", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "list-struct-octet-string");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterListStructOctetString() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000001C, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000001C, mValue);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type>>
+        mComplex;
+};
+
+class WriteTestClusterLongOctetString : public WriteAttribute
+{
+public:
+    WriteTestClusterLongOctetString(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("LongOctetString", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "long-octet-string");
+        AddArgument("attr-value", &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterLongOctetString() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000001D, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000001D, mValue);
+    }
+
+private:
+    chip::ByteSpan mValue;
+};
+
+class WriteTestClusterCharString : public WriteAttribute
+{
+public:
+    WriteTestClusterCharString(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("CharString", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "char-string");
+        AddArgument("attr-value", &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterCharString() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000001E, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000001E, mValue);
+    }
+
+private:
+    chip::CharSpan mValue;
+};
+
+class WriteTestClusterLongCharString : public WriteAttribute
+{
+public:
+    WriteTestClusterLongCharString(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("LongCharString", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "long-char-string");
+        AddArgument("attr-value", &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterLongCharString() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000001F, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000001F, mValue);
+    }
+
+private:
+    chip::CharSpan mValue;
+};
+
+class WriteTestClusterEpochUs : public WriteAttribute
+{
+public:
+    WriteTestClusterEpochUs(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("EpochUs", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "epoch-us");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterEpochUs() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000020, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000020, mValue);
+    }
+
+private:
+    uint64_t mValue;
+};
+
+class WriteTestClusterEpochS : public WriteAttribute
+{
+public:
+    WriteTestClusterEpochS(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("EpochS", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "epoch-s");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterEpochS() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000021, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000021, mValue);
+    }
+
+private:
+    uint32_t mValue;
+};
+
+class WriteTestClusterVendorId : public WriteAttribute
+{
+public:
+    WriteTestClusterVendorId(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("VendorId", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "vendor-id");
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterVendorId() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000022, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000022, mValue);
+    }
+
+private:
+    chip::VendorId mValue;
+};
+
+class WriteTestClusterListNullablesAndOptionalsStruct : public WriteAttribute
+{
+public:
+    WriteTestClusterListNullablesAndOptionalsStruct(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ListNullablesAndOptionalsStruct", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "list-nullables-and-optionals-struct");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterListNullablesAndOptionalsStruct() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000023, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000023, mValue);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type> mValue;
+    TypedComplexArgument<
+        chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type>>
+        mComplex;
+};
+
+class WriteTestClusterEnumAttr : public WriteAttribute
+{
+public:
+    WriteTestClusterEnumAttr(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("EnumAttr", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "enum-attr");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterEnumAttr() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000024, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000024, mValue);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::SimpleEnum mValue;
+};
+
+class WriteTestClusterStructAttr : public WriteAttribute
+{
+public:
+    WriteTestClusterStructAttr(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("StructAttr", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "struct-attr");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterStructAttr() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000025, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000025, mValue);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type mValue;
+    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mComplex;
+};
+
+class WriteTestClusterRangeRestrictedInt8u : public WriteAttribute
+{
+public:
+    WriteTestClusterRangeRestrictedInt8u(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("RangeRestrictedInt8u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "range-restricted-int8u");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterRangeRestrictedInt8u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000026, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000026, mValue);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class WriteTestClusterRangeRestrictedInt8s : public WriteAttribute
+{
+public:
+    WriteTestClusterRangeRestrictedInt8s(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("RangeRestrictedInt8s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "range-restricted-int8s");
+        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterRangeRestrictedInt8s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000027, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000027, mValue);
+    }
+
+private:
+    int8_t mValue;
+};
+
+class WriteTestClusterRangeRestrictedInt16u : public WriteAttribute
+{
+public:
+    WriteTestClusterRangeRestrictedInt16u(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("RangeRestrictedInt16u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "range-restricted-int16u");
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterRangeRestrictedInt16u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000028, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000028, mValue);
+    }
+
+private:
+    uint16_t mValue;
+};
+
+class WriteTestClusterRangeRestrictedInt16s : public WriteAttribute
+{
+public:
+    WriteTestClusterRangeRestrictedInt16s(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("RangeRestrictedInt16s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "range-restricted-int16s");
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterRangeRestrictedInt16s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000029, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000029, mValue);
+    }
+
+private:
+    int16_t mValue;
+};
+
+class WriteTestClusterListLongOctetString : public WriteAttribute
+{
+public:
+    WriteTestClusterListLongOctetString(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ListLongOctetString", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "list-long-octet-string");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterListLongOctetString() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000002A, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000002A, mValue);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::ByteSpan> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex;
+};
+
+class WriteTestClusterListFabricScoped : public WriteAttribute
+{
+public:
+    WriteTestClusterListFabricScoped(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ListFabricScoped", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "list-fabric-scoped");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterListFabricScoped() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000002B, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000002B, mValue);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type>>
+        mComplex;
+};
+
+class WriteTestClusterTimedWriteBoolean : public WriteAttribute
+{
+public:
+    WriteTestClusterTimedWriteBoolean(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("TimedWriteBoolean", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "timed-write-boolean");
+        AddArgument("attr-value", 0, 1, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterTimedWriteBoolean() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000030, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000030, mValue);
+    }
+
+private:
+    bool mValue;
+};
+
+class WriteTestClusterGeneralErrorBoolean : public WriteAttribute
+{
+public:
+    WriteTestClusterGeneralErrorBoolean(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("GeneralErrorBoolean", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "general-error-boolean");
+        AddArgument("attr-value", 0, 1, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterGeneralErrorBoolean() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000031, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000031, mValue);
+    }
+
+private:
+    bool mValue;
+};
+
+class WriteTestClusterClusterErrorBoolean : public WriteAttribute
+{
+public:
+    WriteTestClusterClusterErrorBoolean(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ClusterErrorBoolean", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "cluster-error-boolean");
+        AddArgument("attr-value", 0, 1, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterClusterErrorBoolean() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00000032, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00000032, mValue);
+    }
+
+private:
+    bool mValue;
+};
+
+class WriteTestClusterUnsupported : public WriteAttribute
+{
+public:
+    WriteTestClusterUnsupported(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("Unsupported", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "unsupported");
+        AddArgument("attr-value", 0, 1, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterUnsupported() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x000000FF, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x000000FF, mValue);
+    }
+
+private:
+    bool mValue;
+};
+
+class WriteTestClusterNullableBoolean : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableBoolean(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableBoolean", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-boolean");
+        AddArgument("attr-value", 0, 1, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableBoolean() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004000, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004000, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<bool> mValue;
+};
+
+class WriteTestClusterNullableBitmap8 : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableBitmap8(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableBitmap8", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-bitmap8");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableBitmap8() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004001, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004001, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> mValue;
+};
+
+class WriteTestClusterNullableBitmap16 : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableBitmap16(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableBitmap16", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-bitmap16");
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableBitmap16() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004002, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004002, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> mValue;
+};
+
+class WriteTestClusterNullableBitmap32 : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableBitmap32(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableBitmap32", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-bitmap32");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableBitmap32() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004003, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004003, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> mValue;
+};
+
+class WriteTestClusterNullableBitmap64 : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableBitmap64(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableBitmap64", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-bitmap64");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableBitmap64() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004004, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004004, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> mValue;
+};
+
+class WriteTestClusterNullableInt8u : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt8u(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("NullableInt8u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int8u");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt8u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004005, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004005, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint8_t> mValue;
+};
+
+class WriteTestClusterNullableInt16u : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt16u(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableInt16u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int16u");
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt16u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004006, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004006, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint16_t> mValue;
+};
+
+class WriteTestClusterNullableInt24u : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt24u(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableInt24u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int24u");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt24u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004007, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004007, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint32_t> mValue;
+};
+
+class WriteTestClusterNullableInt32u : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt32u(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableInt32u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int32u");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt32u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004008, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004008, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint32_t> mValue;
+};
+
+class WriteTestClusterNullableInt40u : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt40u(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableInt40u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int40u");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt40u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004009, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004009, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint64_t> mValue;
+};
+
+class WriteTestClusterNullableInt48u : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt48u(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableInt48u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int48u");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt48u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000400A, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000400A, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint64_t> mValue;
+};
+
+class WriteTestClusterNullableInt56u : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt56u(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableInt56u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int56u");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt56u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000400B, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000400B, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint64_t> mValue;
+};
+
+class WriteTestClusterNullableInt64u : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt64u(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableInt64u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int64u");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt64u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000400C, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000400C, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint64_t> mValue;
+};
+
+class WriteTestClusterNullableInt8s : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt8s(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("NullableInt8s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int8s");
+        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt8s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000400D, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000400D, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<int8_t> mValue;
+};
+
+class WriteTestClusterNullableInt16s : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt16s(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableInt16s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int16s");
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt16s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000400E, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000400E, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<int16_t> mValue;
+};
+
+class WriteTestClusterNullableInt24s : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt24s(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableInt24s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int24s");
+        AddArgument("attr-value", INT32_MIN, INT32_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt24s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000400F, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000400F, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<int32_t> mValue;
+};
+
+class WriteTestClusterNullableInt32s : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt32s(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableInt32s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int32s");
+        AddArgument("attr-value", INT32_MIN, INT32_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt32s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004010, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004010, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<int32_t> mValue;
+};
+
+class WriteTestClusterNullableInt40s : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt40s(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableInt40s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int40s");
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt40s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004011, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004011, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<int64_t> mValue;
+};
+
+class WriteTestClusterNullableInt48s : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt48s(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableInt48s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int48s");
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt48s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004012, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004012, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<int64_t> mValue;
+};
+
+class WriteTestClusterNullableInt56s : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt56s(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableInt56s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int56s");
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt56s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004013, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004013, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<int64_t> mValue;
+};
+
+class WriteTestClusterNullableInt64s : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableInt64s(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableInt64s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-int64s");
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt64s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004014, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004014, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<int64_t> mValue;
+};
+
+class WriteTestClusterNullableEnum8 : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableEnum8(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("NullableEnum8", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-enum8");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableEnum8() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004015, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004015, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint8_t> mValue;
+};
+
+class WriteTestClusterNullableEnum16 : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableEnum16(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableEnum16", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-enum16");
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableEnum16() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004016, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004016, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint16_t> mValue;
+};
+
+class WriteTestClusterNullableFloatSingle : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableFloatSingle(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableFloatSingle", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-float-single");
+        AddArgument("attr-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableFloatSingle() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004017, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004017, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<float> mValue;
+};
+
+class WriteTestClusterNullableFloatDouble : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableFloatDouble(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableFloatDouble", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-float-double");
+        AddArgument("attr-value", -std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableFloatDouble() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004018, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004018, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<double> mValue;
+};
+
+class WriteTestClusterNullableOctetString : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableOctetString(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableOctetString", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-octet-string");
+        AddArgument("attr-value", &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableOctetString() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004019, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004019, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<chip::ByteSpan> mValue;
+};
+
+class WriteTestClusterNullableCharString : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableCharString(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableCharString", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-char-string");
+        AddArgument("attr-value", &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableCharString() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x0000401E, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x0000401E, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<chip::CharSpan> mValue;
+};
+
+class WriteTestClusterNullableEnumAttr : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableEnumAttr(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableEnumAttr", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-enum-attr");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableEnumAttr() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004024, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004024, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> mValue;
+};
+
+class WriteTestClusterNullableStruct : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableStruct(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableStruct", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "nullable-struct");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableStruct() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004025, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004025, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>> mComplex;
+};
+
+class WriteTestClusterNullableRangeRestrictedInt8u : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableRangeRestrictedInt8u(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableRangeRestrictedInt8u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int8u");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableRangeRestrictedInt8u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004026, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004026, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint8_t> mValue;
+};
+
+class WriteTestClusterNullableRangeRestrictedInt8s : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableRangeRestrictedInt8s(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableRangeRestrictedInt8s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int8s");
+        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableRangeRestrictedInt8s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004027, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004027, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<int8_t> mValue;
+};
+
+class WriteTestClusterNullableRangeRestrictedInt16u : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableRangeRestrictedInt16u(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableRangeRestrictedInt16u", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int16u");
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableRangeRestrictedInt16u() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004028, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004028, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint16_t> mValue;
+};
+
+class WriteTestClusterNullableRangeRestrictedInt16s : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableRangeRestrictedInt16s(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableRangeRestrictedInt16s", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int16s");
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableRangeRestrictedInt16s() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0xFFF1FC05, 0x00004029, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0xFFF1FC05, 0x00004029, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<int16_t> mValue;
+};
+
+/*----------------------------------------------------------------------------*\
 | Register all Clusters commands                                               |
 \*----------------------------------------------------------------------------*/
 void registerClusterPowerConfiguration(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
@@ -19779,15 +19121,16 @@ void registerClusterLevelControl(Commands & commands, CredentialIssuerCommands *
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),               //
-        make_unique<LevelControlMoveToLevel>(credsIssuerConfig),          //
-        make_unique<LevelControlMove>(credsIssuerConfig),                 //
-        make_unique<LevelControlStep>(credsIssuerConfig),                 //
-        make_unique<LevelControlStop>(credsIssuerConfig),                 //
-        make_unique<LevelControlMoveToLevelWithOnOff>(credsIssuerConfig), //
-        make_unique<LevelControlMoveWithOnOff>(credsIssuerConfig),        //
-        make_unique<LevelControlStepWithOnOff>(credsIssuerConfig),        //
-        make_unique<LevelControlStopWithOnOff>(credsIssuerConfig),        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                 //
+        make_unique<LevelControlMoveToLevel>(credsIssuerConfig),            //
+        make_unique<LevelControlMove>(credsIssuerConfig),                   //
+        make_unique<LevelControlStep>(credsIssuerConfig),                   //
+        make_unique<LevelControlStop>(credsIssuerConfig),                   //
+        make_unique<LevelControlMoveToLevelWithOnOff>(credsIssuerConfig),   //
+        make_unique<LevelControlMoveWithOnOff>(credsIssuerConfig),          //
+        make_unique<LevelControlStepWithOnOff>(credsIssuerConfig),          //
+        make_unique<LevelControlStopWithOnOff>(credsIssuerConfig),          //
+        make_unique<LevelControlMoveToClosestFrequency>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -21033,19 +20376,22 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                 //
+        make_unique<GeneralDiagnosticsTestEventTrigger>(credsIssuerConfig), //
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
-        make_unique<ReadAttribute>(Id, "network-interfaces", Attributes::NetworkInterfaces::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "reboot-count", Attributes::RebootCount::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "up-time", Attributes::UpTime::Id, credsIssuerConfig),                                     //
-        make_unique<ReadAttribute>(Id, "total-operational-hours", Attributes::TotalOperationalHours::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "boot-reasons", Attributes::BootReasons::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "active-hardware-faults", Attributes::ActiveHardwareFaults::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "active-radio-faults", Attributes::ActiveRadioFaults::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<ReadAttribute>(Id, "network-interfaces", Attributes::NetworkInterfaces::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "reboot-count", Attributes::RebootCount::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "up-time", Attributes::UpTime::Id, credsIssuerConfig),                                //
+        make_unique<ReadAttribute>(Id, "total-operational-hours", Attributes::TotalOperationalHours::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "boot-reasons", Attributes::BootReasons::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "active-hardware-faults", Attributes::ActiveHardwareFaults::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "active-radio-faults", Attributes::ActiveRadioFaults::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "test-event-triggers-enabled", Attributes::TestEventTriggersEnabled::Id,
+                                   credsIssuerConfig),                                                                            //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                       //
@@ -21061,11 +20407,13 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeAttribute>(Id, "active-hardware-faults", Attributes::ActiveHardwareFaults::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "active-radio-faults", Attributes::ActiveRadioFaults::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "test-event-triggers-enabled", Attributes::TestEventTriggersEnabled::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         //
         // Events
         //
@@ -21664,16 +21012,15 @@ void registerClusterOperationalCredentials(Commands & commands, CredentialIssuer
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                 //
-        make_unique<OperationalCredentialsAttestationRequest>(credsIssuerConfig),           //
-        make_unique<OperationalCredentialsCertificateChainRequest>(credsIssuerConfig),      //
-        make_unique<OperationalCredentialsCSRRequest>(credsIssuerConfig),                   //
-        make_unique<OperationalCredentialsAddNOC>(credsIssuerConfig),                       //
-        make_unique<OperationalCredentialsUpdateNOC>(credsIssuerConfig),                    //
-        make_unique<OperationalCredentialsUpdateFabricLabel>(credsIssuerConfig),            //
-        make_unique<OperationalCredentialsRemoveFabric>(credsIssuerConfig),                 //
-        make_unique<OperationalCredentialsAddTrustedRootCertificate>(credsIssuerConfig),    //
-        make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                              //
+        make_unique<OperationalCredentialsAttestationRequest>(credsIssuerConfig),        //
+        make_unique<OperationalCredentialsCertificateChainRequest>(credsIssuerConfig),   //
+        make_unique<OperationalCredentialsCSRRequest>(credsIssuerConfig),                //
+        make_unique<OperationalCredentialsAddNOC>(credsIssuerConfig),                    //
+        make_unique<OperationalCredentialsUpdateNOC>(credsIssuerConfig),                 //
+        make_unique<OperationalCredentialsUpdateFabricLabel>(credsIssuerConfig),         //
+        make_unique<OperationalCredentialsRemoveFabric>(credsIssuerConfig),              //
+        make_unique<OperationalCredentialsAddTrustedRootCertificate>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -22101,13 +21448,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<DoorLockLockDoor>(credsIssuerConfig),             //
         make_unique<DoorLockUnlockDoor>(credsIssuerConfig),           //
         make_unique<DoorLockUnlockWithTimeout>(credsIssuerConfig),    //
-        make_unique<DoorLockGetLogRecord>(credsIssuerConfig),         //
-        make_unique<DoorLockSetPINCode>(credsIssuerConfig),           //
-        make_unique<DoorLockGetPINCode>(credsIssuerConfig),           //
-        make_unique<DoorLockClearPINCode>(credsIssuerConfig),         //
-        make_unique<DoorLockClearAllPINCodes>(credsIssuerConfig),     //
-        make_unique<DoorLockSetUserStatus>(credsIssuerConfig),        //
-        make_unique<DoorLockGetUserStatus>(credsIssuerConfig),        //
         make_unique<DoorLockSetWeekDaySchedule>(credsIssuerConfig),   //
         make_unique<DoorLockGetWeekDaySchedule>(credsIssuerConfig),   //
         make_unique<DoorLockClearWeekDaySchedule>(credsIssuerConfig), //
@@ -22117,12 +21457,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<DoorLockSetHolidaySchedule>(credsIssuerConfig),   //
         make_unique<DoorLockGetHolidaySchedule>(credsIssuerConfig),   //
         make_unique<DoorLockClearHolidaySchedule>(credsIssuerConfig), //
-        make_unique<DoorLockSetUserType>(credsIssuerConfig),          //
-        make_unique<DoorLockGetUserType>(credsIssuerConfig),          //
-        make_unique<DoorLockSetRFIDCode>(credsIssuerConfig),          //
-        make_unique<DoorLockGetRFIDCode>(credsIssuerConfig),          //
-        make_unique<DoorLockClearRFIDCode>(credsIssuerConfig),        //
-        make_unique<DoorLockClearAllRFIDCodes>(credsIssuerConfig),    //
         make_unique<DoorLockSetUser>(credsIssuerConfig),              //
         make_unique<DoorLockGetUser>(credsIssuerConfig),              //
         make_unique<DoorLockClearUser>(credsIssuerConfig),            //
@@ -22140,8 +21474,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<ReadAttribute>(Id, "door-open-events", Attributes::DoorOpenEvents::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "door-closed-events", Attributes::DoorClosedEvents::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "open-period", Attributes::OpenPeriod::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "number-of-log-records-supported", Attributes::NumberOfLogRecordsSupported::Id,
-                                   credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "number-of-total-users-supported", Attributes::NumberOfTotalUsersSupported::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "number-of-pinusers-supported", Attributes::NumberOfPINUsersSupported::Id,
@@ -22161,7 +21493,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<ReadAttribute>(Id, "credential-rules-support", Attributes::CredentialRulesSupport::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "number-of-credentials-supported-per-user",
                                    Attributes::NumberOfCredentialsSupportedPerUser::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "enable-logging", Attributes::EnableLogging::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "language", Attributes::Language::Id, credsIssuerConfig),                                 //
         make_unique<ReadAttribute>(Id, "ledsettings", Attributes::LEDSettings::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "auto-relock-time", Attributes::AutoRelockTime::Id, credsIssuerConfig),                   //
@@ -22181,22 +21512,8 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
                                    credsIssuerConfig),                                                                //
         make_unique<ReadAttribute>(Id, "send-pinover-the-air", Attributes::SendPINOverTheAir::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "require-pinfor-remote-operation", Attributes::RequirePINforRemoteOperation::Id,
-                                   credsIssuerConfig),                                                                   //
-        make_unique<ReadAttribute>(Id, "expiring-user-timeout", Attributes::ExpiringUserTimeout::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "keypad-operation-event-mask", Attributes::KeypadOperationEventMask::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "remote-operation-event-mask", Attributes::RemoteOperationEventMask::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "manual-operation-event-mask", Attributes::ManualOperationEventMask::Id,
-                                   credsIssuerConfig),                                                                         //
-        make_unique<ReadAttribute>(Id, "rfidoperation-event-mask", Attributes::RFIDOperationEventMask::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "keypad-programming-event-mask", Attributes::KeypadProgrammingEventMask::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "remote-programming-event-mask", Attributes::RemoteProgrammingEventMask::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "rfidprogramming-event-mask", Attributes::RFIDProgrammingEventMask::Id,
                                    credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "expiring-user-timeout", Attributes::ExpiringUserTimeout::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -22206,7 +21523,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<WriteDoorLockDoorOpenEvents>(credsIssuerConfig),                                                       //
         make_unique<WriteDoorLockDoorClosedEvents>(credsIssuerConfig),                                                     //
         make_unique<WriteDoorLockOpenPeriod>(credsIssuerConfig),                                                           //
-        make_unique<WriteDoorLockEnableLogging>(credsIssuerConfig),                                                        //
         make_unique<WriteDoorLockLanguage>(credsIssuerConfig),                                                             //
         make_unique<WriteDoorLockLEDSettings>(credsIssuerConfig),                                                          //
         make_unique<WriteDoorLockAutoRelockTime>(credsIssuerConfig),                                                       //
@@ -22222,14 +21538,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<WriteDoorLockSendPINOverTheAir>(credsIssuerConfig),                                                    //
         make_unique<WriteDoorLockRequirePINforRemoteOperation>(credsIssuerConfig),                                         //
         make_unique<WriteDoorLockExpiringUserTimeout>(credsIssuerConfig),                                                  //
-        make_unique<WriteDoorLockAlarmMask>(credsIssuerConfig),                                                            //
-        make_unique<WriteDoorLockKeypadOperationEventMask>(credsIssuerConfig),                                             //
-        make_unique<WriteDoorLockRemoteOperationEventMask>(credsIssuerConfig),                                             //
-        make_unique<WriteDoorLockManualOperationEventMask>(credsIssuerConfig),                                             //
-        make_unique<WriteDoorLockRFIDOperationEventMask>(credsIssuerConfig),                                               //
-        make_unique<WriteDoorLockKeypadProgrammingEventMask>(credsIssuerConfig),                                           //
-        make_unique<WriteDoorLockRemoteProgrammingEventMask>(credsIssuerConfig),                                           //
-        make_unique<WriteDoorLockRFIDProgrammingEventMask>(credsIssuerConfig),                                             //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
         make_unique<SubscribeAttribute>(Id, "lock-state", Attributes::LockState::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "lock-type", Attributes::LockType::Id, credsIssuerConfig),                     //
@@ -22238,8 +21546,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<SubscribeAttribute>(Id, "door-open-events", Attributes::DoorOpenEvents::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "door-closed-events", Attributes::DoorClosedEvents::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "open-period", Attributes::OpenPeriod::Id, credsIssuerConfig),                 //
-        make_unique<SubscribeAttribute>(Id, "number-of-log-records-supported", Attributes::NumberOfLogRecordsSupported::Id,
-                                        credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-total-users-supported", Attributes::NumberOfTotalUsersSupported::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-pinusers-supported", Attributes::NumberOfPINUsersSupported::Id,
@@ -22260,7 +21566,6 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-credentials-supported-per-user",
                                         Attributes::NumberOfCredentialsSupportedPerUser::Id, credsIssuerConfig),    //
-        make_unique<SubscribeAttribute>(Id, "enable-logging", Attributes::EnableLogging::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "language", Attributes::Language::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "ledsettings", Attributes::LEDSettings::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "auto-relock-time", Attributes::AutoRelockTime::Id, credsIssuerConfig), //
@@ -22285,23 +21590,8 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
                                         credsIssuerConfig),                                                                //
         make_unique<SubscribeAttribute>(Id, "send-pinover-the-air", Attributes::SendPINOverTheAir::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "require-pinfor-remote-operation", Attributes::RequirePINforRemoteOperation::Id,
-                                        credsIssuerConfig),                                                                   //
-        make_unique<SubscribeAttribute>(Id, "expiring-user-timeout", Attributes::ExpiringUserTimeout::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "keypad-operation-event-mask", Attributes::KeypadOperationEventMask::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "remote-operation-event-mask", Attributes::RemoteOperationEventMask::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "manual-operation-event-mask", Attributes::ManualOperationEventMask::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "rfidoperation-event-mask", Attributes::RFIDOperationEventMask::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "keypad-programming-event-mask", Attributes::KeypadProgrammingEventMask::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "remote-programming-event-mask", Attributes::RemoteProgrammingEventMask::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "rfidprogramming-event-mask", Attributes::RFIDProgrammingEventMask::Id,
                                         credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "expiring-user-timeout", Attributes::ExpiringUserTimeout::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -22642,7 +21932,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ThermostatSetWeeklySchedule>(credsIssuerConfig),   //
         make_unique<ThermostatGetWeeklySchedule>(credsIssuerConfig),   //
         make_unique<ThermostatClearWeeklySchedule>(credsIssuerConfig), //
-        make_unique<ThermostatGetRelayStatusLog>(credsIssuerConfig),   //
         //
         // Attributes
         //
@@ -22679,7 +21968,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "control-sequence-of-operation", Attributes::ControlSequenceOfOperation::Id,
                                    credsIssuerConfig),                                                                       //
         make_unique<ReadAttribute>(Id, "system-mode", Attributes::SystemMode::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "thermostat-running-mode", Attributes::ThermostatRunningMode::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "start-of-week", Attributes::StartOfWeek::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "number-of-weekly-transitions", Attributes::NumberOfWeeklyTransitions::Id,
@@ -22779,7 +22067,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "control-sequence-of-operation", Attributes::ControlSequenceOfOperation::Id,
                                         credsIssuerConfig),                                                                       //
         make_unique<SubscribeAttribute>(Id, "system-mode", Attributes::SystemMode::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),                          //
         make_unique<SubscribeAttribute>(Id, "thermostat-running-mode", Attributes::ThermostatRunningMode::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "start-of-week", Attributes::StartOfWeek::Id, credsIssuerConfig),                     //
         make_unique<SubscribeAttribute>(Id, "number-of-weekly-transitions", Attributes::NumberOfWeeklyTransitions::Id,
@@ -25584,322 +24871,6 @@ void registerClusterAccountLogin(Commands & commands, CredentialIssuerCommands *
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
-{
-    using namespace chip::app::Clusters::TestCluster;
-
-    const char * clusterName = "TestCluster";
-
-    commands_list clusterCommands = {
-        //
-        // Commands
-        //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                 //
-        make_unique<TestClusterTest>(credsIssuerConfig),                                    //
-        make_unique<TestClusterTestNotHandled>(credsIssuerConfig),                          //
-        make_unique<TestClusterTestSpecific>(credsIssuerConfig),                            //
-        make_unique<TestClusterTestUnknownCommand>(credsIssuerConfig),                      //
-        make_unique<TestClusterTestAddArguments>(credsIssuerConfig),                        //
-        make_unique<TestClusterTestSimpleArgumentRequest>(credsIssuerConfig),               //
-        make_unique<TestClusterTestStructArrayArgumentRequest>(credsIssuerConfig),          //
-        make_unique<TestClusterTestStructArgumentRequest>(credsIssuerConfig),               //
-        make_unique<TestClusterTestNestedStructArgumentRequest>(credsIssuerConfig),         //
-        make_unique<TestClusterTestListStructArgumentRequest>(credsIssuerConfig),           //
-        make_unique<TestClusterTestListInt8UArgumentRequest>(credsIssuerConfig),            //
-        make_unique<TestClusterTestNestedStructListArgumentRequest>(credsIssuerConfig),     //
-        make_unique<TestClusterTestListNestedStructListArgumentRequest>(credsIssuerConfig), //
-        make_unique<TestClusterTestListInt8UReverseRequest>(credsIssuerConfig),             //
-        make_unique<TestClusterTestEnumsRequest>(credsIssuerConfig),                        //
-        make_unique<TestClusterTestNullableOptionalRequest>(credsIssuerConfig),             //
-        make_unique<TestClusterTestComplexNullableOptionalRequest>(credsIssuerConfig),      //
-        make_unique<TestClusterSimpleStructEchoRequest>(credsIssuerConfig),                 //
-        make_unique<TestClusterTimedInvokeRequest>(credsIssuerConfig),                      //
-        make_unique<TestClusterTestSimpleOptionalArgumentRequest>(credsIssuerConfig),       //
-        make_unique<TestClusterTestEmitTestEventRequest>(credsIssuerConfig),                //
-        make_unique<TestClusterTestEmitTestFabricScopedEventRequest>(credsIssuerConfig),    //
-        //
-        // Attributes
-        //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                    //
-        make_unique<ReadAttribute>(Id, "boolean", Attributes::Boolean::Id, credsIssuerConfig),                                //
-        make_unique<ReadAttribute>(Id, "bitmap8", Attributes::Bitmap8::Id, credsIssuerConfig),                                //
-        make_unique<ReadAttribute>(Id, "bitmap16", Attributes::Bitmap16::Id, credsIssuerConfig),                              //
-        make_unique<ReadAttribute>(Id, "bitmap32", Attributes::Bitmap32::Id, credsIssuerConfig),                              //
-        make_unique<ReadAttribute>(Id, "bitmap64", Attributes::Bitmap64::Id, credsIssuerConfig),                              //
-        make_unique<ReadAttribute>(Id, "int8u", Attributes::Int8u::Id, credsIssuerConfig),                                    //
-        make_unique<ReadAttribute>(Id, "int16u", Attributes::Int16u::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "int24u", Attributes::Int24u::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "int32u", Attributes::Int32u::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "int40u", Attributes::Int40u::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "int48u", Attributes::Int48u::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "int56u", Attributes::Int56u::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "int64u", Attributes::Int64u::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "int8s", Attributes::Int8s::Id, credsIssuerConfig),                                    //
-        make_unique<ReadAttribute>(Id, "int16s", Attributes::Int16s::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "int24s", Attributes::Int24s::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "int32s", Attributes::Int32s::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "int40s", Attributes::Int40s::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "int48s", Attributes::Int48s::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "int56s", Attributes::Int56s::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "int64s", Attributes::Int64s::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "enum8", Attributes::Enum8::Id, credsIssuerConfig),                                    //
-        make_unique<ReadAttribute>(Id, "enum16", Attributes::Enum16::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "float-single", Attributes::FloatSingle::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "float-double", Attributes::FloatDouble::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "octet-string", Attributes::OctetString::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "list-int8u", Attributes::ListInt8u::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "list-octet-string", Attributes::ListOctetString::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "list-struct-octet-string", Attributes::ListStructOctetString::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "long-octet-string", Attributes::LongOctetString::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "char-string", Attributes::CharString::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "long-char-string", Attributes::LongCharString::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "epoch-us", Attributes::EpochUs::Id, credsIssuerConfig),                               //
-        make_unique<ReadAttribute>(Id, "epoch-s", Attributes::EpochS::Id, credsIssuerConfig),                                 //
-        make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorId::Id, credsIssuerConfig),                             //
-        make_unique<ReadAttribute>(Id, "list-nullables-and-optionals-struct", Attributes::ListNullablesAndOptionalsStruct::Id,
-                                   credsIssuerConfig),                                                                       //
-        make_unique<ReadAttribute>(Id, "enum-attr", Attributes::EnumAttr::Id, credsIssuerConfig),                            //
-        make_unique<ReadAttribute>(Id, "struct-attr", Attributes::StructAttr::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "range-restricted-int8u", Attributes::RangeRestrictedInt8u::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "range-restricted-int8s", Attributes::RangeRestrictedInt8s::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "range-restricted-int16u", Attributes::RangeRestrictedInt16u::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "range-restricted-int16s", Attributes::RangeRestrictedInt16s::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "list-long-octet-string", Attributes::ListLongOctetString::Id, credsIssuerConfig),    //
-        make_unique<ReadAttribute>(Id, "list-fabric-scoped", Attributes::ListFabricScoped::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "timed-write-boolean", Attributes::TimedWriteBoolean::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "general-error-boolean", Attributes::GeneralErrorBoolean::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "cluster-error-boolean", Attributes::ClusterErrorBoolean::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "nullable-bitmap16", Attributes::NullableBitmap16::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "nullable-bitmap32", Attributes::NullableBitmap32::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "nullable-bitmap64", Attributes::NullableBitmap64::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "nullable-int8u", Attributes::NullableInt8u::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "nullable-int16u", Attributes::NullableInt16u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int24u", Attributes::NullableInt24u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int32u", Attributes::NullableInt32u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int40u", Attributes::NullableInt40u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int48u", Attributes::NullableInt48u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int56u", Attributes::NullableInt56u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int64u", Attributes::NullableInt64u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int8s", Attributes::NullableInt8s::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "nullable-int16s", Attributes::NullableInt16s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int24s", Attributes::NullableInt24s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int32s", Attributes::NullableInt32s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int40s", Attributes::NullableInt40s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int48s", Attributes::NullableInt48s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int56s", Attributes::NullableInt56s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int64s", Attributes::NullableInt64s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-enum8", Attributes::NullableEnum8::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "nullable-enum16", Attributes::NullableEnum16::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-float-single", Attributes::NullableFloatSingle::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "nullable-float-double", Attributes::NullableFloatDouble::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "nullable-octet-string", Attributes::NullableOctetString::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "nullable-char-string", Attributes::NullableCharString::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "nullable-enum-attr", Attributes::NullableEnumAttr::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "nullable-struct", Attributes::NullableStruct::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-range-restricted-int8u", Attributes::NullableRangeRestrictedInt8u::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "nullable-range-restricted-int8s", Attributes::NullableRangeRestrictedInt8s::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "nullable-range-restricted-int16u", Attributes::NullableRangeRestrictedInt16u::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "nullable-range-restricted-int16s", Attributes::NullableRangeRestrictedInt16s::Id,
-                                   credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                //
-        make_unique<WriteTestClusterBoolean>(credsIssuerConfig),                                                           //
-        make_unique<WriteTestClusterBitmap8>(credsIssuerConfig),                                                           //
-        make_unique<WriteTestClusterBitmap16>(credsIssuerConfig),                                                          //
-        make_unique<WriteTestClusterBitmap32>(credsIssuerConfig),                                                          //
-        make_unique<WriteTestClusterBitmap64>(credsIssuerConfig),                                                          //
-        make_unique<WriteTestClusterInt8u>(credsIssuerConfig),                                                             //
-        make_unique<WriteTestClusterInt16u>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterInt24u>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterInt32u>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterInt40u>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterInt48u>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterInt56u>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterInt64u>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterInt8s>(credsIssuerConfig),                                                             //
-        make_unique<WriteTestClusterInt16s>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterInt24s>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterInt32s>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterInt40s>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterInt48s>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterInt56s>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterInt64s>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterEnum8>(credsIssuerConfig),                                                             //
-        make_unique<WriteTestClusterEnum16>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterFloatSingle>(credsIssuerConfig),                                                       //
-        make_unique<WriteTestClusterFloatDouble>(credsIssuerConfig),                                                       //
-        make_unique<WriteTestClusterOctetString>(credsIssuerConfig),                                                       //
-        make_unique<WriteTestClusterListInt8u>(credsIssuerConfig),                                                         //
-        make_unique<WriteTestClusterListOctetString>(credsIssuerConfig),                                                   //
-        make_unique<WriteTestClusterListStructOctetString>(credsIssuerConfig),                                             //
-        make_unique<WriteTestClusterLongOctetString>(credsIssuerConfig),                                                   //
-        make_unique<WriteTestClusterCharString>(credsIssuerConfig),                                                        //
-        make_unique<WriteTestClusterLongCharString>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterEpochUs>(credsIssuerConfig),                                                           //
-        make_unique<WriteTestClusterEpochS>(credsIssuerConfig),                                                            //
-        make_unique<WriteTestClusterVendorId>(credsIssuerConfig),                                                          //
-        make_unique<WriteTestClusterListNullablesAndOptionalsStruct>(credsIssuerConfig),                                   //
-        make_unique<WriteTestClusterEnumAttr>(credsIssuerConfig),                                                          //
-        make_unique<WriteTestClusterStructAttr>(credsIssuerConfig),                                                        //
-        make_unique<WriteTestClusterRangeRestrictedInt8u>(credsIssuerConfig),                                              //
-        make_unique<WriteTestClusterRangeRestrictedInt8s>(credsIssuerConfig),                                              //
-        make_unique<WriteTestClusterRangeRestrictedInt16u>(credsIssuerConfig),                                             //
-        make_unique<WriteTestClusterRangeRestrictedInt16s>(credsIssuerConfig),                                             //
-        make_unique<WriteTestClusterListLongOctetString>(credsIssuerConfig),                                               //
-        make_unique<WriteTestClusterListFabricScoped>(credsIssuerConfig),                                                  //
-        make_unique<WriteTestClusterTimedWriteBoolean>(credsIssuerConfig),                                                 //
-        make_unique<WriteTestClusterGeneralErrorBoolean>(credsIssuerConfig),                                               //
-        make_unique<WriteTestClusterClusterErrorBoolean>(credsIssuerConfig),                                               //
-        make_unique<WriteTestClusterUnsupported>(credsIssuerConfig),                                                       //
-        make_unique<WriteTestClusterNullableBoolean>(credsIssuerConfig),                                                   //
-        make_unique<WriteTestClusterNullableBitmap8>(credsIssuerConfig),                                                   //
-        make_unique<WriteTestClusterNullableBitmap16>(credsIssuerConfig),                                                  //
-        make_unique<WriteTestClusterNullableBitmap32>(credsIssuerConfig),                                                  //
-        make_unique<WriteTestClusterNullableBitmap64>(credsIssuerConfig),                                                  //
-        make_unique<WriteTestClusterNullableInt8u>(credsIssuerConfig),                                                     //
-        make_unique<WriteTestClusterNullableInt16u>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableInt24u>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableInt32u>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableInt40u>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableInt48u>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableInt56u>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableInt64u>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableInt8s>(credsIssuerConfig),                                                     //
-        make_unique<WriteTestClusterNullableInt16s>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableInt24s>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableInt32s>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableInt40s>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableInt48s>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableInt56s>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableInt64s>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableEnum8>(credsIssuerConfig),                                                     //
-        make_unique<WriteTestClusterNullableEnum16>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableFloatSingle>(credsIssuerConfig),                                               //
-        make_unique<WriteTestClusterNullableFloatDouble>(credsIssuerConfig),                                               //
-        make_unique<WriteTestClusterNullableOctetString>(credsIssuerConfig),                                               //
-        make_unique<WriteTestClusterNullableCharString>(credsIssuerConfig),                                                //
-        make_unique<WriteTestClusterNullableEnumAttr>(credsIssuerConfig),                                                  //
-        make_unique<WriteTestClusterNullableStruct>(credsIssuerConfig),                                                    //
-        make_unique<WriteTestClusterNullableRangeRestrictedInt8u>(credsIssuerConfig),                                      //
-        make_unique<WriteTestClusterNullableRangeRestrictedInt8s>(credsIssuerConfig),                                      //
-        make_unique<WriteTestClusterNullableRangeRestrictedInt16u>(credsIssuerConfig),                                     //
-        make_unique<WriteTestClusterNullableRangeRestrictedInt16s>(credsIssuerConfig),                                     //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
-        make_unique<SubscribeAttribute>(Id, "boolean", Attributes::Boolean::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "bitmap8", Attributes::Bitmap8::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "bitmap16", Attributes::Bitmap16::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "bitmap32", Attributes::Bitmap32::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "bitmap64", Attributes::Bitmap64::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "int8u", Attributes::Int8u::Id, credsIssuerConfig),                            //
-        make_unique<SubscribeAttribute>(Id, "int16u", Attributes::Int16u::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "int24u", Attributes::Int24u::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "int32u", Attributes::Int32u::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "int40u", Attributes::Int40u::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "int48u", Attributes::Int48u::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "int56u", Attributes::Int56u::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "int64u", Attributes::Int64u::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "int8s", Attributes::Int8s::Id, credsIssuerConfig),                            //
-        make_unique<SubscribeAttribute>(Id, "int16s", Attributes::Int16s::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "int24s", Attributes::Int24s::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "int32s", Attributes::Int32s::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "int40s", Attributes::Int40s::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "int48s", Attributes::Int48s::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "int56s", Attributes::Int56s::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "int64s", Attributes::Int64s::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "enum8", Attributes::Enum8::Id, credsIssuerConfig),                            //
-        make_unique<SubscribeAttribute>(Id, "enum16", Attributes::Enum16::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "float-single", Attributes::FloatSingle::Id, credsIssuerConfig),               //
-        make_unique<SubscribeAttribute>(Id, "float-double", Attributes::FloatDouble::Id, credsIssuerConfig),               //
-        make_unique<SubscribeAttribute>(Id, "octet-string", Attributes::OctetString::Id, credsIssuerConfig),               //
-        make_unique<SubscribeAttribute>(Id, "list-int8u", Attributes::ListInt8u::Id, credsIssuerConfig),                   //
-        make_unique<SubscribeAttribute>(Id, "list-octet-string", Attributes::ListOctetString::Id, credsIssuerConfig),      //
-        make_unique<SubscribeAttribute>(Id, "list-struct-octet-string", Attributes::ListStructOctetString::Id,
-                                        credsIssuerConfig),                                                           //
-        make_unique<SubscribeAttribute>(Id, "long-octet-string", Attributes::LongOctetString::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "char-string", Attributes::CharString::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "long-char-string", Attributes::LongCharString::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "epoch-us", Attributes::EpochUs::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "epoch-s", Attributes::EpochS::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "vendor-id", Attributes::VendorId::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "list-nullables-and-optionals-struct", Attributes::ListNullablesAndOptionalsStruct::Id,
-                                        credsIssuerConfig),                                                                       //
-        make_unique<SubscribeAttribute>(Id, "enum-attr", Attributes::EnumAttr::Id, credsIssuerConfig),                            //
-        make_unique<SubscribeAttribute>(Id, "struct-attr", Attributes::StructAttr::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "range-restricted-int8u", Attributes::RangeRestrictedInt8u::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "range-restricted-int8s", Attributes::RangeRestrictedInt8s::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "range-restricted-int16u", Attributes::RangeRestrictedInt16u::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "range-restricted-int16s", Attributes::RangeRestrictedInt16s::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "list-long-octet-string", Attributes::ListLongOctetString::Id, credsIssuerConfig),    //
-        make_unique<SubscribeAttribute>(Id, "list-fabric-scoped", Attributes::ListFabricScoped::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "timed-write-boolean", Attributes::TimedWriteBoolean::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "general-error-boolean", Attributes::GeneralErrorBoolean::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "cluster-error-boolean", Attributes::ClusterErrorBoolean::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                       //
-        make_unique<SubscribeAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "nullable-bitmap16", Attributes::NullableBitmap16::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "nullable-bitmap32", Attributes::NullableBitmap32::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "nullable-bitmap64", Attributes::NullableBitmap64::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "nullable-int8u", Attributes::NullableInt8u::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "nullable-int16u", Attributes::NullableInt16u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int24u", Attributes::NullableInt24u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int32u", Attributes::NullableInt32u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int40u", Attributes::NullableInt40u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int48u", Attributes::NullableInt48u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int56u", Attributes::NullableInt56u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int64u", Attributes::NullableInt64u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int8s", Attributes::NullableInt8s::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "nullable-int16s", Attributes::NullableInt16s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int24s", Attributes::NullableInt24s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int32s", Attributes::NullableInt32s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int40s", Attributes::NullableInt40s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int48s", Attributes::NullableInt48s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int56s", Attributes::NullableInt56s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int64s", Attributes::NullableInt64s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-enum8", Attributes::NullableEnum8::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "nullable-enum16", Attributes::NullableEnum16::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-float-single", Attributes::NullableFloatSingle::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "nullable-float-double", Attributes::NullableFloatDouble::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "nullable-octet-string", Attributes::NullableOctetString::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "nullable-char-string", Attributes::NullableCharString::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "nullable-enum-attr", Attributes::NullableEnumAttr::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "nullable-struct", Attributes::NullableStruct::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int8u", Attributes::NullableRangeRestrictedInt8u::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int8s", Attributes::NullableRangeRestrictedInt8s::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int16u", Attributes::NullableRangeRestrictedInt16u::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int16s", Attributes::NullableRangeRestrictedInt16s::Id,
-                                        credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        //
-        // Events
-        //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                     //
-        make_unique<ReadEvent>(Id, "test-event", Events::TestEvent::Id, credsIssuerConfig),                                //
-        make_unique<ReadEvent>(Id, "test-fabric-scoped-event", Events::TestFabricScopedEvent::Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                //
-        make_unique<SubscribeEvent>(Id, "test-event", Events::TestEvent::Id, credsIssuerConfig),                           //
-        make_unique<SubscribeEvent>(Id, "test-fabric-scoped-event", Events::TestFabricScopedEvent::Id, credsIssuerConfig), //
-    };
-
-    commands.Register(clusterName, clusterCommands);
-}
 void registerClusterMessaging(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::Messaging;
@@ -26522,6 +25493,322 @@ void registerClusterElectricalMeasurement(Commands & commands, CredentialIssuerC
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::TestCluster;
+
+    const char * clusterName = "TestCluster";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                 //
+        make_unique<TestClusterTest>(credsIssuerConfig),                                    //
+        make_unique<TestClusterTestNotHandled>(credsIssuerConfig),                          //
+        make_unique<TestClusterTestSpecific>(credsIssuerConfig),                            //
+        make_unique<TestClusterTestUnknownCommand>(credsIssuerConfig),                      //
+        make_unique<TestClusterTestAddArguments>(credsIssuerConfig),                        //
+        make_unique<TestClusterTestSimpleArgumentRequest>(credsIssuerConfig),               //
+        make_unique<TestClusterTestStructArrayArgumentRequest>(credsIssuerConfig),          //
+        make_unique<TestClusterTestStructArgumentRequest>(credsIssuerConfig),               //
+        make_unique<TestClusterTestNestedStructArgumentRequest>(credsIssuerConfig),         //
+        make_unique<TestClusterTestListStructArgumentRequest>(credsIssuerConfig),           //
+        make_unique<TestClusterTestListInt8UArgumentRequest>(credsIssuerConfig),            //
+        make_unique<TestClusterTestNestedStructListArgumentRequest>(credsIssuerConfig),     //
+        make_unique<TestClusterTestListNestedStructListArgumentRequest>(credsIssuerConfig), //
+        make_unique<TestClusterTestListInt8UReverseRequest>(credsIssuerConfig),             //
+        make_unique<TestClusterTestEnumsRequest>(credsIssuerConfig),                        //
+        make_unique<TestClusterTestNullableOptionalRequest>(credsIssuerConfig),             //
+        make_unique<TestClusterTestComplexNullableOptionalRequest>(credsIssuerConfig),      //
+        make_unique<TestClusterSimpleStructEchoRequest>(credsIssuerConfig),                 //
+        make_unique<TestClusterTimedInvokeRequest>(credsIssuerConfig),                      //
+        make_unique<TestClusterTestSimpleOptionalArgumentRequest>(credsIssuerConfig),       //
+        make_unique<TestClusterTestEmitTestEventRequest>(credsIssuerConfig),                //
+        make_unique<TestClusterTestEmitTestFabricScopedEventRequest>(credsIssuerConfig),    //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                    //
+        make_unique<ReadAttribute>(Id, "boolean", Attributes::Boolean::Id, credsIssuerConfig),                                //
+        make_unique<ReadAttribute>(Id, "bitmap8", Attributes::Bitmap8::Id, credsIssuerConfig),                                //
+        make_unique<ReadAttribute>(Id, "bitmap16", Attributes::Bitmap16::Id, credsIssuerConfig),                              //
+        make_unique<ReadAttribute>(Id, "bitmap32", Attributes::Bitmap32::Id, credsIssuerConfig),                              //
+        make_unique<ReadAttribute>(Id, "bitmap64", Attributes::Bitmap64::Id, credsIssuerConfig),                              //
+        make_unique<ReadAttribute>(Id, "int8u", Attributes::Int8u::Id, credsIssuerConfig),                                    //
+        make_unique<ReadAttribute>(Id, "int16u", Attributes::Int16u::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "int24u", Attributes::Int24u::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "int32u", Attributes::Int32u::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "int40u", Attributes::Int40u::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "int48u", Attributes::Int48u::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "int56u", Attributes::Int56u::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "int64u", Attributes::Int64u::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "int8s", Attributes::Int8s::Id, credsIssuerConfig),                                    //
+        make_unique<ReadAttribute>(Id, "int16s", Attributes::Int16s::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "int24s", Attributes::Int24s::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "int32s", Attributes::Int32s::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "int40s", Attributes::Int40s::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "int48s", Attributes::Int48s::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "int56s", Attributes::Int56s::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "int64s", Attributes::Int64s::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "enum8", Attributes::Enum8::Id, credsIssuerConfig),                                    //
+        make_unique<ReadAttribute>(Id, "enum16", Attributes::Enum16::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "float-single", Attributes::FloatSingle::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "float-double", Attributes::FloatDouble::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "octet-string", Attributes::OctetString::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "list-int8u", Attributes::ListInt8u::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "list-octet-string", Attributes::ListOctetString::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "list-struct-octet-string", Attributes::ListStructOctetString::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "long-octet-string", Attributes::LongOctetString::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "char-string", Attributes::CharString::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "long-char-string", Attributes::LongCharString::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "epoch-us", Attributes::EpochUs::Id, credsIssuerConfig),                               //
+        make_unique<ReadAttribute>(Id, "epoch-s", Attributes::EpochS::Id, credsIssuerConfig),                                 //
+        make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorId::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "list-nullables-and-optionals-struct", Attributes::ListNullablesAndOptionalsStruct::Id,
+                                   credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "enum-attr", Attributes::EnumAttr::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "struct-attr", Attributes::StructAttr::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "range-restricted-int8u", Attributes::RangeRestrictedInt8u::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "range-restricted-int8s", Attributes::RangeRestrictedInt8s::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "range-restricted-int16u", Attributes::RangeRestrictedInt16u::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "range-restricted-int16s", Attributes::RangeRestrictedInt16s::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "list-long-octet-string", Attributes::ListLongOctetString::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "list-fabric-scoped", Attributes::ListFabricScoped::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "timed-write-boolean", Attributes::TimedWriteBoolean::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "general-error-boolean", Attributes::GeneralErrorBoolean::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-error-boolean", Attributes::ClusterErrorBoolean::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "nullable-bitmap16", Attributes::NullableBitmap16::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-bitmap32", Attributes::NullableBitmap32::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-bitmap64", Attributes::NullableBitmap64::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int8u", Attributes::NullableInt8u::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "nullable-int16u", Attributes::NullableInt16u::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-int24u", Attributes::NullableInt24u::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-int32u", Attributes::NullableInt32u::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-int40u", Attributes::NullableInt40u::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-int48u", Attributes::NullableInt48u::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-int56u", Attributes::NullableInt56u::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-int64u", Attributes::NullableInt64u::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-int8s", Attributes::NullableInt8s::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "nullable-int16s", Attributes::NullableInt16s::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-int24s", Attributes::NullableInt24s::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-int32s", Attributes::NullableInt32s::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-int40s", Attributes::NullableInt40s::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-int48s", Attributes::NullableInt48s::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-int56s", Attributes::NullableInt56s::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-int64s", Attributes::NullableInt64s::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-enum8", Attributes::NullableEnum8::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "nullable-enum16", Attributes::NullableEnum16::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-float-single", Attributes::NullableFloatSingle::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "nullable-float-double", Attributes::NullableFloatDouble::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "nullable-octet-string", Attributes::NullableOctetString::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "nullable-char-string", Attributes::NullableCharString::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "nullable-enum-attr", Attributes::NullableEnumAttr::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "nullable-struct", Attributes::NullableStruct::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "nullable-range-restricted-int8u", Attributes::NullableRangeRestrictedInt8u::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "nullable-range-restricted-int8s", Attributes::NullableRangeRestrictedInt8s::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "nullable-range-restricted-int16u", Attributes::NullableRangeRestrictedInt16u::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "nullable-range-restricted-int16s", Attributes::NullableRangeRestrictedInt16s::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<WriteTestClusterBoolean>(credsIssuerConfig),                                                           //
+        make_unique<WriteTestClusterBitmap8>(credsIssuerConfig),                                                           //
+        make_unique<WriteTestClusterBitmap16>(credsIssuerConfig),                                                          //
+        make_unique<WriteTestClusterBitmap32>(credsIssuerConfig),                                                          //
+        make_unique<WriteTestClusterBitmap64>(credsIssuerConfig),                                                          //
+        make_unique<WriteTestClusterInt8u>(credsIssuerConfig),                                                             //
+        make_unique<WriteTestClusterInt16u>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterInt24u>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterInt32u>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterInt40u>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterInt48u>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterInt56u>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterInt64u>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterInt8s>(credsIssuerConfig),                                                             //
+        make_unique<WriteTestClusterInt16s>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterInt24s>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterInt32s>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterInt40s>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterInt48s>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterInt56s>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterInt64s>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterEnum8>(credsIssuerConfig),                                                             //
+        make_unique<WriteTestClusterEnum16>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterFloatSingle>(credsIssuerConfig),                                                       //
+        make_unique<WriteTestClusterFloatDouble>(credsIssuerConfig),                                                       //
+        make_unique<WriteTestClusterOctetString>(credsIssuerConfig),                                                       //
+        make_unique<WriteTestClusterListInt8u>(credsIssuerConfig),                                                         //
+        make_unique<WriteTestClusterListOctetString>(credsIssuerConfig),                                                   //
+        make_unique<WriteTestClusterListStructOctetString>(credsIssuerConfig),                                             //
+        make_unique<WriteTestClusterLongOctetString>(credsIssuerConfig),                                                   //
+        make_unique<WriteTestClusterCharString>(credsIssuerConfig),                                                        //
+        make_unique<WriteTestClusterLongCharString>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterEpochUs>(credsIssuerConfig),                                                           //
+        make_unique<WriteTestClusterEpochS>(credsIssuerConfig),                                                            //
+        make_unique<WriteTestClusterVendorId>(credsIssuerConfig),                                                          //
+        make_unique<WriteTestClusterListNullablesAndOptionalsStruct>(credsIssuerConfig),                                   //
+        make_unique<WriteTestClusterEnumAttr>(credsIssuerConfig),                                                          //
+        make_unique<WriteTestClusterStructAttr>(credsIssuerConfig),                                                        //
+        make_unique<WriteTestClusterRangeRestrictedInt8u>(credsIssuerConfig),                                              //
+        make_unique<WriteTestClusterRangeRestrictedInt8s>(credsIssuerConfig),                                              //
+        make_unique<WriteTestClusterRangeRestrictedInt16u>(credsIssuerConfig),                                             //
+        make_unique<WriteTestClusterRangeRestrictedInt16s>(credsIssuerConfig),                                             //
+        make_unique<WriteTestClusterListLongOctetString>(credsIssuerConfig),                                               //
+        make_unique<WriteTestClusterListFabricScoped>(credsIssuerConfig),                                                  //
+        make_unique<WriteTestClusterTimedWriteBoolean>(credsIssuerConfig),                                                 //
+        make_unique<WriteTestClusterGeneralErrorBoolean>(credsIssuerConfig),                                               //
+        make_unique<WriteTestClusterClusterErrorBoolean>(credsIssuerConfig),                                               //
+        make_unique<WriteTestClusterUnsupported>(credsIssuerConfig),                                                       //
+        make_unique<WriteTestClusterNullableBoolean>(credsIssuerConfig),                                                   //
+        make_unique<WriteTestClusterNullableBitmap8>(credsIssuerConfig),                                                   //
+        make_unique<WriteTestClusterNullableBitmap16>(credsIssuerConfig),                                                  //
+        make_unique<WriteTestClusterNullableBitmap32>(credsIssuerConfig),                                                  //
+        make_unique<WriteTestClusterNullableBitmap64>(credsIssuerConfig),                                                  //
+        make_unique<WriteTestClusterNullableInt8u>(credsIssuerConfig),                                                     //
+        make_unique<WriteTestClusterNullableInt16u>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableInt24u>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableInt32u>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableInt40u>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableInt48u>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableInt56u>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableInt64u>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableInt8s>(credsIssuerConfig),                                                     //
+        make_unique<WriteTestClusterNullableInt16s>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableInt24s>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableInt32s>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableInt40s>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableInt48s>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableInt56s>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableInt64s>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableEnum8>(credsIssuerConfig),                                                     //
+        make_unique<WriteTestClusterNullableEnum16>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableFloatSingle>(credsIssuerConfig),                                               //
+        make_unique<WriteTestClusterNullableFloatDouble>(credsIssuerConfig),                                               //
+        make_unique<WriteTestClusterNullableOctetString>(credsIssuerConfig),                                               //
+        make_unique<WriteTestClusterNullableCharString>(credsIssuerConfig),                                                //
+        make_unique<WriteTestClusterNullableEnumAttr>(credsIssuerConfig),                                                  //
+        make_unique<WriteTestClusterNullableStruct>(credsIssuerConfig),                                                    //
+        make_unique<WriteTestClusterNullableRangeRestrictedInt8u>(credsIssuerConfig),                                      //
+        make_unique<WriteTestClusterNullableRangeRestrictedInt8s>(credsIssuerConfig),                                      //
+        make_unique<WriteTestClusterNullableRangeRestrictedInt16u>(credsIssuerConfig),                                     //
+        make_unique<WriteTestClusterNullableRangeRestrictedInt16s>(credsIssuerConfig),                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
+        make_unique<SubscribeAttribute>(Id, "boolean", Attributes::Boolean::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "bitmap8", Attributes::Bitmap8::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "bitmap16", Attributes::Bitmap16::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "bitmap32", Attributes::Bitmap32::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "bitmap64", Attributes::Bitmap64::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "int8u", Attributes::Int8u::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "int16u", Attributes::Int16u::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "int24u", Attributes::Int24u::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "int32u", Attributes::Int32u::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "int40u", Attributes::Int40u::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "int48u", Attributes::Int48u::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "int56u", Attributes::Int56u::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "int64u", Attributes::Int64u::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "int8s", Attributes::Int8s::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "int16s", Attributes::Int16s::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "int24s", Attributes::Int24s::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "int32s", Attributes::Int32s::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "int40s", Attributes::Int40s::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "int48s", Attributes::Int48s::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "int56s", Attributes::Int56s::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "int64s", Attributes::Int64s::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "enum8", Attributes::Enum8::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "enum16", Attributes::Enum16::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "float-single", Attributes::FloatSingle::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "float-double", Attributes::FloatDouble::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "octet-string", Attributes::OctetString::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "list-int8u", Attributes::ListInt8u::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "list-octet-string", Attributes::ListOctetString::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "list-struct-octet-string", Attributes::ListStructOctetString::Id,
+                                        credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "long-octet-string", Attributes::LongOctetString::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "char-string", Attributes::CharString::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "long-char-string", Attributes::LongCharString::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "epoch-us", Attributes::EpochUs::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "epoch-s", Attributes::EpochS::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "vendor-id", Attributes::VendorId::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "list-nullables-and-optionals-struct", Attributes::ListNullablesAndOptionalsStruct::Id,
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "enum-attr", Attributes::EnumAttr::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "struct-attr", Attributes::StructAttr::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "range-restricted-int8u", Attributes::RangeRestrictedInt8u::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "range-restricted-int8s", Attributes::RangeRestrictedInt8s::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "range-restricted-int16u", Attributes::RangeRestrictedInt16u::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "range-restricted-int16s", Attributes::RangeRestrictedInt16s::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "list-long-octet-string", Attributes::ListLongOctetString::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "list-fabric-scoped", Attributes::ListFabricScoped::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "timed-write-boolean", Attributes::TimedWriteBoolean::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "general-error-boolean", Attributes::GeneralErrorBoolean::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-error-boolean", Attributes::ClusterErrorBoolean::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                       //
+        make_unique<SubscribeAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "nullable-bitmap16", Attributes::NullableBitmap16::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-bitmap32", Attributes::NullableBitmap32::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-bitmap64", Attributes::NullableBitmap64::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int8u", Attributes::NullableInt8u::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "nullable-int16u", Attributes::NullableInt16u::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-int24u", Attributes::NullableInt24u::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-int32u", Attributes::NullableInt32u::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-int40u", Attributes::NullableInt40u::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-int48u", Attributes::NullableInt48u::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-int56u", Attributes::NullableInt56u::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-int64u", Attributes::NullableInt64u::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-int8s", Attributes::NullableInt8s::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "nullable-int16s", Attributes::NullableInt16s::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-int24s", Attributes::NullableInt24s::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-int32s", Attributes::NullableInt32s::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-int40s", Attributes::NullableInt40s::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-int48s", Attributes::NullableInt48s::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-int56s", Attributes::NullableInt56s::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-int64s", Attributes::NullableInt64s::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-enum8", Attributes::NullableEnum8::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "nullable-enum16", Attributes::NullableEnum16::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-float-single", Attributes::NullableFloatSingle::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "nullable-float-double", Attributes::NullableFloatDouble::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "nullable-octet-string", Attributes::NullableOctetString::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "nullable-char-string", Attributes::NullableCharString::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "nullable-enum-attr", Attributes::NullableEnumAttr::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "nullable-struct", Attributes::NullableStruct::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int8u", Attributes::NullableRangeRestrictedInt8u::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int8s", Attributes::NullableRangeRestrictedInt8s::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int16u", Attributes::NullableRangeRestrictedInt16u::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int16s", Attributes::NullableRangeRestrictedInt16s::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadEvent>(Id, "test-event", Events::TestEvent::Id, credsIssuerConfig),                                //
+        make_unique<ReadEvent>(Id, "test-fabric-scoped-event", Events::TestFabricScopedEvent::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeEvent>(Id, "test-event", Events::TestEvent::Id, credsIssuerConfig),                           //
+        make_unique<SubscribeEvent>(Id, "test-fabric-scoped-event", Events::TestFabricScopedEvent::Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 
 void registerClusterAny(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -26652,12 +25939,12 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterApplicationLauncher(commands, credsIssuerConfig);
     registerClusterApplicationBasic(commands, credsIssuerConfig);
     registerClusterAccountLogin(commands, credsIssuerConfig);
-    registerClusterTestCluster(commands, credsIssuerConfig);
     registerClusterMessaging(commands, credsIssuerConfig);
     registerClusterApplianceIdentification(commands, credsIssuerConfig);
     registerClusterMeterIdentification(commands, credsIssuerConfig);
     registerClusterApplianceEventsAndAlert(commands, credsIssuerConfig);
     registerClusterApplianceStatistics(commands, credsIssuerConfig);
     registerClusterElectricalMeasurement(commands, credsIssuerConfig);
+    registerClusterTestCluster(commands, credsIssuerConfig);
     registerClusterSubscriptions(commands, credsIssuerConfig);
 }

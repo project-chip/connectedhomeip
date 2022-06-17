@@ -41,7 +41,7 @@ limitations under the License.
       <description>Upon receipt, this SHALL hide the input list from the screen.</description>
     </command>
 
-    <command source="client" code="0x03" name="RenameInput" optional="false">
+    <command source="client" code="0x03" name="RenameInput" optional="true">
       <description>Upon receipt, this SHALL rename the input at a specific index in the Input List. Updates to the input name SHALL appear in the TV settings menus.    </description>
       <arg name="index" type="INT8U"/>
       <arg name="name" type="CHAR_STRING"/>

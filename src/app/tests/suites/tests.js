@@ -38,6 +38,9 @@ function getManualTests() {
     'Test_TC_DD_1_10',
     'Test_TC_DD_1_11',
     'Test_TC_DD_1_12',
+    'Test_TC_DD_1_13',
+    'Test_TC_DD_1_14',
+    'Test_TC_DD_1_15',
     'Test_TC_DD_2_1',
     'Test_TC_DD_2_2',
     'Test_TC_DD_3_1',
@@ -54,26 +57,30 @@ function getManualTests() {
     'Test_TC_DD_3_12',
     'Test_TC_DD_3_13',
     'Test_TC_DD_3_14',
-    'Test_TC_DD_4_1',
+    'Test_TC_DD_3_15',
+    'Test_TC_DD_3_16',
+    'Test_TC_DD_3_17',
+    'Test_TC_DD_3_18',
+    'Test_TC_DD_3_19',
+    'Test_TC_DD_3_20',
   ];
 
   const Groups = [
     'TestGroupDemoCommand',
     'TestGroupDemoConfig',
+    'Test_TC_GR_1_1',
+    'Test_TC_GR_2_1',
+    'Test_TC_GR_2_2',
+    'Test_TC_GR_2_3',
+    'Test_TC_GR_3_1',
+    'Test_TC_GR_3_2',
   ];
 
   const BulkDataExchangeProtocol = [
-    'Test_TC_BDX_1_1',
     'Test_TC_BDX_1_2',
-    'Test_TC_BDX_1_3',
     'Test_TC_BDX_1_4',
-    'Test_TC_BDX_1_5',
-    'Test_TC_BDX_1_6',
     'Test_TC_BDX_2_1',
     'Test_TC_BDX_2_2',
-    'Test_TC_BDX_2_3',
-    'Test_TC_BDX_2_4',
-    'Test_TC_BDX_2_5',
   ];
 
   const bridge = [
@@ -93,11 +100,14 @@ function getManualTests() {
   ];
 
   const DeviceManagement = [
+    'Test_TC_DM_1_1',
     'Test_TC_DM_1_2',
-    'Test_TC_DM_1_4',
-    'Test_TC_DM_2_1',
+    'Test_TC_DM_1_3',
+    'Test_TC_DM_2_2',
     'Test_TC_DM_2_4',
+    'Test_TC_DM_3_1',
     'Test_TC_DM_3_2',
+    'Test_TC_DM_3_3',
     'Test_TC_DM_3_4',
     'Test_TC_DM_4_1',
     'Test_TC_DM_4_2',
@@ -123,23 +133,28 @@ function getManualTests() {
   ];
 
   const DiagnosticsLogs = [
-    'Test_TC_Diag_Log_2_1',
-    'Test_TC_Diag_Log_2_2',
-    'Test_TC_Diag_Log_2_3',
+    'Test_TC_DLOG_1_1',
+    'Test_TC_DLOG_2_1',
+    'Test_TC_DLOG_2_2',
+    'Test_TC_DLOG_3_1',
   ];
 
   const Descriptor = [
     'Test_TC_DESC_1_1',
+    'Test_TC_DESC_2_1',
+    'Test_TC_DESC_2_2',
   ];
 
   const EthernetNetworkDiagnostics = [
-    'Test_TC_ETHDIAG_1_2',
+    'Test_TC_DGETH_1_1',
+    'Test_TC_DGETH_3_1',
+    'Test_TC_DGETH_3_2',
   ];
 
   const GeneralCommissioning = [
-    'Test_TC_GC_2_2',
-    'Test_TC_GC_2_3',
-    'Test_TC_GC_2_4',
+    'Test_TC_CGEN_2_2',
+    'Test_TC_CGEN_2_3',
+    'Test_TC_CGEN_2_4',
   ];
 
   const GeneralDiagnostics = [
@@ -168,6 +183,7 @@ function getManualTests() {
     'Test_TC_IDM_3_2',
     'Test_TC_IDM_4_1',
     'Test_TC_IDM_4_2',
+    'Test_TC_IDM_4_3',
     'Test_TC_IDM_5_1',
     'Test_TC_IDM_5_2',
     'Test_TC_IDM_6_1',
@@ -179,19 +195,32 @@ function getManualTests() {
 
   const MediaControl = [
     'Test_TC_MC_2_2',
+    'Test_TC_MC_3_7_1',
+    'Test_TC_MC_3_8_1',
+    'Test_TC_MC_3_9_1',
+    'Test_TC_MC_3_14',
+    'Test_TC_MC_3_15',
+    'Test_TC_MC_3_16',
+    'Test_TC_MC_3_17',
     'Test_TC_MC_4_1',
+    'Test_TC_MC_5_4',
+    'Test_TC_MC_5_5',
+    'Test_TC_MC_5_6',
     'Test_TC_MC_6_1',
     'Test_TC_MC_6_2',
     'Test_TC_MC_6_3',
     'Test_TC_MC_6_4',
-    'Test_TC_MC_8_2',
-    'Test_TC_MC_9_2',
-    'Test_TC_MC_10_2',
+    'Test_TC_MC_6_5',
+    'Test_TC_MC_6_7',
+    'Test_TC_MC_7_3',
+    'Test_TC_MC_7_4',
     'Test_TC_MC_10_3',
-    'Test_TC_MC_10_4',
     'Test_TC_MC_10_5',
-    'Test_TC_MC_10_6',
     'Test_TC_MC_10_7',
+    'Test_TC_MC_11_1',
+    'Test_TC_MC_11_2',
+    'Test_TC_MC_12_1',
+    'Test_TC_MC_12_2',
   ];
 
   const MultipleFabrics = [
@@ -239,6 +268,7 @@ function getManualTests() {
     'Test_TC_SU_2_5',
     'Test_TC_SU_2_6',
     'Test_TC_SU_2_7',
+    'Test_TC_SU_2_8',
     'Test_TC_SU_3_1',
     'Test_TC_SU_3_2',
     'Test_TC_SU_3_3',
@@ -270,8 +300,10 @@ function getManualTests() {
   ];
 
   const WiFiNetworkDiagnostics = [
-    'Test_TC_WIFIDIAG_1_2',
-    'Test_TC_WIFIDIAG_2_1',
+    'Test_TC_DGWIFI_1_1',
+    'Test_TC_DGWIFI_2_2',
+    'Test_TC_DGWIFI_3_1',
+    'Test_TC_DGWIFI_3_2',
   ];
 
   const WindowCovering = [
@@ -280,6 +312,7 @@ function getManualTests() {
   ];
 
   const FlowMeasurement = [
+    'Test_TC_FLW_2_2',
     'Test_TC_FLW_3_1',
   ];
 
@@ -318,16 +351,11 @@ function getManualTests() {
   ];
 
   const DoorLock = [
+    'Test_TC_DL_1_1',
     'Test_TC_DL_2_1',
-    'Test_TC_DL_2_5',
     'Test_TC_DL_2_6',
-    'Test_TC_DL_2_7',
+    'Test_TC_DL_2_8',
     'Test_TC_DL_2_10',
-    'Test_TC_DL_2_13',
-    'Test_TC_DL_2_14',
-    'Test_TC_DL_2_15',
-    'Test_TC_DL_2_16',
-    'Test_TC_DL_2_17',
   ];
 
   const UserLabel = [
@@ -337,32 +365,14 @@ function getManualTests() {
   ];
 
   const LocalizationConfiguration = [
-    'Test_TC_LO_1_1',
+    'Test_TC_LCFG_1_1',
+    'Test_TC_LCFG_2_1',
+    'Test_TC_LCFG_3_1',
   ];
 
   const LevelControl = [
     'Test_TC_LVL_2_3',
-  ];
-
-  const NetworkCommissioning = [
-    'Test_TC_NC_1_1',
-    'Test_TC_NC_1_2',
-    'Test_TC_NC_1_3',
-    'Test_TC_NC_1_4',
-    'Test_TC_NC_1_5',
-    'Test_TC_NC_1_6',
-    'Test_TC_NC_1_7',
-    'Test_TC_NC_1_8',
-    'Test_TC_NC_1_9',
-    'Test_TC_NC_1_10',
-    'Test_TC_NC_1_11',
-    'Test_TC_NC_1_12',
-    'Test_TC_NC_1_13',
-    'Test_TC_NC_1_14',
-    'Test_TC_NC_1_15',
-    'Test_TC_NC_1_16',
-    'Test_TC_NC_1_17',
-    'Test_TC_NC_1_18',
+    'Test_TC_LVL_8_1',
   ];
 
   const OnOff = [
@@ -371,15 +381,18 @@ function getManualTests() {
   ];
 
   const RelativeHumidityMeasurement = [
+    'Test_TC_RH_2_2',
     'Test_TC_RH_3_1',
   ];
 
   const Switch = [
     'Test_TC_SWTCH_1_1',
+    'Test_TC_SWTCH_2_2',
     'Test_TC_SWTCH_3_1',
   ];
 
   const TemperatureMeasurement = [
+    'Test_TC_TM_2_2',
     'Test_TC_TM_3_1',
   ];
 
@@ -399,6 +412,37 @@ function getManualTests() {
     'Test_TC_DIAG_TH_NW_2_9',
   ];
 
+  const Actions = [
+    'Test_TC_ACT_1_1',
+    'Test_TC_ACT_2_1',
+    'Test_TC_ACT_2_2',
+    'Test_TC_ACT_3_1',
+  ];
+
+  const TimeFormatLocalization = [
+    'Test_TC_TFL_1_1',
+    'Test_TC_TFL_1_2',
+    'Test_TC_TFL_2_1',
+    'Test_TC_TFL_2_2',
+  ];
+
+  const UnitLocalization = [
+    'Test_TC_UL_1_1',
+    'Test_TC_UL_1_2',
+    'Test_TC_UL_2_1',
+    'Test_TC_UL_2_2',
+  ];
+
+  const FixedLabel = [
+    'Test_TC_FLABEL_1_1',
+    'Test_TC_FLABEL_2_1',
+    'Test_TC_FLABEL_2_2',
+  ];
+
+  const Binding = [
+    'Test_TC_BIND_1_1',
+    'Test_TC_BIND_2_1',
+  ];
 
   const tests = [
     DeviceDiscovery,
@@ -435,7 +479,6 @@ function getManualTests() {
     UserLabel,
     LocalizationConfiguration,
     LevelControl,
-    NetworkCommissioning,
     OnOff,
     RelativeHumidityMeasurement,
     Switch,
@@ -443,6 +486,11 @@ function getManualTests() {
     Thermostat,
     ThermostatUserConfiguration,
     ThreadNetworkDiagnostics,
+    Actions,
+    TimeFormatLocalization,
+    UnitLocalization,
+    FixedLabel,
+    Binding,
   ].flat(1);
 
   tests.disable = disable.bind(tests);
@@ -496,9 +544,7 @@ function getTests() {
   ];
 
   const DeviceManagement = [
-    'Test_TC_DM_1_1',
-    'Test_TC_DM_3_1',
-    'Test_TC_DM_2_2',
+    'Test_TC_DM_2_1',
   ];
 
   const ElectricalMeasurement = [
@@ -506,19 +552,18 @@ function getTests() {
   ];
 
   const EthernetNetworkDiagnostics = [
-    'Test_TC_ETHDIAG_1_1',
-    'Test_TC_ETHDIAG_2_1',
+    'Test_TC_DGETH_2_1',
+    'Test_TC_DGETH_2_2',
   ];
 
   const FlowMeasurement = [
     'Test_TC_FLW_1_1',
     'Test_TC_FLW_2_1',
-    'Test_TC_FLW_2_2',
   ];
 
   const GeneralCommissioning = [
-    'Test_TC_GC_1_1',
-    'Test_TC_GC_2_1',
+    'Test_TC_CGEN_1_1',
+    'Test_TC_CGEN_2_1',
   ];
 
   const Identify = [
@@ -566,7 +611,6 @@ function getTests() {
     'Test_TC_MC_1_11',
     'Test_TC_MC_1_12',
     'Test_TC_MC_2_1',
-    'Test_TC_MC_3_1',
     'Test_TC_MC_3_2',
     'Test_TC_MC_3_3',
     'Test_TC_MC_3_4',
@@ -638,7 +682,6 @@ function getTests() {
   const RelativeHumidityMeasurement = [
     'Test_TC_RH_1_1',
     'Test_TC_RH_2_1',
-    'Test_TC_RH_2_2',
   ];
 
   const SecureChannel = [
@@ -647,13 +690,11 @@ function getTests() {
 
   const Switch = [
     'Test_TC_SWTCH_2_1',
-    'Test_TC_SWTCH_2_2',
   ];
 
   const TemperatureMeasurement = [
     'Test_TC_TM_1_1',
     'Test_TC_TM_2_1',
-    'Test_TC_TM_2_2',
   ];
 
   const Thermostat = [
@@ -676,8 +717,8 @@ function getTests() {
   ];
 
   const WiFiNetworkDiagnostics = [
-    'Test_TC_WIFIDIAG_1_1',
-    'Test_TC_WIFIDIAG_3_1',
+    'Test_TC_DGWIFI_2_1',
+    'Test_TC_DGWIFI_2_3',
   ];
 
   const WindowCovering = [
@@ -759,8 +800,9 @@ function getTests() {
     'Test_TC_DL_2_2',
     'Test_TC_DL_2_3',
     'Test_TC_DL_2_4',
-    'Test_TC_DL_2_8',
-    'Test_TC_DL_2_11',
+    'Test_TC_DL_2_5',
+    'Test_TC_DL_2_7',
+    'Test_TC_DL_2_9',
   ];
 
   const Groups = [

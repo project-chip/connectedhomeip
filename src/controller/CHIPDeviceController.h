@@ -136,7 +136,7 @@ struct CommissionerInitParams : public ControllerInitParams
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SessionRecoveryDelegate, public AbstractDnssdDiscoveryController
+class DLL_EXPORT DeviceController : public AbstractDnssdDiscoveryController
 {
 public:
     DeviceController();
@@ -300,9 +300,6 @@ protected:
     /// Fetches the session to use for the current device. Allows overriding
     /// in case subclasses want to create the session if it does not yet exist
     virtual OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId);
-
-    //////////// SessionRecoveryDelegate Implementation ///////////////
-    void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
 
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 
@@ -468,16 +465,6 @@ public:
 
     /**
      * @brief
-     *   This function returns the attestation challenge for the secure session of the device being commissioned.
-     *
-     * @param[out] attestationChallenge The output for the attestationChallenge
-     *
-     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or CHIP_ERROR_INVALID_ARGUMENT if no secure session is active
-     */
-    CHIP_ERROR GetAttestationChallenge(ByteSpan & attestationChallenge);
-
-    /**
-     * @brief
      *   This function stops a pairing process that's in progress. It does not delete the pairing of a previously
      *   paired device.
      *
@@ -632,24 +619,27 @@ private:
     /* This function sends a Device Attestation Certificate chain request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendCertificateChainRequestCommand(DeviceProxy * device, Credentials::CertificateType certificateType);
+    CHIP_ERROR SendCertificateChainRequestCommand(DeviceProxy * device, Credentials::CertificateType certificateType,
+                                                  Optional<System::Clock::Timeout> timeout);
     /* This function sends an Attestation request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce);
+    CHIP_ERROR SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce,
+                                             Optional<System::Clock::Timeout> timeout);
     /* This function sends an CSR request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce);
+    CHIP_ERROR SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce,
+                                                               Optional<System::Clock::Timeout> timeout);
     /* This function sends the operational credentials to the device.
        The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf, const Optional<ByteSpan> & icaCertBuf,
-                                          AesCcm128KeySpan ipk, NodeId adminSubject);
+                                          AesCcm128KeySpan ipk, NodeId adminSubject, Optional<System::Clock::Timeout> timeout);
     /* This function sends the trusted root certificate to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendTrustedRootCertificate(DeviceProxy * device, const ByteSpan & rcac);
+    CHIP_ERROR SendTrustedRootCertificate(DeviceProxy * device, const ByteSpan & rcac, Optional<System::Clock::Timeout> timeout);
 
     /* This function is called by the commissioner code when the device completes
        the operational credential provisioning process.
@@ -768,9 +758,9 @@ private:
     template <typename ClusterObjectT, typename RequestObjectT>
     CHIP_ERROR SendCommand(DeviceProxy * device, const RequestObjectT & request,
                            CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
-                           CommandResponseFailureCallback failureCb)
+                           CommandResponseFailureCallback failureCb, Optional<System::Clock::Timeout> timeout)
     {
-        return SendCommand<ClusterObjectT>(device, request, successCb, failureCb, 0, NullOptional);
+        return SendCommand<ClusterObjectT>(device, request, successCb, failureCb, 0, timeout);
     }
 
     template <typename ClusterObjectT, typename RequestObjectT>

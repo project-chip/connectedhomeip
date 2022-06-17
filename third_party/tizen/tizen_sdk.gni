@@ -63,7 +63,7 @@ template("tizen_sdk_package") {
   # Output directory where packaging will occur. We need a separate directory
   # for this, because Tizen Studio CLI scans "res" (resources), "shared" and
   # "lib" directories for items to pack. In our case it could include in the
-  # TPK package libraries available in ${root_build_dir}/lib directory.
+  # TPK package libraries available in ${root_out_dir}/lib directory.
   tizen_package_dir = "${root_build_dir}/package"
   tizen_package_out_dir = "${tizen_package_dir}/out"
 
@@ -94,7 +94,7 @@ template("tizen_sdk_package") {
   if (manifest_apps["service"] != "") {
     dependencies += [ ":${target_name}:app:service" ]
     copy("${target_name}:app:service") {
-      sources = [ root_build_dir + "/" + manifest_apps["service"] ]
+      sources = [ root_out_dir + "/" + manifest_apps["service"] ]
       outputs = [ "${tizen_package_out_dir}/{{source_file_part}}" ]
       deps = invoker.deps
     }

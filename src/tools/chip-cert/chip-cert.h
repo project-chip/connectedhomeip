@@ -51,6 +51,7 @@
 
 #include <CHIPVersion.h>
 #include <credentials/CHIPCert.h>
+#include <credentials/CHIPCertificateSet.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/core/CHIPConfig.h>
@@ -188,11 +189,11 @@ public:
         }
         if (attCertType == kAttCertType_PAA)
         {
-            return 0;
+            return 1;
         }
         if (attCertType == kAttCertType_PAI)
         {
-            return 1;
+            return 0;
         }
         return 0;
     }

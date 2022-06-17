@@ -90,6 +90,7 @@ if(CONFIG_ENABLE_PW_RPC)
     chip_gn_arg_append("pw_trace_BACKEND"                   "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_trace_tokenized\"")
     chip_gn_arg_append("dir_pw_third_party_nanopb"          "\"//third_party/connectedhomeip/third_party/nanopb/repo\"")
     chip_gn_arg_append("pw_build_LINK_DEPS"                 "[\"\$dir_pw_assert:impl\", \"\$dir_pw_log:impl\"]")
+    chip_gn_arg_append("pw_rpc_CONFIG"                      "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc:disable_global_mutex\"")
 endif()
 
 if (CONFIG_BUILD_CHIP_TESTS)
@@ -134,6 +135,24 @@ endif()
 if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
     chip_gn_arg_append("chip_device_platform"   "\"external\"")
     chip_gn_arg_append("chip_platform_target"   "\"//${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}\"")
+endif()
+
+# Set up CHIP project configuration file
+
+if (CONFIG_CHIP_PROJECT_CONFIG)
+    get_filename_component(CHIP_PROJECT_CONFIG
+        ${CONFIG_CHIP_PROJECT_CONFIG}
+        REALPATH
+        BASE_DIR ${CMAKE_SOURCE_DIR}
+    )
+    set(CHIP_PROJECT_CONFIG "<${CHIP_PROJECT_CONFIG}>")
+else()
+    set(CHIP_PROJECT_CONFIG "")
+endif()
+
+if (CHIP_PROJECT_CONFIG)
+    chip_gn_arg_append("chip_project_config_include" "\"${CHIP_PROJECT_CONFIG}\"")
+    chip_gn_arg_append("chip_system_project_config_include" "\"${CHIP_PROJECT_CONFIG}\"")
 endif()
 
 if (CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER)

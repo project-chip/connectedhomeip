@@ -215,6 +215,39 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         return CHIP_NO_ERROR == customArgument->Parse(arg.name, argValue);
     }
 
+    case ArgumentType::VectorBool: {
+        // Currently only chip::Optional<std::vector<bool>> is supported.
+        if (arg.flags != Argument::kOptional)
+        {
+            return false;
+        }
+
+        std::vector<bool> vectorArgument;
+        std::stringstream ss(argValue);
+        while (ss.good())
+        {
+            std::string valueAsString;
+            getline(ss, valueAsString, ',');
+
+            if (strcasecmp(valueAsString.c_str(), "true") == 0)
+            {
+                vectorArgument.push_back(true);
+            }
+            else if (strcasecmp(valueAsString.c_str(), "false") == 0)
+            {
+                vectorArgument.push_back(false);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        auto optionalArgument = static_cast<chip::Optional<std::vector<bool>> *>(arg.value);
+        optionalArgument->SetValue(vectorArgument);
+        return true;
+    }
+
     case ArgumentType::Vector16:
     case ArgumentType::Vector32: {
         std::vector<uint64_t> values;
@@ -623,6 +656,21 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, chip::
     return AddArgumentToList(std::move(arg));
 }
 
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<std::vector<bool>> * value,
+                            const char * desc)
+{
+    Argument arg;
+    arg.type  = ArgumentType::VectorBool;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.min   = min;
+    arg.max   = max;
+    arg.flags = Argument::kOptional;
+    arg.desc  = desc;
+
+    return AddArgumentToList(std::move(arg));
+}
+
 size_t Command::AddArgument(const char * name, ComplexArgument * value, const char * desc)
 {
     Argument arg;
@@ -784,7 +832,12 @@ void Command::ResetArguments()
         const Argument arg      = mArgs[i];
         const ArgumentType type = arg.type;
         const uint8_t flags     = arg.flags;
-        if (type == ArgumentType::Vector16 && flags != Argument::kOptional)
+        if (type == ArgumentType::VectorBool && flags == Argument::kOptional)
+        {
+            auto vectorArgument = static_cast<std::vector<uint16_t> *>(arg.value);
+            vectorArgument->clear();
+        }
+        else if (type == ArgumentType::Vector16 && flags != Argument::kOptional)
         {
             auto vectorArgument = static_cast<std::vector<uint16_t> *>(arg.value);
             vectorArgument->clear();

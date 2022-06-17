@@ -26,7 +26,6 @@ ti_simplelink_board = "LP_CC2652R7"
 optimize_debug_level = "s"
 lwip_debug = false
 
-#optimize_for_size=true
 chip_enable_ota_requestor = false
 
 # Disable FTD Build for all-clusters app to save Flash

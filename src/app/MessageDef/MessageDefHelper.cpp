@@ -37,45 +37,48 @@ namespace app {
 // this is used to run in signle thread for IM message debug purpose
 namespace {
 uint32_t gPrettyPrintingDepthLevel = 0;
-char gLineBuffer[256];
+char gLineBuffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 size_t gCurLineBufferSize = 0;
 } // namespace
 
-void ENFORCE_FORMAT(2, 3) PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
+void PrettyPrintIMBlankLine()
+{
+    if (gCurLineBufferSize)
+    {
+        // Don't need to explicitly NULL-terminate the string because
+        // snprintf takes care of that.
+        ChipLogDetail(DataManagement, "%s", gLineBuffer);
+        gCurLineBufferSize = 0;
+    }
+
+    for (uint32_t i = 0; i < gPrettyPrintingDepthLevel; i++)
+    {
+        if (sizeof(gLineBuffer) > gCurLineBufferSize)
+        {
+            size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
+            size_t ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
+            if (ret > 0)
+            {
+                gCurLineBufferSize += std::min(ret, sizeLeft);
+            }
+        }
+    }
+}
+
+void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
 {
     va_list args;
-    size_t ret;
-    size_t sizeLeft;
     va_start(args, aFmt);
 
     if (aIsNewLine)
     {
-        if (gCurLineBufferSize)
-        {
-            // Don't need to explicitly NULL-terminate the string because
-            // snprintf takes care of that.
-            ChipLogDetail(DataManagement, "%s", gLineBuffer);
-            gCurLineBufferSize = 0;
-        }
-
-        for (uint32_t i = 0; i < gPrettyPrintingDepthLevel; i++)
-        {
-            if (sizeof(gLineBuffer) > gCurLineBufferSize)
-            {
-                sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-                ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
-                if (ret > 0)
-                {
-                    gCurLineBufferSize += std::min(ret, sizeLeft);
-                }
-            }
-        }
+        PrettyPrintIMBlankLine();
     }
 
     if (sizeof(gLineBuffer) > gCurLineBufferSize)
     {
-        sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-        ret      = (size_t)(vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
+        size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
+        size_t ret      = (size_t)(vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
         if (ret > 0)
         {
             gCurLineBufferSize += std::min(ret, sizeLeft);

@@ -23,6 +23,7 @@ class IMXApp(Enum):
     LIGHT = auto()
     THERMOSTAT = auto()
     ALL_CLUSTERS = auto()
+    ALL_CLUSTERS_MINIMAL = auto()
     OTA_PROVIDER = auto()
 
     def ExamplePath(self):
@@ -34,6 +35,8 @@ class IMXApp(Enum):
             return 'thermostat/linux'
         if self == IMXApp.ALL_CLUSTERS:
             return 'all-clusters-app/linux'
+        if self == IMXApp.ALL_CLUSTERS_MINIMAL:
+            return 'all-clusters-minimal-app/linux'
         if self == IMXApp.OTA_PROVIDER:
             return 'ota-provider-app/linux'
 
@@ -50,6 +53,9 @@ class IMXApp(Enum):
         if self == IMXApp.ALL_CLUSTERS:
             yield 'chip-all-clusters-app'
             yield 'chip-all-clusters-app.map'
+        if self == IMXApp.ALL_CLUSTERS_MINIMAL:
+            yield 'chip-all-clusters-minimal-app'
+            yield 'chip-all-clusters-minimal-app.map'
         if self == IMXApp.OTA_PROVIDER:
             yield 'chip-ota-provider-app'
             yield 'chip-ota-provider-app.map'

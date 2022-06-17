@@ -1187,11 +1187,15 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
         prev.next = endpoint.next;
         ReturnErrorOnFailure(prev.Save(mStorage));
     }
-    if (group.endpoint_count > 0)
+
+    if (group.endpoint_count > 1)
     {
         group.endpoint_count--;
+        return group.Save(mStorage);
     }
-    return group.Save(mStorage);
+
+    // No more endpoints, remove the group
+    return RemoveGroupInfoAt(fabric_index, group.index);
 }
 
 CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id)

@@ -548,6 +548,8 @@ server cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute int64u timeSinceReset = 8;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 server cluster FixedLabel = 64 {
@@ -760,8 +762,16 @@ server cluster GeneralDiagnostics = 51 {
   readonly attribute ENUM8 activeHardwareFaults[] = 5;
   readonly attribute ENUM8 activeRadioFaults[] = 6;
   readonly attribute ENUM8 activeNetworkFaults[] = 7;
+  readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct TestEventTriggerRequest {
+    OCTET_STRING enableKey = 0;
+    INT64U eventTrigger = 1;
+  }
+
+  command TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
 }
 
 server cluster GroupKeyManagement = 63 {
@@ -783,10 +793,52 @@ server cluster GroupKeyManagement = 63 {
     fabric_idx fabricIndex = 254;
   }
 
+  struct GroupKeySetStruct {
+    int16u groupKeySetID = 0;
+    GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
+    nullable octet_string<16> epochKey0 = 2;
+    nullable epoch_us epochStartTime0 = 3;
+    nullable octet_string<16> epochKey1 = 4;
+    nullable epoch_us epochStartTime1 = 5;
+    nullable octet_string<16> epochKey2 = 6;
+    nullable epoch_us epochStartTime2 = 7;
+  }
+
   attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
+  readonly attribute int16u maxGroupsPerFabric = 2;
+  readonly attribute int16u maxGroupKeysPerFabric = 3;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct KeySetWriteRequest {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct KeySetReadRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetRemoveRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetReadAllIndicesRequest {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  response struct KeySetReadResponse = 2 {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  response struct KeySetReadAllIndicesResponse = 5 {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+  command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
 }
 
 server cluster KeypadInput = 1289 {
@@ -1499,6 +1551,7 @@ client cluster OperationalCredentials = 62 {
     kInvalidNOC = 3;
     kMissingCsr = 4;
     kTableFull = 5;
+    kInvalidAdminSubject = 6;
     kInsufficientPrivilege = 8;
     kFabricConflict = 9;
     kLabelConflict = 10;
@@ -1539,13 +1592,14 @@ client cluster OperationalCredentials = 62 {
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
+    optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
     OCTET_STRING NOCValue = 0;
     optional OCTET_STRING ICACValue = 1;
     OCTET_STRING IPKValue = 2;
-    NODE_ID caseAdminNode = 3;
+    Int64u caseAdminSubject = 3;
     VENDOR_ID adminVendorId = 4;
   }
 
@@ -1598,6 +1652,7 @@ server cluster OperationalCredentials = 62 {
     kInvalidNOC = 3;
     kMissingCsr = 4;
     kTableFull = 5;
+    kInvalidAdminSubject = 6;
     kInsufficientPrivilege = 8;
     kFabricConflict = 9;
     kLabelConflict = 10;
@@ -1638,13 +1693,14 @@ server cluster OperationalCredentials = 62 {
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
+    optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
     OCTET_STRING NOCValue = 0;
     optional OCTET_STRING ICACValue = 1;
     OCTET_STRING IPKValue = 2;
-    NODE_ID caseAdminNode = 3;
+    Int64u caseAdminSubject = 3;
     VENDOR_ID adminVendorId = 4;
   }
 
@@ -1663,10 +1719,6 @@ server cluster OperationalCredentials = 62 {
 
   request struct AddTrustedRootCertificateRequest {
     OCTET_STRING rootCertificate = 0;
-  }
-
-  request struct RemoveTrustedRootCertificateRequest {
-    OCTET_STRING trustedRootIdentifier = 0;
   }
 
   response struct AttestationResponse = 1 {
@@ -1697,7 +1749,6 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  command access(invoke: administer) RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
 }
 
 server cluster RelativeHumidityMeasurement = 1029 {
@@ -1709,12 +1760,16 @@ server cluster RelativeHumidityMeasurement = 1029 {
 }
 
 server cluster SoftwareDiagnostics = 52 {
+  bitmap SoftwareDiagnosticsFeature : BITMAP32 {
+    kWaterMarks = 0x1;
+  }
+
   struct ThreadMetrics {
     int64u id = 0;
-    char_string<8> name = 1;
-    int32u stackFreeCurrent = 2;
-    int32u stackFreeMinimum = 3;
-    int32u stackSize = 4;
+    optional char_string<8> name = 1;
+    optional int32u stackFreeCurrent = 2;
+    optional int32u stackFreeMinimum = 3;
+    optional int32u stackSize = 4;
   }
 
   info event SoftwareFault = 0 {
@@ -1844,7 +1899,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
   }
 
   readonly attribute nullable int16u channel = 0;
-  readonly attribute nullable enum8 routingRole = 1;
+  readonly attribute nullable RoutingRole routingRole = 1;
   readonly attribute nullable char_string<16> networkName = 2;
   readonly attribute nullable int16u panId = 3;
   readonly attribute nullable int64u extendedPanId = 4;
@@ -1852,11 +1907,11 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int64u overrunCount = 6;
   readonly attribute NeighborTable neighborTableList[] = 7;
   readonly attribute RouteTable routeTableList[] = 8;
-  readonly attribute int32u partitionId = 9;
-  readonly attribute int8u weighting = 10;
-  readonly attribute int8u dataVersion = 11;
-  readonly attribute int8u stableDataVersion = 12;
-  readonly attribute int8u leaderRouterId = 13;
+  readonly attribute nullable int32u partitionId = 9;
+  readonly attribute nullable int8u weighting = 10;
+  readonly attribute nullable int8u dataVersion = 11;
+  readonly attribute nullable int8u stableDataVersion = 12;
+  readonly attribute nullable int8u leaderRouterId = 13;
   readonly attribute int16u detachedRoleCount = 14;
   readonly attribute int16u childRoleCount = 15;
   readonly attribute int16u routerRoleCount = 16;
@@ -1899,12 +1954,12 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int32u rxErrSecCount = 53;
   readonly attribute int32u rxErrFcsCount = 54;
   readonly attribute int32u rxErrOtherCount = 55;
-  readonly attribute int64u activeTimestamp = 56;
-  readonly attribute int64u pendingTimestamp = 57;
-  readonly attribute int32u delay = 58;
-  readonly attribute SecurityPolicy securityPolicy[] = 59;
-  readonly attribute octet_string<4> channelMask = 60;
-  readonly attribute OperationalDatasetComponents operationalDatasetComponents[] = 61;
+  readonly attribute nullable int64u activeTimestamp = 56;
+  readonly attribute nullable int64u pendingTimestamp = 57;
+  readonly attribute nullable int32u delay = 58;
+  readonly attribute nullable SecurityPolicy securityPolicy = 59;
+  readonly attribute nullable octet_string<4> channelMask = 60;
+  readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents = 61;
   readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -2027,8 +2082,8 @@ server cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-
 endpoint 0 {
+  device type rootdevice = 22;
   binding cluster Binding;
   binding cluster GeneralCommissioning;
   binding cluster NetworkCommissioning;
@@ -2148,6 +2203,7 @@ endpoint 0 {
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
+    callback attribute testEventTriggersEnabled;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -2162,67 +2218,67 @@ endpoint 0 {
   }
 
   server cluster ThreadNetworkDiagnostics {
-    ram      attribute channel;
-    ram      attribute routingRole;
-    ram      attribute networkName;
-    ram      attribute panId;
-    ram      attribute extendedPanId;
-    ram      attribute meshLocalPrefix;
-    ram      attribute overrunCount;
+    callback attribute channel;
+    callback attribute routingRole;
+    callback attribute networkName;
+    callback attribute panId;
+    callback attribute extendedPanId;
+    callback attribute meshLocalPrefix;
+    callback attribute overrunCount;
     callback attribute neighborTableList;
     callback attribute routeTableList;
-    ram      attribute partitionId;
-    ram      attribute weighting;
-    ram      attribute dataVersion;
-    ram      attribute stableDataVersion;
-    ram      attribute leaderRouterId;
-    ram      attribute detachedRoleCount;
-    ram      attribute childRoleCount;
-    ram      attribute routerRoleCount;
-    ram      attribute leaderRoleCount;
-    ram      attribute attachAttemptCount;
-    ram      attribute partitionIdChangeCount;
-    ram      attribute betterPartitionAttachAttemptCount;
-    ram      attribute parentChangeCount;
-    ram      attribute txTotalCount;
-    ram      attribute txUnicastCount;
-    ram      attribute txBroadcastCount;
-    ram      attribute txAckRequestedCount;
-    ram      attribute txAckedCount;
-    ram      attribute txNoAckRequestedCount;
-    ram      attribute txDataCount;
-    ram      attribute txDataPollCount;
-    ram      attribute txBeaconCount;
-    ram      attribute txBeaconRequestCount;
-    ram      attribute txOtherCount;
-    ram      attribute txRetryCount;
-    ram      attribute txDirectMaxRetryExpiryCount;
-    ram      attribute txIndirectMaxRetryExpiryCount;
-    ram      attribute txErrCcaCount;
-    ram      attribute txErrAbortCount;
-    ram      attribute txErrBusyChannelCount;
-    ram      attribute rxTotalCount;
-    ram      attribute rxUnicastCount;
-    ram      attribute rxBroadcastCount;
-    ram      attribute rxDataCount;
-    ram      attribute rxDataPollCount;
-    ram      attribute rxBeaconCount;
-    ram      attribute rxBeaconRequestCount;
-    ram      attribute rxOtherCount;
-    ram      attribute rxAddressFilteredCount;
-    ram      attribute rxDestAddrFilteredCount;
-    ram      attribute rxDuplicatedCount;
-    ram      attribute rxErrNoFrameCount;
-    ram      attribute rxErrUnknownNeighborCount;
-    ram      attribute rxErrInvalidSrcAddrCount;
-    ram      attribute rxErrSecCount;
-    ram      attribute rxErrFcsCount;
-    ram      attribute rxErrOtherCount;
-    ram      attribute activeTimestamp;
-    ram      attribute pendingTimestamp;
-    ram      attribute delay;
+    callback attribute partitionId;
+    callback attribute weighting;
+    callback attribute dataVersion;
+    callback attribute stableDataVersion;
+    callback attribute leaderRouterId;
+    callback attribute detachedRoleCount;
+    callback attribute childRoleCount;
+    callback attribute routerRoleCount;
+    callback attribute leaderRoleCount;
+    callback attribute attachAttemptCount;
+    callback attribute partitionIdChangeCount;
+    callback attribute betterPartitionAttachAttemptCount;
+    callback attribute parentChangeCount;
+    callback attribute txTotalCount;
+    callback attribute txUnicastCount;
+    callback attribute txBroadcastCount;
+    callback attribute txAckRequestedCount;
+    callback attribute txAckedCount;
+    callback attribute txNoAckRequestedCount;
+    callback attribute txDataCount;
+    callback attribute txDataPollCount;
+    callback attribute txBeaconCount;
+    callback attribute txBeaconRequestCount;
+    callback attribute txOtherCount;
+    callback attribute txRetryCount;
+    callback attribute txDirectMaxRetryExpiryCount;
+    callback attribute txIndirectMaxRetryExpiryCount;
+    callback attribute txErrCcaCount;
+    callback attribute txErrAbortCount;
+    callback attribute txErrBusyChannelCount;
+    callback attribute rxTotalCount;
+    callback attribute rxUnicastCount;
+    callback attribute rxBroadcastCount;
+    callback attribute rxDataCount;
+    callback attribute rxDataPollCount;
+    callback attribute rxBeaconCount;
+    callback attribute rxBeaconRequestCount;
+    callback attribute rxOtherCount;
+    callback attribute rxAddressFilteredCount;
+    callback attribute rxDestAddrFilteredCount;
+    callback attribute rxDuplicatedCount;
+    callback attribute rxErrNoFrameCount;
+    callback attribute rxErrUnknownNeighborCount;
+    callback attribute rxErrInvalidSrcAddrCount;
+    callback attribute rxErrSecCount;
+    callback attribute rxErrFcsCount;
+    callback attribute rxErrOtherCount;
+    callback attribute activeTimestamp;
+    callback attribute pendingTimestamp;
+    callback attribute delay;
     callback attribute securityPolicy;
-    ram      attribute channelMask;
+    callback attribute channelMask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
@@ -2283,6 +2339,8 @@ endpoint 0 {
   server cluster GroupKeyManagement {
     callback attribute groupKeyMap;
     callback attribute groupTable;
+    callback attribute maxGroupsPerFabric;
+    callback attribute maxGroupKeysPerFabric;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -2307,8 +2365,8 @@ endpoint 0 {
     ram      attribute clusterRevision default = 3;
   }
 }
-
 endpoint 1 {
+  device type videoplayer = 35;
 
   server cluster OnOff {
     ram      attribute onOff;
@@ -2342,7 +2400,7 @@ endpoint 1 {
   server cluster TargetNavigator {
     callback attribute targetList;
     ram      attribute currentTarget;
-    ram      attribute featureMap default = 0x0001;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -2402,8 +2460,8 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 2 {
+  device type speaker = 34;
 
   server cluster OnOff {
     ram      attribute onOff;
@@ -2439,8 +2497,8 @@ endpoint 2 {
     callback attribute clusterRevision default = 1;
   }
 }
-
 endpoint 3 {
+  device type contentapplication = 36;
 
   server cluster Descriptor {
     callback attribute deviceList;
@@ -2488,8 +2546,8 @@ endpoint 3 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 4 {
+  device type contentapplication = 36;
 
   server cluster Descriptor {
     callback attribute deviceList;
@@ -2520,8 +2578,8 @@ endpoint 4 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
 endpoint 5 {
+  device type contentapplication = 36;
 
   server cluster Descriptor {
     callback attribute deviceList;
@@ -2540,6 +2598,7 @@ endpoint 5 {
     callback attribute application;
     ram      attribute status;
     ram      attribute applicationVersion;
+    callback attribute allowedVendorList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }

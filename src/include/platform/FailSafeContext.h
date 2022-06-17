@@ -40,9 +40,15 @@ public:
      *  first be cancelled, then the fail-safe timer will be re-armed.
      */
     CHIP_ERROR ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength);
-    CHIP_ERROR DisarmFailSafe();
+
+    /**
+     * @brief Cleanly disarm failsafe timer, such as on CommissioningComplete
+     */
+    void DisarmFailSafe();
     CHIP_ERROR SetAddNocCommandInvoked(FabricIndex nocFabricIndex);
     CHIP_ERROR SetUpdateNocCommandInvoked();
+    void SetAddTrustedRootCertInvoked() { mAddTrustedRootCertHasBeenInvoked = true; }
+    void SetCsrRequestForUpdateNoc(bool isForUpdateNoc) { mIsCsrRequestForUpdateNoc = isForUpdateNoc; }
 
     /**
      * @brief
@@ -51,28 +57,30 @@ public:
      */
     void ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addNocCommandInvoked, bool updateNocCommandInvoked);
 
-    inline bool IsFailSafeArmed(FabricIndex accessingFabricIndex) const
+    bool IsFailSafeArmed(FabricIndex accessingFabricIndex) const
     {
         return mFailSafeArmed && MatchesFabricIndex(accessingFabricIndex);
     }
 
     // Returns true if the fail-safe is in a state where commands that require an armed
     // fail-safe can no longer execute, but a new fail-safe can't be armed yet.
-    inline bool IsFailSafeBusy() const { return mFailSafeBusy; }
+    bool IsFailSafeBusy() const { return mFailSafeBusy; }
 
-    inline bool IsFailSafeArmed() const { return mFailSafeArmed; }
+    bool IsFailSafeArmed() const { return mFailSafeArmed; }
 
-    inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex) const
+    bool MatchesFabricIndex(FabricIndex accessingFabricIndex) const
     {
         VerifyOrDie(mFailSafeArmed);
         return (accessingFabricIndex == mFabricIndex);
     }
 
-    inline bool NocCommandHasBeenInvoked() const { return mAddNocCommandHasBeenInvoked || mUpdateNocCommandHasBeenInvoked; }
-    inline bool AddNocCommandHasBeenInvoked() { return mAddNocCommandHasBeenInvoked; }
-    inline bool UpdateNocCommandHasBeenInvoked() { return mUpdateNocCommandHasBeenInvoked; }
+    bool NocCommandHasBeenInvoked() const { return mAddNocCommandHasBeenInvoked || mUpdateNocCommandHasBeenInvoked; }
+    bool AddNocCommandHasBeenInvoked() const { return mAddNocCommandHasBeenInvoked; }
+    bool UpdateNocCommandHasBeenInvoked() const { return mUpdateNocCommandHasBeenInvoked; }
+    bool AddTrustedRootCertHasBeenInvoked() const { return mAddTrustedRootCertHasBeenInvoked; }
+    bool IsCsrRequestForUpdateNoc() const { return mIsCsrRequestForUpdateNoc; }
 
-    inline FabricIndex GetFabricIndex() const
+    FabricIndex GetFabricIndex() const
     {
         VerifyOrDie(mFailSafeArmed);
         return mFabricIndex;
@@ -86,13 +94,14 @@ public:
     static CHIP_ERROR DeleteFromStorage();
 
 private:
-    // ===== Private members reserved for use by this class only.
-
-    bool mFailSafeArmed                  = false;
-    bool mFailSafeBusy                   = false;
-    bool mAddNocCommandHasBeenInvoked    = false;
-    bool mUpdateNocCommandHasBeenInvoked = false;
-    FabricIndex mFabricIndex             = kUndefinedFabricIndex;
+    bool mFailSafeArmed                    = false;
+    bool mFailSafeBusy                     = false;
+    bool mAddNocCommandHasBeenInvoked      = false;
+    bool mUpdateNocCommandHasBeenInvoked   = false;
+    bool mAddTrustedRootCertHasBeenInvoked = false;
+    // The fact of whether a CSR occurred at all is stored elsewhere.
+    bool mIsCsrRequestForUpdateNoc = false;
+    FabricIndex mFabricIndex       = kUndefinedFabricIndex;
 
     // TODO:: Track the state of what was mutated during fail-safe.
 
@@ -113,6 +122,19 @@ private:
      *  to actually disarm the fail-safe.
      */
     static void HandleDisarmFailSafe(intptr_t arg);
+
+    /**
+     * @brief Reset to unarmed basic state
+     */
+    void ResetState()
+    {
+        mFailSafeArmed                    = false;
+        mAddNocCommandHasBeenInvoked      = false;
+        mUpdateNocCommandHasBeenInvoked   = false;
+        mAddTrustedRootCertHasBeenInvoked = false;
+        mFailSafeBusy                     = false;
+        mIsCsrRequestForUpdateNoc         = false;
+    }
 
     void FailSafeTimerExpired();
     CHIP_ERROR CommitToStorage();

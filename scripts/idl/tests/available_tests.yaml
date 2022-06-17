@@ -30,3 +30,7 @@ java:
         jni/FirstClient-InvokeSubscribeImpl.cpp: outputs/several_clusters/jni/FirstClient-InvokeSubscribeImpl.cpp
         jni/SecondClient-InvokeSubscribeImpl.cpp: outputs/several_clusters/jni/SecondClient-InvokeSubscribeImpl.cpp
         jni/ThirdClient-InvokeSubscribeImpl.cpp: outputs/several_clusters/jni/ThirdClient-InvokeSubscribeImpl.cpp
+
+    inputs/optional_argument.matter:
+        jni/MyClusterClient-ReadImpl.cpp: outputs/optional_argument/jni/MyClusterClient-ReadImpl.cpp
+        jni/MyClusterClient-InvokeSubscribeImpl.cpp: outputs/optional_argument/jni/MyClusterClient-InvokeSubscribeImpl.cpp

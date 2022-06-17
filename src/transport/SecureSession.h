@@ -66,6 +66,7 @@ public:
     };
 
     // Test-only: inject a session in Active state.
+    // TODO: Tests should allocate a pending session and then call Activate(), just like non-test code does.
     SecureSession(SecureSessionTable & table, Type secureSessionType, uint16_t localSessionId, NodeId localNodeId,
                   NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
                   const ReliableMessageProtocolConfig & config) :
@@ -73,9 +74,9 @@ public:
         mState(State::kActive), mSecureSessionType(secureSessionType), mLocalNodeId(localNodeId), mPeerNodeId(peerNodeId),
         mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mMRPConfig(config)
     {
-        Retain(); // Put the test session in Active state
+        Retain(); // Put the test session in Active state. This ref is released inside MarkForRemoval
         SetFabricIndex(fabric);
-        ChipLogDetail(Inet, "SecureSession Allocated for test %p Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
+        ChipLogDetail(Inet, "SecureSession[%p]: Allocated for Test Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
                       mLocalSessionId);
     }
 
@@ -88,7 +89,8 @@ public:
     SecureSession(SecureSessionTable & table, Type secureSessionType, uint16_t localSessionId) :
         mTable(table), mState(State::kPairing), mSecureSessionType(secureSessionType), mLocalSessionId(localSessionId)
     {
-        ChipLogDetail(Inet, "SecureSession Allocated %p Type:%d LSID:%d", this, to_underlying(mSecureSessionType), mLocalSessionId);
+        ChipLogDetail(Inet, "SecureSession[%p]: Allocated Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
+                      mLocalSessionId);
     }
 
     /**
@@ -118,13 +120,15 @@ public:
         mMRPConfig     = config;
         SetFabricIndex(peerNode.GetFabricIndex());
 
-        Retain();
+        Retain(); // This ref is released inside MarkForRemoval
         mState = State::kActive;
-        ChipLogDetail(Inet, "SecureSession Active %p Type:%d LSID:%d", this, to_underlying(mSecureSessionType), mLocalSessionId);
+        ChipLogDetail(Inet, "SecureSession[%p]: Activated - Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
+                      mLocalSessionId);
     }
     ~SecureSession() override
     {
-        ChipLogDetail(Inet, "SecureSession Released %p Type:%d LSID:%d", this, to_underlying(mSecureSessionType), mLocalSessionId);
+        ChipLogDetail(Inet, "SecureSession[%p]: Released - Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
+                      mLocalSessionId);
     }
 
     SecureSession(SecureSession &&)      = delete;
@@ -132,8 +136,8 @@ public:
     SecureSession & operator=(const SecureSession &) = delete;
     SecureSession & operator=(SecureSession &&) = delete;
 
-    void Retain() override { ReferenceCounted<SecureSession, SecureSessionDeleter, 0, uint16_t>::Retain(); }
-    void Release() override { ReferenceCounted<SecureSession, SecureSessionDeleter, 0, uint16_t>::Release(); }
+    void Retain() override;
+    void Release() override;
 
     bool IsActiveSession() const override { return mState == State::kActive; }
     bool IsPairing() const { return mState == State::kPairing; }
@@ -161,6 +165,10 @@ public:
             return GetMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
+        case Transport::Type::kBle:
+            // TODO: Figure out what this should be, but zero is not the right
+            // answer.
+            return System::Clock::Seconds16(5);
         default:
             break;
         }
@@ -223,9 +231,6 @@ public:
 private:
     enum class State : uint8_t
     {
-        // kPending denotes a secure session object that is internally
-        // reserved by the stack before and during session establishment.
-        //
         // Although the stack can tolerate eviction of these (releasing one
         // out from under the holder would exhibit as CHIP_ERROR_INCORRECT_STATE
         // during CASE or PASE), intent is that we should not and would leave
@@ -240,9 +245,9 @@ private:
         kActive = 2,
 
         // The session is pending for removal, all SessionHolders are already
-        // cleared during MarkForRemoval, no future SessionHolder is able grab
-        // this session, when all SessionHandles goes out of scope, the session
-        // object will be released automatically.
+        // cleared during MarkForRemoval, no future SessionHolder is able to
+        // grab this session, when all SessionHandles go out of scope, the
+        // session object will be released automatically.
         kPendingRemoval = 3,
     };
 

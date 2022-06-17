@@ -394,6 +394,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
         haveIPv4Conn = wfx_have_ipv4_addr(SL_WFX_STA_INTERFACE);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
         haveIPv6Conn = wfx_have_ipv6_addr(SL_WFX_STA_INTERFACE);
+#endif
     }
 
     // If the internet connectivity state has changed...
