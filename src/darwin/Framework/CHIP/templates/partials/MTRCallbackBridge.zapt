@@ -2,15 +2,15 @@
 {{#*inline "callbackType"}}
   {{#if partial-type}}
     {{#if (isStrEqual partial-type "Command")}}
-      MTR{{> @partial-block}}Type
+      {{> @partial-block}}Type
     {{else}}
-      MTR{{> @partial-block}}
+      {{> @partial-block}}
     {{/if}}
   {{else}}
-    MTR{{> @partial-block}}
+    {{> @partial-block}}
   {{/if}}
 {{/inline}}
-class MTR{{> @partial-block}}Bridge : public MTRCallbackBridge<{{>callbackType}}>
+class MTR{{> @partial-block}}Bridge : public MTRCallbackBridge<MTR{{>callbackType}}>
 {
 public:
     MTR{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, bool keepAlive = false)
