@@ -7,12 +7,12 @@
 #include <app/util/im-client-callbacks.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
-typedef void (*CommandSuccessCallback)(void *, const chip::app::DataModel::NullObjectType &);
-using MTRCommandSuccessCallbackType = CommandSuccessCallback;
+typedef void (*MTRCommandSuccessCallback)(void *, const chip::app::DataModel::NullObjectType &);
+using MTRCommandSuccessCallbackType = MTRCommandSuccessCallback;
 typedef void (*MTRDefaultSuccessCallbackType)(void *);
 
-typedef void (*VendorIdAttributeCallback)(void *, chip::VendorId);
-typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::VendorId> &);
+typedef void (*MTRVendorIdAttributeCallback)(void *, chip::VendorId);
+typedef void (*MTRNullableVendorIdAttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::VendorId> &);
 
 {{#chip_client_clusters includeAll=true}}
 {{#chip_cluster_responses}}
@@ -22,8 +22,8 @@ typedef void (*MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name
 
 {{#zcl_clusters}}
 {{#zcl_enums}}
-typedef void (*{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback)(void *, chip::app::Clusters::{{asUpperCamelCase parent.name}}::{{asType label}});
-typedef void (*Nullable{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::app::Clusters::{{asUpperCamelCase parent.name}}::{{asType label}}> &);
+typedef void (*MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback)(void *, chip::app::Clusters::{{asUpperCamelCase parent.name}}::{{asType label}});
+typedef void (*MTRNullable{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::app::Clusters::{{asUpperCamelCase parent.name}}::{{asType label}}> &);
 {{/zcl_enums}}
 {{/zcl_clusters}}
 
