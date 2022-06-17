@@ -50,11 +50,8 @@ public:
         return *this;
     }
 
-    ResponseConfiguration & SetTtlSecondsOverride(uint32_t value)
-    {
-        return SetTtlSecondsOverride(chip::Optional<uint32_t>::Value(value));
-    }
-    ResponseConfiguration & ClearTtlSecondsOverride() { return SetTtlSecondsOverride(chip::Optional<uint32_t>::Missing()); }
+    ResponseConfiguration & SetTtlSecondsOverride(uint32_t value) { return SetTtlSecondsOverride(chip::MakeOptional(value)); }
+    ResponseConfiguration & ClearTtlSecondsOverride() { return SetTtlSecondsOverride(chip::NullOptional); }
 
     /// Applies any adjustments to resource records before they are being serialized
     /// to some form of reply.

@@ -43,8 +43,8 @@ public:
     bool RequestedUnicastAnswer() const { return mAnswerViaUnicast; }
 
     /// Internal broadcasts will advertise all available data and will not apply
-    /// an broadcast filtering. Intent is for paths such as:
-    ///   - boot time advertisement: advertise all servicese available
+    /// any broadcast filtering. Intent is for paths such as:
+    ///   - boot time advertisement: advertise all services available
     ///   - stop-time advertisement: advertise a TTL of 0 as services are removed
     bool IsInternalBroadcast() const { return mIsInternalBroadcast; }
     void SetIsInternalBroadcast(bool isInternalBroadcast) { mIsInternalBroadcast = isInternalBroadcast; }
@@ -67,7 +67,7 @@ private:
     bool mAnswerViaUnicast = false;
     SerializedQNameIterator mNameIterator;
 
-    /// Flag as a internal broadcast, controls repliy construction (e.g. no
+    /// Flag as an internal broadcast, controls reply construction (e.g. no
     /// filtering applied)
     bool mIsInternalBroadcast = false;
 };

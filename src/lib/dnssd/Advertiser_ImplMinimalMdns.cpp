@@ -432,10 +432,12 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
     char nameBuffer[Operational::kInstanceNameMaxLength + 1] = "";
 
-    /// need to set server name
+    // need to set server name
     ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetPeerId()));
 
-    // about to clear all records below, clear them
+    // Advertising data changed. Send a TTL=0 for everything as a refresh,
+    // which will clear caches (including things we are about to remove). Once this is done
+    // we will re-advertise available records with a longer TTL again.
     AdvertiseRecords(BroadcastAdvertiseType::kRemovingAll);
 
     QNamePart nameCheckParts[]  = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
@@ -553,7 +555,9 @@ CHIP_ERROR AdvertiserMinMdns::UpdateCommissionableInstanceName()
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
 {
-    // about to override a new advertising type
+    // Advertising data changed. Send a TTL=0 for everything as a refresh,
+    // which will clear caches (including things we are about to remove). Once this is done
+    // we will re-advertise available records with a longer TTL again.
     AdvertiseRecords(BroadcastAdvertiseType::kRemovingAll);
 
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
@@ -905,7 +909,20 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
         packetInfo.Interface = interfaceAddress.GetInterfaceId();
 
         // Advertise all records
-        // TODO: for kStarted,  don't announce records that haven't been updated.
+        //
+        // TODO: Consider advertising delta changes.
+        //
+        // Current advertisement does not have a concept of "delta" to only
+        // advertise changes. Current implementation is to always
+        //    1. advertise TTL=0 (clear all caches)
+        //    2. advertise available records (with longer TTL)
+        //
+        // It would be nice if we could selectively advertise what changes, like
+        // send TTL=0 for anything removed/about to be removed (and only those),
+        // then only advertise new items added.
+        //
+        // This optimization likely will take more logic and state storage, so
+        // for now it is not done.
         QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
         queryData.SetIsInternalBroadcast(true);
 
