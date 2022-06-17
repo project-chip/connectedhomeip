@@ -23,12 +23,12 @@
 #include <app/data-model/NullObject.h>
 #include <platform/CHIPDeviceLayer.h>
 
-typedef CHIP_ERROR (^CHIPActionBlock)(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure);
+typedef CHIP_ERROR (^MTRActionBlock)(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure);
 typedef void (*MTRDefaultFailureCallbackType)(void *, CHIP_ERROR);
 
 template <class T> class MTRCallbackBridge {
 public:
-    MTRCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action, T OnSuccessFn, bool keepAlive)
+    MTRCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, T OnSuccessFn, bool keepAlive)
         : mQueue(queue)
         , mHandler(handler)
         , mKeepAlive(keepAlive)

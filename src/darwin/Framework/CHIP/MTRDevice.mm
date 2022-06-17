@@ -727,7 +727,7 @@ private:
 class NSObjectDataValueCallbackBridge : public MTRCallbackBridge<NSObjectDataValueCallback> {
 public:
     NSObjectDataValueCallbackBridge(
-        dispatch_queue_t queue, MTRDeviceResponseHandler handler, CHIPActionBlock action, bool keepAlive = false)
+        dispatch_queue_t queue, MTRDeviceResponseHandler handler, MTRActionBlock action, bool keepAlive = false)
         : MTRCallbackBridge<NSObjectDataValueCallback>(queue, handler, action, OnSuccessFn, keepAlive) {};
 
     static void OnSuccessFn(void * context, id value) { DispatchSuccess(context, value); }
