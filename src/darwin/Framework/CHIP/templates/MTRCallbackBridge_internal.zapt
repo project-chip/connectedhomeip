@@ -16,7 +16,7 @@ typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataM
 
 {{#chip_client_clusters includeAll=true}}
 {{#chip_cluster_responses}}
-typedef void (*MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackType)(void *, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &);
+typedef void (*{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackType)(void *, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &);
 {{/chip_cluster_responses}}
 {{/chip_client_clusters}}
 

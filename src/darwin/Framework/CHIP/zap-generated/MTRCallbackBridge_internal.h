@@ -31,113 +31,113 @@ typedef void (*DefaultSuccessCallbackType)(void *);
 typedef void (*VendorIdAttributeCallback)(void *, chip::VendorId);
 typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::VendorId> &);
 
-typedef void (*MTRAccountLoginClusterGetSetupPINResponseCallbackType)(
+typedef void (*AccountLoginClusterGetSetupPINResponseCallbackType)(
     void *, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &);
-typedef void (*MTRApplicationLauncherClusterLauncherResponseCallbackType)(
+typedef void (*ApplicationLauncherClusterLauncherResponseCallbackType)(
     void *, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType &);
-typedef void (*MTRChannelClusterChangeChannelResponseCallbackType)(
+typedef void (*ChannelClusterChangeChannelResponseCallbackType)(
     void *, const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType &);
-typedef void (*MTRContentLauncherClusterLaunchResponseCallbackType)(
+typedef void (*ContentLauncherClusterLaunchResponseCallbackType)(
     void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType &);
-typedef void (*MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
+typedef void (*DiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
     void *, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &);
-typedef void (*MTRDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
+typedef void (*DoorLockClusterGetWeekDayScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
-typedef void (*MTRDoorLockClusterGetYearDayScheduleResponseCallbackType)(
+typedef void (*DoorLockClusterGetYearDayScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &);
-typedef void (*MTRDoorLockClusterGetHolidayScheduleResponseCallbackType)(
+typedef void (*DoorLockClusterGetHolidayScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
-typedef void (*MTRDoorLockClusterGetUserResponseCallbackType)(
+typedef void (*DoorLockClusterGetUserResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &);
-typedef void (*MTRDoorLockClusterSetCredentialResponseCallbackType)(
+typedef void (*DoorLockClusterSetCredentialResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType &);
-typedef void (*MTRDoorLockClusterGetCredentialStatusResponseCallbackType)(
+typedef void (*DoorLockClusterGetCredentialStatusResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &);
-typedef void (*MTRGeneralCommissioningClusterArmFailSafeResponseCallbackType)(
+typedef void (*GeneralCommissioningClusterArmFailSafeResponseCallbackType)(
     void *, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType &);
-typedef void (*MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType)(
+typedef void (*GeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType)(
     void *, const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType &);
-typedef void (*MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackType)(
+typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallbackType)(
     void *, const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType &);
-typedef void (*MTRGroupKeyManagementClusterKeySetReadResponseCallbackType)(
+typedef void (*GroupKeyManagementClusterKeySetReadResponseCallbackType)(
     void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &);
-typedef void (*MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType)(
+typedef void (*GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType)(
     void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &);
-typedef void (*MTRGroupsClusterAddGroupResponseCallbackType)(
+typedef void (*GroupsClusterAddGroupResponseCallbackType)(
     void *, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType &);
-typedef void (*MTRGroupsClusterViewGroupResponseCallbackType)(
+typedef void (*GroupsClusterViewGroupResponseCallbackType)(
     void *, const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType &);
-typedef void (*MTRGroupsClusterGetGroupMembershipResponseCallbackType)(
+typedef void (*GroupsClusterGetGroupMembershipResponseCallbackType)(
     void *, const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType &);
-typedef void (*MTRGroupsClusterRemoveGroupResponseCallbackType)(
+typedef void (*GroupsClusterRemoveGroupResponseCallbackType)(
     void *, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType &);
-typedef void (*MTRKeypadInputClusterSendKeyResponseCallbackType)(
+typedef void (*KeypadInputClusterSendKeyResponseCallbackType)(
     void *, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType &);
-typedef void (*MTRMediaPlaybackClusterPlaybackResponseCallbackType)(
+typedef void (*MediaPlaybackClusterPlaybackResponseCallbackType)(
     void *, const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType &);
-typedef void (*MTRNetworkCommissioningClusterScanNetworksResponseCallbackType)(
+typedef void (*NetworkCommissioningClusterScanNetworksResponseCallbackType)(
     void *, const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType &);
-typedef void (*MTRNetworkCommissioningClusterNetworkConfigResponseCallbackType)(
+typedef void (*NetworkCommissioningClusterNetworkConfigResponseCallbackType)(
     void *, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType &);
-typedef void (*MTRNetworkCommissioningClusterConnectNetworkResponseCallbackType)(
+typedef void (*NetworkCommissioningClusterConnectNetworkResponseCallbackType)(
     void *, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType &);
-typedef void (*MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType)(
+typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType)(
     void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType &);
-typedef void (*MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType)(
+typedef void (*OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType)(
     void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType &);
-typedef void (*MTROperationalCredentialsClusterAttestationResponseCallbackType)(
+typedef void (*OperationalCredentialsClusterAttestationResponseCallbackType)(
     void *, const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType &);
-typedef void (*MTROperationalCredentialsClusterCertificateChainResponseCallbackType)(
+typedef void (*OperationalCredentialsClusterCertificateChainResponseCallbackType)(
     void *, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType &);
-typedef void (*MTROperationalCredentialsClusterCSRResponseCallbackType)(
+typedef void (*OperationalCredentialsClusterCSRResponseCallbackType)(
     void *, const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType &);
-typedef void (*MTROperationalCredentialsClusterNOCResponseCallbackType)(
+typedef void (*OperationalCredentialsClusterNOCResponseCallbackType)(
     void *, const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType &);
-typedef void (*MTRScenesClusterAddSceneResponseCallbackType)(
+typedef void (*ScenesClusterAddSceneResponseCallbackType)(
     void *, const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType &);
-typedef void (*MTRScenesClusterViewSceneResponseCallbackType)(
+typedef void (*ScenesClusterViewSceneResponseCallbackType)(
     void *, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType &);
-typedef void (*MTRScenesClusterRemoveSceneResponseCallbackType)(
+typedef void (*ScenesClusterRemoveSceneResponseCallbackType)(
     void *, const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType &);
-typedef void (*MTRScenesClusterRemoveAllScenesResponseCallbackType)(
+typedef void (*ScenesClusterRemoveAllScenesResponseCallbackType)(
     void *, const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType &);
-typedef void (*MTRScenesClusterStoreSceneResponseCallbackType)(
+typedef void (*ScenesClusterStoreSceneResponseCallbackType)(
     void *, const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType &);
-typedef void (*MTRScenesClusterGetSceneMembershipResponseCallbackType)(
+typedef void (*ScenesClusterGetSceneMembershipResponseCallbackType)(
     void *, const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType &);
-typedef void (*MTRScenesClusterEnhancedAddSceneResponseCallbackType)(
+typedef void (*ScenesClusterEnhancedAddSceneResponseCallbackType)(
     void *, const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType &);
-typedef void (*MTRScenesClusterEnhancedViewSceneResponseCallbackType)(
+typedef void (*ScenesClusterEnhancedViewSceneResponseCallbackType)(
     void *, const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType &);
-typedef void (*MTRScenesClusterCopySceneResponseCallbackType)(
+typedef void (*ScenesClusterCopySceneResponseCallbackType)(
     void *, const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType &);
-typedef void (*MTRTargetNavigatorClusterNavigateTargetResponseCallbackType)(
+typedef void (*TargetNavigatorClusterNavigateTargetResponseCallbackType)(
     void *, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType &);
-typedef void (*MTRTestClusterClusterTestSpecificResponseCallbackType)(
+typedef void (*TestClusterClusterTestSpecificResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType &);
-typedef void (*MTRTestClusterClusterTestAddArgumentsResponseCallbackType)(
+typedef void (*TestClusterClusterTestAddArgumentsResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType &);
-typedef void (*MTRTestClusterClusterTestSimpleArgumentResponseCallbackType)(
+typedef void (*TestClusterClusterTestSimpleArgumentResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentResponse::DecodableType &);
-typedef void (*MTRTestClusterClusterTestStructArrayArgumentResponseCallbackType)(
+typedef void (*TestClusterClusterTestStructArrayArgumentResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType &);
-typedef void (*MTRTestClusterClusterTestListInt8UReverseResponseCallbackType)(
+typedef void (*TestClusterClusterTestListInt8UReverseResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType &);
-typedef void (*MTRTestClusterClusterTestEnumsResponseCallbackType)(
+typedef void (*TestClusterClusterTestEnumsResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType &);
-typedef void (*MTRTestClusterClusterTestNullableOptionalResponseCallbackType)(
+typedef void (*TestClusterClusterTestNullableOptionalResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType &);
-typedef void (*MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackType)(
+typedef void (*TestClusterClusterTestComplexNullableOptionalResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalResponse::DecodableType &);
-typedef void (*MTRTestClusterClusterBooleanResponseCallbackType)(
+typedef void (*TestClusterClusterBooleanResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType &);
-typedef void (*MTRTestClusterClusterSimpleStructResponseCallbackType)(
+typedef void (*TestClusterClusterSimpleStructResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType &);
-typedef void (*MTRTestClusterClusterTestEmitTestEventResponseCallbackType)(
+typedef void (*TestClusterClusterTestEmitTestEventResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType &);
-typedef void (*MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType)(
+typedef void (*TestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &);
-typedef void (*MTRThermostatClusterGetWeeklyScheduleResponseCallbackType)(
+typedef void (*ThermostatClusterGetWeeklyScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &);
 
 typedef void (*IdentifyClusterIdentifyEffectIdentifierAttributeCallback)(void *,
