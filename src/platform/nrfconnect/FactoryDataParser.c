@@ -60,7 +60,7 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
 
         if (strncmp("hw_ver", (const char *) currentString.value, currentString.len) == 0)
         {
-            res = res && uint16_decode(states, &factoryData->hw_ver);
+            res                       = res && uint16_decode(states, &factoryData->hw_ver);
             factoryData->hwVerPresent = res;
         }
         else if (strncmp("spake2_it", (const char *) currentString.value, currentString.len) == 0)
@@ -69,17 +69,17 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
         }
         else if (strncmp("vendor_id", (const char *) currentString.value, currentString.len) == 0)
         {
-            res = res && uint16_decode(states, &factoryData->vendor_id);
+            res                          = res && uint16_decode(states, &factoryData->vendor_id);
             factoryData->vendorIdPresent = res;
         }
         else if (strncmp("product_id", (const char *) currentString.value, currentString.len) == 0)
         {
-            res = res && uint16_decode(states, &factoryData->product_id);
+            res                           = res && uint16_decode(states, &factoryData->product_id);
             factoryData->productIdPresent = res;
         }
         else if (strncmp("discriminator", (const char *) currentString.value, currentString.len) == 0)
         {
-            res = res && uint16_decode(states, &factoryData->discriminator);
+            res                               = res && uint16_decode(states, &factoryData->discriminator);
             factoryData->discriminatorPresent = res;
         }
         else if (strncmp("passcode", (const char *) currentString.value, currentString.len) == 0)
