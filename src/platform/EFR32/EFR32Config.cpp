@@ -34,6 +34,8 @@
 #include "nvm3_default.h"
 #include "nvm3_hal_flash.h"
 
+extern int liss_counter;
+
 // Substitute the GSDK weak nvm3_lockBegin and nvm3_lockEnd
 // for an application controlled re-entrance protection
 #define EFR32_SEM_TIMEOUT_ms 5
@@ -517,12 +519,21 @@ void EFR32Config::RunConfigUnitTest()
     ::chip::DeviceLayer::Internal::RunConfigUnitTest<EFR32Config>();
 }
 
+
+
 void EFR32Config::RepackNvm3Flash(void)
 {
+       ChipLogError(SoftwareUpdate,"LISS RepackNvm3Flash counter %d", liss_counter);
+
+#if 1 // LISS
+
     // Repack nvm3 flash if nvm3 space < headroom threshold.
     // Note- checking periodically during idle periods should prevent
     // forced repack events on any write operation.
     nvm3_repack(nvm3_defaultHandle);
+
+#endif
+
 }
 
 } // namespace Internal
