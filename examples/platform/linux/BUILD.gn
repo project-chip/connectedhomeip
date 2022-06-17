@@ -70,7 +70,8 @@ source_set("app-main") {
   }
 
   if (chip_enable_ota_requestor) {
-    public_deps += [ "${chip_root}/examples/ota-requestor-app/ota-requestor-common" ]
+    public_deps +=
+        [ "${chip_root}/examples/ota-requestor-app/ota-requestor-common" ]
   }
 
   public_configs = [ ":app-main-config" ]
