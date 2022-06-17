@@ -48,9 +48,14 @@ namespace {
 const char * TAG = "ota-requester-app";
 static AppDeviceCallbacks EchoCallbacks;
 
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
+
 static void InitServer(intptr_t context)
 {
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+
+    // We only have network commissioning on endpoint 0.
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 }
 
 } // namespace
