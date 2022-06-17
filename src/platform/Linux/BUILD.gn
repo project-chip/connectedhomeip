@@ -84,9 +84,7 @@ static_library("Linux") {
   ]
 
   if (chip_enable_openthread) {
-    sources += [
-      "NetworkCommissioningThreadDriver.cpp",
-    ]
+    sources += [ "NetworkCommissioningThreadDriver.cpp" ]
   }
 
   deps = [ "${chip_root}/src/setup_payload" ]
@@ -128,9 +126,7 @@ static_library("Linux") {
   }
 
   if (chip_enable_wifi) {
-    sources += [
-      "GlibTypeDeleter.h",
-    ]
+    sources += [ "GlibTypeDeleter.h" ]
 
     public_deps += [ "dbus/wpa" ]
   }
