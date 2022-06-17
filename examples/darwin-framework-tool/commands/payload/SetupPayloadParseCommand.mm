@@ -39,7 +39,7 @@ NSString * CustomFlowString(CHIPCommissioningFlow flow)
     case kCommissioningFlowInvalid:
         return @"INVALID";
     }
-    
+
     return @"???";
 }
 
