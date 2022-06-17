@@ -63,8 +63,6 @@ jobs:
           path: |
             .environment/gn_out/.ninja_log
             .environment/pigweed-venv/*.log
-      - name: Creating Output Directory
-        run: mkdir -p /tmp/macos_framework_output
       - name: Run iOS Build Debug
         timeout-minutes: 30
         working-directory: src/darwin/Framework
@@ -91,15 +89,12 @@ jobs:
         run: xcodebuild -target "Matter" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wno-macro-redefined'
         working-directory: src/darwin/Framework
       - name: Copying Framework to Temporary Path
+        continue-on-error: true
         run: |
-          find ~/Library/Developer/
-          ls -la ~/Library/Developer/Xcode/
-          ls -la ~/Library/Developer/Xcode/DerivedData
-          ls -la ~/Library/Developer/Xcode/DerivedData/Build
-          ls -la ~/Library/Developer/Xcode/DerivedData/Build/Products
-          ls -la ~/Library/Developer/Xcode/DerivedData/Build/Products/Debug
+          mkdir -p /tmp/macos_framework_output
           ls -la /Users/runner/work/connectedhomeip/connectedhomeip/src/darwin/Framework/build/Release/
           mv /Users/runner/work/connectedhomeip/connectedhomeip/src/darwin/Framework/build/Release/Matter.framework /tmp/macos_framework_output
+          ls -la /tmp/macos_framework_output
       - name: Clean Build
         run: xcodebuild clean
         working-directory: src/darwin/Framework
