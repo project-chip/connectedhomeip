@@ -188,7 +188,7 @@ public:
     void Clear();
 
 private:
-    friend class CASESessionForTest;
+    friend class TestCASESession;
     enum class State : uint8_t
     {
         kInitialized       = 0,
