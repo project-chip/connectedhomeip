@@ -58,6 +58,7 @@
 		51E51FBF282AD37A00FC978D /* CHIPDeviceControllerStartupParams.h in Headers */ = {isa = PBXBuildFile; fileRef = 51E51FBC282AD37A00FC978D /* CHIPDeviceControllerStartupParams.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51E51FC0282AD37A00FC978D /* CHIPDeviceControllerStartupParams_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 51E51FBD282AD37A00FC978D /* CHIPDeviceControllerStartupParams_Internal.h */; };
 		51E51FC1282AD37A00FC978D /* CHIPDeviceControllerStartupParams.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51E51FBE282AD37A00FC978D /* CHIPDeviceControllerStartupParams.mm */; };
+		51F07EAD285C343C002FEBD8 /* privilege-storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51F07EAC285C343C002FEBD8 /* privilege-storage.cpp */; };
 		5A60370827EA1FF60020DB79 /* CHIPAttributeCacheContainer+XPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A60370727EA1FF60020DB79 /* CHIPAttributeCacheContainer+XPC.h */; };
 		5A6FEC9027B563D900F25F42 /* CHIPDeviceControllerOverXPC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6FEC8F27B563D900F25F42 /* CHIPDeviceControllerOverXPC.m */; };
 		5A6FEC9227B5669C00F25F42 /* CHIPDeviceControllerOverXPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A6FEC8D27B5624E00F25F42 /* CHIPDeviceControllerOverXPC.h */; };
@@ -171,6 +172,7 @@
 		51E51FBC282AD37A00FC978D /* CHIPDeviceControllerStartupParams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceControllerStartupParams.h; sourceTree = "<group>"; };
 		51E51FBD282AD37A00FC978D /* CHIPDeviceControllerStartupParams_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceControllerStartupParams_Internal.h; sourceTree = "<group>"; };
 		51E51FBE282AD37A00FC978D /* CHIPDeviceControllerStartupParams.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDeviceControllerStartupParams.mm; sourceTree = "<group>"; };
+		51F07EAC285C343C002FEBD8 /* privilege-storage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "privilege-storage.cpp"; path = "../../../app/util/privilege-storage.cpp"; sourceTree = "<group>"; };
 		5A60370727EA1FF60020DB79 /* CHIPAttributeCacheContainer+XPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CHIPAttributeCacheContainer+XPC.h"; sourceTree = "<group>"; };
 		5A6FEC8B27B5609C00F25F42 /* CHIPDeviceOverXPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceOverXPC.h; sourceTree = "<group>"; };
 		5A6FEC8D27B5624E00F25F42 /* CHIPDeviceControllerOverXPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceControllerOverXPC.h; sourceTree = "<group>"; };
@@ -189,7 +191,7 @@
 		5AE6D4E327A99041001F2493 /* CHIPDeviceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPDeviceTests.m; sourceTree = "<group>"; };
 		754F3DF327FBB94B00E60580 /* CHIPEventTLVValueDecoder_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPEventTLVValueDecoder_Internal.h; sourceTree = "<group>"; };
 		7560FD1B27FBBD3F005E85B3 /* CHIPEventTLVValueDecoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPEventTLVValueDecoder.mm; path = "zap-generated/CHIPEventTLVValueDecoder.mm"; sourceTree = "<group>"; };
-		75C645A32825AAC3007E2C29 /* MatterClusterConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MatterClusterConstants.h; path = "MatterClusterConstants.h"; sourceTree = "<group>"; };
+		75C645A32825AAC3007E2C29 /* MatterClusterConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatterClusterConstants.h; sourceTree = "<group>"; };
 		88EBF8CB27FABDD500686BC1 /* CHIPDeviceAttestationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceAttestationDelegate.h; sourceTree = "<group>"; };
 		88EBF8CC27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDeviceAttestationDelegateBridge.mm; sourceTree = "<group>"; };
 		88EBF8CD27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceAttestationDelegateBridge.h; sourceTree = "<group>"; };
@@ -251,6 +253,7 @@
 			isa = PBXGroup;
 			children = (
 				2FD775542695557E00FF4B12 /* error-mapping.cpp */,
+				51F07EAC285C343C002FEBD8 /* privilege-storage.cpp */,
 				51431AFA27D29CA4008A7943 /* ota-provider.cpp */,
 			);
 			name = CHIPApp;
@@ -620,6 +623,7 @@
 				88EBF8CF27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.mm in Sources */,
 				5A6FEC9827B5C6AF00F25F42 /* CHIPDeviceOverXPC.m in Sources */,
 				51431AF927D2973E008A7943 /* CHIPIMDispatch.mm in Sources */,
+				51F07EAD285C343C002FEBD8 /* privilege-storage.cpp in Sources */,
 				51431AFB27D29CA4008A7943 /* ota-provider.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
