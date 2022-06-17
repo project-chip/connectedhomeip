@@ -219,9 +219,9 @@ public:
         printf("TestArmFailSafe\n");
         printf("TestFanControl\n");
         printf("TestMultiAdmin\n");
-        printf("Test_TC_SWDIAG_1_1\n");
-        printf("Test_TC_SWDIAG_2_1\n");
-        printf("Test_TC_SWDIAG_3_1\n");
+        printf("Test_TC_DGSW_2_1\n");
+        printf("Test_TC_DGSW_2_2\n");
+        printf("Test_TC_DGSW_2_3\n");
         printf("TestSubscribe_OnOff\n");
         printf("DL_UsersAndCredentials\n");
         printf("DL_LockUnlock\n");
@@ -468,7 +468,9 @@ public:
         printf("Test_TC_SC_4_8\n");
         printf("Test_TC_SC_4_9\n");
         printf("Test_TC_SC_4_10\n");
-        printf("Test_TC_SWDIAG_1_2\n");
+        printf("Test_TC_DGSW_1_1\n");
+        printf("Test_TC_DGSW_3_1\n");
+        printf("Test_TC_DGSW_3_2\n");
         printf("Test_TC_DGWIFI_1_1\n");
         printf("Test_TC_DGWIFI_2_2\n");
         printf("Test_TC_DGWIFI_3_1\n");
@@ -3663,31 +3665,37 @@ private:
         }
         case 1: {
             LogStep(1, "Validate constraints of attribute: CurrentHue");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Validate constraints of attribute: CurrentSaturation");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads CurrentX attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Validate constraints of attribute: CurrentX");
+            VerifyOrDo(!ShouldSkip("CC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id, true,
                                  chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Reads CurrentY attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id, true,
                                  chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Validate constraints of attribute: CurrentY");
+            VerifyOrDo(!ShouldSkip("CC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id, true,
                                  chip::NullOptional);
         }
@@ -3699,6 +3707,7 @@ private:
         }
         case 8: {
             LogStep(8, "Validate constraints of attribute: ColorTemperatureMireds");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -3710,16 +3719,19 @@ private:
         }
         case 10: {
             LogStep(10, "Validate constraints of attribute: ColorMode");
+            VerifyOrDo(!ShouldSkip("CC.S.A0008"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorMode::Id, true,
                                  chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Validate constraints of attribute: Options");
+            VerifyOrDo(!ShouldSkip("CC.S.A000f"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Options::Id, true,
                                  chip::NullOptional);
         }
         case 12: {
             LogStep(12, "Validate constraints of attribute: EnhancedCurrentHue");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -3731,231 +3743,277 @@ private:
         }
         case 14: {
             LogStep(14, "Validate constraints of attribute: ColorLoopActive");
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 15: {
             LogStep(15, "Validate constraints of attribute: ColorLoopDirection");
+            VerifyOrDo(!ShouldSkip("CC.S.A4003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopDirection::Id,
                                  true, chip::NullOptional);
         }
         case 16: {
             LogStep(16, "Validate constraints of attribute: ColorLoopTime");
+            VerifyOrDo(!ShouldSkip("CC.S.A4004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopTime::Id,
                                  true, chip::NullOptional);
         }
         case 17: {
             LogStep(17, "Validate constraints of attribute: ColorLoopStartEnhancedHue");
+            VerifyOrDo(!ShouldSkip("CC.S.A4005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStartEnhancedHue::Id, true, chip::NullOptional);
         }
         case 18: {
             LogStep(18, "Validate constraints of attribute: ColorLoopStoredEnhancedHue");
+            VerifyOrDo(!ShouldSkip("CC.S.A4006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, true, chip::NullOptional);
         }
         case 19: {
             LogStep(19, "Reads ColorCapabilities attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A400a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorCapabilities::Id,
                                  true, chip::NullOptional);
         }
         case 20: {
             LogStep(20, "Validate constraints of attribute: ColorCapabilities");
+            VerifyOrDo(!ShouldSkip("CC.S.A400a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorCapabilities::Id,
                                  true, chip::NullOptional);
         }
         case 21: {
             LogStep(21, "Reads ColorTempPhysicalMinMireds attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A400b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorTempPhysicalMinMireds::Id, true, chip::NullOptional);
         }
         case 22: {
             LogStep(22, "Validate constraints of attribute: ColorTempPhysicalMinMireds");
+            VerifyOrDo(!ShouldSkip("CC.S.A400b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorTempPhysicalMinMireds::Id, true, chip::NullOptional);
         }
         case 23: {
             LogStep(23, "Read ColorTempPhysicalMaxMireds attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A400c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorTempPhysicalMaxMireds::Id, true, chip::NullOptional);
         }
         case 24: {
             LogStep(24, "Validate constraints of attribute: ColorTempPhysicalMaxMireds");
+            VerifyOrDo(!ShouldSkip("CC.S.A400c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorTempPhysicalMaxMireds::Id, true, chip::NullOptional);
         }
         case 25: {
             LogStep(25, "Read the optional attribute: CoupleColorTempToLevelMinMireds");
+            VerifyOrDo(!ShouldSkip("CC.S.A400d"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::CoupleColorTempToLevelMinMireds::Id, true, chip::NullOptional);
         }
         case 26: {
             LogStep(26, "Read the optional attribute: StartUpColorTemperatureMireds");
+            VerifyOrDo(!ShouldSkip("CC.S.A4010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::StartUpColorTemperatureMireds::Id, true, chip::NullOptional);
         }
         case 27: {
             LogStep(27, "Validate constraints of attribute: RemainingTime");
+            VerifyOrDo(!ShouldSkip("CC.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::RemainingTime::Id,
                                  true, chip::NullOptional);
         }
         case 28: {
             LogStep(28, "Read the optional attribute: DriftCompensation");
+            VerifyOrDo(!ShouldSkip("CC.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::DriftCompensation::Id,
                                  true, chip::NullOptional);
         }
         case 29: {
             LogStep(29, "Read the optional attribute: CompensationText");
+            VerifyOrDo(!ShouldSkip("CC.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CompensationText::Id,
                                  true, chip::NullOptional);
         }
         case 30: {
             LogStep(30, "Read the mandatory attribute: NumberOfPrimaries");
+            VerifyOrDo(!ShouldSkip("CC.S.A0010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::NumberOfPrimaries::Id,
                                  true, chip::NullOptional);
         }
         case 31: {
             LogStep(31, "Read the mandatory attribute: Primary1X");
+            VerifyOrDo(!ShouldSkip("CC.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary1X::Id, true,
                                  chip::NullOptional);
         }
         case 32: {
             LogStep(32, "Read the mandatory attribute: Primary1Y");
+            VerifyOrDo(!ShouldSkip("CC.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary1Y::Id, true,
                                  chip::NullOptional);
         }
         case 33: {
             LogStep(33, "Read the mandatory attribute: Primary1Intensity");
+            VerifyOrDo(!ShouldSkip("CC.S.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary1Intensity::Id,
                                  true, chip::NullOptional);
         }
         case 34: {
             LogStep(34, "Read the mandatory attribute: Primary2X");
+            VerifyOrDo(!ShouldSkip("CC.S.A0015"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary2X::Id, true,
                                  chip::NullOptional);
         }
         case 35: {
             LogStep(35, "Read the mandatory attribute: Primary2Y");
+            VerifyOrDo(!ShouldSkip("CC.S.A0016"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary2Y::Id, true,
                                  chip::NullOptional);
         }
         case 36: {
             LogStep(36, "Validate constraints of attribute: Primary2Intensity");
+            VerifyOrDo(!ShouldSkip("CC.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary2Intensity::Id,
                                  true, chip::NullOptional);
         }
         case 37: {
             LogStep(37, "Read the mandatory attribute: Primary3X");
+            VerifyOrDo(!ShouldSkip("CC.S.A0019"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary3X::Id, true,
                                  chip::NullOptional);
         }
         case 38: {
             LogStep(38, "Read the mandatory attribute: Primary3Y");
+            VerifyOrDo(!ShouldSkip("CC.S.A001a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary3Y::Id, true,
                                  chip::NullOptional);
         }
         case 39: {
             LogStep(39, "Read the mandatory attribute: Primary3Intensity");
+            VerifyOrDo(!ShouldSkip("CC.S.A001b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary3Intensity::Id,
                                  true, chip::NullOptional);
         }
         case 40: {
             LogStep(40, "Read the mandatory attribute: Primary4X");
+            VerifyOrDo(!ShouldSkip("CC.S.A0020"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary4X::Id, true,
                                  chip::NullOptional);
         }
         case 41: {
             LogStep(41, "Read the mandatory attribute: Primary4Y");
+            VerifyOrDo(!ShouldSkip("CC.S.A0021"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary4Y::Id, true,
                                  chip::NullOptional);
         }
         case 42: {
             LogStep(42, "Read the mandatory attribute: Primary4Intensity");
+            VerifyOrDo(!ShouldSkip("CC.S.A0022"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary4Intensity::Id,
                                  true, chip::NullOptional);
         }
         case 43: {
             LogStep(43, "Read the mandatory attribute: Primary5X");
+            VerifyOrDo(!ShouldSkip("CC.S.A0024"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary5X::Id, true,
                                  chip::NullOptional);
         }
         case 44: {
             LogStep(44, "Read the mandatory attribute: Primary5Y");
+            VerifyOrDo(!ShouldSkip("CC.S.A0025"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary5Y::Id, true,
                                  chip::NullOptional);
         }
         case 45: {
             LogStep(45, "Read the mandatory attribute: Primary5Intensity");
+            VerifyOrDo(!ShouldSkip("CC.S.A0026"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary5Intensity::Id,
                                  true, chip::NullOptional);
         }
         case 46: {
             LogStep(46, "Read the mandatory attribute: Primary6X");
+            VerifyOrDo(!ShouldSkip("CC.S.A0028"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary6X::Id, true,
                                  chip::NullOptional);
         }
         case 47: {
             LogStep(47, "Read the mandatory attribute: Primary6Y");
+            VerifyOrDo(!ShouldSkip("CC.S.A0029"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary6Y::Id, true,
                                  chip::NullOptional);
         }
         case 48: {
             LogStep(48, "Read the mandatory attribute: Primary6Intensity");
+            VerifyOrDo(!ShouldSkip("CC.S.A002a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary6Intensity::Id,
                                  true, chip::NullOptional);
         }
         case 49: {
             LogStep(49, "Read the optional attribute: WhitePointX");
+            VerifyOrDo(!ShouldSkip("CC.S.A0030"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::WhitePointX::Id, true,
                                  chip::NullOptional);
         }
         case 50: {
             LogStep(50, "Read the optional attribute: WhitePointY");
+            VerifyOrDo(!ShouldSkip("CC.S.A0031"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::WhitePointY::Id, true,
                                  chip::NullOptional);
         }
         case 51: {
             LogStep(51, "Read the optional attribute: ColorPointRX");
+            VerifyOrDo(!ShouldSkip("CC.S.A0032"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointRX::Id, true,
                                  chip::NullOptional);
         }
         case 52: {
             LogStep(52, "Read the optional attribute: ColorPointRY");
+            VerifyOrDo(!ShouldSkip("CC.S.A0033"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointRY::Id, true,
                                  chip::NullOptional);
         }
         case 53: {
             LogStep(53, "Read the optional attribute: ColorPointRIntensity");
+            VerifyOrDo(!ShouldSkip("CC.S.A0034"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorPointRIntensity::Id, true, chip::NullOptional);
         }
         case 54: {
             LogStep(54, "Read the optional attribute: ColorPointGX");
+            VerifyOrDo(!ShouldSkip("CC.S.A0036"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointGX::Id, true,
                                  chip::NullOptional);
         }
         case 55: {
             LogStep(55, "Read the optional attribute: ColorPointGY");
+            VerifyOrDo(!ShouldSkip("CC.S.A0037"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointGY::Id, true,
                                  chip::NullOptional);
         }
         case 56: {
             LogStep(56, "Read the optional attribute: ColorPointGIntensity");
+            VerifyOrDo(!ShouldSkip("CC.S.A0038"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorPointGIntensity::Id, true, chip::NullOptional);
         }
         case 57: {
             LogStep(57, "Read the optional attribute: ColorPointBX");
+            VerifyOrDo(!ShouldSkip("CC.S.A003a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointBX::Id, true,
                                  chip::NullOptional);
         }
         case 58: {
             LogStep(58, "Read the optional attribute: ColorPointBY");
+            VerifyOrDo(!ShouldSkip("CC.S.A003b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointBY::Id, true,
                                  chip::NullOptional);
         }
         case 59: {
             LogStep(59, "Read the optional attribute: ColorPointBIntensity");
+            VerifyOrDo(!ShouldSkip("CC.S.A003c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorPointBIntensity::Id, true, chip::NullOptional);
         }
@@ -4252,11 +4310,13 @@ private:
         }
         case 3: {
             LogStep(3, "Reads CurrentHue attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Move to hue shortest distance command");
+            VerifyOrDo(!ShouldSkip("CC.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHue::Type value;
             value.hue             = 150;
@@ -4278,6 +4338,7 @@ private:
         }
         case 6: {
             LogStep(6, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4290,6 +4351,7 @@ private:
         }
         case 8: {
             LogStep(8, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4302,11 +4364,13 @@ private:
         }
         case 10: {
             LogStep(10, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Move to hue longest distance command");
+            VerifyOrDo(!ShouldSkip("CC.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHue::Type value;
             value.hue             = 200;
@@ -4328,6 +4392,7 @@ private:
         }
         case 13: {
             LogStep(13, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4340,6 +4405,7 @@ private:
         }
         case 15: {
             LogStep(15, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4352,11 +4418,13 @@ private:
         }
         case 17: {
             LogStep(17, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 18: {
             LogStep(18, "Move to hue up command");
+            VerifyOrDo(!ShouldSkip("CC.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHue::Type value;
             value.hue             = 250;
@@ -4378,6 +4446,7 @@ private:
         }
         case 20: {
             LogStep(20, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4390,6 +4459,7 @@ private:
         }
         case 22: {
             LogStep(22, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4402,11 +4472,13 @@ private:
         }
         case 24: {
             LogStep(24, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 25: {
             LogStep(25, "Move to hue down command");
+            VerifyOrDo(!ShouldSkip("CC.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHue::Type value;
             value.hue             = 225;
@@ -4428,6 +4500,7 @@ private:
         }
         case 27: {
             LogStep(27, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4440,6 +4513,7 @@ private:
         }
         case 29: {
             LogStep(29, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4452,6 +4526,7 @@ private:
         }
         case 31: {
             LogStep(31, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4760,11 +4835,13 @@ private:
         }
         case 3: {
             LogStep(3, "Reads CurrentHue attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Move hue up command");
+            VerifyOrDo(!ShouldSkip("CC.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
@@ -4785,6 +4862,7 @@ private:
         }
         case 6: {
             LogStep(6, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4797,6 +4875,7 @@ private:
         }
         case 8: {
             LogStep(8, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4809,11 +4888,13 @@ private:
         }
         case 10: {
             LogStep(10, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Move hue stop command");
+            VerifyOrDo(!ShouldSkip("CC.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
@@ -4834,6 +4915,7 @@ private:
         }
         case 13: {
             LogStep(13, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4846,6 +4928,7 @@ private:
         }
         case 15: {
             LogStep(15, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4858,11 +4941,13 @@ private:
         }
         case 17: {
             LogStep(17, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 18: {
             LogStep(18, "Move hue down command");
+            VerifyOrDo(!ShouldSkip("CC.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
@@ -4883,6 +4968,7 @@ private:
         }
         case 20: {
             LogStep(20, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4895,6 +4981,7 @@ private:
         }
         case 22: {
             LogStep(22, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4907,11 +4994,13 @@ private:
         }
         case 24: {
             LogStep(24, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 25: {
             LogStep(25, "Move hue stop command");
+            VerifyOrDo(!ShouldSkip("CC.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
@@ -4932,6 +5021,7 @@ private:
         }
         case 27: {
             LogStep(27, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4944,6 +5034,7 @@ private:
         }
         case 29: {
             LogStep(29, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -4956,6 +5047,7 @@ private:
         }
         case 31: {
             LogStep(31, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -5118,11 +5210,13 @@ private:
         }
         case 3: {
             LogStep(3, "Reads CurrentHue attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Step hue up command");
+            VerifyOrDo(!ShouldSkip("CC.S.C02.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepHue::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
@@ -5144,11 +5238,13 @@ private:
         }
         case 6: {
             LogStep(6, "Over TransitionTime,Read CurrentHue attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Step hue down command");
+            VerifyOrDo(!ShouldSkip("CC.S.C02.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepHue::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(3);
@@ -5170,6 +5266,7 @@ private:
         }
         case 9: {
             LogStep(9, "Over TransitionTime,Read CurrentHue attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -5343,11 +5440,13 @@ private:
         }
         case 3: {
             LogStep(3, "Check Saturation attribute value matched before any change");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Move to saturation command");
+            VerifyOrDo(!ShouldSkip("CC.S.C03.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type value;
             value.saturation      = 90;
@@ -5368,6 +5467,7 @@ private:
         }
         case 6: {
             LogStep(6, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -5380,6 +5480,7 @@ private:
         }
         case 8: {
             LogStep(8, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -5392,6 +5493,7 @@ private:
         }
         case 10: {
             LogStep(10, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -5790,11 +5892,13 @@ private:
         }
         case 3: {
             LogStep(3, "Check Saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Move saturation up command");
+            VerifyOrDo(!ShouldSkip("CC.S.C04.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(1);
@@ -5815,6 +5919,7 @@ private:
         }
         case 6: {
             LogStep(6, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -5827,6 +5932,7 @@ private:
         }
         case 8: {
             LogStep(8, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -5839,11 +5945,13 @@ private:
         }
         case 10: {
             LogStep(10, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Move saturation down command");
+            VerifyOrDo(!ShouldSkip("CC.S.C04.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(3);
@@ -5864,6 +5972,7 @@ private:
         }
         case 13: {
             LogStep(13, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -5876,6 +5985,7 @@ private:
         }
         case 15: {
             LogStep(15, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -5888,11 +5998,13 @@ private:
         }
         case 17: {
             LogStep(17, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
         case 18: {
             LogStep(18, "Move saturation up command");
+            VerifyOrDo(!ShouldSkip("CC.S.C04.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(1);
@@ -5913,6 +6025,7 @@ private:
         }
         case 20: {
             LogStep(20, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -5925,6 +6038,7 @@ private:
         }
         case 22: {
             LogStep(22, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -5937,11 +6051,13 @@ private:
         }
         case 24: {
             LogStep(24, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
         case 25: {
             LogStep(25, "Move saturation stop command");
+            VerifyOrDo(!ShouldSkip("CC.S.C04.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(0);
@@ -5962,6 +6078,7 @@ private:
         }
         case 27: {
             LogStep(27, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -5974,6 +6091,7 @@ private:
         }
         case 29: {
             LogStep(29, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -5986,11 +6104,13 @@ private:
         }
         case 31: {
             LogStep(31, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
         case 32: {
             LogStep(32, "Move saturation down command");
+            VerifyOrDo(!ShouldSkip("CC.S.C04.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(3);
@@ -6011,6 +6131,7 @@ private:
         }
         case 34: {
             LogStep(34, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -6023,6 +6144,7 @@ private:
         }
         case 36: {
             LogStep(36, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -6035,11 +6157,13 @@ private:
         }
         case 38: {
             LogStep(38, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
         case 39: {
             LogStep(39, "Move saturation stop command");
+            VerifyOrDo(!ShouldSkip("CC.S.C04.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(0);
@@ -6060,6 +6184,7 @@ private:
         }
         case 41: {
             LogStep(41, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -6072,6 +6197,7 @@ private:
         }
         case 43: {
             LogStep(43, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -6084,6 +6210,7 @@ private:
         }
         case 45: {
             LogStep(45, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -6246,11 +6373,13 @@ private:
         }
         case 3: {
             LogStep(3, "Reads CurrentSaturation attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Step saturation up command");
+            VerifyOrDo(!ShouldSkip("CC.S.C05.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepSaturation::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::SaturationStepMode>(1);
@@ -6272,11 +6401,13 @@ private:
         }
         case 6: {
             LogStep(6, "Over TransitionTime,Read CurrentSaturation attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Step saturation down command");
+            VerifyOrDo(!ShouldSkip("CC.S.C05.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepSaturation::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::SaturationStepMode>(3);
@@ -6298,6 +6429,7 @@ private:
         }
         case 9: {
             LogStep(9, "Over TransitionTime,Reads CurrentSaturation attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -6463,16 +6595,19 @@ private:
         }
         case 3: {
             LogStep(3, "Check current hue attribute value matched before any change");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Check Saturation attribute value matched before any change");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Move To current hue and saturation command");
+            VerifyOrDo(!ShouldSkip("CC.S.C06.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type value;
             value.hue             = 40;
@@ -6494,11 +6629,13 @@ private:
         }
         case 7: {
             LogStep(7, "Check current hue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 8: {
             LogStep(8, "Check current saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -6664,16 +6801,19 @@ private:
         }
         case 3: {
             LogStep(3, "Check current x attribute value matched before any change");
+            VerifyOrDo(!ShouldSkip("CC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Check current y attribute value matched before any change");
+            VerifyOrDo(!ShouldSkip("CC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id, true,
                                  chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Move to Color command");
+            VerifyOrDo(!ShouldSkip("CC.S.C07.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToColor::Type value;
             value.colorX          = 200U;
@@ -6695,11 +6835,13 @@ private:
         }
         case 7: {
             LogStep(7, "Check current x attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id, true,
                                  chip::NullOptional);
         }
         case 8: {
             LogStep(8, "Check current y attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id, true,
                                  chip::NullOptional);
         }
@@ -6888,16 +7030,19 @@ private:
         }
         case 3: {
             LogStep(3, "Check current x attribute value  matched before any change");
+            VerifyOrDo(!ShouldSkip("CC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Check current y attribute value matched before any change");
+            VerifyOrDo(!ShouldSkip("CC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id, true,
                                  chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Move Color command");
+            VerifyOrDo(!ShouldSkip("CC.S.C08.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColor::Type value;
             value.rateX           = 15;
@@ -6918,16 +7063,19 @@ private:
         }
         case 7: {
             LogStep(7, "Check current x attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id, true,
                                  chip::NullOptional);
         }
         case 8: {
             LogStep(8, "Check current y attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id, true,
                                  chip::NullOptional);
         }
         case 9: {
             LogStep(9, "Stop Move Step command");
+            VerifyOrDo(!ShouldSkip("CC.S.C47.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
             value.optionsMask     = 0;
@@ -6939,11 +7087,13 @@ private:
         }
         case 10: {
             LogStep(10, "Check current x attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id, true,
                                  chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Check current y attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id, true,
                                  chip::NullOptional);
         }
@@ -7109,16 +7259,19 @@ private:
         }
         case 3: {
             LogStep(3, "Check current x attribute value  matched before any change");
+            VerifyOrDo(!ShouldSkip("CC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Check current y attribute  value  matched before any change");
+            VerifyOrDo(!ShouldSkip("CC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id, true,
                                  chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Step Color command");
+            VerifyOrDo(!ShouldSkip("CC.S.C09.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepColor::Type value;
             value.stepX           = 15;
@@ -7140,11 +7293,13 @@ private:
         }
         case 7: {
             LogStep(7, "Check current x attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id, true,
                                  chip::NullOptional);
         }
         case 8: {
             LogStep(8, "Check current y attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id, true,
                                  chip::NullOptional);
         }
@@ -7290,11 +7445,13 @@ private:
         }
         case 3: {
             LogStep(3, "Read current color temprature");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Move To Color Temperature command");
+            VerifyOrDo(!ShouldSkip("CC.S.C0A.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type value;
             value.colorTemperature = 100U;
@@ -7315,6 +7472,7 @@ private:
         }
         case 6: {
             LogStep(6, "Read current color temprature");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -7629,11 +7787,13 @@ private:
         }
         case 3: {
             LogStep(3, "Read current color temprature");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Move up color temperature command");
+            VerifyOrDo(!ShouldSkip("CC.S.C4B.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
             value.moveMode                      = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
@@ -7656,6 +7816,7 @@ private:
         }
         case 6: {
             LogStep(6, "Read current color temprature attribute from DUT several times");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -7668,6 +7829,7 @@ private:
         }
         case 8: {
             LogStep(8, "Read current color temprature attribute from DUT several times");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -7680,11 +7842,13 @@ private:
         }
         case 10: {
             LogStep(10, "Read current color temprature attribute from DUT several times");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Move down color temperature command");
+            VerifyOrDo(!ShouldSkip("CC.S.C4B.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
             value.moveMode                      = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
@@ -7707,6 +7871,7 @@ private:
         }
         case 13: {
             LogStep(13, "Read current color temprature attribute from DUT several times");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -7719,6 +7884,7 @@ private:
         }
         case 15: {
             LogStep(15, "Read current color temprature attribute from DUT several times");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -7731,11 +7897,13 @@ private:
         }
         case 17: {
             LogStep(17, "Read current color temprature attribute from DUT several times");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
         case 18: {
             LogStep(18, "Move up color temperature command");
+            VerifyOrDo(!ShouldSkip("CC.S.C4B.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
             value.moveMode                      = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
@@ -7751,6 +7919,7 @@ private:
         }
         case 19: {
             LogStep(19, "Stop Color Temperature command");
+            VerifyOrDo(!ShouldSkip("CC.S.C4B.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
             value.moveMode                      = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
@@ -7773,6 +7942,7 @@ private:
         }
         case 21: {
             LogStep(21, "Read current color temprature attribute from DUT several times");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -7785,6 +7955,7 @@ private:
         }
         case 23: {
             LogStep(23, "Read current color temprature attribute from DUT several times");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -7797,11 +7968,13 @@ private:
         }
         case 25: {
             LogStep(25, "Read current color temprature attribute from DUT several times");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
         case 26: {
             LogStep(26, "Move down color temperature command");
+            VerifyOrDo(!ShouldSkip("CC.S.C4B.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
             value.moveMode                      = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
@@ -7817,6 +7990,7 @@ private:
         }
         case 27: {
             LogStep(27, "Stop Color Temperature command");
+            VerifyOrDo(!ShouldSkip("CC.S.C4B.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
             value.moveMode                      = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
@@ -7839,6 +8013,7 @@ private:
         }
         case 29: {
             LogStep(29, "Read current color temprature attribute from DUT several times");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -7851,6 +8026,7 @@ private:
         }
         case 31: {
             LogStep(31, "Read current color temprature attribute from DUT several times");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -7863,6 +8039,7 @@ private:
         }
         case 33: {
             LogStep(33, "Read current color temprature attribute from DUT several times");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -8081,11 +8258,13 @@ private:
         }
         case 3: {
             LogStep(3, "Read current color temprature");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Step up color temperature command");
+            VerifyOrDo(!ShouldSkip("CC.S.C4C.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type value;
             value.stepMode                      = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
@@ -8109,6 +8288,7 @@ private:
         }
         case 6: {
             LogStep(6, "Read current color temprature");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -8121,6 +8301,7 @@ private:
         }
         case 8: {
             LogStep(8, "Read current color temprature");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -8133,11 +8314,13 @@ private:
         }
         case 10: {
             LogStep(10, "Read current color temprature");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Step down color temperature command");
+            VerifyOrDo(!ShouldSkip("CC.S.C4C.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type value;
             value.stepMode                      = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(3);
@@ -8161,6 +8344,7 @@ private:
         }
         case 13: {
             LogStep(13, "Read current color temprature");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -8173,6 +8357,7 @@ private:
         }
         case 15: {
             LogStep(15, "Read current color temprature");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -8185,6 +8370,7 @@ private:
         }
         case 17: {
             LogStep(17, "Read current color temprature");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -8496,6 +8682,7 @@ private:
         }
         case 3: {
             LogStep(3, "Enhanced Move To Hue command");
+            VerifyOrDo(!ShouldSkip("CC.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 1025U;
@@ -8510,11 +8697,13 @@ private:
         }
         case 4: {
             LogStep(4, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Enhanced Move To Hue command");
+            VerifyOrDo(!ShouldSkip("CC.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 1100U;
@@ -8536,6 +8725,7 @@ private:
         }
         case 7: {
             LogStep(7, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -8548,6 +8738,7 @@ private:
         }
         case 9: {
             LogStep(9, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -8560,11 +8751,13 @@ private:
         }
         case 11: {
             LogStep(11, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 12: {
             LogStep(12, "Enhanced Move To Hue command");
+            VerifyOrDo(!ShouldSkip("CC.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 1150U;
@@ -8586,6 +8779,7 @@ private:
         }
         case 14: {
             LogStep(14, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -8598,6 +8792,7 @@ private:
         }
         case 16: {
             LogStep(16, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -8610,11 +8805,13 @@ private:
         }
         case 18: {
             LogStep(18, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 19: {
             LogStep(19, "Enhanced Move To Hue command");
+            VerifyOrDo(!ShouldSkip("CC.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 1200U;
@@ -8636,6 +8833,7 @@ private:
         }
         case 21: {
             LogStep(21, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -8648,6 +8846,7 @@ private:
         }
         case 23: {
             LogStep(23, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -8660,11 +8859,13 @@ private:
         }
         case 25: {
             LogStep(25, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 26: {
             LogStep(26, "Enhanced Move To Hue command");
+            VerifyOrDo(!ShouldSkip("CC.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 1300U;
@@ -8686,6 +8887,7 @@ private:
         }
         case 28: {
             LogStep(28, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -8698,6 +8900,7 @@ private:
         }
         case 30: {
             LogStep(30, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -8710,6 +8913,7 @@ private:
         }
         case 32: {
             LogStep(32, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -8954,11 +9158,13 @@ private:
         }
         case 3: {
             LogStep(3, "Check EnhancedCurrentHue attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Enhanced Move Hue Up command");
+            VerifyOrDo(!ShouldSkip("CC.S.C41.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
@@ -8979,6 +9185,7 @@ private:
         }
         case 6: {
             LogStep(6, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -8991,6 +9198,7 @@ private:
         }
         case 8: {
             LogStep(8, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -9003,11 +9211,13 @@ private:
         }
         case 10: {
             LogStep(10, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Enhanced Move Hue Stop command");
+            VerifyOrDo(!ShouldSkip("CC.S.C41.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
@@ -9021,11 +9231,13 @@ private:
         }
         case 12: {
             LogStep(12, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 13: {
-            LogStep(13, "Enhanced Move Hue Down command ");
+            LogStep(13, "Enhanced Move Hue Down command");
+            VerifyOrDo(!ShouldSkip("CC.S.C41.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
@@ -9046,6 +9258,7 @@ private:
         }
         case 15: {
             LogStep(15, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -9058,6 +9271,7 @@ private:
         }
         case 17: {
             LogStep(17, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -9070,11 +9284,13 @@ private:
         }
         case 19: {
             LogStep(19, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 20: {
             LogStep(20, "Enhanced Move Hue Stop command");
+            VerifyOrDo(!ShouldSkip("CC.S.C41.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
@@ -9088,6 +9304,7 @@ private:
         }
         case 21: {
             LogStep(21, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -9250,11 +9467,13 @@ private:
         }
         case 3: {
             LogStep(3, "Reads EnhancedCurrentHue attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Enhanced Step Hue Up command");
+            VerifyOrDo(!ShouldSkip("CC.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(0);
@@ -9276,11 +9495,13 @@ private:
         }
         case 6: {
             LogStep(6, "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Enhanced Step Hue Down command");
+            VerifyOrDo(!ShouldSkip("CC.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
@@ -9302,6 +9523,7 @@ private:
         }
         case 9: {
             LogStep(9, "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -9447,11 +9669,13 @@ private:
         }
         case 3: {
             LogStep(3, "Reads EnhancedCurrentHue attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Enhanced move to hue and saturation command");
+            VerifyOrDo(!ShouldSkip("CC.S.C43.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type value;
             value.enhancedHue     = 1200U;
@@ -9473,6 +9697,7 @@ private:
         }
         case 6: {
             LogStep(6, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -9821,6 +10046,7 @@ private:
         }
         case 3: {
             LogStep(3, "Move hue up command");
+            VerifyOrDo(!ShouldSkip("CC.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
@@ -9834,11 +10060,13 @@ private:
         }
         case 4: {
             LogStep(4, "Reads CurrentHue attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Stop Move Step command");
+            VerifyOrDo(!ShouldSkip("CC.S.C47.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
             value.optionsMask     = 0;
@@ -9850,6 +10078,7 @@ private:
         }
         case 6: {
             LogStep(6, "Reads CurrentHue attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
@@ -9862,11 +10091,13 @@ private:
         }
         case 8: {
             LogStep(8, "Check current hue attribute value matched the value sent by the last attribute");
+            VerifyOrDo(!ShouldSkip("CC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, true,
                                  chip::NullOptional);
         }
         case 9: {
             LogStep(9, "Move saturation up command");
+            VerifyOrDo(!ShouldSkip("CC.S.C04.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(1);
@@ -9880,11 +10111,13 @@ private:
         }
         case 10: {
             LogStep(10, "Check Saturation attribute value matched the value sent by the last command");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Stop Move Step command");
+            VerifyOrDo(!ShouldSkip("CC.S.C47.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
             value.optionsMask     = 0;
@@ -9896,6 +10129,7 @@ private:
         }
         case 12: {
             LogStep(12, "Reads CurrentSaturation attribute from DUT.");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
@@ -9908,11 +10142,13 @@ private:
         }
         case 14: {
             LogStep(14, "Check Saturation attribute value matched the value sent by the last attribute");
+            VerifyOrDo(!ShouldSkip("CC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
                                  true, chip::NullOptional);
         }
         case 15: {
             LogStep(15, "Move Color command");
+            VerifyOrDo(!ShouldSkip("CC.S.C08.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColor::Type value;
             value.rateX           = 15;
@@ -9926,16 +10162,19 @@ private:
         }
         case 16: {
             LogStep(16, "Reads CurrentX attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id, true,
                                  chip::NullOptional);
         }
         case 17: {
             LogStep(17, "Reads CurrentY attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id, true,
                                  chip::NullOptional);
         }
         case 18: {
             LogStep(18, "Stop Move Step command");
+            VerifyOrDo(!ShouldSkip("CC.S.C47.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
             value.optionsMask     = 0;
@@ -9947,11 +10186,13 @@ private:
         }
         case 19: {
             LogStep(19, "Reads CurrentX attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id, true,
                                  chip::NullOptional);
         }
         case 20: {
             LogStep(20, "Reads CurrentY attribute from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id, true,
                                  chip::NullOptional);
         }
@@ -9964,16 +10205,19 @@ private:
         }
         case 22: {
             LogStep(22, "Check current x attribute value matched the value sent by the last attribute");
+            VerifyOrDo(!ShouldSkip("CC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id, true,
                                  chip::NullOptional);
         }
         case 23: {
             LogStep(23, "Check current y attribute value matched the value sent by the last attribute");
+            VerifyOrDo(!ShouldSkip("CC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id, true,
                                  chip::NullOptional);
         }
         case 24: {
             LogStep(24, "Move up color temperature command");
+            VerifyOrDo(!ShouldSkip("CC.S.C4B.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
             value.moveMode                      = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
@@ -9989,11 +10233,13 @@ private:
         }
         case 25: {
             LogStep(25, "Reads current color temprature from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
         case 26: {
             LogStep(26, "Stop Move Step command");
+            VerifyOrDo(!ShouldSkip("CC.S.C47.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
             value.optionsMask     = 0;
@@ -10005,6 +10251,7 @@ private:
         }
         case 27: {
             LogStep(27, "Reads current color temprature from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
@@ -10017,11 +10264,13 @@ private:
         }
         case 29: {
             LogStep(29, "Reads current color attribute value matched the value sent by the last attribute");
+            VerifyOrDo(!ShouldSkip("CC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id,
                                  true, chip::NullOptional);
         }
         case 30: {
             LogStep(30, "Enhanced Move Hue Up command");
+            VerifyOrDo(!ShouldSkip("CC.S.C41.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
@@ -10035,11 +10284,13 @@ private:
         }
         case 31: {
             LogStep(31, "Reads EnhancedCurrentHue attribute value from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 32: {
             LogStep(32, "Stop Move Step command");
+            VerifyOrDo(!ShouldSkip("CC.S.C47.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
             value.optionsMask     = 0;
@@ -10051,6 +10302,7 @@ private:
         }
         case 33: {
             LogStep(33, "Reads EnhancedCurrentHue attribute value from DUT");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -10063,6 +10315,7 @@ private:
         }
         case 35: {
             LogStep(35, "Check EnhancedCurrentHue attribute value matched the value sent by the last attribute");
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -10618,7 +10871,7 @@ private:
         }
         case 3: {
             LogStep(3, "Precondition : Set DUT EnhancedCurrentHue to 0x4000 using EnhancedMoveToHue command");
-            VerifyOrDo(!ShouldSkip("CR_ENHANCEDMOVETOHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 16384U;
@@ -10633,7 +10886,7 @@ private:
         }
         case 4: {
             LogStep(4, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
@@ -10650,13 +10903,13 @@ private:
         }
         case 5: {
             LogStep(5, "Read ColorLoopActive attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
@@ -10673,13 +10926,13 @@ private:
         }
         case 7: {
             LogStep(7, "Read ColorLoopDirection attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPDIRECTION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopDirection::Id,
                                  true, chip::NullOptional);
         }
         case 8: {
             LogStep(8, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
@@ -10696,13 +10949,13 @@ private:
         }
         case 9: {
             LogStep(9, "Read ColorLoopTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopTime::Id,
                                  true, chip::NullOptional);
         }
         case 10: {
             LogStep(10, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(8);
@@ -10719,13 +10972,13 @@ private:
         }
         case 11: {
             LogStep(11, "Read ColorLoopStartEnhancedHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStartEnhancedHue::Id, true, chip::NullOptional);
         }
         case 12: {
             LogStep(12, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
@@ -10742,14 +10995,13 @@ private:
         }
         case 13: {
             LogStep(13, "Read ColorLoopActive attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 14: {
             LogStep(14, "Read ColorLoopStoredEnhancedHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_COLORLOOPSTOREDENHANCEDHUE"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && CC.S.A4006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, true, chip::NullOptional);
         }
@@ -10762,13 +11014,13 @@ private:
         }
         case 16: {
             LogStep(16, "Read ColorLoopStartEnhancedHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStartEnhancedHue::Id, true, chip::NullOptional);
         }
         case 17: {
             LogStep(17, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -10781,13 +11033,13 @@ private:
         }
         case 19: {
             LogStep(19, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 20: {
             LogStep(20, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
@@ -10804,25 +11056,25 @@ private:
         }
         case 21: {
             LogStep(21, "Read ColorLoopActive attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 22: {
             LogStep(22, "Read ColorLoopStoredEnhancedHue attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTOREDENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, true, chip::NullOptional);
         }
         case 23: {
             LogStep(23, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 24: {
             LogStep(24, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
@@ -10839,13 +11091,13 @@ private:
         }
         case 25: {
             LogStep(25, "Read ColorLoopDirection attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPDIRECTION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopDirection::Id,
                                  true, chip::NullOptional);
         }
         case 26: {
             LogStep(26, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
@@ -10862,14 +11114,13 @@ private:
         }
         case 27: {
             LogStep(27, "Read ColorLoopActive attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 28: {
             LogStep(28, "Read ColorLoopStoredEnhancedHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_COLORLOOPSTOREDENHANCEDHUE"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && CC.S.A4006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, true, chip::NullOptional);
         }
@@ -10882,13 +11133,13 @@ private:
         }
         case 30: {
             LogStep(30, "Read ColorLoopStartEnhancedHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStartEnhancedHue::Id, true, chip::NullOptional);
         }
         case 31: {
             LogStep(31, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -10901,13 +11152,13 @@ private:
         }
         case 33: {
             LogStep(33, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 34: {
             LogStep(34, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
@@ -10924,25 +11175,25 @@ private:
         }
         case 35: {
             LogStep(35, "Read ColorLoopActive attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 36: {
             LogStep(36, "Read ColorLoopStoredEnhancedHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTOREDENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, true, chip::NullOptional);
         }
         case 37: {
             LogStep(37, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 38: {
             LogStep(38, "Enhanced Move To Hue command");
-            VerifyOrDo(!ShouldSkip("CR_ENHANCEDMOVETOHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 40960U;
@@ -10964,13 +11215,13 @@ private:
         }
         case 40: {
             LogStep(40, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 41: {
             LogStep(41, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
@@ -10987,13 +11238,13 @@ private:
         }
         case 42: {
             LogStep(42, "Read ColorLoopDirection attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPDIRECTION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopDirection::Id,
                                  true, chip::NullOptional);
         }
         case 43: {
             LogStep(43, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
@@ -11010,14 +11261,13 @@ private:
         }
         case 44: {
             LogStep(44, "Read ColorLoopActive attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 45: {
             LogStep(45, "Read ColorLoopStoredEnhancedHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_COLORLOOPSTOREDENHANCEDHUE"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && CC.S.A4006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, true, chip::NullOptional);
         }
@@ -11030,13 +11280,13 @@ private:
         }
         case 47: {
             LogStep(47, "Read ColorLoopStartEnhancedHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStartEnhancedHue::Id, true, chip::NullOptional);
         }
         case 48: {
             LogStep(48, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -11049,13 +11299,13 @@ private:
         }
         case 50: {
             LogStep(50, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 51: {
             LogStep(51, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
@@ -11072,25 +11322,25 @@ private:
         }
         case 52: {
             LogStep(52, "Read ColorLoopActive attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 53: {
             LogStep(53, "Read ColorLoopStoredEnhancedHue attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTOREDENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, true, chip::NullOptional);
         }
         case 54: {
             LogStep(54, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 55: {
             LogStep(55, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
@@ -11107,13 +11357,13 @@ private:
         }
         case 56: {
             LogStep(56, "Read ColorLoopDirection attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPDIRECTION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopDirection::Id,
                                  true, chip::NullOptional);
         }
         case 57: {
             LogStep(57, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
@@ -11130,14 +11380,13 @@ private:
         }
         case 58: {
             LogStep(58, "Read ColorLoopActive attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 59: {
             LogStep(59, "Read ColorLoopStoredEnhancedHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_COLORLOOPSTOREDENHANCEDHUE"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && CC.S.A4006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, true, chip::NullOptional);
         }
@@ -11150,13 +11399,13 @@ private:
         }
         case 61: {
             LogStep(61, "Read ColorLoopStartEnhancedHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStartEnhancedHue::Id, true, chip::NullOptional);
         }
         case 62: {
             LogStep(62, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -11169,13 +11418,13 @@ private:
         }
         case 64: {
             LogStep(64, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 65: {
             LogStep(65, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
@@ -11192,19 +11441,19 @@ private:
         }
         case 66: {
             LogStep(66, "Read ColorLoopActive attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 67: {
             LogStep(67, "Read ColorLoopStoredEnhancedHue attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTOREDENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, true, chip::NullOptional);
         }
         case 68: {
             LogStep(68, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -11494,7 +11743,7 @@ private:
         }
         case 3: {
             LogStep(3, "Precondition : Set DUT EnhancedCurrentHue to 0x4000 using EnhancedMoveToHue command");
-            VerifyOrDo(!ShouldSkip("CR_ENHANCEDMOVETOHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 16384U;
@@ -11509,7 +11758,7 @@ private:
         }
         case 4: {
             LogStep(4, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
@@ -11526,31 +11775,31 @@ private:
         }
         case 5: {
             LogStep(5, "Read ColorLoopActive attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Read ColorLoopDirection attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPDIRECTION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopDirection::Id,
                                  true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Read ColorLoopTime attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopTime::Id,
                                  true, chip::NullOptional);
         }
         case 8: {
             LogStep(8, "Read ColorLoopStartEnhancedHue attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStartEnhancedHue::Id, true, chip::NullOptional);
         }
         case 9: {
             LogStep(9, "Color Loop Set Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
@@ -11567,14 +11816,13 @@ private:
         }
         case 10: {
             LogStep(10, "Read ColorLoopActive attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Read ColorLoopStoredEnhancedHue attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_COLORLOOPSTOREDENHANCEDHUE"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && CC.S.A4006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, true, chip::NullOptional);
         }
@@ -11587,13 +11835,13 @@ private:
         }
         case 13: {
             LogStep(13, "Read ColorLoopStartEnhancedHue attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStartEnhancedHue::Id, true, chip::NullOptional);
         }
         case 14: {
             LogStep(14, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -11606,13 +11854,13 @@ private:
         }
         case 16: {
             LogStep(16, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 17: {
             LogStep(17, "Color Loop Set Command - Start Color Loop");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
@@ -11629,7 +11877,7 @@ private:
         }
         case 18: {
             LogStep(18, "Read ColorLoopDirection attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPDIRECTION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopDirection::Id,
                                  true, chip::NullOptional);
         }
@@ -11642,13 +11890,13 @@ private:
         }
         case 20: {
             LogStep(20, "Read ColorLoopStartEnhancedHue attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStartEnhancedHue::Id, true, chip::NullOptional);
         }
         case 21: {
             LogStep(21, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -11661,13 +11909,13 @@ private:
         }
         case 23: {
             LogStep(23, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 24: {
             LogStep(24, "Color Loop Set Command - Start Color Loop");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
@@ -11684,19 +11932,19 @@ private:
         }
         case 25: {
             LogStep(25, "Read ColorLoopActive attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 26: {
             LogStep(26, "Read ColorLoopStoredEnhancedHue attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTOREDENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, true, chip::NullOptional);
         }
         case 27: {
             LogStep(27, "Read EnhancedCurrentHue attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -11976,7 +12224,7 @@ private:
         }
         case 3: {
             LogStep(3, "Precondition : Set DUT EnhancedCurrentHue to 0x4000 using EnhancedMoveToHue command");
-            VerifyOrDo(!ShouldSkip("CR_ENHANCEDMOVETOHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 16384U;
@@ -11991,7 +12239,7 @@ private:
         }
         case 4: {
             LogStep(4, "Sends ColorLoopSet Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
@@ -12008,31 +12256,31 @@ private:
         }
         case 5: {
             LogStep(5, "Read ColorLoopActive attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Read ColorLoopDirection attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPDIRECTION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopDirection::Id,
                                  true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Read ColorLoopTime attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopTime::Id,
                                  true, chip::NullOptional);
         }
         case 8: {
             LogStep(8, "Read ColorLoopStartEnhancedHue attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStartEnhancedHue::Id, true, chip::NullOptional);
         }
         case 9: {
             LogStep(9, "Color Loop Set Command - Set all Attributes");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
@@ -12049,14 +12297,13 @@ private:
         }
         case 10: {
             LogStep(10, "Read ColorLoopActive attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Read ColorLoopStoredEnhancedHue attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_COLORLOOPSTOREDENHANCEDHUE"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && CC.S.A4006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, true, chip::NullOptional);
         }
@@ -12069,13 +12316,13 @@ private:
         }
         case 13: {
             LogStep(13, "Read ColorLoopStartEnhancedHue attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStartEnhancedHue::Id, true, chip::NullOptional);
         }
         case 14: {
             LogStep(14, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -12088,13 +12335,13 @@ private:
         }
         case 16: {
             LogStep(16, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 17: {
             LogStep(17, "Color Loop Set Command - Start Color Loop");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
@@ -12111,7 +12358,7 @@ private:
         }
         case 18: {
             LogStep(18, "Read ColorLoopTime attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopTime::Id,
                                  true, chip::NullOptional);
         }
@@ -12124,7 +12371,7 @@ private:
         }
         case 20: {
             LogStep(20, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -12137,13 +12384,13 @@ private:
         }
         case 22: {
             LogStep(22, "Read EnhancedCurrentHue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
         case 23: {
             LogStep(23, "Color Loop Set Command - Start Color Loop");
-            VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.C44.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
@@ -12160,19 +12407,19 @@ private:
         }
         case 24: {
             LogStep(24, "Read ColorLoopActive attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPACTIVE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id,
                                  true, chip::NullOptional);
         }
         case 25: {
             LogStep(25, "Read ColorLoopStoredEnhancedHue attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_COLORLOOPSTOREDENHANCEDHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, true, chip::NullOptional);
         }
         case 26: {
             LogStep(26, "Read EnhancedCurrentHue attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_ENHANCEDCURRENTHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CC.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id,
                                  true, chip::NullOptional);
         }
@@ -22526,11 +22773,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22985,11 +23232,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -23020,11 +23267,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -23081,11 +23328,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -23549,11 +23796,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -24340,11 +24587,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -24372,11 +24619,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -24392,11 +24639,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -24424,11 +24671,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -24444,11 +24691,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -56696,10 +56943,10 @@ private:
     }
 };
 
-class Test_TC_SWDIAG_1_1Suite : public TestCommand
+class Test_TC_DGSW_2_1Suite : public TestCommand
 {
 public:
-    Test_TC_SWDIAG_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SWDIAG_1_1", 5, credsIssuerConfig)
+    Test_TC_DGSW_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DGSW_2_1", 5, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -56707,7 +56954,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_SWDIAG_1_1Suite() {}
+    ~Test_TC_DGSW_2_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -56746,10 +56993,6 @@ private:
             }
             break;
         case 2:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint64_t value;
@@ -56758,10 +57001,6 @@ private:
             }
             break;
         case 3:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint64_t value;
@@ -56770,10 +57009,6 @@ private:
             }
             break;
         case 4:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint64_t value;
@@ -56805,24 +57040,25 @@ private:
         }
         case 1: {
             LogStep(1, "Reads a list of ThreadMetrics struct non-global attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_THREADMETRICS"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                  SoftwareDiagnostics::Attributes::ThreadMetrics::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Reads CurrentHeapFree non-global attribute value from DUT");
+            VerifyOrDo(!ShouldSkip("DGSW.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                  SoftwareDiagnostics::Attributes::CurrentHeapFree::Id, true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads CurrentHeapUsed non-global attribute value from DUT");
-            VerifyOrDo(!ShouldSkip("A_CURRENTHEAPUSED"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                  SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Reads CurrentHeapHighWaterMark non-global attribute value from DUT");
-            VerifyOrDo(!ShouldSkip("A_CURRENTHEAPHIGHWATERMARK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                  SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id, true, chip::NullOptional);
         }
@@ -56831,10 +57067,10 @@ private:
     }
 };
 
-class Test_TC_SWDIAG_2_1Suite : public TestCommand
+class Test_TC_DGSW_2_2Suite : public TestCommand
 {
 public:
-    Test_TC_SWDIAG_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SWDIAG_2_1", 1, credsIssuerConfig)
+    Test_TC_DGSW_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DGSW_2_2", 1, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -56842,7 +57078,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_SWDIAG_2_1Suite() {}
+    ~Test_TC_DGSW_2_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -56903,10 +57139,10 @@ private:
     }
 };
 
-class Test_TC_SWDIAG_3_1Suite : public TestCommand
+class Test_TC_DGSW_2_3Suite : public TestCommand
 {
 public:
-    Test_TC_SWDIAG_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SWDIAG_3_1", 5, credsIssuerConfig)
+    Test_TC_DGSW_2_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DGSW_2_3", 5, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -56914,7 +57150,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_SWDIAG_3_1Suite() {}
+    ~Test_TC_DGSW_2_3Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -56956,10 +57192,6 @@ private:
             }
             break;
         case 3:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint64_t value;
@@ -56968,10 +57200,6 @@ private:
             }
             break;
         case 4:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint64_t value;
@@ -57003,7 +57231,7 @@ private:
         }
         case 1: {
             LogStep(1, "Sends ResetWatermarks to DUT");
-            VerifyOrDo(!ShouldSkip("CR_RESETWATERMARKS"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
@@ -57013,19 +57241,19 @@ private:
         }
         case 2: {
             LogStep(2, "Reads a list of ThreadMetrics struct attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("A_THREADMETRICS"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                  SoftwareDiagnostics::Attributes::ThreadMetrics::Id, true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads CurrentHeapUsed attribute value from DUT");
-            VerifyOrDo(!ShouldSkip("A_CURRENTHEAPUSED"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                  SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Reads CurrentHeapHighWaterMark attribute value from DUT");
-            VerifyOrDo(!ShouldSkip("A_CURRENTHEAPHIGHWATERMARK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                  SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id, true, chip::NullOptional);
         }
@@ -67151,8 +67379,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67207,8 +67434,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67263,8 +67489,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67319,8 +67544,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67375,8 +67599,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67431,8 +67654,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67487,8 +67709,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67543,8 +67764,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67599,8 +67819,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67655,8 +67874,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67711,8 +67929,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67767,8 +67984,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67823,8 +68039,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67879,8 +68094,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67935,8 +68149,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67991,8 +68204,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68047,8 +68259,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68103,8 +68314,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68159,8 +68369,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68215,8 +68424,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68271,8 +68479,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68327,8 +68534,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68383,8 +68589,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68439,8 +68644,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68495,8 +68699,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68551,8 +68754,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68607,8 +68809,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68663,8 +68864,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68719,8 +68919,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68775,8 +68974,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68831,8 +69029,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68887,8 +69084,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68943,8 +69139,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69452,8 +69647,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69508,8 +69702,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69564,8 +69757,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69620,8 +69812,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69676,8 +69867,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69732,8 +69922,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69788,8 +69977,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69844,8 +70032,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69900,8 +70087,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69956,8 +70142,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70012,8 +70197,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70068,8 +70252,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70124,8 +70307,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70180,8 +70362,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70236,8 +70417,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70292,8 +70472,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70348,8 +70527,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70404,8 +70582,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70460,8 +70637,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70516,8 +70692,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70572,8 +70747,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70628,8 +70802,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70684,8 +70857,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70740,8 +70912,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70796,8 +70967,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70852,8 +71022,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70908,8 +71077,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70964,8 +71132,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71020,8 +71187,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71076,8 +71242,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71132,8 +71297,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71188,8 +71352,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71450,8 +71613,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71506,8 +71668,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71562,8 +71723,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71618,8 +71778,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71674,8 +71833,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71730,8 +71888,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71786,8 +71943,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71842,8 +71998,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71898,8 +72053,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71954,8 +72108,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72010,8 +72163,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72066,8 +72218,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72122,8 +72273,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72178,8 +72328,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72234,8 +72383,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72290,8 +72438,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72346,8 +72493,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72402,8 +72548,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72458,8 +72603,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72514,8 +72658,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72570,8 +72713,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72626,8 +72768,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72682,8 +72823,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72738,8 +72878,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72794,8 +72933,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72850,8 +72988,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72906,8 +73043,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72962,8 +73098,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73018,8 +73153,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73074,8 +73208,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73130,8 +73263,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73186,8 +73318,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73242,8 +73373,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73298,8 +73428,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73354,8 +73483,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73410,8 +73538,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73466,8 +73593,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73522,8 +73648,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73579,8 +73704,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73635,8 +73759,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73691,8 +73814,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73747,8 +73869,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73803,8 +73924,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73859,8 +73979,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73915,8 +74034,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73971,8 +74089,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74027,8 +74144,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74083,8 +74199,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74139,8 +74254,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74195,8 +74309,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74251,8 +74364,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74307,8 +74419,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74363,8 +74474,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74419,8 +74529,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74475,8 +74584,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74531,8 +74639,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74587,8 +74694,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74643,8 +74749,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74699,8 +74804,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74755,8 +74859,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74811,8 +74914,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74867,8 +74969,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74923,8 +75024,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74979,8 +75079,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75035,8 +75134,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75091,8 +75189,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75147,8 +75244,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75203,8 +75299,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75259,8 +75354,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75315,8 +75409,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75371,8 +75464,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75427,8 +75519,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76583,8 +76674,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76639,8 +76729,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76695,8 +76784,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76751,8 +76839,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76807,8 +76894,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76863,8 +76949,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76919,8 +77004,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76975,8 +77059,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77031,8 +77114,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77087,8 +77169,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77143,8 +77224,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77199,8 +77279,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77255,8 +77334,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77311,8 +77389,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77367,8 +77444,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77423,8 +77499,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77479,8 +77554,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77535,8 +77609,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77591,8 +77664,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77647,8 +77719,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77703,8 +77774,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77759,8 +77829,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77815,8 +77884,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77871,8 +77939,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77927,8 +77994,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77983,8 +78049,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78039,8 +78104,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78095,8 +78159,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78151,8 +78214,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78207,8 +78269,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78449,11 +78510,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -78481,11 +78542,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 179U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -78555,8 +78616,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78611,8 +78671,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78667,8 +78726,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78723,8 +78781,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78779,8 +78836,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78835,8 +78891,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78891,8 +78946,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -78947,8 +79001,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79003,8 +79056,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79059,8 +79111,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79115,8 +79166,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79171,8 +79221,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79227,8 +79276,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79283,8 +79331,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79339,8 +79386,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79395,8 +79441,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79451,8 +79496,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79507,8 +79551,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79563,8 +79606,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79619,8 +79661,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79675,8 +79716,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79731,8 +79771,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79787,8 +79826,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79843,8 +79881,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79899,8 +79936,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -79955,8 +79991,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80011,8 +80046,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80067,8 +80101,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80123,8 +80156,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80179,8 +80211,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80235,8 +80266,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80291,8 +80321,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80347,8 +80376,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80403,8 +80431,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80459,8 +80486,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80515,8 +80541,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80571,8 +80596,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80627,8 +80651,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80683,8 +80706,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80739,8 +80761,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80795,8 +80816,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80851,8 +80871,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80907,8 +80926,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -80963,8 +80981,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81019,8 +81036,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81075,16 +81091,15 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
 
-class Test_TC_SWDIAG_1_2Suite : public TestCommand
+class Test_TC_DGSW_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_SWDIAG_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SWDIAG_1_2", 0, credsIssuerConfig)
+    Test_TC_DGSW_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DGSW_1_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -81092,7 +81107,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_SWDIAG_1_2Suite() {}
+    ~Test_TC_DGSW_1_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -81131,8 +81146,117 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DGSW_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_DGSW_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DGSW_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DGSW_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
         {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DGSW_3_2Suite : public TestCommand
+{
+public:
+    Test_TC_DGSW_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DGSW_3_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DGSW_3_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81187,8 +81311,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81243,8 +81366,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81299,8 +81421,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81355,8 +81476,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81411,8 +81531,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81467,8 +81586,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81633,8 +81751,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81800,8 +81917,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81856,8 +81972,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81912,8 +82027,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -81968,8 +82082,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82024,8 +82137,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82080,8 +82192,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82136,8 +82247,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82192,8 +82302,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82248,8 +82357,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82304,8 +82412,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82360,8 +82467,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82416,8 +82522,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82472,8 +82577,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82528,8 +82632,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82584,8 +82687,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82640,8 +82742,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82696,8 +82797,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82752,8 +82852,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82808,8 +82907,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82864,8 +82962,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82920,8 +83017,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -82976,8 +83072,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -83032,8 +83127,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -83088,8 +83182,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -83144,8 +83237,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -83200,8 +83292,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -83256,8 +83347,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -83312,8 +83402,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -85188,8 +85277,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -85244,8 +85332,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -85445,8 +85532,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -85501,8 +85587,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -85557,8 +85642,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -85613,8 +85697,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -85811,8 +85894,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -85867,8 +85949,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -85923,8 +86004,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -85979,8 +86059,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86036,8 +86115,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86093,8 +86171,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86150,8 +86227,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86207,8 +86283,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86263,8 +86338,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86319,8 +86393,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86375,8 +86448,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86431,8 +86503,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86487,8 +86558,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86543,8 +86613,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86599,8 +86668,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86655,8 +86723,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86711,8 +86778,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86767,8 +86833,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86823,8 +86888,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86879,8 +86943,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86935,8 +86998,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -86991,8 +87053,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -87047,8 +87108,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -87103,8 +87163,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -87159,8 +87218,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -87215,8 +87273,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -87271,8 +87328,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -87327,8 +87383,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -87383,8 +87438,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -87439,8 +87493,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -87640,9 +87693,9 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestArmFailSafeSuite>(credsIssuerConfig),
         make_unique<TestFanControlSuite>(credsIssuerConfig),
         make_unique<TestMultiAdminSuite>(credsIssuerConfig),
-        make_unique<Test_TC_SWDIAG_1_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_SWDIAG_2_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_SWDIAG_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGSW_2_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGSW_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGSW_2_3Suite>(credsIssuerConfig),
         make_unique<TestSubscribe_OnOffSuite>(credsIssuerConfig),
         make_unique<DL_UsersAndCredentialsSuite>(credsIssuerConfig),
         make_unique<DL_LockUnlockSuite>(credsIssuerConfig),
@@ -87878,7 +87931,9 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_SC_4_8Suite>(credsIssuerConfig),
         make_unique<Test_TC_SC_4_9Suite>(credsIssuerConfig),
         make_unique<Test_TC_SC_4_10Suite>(credsIssuerConfig),
-        make_unique<Test_TC_SWDIAG_1_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGSW_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGSW_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGSW_3_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_DGWIFI_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_DGWIFI_2_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_DGWIFI_3_1Suite>(credsIssuerConfig),
