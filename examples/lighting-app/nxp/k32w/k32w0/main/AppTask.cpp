@@ -516,7 +516,7 @@ void AppTask::OTAHandler(AppEvent * aEvent)
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 void AppTask::StartOTAQuery(intptr_t arg)
 {
-    static_cast<DefaultOTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
+    GetRequestorInstance()->TriggerImmediateQuery();
 }
 
 void AppTask::PostOTAResume()

@@ -20,7 +20,6 @@
 #include <platform/PlatformManager.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -67,6 +66,10 @@
 #include "TraceDecoder.h"
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
+#endif
 
 #include <signal.h>
 
@@ -306,9 +309,11 @@ void ChipLinuxAppMainLoop()
         initParams.operationalKeystore = &LinuxDeviceOptions::GetInstance().mCSRResponseOptions.badCsrOperationalKeyStoreForTest;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(
         LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey) };
     initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+#endif
 
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
