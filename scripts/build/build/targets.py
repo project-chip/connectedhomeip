@@ -247,6 +247,7 @@ def HostTargets():
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
         app_targets.append(target.Extend('light', app=HostApp.LIGHT))
+        app_targets.append(target.Extend('light-rpc', app=HostApp.LIGHT, enable_rpcs=True))
         app_targets.append(target.Extend('lock', app=HostApp.LOCK))
         app_targets.append(target.Extend('shell', app=HostApp.SHELL))
         app_targets.append(target.Extend(
