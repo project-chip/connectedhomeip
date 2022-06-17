@@ -24,12 +24,12 @@
 #include <app/data-model/DecodableList.h>
 #include <app/util/im-client-callbacks.h>
 
-typedef void (*MTRCommandSuccessCallback)(void *, const chip::app::DataModel::NullObjectType &);
-using MTRCommandSuccessCallbackType = MTRCommandSuccessCallback;
-typedef void (*MTRDefaultSuccessCallbackType)(void *);
+typedef void (*CommandSuccessCallback)(void *, const chip::app::DataModel::NullObjectType &);
+using CommandSuccessCallbackType = CommandSuccessCallback;
+typedef void (*DefaultSuccessCallbackType)(void *);
 
-typedef void (*MTRVendorIdAttributeCallback)(void *, chip::VendorId);
-typedef void (*MTRNullableVendorIdAttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::VendorId> &);
+typedef void (*VendorIdAttributeCallback)(void *, chip::VendorId);
+typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::VendorId> &);
 
 typedef void (*MTRAccountLoginClusterGetSetupPINResponseCallbackType)(
     void *, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &);
@@ -140,439 +140,424 @@ typedef void (*MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbac
 typedef void (*MTRThermostatClusterGetWeeklyScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &);
 
-typedef void (*MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallback)(
-    void *, chip::app::Clusters::Identify::IdentifyEffectIdentifier);
-typedef void (*MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallback)(
+typedef void (*IdentifyClusterIdentifyEffectIdentifierAttributeCallback)(void *,
+                                                                         chip::app::Clusters::Identify::IdentifyEffectIdentifier);
+typedef void (*NullableIdentifyClusterIdentifyEffectIdentifierAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectIdentifier> &);
-typedef void (*MTRIdentifyClusterIdentifyEffectVariantAttributeCallback)(void *,
-                                                                         chip::app::Clusters::Identify::IdentifyEffectVariant);
-typedef void (*MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallback)(
+typedef void (*IdentifyClusterIdentifyEffectVariantAttributeCallback)(void *, chip::app::Clusters::Identify::IdentifyEffectVariant);
+typedef void (*NullableIdentifyClusterIdentifyEffectVariantAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectVariant> &);
-typedef void (*MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallback)(void *,
-                                                                        chip::app::Clusters::Identify::IdentifyIdentifyType);
-typedef void (*MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallback)(
+typedef void (*IdentifyClusterIdentifyIdentifyTypeAttributeCallback)(void *, chip::app::Clusters::Identify::IdentifyIdentifyType);
+typedef void (*NullableIdentifyClusterIdentifyIdentifyTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyIdentifyType> &);
-typedef void (*MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallback)(
+typedef void (*OnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallback)(
     void *, chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant);
-typedef void (*MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallback)(
+typedef void (*NullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant> &);
-typedef void (*MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallback)(
-    void *, chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant);
-typedef void (*MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallback)(
+typedef void (*OnOffClusterOnOffDyingLightEffectVariantAttributeCallback)(void *,
+                                                                          chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant);
+typedef void (*NullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant> &);
-typedef void (*MTROnOffClusterOnOffEffectIdentifierAttributeCallback)(void *, chip::app::Clusters::OnOff::OnOffEffectIdentifier);
-typedef void (*MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallback)(
+typedef void (*OnOffClusterOnOffEffectIdentifierAttributeCallback)(void *, chip::app::Clusters::OnOff::OnOffEffectIdentifier);
+typedef void (*NullableOnOffClusterOnOffEffectIdentifierAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffEffectIdentifier> &);
-typedef void (*MTROnOffClusterOnOffStartUpOnOffAttributeCallback)(void *, chip::app::Clusters::OnOff::OnOffStartUpOnOff);
-typedef void (*MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallback)(
+typedef void (*OnOffClusterOnOffStartUpOnOffAttributeCallback)(void *, chip::app::Clusters::OnOff::OnOffStartUpOnOff);
+typedef void (*NullableOnOffClusterOnOffStartUpOnOffAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> &);
-typedef void (*MTRLevelControlClusterMoveModeAttributeCallback)(void *, chip::app::Clusters::LevelControl::MoveMode);
-typedef void (*MTRNullableLevelControlClusterMoveModeAttributeCallback)(
+typedef void (*LevelControlClusterMoveModeAttributeCallback)(void *, chip::app::Clusters::LevelControl::MoveMode);
+typedef void (*NullableLevelControlClusterMoveModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::MoveMode> &);
-typedef void (*MTRLevelControlClusterStepModeAttributeCallback)(void *, chip::app::Clusters::LevelControl::StepMode);
-typedef void (*MTRNullableLevelControlClusterStepModeAttributeCallback)(
+typedef void (*LevelControlClusterStepModeAttributeCallback)(void *, chip::app::Clusters::LevelControl::StepMode);
+typedef void (*NullableLevelControlClusterStepModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::StepMode> &);
-typedef void (*MTRApplianceControlClusterApplianceStatusAttributeCallback)(void *,
-                                                                           chip::app::Clusters::ApplianceControl::ApplianceStatus);
-typedef void (*MTRNullableApplianceControlClusterApplianceStatusAttributeCallback)(
+typedef void (*ApplianceControlClusterApplianceStatusAttributeCallback)(void *,
+                                                                        chip::app::Clusters::ApplianceControl::ApplianceStatus);
+typedef void (*NullableApplianceControlClusterApplianceStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::ApplianceStatus> &);
-typedef void (*MTRApplianceControlClusterCommandIdentificationAttributeCallback)(
+typedef void (*ApplianceControlClusterCommandIdentificationAttributeCallback)(
     void *, chip::app::Clusters::ApplianceControl::CommandIdentification);
-typedef void (*MTRNullableApplianceControlClusterCommandIdentificationAttributeCallback)(
+typedef void (*NullableApplianceControlClusterCommandIdentificationAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::CommandIdentification> &);
-typedef void (*MTRApplianceControlClusterWarningEventAttributeCallback)(void *,
-                                                                        chip::app::Clusters::ApplianceControl::WarningEvent);
-typedef void (*MTRNullableApplianceControlClusterWarningEventAttributeCallback)(
+typedef void (*ApplianceControlClusterWarningEventAttributeCallback)(void *, chip::app::Clusters::ApplianceControl::WarningEvent);
+typedef void (*NullableApplianceControlClusterWarningEventAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::WarningEvent> &);
-typedef void (*MTRAccessControlClusterAuthModeAttributeCallback)(void *, chip::app::Clusters::AccessControl::AuthMode);
-typedef void (*MTRNullableAccessControlClusterAuthModeAttributeCallback)(
+typedef void (*AccessControlClusterAuthModeAttributeCallback)(void *, chip::app::Clusters::AccessControl::AuthMode);
+typedef void (*NullableAccessControlClusterAuthModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AuthMode> &);
-typedef void (*MTRAccessControlClusterChangeTypeEnumAttributeCallback)(void *, chip::app::Clusters::AccessControl::ChangeTypeEnum);
-typedef void (*MTRNullableAccessControlClusterChangeTypeEnumAttributeCallback)(
+typedef void (*AccessControlClusterChangeTypeEnumAttributeCallback)(void *, chip::app::Clusters::AccessControl::ChangeTypeEnum);
+typedef void (*NullableAccessControlClusterChangeTypeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::ChangeTypeEnum> &);
-typedef void (*MTRAccessControlClusterPrivilegeAttributeCallback)(void *, chip::app::Clusters::AccessControl::Privilege);
-typedef void (*MTRNullableAccessControlClusterPrivilegeAttributeCallback)(
+typedef void (*AccessControlClusterPrivilegeAttributeCallback)(void *, chip::app::Clusters::AccessControl::Privilege);
+typedef void (*NullableAccessControlClusterPrivilegeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::Privilege> &);
-typedef void (*MTRBridgedActionsClusterActionErrorEnumAttributeCallback)(void *,
-                                                                         chip::app::Clusters::BridgedActions::ActionErrorEnum);
-typedef void (*MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallback)(
+typedef void (*BridgedActionsClusterActionErrorEnumAttributeCallback)(void *, chip::app::Clusters::BridgedActions::ActionErrorEnum);
+typedef void (*NullableBridgedActionsClusterActionErrorEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionErrorEnum> &);
-typedef void (*MTRBridgedActionsClusterActionStateEnumAttributeCallback)(void *,
-                                                                         chip::app::Clusters::BridgedActions::ActionStateEnum);
-typedef void (*MTRNullableBridgedActionsClusterActionStateEnumAttributeCallback)(
+typedef void (*BridgedActionsClusterActionStateEnumAttributeCallback)(void *, chip::app::Clusters::BridgedActions::ActionStateEnum);
+typedef void (*NullableBridgedActionsClusterActionStateEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionStateEnum> &);
-typedef void (*MTRBridgedActionsClusterActionTypeEnumAttributeCallback)(void *,
-                                                                        chip::app::Clusters::BridgedActions::ActionTypeEnum);
-typedef void (*MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallback)(
+typedef void (*BridgedActionsClusterActionTypeEnumAttributeCallback)(void *, chip::app::Clusters::BridgedActions::ActionTypeEnum);
+typedef void (*NullableBridgedActionsClusterActionTypeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionTypeEnum> &);
-typedef void (*MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallback)(
+typedef void (*BridgedActionsClusterEndpointListTypeEnumAttributeCallback)(
     void *, chip::app::Clusters::BridgedActions::EndpointListTypeEnum);
-typedef void (*MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallback)(
+typedef void (*NullableBridgedActionsClusterEndpointListTypeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::EndpointListTypeEnum> &);
-typedef void (*MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback)(
+typedef void (*OtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback)(
     void *, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction);
-typedef void (*MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback)(
+typedef void (*NullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction> &);
-typedef void (*MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback)(
+typedef void (*OtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback)(
     void *, chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol);
-typedef void (*MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback)(
+typedef void (*NullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol> &);
-typedef void (*MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback)(
+typedef void (*OtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback)(
     void *, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus);
-typedef void (*MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback)(
+typedef void (*NullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus> &);
-typedef void (*MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback)(
+typedef void (*OtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback)(
     void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason);
-typedef void (*MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback)(
+typedef void (*NullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason> &);
-typedef void (*MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback)(
+typedef void (*OtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback)(
     void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum);
-typedef void (*MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback)(
+typedef void (*NullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> &);
-typedef void (*MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback)(
+typedef void (*OtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback)(
     void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum);
-typedef void (*MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback)(
+typedef void (*NullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> &);
-typedef void (*MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallback)(
+typedef void (*TimeFormatLocalizationClusterCalendarTypeAttributeCallback)(
     void *, chip::app::Clusters::TimeFormatLocalization::CalendarType);
-typedef void (*MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallback)(
+typedef void (*NullableTimeFormatLocalizationClusterCalendarTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::CalendarType> &);
-typedef void (*MTRTimeFormatLocalizationClusterHourFormatAttributeCallback)(
-    void *, chip::app::Clusters::TimeFormatLocalization::HourFormat);
-typedef void (*MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallback)(
+typedef void (*TimeFormatLocalizationClusterHourFormatAttributeCallback)(void *,
+                                                                         chip::app::Clusters::TimeFormatLocalization::HourFormat);
+typedef void (*NullableTimeFormatLocalizationClusterHourFormatAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::HourFormat> &);
-typedef void (*MTRUnitLocalizationClusterTempUnitAttributeCallback)(void *, chip::app::Clusters::UnitLocalization::TempUnit);
-typedef void (*MTRNullableUnitLocalizationClusterTempUnitAttributeCallback)(
+typedef void (*UnitLocalizationClusterTempUnitAttributeCallback)(void *, chip::app::Clusters::UnitLocalization::TempUnit);
+typedef void (*NullableUnitLocalizationClusterTempUnitAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnit> &);
-typedef void (*MTRPowerSourceClusterBatChargeFaultTypeAttributeCallback)(void *,
-                                                                         chip::app::Clusters::PowerSource::BatChargeFaultType);
-typedef void (*MTRNullablePowerSourceClusterBatChargeFaultTypeAttributeCallback)(
+typedef void (*PowerSourceClusterBatChargeFaultTypeAttributeCallback)(void *, chip::app::Clusters::PowerSource::BatChargeFaultType);
+typedef void (*NullablePowerSourceClusterBatChargeFaultTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFaultType> &);
-typedef void (*MTRPowerSourceClusterBatChargeLevelAttributeCallback)(void *, chip::app::Clusters::PowerSource::BatChargeLevel);
-typedef void (*MTRNullablePowerSourceClusterBatChargeLevelAttributeCallback)(
+typedef void (*PowerSourceClusterBatChargeLevelAttributeCallback)(void *, chip::app::Clusters::PowerSource::BatChargeLevel);
+typedef void (*NullablePowerSourceClusterBatChargeLevelAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeLevel> &);
-typedef void (*MTRPowerSourceClusterBatChargeStateAttributeCallback)(void *, chip::app::Clusters::PowerSource::BatChargeState);
-typedef void (*MTRNullablePowerSourceClusterBatChargeStateAttributeCallback)(
+typedef void (*PowerSourceClusterBatChargeStateAttributeCallback)(void *, chip::app::Clusters::PowerSource::BatChargeState);
+typedef void (*NullablePowerSourceClusterBatChargeStateAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeState> &);
-typedef void (*MTRPowerSourceClusterBatFaultTypeAttributeCallback)(void *, chip::app::Clusters::PowerSource::BatFaultType);
-typedef void (*MTRNullablePowerSourceClusterBatFaultTypeAttributeCallback)(
+typedef void (*PowerSourceClusterBatFaultTypeAttributeCallback)(void *, chip::app::Clusters::PowerSource::BatFaultType);
+typedef void (*NullablePowerSourceClusterBatFaultTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatFaultType> &);
-typedef void (*MTRPowerSourceClusterBatReplaceabilityAttributeCallback)(void *,
-                                                                        chip::app::Clusters::PowerSource::BatReplaceability);
-typedef void (*MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallback)(
+typedef void (*PowerSourceClusterBatReplaceabilityAttributeCallback)(void *, chip::app::Clusters::PowerSource::BatReplaceability);
+typedef void (*NullablePowerSourceClusterBatReplaceabilityAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatReplaceability> &);
-typedef void (*MTRPowerSourceClusterPowerSourceStatusAttributeCallback)(void *,
-                                                                        chip::app::Clusters::PowerSource::PowerSourceStatus);
-typedef void (*MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallback)(
+typedef void (*PowerSourceClusterPowerSourceStatusAttributeCallback)(void *, chip::app::Clusters::PowerSource::PowerSourceStatus);
+typedef void (*NullablePowerSourceClusterPowerSourceStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::PowerSourceStatus> &);
-typedef void (*MTRPowerSourceClusterWiredCurrentTypeAttributeCallback)(void *, chip::app::Clusters::PowerSource::WiredCurrentType);
-typedef void (*MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallback)(
+typedef void (*PowerSourceClusterWiredCurrentTypeAttributeCallback)(void *, chip::app::Clusters::PowerSource::WiredCurrentType);
+typedef void (*NullablePowerSourceClusterWiredCurrentTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredCurrentType> &);
-typedef void (*MTRPowerSourceClusterWiredFaultTypeAttributeCallback)(void *, chip::app::Clusters::PowerSource::WiredFaultType);
-typedef void (*MTRNullablePowerSourceClusterWiredFaultTypeAttributeCallback)(
+typedef void (*PowerSourceClusterWiredFaultTypeAttributeCallback)(void *, chip::app::Clusters::PowerSource::WiredFaultType);
+typedef void (*NullablePowerSourceClusterWiredFaultTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFaultType> &);
-typedef void (*MTRGeneralCommissioningClusterCommissioningErrorAttributeCallback)(
+typedef void (*GeneralCommissioningClusterCommissioningErrorAttributeCallback)(
     void *, chip::app::Clusters::GeneralCommissioning::CommissioningError);
-typedef void (*MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallback)(
+typedef void (*NullableGeneralCommissioningClusterCommissioningErrorAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningError> &);
-typedef void (*MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback)(
+typedef void (*GeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback)(
     void *, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType);
-typedef void (*MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback)(
+typedef void (*NullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType> &);
-typedef void (*MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback)(
+typedef void (*NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback)(
     void *, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus);
-typedef void (*MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback)(
+typedef void (*NullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> &);
-typedef void (*MTRNetworkCommissioningClusterWiFiBandAttributeCallback)(void *,
-                                                                        chip::app::Clusters::NetworkCommissioning::WiFiBand);
-typedef void (*MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallback)(
+typedef void (*NetworkCommissioningClusterWiFiBandAttributeCallback)(void *, chip::app::Clusters::NetworkCommissioning::WiFiBand);
+typedef void (*NullableNetworkCommissioningClusterWiFiBandAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::WiFiBand> &);
-typedef void (*MTRDiagnosticLogsClusterLogsIntentAttributeCallback)(void *, chip::app::Clusters::DiagnosticLogs::LogsIntent);
-typedef void (*MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallback)(
+typedef void (*DiagnosticLogsClusterLogsIntentAttributeCallback)(void *, chip::app::Clusters::DiagnosticLogs::LogsIntent);
+typedef void (*NullableDiagnosticLogsClusterLogsIntentAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsIntent> &);
-typedef void (*MTRDiagnosticLogsClusterLogsStatusAttributeCallback)(void *, chip::app::Clusters::DiagnosticLogs::LogsStatus);
-typedef void (*MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallback)(
+typedef void (*DiagnosticLogsClusterLogsStatusAttributeCallback)(void *, chip::app::Clusters::DiagnosticLogs::LogsStatus);
+typedef void (*NullableDiagnosticLogsClusterLogsStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsStatus> &);
-typedef void (*MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallback)(
+typedef void (*DiagnosticLogsClusterLogsTransferProtocolAttributeCallback)(
     void *, chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol);
-typedef void (*MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallback)(
+typedef void (*NullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol> &);
-typedef void (*MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallback)(
-    void *, chip::app::Clusters::GeneralDiagnostics::BootReasonType);
-typedef void (*MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallback)(
+typedef void (*GeneralDiagnosticsClusterBootReasonTypeAttributeCallback)(void *,
+                                                                         chip::app::Clusters::GeneralDiagnostics::BootReasonType);
+typedef void (*NullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::BootReasonType> &);
-typedef void (*MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallback)(
+typedef void (*GeneralDiagnosticsClusterHardwareFaultTypeAttributeCallback)(
     void *, chip::app::Clusters::GeneralDiagnostics::HardwareFaultType);
-typedef void (*MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallback)(
+typedef void (*NullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::HardwareFaultType> &);
-typedef void (*MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallback)(void *,
-                                                                           chip::app::Clusters::GeneralDiagnostics::InterfaceType);
-typedef void (*MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallback)(
+typedef void (*GeneralDiagnosticsClusterInterfaceTypeAttributeCallback)(void *,
+                                                                        chip::app::Clusters::GeneralDiagnostics::InterfaceType);
+typedef void (*NullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::InterfaceType> &);
-typedef void (*MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback)(
+typedef void (*GeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback)(
     void *, chip::app::Clusters::GeneralDiagnostics::NetworkFaultType);
-typedef void (*MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback)(
+typedef void (*NullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> &);
-typedef void (*MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallback)(
-    void *, chip::app::Clusters::GeneralDiagnostics::RadioFaultType);
-typedef void (*MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallback)(
+typedef void (*GeneralDiagnosticsClusterRadioFaultTypeAttributeCallback)(void *,
+                                                                         chip::app::Clusters::GeneralDiagnostics::RadioFaultType);
+typedef void (*NullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::RadioFaultType> &);
-typedef void (*MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallback)(
+typedef void (*ThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallback)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault);
-typedef void (*MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallback)(
+typedef void (*NullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> &);
-typedef void (*MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallback)(
+typedef void (*ThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallback)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole);
-typedef void (*MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallback)(
+typedef void (*NullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> &);
-typedef void (*MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback)(
+typedef void (*ThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus);
-typedef void (*MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback)(
+typedef void (*NullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus> &);
-typedef void (*MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallback)(
+typedef void (*WiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallback)(
     void *, chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause);
-typedef void (*MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallback)(
+typedef void (*NullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause> &);
-typedef void (*MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallback)(
+typedef void (*WiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallback)(
     void *, chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType);
-typedef void (*MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallback)(
+typedef void (*NullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> &);
-typedef void (*MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallback)(
+typedef void (*WiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallback)(
     void *, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus);
-typedef void (*MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallback)(
+typedef void (*NullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus> &);
-typedef void (*MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallback)(
+typedef void (*WiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallback)(
     void *, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType);
-typedef void (*MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallback)(
+typedef void (*NullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> &);
-typedef void (*MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallback)(
+typedef void (*EthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallback)(
     void *, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType);
-typedef void (*MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallback)(
+typedef void (*NullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> &);
-typedef void (*MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback)(
+typedef void (*AdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback)(
     void *, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus);
-typedef void (*MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback)(
+typedef void (*NullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus> &);
-typedef void (*MTRAdministratorCommissioningClusterStatusCodeAttributeCallback)(
+typedef void (*AdministratorCommissioningClusterStatusCodeAttributeCallback)(
     void *, chip::app::Clusters::AdministratorCommissioning::StatusCode);
-typedef void (*MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallback)(
+typedef void (*NullableAdministratorCommissioningClusterStatusCodeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::StatusCode> &);
-typedef void (*MTROperationalCredentialsClusterOperationalCertStatusAttributeCallback)(
+typedef void (*OperationalCredentialsClusterOperationalCertStatusAttributeCallback)(
     void *, chip::app::Clusters::OperationalCredentials::OperationalCertStatus);
-typedef void (*MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback)(
+typedef void (*NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::OperationalCertStatus> &);
-typedef void (*MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback)(
+typedef void (*GroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback)(
     void *, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy);
-typedef void (*MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback)(
+typedef void (*NullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy> &);
-typedef void (*MTRDoorLockClusterDlAlarmCodeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlAlarmCode);
-typedef void (*MTRNullableDoorLockClusterDlAlarmCodeAttributeCallback)(
+typedef void (*DoorLockClusterDlAlarmCodeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlAlarmCode);
+typedef void (*NullableDoorLockClusterDlAlarmCodeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlAlarmCode> &);
-typedef void (*MTRDoorLockClusterDlCredentialRuleAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlCredentialRule);
-typedef void (*MTRNullableDoorLockClusterDlCredentialRuleAttributeCallback)(
+typedef void (*DoorLockClusterDlCredentialRuleAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlCredentialRule);
+typedef void (*NullableDoorLockClusterDlCredentialRuleAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> &);
-typedef void (*MTRDoorLockClusterDlCredentialTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlCredentialType);
-typedef void (*MTRNullableDoorLockClusterDlCredentialTypeAttributeCallback)(
+typedef void (*DoorLockClusterDlCredentialTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlCredentialType);
+typedef void (*NullableDoorLockClusterDlCredentialTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialType> &);
-typedef void (*MTRDoorLockClusterDlDataOperationTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlDataOperationType);
-typedef void (*MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallback)(
+typedef void (*DoorLockClusterDlDataOperationTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlDataOperationType);
+typedef void (*NullableDoorLockClusterDlDataOperationTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDataOperationType> &);
-typedef void (*MTRDoorLockClusterDlDoorStateAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlDoorState);
-typedef void (*MTRNullableDoorLockClusterDlDoorStateAttributeCallback)(
+typedef void (*DoorLockClusterDlDoorStateAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlDoorState);
+typedef void (*NullableDoorLockClusterDlDoorStateAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> &);
-typedef void (*MTRDoorLockClusterDlLockDataTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlLockDataType);
-typedef void (*MTRNullableDoorLockClusterDlLockDataTypeAttributeCallback)(
+typedef void (*DoorLockClusterDlLockDataTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlLockDataType);
+typedef void (*NullableDoorLockClusterDlLockDataTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockDataType> &);
-typedef void (*MTRDoorLockClusterDlLockOperationTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlLockOperationType);
-typedef void (*MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallback)(
+typedef void (*DoorLockClusterDlLockOperationTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlLockOperationType);
+typedef void (*NullableDoorLockClusterDlLockOperationTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockOperationType> &);
-typedef void (*MTRDoorLockClusterDlLockStateAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlLockState);
-typedef void (*MTRNullableDoorLockClusterDlLockStateAttributeCallback)(
+typedef void (*DoorLockClusterDlLockStateAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlLockState);
+typedef void (*NullableDoorLockClusterDlLockStateAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> &);
-typedef void (*MTRDoorLockClusterDlLockTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlLockType);
-typedef void (*MTRNullableDoorLockClusterDlLockTypeAttributeCallback)(
+typedef void (*DoorLockClusterDlLockTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlLockType);
+typedef void (*NullableDoorLockClusterDlLockTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockType> &);
-typedef void (*MTRDoorLockClusterDlOperatingModeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlOperatingMode);
-typedef void (*MTRNullableDoorLockClusterDlOperatingModeAttributeCallback)(
+typedef void (*DoorLockClusterDlOperatingModeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlOperatingMode);
+typedef void (*NullableDoorLockClusterDlOperatingModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperatingMode> &);
-typedef void (*MTRDoorLockClusterDlOperationErrorAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlOperationError);
-typedef void (*MTRNullableDoorLockClusterDlOperationErrorAttributeCallback)(
+typedef void (*DoorLockClusterDlOperationErrorAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlOperationError);
+typedef void (*NullableDoorLockClusterDlOperationErrorAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperationError> &);
-typedef void (*MTRDoorLockClusterDlOperationSourceAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlOperationSource);
-typedef void (*MTRNullableDoorLockClusterDlOperationSourceAttributeCallback)(
+typedef void (*DoorLockClusterDlOperationSourceAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlOperationSource);
+typedef void (*NullableDoorLockClusterDlOperationSourceAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperationSource> &);
-typedef void (*MTRDoorLockClusterDlStatusAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlStatus);
-typedef void (*MTRNullableDoorLockClusterDlStatusAttributeCallback)(
+typedef void (*DoorLockClusterDlStatusAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlStatus);
+typedef void (*NullableDoorLockClusterDlStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlStatus> &);
-typedef void (*MTRDoorLockClusterDlUserStatusAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlUserStatus);
-typedef void (*MTRNullableDoorLockClusterDlUserStatusAttributeCallback)(
+typedef void (*DoorLockClusterDlUserStatusAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlUserStatus);
+typedef void (*NullableDoorLockClusterDlUserStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> &);
-typedef void (*MTRDoorLockClusterDlUserTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlUserType);
-typedef void (*MTRNullableDoorLockClusterDlUserTypeAttributeCallback)(
+typedef void (*DoorLockClusterDlUserTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlUserType);
+typedef void (*NullableDoorLockClusterDlUserTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> &);
-typedef void (*MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallback)(
+typedef void (*DoorLockClusterDoorLockOperationEventCodeAttributeCallback)(
     void *, chip::app::Clusters::DoorLock::DoorLockOperationEventCode);
-typedef void (*MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallback)(
+typedef void (*NullableDoorLockClusterDoorLockOperationEventCodeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockOperationEventCode> &);
-typedef void (*MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallback)(
+typedef void (*DoorLockClusterDoorLockProgrammingEventCodeAttributeCallback)(
     void *, chip::app::Clusters::DoorLock::DoorLockProgrammingEventCode);
-typedef void (*MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallback)(
+typedef void (*NullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockProgrammingEventCode> &);
-typedef void (*MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallback)(
-    void *, chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus);
-typedef void (*MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallback)(
+typedef void (*DoorLockClusterDoorLockSetPinOrIdStatusAttributeCallback)(void *,
+                                                                         chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus);
+typedef void (*NullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus> &);
-typedef void (*MTRDoorLockClusterDoorLockUserStatusAttributeCallback)(void *, chip::app::Clusters::DoorLock::DoorLockUserStatus);
-typedef void (*MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallback)(
+typedef void (*DoorLockClusterDoorLockUserStatusAttributeCallback)(void *, chip::app::Clusters::DoorLock::DoorLockUserStatus);
+typedef void (*NullableDoorLockClusterDoorLockUserStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserStatus> &);
-typedef void (*MTRDoorLockClusterDoorLockUserTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DoorLockUserType);
-typedef void (*MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallback)(
+typedef void (*DoorLockClusterDoorLockUserTypeAttributeCallback)(void *, chip::app::Clusters::DoorLock::DoorLockUserType);
+typedef void (*NullableDoorLockClusterDoorLockUserTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserType> &);
-typedef void (*MTRWindowCoveringClusterEndProductTypeAttributeCallback)(void *,
-                                                                        chip::app::Clusters::WindowCovering::EndProductType);
-typedef void (*MTRNullableWindowCoveringClusterEndProductTypeAttributeCallback)(
+typedef void (*WindowCoveringClusterEndProductTypeAttributeCallback)(void *, chip::app::Clusters::WindowCovering::EndProductType);
+typedef void (*NullableWindowCoveringClusterEndProductTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::EndProductType> &);
-typedef void (*MTRWindowCoveringClusterTypeAttributeCallback)(void *, chip::app::Clusters::WindowCovering::Type);
-typedef void (*MTRNullableWindowCoveringClusterTypeAttributeCallback)(
+typedef void (*WindowCoveringClusterTypeAttributeCallback)(void *, chip::app::Clusters::WindowCovering::Type);
+typedef void (*NullableWindowCoveringClusterTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::Type> &);
-typedef void (*MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallback)(
+typedef void (*PumpConfigurationAndControlClusterPumpControlModeAttributeCallback)(
     void *, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode);
-typedef void (*MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallback)(
+typedef void (*NullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode> &);
-typedef void (*MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallback)(
+typedef void (*PumpConfigurationAndControlClusterPumpOperationModeAttributeCallback)(
     void *, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode);
-typedef void (*MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallback)(
+typedef void (*NullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode> &);
-typedef void (*MTRThermostatClusterSetpointAdjustModeAttributeCallback)(void *,
-                                                                        chip::app::Clusters::Thermostat::SetpointAdjustMode);
-typedef void (*MTRNullableThermostatClusterSetpointAdjustModeAttributeCallback)(
+typedef void (*ThermostatClusterSetpointAdjustModeAttributeCallback)(void *, chip::app::Clusters::Thermostat::SetpointAdjustMode);
+typedef void (*NullableThermostatClusterSetpointAdjustModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::SetpointAdjustMode> &);
-typedef void (*MTRThermostatClusterThermostatControlSequenceAttributeCallback)(
+typedef void (*ThermostatClusterThermostatControlSequenceAttributeCallback)(
     void *, chip::app::Clusters::Thermostat::ThermostatControlSequence);
-typedef void (*MTRNullableThermostatClusterThermostatControlSequenceAttributeCallback)(
+typedef void (*NullableThermostatClusterThermostatControlSequenceAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatControlSequence> &);
-typedef void (*MTRThermostatClusterThermostatRunningModeAttributeCallback)(void *,
-                                                                           chip::app::Clusters::Thermostat::ThermostatRunningMode);
-typedef void (*MTRNullableThermostatClusterThermostatRunningModeAttributeCallback)(
+typedef void (*ThermostatClusterThermostatRunningModeAttributeCallback)(void *,
+                                                                        chip::app::Clusters::Thermostat::ThermostatRunningMode);
+typedef void (*NullableThermostatClusterThermostatRunningModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatRunningMode> &);
-typedef void (*MTRThermostatClusterThermostatSystemModeAttributeCallback)(void *,
-                                                                          chip::app::Clusters::Thermostat::ThermostatSystemMode);
-typedef void (*MTRNullableThermostatClusterThermostatSystemModeAttributeCallback)(
+typedef void (*ThermostatClusterThermostatSystemModeAttributeCallback)(void *,
+                                                                       chip::app::Clusters::Thermostat::ThermostatSystemMode);
+typedef void (*NullableThermostatClusterThermostatSystemModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemMode> &);
-typedef void (*MTRFanControlClusterFanModeSequenceTypeAttributeCallback)(void *,
-                                                                         chip::app::Clusters::FanControl::FanModeSequenceType);
-typedef void (*MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallback)(
+typedef void (*FanControlClusterFanModeSequenceTypeAttributeCallback)(void *, chip::app::Clusters::FanControl::FanModeSequenceType);
+typedef void (*NullableFanControlClusterFanModeSequenceTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequenceType> &);
-typedef void (*MTRFanControlClusterFanModeTypeAttributeCallback)(void *, chip::app::Clusters::FanControl::FanModeType);
-typedef void (*MTRNullableFanControlClusterFanModeTypeAttributeCallback)(
+typedef void (*FanControlClusterFanModeTypeAttributeCallback)(void *, chip::app::Clusters::FanControl::FanModeType);
+typedef void (*NullableFanControlClusterFanModeTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeType> &);
-typedef void (*MTRColorControlClusterColorLoopActionAttributeCallback)(void *, chip::app::Clusters::ColorControl::ColorLoopAction);
-typedef void (*MTRNullableColorControlClusterColorLoopActionAttributeCallback)(
+typedef void (*ColorControlClusterColorLoopActionAttributeCallback)(void *, chip::app::Clusters::ColorControl::ColorLoopAction);
+typedef void (*NullableColorControlClusterColorLoopActionAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopAction> &);
-typedef void (*MTRColorControlClusterColorLoopDirectionAttributeCallback)(void *,
-                                                                          chip::app::Clusters::ColorControl::ColorLoopDirection);
-typedef void (*MTRNullableColorControlClusterColorLoopDirectionAttributeCallback)(
+typedef void (*ColorControlClusterColorLoopDirectionAttributeCallback)(void *,
+                                                                       chip::app::Clusters::ColorControl::ColorLoopDirection);
+typedef void (*NullableColorControlClusterColorLoopDirectionAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopDirection> &);
-typedef void (*MTRColorControlClusterColorModeAttributeCallback)(void *, chip::app::Clusters::ColorControl::ColorMode);
-typedef void (*MTRNullableColorControlClusterColorModeAttributeCallback)(
+typedef void (*ColorControlClusterColorModeAttributeCallback)(void *, chip::app::Clusters::ColorControl::ColorMode);
+typedef void (*NullableColorControlClusterColorModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorMode> &);
-typedef void (*MTRColorControlClusterHueDirectionAttributeCallback)(void *, chip::app::Clusters::ColorControl::HueDirection);
-typedef void (*MTRNullableColorControlClusterHueDirectionAttributeCallback)(
+typedef void (*ColorControlClusterHueDirectionAttributeCallback)(void *, chip::app::Clusters::ColorControl::HueDirection);
+typedef void (*NullableColorControlClusterHueDirectionAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueDirection> &);
-typedef void (*MTRColorControlClusterHueMoveModeAttributeCallback)(void *, chip::app::Clusters::ColorControl::HueMoveMode);
-typedef void (*MTRNullableColorControlClusterHueMoveModeAttributeCallback)(
+typedef void (*ColorControlClusterHueMoveModeAttributeCallback)(void *, chip::app::Clusters::ColorControl::HueMoveMode);
+typedef void (*NullableColorControlClusterHueMoveModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueMoveMode> &);
-typedef void (*MTRColorControlClusterHueStepModeAttributeCallback)(void *, chip::app::Clusters::ColorControl::HueStepMode);
-typedef void (*MTRNullableColorControlClusterHueStepModeAttributeCallback)(
+typedef void (*ColorControlClusterHueStepModeAttributeCallback)(void *, chip::app::Clusters::ColorControl::HueStepMode);
+typedef void (*NullableColorControlClusterHueStepModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueStepMode> &);
-typedef void (*MTRColorControlClusterSaturationMoveModeAttributeCallback)(void *,
-                                                                          chip::app::Clusters::ColorControl::SaturationMoveMode);
-typedef void (*MTRNullableColorControlClusterSaturationMoveModeAttributeCallback)(
+typedef void (*ColorControlClusterSaturationMoveModeAttributeCallback)(void *,
+                                                                       chip::app::Clusters::ColorControl::SaturationMoveMode);
+typedef void (*NullableColorControlClusterSaturationMoveModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::SaturationMoveMode> &);
-typedef void (*MTRColorControlClusterSaturationStepModeAttributeCallback)(void *,
-                                                                          chip::app::Clusters::ColorControl::SaturationStepMode);
-typedef void (*MTRNullableColorControlClusterSaturationStepModeAttributeCallback)(
+typedef void (*ColorControlClusterSaturationStepModeAttributeCallback)(void *,
+                                                                       chip::app::Clusters::ColorControl::SaturationStepMode);
+typedef void (*NullableColorControlClusterSaturationStepModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::SaturationStepMode> &);
-typedef void (*MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallback)(
+typedef void (*IlluminanceMeasurementClusterLightSensorTypeAttributeCallback)(
     void *, chip::app::Clusters::IlluminanceMeasurement::LightSensorType);
-typedef void (*MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallback)(
+typedef void (*NullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorType> &);
-typedef void (*MTRChannelClusterChannelStatusEnumAttributeCallback)(void *, chip::app::Clusters::Channel::ChannelStatusEnum);
-typedef void (*MTRNullableChannelClusterChannelStatusEnumAttributeCallback)(
+typedef void (*ChannelClusterChannelStatusEnumAttributeCallback)(void *, chip::app::Clusters::Channel::ChannelStatusEnum);
+typedef void (*NullableChannelClusterChannelStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelStatusEnum> &);
-typedef void (*MTRChannelClusterLineupInfoTypeEnumAttributeCallback)(void *, chip::app::Clusters::Channel::LineupInfoTypeEnum);
-typedef void (*MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallback)(
+typedef void (*ChannelClusterLineupInfoTypeEnumAttributeCallback)(void *, chip::app::Clusters::Channel::LineupInfoTypeEnum);
+typedef void (*NullableChannelClusterLineupInfoTypeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::LineupInfoTypeEnum> &);
-typedef void (*MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback)(
+typedef void (*TargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback)(
     void *, chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum);
-typedef void (*MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback)(
+typedef void (*NullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum> &);
-typedef void (*MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback)(
+typedef void (*MediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback)(
     void *, chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum);
-typedef void (*MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback)(
+typedef void (*NullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum> &);
-typedef void (*MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallback)(void *,
-                                                                          chip::app::Clusters::MediaPlayback::PlaybackStateEnum);
-typedef void (*MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallback)(
+typedef void (*MediaPlaybackClusterPlaybackStateEnumAttributeCallback)(void *,
+                                                                       chip::app::Clusters::MediaPlayback::PlaybackStateEnum);
+typedef void (*NullableMediaPlaybackClusterPlaybackStateEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::PlaybackStateEnum> &);
-typedef void (*MTRMediaInputClusterInputTypeEnumAttributeCallback)(void *, chip::app::Clusters::MediaInput::InputTypeEnum);
-typedef void (*MTRNullableMediaInputClusterInputTypeEnumAttributeCallback)(
+typedef void (*MediaInputClusterInputTypeEnumAttributeCallback)(void *, chip::app::Clusters::MediaInput::InputTypeEnum);
+typedef void (*NullableMediaInputClusterInputTypeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaInput::InputTypeEnum> &);
-typedef void (*MTRKeypadInputClusterCecKeyCodeAttributeCallback)(void *, chip::app::Clusters::KeypadInput::CecKeyCode);
-typedef void (*MTRNullableKeypadInputClusterCecKeyCodeAttributeCallback)(
+typedef void (*KeypadInputClusterCecKeyCodeAttributeCallback)(void *, chip::app::Clusters::KeypadInput::CecKeyCode);
+typedef void (*NullableKeypadInputClusterCecKeyCodeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::CecKeyCode> &);
-typedef void (*MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallback)(
-    void *, chip::app::Clusters::KeypadInput::KeypadInputStatusEnum);
-typedef void (*MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallback)(
+typedef void (*KeypadInputClusterKeypadInputStatusEnumAttributeCallback)(void *,
+                                                                         chip::app::Clusters::KeypadInput::KeypadInputStatusEnum);
+typedef void (*NullableKeypadInputClusterKeypadInputStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::KeypadInputStatusEnum> &);
-typedef void (*MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallback)(
+typedef void (*ContentLauncherClusterContentLaunchStatusEnumAttributeCallback)(
     void *, chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum);
-typedef void (*MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallback)(
+typedef void (*NullableContentLauncherClusterContentLaunchStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum> &);
-typedef void (*MTRContentLauncherClusterMetricTypeEnumAttributeCallback)(void *,
-                                                                         chip::app::Clusters::ContentLauncher::MetricTypeEnum);
-typedef void (*MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallback)(
+typedef void (*ContentLauncherClusterMetricTypeEnumAttributeCallback)(void *, chip::app::Clusters::ContentLauncher::MetricTypeEnum);
+typedef void (*NullableContentLauncherClusterMetricTypeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::MetricTypeEnum> &);
-typedef void (*MTRContentLauncherClusterParameterEnumAttributeCallback)(void *,
-                                                                        chip::app::Clusters::ContentLauncher::ParameterEnum);
-typedef void (*MTRNullableContentLauncherClusterParameterEnumAttributeCallback)(
+typedef void (*ContentLauncherClusterParameterEnumAttributeCallback)(void *, chip::app::Clusters::ContentLauncher::ParameterEnum);
+typedef void (*NullableContentLauncherClusterParameterEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ParameterEnum> &);
-typedef void (*MTRAudioOutputClusterOutputTypeEnumAttributeCallback)(void *, chip::app::Clusters::AudioOutput::OutputTypeEnum);
-typedef void (*MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallback)(
+typedef void (*AudioOutputClusterOutputTypeEnumAttributeCallback)(void *, chip::app::Clusters::AudioOutput::OutputTypeEnum);
+typedef void (*NullableAudioOutputClusterOutputTypeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AudioOutput::OutputTypeEnum> &);
-typedef void (*MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback)(
+typedef void (*ApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback)(
     void *, chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum);
-typedef void (*MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback)(
+typedef void (*NullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum> &);
-typedef void (*MTRApplicationBasicClusterApplicationStatusEnumAttributeCallback)(
+typedef void (*ApplicationBasicClusterApplicationStatusEnumAttributeCallback)(
     void *, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum);
-typedef void (*MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallback)(
+typedef void (*NullableApplicationBasicClusterApplicationStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum> &);
-typedef void (*MTRMessagingClusterEventIdAttributeCallback)(void *, chip::app::Clusters::Messaging::EventId);
-typedef void (*MTRNullableMessagingClusterEventIdAttributeCallback)(
+typedef void (*MessagingClusterEventIdAttributeCallback)(void *, chip::app::Clusters::Messaging::EventId);
+typedef void (*NullableMessagingClusterEventIdAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::EventId> &);
-typedef void (*MTRMessagingClusterMessagingControlConfirmationAttributeCallback)(
+typedef void (*MessagingClusterMessagingControlConfirmationAttributeCallback)(
     void *, chip::app::Clusters::Messaging::MessagingControlConfirmation);
-typedef void (*MTRNullableMessagingClusterMessagingControlConfirmationAttributeCallback)(
+typedef void (*NullableMessagingClusterMessagingControlConfirmationAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlConfirmation> &);
-typedef void (*MTRMessagingClusterMessagingControlEnhancedConfirmationAttributeCallback)(
+typedef void (*MessagingClusterMessagingControlEnhancedConfirmationAttributeCallback)(
     void *, chip::app::Clusters::Messaging::MessagingControlEnhancedConfirmation);
-typedef void (*MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallback)(
+typedef void (*NullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlEnhancedConfirmation> &);
-typedef void (*MTRMessagingClusterMessagingControlImportanceAttributeCallback)(
+typedef void (*MessagingClusterMessagingControlImportanceAttributeCallback)(
     void *, chip::app::Clusters::Messaging::MessagingControlImportance);
-typedef void (*MTRNullableMessagingClusterMessagingControlImportanceAttributeCallback)(
+typedef void (*NullableMessagingClusterMessagingControlImportanceAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlImportance> &);
-typedef void (*MTRMessagingClusterMessagingControlTransmissionAttributeCallback)(
+typedef void (*MessagingClusterMessagingControlTransmissionAttributeCallback)(
     void *, chip::app::Clusters::Messaging::MessagingControlTransmission);
-typedef void (*MTRNullableMessagingClusterMessagingControlTransmissionAttributeCallback)(
+typedef void (*NullableMessagingClusterMessagingControlTransmissionAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlTransmission> &);
-typedef void (*MTRApplianceEventsAndAlertClusterEventIdentificationAttributeCallback)(
+typedef void (*ApplianceEventsAndAlertClusterEventIdentificationAttributeCallback)(
     void *, chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification);
-typedef void (*MTRNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallback)(
+typedef void (*NullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification> &);
-typedef void (*MTRTestClusterClusterSimpleEnumAttributeCallback)(void *, chip::app::Clusters::TestCluster::SimpleEnum);
-typedef void (*MTRNullableTestClusterClusterSimpleEnumAttributeCallback)(
+typedef void (*TestClusterClusterSimpleEnumAttributeCallback)(void *, chip::app::Clusters::TestCluster::SimpleEnum);
+typedef void (*NullableTestClusterClusterSimpleEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> &);
 
 typedef void (*AccessControlAclListAttributeCallback)(
