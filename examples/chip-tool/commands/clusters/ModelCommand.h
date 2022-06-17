@@ -18,7 +18,10 @@
 
 #pragma once
 
+#ifdef CONFIG_USE_LOCAL_STORAGE
 #include "../../config/PersistentStorage.h"
+#endif // CONFIG_USE_LOCAL_STORAGE
+
 #include "../common/CHIPCommand.h"
 #include <lib/core/CHIPEncoding.h>
 

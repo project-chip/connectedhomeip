@@ -489,6 +489,10 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.do_build:
+        branch = shell.run_cmd(
+            "git branch | awk -v FS=' ' '/\*/{print $NF}' | sed 's|[()]||g'", return_cmd_output=True).replace("\n", "")
+        commit_id = shell.run_cmd("git rev-parse HEAD", return_cmd_output=True).replace("\n", "")
+
         if options.use_zzz:
             flush_print("Using pre-generated ZAP output")
             zzz_dir = os.path.join(_CHEF_SCRIPT_PATH,
@@ -543,6 +547,11 @@ def main(argv: Sequence[str]) -> None:
                 shell.run_cmd(f"rm -rf {_CHEF_SCRIPT_PATH}/esp32/build")
                 shell.run_cmd("idf.py fullclean")
             shell.run_cmd("idf.py build")
+            shell.run_cmd("idf.py build flashing_script")
+            shell.run_cmd(
+                f"(cd build/ && tar cJvf $(git rev-parse HEAD)-{options.sample_device_type_name}.tar.xz --files-from=chip-shell.flashbundle.txt)")
+            shell.run_cmd(
+                f"cp build/$(git rev-parse HEAD)-{options.sample_device_type_name}.tar.xz {_CHEF_SCRIPT_PATH}")
         elif options.build_target == "nrfconnect":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/nrfconnect")
             nrf_build_cmds = ["west build -b nrf52840dk_nrf52840"]
@@ -567,7 +576,9 @@ def main(argv: Sequence[str]) -> None:
                         import("//build_overrides/chip.gni")
                         import("${{chip_root}}/config/standalone/args.gni")
                         chip_shell_cmd_server = false
-                        target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.do_rpc else '0'}"]
+                        chip_build_libshell = true
+                        chip_config_network_layer_ble = false
+                        target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.do_rpc else '0'}", "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\\"{branch}:{commit_id}\\""]
                         """))
             with open(f"{_CHEF_SCRIPT_PATH}/linux/sample.gni", "w") as f:
                 f.write(textwrap.dedent(f"""\
@@ -577,7 +588,8 @@ def main(argv: Sequence[str]) -> None:
             if options.do_clean:
                 shell.run_cmd(f"rm -rf out")
             if options.do_rpc:
-                shell.run_cmd("gn gen out --args='import(\"//with_pw_rpc.gni\")'")
+                shell.run_cmd(
+                    "gn gen out --args='import(\"//with_pw_rpc.gni\")'")
             else:
                 shell.run_cmd("gn gen out --args=''")
             shell.run_cmd("ninja -C out")

@@ -95,23 +95,21 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
     return err;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
-    NetworkInterface * ifp = Platform::New<NetworkInterface>();
+    auto ifp = Platform::New<ThreadNetworkInterface>();
+    VerifyOrReturnError(ifp != nullptr, CHIP_ERROR_NO_MEMORY);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
     ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
     ifp->isOperational             = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
-#else
-    /* TODO */
-#endif
-    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
-    ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
+    ifp->hardwareAddress = ByteSpan(ifp->macBuffer);
+    ifp->type            = app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
+
+    ConfigurationMgr().GetPrimary802154MACAddress(ifp->macBuffer);
 
     *netifpp = ifp;
     return CHIP_NO_ERROR;
@@ -126,6 +124,7 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
         Platform::Delete(del);
     }
 }
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 
 } // namespace DeviceLayer
 } // namespace chip

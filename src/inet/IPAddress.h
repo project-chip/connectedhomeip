@@ -69,6 +69,8 @@
 #error Forbidden : native Open Thread implementation with IPV4 enabled
 #endif
 
+#include <inet/InetInterface.h>
+
 #define NL_INET_IPV6_ADDR_LEN_IN_BYTES (16)
 #define NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES (14)
 
@@ -385,6 +387,21 @@ public:
      * @retval false Otherwise
      */
     static bool FromString(const char * str, size_t strLen, IPAddress & output);
+
+    /**
+     * @brief
+     *   Scan the IP address from its conventional presentation text, including
+     *   the interface ID if present. (e.g. "fe80::2%wlan0"). If no interface ID
+     *   is present, then ifaceOutput will be set to the null interface ID.
+     *
+     * @param[in]    str          A pointer to the text to be scanned.
+     * @param[out]   addrOutput   The object to set to the IP address.
+     * @param[out]   ifaceOutput  The object to set to the interface ID.
+     *
+     * @retval true  The presentation format is valid
+     * @retval false Otherwise
+     */
+    static bool FromString(const char * str, IPAddress & addrOutput, class InterfaceId & ifaceOutput);
 
     /**
      * @brief   Emit the IP address in standard network representation.

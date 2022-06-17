@@ -19,6 +19,7 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    timeout: 400
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -41,24 +42,42 @@ tests:
       response:
           value: 1
 
+    - label:
+          "Precondition : Set DUT EnhancedCurrentHue to 0x4000 using
+          EnhancedMoveToHue command"
+      command: "EnhancedMoveToHue"
+      PICS: CR_ENHANCEDMOVETOHUE
+      arguments:
+          values:
+              - name: "enhancedHue"
+                value: 16384
+              - name: "direction"
+                value: 0
+              - name: "transitionTime"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
       PICS: CR_COLORLOOPSET
       arguments:
           values:
-              - name: "UpdateFlags"
+              - name: "updateFlags"
                 value: 15
-              - name: "Action"
+              - name: "action"
                 value: 0
-              - name: "Direction"
+              - name: "direction"
                 value: 0
-              - name: "Time"
+              - name: "time"
                 value: 30
               - name: "startHue"
                 value: 160
-              - name: "OptionsMask"
+              - name: "optionsMask"
                 value: 0
-              - name: "OptionsOverride"
+              - name: "optionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT"
@@ -89,33 +108,24 @@ tests:
       response:
           value: 160
 
-    - label: "Read EnhancedCurrentHue attribute from DUT."
-      command: "readAttribute"
-      attribute: "EnhancedCurrentHue"
-      PICS: A_ENHANCEDCURRENTHUE
-      response:
-          saveAs: EnhancedCurrentHueValue
-          constraints:
-              type: uint16
-
     - label: "Color Loop Set Command - Set all Attributes"
       command: "ColorLoopSet"
       PICS: CR_COLORLOOPSET
       arguments:
           values:
-              - name: "UpdateFlags"
+              - name: "updateFlags"
                 value: 1
-              - name: "Action"
+              - name: "action"
                 value: 1
-              - name: "Direction"
+              - name: "direction"
                 value: 0
-              - name: "Time"
+              - name: "time"
                 value: 0
               - name: "startHue"
                 value: 0
-              - name: "OptionsMask"
+              - name: "optionsMask"
                 value: 0
-              - name: "OptionsOverride"
+              - name: "optionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT."
@@ -125,51 +135,77 @@ tests:
       response:
           value: 1
 
+    #Issue 18848
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
-      PICS: A_COLORLOOPSTOREDENHANCEDHUE
+      PICS: PICS_SKIP_SAMPLE_APP && A_COLORLOOPSTOREDENHANCEDHUE
       response:
-          value: EnhancedCurrentHueValue
+          value: 16384
 
-    # Test is disabled because a sleep/wait is necessary to let the hue change over time
-    # Once sleep/wait is available, test case will need to be adapted
+    - label: "Wait for 30S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 30000
+
+    - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+      PICS: A_COLORLOOPSTARTENHANCEDHUE
+      response:
+          saveAs: ColorLoopStartEnhancedHueValue
+          constraints:
+              type: uint16
+
     - label: "Read EnhancedCurrentHue attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       PICS: A_ENHANCEDCURRENTHUE
       response:
-          value: 500
+          constraints:
+              type: uint16
+              minValue: ColorLoopStartEnhancedHueValue
+              maxValue: 65535
 
-    # Test is disabled because a sleep/wait is necessary to let the hue change over time
-    # Once sleep/wait is available, test case will need to be adapted
+    - label: "Wait for 30S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 30000
+
     - label: "Read EnhancedCurrentHue attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       PICS: A_ENHANCEDCURRENTHUE
       response:
-          value: 500
+          constraints:
+              type: uint16
+              minValue: ColorLoopStartEnhancedHueValue
+              maxValue: 65535
 
     - label: "Color Loop Set Command - Start Color Loop"
       command: "ColorLoopSet"
       PICS: CR_COLORLOOPSET
       arguments:
           values:
-              - name: "UpdateFlags"
+              - name: "updateFlags"
                 value: 2
-              - name: "Action"
+              - name: "action"
                 value: 0
-              - name: "Direction"
+              - name: "direction"
                 value: 1
-              - name: "Time"
+              - name: "time"
                 value: 0
               - name: "startHue"
                 value: 0
-              - name: "OptionsMask"
+              - name: "optionsMask"
                 value: 0
-              - name: "OptionsOverride"
+              - name: "optionsOverride"
                 value: 0
 
     - label: "Read ColorLoopDirection attribute from DUT."
@@ -179,44 +215,69 @@ tests:
       response:
           value: 1
 
-    # Test is disabled because a sleep/wait is necessary to let the hue change over time
-    # Once sleep/wait is available, test case will need to be adapted
-    - label: "Read EnhancedCurrentHue attribute from DUT"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EnhancedCurrentHue"
-      PICS: A_ENHANCEDCURRENTHUE
-      response:
-          value: 500
+    - label: "Wait for 30S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 30000
 
-    # Test is disabled because a sleep/wait is necessary to let the hue change over time
-    # Once sleep/wait is available, test case will need to be adapted
+    - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+      PICS: A_COLORLOOPSTARTENHANCEDHUE
+      response:
+          saveAs: ColorLoopStartEnhancedHue1
+          constraints:
+              type: uint16
+
     - label: "Read EnhancedCurrentHue attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       PICS: A_ENHANCEDCURRENTHUE
       response:
-          value: 500
+          constraints:
+              type: uint16
+              minValue: ColorLoopStartEnhancedHue1
+              maxValue: 65535
+
+    - label: "Wait for 30S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 30000
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      PICS: A_ENHANCEDCURRENTHUE
+      response:
+          constraints:
+              type: uint16
+              minValue: ColorLoopStartEnhancedHue1
+              maxValue: 65535
 
     - label: "Color Loop Set Command - Start Color Loop"
       command: "ColorLoopSet"
       PICS: CR_COLORLOOPSET
       arguments:
           values:
-              - name: "UpdateFlags"
+              - name: "updateFlags"
                 value: 1
-              - name: "Action"
+              - name: "action"
                 value: 0
-              - name: "Direction"
+              - name: "direction"
                 value: 0
-              - name: "Time"
+              - name: "time"
                 value: 0
               - name: "startHue"
                 value: 0
-              - name: "OptionsMask"
+              - name: "optionsMask"
                 value: 0
-              - name: "OptionsOverride"
+              - name: "optionsOverride"
                 value: 0
 
     - label: "Read ColorLoopActive attribute from DUT"

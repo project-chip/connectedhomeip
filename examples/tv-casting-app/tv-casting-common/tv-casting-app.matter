@@ -530,6 +530,8 @@ server cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute int64u timeSinceReset = 8;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 server cluster FixedLabel = 64 {
@@ -555,6 +557,7 @@ server cluster GeneralCommissioning = 48 {
 
   struct BasicCommissioningInfo {
     int16u failSafeExpiryLengthSeconds = 0;
+    int16u maxCumulativeFailsafeSeconds = 1;
   }
 
   attribute access(write: administer) int64u breadcrumb = 0;
@@ -715,10 +718,44 @@ server cluster GroupKeyManagement = 63 {
     fabric_idx fabricIndex = 254;
   }
 
+  struct GroupKeySetStruct {
+    int16u groupKeySetID = 0;
+    GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
+    nullable octet_string<16> epochKey0 = 2;
+    nullable epoch_us epochStartTime0 = 3;
+    nullable octet_string<16> epochKey1 = 4;
+    nullable epoch_us epochStartTime1 = 5;
+    nullable octet_string<16> epochKey2 = 6;
+    nullable epoch_us epochStartTime2 = 7;
+  }
+
   attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
+  readonly attribute int16u maxGroupsPerFabric = 2;
+  readonly attribute int16u maxGroupKeysPerFabric = 3;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct KeySetWriteRequest {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct KeySetReadRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetRemoveRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetReadAllIndicesRequest {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+  command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
 }
 
 server cluster Groups = 4 {
@@ -777,74 +814,6 @@ server cluster Groups = 4 {
   command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
-server cluster IasZone = 1280 {
-  enum IasEnrollResponseCode : ENUM8 {
-    kSuccess = 0;
-    kNotSupported = 1;
-    kNoEnrollPermit = 2;
-    kTooManyZones = 3;
-  }
-
-  enum IasZoneType : ENUM16 {
-    kStandardCie = 0;
-    kMotionSensor = 13;
-    kContactSwitch = 21;
-    kFireSensor = 40;
-    kWaterSensor = 42;
-    kGasSensor = 43;
-    kPersonalEmergencyDevice = 44;
-    kVibrationMovementSensor = 45;
-    kRemoteControl = 271;
-    kKeyFob = 277;
-    kKeypad = 541;
-    kStandardWarningDevice = 549;
-    kGlassBreakSensor = 550;
-    kCarbonMonoxideSensor = 551;
-    kSecurityRepeater = 553;
-    kInvalidZoneType = 65535;
-  }
-
-  bitmap IasZoneStatus : BITMAP16 {
-    kAlarm1 = 0x1;
-    kAlarm2 = 0x2;
-    kTamper = 0x4;
-    kBattery = 0x8;
-    kSupervisionReports = 0x10;
-    kRestoreReports = 0x20;
-    kTrouble = 0x40;
-    kAc = 0x80;
-    kTest = 0x100;
-    kBatteryDefect = 0x200;
-  }
-
-  readonly attribute enum8 zoneState = 0;
-  readonly attribute enum16 zoneType = 1;
-  readonly attribute bitmap16 zoneStatus = 2;
-  attribute node_id iasCieAddress = 16;
-  readonly attribute int8u zoneId = 17;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct ZoneEnrollResponseRequest {
-    IasEnrollResponseCode enrollResponseCode = 0;
-    INT8U zoneId = 1;
-  }
-
-  response struct ZoneStatusChangeNotification = 0 {
-    IasZoneStatus zoneStatus = 0;
-    BITMAP8 extendedStatus = 1;
-    INT8U zoneId = 2;
-    INT16U delay = 3;
-  }
-
-  response struct ZoneEnrollRequest = 1 {
-    IasZoneType zoneType = 0;
-    INT16U manufacturerCode = 1;
-  }
-
-  command ZoneEnrollResponse(ZoneEnrollResponseRequest): DefaultSuccess = 0;
-}
-
 server cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {
     kBlink = 0;
@@ -869,6 +838,7 @@ server cluster Identify = 3 {
   }
 
   attribute int16u identifyTime = 0;
+  readonly attribute enum8 identifyType = 1;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -1854,97 +1824,6 @@ client cluster TargetNavigator = 1285 {
   command NavigateTarget(NavigateTargetRequest): NavigateTargetResponse = 0;
 }
 
-server cluster TestCluster = 4294048773 {
-  enum SimpleEnum : ENUM8 {
-    kUnspecified = 0;
-    kValueA = 1;
-    kValueB = 2;
-    kValueC = 3;
-  }
-
-  bitmap Bitmap16MaskMap : BITMAP16 {
-    kMaskVal1 = 0x1;
-    kMaskVal2 = 0x2;
-    kMaskVal3 = 0x4;
-    kMaskVal4 = 0x4000;
-  }
-
-  bitmap Bitmap32MaskMap : BITMAP32 {
-    kMaskVal1 = 0x1;
-    kMaskVal2 = 0x2;
-    kMaskVal3 = 0x4;
-    kMaskVal4 = 0x40000000;
-  }
-
-  bitmap Bitmap64MaskMap : BITMAP64 {
-    kMaskVal1 = 0x1;
-    kMaskVal2 = 0x2;
-    kMaskVal3 = 0x4;
-    kMaskVal4 = 0x4000000000000000;
-  }
-
-  bitmap Bitmap8MaskMap : BITMAP8 {
-    kMaskVal1 = 0x1;
-    kMaskVal2 = 0x2;
-    kMaskVal3 = 0x4;
-    kMaskVal4 = 0x40;
-  }
-
-  bitmap SimpleBitmap : BITMAP8 {
-    kValueA = 0x1;
-    kValueB = 0x2;
-    kValueC = 0x4;
-  }
-
-  struct TestListStructOctet {
-    int64u member1 = 0;
-    octet_string<32> member2 = 1;
-  }
-
-  info event TestEvent = 1 {
-    INT8U arg1 = 1;
-    SimpleEnum arg2 = 2;
-    BOOLEAN arg3 = 3;
-    SimpleStruct arg4 = 4;
-    SimpleStruct arg5[] = 5;
-    SimpleEnum arg6[] = 6;
-  }
-
-  info event TestFabricScopedEvent = 2 {
-    fabric_idx arg1 = 254;
-  }
-
-  attribute boolean boolean = 0;
-  attribute Bitmap8MaskMap bitmap8 = 1;
-  attribute Bitmap16MaskMap bitmap16 = 2;
-  attribute Bitmap32MaskMap bitmap32 = 3;
-  attribute Bitmap64MaskMap bitmap64 = 4;
-  attribute int8u int8u = 5;
-  attribute int16u int16u = 6;
-  attribute int32u int32u = 8;
-  attribute int64u int64u = 12;
-  attribute int8s int8s = 13;
-  attribute int16s int16s = 14;
-  attribute int32s int32s = 16;
-  attribute int64s int64s = 20;
-  attribute enum8 enum8 = 21;
-  attribute enum16 enum16 = 22;
-  attribute octet_string<10> octetString = 25;
-  attribute INT8U listInt8u[] = 26;
-  attribute OCTET_STRING listOctetString[] = 27;
-  attribute TestListStructOctet listStructOctetString[] = 28;
-  attribute long_octet_string<1000> longOctetString = 29;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  response struct TestSpecificResponse = 0 {
-    INT8U returnValue = 0;
-  }
-
-  command Test(): DefaultSuccess = 0;
-  command TestNotHandled(): DefaultSuccess = 1;
-}
-
 server cluster ThreadNetworkDiagnostics = 53 {
   enum NetworkFault : ENUM8 {
     kUnspecified = 0;
@@ -2466,6 +2345,8 @@ endpoint 0 {
   server cluster GroupKeyManagement {
     callback attribute groupKeyMap;
     callback attribute groupTable;
+    callback attribute maxGroupsPerFabric;
+    callback attribute maxGroupKeysPerFabric;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -2500,6 +2381,7 @@ endpoint 1 {
 
   server cluster Identify {
     ram      attribute identifyTime;
+    ram      attribute identifyType;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 4;
   }
@@ -2594,43 +2476,8 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster IasZone {
-    ram      attribute zoneState;
-    ram      attribute zoneType;
-    ram      attribute zoneStatus;
-    ram      attribute iasCieAddress;
-    ram      attribute zoneId default = 0xff;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 2;
-  }
-
   server cluster WakeOnLan {
     ram      attribute MACAddress;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster TestCluster {
-    ram      attribute boolean;
-    ram      attribute bitmap8;
-    ram      attribute bitmap16;
-    ram      attribute bitmap32;
-    ram      attribute bitmap64;
-    ram      attribute int8u;
-    ram      attribute int16u;
-    ram      attribute int32u;
-    ram      attribute int64u;
-    ram      attribute int8s;
-    ram      attribute int16s;
-    ram      attribute int32s;
-    ram      attribute int64s;
-    ram      attribute enum8;
-    ram      attribute enum16;
-    ram      attribute octetString;
-    callback attribute listInt8u;
-    callback attribute listOctetString;
-    callback attribute listStructOctetString;
-    ram      attribute longOctetString;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }

@@ -730,7 +730,9 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
     return fabricIdx;
 }
 
-- (CHIP_ERROR)isRunningOnFabric:(chip::FabricInfo *)fabric isRunning:(BOOL *)isRunning
+- (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
+                    fabricIndex:(chip::FabricIndex)fabricIndex
+                      isRunning:(BOOL *)isRunning
 {
     if (![self isRunning]) {
         *isRunning = NO;
@@ -743,26 +745,26 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    if (ourFabric->GetFabricId() != fabric->GetFabricId()) {
+    chip::FabricInfo * otherFabric = fabricTable->FindFabricWithIndex(fabricIndex);
+    if (!otherFabric) {
+        // Also surprising!
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if (ourFabric->GetFabricId() != otherFabric->GetFabricId()) {
         *isRunning = NO;
         return CHIP_NO_ERROR;
     }
 
-    // "fabric" comes from a different fabric table for the moment, but it's a
-    // fabric table that is: (1) readonly, (2) has stack lifetime, and (3) uses
-    // the same storage as _cppCommissioner->GetFabricTable(), so it turns out
-    // that in practice they have the same fabric indices and this logic is OK.
-    //
-    // TODO: stop relying on that.
-    const chip::FabricTable * fabricTable = _cppCommissioner->GetFabricTable();
-    if (!fabricTable) {
+    const chip::FabricTable * ourFabricTable = _cppCommissioner->GetFabricTable();
+    if (!ourFabricTable) {
         // Surprising as well!
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
     chip::Crypto::P256PublicKey ourRootPublicKey, otherRootPublicKey;
-    ReturnErrorOnFailure(fabricTable->FetchRootPubkey(ourFabric->GetFabricIndex(), ourRootPublicKey));
-    ReturnErrorOnFailure(fabricTable->FetchRootPubkey(fabric->GetFabricIndex(), otherRootPublicKey));
+    ReturnErrorOnFailure(ourFabricTable->FetchRootPubkey(ourFabric->GetFabricIndex(), ourRootPublicKey));
+    ReturnErrorOnFailure(fabricTable->FetchRootPubkey(otherFabric->GetFabricIndex(), otherRootPublicKey));
 
     *isRunning = (ourRootPublicKey.Matches(otherRootPublicKey));
     return CHIP_NO_ERROR;

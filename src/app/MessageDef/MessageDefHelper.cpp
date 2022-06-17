@@ -98,5 +98,167 @@ void DecreaseDepth()
 }
 #endif
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLabel)
+{
+    if (aDepth == 0)
+    {
+        PRETTY_PRINT("%s = ", aLabel);
+    }
+    else
+    {
+        if (TLV::IsContextTag(aReader.GetTag()))
+        {
+            PRETTY_PRINT("0x%" PRIx32 " = ", TLV::TagNumFromTag(aReader.GetTag()));
+        }
+        else if (TLV::IsProfileTag(aReader.GetTag()))
+        {
+            PRETTY_PRINT("0x%" PRIx32 "::0x%" PRIx32 " = ", TLV::ProfileIdFromTag(aReader.GetTag()),
+                         TLV::TagNumFromTag(aReader.GetTag()));
+        }
+        else
+        {
+            // Anonymous tag, don't print anything
+        }
+    }
+
+    switch (aReader.GetType())
+    {
+    case TLV::kTLVType_Structure:
+        PRETTY_PRINT("{");
+        break;
+
+    case TLV::kTLVType_Array:
+        PRETTY_PRINT_SAMELINE("[");
+        PRETTY_PRINT("\t\t");
+        break;
+
+    case TLV::kTLVType_SignedInteger: {
+        int64_t value_s64;
+
+        ReturnErrorOnFailure(aReader.Get(value_s64));
+
+        PRETTY_PRINT_SAMELINE("%" PRId64 ", ", value_s64);
+        break;
+    }
+
+    case TLV::kTLVType_UnsignedInteger: {
+        uint64_t value_u64;
+
+        ReturnErrorOnFailure(aReader.Get(value_u64));
+
+        PRETTY_PRINT_SAMELINE("%" PRIu64 ", ", value_u64);
+        break;
+    }
+
+    case TLV::kTLVType_FloatingPointNumber: {
+        double value_fp;
+
+        ReturnErrorOnFailure(aReader.Get(value_fp));
+
+        PRETTY_PRINT_SAMELINE("%f, ", value_fp);
+        break;
+    }
+    case TLV::kTLVType_Boolean: {
+        bool value_b;
+
+        ReturnErrorOnFailure(aReader.Get(value_b));
+
+        PRETTY_PRINT_SAMELINE("%s, ", value_b ? "true" : "false");
+        break;
+    }
+
+    case TLV::kTLVType_UTF8String: {
+        char value_s[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+
+        CHIP_ERROR err = aReader.GetString(value_s, sizeof(value_s));
+        VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, err);
+
+        if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            PRETTY_PRINT_SAMELINE("... (byte string too long) ...");
+        }
+        else
+        {
+            PRETTY_PRINT_SAMELINE("\"%s\", ", value_s);
+        }
+        break;
+    }
+
+    case TLV::kTLVType_ByteString: {
+        uint8_t value_b[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+        uint32_t len, readerLen;
+
+        readerLen = aReader.GetLength();
+
+        CHIP_ERROR err = aReader.GetBytes(value_b, sizeof(value_b));
+        VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, err);
+
+        PRETTY_PRINT_SAMELINE("[");
+        PRETTY_PRINT("\t\t");
+
+        if (readerLen < sizeof(value_b))
+        {
+            len = readerLen;
+        }
+        else
+        {
+            len = sizeof(value_b);
+        }
+
+        if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            PRETTY_PRINT_SAMELINE("... (byte string too long) ...");
+        }
+        else
+        {
+            for (size_t i = 0; i < len; i++)
+            {
+                PRETTY_PRINT_SAMELINE("0x%x, ", value_b[i]);
+            }
+        }
+
+        PRETTY_PRINT("]");
+        break;
+    }
+
+    case TLV::kTLVType_Null:
+        PRETTY_PRINT_SAMELINE("NULL");
+        break;
+
+    default:
+        PRETTY_PRINT_SAMELINE("--");
+        break;
+    }
+
+    if (aReader.GetType() == TLV::kTLVType_Structure || aReader.GetType() == TLV::kTLVType_Array)
+    {
+        const char terminating_char = (aReader.GetType() == TLV::kTLVType_Structure) ? '}' : ']';
+        TLV::TLVType type;
+
+        IgnoreUnusedVariable(terminating_char);
+
+        ReturnErrorOnFailure(aReader.EnterContainer(type));
+
+        CHIP_ERROR err;
+        while ((err = aReader.Next()) == CHIP_NO_ERROR)
+        {
+            PRETTY_PRINT_INCDEPTH();
+
+            ReturnErrorOnFailure(CheckIMPayload(aReader, aDepth + 1, aLabel));
+
+            PRETTY_PRINT_DECDEPTH();
+        }
+
+        PRETTY_PRINT("%c,", terminating_char);
+
+        ReturnErrorOnFailure(aReader.ExitContainer(type));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+
 }; // namespace app
 }; // namespace chip

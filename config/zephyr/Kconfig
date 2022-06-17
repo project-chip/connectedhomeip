@@ -139,6 +139,26 @@ config CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
 	help
 	  Enables Thread Sleepy End Device support in Matter.
 
+if CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
+
+config CHIP_SED_IDLE_INTERVAL
+	int "Sleepy End Device idle interval (ms)"
+	default 1000
+	help
+	  SED wake interval in milliseconds while the device is idle, meaning that
+	  there is no active exchange to or from the device, and its commissioning
+	  window is closed.
+
+config CHIP_SED_ACTIVE_INTERVAL
+	int "Sleepy End Device active interval (ms)"
+	default 200
+	help
+	  SED wake interval in milliseconds while the device is active, meaning that
+	  there is an active exchange to or from the device, or its commissioning
+	  window is open.
+
+endif # CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
+
 config CHIP_THREAD_SSED
 	  bool "Enable Thread Synchronized Sleepy End Device support"
 	  depends on OPENTHREAD_CSL_RECEIVER && CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT

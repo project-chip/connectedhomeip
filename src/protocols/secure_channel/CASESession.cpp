@@ -144,10 +144,28 @@ void CASESession::Clear()
     mState = State::kInitialized;
     Crypto::ClearSecretData(mIPK);
 
+    if (mFabricsTable)
+    {
+        mFabricsTable->RemoveFabricDelegate(this);
+    }
+
     mLocalNodeId  = kUndefinedNodeId;
     mPeerNodeId   = kUndefinedNodeId;
     mFabricsTable = nullptr;
     mFabricIndex  = kUndefinedFabricIndex;
+}
+
+void CASESession::InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex)
+{
+    if (mFabricIndex != fabricIndex)
+    {
+        return;
+    }
+    if (!IsSessionEstablishmentInProgress())
+    {
+        return;
+    }
+    AbortPendingEstablish(CHIP_ERROR_CANCELLED);
 }
 
 CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::CertificateValidityPolicy * policy,
@@ -172,16 +190,21 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::Certi
 }
 
 CHIP_ERROR
-CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabrics,
+CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabricTable,
                                             SessionResumptionStorage * sessionResumptionStorage,
                                             Credentials::CertificateValidityPolicy * policy,
                                             SessionEstablishmentDelegate * delegate, ScopedNodeId previouslyEstablishedPeer,
                                             Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
-    VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    // Below VerifyOrReturnError is not SuccessOrExit since we only want to goto `exit:` after
+    // Init has been successfully called.
+    VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(Init(sessionManager, policy, delegate, previouslyEstablishedPeer));
 
-    mFabricsTable             = fabrics;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = fabricTable->AddFabricDelegate(this));
+
+    mFabricsTable             = fabricTable;
     mRole                     = CryptoContext::SessionRole::kResponder;
     mSessionResumptionStorage = sessionResumptionStorage;
     mLocalMRPConfig           = mrpConfig;
@@ -189,7 +212,12 @@ CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, Fab
     ChipLogDetail(SecureChannel, "Allocated SecureSession (%p) - waiting for Sigma1 msg",
                   mSecureSessionHolder.Get().Value()->AsSecureSession());
 
-    return CHIP_NO_ERROR;
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        Clear();
+    }
+    return err;
 }
 
 CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, FabricTable * fabricTable, ScopedNodeId peerScopedNodeId,
@@ -222,6 +250,8 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     // been initialized
     SuccessOrExit(err);
 
+    SuccessOrExit(err = fabricTable->AddFabricDelegate(this));
+
     mFabricsTable             = fabricTable;
     mFabricIndex              = fabricInfo->GetFabricIndex();
     mSessionResumptionStorage = sessionResumptionStorage;
@@ -251,12 +281,17 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
                  to_underlying(mState));
-    // Discard the exchange so that Clear() doesn't try closing it.  The
+    // Discard the exchange so that Clear() doesn't try aborting it.  The
     // exchange will handle that.
     DiscardExchange();
+    AbortPendingEstablish(CHIP_ERROR_TIMEOUT);
+}
+
+void CASESession::AbortPendingEstablish(CHIP_ERROR err)
+{
     Clear();
     // Do this last in case the delegate frees us.
-    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+    mDelegate->OnSessionEstablishmentError(err);
 }
 
 CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
@@ -1692,6 +1727,22 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     Protocols::SecureChannel::MsgType msgType = static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType());
     SuccessOrExit(err);
 
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    if (mStopHandshakeAtState.HasValue() && mState == mStopHandshakeAtState.Value())
+    {
+        mStopHandshakeAtState = Optional<State>::Missing();
+        // For testing purposes we are trying to stop a successful CASESession from happening by dropping part of the
+        // handshake in the middle. We are trying to keep both sides of the CASESession establishment in an active
+        // pending state. In order to keep this side open we have to tell the exchange context that we will send an
+        // async message.
+        //
+        // Should you need to resume the CASESession, you could theoretically pass along the msg to a callback that gets
+        // registered when setting mStopHandshakeAtState.
+        mExchangeCtxt->WillSendMessage();
+        return CHIP_NO_ERROR;
+    }
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+
 #if CHIP_CONFIG_SLOW_CRYPTO
     if (msgType == Protocols::SecureChannel::MsgType::CASE_Sigma1 || msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2 ||
         msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2Resume ||
@@ -1788,12 +1839,10 @@ exit:
     // Call delegate to indicate session establishment failure.
     if (err != CHIP_NO_ERROR)
     {
-        // Discard the exchange so that Clear() doesn't try closing it.  The
+        // Discard the exchange so that Clear() doesn't try aborting it.  The
         // exchange will handle that.
         DiscardExchange();
-        Clear();
-        // Do this last in case the delegate frees us.
-        mDelegate->OnSessionEstablishmentError(err);
+        AbortPendingEstablish(err);
     }
     return err;
 }

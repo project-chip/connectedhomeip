@@ -138,6 +138,17 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     return tlvReader.ExitContainer(containerType);
 }
 
+bool PairingSession::IsSessionEstablishmentInProgress()
+{
+    if (!mSecureSessionHolder)
+    {
+        return false;
+    }
+
+    Transport::SecureSession * secureSession = mSecureSessionHolder->AsSecureSession();
+    return secureSession->IsPairing();
+}
+
 void PairingSession::Clear()
 {
     // Clear acts like the destructor if PairingSession, if it is call during

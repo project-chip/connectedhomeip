@@ -22,12 +22,14 @@
 #include <cstdio>
 #include <platform/CHIPDeviceLayer.h>
 
+using namespace chip::app::Clusters::BridgedActions;
+
 // LightingManager LightingManager::sLight;
 
-Device::Device(const char * szDeviceName, const char * szLocation)
+Device::Device(const char * szDeviceName, std::string szLocation)
 {
     strncpy(mName, szDeviceName, sizeof(mName));
-    strncpy(mLocation, szLocation, sizeof(mLocation));
+    mLocation   = szLocation;
     mReachable  = false;
     mEndpointId = 0;
 }
@@ -72,13 +74,13 @@ void Device::SetName(const char * szName)
     }
 }
 
-void Device::SetLocation(const char * szLocation)
+void Device::SetLocation(std::string szLocation)
 {
-    bool changed = (strncmp(mLocation, szLocation, sizeof(mLocation)) != 0);
+    bool changed = (mLocation.compare(szLocation) != 0);
 
-    strncpy(mLocation, szLocation, sizeof(mLocation));
+    mLocation = szLocation;
 
-    ChipLogProgress(DeviceLayer, "Device[%s]: Location=\"%s\"", mName, mLocation);
+    ChipLogProgress(DeviceLayer, "Device[%s]: Location=\"%s\"", mName, mLocation.c_str());
 
     if (changed)
     {
@@ -86,7 +88,7 @@ void Device::SetLocation(const char * szLocation)
     }
 }
 
-DeviceOnOff::DeviceOnOff(const char * szDeviceName, const char * szLocation) : Device(szDeviceName, szLocation)
+DeviceOnOff::DeviceOnOff(const char * szDeviceName, std::string szLocation) : Device(szDeviceName, szLocation)
 {
     mOn = false;
 }
@@ -129,7 +131,7 @@ void DeviceOnOff::HandleDeviceChange(Device * device, Device::Changed_t changeMa
     }
 }
 
-DeviceSwitch::DeviceSwitch(const char * szDeviceName, const char * szLocation, uint32_t aFeatureMap) :
+DeviceSwitch::DeviceSwitch(const char * szDeviceName, std::string szLocation, uint32_t aFeatureMap) :
     Device(szDeviceName, szLocation)
 {
     mNumberOfPositions = 2;
@@ -230,4 +232,33 @@ void DevicePowerSource::SetDescription(std::string aDescription)
     {
         mChanged_CB(this, kChanged_Description);
     }
+}
+
+EndpointListInfo::EndpointListInfo(uint16_t endpointListId, std::string name, EndpointListTypeEnum type)
+{
+    mEndpointListId = endpointListId;
+    mName           = name;
+    mType           = type;
+}
+
+EndpointListInfo::EndpointListInfo(uint16_t endpointListId, std::string name, EndpointListTypeEnum type,
+                                   chip::EndpointId endpointId)
+{
+    mEndpointListId = endpointListId;
+    mName           = name;
+    mType           = type;
+    mEndpoints.push_back(endpointId);
+}
+
+void EndpointListInfo::AddEndpointId(chip::EndpointId endpointId)
+{
+    mEndpoints.push_back(endpointId);
+}
+
+Room::Room(std::string name, uint16_t endpointListId, EndpointListTypeEnum type, bool isVisible)
+{
+    mName           = name;
+    mEndpointListId = endpointListId;
+    mType           = type;
+    mIsVisible      = isVisible;
 }

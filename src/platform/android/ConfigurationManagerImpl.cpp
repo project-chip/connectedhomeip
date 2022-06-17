@@ -158,38 +158,6 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     return;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetProductId(uint16_t & productId)
-{
-    CHIP_ERROR err;
-    uint32_t u32ProductId = 0;
-    err                   = ReadConfigValue(AndroidConfig::kConfigKey_ProductId, u32ProductId);
-
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
-    }
-    else
-    {
-        productId = static_cast<uint16_t>(u32ProductId);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetProductName(char * buf, size_t bufSize)
-{
-    CHIP_ERROR err;
-    size_t productNameSize = 0; // without counting null-terminator
-    err                    = ReadConfigValueStr(AndroidConfig::kConfigKey_ProductName, buf, bufSize, productNameSize);
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-        strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
 {
     CHIP_ERROR err;

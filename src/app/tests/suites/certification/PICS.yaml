@@ -191,6 +191,27 @@ PICS:
     - label: "Does the device implement the MinSetpointDeadBand attribute?"
       id: A_MINSETPOINTDEADBAND
 
+    - label: "Does the device implement the Tolerance attribute?"
+      id: A_TEMPERATURE_TOLERANCE
+
+    - label: "Thermostat is capable of managing a heating device"
+      id: TSTAT_HEAT
+
+    - label: "Thermostat is capable of managing a cooling device"
+      id: TSTAT_COOL
+
+    - label: "Supports Occupied and Unoccupied setpoints"
+      id: TSTAT_OCC
+
+    - label: "Supports a weekly schedule of setpoint transitions"
+      id: TSTAT_SCH
+
+    - label: "Supports configurable setback (or span)"
+      id: TSTAT_SB
+
+    - label: "Supports a System Mode of Auto"
+      id: TSTAT_AUTO
+
       # Occupency sensing cluster
     - label: "Does the device implement the Occupancy attribute?"
       id: A_OCCUPANCY

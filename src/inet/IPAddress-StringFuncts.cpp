@@ -28,6 +28,7 @@
 #endif
 #include <limits>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <inet/IPAddress.h>
@@ -136,6 +137,33 @@ bool IPAddress::FromString(const char * str, size_t strLen, IPAddress & output)
     }
 
     return res;
+}
+
+bool IPAddress::FromString(const char * str, IPAddress & addrOutput, class InterfaceId & ifaceOutput)
+{
+    char * addrStr       = const_cast<char *>(str);
+    char * addrPart      = nullptr;
+    char * scopePart     = nullptr;
+    char * strtokContext = nullptr;
+
+    addrPart = strtok_r(addrStr, "%", &strtokContext);
+    if (addrPart != nullptr)
+    {
+        scopePart = strtok_r(nullptr, "%", &strtokContext);
+    }
+
+    if (addrPart == nullptr || scopePart == nullptr)
+    {
+        ifaceOutput = Inet::InterfaceId();
+        return Inet::IPAddress::FromString(addrStr, addrOutput);
+    }
+
+    CHIP_ERROR err = Inet::InterfaceId::InterfaceNameToId(scopePart, ifaceOutput);
+    if (err != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+    return Inet::IPAddress::FromString(addrPart, addrOutput);
 }
 
 } // namespace Inet

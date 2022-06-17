@@ -50,10 +50,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # Enable including the additional data in the advertisement packets
     chip_enable_additional_data_advertising = false
 
-    # Enable default/generic test-mode DeviceInstanceInfoProvider in GenericConfigurationManagerImpl
-    # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
-    chip_use_transitional_device_instance_info_provider = true
-
     # Enable default/generic test-mode CommissionableDataProvider in GenericConfigurationManagerImpl
     # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
     # Linux platform has already transitioned.
@@ -150,12 +146,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=1" ]
     } else {
       defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=0" ]
-    }
-
-    if (chip_use_transitional_device_instance_info_provider) {
-      defines += [ "CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER=1" ]
-    } else {
-      defines += [ "CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER=0" ]
     }
 
     if (chip_device_platform == "cc13x2_26x2") {
@@ -339,6 +329,8 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericConnectivityManagerImpl_Thread.ipp",
       "../include/platform/internal/GenericConnectivityManagerImpl_WiFi.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_WiFi.ipp",
+      "../include/platform/internal/GenericDeviceInstanceInfoProvider.h",
+      "../include/platform/internal/GenericDeviceInstanceInfoProvider.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl.h",
       "../include/platform/internal/GenericPlatformManagerImpl.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
