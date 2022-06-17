@@ -69,7 +69,6 @@ static_library("chip-tool-utils") {
     "commands/pairing/CloseSessionCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
-    "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
     "commands/payload/SetupPayloadGenerateCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
@@ -95,7 +94,6 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/app/tests/suites/commands/log",
     "${chip_root}/src/app/tests/suites/commands/system",
     "${chip_root}/src/app/tests/suites/pics",
-    "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:file_attestation_trust_store",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
@@ -114,9 +112,15 @@ static_library("chip-tool-utils") {
 }
 
 executable("chip-tool") {
-  sources = [ "main.cpp" ]
+  sources = [
+    "commands/pairing/PairingCommand.cpp",
+    "main.cpp",
+  ]
 
-  deps = [ ":chip-tool-utils" ]
+  deps = [
+    ":chip-tool-utils",
+    "${chip_root}/src/controller/data_model",
+  ]
 
   output_dir = root_out_dir
 }
