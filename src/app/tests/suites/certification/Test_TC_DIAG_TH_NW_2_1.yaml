@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 51.2. TC-DIAG-TH_NW-1.2 Attributes [DUT Server]
+name: 49.2.1. [TC-DIAG-TH_NW-2.1] Attributes [DUT- Server]
 
 config:
     nodeId: 0x12344321
