@@ -46,8 +46,8 @@ using namespace chip::app::Clusters;
         using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
         TypeInfo::Type cppValue;
         {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
-        auto successFn = Callback<MTR{{>callbackName}}CallbackType>::FromCancelable(success);
-        auto failureFn = Callback<MTRDefaultFailureCallbackType>::FromCancelable(failure);
+        auto successFn = Callback<{{>callbackName}}CallbackType>::FromCancelable(success);
+        auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
