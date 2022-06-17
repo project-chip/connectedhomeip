@@ -199,9 +199,11 @@ def bundle(platform: str, device_name: str) -> None:
     shutil.rmtree(_CD_STAGING_DIR, ignore_errors=True)
     os.mkdir(_CD_STAGING_DIR)
     flush_print(f"Checking for {bundler_name}")
-    if bundler_name in globals():
+    chef_module = sys.modules[__name__]
+    if hasattr(chef_module, bundler_name):
         flush_print(f"Found {bundler_name}")
-        globals()[bundler_name](device_name)
+        bundler = getattr(chef_module, bundler_name)
+        bundler(device_name)
     else:
         flush_print(f"No bundle function for {platform}!")
         exit(1)
@@ -285,13 +287,10 @@ def bundle_esp32(device_name: str) -> None:
                                  "chip-shell.flashbundle.txt")
     with open(manifest_file) as manifest:
         for item in manifest:
-            item = item.replace("\n", "")
-            if os.sep in item:
-                new_dir = item[:item.rindex(os.sep)]
-                new_dir = os.path.join(_CD_STAGING_DIR, new_dir)
-                os.makedirs(new_dir, exist_ok=True)
+            item = item.strip()
             src_item = os.path.join(esp_root, item)
             dest_item = os.path.join(_CD_STAGING_DIR, item)
+            os.makedirs(os.path.dirname(dest_item), exist_ok=True)
             shutil.copy(src_item, dest_item)
 
 

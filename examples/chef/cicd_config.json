@@ -2,7 +2,7 @@
     "ci_allow_list": ["lighting-app"],
     "cd_platforms": {
         "linux": "linux_x86",
-        "esp32": "esp32-m5stack",
-        "nrfconnect": "nrf-nrf52840dk"
+        "esp32": "m5stack",
+        "nrfconnect": "nrf52840dk"
     }
 }
