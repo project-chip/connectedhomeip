@@ -100,7 +100,7 @@ using namespace chip::app::Clusters;
       completionHandler,
       ^(Cancelable * success, Cancelable * failure) {
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
-          auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
+          auto successFn = Callback<MTR{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<MTRDefaultFailureCallbackType>::FromCancelable(failure);
           return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall
           {{~#if_is_fabric_scoped_struct type~}}
@@ -165,7 +165,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
               return CHIP_ERROR_INVALID_ARGUMENT;
           }
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
-          auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
+          auto successFn = Callback<MTR{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<MTRDefaultFailureCallbackType>::FromCancelable(failure);
           return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [minInterval unsignedShortValue], [maxInterval unsignedShortValue], MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished, nil,
               params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
@@ -187,7 +187,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
               path.mAttributeId = TypeInfo::GetAttributeId();
               TypeInfo::DecodableType value;
               CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
-              auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
+              auto successFn = Callback<MTR{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
               if (err == CHIP_NO_ERROR)
               {
                 successFn->mCall(successFn->mContext, value);

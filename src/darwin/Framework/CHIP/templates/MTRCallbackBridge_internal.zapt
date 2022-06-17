@@ -42,36 +42,36 @@ typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Attribut
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 
-{{#>MTRCallbackBridge header="1" partial-type="Status"                         }}MTRDefaultSuccessCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" partial-type="CommandStatus"                  }}MTRCommandSuccessCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Octet_String" isNullable=false ns="chip"}}MTROctetStringAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Octet_String" isNullable=true  ns="chip"}}MTRNullableOctetStringAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Char_String"  isNullable=false ns="chip"}}MTRCharStringAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Char_String"  isNullable=true  ns="chip"}}MTRNullableCharStringAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Boolean"      isNullable=false ns="chip"}}MTRBooleanAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Boolean"      isNullable=true  ns="chip"}}MTRNullableBooleanAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int8u"        isNullable=false ns="chip"}}MTRInt8uAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int8u"        isNullable=true  ns="chip"}}MTRNullableInt8uAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int8s"        isNullable=false ns="chip"}}MTRInt8sAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int8s"        isNullable=true  ns="chip"}}MTRNullableInt8sAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int16u"       isNullable=false ns="chip"}}MTRInt16uAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int16u"       isNullable=true  ns="chip"}}MTRNullableInt16uAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int16s"       isNullable=false ns="chip"}}MTRInt16sAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int16s"       isNullable=true  ns="chip"}}MTRNullableInt16sAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int32u"       isNullable=false ns="chip"}}MTRInt32uAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int32u"       isNullable=true  ns="chip"}}MTRNullableInt32uAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int32s"       isNullable=false ns="chip"}}MTRInt32sAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int32s"       isNullable=true  ns="chip"}}MTRNullableInt32sAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int64u"       isNullable=false ns="chip"}}MTRInt64uAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int64u"       isNullable=true  ns="chip"}}MTRNullableInt64uAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int64s"       isNullable=false ns="chip"}}MTRInt64sAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Int64s"       isNullable=true  ns="chip"}}MTRNullableInt64sAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Single"       isNullable=false ns="chip"}}MTRFloatAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Single"       isNullable=true  ns="chip"}}MTRNullableFloatAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Double"       isNullable=false ns="chip"}}MTRDoubleAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="Double"       isNullable=true  ns="chip"}}MTRNullableDoubleAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="vendor_id"    isNullable=false ns="chip"}}MTRVendorIdAttributeCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" type="vendor_id"    isNullable=true  ns="chip"}}MTRNullableVendorIdAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" partial-type="Status"                         }}DefaultSuccessCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" partial-type="CommandStatus"                  }}CommandSuccessCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Octet_String" isNullable=false ns="chip"}}OctetStringAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Octet_String" isNullable=true  ns="chip"}}NullableOctetStringAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Char_String"  isNullable=false ns="chip"}}CharStringAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Char_String"  isNullable=true  ns="chip"}}NullableCharStringAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Boolean"      isNullable=false ns="chip"}}BooleanAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Boolean"      isNullable=true  ns="chip"}}NullableBooleanAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int8u"        isNullable=false ns="chip"}}Int8uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int8u"        isNullable=true  ns="chip"}}NullableInt8uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int8s"        isNullable=false ns="chip"}}Int8sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int8s"        isNullable=true  ns="chip"}}NullableInt8sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int16u"       isNullable=false ns="chip"}}Int16uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int16u"       isNullable=true  ns="chip"}}NullableInt16uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int16s"       isNullable=false ns="chip"}}Int16sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int16s"       isNullable=true  ns="chip"}}NullableInt16sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int32u"       isNullable=false ns="chip"}}Int32uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int32u"       isNullable=true  ns="chip"}}NullableInt32uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int32s"       isNullable=false ns="chip"}}Int32sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int32s"       isNullable=true  ns="chip"}}NullableInt32sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int64u"       isNullable=false ns="chip"}}Int64uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int64u"       isNullable=true  ns="chip"}}NullableInt64uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int64s"       isNullable=false ns="chip"}}Int64sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Int64s"       isNullable=true  ns="chip"}}NullableInt64sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Single"       isNullable=false ns="chip"}}FloatAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Single"       isNullable=true  ns="chip"}}NullableFloatAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Double"       isNullable=false ns="chip"}}DoubleAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="Double"       isNullable=true  ns="chip"}}NullableDoubleAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="vendor_id"    isNullable=false ns="chip"}}VendorIdAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge header="1" type="vendor_id"    isNullable=true  ns="chip"}}NullableVendorIdAttributeCallback{{/MTRCallbackBridge}}
 
 {{#chip_client_clusters includeAll=true}}
 {{#chip_server_cluster_attributes}}
