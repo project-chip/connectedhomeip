@@ -459,8 +459,11 @@ chip::ChipError::StorageType pychip_ReadClient_Read(void * appContext, ReadClien
             params.mMaxIntervalCeilingSeconds = pyParams.maxInterval;
             params.mKeepSubscriptions         = pyParams.keepSubscriptions;
             params.mResubscribePolicy         = PythonResubscribePolicy;
+
+            dataVersionFilters.release();
             attributePaths.release();
             eventPaths.release();
+
             err = readClient->SendAutoResubscribeRequest(std::move(params));
             SuccessOrExit(err);
         }

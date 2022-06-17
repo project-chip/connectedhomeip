@@ -99,7 +99,7 @@ class ChipDeviceController():
 
         res = self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateController(ctypes.c_void_p(
-                opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId, ctypes.c_char_p(None if len(paaTrustStorePath) is 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
+                opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId, ctypes.c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
         )
 
         if res != 0:
@@ -546,14 +546,12 @@ class ChipDeviceController():
         future = eventLoop.create_future()
 
         device = self.GetConnectedDeviceSync(nodeid)
-        res = self._ChipStack.Call(
-            lambda: ClusterCommand.SendCommand(
-                future, eventLoop, responseType, device, ClusterCommand.CommandPath(
-                    EndpointId=endpoint,
-                    ClusterId=payload.cluster_id,
-                    CommandId=payload.command_id,
-                ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs)
-        )
+        res = ClusterCommand.SendCommand(
+            future, eventLoop, responseType, device, ClusterCommand.CommandPath(
+                EndpointId=endpoint,
+                ClusterId=payload.cluster_id,
+                CommandId=payload.command_id,
+            ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs)
         if res != 0:
             future.set_exception(self._ChipStack.ErrorToException(res))
         return await future
@@ -585,10 +583,8 @@ class ChipDeviceController():
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
                     v[0], v[1], v[2], 1, v[1].value))
 
-        res = self._ChipStack.Call(
-            lambda: ClusterAttribute.WriteAttributes(
-                future, eventLoop, device, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs)
-        )
+        res = ClusterAttribute.WriteAttributes(
+            future, eventLoop, device, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         return await future
@@ -769,8 +765,8 @@ class ChipDeviceController():
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
-        res = self._ChipStack.Call(
-            lambda: ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device, devCtrl=self, attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths, returnClusterObject=returnClusterObject, subscriptionParameters=ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered, keepSubscriptions=keepSubscriptions))
+        res = ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device, devCtrl=self, attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths, returnClusterObject=returnClusterObject,
+                                    subscriptionParameters=ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered, keepSubscriptions=keepSubscriptions)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         return await future
