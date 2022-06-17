@@ -20,6 +20,7 @@
 #include <platform/PlatformManager.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -304,6 +305,10 @@ void ChipLinuxAppMainLoop()
             initParams.persistentStorageDelegate);
         initParams.operationalKeystore = &LinuxDeviceOptions::GetInstance().mCSRResponseOptions.badCsrOperationalKeyStoreForTest;
     }
+
+    static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(
+        LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
 
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
