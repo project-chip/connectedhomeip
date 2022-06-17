@@ -144,7 +144,7 @@ public:
     /// @brief Mark as pending removal, all holders to this session will be cleared, and disallow future grab
     void MarkForRemoval();
 
-    // Used by UpdateNOC command to prevent any new exchange created on the session.
+    // Used to prevent any new exchange created on the session while the existing exchanges finish their work.
     void MarkForInactive();
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kSecure; }
@@ -253,9 +253,11 @@ private:
         // session object will be released automatically.
         kPendingRemoval = 3,
 
-        // For UpdateNOC command, the session still functional, but it can't
-        // yield any new exchanges, the last exchange running UpdateNOC command
-        // will close the session soon.
+        // The session is still functional, but it can't yield any new exchanges,
+        // This is meant to be used in conjunction with 
+        // ExchangeManager::AbortExchangesForFabricExceptOne, with the one
+        // exceptional exchange handling moving this session out of this state when
+        // it finishes whatever it needs the session for.
         kInactive = 4,
     };
 

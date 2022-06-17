@@ -379,7 +379,7 @@ void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * deleg
 void ExchangeManager::AbortExchangesForFabricExceptOne(FabricIndex fabricIndex, ExchangeContext * deferred)
 {
     mContextPool.ForEachActiveObject([&](auto * ec) {
-        if (ec->HasSessionHandle() && ec->GetSessionHandle()->GetPeer().GetFabricIndex() == fabricIndex)
+        if (ec->HasSessionHandle() && ec->GetSessionHandle()->GetFabricIndex() == fabricIndex)
         {
             if (ec == deferred)
                 ec->SetAutoReleaseSession();

@@ -124,9 +124,10 @@ public:
     /// Determine whether this exchange is a EphemeralExchange for replying a StandaloneAck
     bool IsEphemeralExchange() const;
 
-    // For UpdateNOC command, I'm the last exchange, I must release the session when finishing my work.
+    // If SetAutoReleaseSession() is called, this exchange must be using a SecureSession, and should
+    // evict it when the exchange is done with all its work (including any MRP traffic).
     void SetAutoReleaseSession();
-    bool IsAutoReleaseSession();
+    bool ReleaseSessionOnDestruction();
 
     /**
      * Get the reliable message manager that corresponds to this reliable
@@ -169,7 +170,7 @@ protected:
         /// When set, signifies that the exchange created sorely for replying a StandaloneAck
         kFlagEphemeralExchange = (1u << 9),
 
-        /// When set, automatically release the session when finishing its work. Used by UpdateNOC command
+        /// When set, automatically release the session when this exchange is destroyed.
         kFlagAutoReleaseSession = (1u << 10),
     };
 

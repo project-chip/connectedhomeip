@@ -61,7 +61,7 @@ void SecureSession::MarkForInactive()
         VerifyOrDie(false);
         return;
     case State::kActive:
-        // By setting this state, IsActiveSession() will return false, which prevent creating new exchanges.
+        // By setting this state, IsActiveSession() will return false, which prevents creating new exchanges.
         mState = State::kInactive;
         return;
     case State::kInactive:

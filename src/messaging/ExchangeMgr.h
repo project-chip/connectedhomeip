@@ -183,8 +183,10 @@ public:
      */
     void CloseAllContextsForDelegate(const ExchangeDelegate * delegate);
 
-    // This API is used by UpdateNOC command, to abort all exchanges except the given one, whose abort is deferred until UpdateNOC
-    // command finishing its work.
+    // This API is used by commands that need to shut down all existing exchanges on 
+    // a fabric but need to make sure the response to the command still goes out on the exchange
+    // the command came in on.  This API flags that one exchange to shut down its session
+    // when it's done.
     void AbortExchangesForFabricExceptOne(FabricIndex fabricIndex, ExchangeContext * deferred);
 
     SessionManager * GetSessionManager() const { return mSessionManager; }
