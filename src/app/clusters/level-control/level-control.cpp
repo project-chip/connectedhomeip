@@ -141,7 +141,7 @@ static void timerCallback(System::Layer *, void * callbackContext)
 static void schedule(EndpointId endpoint, uint32_t delayMs)
 {
     DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
-                                          reinterpret_cast<uintptr_t>(endpoint));
+                                          reinterpret_cast<void*>(static_cast<uintptr_t>(endpoint)));
 }
 
 static void deactivate(EndpointId endpoint)
