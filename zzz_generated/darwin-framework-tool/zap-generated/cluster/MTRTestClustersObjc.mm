@@ -20,7 +20,7 @@
 
 #import <Matter/Matter.h>
 
-#import <Matter/MTRCallbackBridge_internal.> // For CHIPDefaultSuccessCallbackBridge, etc
+#import <Matter/MTRCallbackBridge_internal.> // For MTRDefaultSuccessCallbackBridge, etc
 #import <Matter/MTRCluster_internal.h> // For self.callbackQueue
 
 #import "zap-generated/cluster/CHIPTestClustersObjc.h"
@@ -46,7 +46,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeSubjectsPerAccessControlEntryWithValue:(NSNumber * _Nonnull)value
                                            completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -65,7 +65,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeTargetsPerAccessControlEntryWithValue:(NSNumber * _Nonnull)value
                                           completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -84,7 +84,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAccessControlEntriesPerFabricWithValue:(NSNumber * _Nonnull)value
                                            completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -102,7 +102,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -141,7 +141,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -180,7 +180,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -219,7 +219,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -237,7 +237,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -268,7 +268,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -307,7 +307,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -346,7 +346,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -385,7 +385,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -403,7 +403,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -434,7 +434,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeWindowStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -452,7 +452,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAdminFabricIndexWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -470,7 +470,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAdminVendorIdWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -488,7 +488,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -527,7 +527,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -566,7 +566,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -605,7 +605,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -623,7 +623,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -654,7 +654,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeVendorNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -672,7 +672,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeVendorIDWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -690,7 +690,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeApplicationNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -708,7 +708,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeProductIDWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -727,7 +727,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeApplicationWithValue:(CHIPApplicationBasicClusterApplicationBasicApplication * _Nonnull)value
                          completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -746,7 +746,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -764,7 +764,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeApplicationVersionWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -782,7 +782,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAllowedVendorListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -822,7 +822,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -861,7 +861,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -900,7 +900,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -939,7 +939,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -957,7 +957,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -988,7 +988,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCatalogListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1027,7 +1027,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1066,7 +1066,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1105,7 +1105,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1144,7 +1144,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1162,7 +1162,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1193,7 +1193,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeOutputListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1236,7 +1236,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentOutputWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1254,7 +1254,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1293,7 +1293,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1332,7 +1332,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1371,7 +1371,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1389,7 +1389,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1420,7 +1420,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBarrierMovingStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1438,7 +1438,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBarrierSafetyStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1456,7 +1456,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBarrierCapabilitiesWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1474,7 +1474,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBarrierPositionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1492,7 +1492,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1531,7 +1531,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1570,7 +1570,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1609,7 +1609,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1627,7 +1627,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1658,7 +1658,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDataModelRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1676,7 +1676,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeVendorNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1694,7 +1694,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeVendorIDWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1712,7 +1712,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeProductNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1730,7 +1730,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeProductIDWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1748,7 +1748,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeHardwareVersionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1767,7 +1767,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeHardwareVersionStringWithValue:(NSString * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1785,7 +1785,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSoftwareVersionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1804,7 +1804,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeSoftwareVersionStringWithValue:(NSString * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1822,7 +1822,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeManufacturingDateWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1840,7 +1840,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePartNumberWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1858,7 +1858,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeProductURLWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1876,7 +1876,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeProductLabelWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1894,7 +1894,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSerialNumberWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1912,7 +1912,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeReachableWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1930,7 +1930,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeUniqueIDWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1949,7 +1949,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeCapabilityMinimaWithValue:(CHIPBasicClusterCapabilityMinimaStruct * _Nonnull)value
                               completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -1968,7 +1968,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2007,7 +2007,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2046,7 +2046,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2085,7 +2085,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2103,7 +2103,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2134,7 +2134,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePolarityWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2152,7 +2152,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeStatusFlagsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2170,7 +2170,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeApplicationTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2188,7 +2188,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2227,7 +2227,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2266,7 +2266,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2305,7 +2305,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2323,7 +2323,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2354,7 +2354,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2393,7 +2393,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2432,7 +2432,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2471,7 +2471,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2489,7 +2489,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2520,7 +2520,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeStateValueWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2538,7 +2538,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2577,7 +2577,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2616,7 +2616,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2655,7 +2655,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2673,7 +2673,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2704,7 +2704,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActionListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2752,7 +2752,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeEndpointListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2817,7 +2817,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSetupUrlWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2835,7 +2835,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2874,7 +2874,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2913,7 +2913,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2952,7 +2952,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -2970,7 +2970,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3001,7 +3001,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeVendorNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3019,7 +3019,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeVendorIDWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3037,7 +3037,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeProductNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3055,7 +3055,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeHardwareVersionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3074,7 +3074,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeHardwareVersionStringWithValue:(NSString * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3092,7 +3092,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSoftwareVersionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3111,7 +3111,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeSoftwareVersionStringWithValue:(NSString * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3129,7 +3129,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeManufacturingDateWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3147,7 +3147,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePartNumberWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3165,7 +3165,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeProductURLWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3183,7 +3183,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeProductLabelWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3201,7 +3201,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSerialNumberWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3219,7 +3219,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeReachableWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3237,7 +3237,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeUniqueIDWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3255,7 +3255,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3294,7 +3294,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3333,7 +3333,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3372,7 +3372,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3390,7 +3390,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3421,7 +3421,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeChannelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3474,7 +3474,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeLineupWithValue:(CHIPChannelClusterLineupInfo * _Nullable)value
                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3508,7 +3508,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeCurrentChannelWithValue:(CHIPChannelClusterChannelInfo * _Nullable)value
                             completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3544,7 +3544,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3583,7 +3583,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3622,7 +3622,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3661,7 +3661,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3679,7 +3679,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3710,7 +3710,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentHueWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3728,7 +3728,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentSaturationWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3746,7 +3746,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRemainingTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3764,7 +3764,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3782,7 +3782,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3800,7 +3800,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDriftCompensationWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3818,7 +3818,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCompensationTextWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3836,7 +3836,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeColorTemperatureWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3854,7 +3854,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeColorModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3872,7 +3872,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeNumberOfPrimariesWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3895,7 +3895,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary1XWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3913,7 +3913,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary1YWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3931,7 +3931,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary1IntensityWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3954,7 +3954,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary2XWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3972,7 +3972,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary2YWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -3990,7 +3990,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary2IntensityWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4013,7 +4013,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary3XWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4031,7 +4031,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary3YWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4049,7 +4049,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary3IntensityWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4072,7 +4072,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary4XWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4090,7 +4090,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary4YWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4108,7 +4108,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary4IntensityWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4131,7 +4131,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary5XWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4149,7 +4149,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary5YWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4167,7 +4167,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary5IntensityWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4190,7 +4190,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary6XWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4208,7 +4208,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary6YWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4226,7 +4226,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePrimary6IntensityWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4249,7 +4249,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeEnhancedCurrentHueWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4267,7 +4267,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeEnhancedColorModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4285,7 +4285,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeColorLoopActiveWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4303,7 +4303,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeColorLoopDirectionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4321,7 +4321,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeColorLoopTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4340,7 +4340,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeColorLoopStartEnhancedHueWithValue:(NSNumber * _Nonnull)value
                                        completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4359,7 +4359,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeColorLoopStoredEnhancedHueWithValue:(NSNumber * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4377,7 +4377,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeColorCapabilitiesWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4396,7 +4396,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeColorTempPhysicalMinMiredsWithValue:(NSNumber * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4415,7 +4415,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeColorTempPhysicalMaxMiredsWithValue:(NSNumber * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4434,7 +4434,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeCoupleColorTempToLevelMinMiredsWithValue:(NSNumber * _Nonnull)value
                                              completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4452,7 +4452,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4491,7 +4491,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4530,7 +4530,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4569,7 +4569,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4587,7 +4587,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4618,7 +4618,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptHeaderWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4657,7 +4657,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4696,7 +4696,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4735,7 +4735,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4774,7 +4774,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4792,7 +4792,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4823,7 +4823,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDeviceListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4863,7 +4863,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeServerListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4902,7 +4902,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClientListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4941,7 +4941,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePartsListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -4980,7 +4980,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5019,7 +5019,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5058,7 +5058,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5097,7 +5097,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5115,7 +5115,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5146,7 +5146,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5185,7 +5185,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5224,7 +5224,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5263,7 +5263,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5281,7 +5281,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5312,7 +5312,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeLockStateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5335,7 +5335,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeLockTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5353,7 +5353,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActuatorEnabledWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5371,7 +5371,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDoorStateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5395,7 +5395,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeNumberOfTotalUsersSupportedWithValue:(NSNumber * _Nonnull)value
                                          completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5414,7 +5414,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeNumberOfPINUsersSupportedWithValue:(NSNumber * _Nonnull)value
                                        completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5433,7 +5433,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeNumberOfRFIDUsersSupportedWithValue:(NSNumber * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5452,7 +5452,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeNumberOfWeekDaySchedulesSupportedPerUserWithValue:(NSNumber * _Nonnull)value
                                                       completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5471,7 +5471,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeNumberOfYearDaySchedulesSupportedPerUserWithValue:(NSNumber * _Nonnull)value
                                                       completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5490,7 +5490,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeNumberOfHolidaySchedulesSupportedWithValue:(NSNumber * _Nonnull)value
                                                completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5508,7 +5508,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxPINCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5526,7 +5526,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinPINCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5544,7 +5544,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxRFIDCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5562,7 +5562,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinRFIDCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5581,7 +5581,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeCredentialRulesSupportWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5600,7 +5600,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeNumberOfCredentialsSupportedPerUserWithValue:(NSNumber * _Nonnull)value
                                                  completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5619,7 +5619,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeSupportedOperatingModesWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5638,7 +5638,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeDefaultConfigurationRegisterWithValue:(NSNumber * _Nonnull)value
                                           completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5656,7 +5656,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5695,7 +5695,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5734,7 +5734,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5773,7 +5773,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5791,7 +5791,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5822,7 +5822,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMeasurementTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5840,7 +5840,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcVoltageWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5858,7 +5858,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcVoltageMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5876,7 +5876,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcVoltageMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5894,7 +5894,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5912,7 +5912,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcCurrentMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5930,7 +5930,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcCurrentMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5948,7 +5948,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcPowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5966,7 +5966,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcPowerMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -5984,7 +5984,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcPowerMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6002,7 +6002,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcVoltageMultiplierWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6020,7 +6020,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcVoltageDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6038,7 +6038,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcCurrentMultiplierWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6056,7 +6056,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcCurrentDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6074,7 +6074,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcPowerMultiplierWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6092,7 +6092,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDcPowerDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6110,7 +6110,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcFrequencyWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6128,7 +6128,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcFrequencyMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6146,7 +6146,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcFrequencyMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6164,7 +6164,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeNeutralCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6182,7 +6182,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTotalActivePowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6200,7 +6200,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTotalReactivePowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6218,7 +6218,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTotalApparentPowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6237,7 +6237,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeMeasured1stHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6256,7 +6256,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeMeasured3rdHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6275,7 +6275,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeMeasured5thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6294,7 +6294,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeMeasured7thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6313,7 +6313,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeMeasured9thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6332,7 +6332,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeMeasured11thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
                                          completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6351,7 +6351,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeMeasuredPhase1stHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
                                              completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6370,7 +6370,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeMeasuredPhase3rdHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
                                              completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6389,7 +6389,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeMeasuredPhase5thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
                                              completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6408,7 +6408,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeMeasuredPhase7thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
                                              completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6427,7 +6427,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeMeasuredPhase9thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
                                              completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6446,7 +6446,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeMeasuredPhase11thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
                                               completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6465,7 +6465,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAcFrequencyMultiplierWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6483,7 +6483,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcFrequencyDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6501,7 +6501,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePowerMultiplierWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6519,7 +6519,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePowerDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6538,7 +6538,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeHarmonicCurrentMultiplierWithValue:(NSNumber * _Nonnull)value
                                        completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6557,7 +6557,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributePhaseHarmonicCurrentMultiplierWithValue:(NSNumber * _Nonnull)value
                                             completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6575,7 +6575,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeInstantaneousVoltageWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6594,7 +6594,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeInstantaneousLineCurrentWithValue:(NSNumber * _Nonnull)value
                                       completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6613,7 +6613,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeInstantaneousActiveCurrentWithValue:(NSNumber * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6632,7 +6632,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeInstantaneousReactiveCurrentWithValue:(NSNumber * _Nonnull)value
                                           completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6650,7 +6650,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeInstantaneousPowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6668,7 +6668,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsVoltageWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6686,7 +6686,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsVoltageMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6704,7 +6704,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsVoltageMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6722,7 +6722,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6740,7 +6740,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsCurrentMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6758,7 +6758,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsCurrentMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6776,7 +6776,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActivePowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6794,7 +6794,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActivePowerMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6812,7 +6812,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActivePowerMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6830,7 +6830,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeReactivePowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6848,7 +6848,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeApparentPowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6866,7 +6866,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePowerFactorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6884,7 +6884,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcVoltageMultiplierWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6902,7 +6902,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcVoltageDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6920,7 +6920,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcCurrentMultiplierWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6938,7 +6938,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcCurrentDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6956,7 +6956,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcPowerMultiplierWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6974,7 +6974,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcPowerDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -6992,7 +6992,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeVoltageOverloadWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7010,7 +7010,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentOverloadWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7028,7 +7028,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcVoltageOverloadWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7046,7 +7046,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcCurrentOverloadWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7065,7 +7065,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAcActivePowerOverloadWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7084,7 +7084,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAcReactivePowerOverloadWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7103,7 +7103,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAverageRmsOverVoltageWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7122,7 +7122,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAverageRmsUnderVoltageWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7141,7 +7141,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeRmsExtremeOverVoltageWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7160,7 +7160,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeRmsExtremeUnderVoltageWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7178,7 +7178,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsVoltageSagWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7196,7 +7196,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsVoltageSwellWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7214,7 +7214,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeLineCurrentPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7232,7 +7232,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActiveCurrentPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7251,7 +7251,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeReactiveCurrentPhaseBWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7269,7 +7269,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsVoltagePhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7287,7 +7287,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsVoltageMinPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7305,7 +7305,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsVoltageMaxPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7323,7 +7323,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsCurrentPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7341,7 +7341,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsCurrentMinPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7359,7 +7359,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsCurrentMaxPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7377,7 +7377,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActivePowerPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7395,7 +7395,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActivePowerMinPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7413,7 +7413,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActivePowerMaxPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7431,7 +7431,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeReactivePowerPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7449,7 +7449,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeApparentPowerPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7467,7 +7467,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePowerFactorPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7486,7 +7486,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithValue:(NSNumber * _Nonnull)value
                                                       completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7505,7 +7505,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAverageRmsOverVoltageCounterPhaseBWithValue:(NSNumber * _Nonnull)value
                                                 completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7524,7 +7524,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAverageRmsUnderVoltageCounterPhaseBWithValue:(NSNumber * _Nonnull)value
                                                  completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7543,7 +7543,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeRmsExtremeOverVoltagePeriodPhaseBWithValue:(NSNumber * _Nonnull)value
                                                completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7562,7 +7562,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeRmsExtremeUnderVoltagePeriodPhaseBWithValue:(NSNumber * _Nonnull)value
                                                 completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7581,7 +7581,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeRmsVoltageSagPeriodPhaseBWithValue:(NSNumber * _Nonnull)value
                                        completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7600,7 +7600,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeRmsVoltageSwellPeriodPhaseBWithValue:(NSNumber * _Nonnull)value
                                          completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7618,7 +7618,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeLineCurrentPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7636,7 +7636,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActiveCurrentPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7655,7 +7655,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeReactiveCurrentPhaseCWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7673,7 +7673,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsVoltagePhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7691,7 +7691,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsVoltageMinPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7709,7 +7709,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsVoltageMaxPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7727,7 +7727,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsCurrentPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7745,7 +7745,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsCurrentMinPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7763,7 +7763,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRmsCurrentMaxPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7781,7 +7781,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActivePowerPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7799,7 +7799,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActivePowerMinPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7817,7 +7817,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActivePowerMaxPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7835,7 +7835,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeReactivePowerPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7853,7 +7853,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeApparentPowerPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7871,7 +7871,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePowerFactorPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7890,7 +7890,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithValue:(NSNumber * _Nonnull)value
                                                       completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7909,7 +7909,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAverageRmsOverVoltageCounterPhaseCWithValue:(NSNumber * _Nonnull)value
                                                 completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7928,7 +7928,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAverageRmsUnderVoltageCounterPhaseCWithValue:(NSNumber * _Nonnull)value
                                                  completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7947,7 +7947,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeRmsExtremeOverVoltagePeriodPhaseCWithValue:(NSNumber * _Nonnull)value
                                                completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7966,7 +7966,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeRmsExtremeUnderVoltagePeriodPhaseCWithValue:(NSNumber * _Nonnull)value
                                                 completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -7985,7 +7985,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeRmsVoltageSagPeriodPhaseCWithValue:(NSNumber * _Nonnull)value
                                        completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8004,7 +8004,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeRmsVoltageSwellPeriodPhaseCWithValue:(NSNumber * _Nonnull)value
                                          completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8022,7 +8022,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8061,7 +8061,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8100,7 +8100,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8139,7 +8139,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8157,7 +8157,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8188,7 +8188,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePHYRateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8211,7 +8211,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFullDuplexWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8234,7 +8234,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePacketRxCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8252,7 +8252,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePacketTxCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8270,7 +8270,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTxErrCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8288,7 +8288,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCollisionCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8306,7 +8306,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeOverrunCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8324,7 +8324,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCarrierDetectWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8347,7 +8347,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTimeSinceResetWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8365,7 +8365,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8404,7 +8404,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8443,7 +8443,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8482,7 +8482,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8500,7 +8500,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8531,7 +8531,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePercentCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8549,7 +8549,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSpeedMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8567,7 +8567,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSpeedCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8585,7 +8585,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRockSupportWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8603,7 +8603,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeWindSupportWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8621,7 +8621,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8660,7 +8660,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8699,7 +8699,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8738,7 +8738,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8756,7 +8756,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8787,7 +8787,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeLabelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8827,7 +8827,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8866,7 +8866,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8905,7 +8905,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8944,7 +8944,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8962,7 +8962,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -8993,7 +8993,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9016,7 +9016,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9039,7 +9039,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9062,7 +9062,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeToleranceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9080,7 +9080,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9119,7 +9119,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9158,7 +9158,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9197,7 +9197,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9215,7 +9215,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9247,7 +9247,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeBasicCommissioningInfoWithValue:(CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9265,7 +9265,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRegulatoryConfigWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9283,7 +9283,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeLocationCapabilityWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9302,7 +9302,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeSupportsConcurrentConnectionWithValue:(NSNumber * _Nonnull)value
                                           completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9320,7 +9320,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9359,7 +9359,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9398,7 +9398,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9437,7 +9437,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9455,7 +9455,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9486,7 +9486,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeNetworkInterfacesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9588,7 +9588,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRebootCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9606,7 +9606,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeUpTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9625,7 +9625,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeTotalOperationalHoursWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9643,7 +9643,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBootReasonsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9661,7 +9661,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActiveHardwareFaultsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9700,7 +9700,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActiveRadioFaultsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9739,7 +9739,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActiveNetworkFaultsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9779,7 +9779,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeTestEventTriggersEnabledWithValue:(NSNumber * _Nonnull)value
                                       completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9797,7 +9797,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9836,7 +9836,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9875,7 +9875,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9914,7 +9914,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9932,7 +9932,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -9963,7 +9963,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGroupTableWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10029,7 +10029,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxGroupsPerFabricWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10048,7 +10048,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeMaxGroupKeysPerFabricWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10066,7 +10066,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10105,7 +10105,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10144,7 +10144,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10183,7 +10183,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10201,7 +10201,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10232,7 +10232,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeNameSupportWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10250,7 +10250,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10289,7 +10289,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10328,7 +10328,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10367,7 +10367,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10385,7 +10385,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10416,7 +10416,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeIdentifyTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10434,7 +10434,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10473,7 +10473,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10512,7 +10512,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10551,7 +10551,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10569,7 +10569,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10600,7 +10600,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10623,7 +10623,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10646,7 +10646,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10669,7 +10669,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeToleranceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10687,7 +10687,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeLightSensorTypeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10710,7 +10710,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10749,7 +10749,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10788,7 +10788,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10827,7 +10827,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10845,7 +10845,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10876,7 +10876,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10915,7 +10915,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10954,7 +10954,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -10993,7 +10993,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11011,7 +11011,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11042,7 +11042,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11060,7 +11060,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRemainingTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11078,7 +11078,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11096,7 +11096,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11114,7 +11114,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentFrequencyWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11132,7 +11132,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinFrequencyWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11150,7 +11150,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxFrequencyWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11168,7 +11168,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11207,7 +11207,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11246,7 +11246,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11285,7 +11285,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11303,7 +11303,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11334,7 +11334,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSupportedLocalesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11373,7 +11373,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11412,7 +11412,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11451,7 +11451,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11490,7 +11490,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11508,7 +11508,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11539,7 +11539,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11578,7 +11578,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11617,7 +11617,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11656,7 +11656,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11674,7 +11674,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11705,7 +11705,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeInputListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11749,7 +11749,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentInputWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11767,7 +11767,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11806,7 +11806,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11845,7 +11845,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11884,7 +11884,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11902,7 +11902,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11933,7 +11933,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11951,7 +11951,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeStartTimeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11974,7 +11974,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDurationWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -11998,7 +11998,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeSampledPositionWithValue:(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable)value
                              completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12027,7 +12027,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePlaybackSpeedWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12045,7 +12045,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSeekRangeEndWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12068,7 +12068,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSeekRangeStartWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12091,7 +12091,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12130,7 +12130,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12169,7 +12169,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12208,7 +12208,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12226,7 +12226,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12257,7 +12257,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDescriptionWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12275,7 +12275,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeStandardNamespaceWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12298,7 +12298,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSupportedModesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12362,7 +12362,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12380,7 +12380,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12419,7 +12419,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12458,7 +12458,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12497,7 +12497,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12515,7 +12515,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12546,7 +12546,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxNetworksWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12564,7 +12564,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeNetworksWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12604,7 +12604,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeScanMaxTimeSecondsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12623,7 +12623,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeConnectMaxTimeSecondsWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12642,7 +12642,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeLastNetworkingStatusWithValue:(NSNumber * _Nullable)value
                                   completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12665,7 +12665,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeLastNetworkIDWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12689,7 +12689,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeLastConnectErrorValueWithValue:(NSNumber * _Nullable)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12712,7 +12712,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12751,7 +12751,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12790,7 +12790,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12829,7 +12829,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12847,7 +12847,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12878,7 +12878,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12917,7 +12917,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12956,7 +12956,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -12995,7 +12995,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13013,7 +13013,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13044,7 +13044,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeUpdatePossibleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13062,7 +13062,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeUpdateStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13080,7 +13080,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeUpdateStateProgressWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13103,7 +13103,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13142,7 +13142,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13181,7 +13181,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13220,7 +13220,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13238,7 +13238,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13269,7 +13269,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeOccupancyWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13287,7 +13287,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeOccupancySensorTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13306,7 +13306,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeOccupancySensorTypeBitmapWithValue:(NSNumber * _Nonnull)value
                                        completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13324,7 +13324,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13363,7 +13363,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13402,7 +13402,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13441,7 +13441,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13459,7 +13459,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13490,7 +13490,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeOnOffWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13508,7 +13508,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGlobalSceneControlWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13526,7 +13526,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13565,7 +13565,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13604,7 +13604,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13643,7 +13643,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13661,7 +13661,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13692,7 +13692,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSwitchTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13710,7 +13710,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13749,7 +13749,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13788,7 +13788,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13827,7 +13827,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13845,7 +13845,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13876,7 +13876,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeNOCsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13922,7 +13922,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFabricsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13968,7 +13968,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSupportedFabricsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -13986,7 +13986,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCommissionedFabricsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14005,7 +14005,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeTrustedRootCertificatesWithValue:(NSArray * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14044,7 +14044,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentFabricIndexWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14062,7 +14062,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14101,7 +14101,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14140,7 +14140,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14179,7 +14179,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14197,7 +14197,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14228,7 +14228,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14246,7 +14246,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeOrderWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14264,7 +14264,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDescriptionWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14283,7 +14283,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeWiredAssessedInputVoltageWithValue:(NSNumber * _Nonnull)value
                                        completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14302,7 +14302,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeWiredAssessedInputFrequencyWithValue:(NSNumber * _Nonnull)value
                                          completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14320,7 +14320,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeWiredCurrentTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14338,7 +14338,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeWiredAssessedCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14356,7 +14356,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeWiredNominalVoltageWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14374,7 +14374,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeWiredMaximumCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14392,7 +14392,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeWiredPresentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14410,7 +14410,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActiveWiredFaultsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14449,7 +14449,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBatteryVoltageWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14468,7 +14468,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeBatteryPercentRemainingWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14486,7 +14486,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBatteryTimeRemainingWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14504,7 +14504,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBatteryChargeLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14523,7 +14523,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeBatteryReplacementNeededWithValue:(NSNumber * _Nonnull)value
                                       completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14542,7 +14542,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeBatteryReplaceabilityWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14560,7 +14560,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBatteryPresentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14578,7 +14578,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActiveBatteryFaultsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14618,7 +14618,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeBatteryReplacementDescriptionWithValue:(NSString * _Nonnull)value
                                            completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14637,7 +14637,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeBatteryCommonDesignationWithValue:(NSNumber * _Nonnull)value
                                       completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14656,7 +14656,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeBatteryANSIDesignationWithValue:(NSString * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14675,7 +14675,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeBatteryIECDesignationWithValue:(NSString * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14694,7 +14694,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeBatteryApprovedChemistryWithValue:(NSNumber * _Nonnull)value
                                       completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14712,7 +14712,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBatteryCapacityWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14730,7 +14730,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBatteryQuantityWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14748,7 +14748,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBatteryChargeStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14767,7 +14767,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeBatteryTimeToFullChargeWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14786,7 +14786,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeBatteryFunctionalWhileChargingWithValue:(NSNumber * _Nonnull)value
                                             completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14805,7 +14805,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeBatteryChargingCurrentWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14824,7 +14824,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeActiveBatteryChargeFaultsWithValue:(NSArray * _Nonnull)value
                                        completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14863,7 +14863,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14902,7 +14902,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14941,7 +14941,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14980,7 +14980,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -14998,7 +14998,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15029,7 +15029,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSourcesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15068,7 +15068,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15107,7 +15107,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15146,7 +15146,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15185,7 +15185,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15203,7 +15203,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15234,7 +15234,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15257,7 +15257,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15280,7 +15280,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15303,7 +15303,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeToleranceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15321,7 +15321,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeScaledValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15344,7 +15344,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinScaledValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15367,7 +15367,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxScaledValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15390,7 +15390,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeScaledToleranceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15408,7 +15408,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeScaleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15426,7 +15426,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15465,7 +15465,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15504,7 +15504,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15543,7 +15543,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15561,7 +15561,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15592,7 +15592,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxPressureWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15615,7 +15615,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxSpeedWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15638,7 +15638,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxFlowWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15661,7 +15661,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinConstPressureWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15684,7 +15684,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxConstPressureWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15707,7 +15707,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinCompPressureWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15730,7 +15730,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxCompPressureWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15753,7 +15753,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinConstSpeedWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15776,7 +15776,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxConstSpeedWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15799,7 +15799,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinConstFlowWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15822,7 +15822,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxConstFlowWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15845,7 +15845,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinConstTempWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15868,7 +15868,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxConstTempWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15891,7 +15891,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePumpStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15910,7 +15910,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeEffectiveOperationModeWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15928,7 +15928,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeEffectiveControlModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15946,7 +15946,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCapacityWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15969,7 +15969,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSpeedWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -15992,7 +15992,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePowerWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16015,7 +16015,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16054,7 +16054,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16093,7 +16093,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16132,7 +16132,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16150,7 +16150,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16181,7 +16181,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16204,7 +16204,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16227,7 +16227,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16250,7 +16250,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeToleranceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16268,7 +16268,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16307,7 +16307,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16346,7 +16346,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16385,7 +16385,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16403,7 +16403,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16434,7 +16434,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSceneCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16452,7 +16452,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentSceneWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16470,7 +16470,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentGroupWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16488,7 +16488,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSceneValidWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16506,7 +16506,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeNameSupportWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16524,7 +16524,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeLastConfiguredByWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16547,7 +16547,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16586,7 +16586,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16625,7 +16625,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16664,7 +16664,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16682,7 +16682,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16713,7 +16713,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeThreadMetricsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16768,7 +16768,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentHeapFreeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16786,7 +16786,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentHeapUsedWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16805,7 +16805,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeCurrentHeapHighWatermarkWithValue:(NSNumber * _Nonnull)value
                                       completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16823,7 +16823,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16862,7 +16862,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16901,7 +16901,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16940,7 +16940,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16958,7 +16958,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -16989,7 +16989,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeNumberOfPositionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17007,7 +17007,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentPositionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17025,7 +17025,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMultiPressMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17043,7 +17043,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17082,7 +17082,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17121,7 +17121,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17160,7 +17160,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17178,7 +17178,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17209,7 +17209,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTargetListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17249,7 +17249,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentTargetWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17267,7 +17267,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17306,7 +17306,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17345,7 +17345,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17384,7 +17384,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17402,7 +17402,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17433,7 +17433,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17456,7 +17456,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMinMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17479,7 +17479,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMaxMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17502,7 +17502,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeToleranceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17520,7 +17520,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17559,7 +17559,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17598,7 +17598,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17637,7 +17637,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17655,7 +17655,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17686,7 +17686,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17725,7 +17725,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17764,7 +17764,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17803,7 +17803,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17821,7 +17821,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17852,7 +17852,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeLocalTemperatureWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17875,7 +17875,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeOutdoorTemperatureWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17898,7 +17898,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeOccupancyWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17917,7 +17917,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAbsMinHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17936,7 +17936,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAbsMaxHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17955,7 +17955,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAbsMinCoolSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17974,7 +17974,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeAbsMaxCoolSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -17992,7 +17992,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePICoolingDemandWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18010,7 +18010,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePIHeatingDemandWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18029,7 +18029,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeThermostatRunningModeWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18047,7 +18047,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeStartOfWeekWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18066,7 +18066,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeNumberOfWeeklyTransitionsWithValue:(NSNumber * _Nonnull)value
                                        completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18085,7 +18085,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeNumberOfDailyTransitionsWithValue:(NSNumber * _Nonnull)value
                                       completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18104,7 +18104,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeThermostatRunningStateWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18122,7 +18122,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSetpointChangeSourceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18141,7 +18141,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeSetpointChangeAmountWithValue:(NSNumber * _Nullable)value
                                   completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18165,7 +18165,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeSetpointChangeSourceTimestampWithValue:(NSNumber * _Nonnull)value
                                            completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18183,7 +18183,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeOccupiedSetbackMinWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18206,7 +18206,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeOccupiedSetbackMaxWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18230,7 +18230,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeUnoccupiedSetbackMinWithValue:(NSNumber * _Nullable)value
                                   completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18254,7 +18254,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeUnoccupiedSetbackMaxWithValue:(NSNumber * _Nullable)value
                                   completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18277,7 +18277,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeACCoilTemperatureWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18300,7 +18300,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18339,7 +18339,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18378,7 +18378,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18417,7 +18417,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18435,7 +18435,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18466,7 +18466,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18505,7 +18505,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18544,7 +18544,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18583,7 +18583,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18601,7 +18601,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18632,7 +18632,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeChannelWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18655,7 +18655,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRoutingRoleWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18678,7 +18678,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeNetworkNameWithValue:(NSString * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18701,7 +18701,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePanIdWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18724,7 +18724,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeExtendedPanIdWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18747,7 +18747,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMeshLocalPrefixWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18770,7 +18770,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeOverrunCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18788,7 +18788,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeNeighborTableListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18850,7 +18850,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRouteTableListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18898,7 +18898,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePartitionIdWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18921,7 +18921,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeWeightingWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18944,7 +18944,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDataVersionWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18967,7 +18967,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeStableDataVersionWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -18990,7 +18990,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeLeaderRouterIdWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19013,7 +19013,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDetachedRoleCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19031,7 +19031,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeChildRoleCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19049,7 +19049,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRouterRoleCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19067,7 +19067,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeLeaderRoleCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19085,7 +19085,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttachAttemptCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19104,7 +19104,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributePartitionIdChangeCountWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19123,7 +19123,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeBetterPartitionAttachAttemptCountWithValue:(NSNumber * _Nonnull)value
                                                completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19141,7 +19141,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeParentChangeCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19159,7 +19159,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTxTotalCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19177,7 +19177,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTxUnicastCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19195,7 +19195,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTxBroadcastCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19213,7 +19213,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTxAckRequestedCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19231,7 +19231,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTxAckedCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19250,7 +19250,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeTxNoAckRequestedCountWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19268,7 +19268,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTxDataCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19286,7 +19286,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTxDataPollCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19304,7 +19304,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTxBeaconCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19322,7 +19322,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTxBeaconRequestCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19340,7 +19340,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTxOtherCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19358,7 +19358,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTxRetryCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19377,7 +19377,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeTxDirectMaxRetryExpiryCountWithValue:(NSNumber * _Nonnull)value
                                          completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19396,7 +19396,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeTxIndirectMaxRetryExpiryCountWithValue:(NSNumber * _Nonnull)value
                                            completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19414,7 +19414,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTxErrCcaCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19432,7 +19432,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTxErrAbortCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19451,7 +19451,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeTxErrBusyChannelCountWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19469,7 +19469,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRxTotalCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19487,7 +19487,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRxUnicastCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19505,7 +19505,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRxBroadcastCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19523,7 +19523,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRxDataCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19541,7 +19541,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRxDataPollCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19559,7 +19559,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRxBeaconCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19577,7 +19577,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRxBeaconRequestCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19595,7 +19595,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRxOtherCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19614,7 +19614,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeRxAddressFilteredCountWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19633,7 +19633,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeRxDestAddrFilteredCountWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19651,7 +19651,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRxDuplicatedCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19669,7 +19669,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRxErrNoFrameCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19688,7 +19688,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeRxErrUnknownNeighborCountWithValue:(NSNumber * _Nonnull)value
                                        completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19707,7 +19707,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeRxErrInvalidSrcAddrCountWithValue:(NSNumber * _Nonnull)value
                                       completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19725,7 +19725,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRxErrSecCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19743,7 +19743,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRxErrFcsCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19761,7 +19761,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRxErrOtherCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19779,7 +19779,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeActiveTimestampWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19802,7 +19802,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePendingTimestampWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19825,7 +19825,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeDelayWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19849,7 +19849,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeSecurityPolicyWithValue:(CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable)value
                             completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19873,7 +19873,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeChannelMaskWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19898,7 +19898,7 @@ using namespace chip::app::Clusters;
             (CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable)value
                                           completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19933,7 +19933,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeActiveNetworkFaultsListWithValue:(NSArray * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -19973,7 +19973,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20012,7 +20012,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20051,7 +20051,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20090,7 +20090,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20108,7 +20108,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20140,7 +20140,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeSupportedCalendarTypesWithValue:(NSArray * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20180,7 +20180,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20219,7 +20219,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20258,7 +20258,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20297,7 +20297,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20315,7 +20315,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20346,7 +20346,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20385,7 +20385,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20424,7 +20424,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20463,7 +20463,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20481,7 +20481,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20512,7 +20512,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20551,7 +20551,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20590,7 +20590,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20629,7 +20629,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20647,7 +20647,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20678,7 +20678,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeMACAddressWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20696,7 +20696,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20735,7 +20735,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20774,7 +20774,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20813,7 +20813,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20831,7 +20831,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20862,7 +20862,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBssidWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20885,7 +20885,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSecurityTypeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20908,7 +20908,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeWiFiVersionWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20931,7 +20931,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeChannelNumberWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20954,7 +20954,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeRssiWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20977,7 +20977,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBeaconLostCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -20995,7 +20995,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeBeaconRxCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21014,7 +21014,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributePacketMulticastRxCountWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21033,7 +21033,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributePacketMulticastTxCountWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21051,7 +21051,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePacketUnicastRxCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21069,7 +21069,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributePacketUnicastTxCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21087,7 +21087,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentMaxRateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21105,7 +21105,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeOverrunCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21123,7 +21123,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21162,7 +21162,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21201,7 +21201,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21240,7 +21240,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21258,7 +21258,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21289,7 +21289,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21308,7 +21308,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributePhysicalClosedLimitLiftWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21327,7 +21327,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributePhysicalClosedLimitTiltWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21345,7 +21345,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentPositionLiftWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21368,7 +21368,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeCurrentPositionTiltWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21392,7 +21392,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeNumberOfActuationsLiftWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21411,7 +21411,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeNumberOfActuationsTiltWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21429,7 +21429,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeConfigStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21448,7 +21448,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeCurrentPositionLiftPercentageWithValue:(NSNumber * _Nullable)value
                                            completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21472,7 +21472,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeCurrentPositionTiltPercentageWithValue:(NSNumber * _Nullable)value
                                            completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21495,7 +21495,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeOperationalStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21514,7 +21514,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeTargetPositionLiftPercent100thsWithValue:(NSNumber * _Nullable)value
                                              completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21538,7 +21538,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeTargetPositionTiltPercent100thsWithValue:(NSNumber * _Nullable)value
                                              completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21561,7 +21561,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeEndProductTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21580,7 +21580,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeCurrentPositionLiftPercent100thsWithValue:(NSNumber * _Nullable)value
                                               completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21604,7 +21604,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeCurrentPositionTiltPercent100thsWithValue:(NSNumber * _Nullable)value
                                               completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21628,7 +21628,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeInstalledOpenLimitLiftWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21647,7 +21647,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeInstalledClosedLimitLiftWithValue:(NSNumber * _Nonnull)value
                                       completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21666,7 +21666,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeInstalledOpenLimitTiltWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21685,7 +21685,7 @@ using namespace chip::app::Clusters;
 - (void)writeAttributeInstalledClosedLimitTiltWithValue:(NSNumber * _Nonnull)value
                                       completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21703,7 +21703,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeSafetyStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21721,7 +21721,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21760,7 +21760,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21799,7 +21799,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21838,7 +21838,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
@@ -21856,7 +21856,7 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIPDefaultSuccessCallbackBridge(
+    new MTRDefaultSuccessCallbackBridge(
         self.callbackQueue,
         ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);

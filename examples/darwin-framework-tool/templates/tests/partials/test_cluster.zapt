@@ -146,7 +146,7 @@ class {{filename}}: public TestCommandBridge
           {{/chip_tests_item_parameters}}
           [cluster {{asLowerCamelCase command}}With{{#if commandObject.arguments.length}}Params:params completionHandler{{else}}CompletionHandler{{/if}}:
           {{#if commandObject.hasSpecificResponse}}
-            ^(CHIP{{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase commandObject.responseName}}Params * _Nullable values, NSError * _Nullable err) {
+            ^(MTR{{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase commandObject.responseName}}Params * _Nullable values, NSError * _Nullable err) {
           {{else}}
             ^(NSError * _Nullable err) {
           {{/if}}

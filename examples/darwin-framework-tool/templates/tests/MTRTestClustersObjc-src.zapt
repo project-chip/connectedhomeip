@@ -3,7 +3,7 @@
 
 #import <Matter/Matter.h>
 
-#import <Matter/MTRCallbackBridge_internal.h> // For CHIPDefaultSuccessCallbackBridge, etc
+#import <Matter/MTRCallbackBridge_internal.h> // For MTRDefaultSuccessCallbackBridge, etc
 #import <Matter/MTRCluster_internal.h> // For self.callbackQueue
 
 #import "zap-generated/cluster/MTRTestClustersObjc.h"
