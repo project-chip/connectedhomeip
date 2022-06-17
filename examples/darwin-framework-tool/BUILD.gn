@@ -78,7 +78,7 @@ executable("darwin-framework-tool") {
   deps = [
     "${chip_root}/examples/chip-tool:chip-tool-utils",
     "${chip_root}/src/app/server",
-    "${chip_root}/src/darwin/Framework/CHIP",
+    # "${chip_root}/src/darwin/Framework/CHIP",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",

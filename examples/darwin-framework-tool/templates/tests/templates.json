@@ -51,14 +51,14 @@
             "output": "test/Commands.h"
         },
         {
-            "path": "CHIPTestClustersObjc.zapt",
+            "path": "MTRTestClustersObjc.zapt",
             "name": "Test Objc API Header",
-            "output": "cluster/CHIPTestClustersObjc.h"
+            "output": "cluster/MTRTestClustersObjc.h"
         },
         {
-            "path": "CHIPTestClustersObjc-src.zapt",
+            "path": "MTRTestClustersObjc-src.zapt",
             "name": "Test Objc API",
-            "output": "cluster/CHIPTestClustersObjc.mm"
+            "output": "cluster/MTRTestClustersObjc.mm"
         }
     ]
 }

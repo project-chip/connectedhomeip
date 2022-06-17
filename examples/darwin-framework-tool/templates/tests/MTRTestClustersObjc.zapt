@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster {{name}}
  *    {{description}}
  */
-@interface CHIPTest{{asUpperCamelCase name}} : CHIP{{asUpperCamelCase name}}
+@interface MTRTest{{asUpperCamelCase name}} : MTR{{asUpperCamelCase name}}
 
 {{#chip_server_cluster_attributes}}
 {{#unless isWritableAttribute}}

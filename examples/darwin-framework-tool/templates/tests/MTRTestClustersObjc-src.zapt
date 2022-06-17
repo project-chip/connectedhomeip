@@ -1,12 +1,12 @@
 {{> header}}
 #import <Foundation/Foundation.h>
 
-#import "CHIP/CHIP.h"
+#import <Matter/Matter.h>
 
-#import "CHIPCallbackBridge_internal.h" // For CHIPDefaultSuccessCallbackBridge, etc
-#import "CHIPCluster_internal.h" // For self.callbackQueue
+#import <Matter/MTRCallbackBridge_internal.h> // For CHIPDefaultSuccessCallbackBridge, etc
+#import <Matter/MTRCluster_internal.h> // For self.callbackQueue
 
-#import "zap-generated/cluster/CHIPTestClustersObjc.h"
+#import "zap-generated/cluster/MTRTestClustersObjc.h"
 
 #include <lib/support/CHIPListUtils.h>
 #include <type_traits>
@@ -17,11 +17,11 @@ using namespace chip::app::Clusters;
 
 {{#chip_client_clusters includeAll=true}}
 
-@interface CHIPTest{{asUpperCamelCase name}} ()
+@interface MTRTest{{asUpperCamelCase name}} ()
 @property (readonly) chip::Controller::{{asUpperCamelCase name}}Cluster cppCluster;
 @end
 
-@implementation CHIPTest{{asUpperCamelCase name}}
+@implementation MTRTest{{asUpperCamelCase name}}
 
 - (chip::Controller::ClusterBase *)getCluster
 {
@@ -34,7 +34,7 @@ using namespace chip::app::Clusters;
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue,
+    new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
       {{! For now, don't change the bridge API; instead just use an adapter
           to invoke our completion handler. This is not great from a
           type-safety perspective, of course. }}
@@ -46,8 +46,8 @@ using namespace chip::app::Clusters;
         using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
         TypeInfo::Type cppValue;
         {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
-        auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        auto successFn = Callback<MTR{{>callbackName}}CallbackType>::FromCancelable(success);
+        auto failureFn = Callback<MTRDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
