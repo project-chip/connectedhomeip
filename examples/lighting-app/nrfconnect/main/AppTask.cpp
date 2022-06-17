@@ -58,15 +58,15 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-constexpr int kFactoryResetTriggerTimeout      = 3000;
-constexpr int kFactoryResetCancelWindowTimeout = 3000;
-constexpr int kAppEventQueueSize               = 10;
-constexpr uint8_t kButtonPushEvent             = 1;
-constexpr uint8_t kButtonReleaseEvent          = 0;
-constexpr EndpointId kLightEndpointId          = 1;
-constexpr uint32_t kIdentifyBlinkRateMs        = 500;
-constexpr uint8_t kDefaultMinLevel             = 0;
-constexpr uint8_t kDefaultMaxLevel             = 254;
+constexpr int kFactoryResetTriggerTimeout        = 3000;
+constexpr int kFactoryResetCancelWindowTimeout   = 3000;
+constexpr int kAppEventQueueSize                 = 10;
+constexpr uint8_t kButtonPushEvent               = 1;
+constexpr uint8_t kButtonReleaseEvent            = 0;
+constexpr EndpointId kLightEndpointId            = 1;
+constexpr uint32_t kIdentifyBlinkRateMs          = 500;
+constexpr uint8_t kDefaultMinLevel               = 0;
+constexpr uint8_t kDefaultMaxLevel               = 254;
 constexpr uint8_t kTestEventTriggerEnableKey[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                      0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
