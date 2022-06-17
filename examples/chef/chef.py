@@ -34,12 +34,11 @@ TermColors = constants.TermColors
 shell = stateful_shell.StatefulShell()
 
 _CHEF_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
-_REPO_BASE_PATH = os.path.join(_CHEF_SCRIPT_PATH, "../../")
+_REPO_BASE_PATH = os.path.abspath(os.path.join(_CHEF_SCRIPT_PATH, "../../"))
 _DEVICE_FOLDER = os.path.join(_CHEF_SCRIPT_PATH, "devices")
 _DEVICE_LIST = [file[:-4] for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap")]
 _CHEF_ZZZ_ROOT = os.path.join(_CHEF_SCRIPT_PATH, "zzz_generated")
-_CI_DEVICE_MANIFEST_NAME = "INPUTMD5.txt"
-_CI_ZAP_MANIFEST_NAME = "ZAPSHA.txt"
+_CI_MANIFEST_FILE = os.path.join(_CHEF_SCRIPT_PATH, "ci_manifest.json")
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_meta.json")
 _CI_ALLOW_LIST = ["lighting-app"]
 
@@ -115,34 +114,69 @@ def check_zap() -> str:
     return zap_commit
 
 
+def generate_hash_from_dir(path: str) -> str:
+    """Generates a hash from a directory."""
+    file_list = []
+    for dirpath, _, files in os.walk(path):
+        for filename in files:
+            file_list.append(os.path.join(dirpath, filename))
+    file_list = sorted(file_list)
+    md5hash = hashlib.md5()
+    for filename in file_list:
+        with open(filename, "rb") as f:
+            md5hash.update(f.read())
+    md5hash.hexdigest()
+    return md5hash.hexdigest()
+
+
+def generate_hash_from_file(path: str) -> str:
+    """Generates a hash from a file"""
+    with open(path, "rb") as f:
+        return hashlib.md5(f.read()).hexdigest()
+
+
 def generate_device_manifest(
         write_manifest_file: bool = False) -> Dict[str, Any]:
     """Produces dictionary containing md5 of device dir zap files.
+
+    Format of dictionary:
+    {
+        zap_commit: <zap_sha>,
+        devices: {
+            device_a: {
+                "zap_hash": <zap_hash>,
+                "zzz_gen_hash": <zzz_gen_hash>,
+            },
+        },
+    }
 
     Args:
         write_manifest_file: Serialize manifest in tree.
     Returns:
         Dict containing MD5 of device dir zap files.
     """
-    ci_manifest = {"devices": {}}
-    devices_manifest = ci_manifest["devices"]
-    zap_sha = check_zap()
-    ci_manifest["zap_commit"] = zap_sha
+    ci_manifest = {
+        "devices": {},
+        "zap_commit": check_zap()
+    }
+
     for device_name in _DEVICE_LIST:
         device_file_path = os.path.join(_DEVICE_FOLDER, device_name + ".zap")
-        with open(device_file_path, "rb") as device_file:
-            device_file_data = device_file.read()
-        device_file_md5 = hashlib.md5(device_file_data).hexdigest()
-        devices_manifest[device_name] = device_file_md5
-        flush_print(f"Current digest for {device_name} : {device_file_md5}")
-        if write_manifest_file:
-            device_zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device_name)
-            device_zzz_md5_file = os.path.join(device_zzz_dir, _CI_DEVICE_MANIFEST_NAME)
-            with open(device_zzz_md5_file, "w+") as md5_file:
-                md5_file.write(device_file_md5)
-            device_zzz_zap_sha_file = os.path.join(device_zzz_dir, _CI_ZAP_MANIFEST_NAME)
-            with open(device_zzz_zap_sha_file, "w+") as zap_sha_file:
-                zap_sha_file.write(zap_sha)
+        device_zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device_name)
+
+        device_file_md5 = generate_hash_from_file(device_file_path)
+        zzz_gen_dir_hash = generate_hash_from_dir(device_zzz_dir)
+
+        device_manifest_object = {
+            "zap_hash": device_file_md5,
+            "zzz_gen_hash": zzz_gen_dir_hash,
+        }
+        ci_manifest["devices"][device_name] = device_manifest_object
+
+        flush_print(f"Current digest for {device_name} : {device_manifest_object}")
+    if write_manifest_file:
+        with open(_CI_MANIFEST_FILE, "w") as f:
+            f.write(json.dumps(ci_manifest))
     return ci_manifest
 
 
@@ -270,42 +304,28 @@ def main(argv: Sequence[str]) -> None:
     if options.validate_zzz:
         flush_print(f"Validating\n{_CHEF_ZZZ_ROOT}\n",
                     with_border=True)
-        fix_instructions = textwrap.dedent("""\
-        Cached files out of date!
-        Please:
+        fix_instructions = textwrap.dedent(f"""\
+        To fix:
+          cd <REPO_BASE_PATH>
           ./scripts/bootstrap.sh
           source ./scripts/activate.sh
           cd ./third_party/zap/repo
           npm install
           cd ../../..
           ./examples/chef/chef.py --generate_zzz
-          git add examples/chef/zzz_generated
+          git add {_CHEF_ZZZ_ROOT}
+          git add {_CI_MANIFEST_FILE}
         Ensure you are running with the latest version of ZAP from master!""")
-        ci_manifest = generate_device_manifest()
-        current_zap = ci_manifest["zap_commit"]
-        for device, device_md5 in ci_manifest["devices"].items():
-            zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device)
-            device_zap_sha_file = os.path.join(zzz_dir, _CI_ZAP_MANIFEST_NAME)
-            device_md5_file = os.path.join(zzz_dir, _CI_DEVICE_MANIFEST_NAME)
-            help_msg = f"{device}: {fix_instructions}"
-            if not os.path.exists(device_zap_sha_file):
-                flush_print(f"ZAP VERSION MISSING {help_msg}")
-                exit(1)
-            else:
-                with open(device_zap_sha_file) as zap_file:
-                    output_cached_zap_sha = zap_file.read()
-                if output_cached_zap_sha != current_zap:
-                    flush_print(f"ZAP VERSION MISMATCH {help_msg}")
-                    exit(1)
-            if not os.path.exists(device_md5_file):
-                flush_print(f"INPUT MD5 MISSING {help_msg}")
-                exit(1)
-            else:
-                with open(device_md5_file) as md5_file:
-                    output_cached_md5 = md5_file.read()
-                if output_cached_md5 != device_md5:
-                    flush_print(f"INPUT MD5 MISMATCH {help_msg}")
-                    exit(1)
+        current_manifest = generate_device_manifest()
+        committed_manifest = json.load(open(_CI_MANIFEST_FILE))
+
+        # Compare and raise issues.
+        if current_manifest["zap_commit"] != committed_manifest["zap_commit"]:
+            flush_print(f"ZAP VERSION MISMATCH\n{fix_instructions}")
+            exit(1)
+        if current_manifest != committed_manifest:
+            flush_print(f"MISMATCH BETWEEN CURRENT AND COMMITTED MANIFEST\n{fix_instructions}")
+            exit(1)
         flush_print("Cached ZAP output is up to date!")
         exit(0)
 
