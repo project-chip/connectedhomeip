@@ -24,7 +24,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 typedef CHIP_ERROR (^MTRActionBlock)(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure);
-typedef void (*MTRDefaultFailureCallbackType)(void *, CHIP_ERROR);
+typedef void (*DefaultFailureCallbackType)(void *, CHIP_ERROR);
 
 template <class T> class MTRCallbackBridge {
 public:
