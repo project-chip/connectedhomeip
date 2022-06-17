@@ -1143,7 +1143,7 @@ typedef void (*WindowCoveringAcceptedCommandListListAttributeCallback)(
 typedef void (*WindowCoveringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 
-class MTRDefaultSuccessCallbackBridge : public MTRCallbackBridge<DefaultSuccessCallback>
+class MTRDefaultSuccessCallbackBridge : public MTRCallbackBridge<MTR DefaultSuccessCallback>
 {
 public:
     MTRDefaultSuccessCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1153,17 +1153,17 @@ public:
     static void OnSuccessFn(void * context);
 };
 
-class MTRCommandSuccessCallbackBridge : public MTRCallbackBridge<MTRCommandSuccessCallback>
+class MTRCommandSuccessCallbackBridge : public MTRCallbackBridge<MTR CommandSuccessCallback>
 {
 public:
     MTRCommandSuccessCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                     bool keepAlive = false) :
-        MTRCallbackBridge<MTRCommandSuccessCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<CommandSuccessCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::NullObjectType &);
 };
 
-class MTROctetStringAttributeCallbackBridge : public MTRCallbackBridge<OctetStringAttributeCallback>
+class MTROctetStringAttributeCallbackBridge : public MTRCallbackBridge<MTR OctetStringAttributeCallback>
 {
 public:
     MTROctetStringAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1188,7 +1188,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableOctetStringAttributeCallbackBridge : public MTRCallbackBridge<NullableOctetStringAttributeCallback>
+class MTRNullableOctetStringAttributeCallbackBridge : public MTRCallbackBridge<MTR NullableOctetStringAttributeCallback>
 {
 public:
     MTRNullableOctetStringAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1214,7 +1214,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRCharStringAttributeCallbackBridge : public MTRCallbackBridge<CharStringAttributeCallback>
+class MTRCharStringAttributeCallbackBridge : public MTRCallbackBridge<MTR CharStringAttributeCallback>
 {
 public:
     MTRCharStringAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1239,7 +1239,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableCharStringAttributeCallbackBridge : public MTRCallbackBridge<NullableCharStringAttributeCallback>
+class MTRNullableCharStringAttributeCallbackBridge : public MTRCallbackBridge<MTR NullableCharStringAttributeCallback>
 {
 public:
     MTRNullableCharStringAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1264,7 +1264,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBooleanAttributeCallbackBridge : public MTRCallbackBridge<BooleanAttributeCallback>
+class MTRBooleanAttributeCallbackBridge : public MTRCallbackBridge<MTR BooleanAttributeCallback>
 {
 public:
     MTRBooleanAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1289,7 +1289,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableBooleanAttributeCallbackBridge : public MTRCallbackBridge<NullableBooleanAttributeCallback>
+class MTRNullableBooleanAttributeCallbackBridge : public MTRCallbackBridge<MTR NullableBooleanAttributeCallback>
 {
 public:
     MTRNullableBooleanAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1314,7 +1314,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRInt8uAttributeCallbackBridge : public MTRCallbackBridge<Int8uAttributeCallback>
+class MTRInt8uAttributeCallbackBridge : public MTRCallbackBridge<MTR Int8uAttributeCallback>
 {
 public:
     MTRInt8uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1339,7 +1339,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableInt8uAttributeCallbackBridge : public MTRCallbackBridge<NullableInt8uAttributeCallback>
+class MTRNullableInt8uAttributeCallbackBridge : public MTRCallbackBridge<MTR NullableInt8uAttributeCallback>
 {
 public:
     MTRNullableInt8uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1364,7 +1364,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRInt8sAttributeCallbackBridge : public MTRCallbackBridge<Int8sAttributeCallback>
+class MTRInt8sAttributeCallbackBridge : public MTRCallbackBridge<MTR Int8sAttributeCallback>
 {
 public:
     MTRInt8sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1389,7 +1389,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableInt8sAttributeCallbackBridge : public MTRCallbackBridge<NullableInt8sAttributeCallback>
+class MTRNullableInt8sAttributeCallbackBridge : public MTRCallbackBridge<MTR NullableInt8sAttributeCallback>
 {
 public:
     MTRNullableInt8sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1414,7 +1414,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRInt16uAttributeCallbackBridge : public MTRCallbackBridge<Int16uAttributeCallback>
+class MTRInt16uAttributeCallbackBridge : public MTRCallbackBridge<MTR Int16uAttributeCallback>
 {
 public:
     MTRInt16uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1439,7 +1439,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableInt16uAttributeCallbackBridge : public MTRCallbackBridge<NullableInt16uAttributeCallback>
+class MTRNullableInt16uAttributeCallbackBridge : public MTRCallbackBridge<MTR NullableInt16uAttributeCallback>
 {
 public:
     MTRNullableInt16uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1464,7 +1464,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRInt16sAttributeCallbackBridge : public MTRCallbackBridge<Int16sAttributeCallback>
+class MTRInt16sAttributeCallbackBridge : public MTRCallbackBridge<MTR Int16sAttributeCallback>
 {
 public:
     MTRInt16sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1489,7 +1489,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableInt16sAttributeCallbackBridge : public MTRCallbackBridge<NullableInt16sAttributeCallback>
+class MTRNullableInt16sAttributeCallbackBridge : public MTRCallbackBridge<MTR NullableInt16sAttributeCallback>
 {
 public:
     MTRNullableInt16sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1514,7 +1514,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRInt32uAttributeCallbackBridge : public MTRCallbackBridge<Int32uAttributeCallback>
+class MTRInt32uAttributeCallbackBridge : public MTRCallbackBridge<MTR Int32uAttributeCallback>
 {
 public:
     MTRInt32uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1539,7 +1539,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableInt32uAttributeCallbackBridge : public MTRCallbackBridge<NullableInt32uAttributeCallback>
+class MTRNullableInt32uAttributeCallbackBridge : public MTRCallbackBridge<MTR NullableInt32uAttributeCallback>
 {
 public:
     MTRNullableInt32uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1564,7 +1564,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRInt32sAttributeCallbackBridge : public MTRCallbackBridge<Int32sAttributeCallback>
+class MTRInt32sAttributeCallbackBridge : public MTRCallbackBridge<MTR Int32sAttributeCallback>
 {
 public:
     MTRInt32sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1589,7 +1589,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableInt32sAttributeCallbackBridge : public MTRCallbackBridge<NullableInt32sAttributeCallback>
+class MTRNullableInt32sAttributeCallbackBridge : public MTRCallbackBridge<MTR NullableInt32sAttributeCallback>
 {
 public:
     MTRNullableInt32sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1614,7 +1614,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRInt64uAttributeCallbackBridge : public MTRCallbackBridge<Int64uAttributeCallback>
+class MTRInt64uAttributeCallbackBridge : public MTRCallbackBridge<MTR Int64uAttributeCallback>
 {
 public:
     MTRInt64uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1639,7 +1639,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableInt64uAttributeCallbackBridge : public MTRCallbackBridge<NullableInt64uAttributeCallback>
+class MTRNullableInt64uAttributeCallbackBridge : public MTRCallbackBridge<MTR NullableInt64uAttributeCallback>
 {
 public:
     MTRNullableInt64uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1664,7 +1664,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRInt64sAttributeCallbackBridge : public MTRCallbackBridge<Int64sAttributeCallback>
+class MTRInt64sAttributeCallbackBridge : public MTRCallbackBridge<MTR Int64sAttributeCallback>
 {
 public:
     MTRInt64sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1689,7 +1689,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableInt64sAttributeCallbackBridge : public MTRCallbackBridge<NullableInt64sAttributeCallback>
+class MTRNullableInt64sAttributeCallbackBridge : public MTRCallbackBridge<MTR NullableInt64sAttributeCallback>
 {
 public:
     MTRNullableInt64sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1714,7 +1714,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRFloatAttributeCallbackBridge : public MTRCallbackBridge<FloatAttributeCallback>
+class MTRFloatAttributeCallbackBridge : public MTRCallbackBridge<MTR FloatAttributeCallback>
 {
 public:
     MTRFloatAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1739,7 +1739,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableFloatAttributeCallbackBridge : public MTRCallbackBridge<NullableFloatAttributeCallback>
+class MTRNullableFloatAttributeCallbackBridge : public MTRCallbackBridge<MTR NullableFloatAttributeCallback>
 {
 public:
     MTRNullableFloatAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1764,7 +1764,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoubleAttributeCallbackBridge : public MTRCallbackBridge<DoubleAttributeCallback>
+class MTRDoubleAttributeCallbackBridge : public MTRCallbackBridge<MTR DoubleAttributeCallback>
 {
 public:
     MTRDoubleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1789,7 +1789,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableDoubleAttributeCallbackBridge : public MTRCallbackBridge<NullableDoubleAttributeCallback>
+class MTRNullableDoubleAttributeCallbackBridge : public MTRCallbackBridge<MTR NullableDoubleAttributeCallback>
 {
 public:
     MTRNullableDoubleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1814,12 +1814,12 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRVendorIdAttributeCallbackBridge : public MTRCallbackBridge<MTRVendorIdAttributeCallback>
+class MTRVendorIdAttributeCallbackBridge : public MTRCallbackBridge<MTR VendorIdAttributeCallback>
 {
 public:
     MTRVendorIdAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                        bool keepAlive = false) :
-        MTRCallbackBridge<MTRVendorIdAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<VendorIdAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, chip::VendorId value);
 };
@@ -1839,7 +1839,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableVendorIdAttributeCallbackBridge : public MTRCallbackBridge<NullableVendorIdAttributeCallback>
+class MTRNullableVendorIdAttributeCallbackBridge : public MTRCallbackBridge<MTR NullableVendorIdAttributeCallback>
 {
 public:
     MTRNullableVendorIdAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1864,7 +1864,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRAccessControlAclListAttributeCallbackBridge : public MTRCallbackBridge<AccessControlAclListAttributeCallback>
+class MTRAccessControlAclListAttributeCallbackBridge : public MTRCallbackBridge<MTR AccessControlAclListAttributeCallback>
 {
 public:
     MTRAccessControlAclListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1893,7 +1893,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRAccessControlExtensionListAttributeCallbackBridge : public MTRCallbackBridge<AccessControlExtensionListAttributeCallback>
+class MTRAccessControlExtensionListAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR AccessControlExtensionListAttributeCallback>
 {
 public:
     MTRAccessControlExtensionListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -1923,7 +1924,7 @@ private:
 };
 
 class MTRAccessControlGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<AccessControlGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR AccessControlGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRAccessControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -1951,7 +1952,7 @@ private:
 };
 
 class MTRAccessControlAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<AccessControlAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR AccessControlAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRAccessControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -1979,7 +1980,7 @@ private:
 };
 
 class MTRAccessControlAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<AccessControlAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR AccessControlAttributeListListAttributeCallback>
 {
 public:
     MTRAccessControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -2007,7 +2008,7 @@ private:
 };
 
 class MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<AccountLoginGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR AccountLoginGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2035,7 +2036,7 @@ private:
 };
 
 class MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<AccountLoginAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR AccountLoginAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2063,7 +2064,7 @@ private:
 };
 
 class MTRAccountLoginAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<AccountLoginAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR AccountLoginAttributeListListAttributeCallback>
 {
 public:
     MTRAccountLoginAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -2091,7 +2092,7 @@ private:
 };
 
 class MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<AdministratorCommissioningGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR AdministratorCommissioningGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2119,7 +2120,7 @@ private:
 };
 
 class MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<AdministratorCommissioningAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR AdministratorCommissioningAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2147,7 +2148,7 @@ private:
 };
 
 class MTRAdministratorCommissioningAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<AdministratorCommissioningAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR AdministratorCommissioningAttributeListListAttributeCallback>
 {
 public:
     MTRAdministratorCommissioningAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2175,7 +2176,7 @@ private:
 };
 
 class MTRApplicationBasicApplicationStructAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplicationBasicApplicationStructAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplicationBasicApplicationStructAttributeCallback>
 {
 public:
     MTRApplicationBasicApplicationStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2205,7 +2206,7 @@ private:
 };
 
 class MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplicationBasicAllowedVendorListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplicationBasicAllowedVendorListListAttributeCallback>
 {
 public:
     MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2233,7 +2234,7 @@ private:
 };
 
 class MTRApplicationBasicGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplicationBasicGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplicationBasicGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRApplicationBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2261,7 +2262,7 @@ private:
 };
 
 class MTRApplicationBasicAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplicationBasicAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplicationBasicAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRApplicationBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2289,7 +2290,7 @@ private:
 };
 
 class MTRApplicationBasicAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplicationBasicAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplicationBasicAttributeListListAttributeCallback>
 {
 public:
     MTRApplicationBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2317,7 +2318,7 @@ private:
 };
 
 class MTRApplicationLauncherCatalogListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplicationLauncherCatalogListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplicationLauncherCatalogListListAttributeCallback>
 {
 public:
     MTRApplicationLauncherCatalogListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2345,7 +2346,7 @@ private:
 };
 
 class MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplicationLauncherCurrentAppStructAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplicationLauncherCurrentAppStructAttributeCallback>
 {
 public:
     MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2376,7 +2377,7 @@ private:
 };
 
 class MTRApplicationLauncherGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplicationLauncherGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplicationLauncherGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRApplicationLauncherGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2404,7 +2405,7 @@ private:
 };
 
 class MTRApplicationLauncherAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplicationLauncherAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplicationLauncherAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRApplicationLauncherAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2432,7 +2433,7 @@ private:
 };
 
 class MTRApplicationLauncherAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplicationLauncherAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplicationLauncherAttributeListListAttributeCallback>
 {
 public:
     MTRApplicationLauncherAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2459,7 +2460,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRAudioOutputOutputListListAttributeCallbackBridge : public MTRCallbackBridge<AudioOutputOutputListListAttributeCallback>
+class MTRAudioOutputOutputListListAttributeCallbackBridge : public MTRCallbackBridge<MTR AudioOutputOutputListListAttributeCallback>
 {
 public:
     MTRAudioOutputOutputListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -2488,7 +2489,7 @@ private:
 };
 
 class MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<AudioOutputGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR AudioOutputGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2516,7 +2517,7 @@ private:
 };
 
 class MTRAudioOutputAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<AudioOutputAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR AudioOutputAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRAudioOutputAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2544,7 +2545,7 @@ private:
 };
 
 class MTRAudioOutputAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<AudioOutputAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR AudioOutputAttributeListListAttributeCallback>
 {
 public:
     MTRAudioOutputAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -2572,7 +2573,7 @@ private:
 };
 
 class MTRBarrierControlGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BarrierControlGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BarrierControlGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRBarrierControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2600,7 +2601,7 @@ private:
 };
 
 class MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BarrierControlAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BarrierControlAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2628,7 +2629,7 @@ private:
 };
 
 class MTRBarrierControlAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BarrierControlAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BarrierControlAttributeListListAttributeCallback>
 {
 public:
     MTRBarrierControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2655,7 +2656,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBasicCapabilityMinimaStructAttributeCallbackBridge : public MTRCallbackBridge<BasicCapabilityMinimaStructAttributeCallback>
+class MTRBasicCapabilityMinimaStructAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR BasicCapabilityMinimaStructAttributeCallback>
 {
 public:
     MTRBasicCapabilityMinimaStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -2684,7 +2686,7 @@ private:
 };
 
 class MTRBasicGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BasicGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BasicGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -2712,7 +2714,7 @@ private:
 };
 
 class MTRBasicAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BasicAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BasicAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -2739,7 +2741,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBasicAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<BasicAttributeListListAttributeCallback>
+class MTRBasicAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<MTR BasicAttributeListListAttributeCallback>
 {
 public:
     MTRBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -2766,7 +2768,7 @@ private:
 };
 
 class MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BinaryInputBasicGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BinaryInputBasicGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2794,7 +2796,7 @@ private:
 };
 
 class MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BinaryInputBasicAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BinaryInputBasicAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2822,7 +2824,7 @@ private:
 };
 
 class MTRBinaryInputBasicAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BinaryInputBasicAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BinaryInputBasicAttributeListListAttributeCallback>
 {
 public:
     MTRBinaryInputBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2849,7 +2851,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBindingBindingListAttributeCallbackBridge : public MTRCallbackBridge<BindingBindingListAttributeCallback>
+class MTRBindingBindingListAttributeCallbackBridge : public MTRCallbackBridge<MTR BindingBindingListAttributeCallback>
 {
 public:
     MTRBindingBindingListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -2877,7 +2879,7 @@ private:
 };
 
 class MTRBindingGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BindingGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BindingGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRBindingGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2905,7 +2907,7 @@ private:
 };
 
 class MTRBindingAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BindingAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BindingAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRBindingAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -2932,7 +2934,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBindingAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<BindingAttributeListListAttributeCallback>
+class MTRBindingAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<MTR BindingAttributeListListAttributeCallback>
 {
 public:
     MTRBindingAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -2959,7 +2961,7 @@ private:
 };
 
 class MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BooleanStateGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BooleanStateGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -2987,7 +2989,7 @@ private:
 };
 
 class MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BooleanStateAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BooleanStateAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3015,7 +3017,7 @@ private:
 };
 
 class MTRBooleanStateAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BooleanStateAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BooleanStateAttributeListListAttributeCallback>
 {
 public:
     MTRBooleanStateAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3043,7 +3045,7 @@ private:
 };
 
 class MTRBridgedActionsActionListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsActionListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BridgedActionsActionListListAttributeCallback>
 {
 public:
     MTRBridgedActionsActionListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3074,7 +3076,7 @@ private:
 };
 
 class MTRBridgedActionsEndpointListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsEndpointListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BridgedActionsEndpointListListAttributeCallback>
 {
 public:
     MTRBridgedActionsEndpointListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3105,7 +3107,7 @@ private:
 };
 
 class MTRBridgedActionsGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BridgedActionsGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRBridgedActionsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3133,7 +3135,7 @@ private:
 };
 
 class MTRBridgedActionsAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BridgedActionsAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRBridgedActionsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3161,7 +3163,7 @@ private:
 };
 
 class MTRBridgedActionsAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BridgedActionsAttributeListListAttributeCallback>
 {
 public:
     MTRBridgedActionsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3189,7 +3191,7 @@ private:
 };
 
 class MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BridgedDeviceBasicGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3217,7 +3219,7 @@ private:
 };
 
 class MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedDeviceBasicAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BridgedDeviceBasicAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3245,7 +3247,7 @@ private:
 };
 
 class MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedDeviceBasicAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR BridgedDeviceBasicAttributeListListAttributeCallback>
 {
 public:
     MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3272,7 +3274,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRChannelChannelListListAttributeCallbackBridge : public MTRCallbackBridge<ChannelChannelListListAttributeCallback>
+class MTRChannelChannelListListAttributeCallbackBridge : public MTRCallbackBridge<MTR ChannelChannelListListAttributeCallback>
 {
 public:
     MTRChannelChannelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3300,7 +3302,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRChannelLineupStructAttributeCallbackBridge : public MTRCallbackBridge<ChannelLineupStructAttributeCallback>
+class MTRChannelLineupStructAttributeCallbackBridge : public MTRCallbackBridge<MTR ChannelLineupStructAttributeCallback>
 {
 public:
     MTRChannelLineupStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3328,7 +3330,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRChannelCurrentChannelStructAttributeCallbackBridge : public MTRCallbackBridge<ChannelCurrentChannelStructAttributeCallback>
+class MTRChannelCurrentChannelStructAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR ChannelCurrentChannelStructAttributeCallback>
 {
 public:
     MTRChannelCurrentChannelStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3358,7 +3361,7 @@ private:
 };
 
 class MTRChannelGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ChannelGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ChannelGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRChannelGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3386,7 +3389,7 @@ private:
 };
 
 class MTRChannelAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ChannelAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ChannelAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRChannelAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3413,7 +3416,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRChannelAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<ChannelAttributeListListAttributeCallback>
+class MTRChannelAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<MTR ChannelAttributeListListAttributeCallback>
 {
 public:
     MTRChannelAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3440,7 +3443,7 @@ private:
 };
 
 class MTRColorControlGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ColorControlGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ColorControlGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRColorControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3468,7 +3471,7 @@ private:
 };
 
 class MTRColorControlAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ColorControlAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ColorControlAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRColorControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3496,7 +3499,7 @@ private:
 };
 
 class MTRColorControlAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ColorControlAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ColorControlAttributeListListAttributeCallback>
 {
 public:
     MTRColorControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3524,7 +3527,7 @@ private:
 };
 
 class MTRContentLauncherAcceptHeaderListAttributeCallbackBridge
-    : public MTRCallbackBridge<ContentLauncherAcceptHeaderListAttributeCallback>
+    : public MTRCallbackBridge<MTR ContentLauncherAcceptHeaderListAttributeCallback>
 {
 public:
     MTRContentLauncherAcceptHeaderListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3552,7 +3555,7 @@ private:
 };
 
 class MTRContentLauncherGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ContentLauncherGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ContentLauncherGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRContentLauncherGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3580,7 +3583,7 @@ private:
 };
 
 class MTRContentLauncherAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ContentLauncherAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ContentLauncherAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRContentLauncherAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3608,7 +3611,7 @@ private:
 };
 
 class MTRContentLauncherAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ContentLauncherAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ContentLauncherAttributeListListAttributeCallback>
 {
 public:
     MTRContentLauncherAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3635,7 +3638,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDescriptorDeviceListListAttributeCallbackBridge : public MTRCallbackBridge<DescriptorDeviceListListAttributeCallback>
+class MTRDescriptorDeviceListListAttributeCallbackBridge : public MTRCallbackBridge<MTR DescriptorDeviceListListAttributeCallback>
 {
 public:
     MTRDescriptorDeviceListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3663,7 +3666,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDescriptorServerListListAttributeCallbackBridge : public MTRCallbackBridge<DescriptorServerListListAttributeCallback>
+class MTRDescriptorServerListListAttributeCallbackBridge : public MTRCallbackBridge<MTR DescriptorServerListListAttributeCallback>
 {
 public:
     MTRDescriptorServerListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3689,7 +3692,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDescriptorClientListListAttributeCallbackBridge : public MTRCallbackBridge<DescriptorClientListListAttributeCallback>
+class MTRDescriptorClientListListAttributeCallbackBridge : public MTRCallbackBridge<MTR DescriptorClientListListAttributeCallback>
 {
 public:
     MTRDescriptorClientListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3715,7 +3718,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDescriptorPartsListListAttributeCallbackBridge : public MTRCallbackBridge<DescriptorPartsListListAttributeCallback>
+class MTRDescriptorPartsListListAttributeCallbackBridge : public MTRCallbackBridge<MTR DescriptorPartsListListAttributeCallback>
 {
 public:
     MTRDescriptorPartsListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3742,7 +3745,7 @@ private:
 };
 
 class MTRDescriptorGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<DescriptorGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR DescriptorGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRDescriptorGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3770,7 +3773,7 @@ private:
 };
 
 class MTRDescriptorAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<DescriptorAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR DescriptorAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRDescriptorAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3797,7 +3800,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDescriptorAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<DescriptorAttributeListListAttributeCallback>
+class MTRDescriptorAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR DescriptorAttributeListListAttributeCallback>
 {
 public:
     MTRDescriptorAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3825,7 +3829,7 @@ private:
 };
 
 class MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<DiagnosticLogsGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR DiagnosticLogsGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3853,7 +3857,7 @@ private:
 };
 
 class MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<DiagnosticLogsAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR DiagnosticLogsAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3881,7 +3885,7 @@ private:
 };
 
 class MTRDiagnosticLogsAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<DiagnosticLogsAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR DiagnosticLogsAttributeListListAttributeCallback>
 {
 public:
     MTRDiagnosticLogsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3909,7 +3913,7 @@ private:
 };
 
 class MTRDoorLockCredentialRulesSupportAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockCredentialRulesSupportAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockCredentialRulesSupportAttributeCallback>
 {
 public:
     MTRDoorLockCredentialRulesSupportAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -3937,7 +3941,7 @@ private:
 };
 
 class MTRDoorLockSupportedOperatingModesAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockSupportedOperatingModesAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockSupportedOperatingModesAttributeCallback>
 {
 public:
     MTRDoorLockSupportedOperatingModesAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3965,7 +3969,7 @@ private:
 };
 
 class MTRDoorLockDefaultConfigurationRegisterAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockDefaultConfigurationRegisterAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockDefaultConfigurationRegisterAttributeCallback>
 {
 public:
     MTRDoorLockDefaultConfigurationRegisterAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -3993,7 +3997,7 @@ private:
 };
 
 class MTRDoorLockLocalProgrammingFeaturesAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockLocalProgrammingFeaturesAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockLocalProgrammingFeaturesAttributeCallback>
 {
 public:
     MTRDoorLockLocalProgrammingFeaturesAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4021,7 +4025,7 @@ private:
 };
 
 class MTRDoorLockGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRDoorLockGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4049,7 +4053,7 @@ private:
 };
 
 class MTRDoorLockAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRDoorLockAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4076,7 +4080,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<DoorLockAttributeListListAttributeCallback>
+class MTRDoorLockAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<MTR DoorLockAttributeListListAttributeCallback>
 {
 public:
     MTRDoorLockAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -4103,7 +4107,7 @@ private:
 };
 
 class MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ElectricalMeasurementGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ElectricalMeasurementGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4131,7 +4135,7 @@ private:
 };
 
 class MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ElectricalMeasurementAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ElectricalMeasurementAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4159,7 +4163,7 @@ private:
 };
 
 class MTRElectricalMeasurementAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ElectricalMeasurementAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ElectricalMeasurementAttributeListListAttributeCallback>
 {
 public:
     MTRElectricalMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4187,7 +4191,7 @@ private:
 };
 
 class MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback>
 {
 public:
     MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4215,7 +4219,7 @@ private:
 };
 
 class MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback>
 {
 public:
     MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4243,7 +4247,7 @@ private:
 };
 
 class MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<EthernetNetworkDiagnosticsAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR EthernetNetworkDiagnosticsAttributeListListAttributeCallback>
 {
 public:
     MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4271,7 +4275,7 @@ private:
 };
 
 class MTRFanControlGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<FanControlGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR FanControlGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRFanControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4299,7 +4303,7 @@ private:
 };
 
 class MTRFanControlAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<FanControlAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR FanControlAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRFanControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4326,7 +4330,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRFanControlAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<FanControlAttributeListListAttributeCallback>
+class MTRFanControlAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR FanControlAttributeListListAttributeCallback>
 {
 public:
     MTRFanControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -4353,7 +4358,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRFixedLabelLabelListListAttributeCallbackBridge : public MTRCallbackBridge<FixedLabelLabelListListAttributeCallback>
+class MTRFixedLabelLabelListListAttributeCallbackBridge : public MTRCallbackBridge<MTR FixedLabelLabelListListAttributeCallback>
 {
 public:
     MTRFixedLabelLabelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -4382,7 +4387,7 @@ private:
 };
 
 class MTRFixedLabelGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<FixedLabelGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR FixedLabelGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRFixedLabelGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4410,7 +4415,7 @@ private:
 };
 
 class MTRFixedLabelAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<FixedLabelAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR FixedLabelAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRFixedLabelAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4437,7 +4442,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRFixedLabelAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<FixedLabelAttributeListListAttributeCallback>
+class MTRFixedLabelAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR FixedLabelAttributeListListAttributeCallback>
 {
 public:
     MTRFixedLabelAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -4465,7 +4471,7 @@ private:
 };
 
 class MTRFlowMeasurementGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<FlowMeasurementGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR FlowMeasurementGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRFlowMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4493,7 +4499,7 @@ private:
 };
 
 class MTRFlowMeasurementAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<FlowMeasurementAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR FlowMeasurementAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRFlowMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4521,7 +4527,7 @@ private:
 };
 
 class MTRFlowMeasurementAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<FlowMeasurementAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR FlowMeasurementAttributeListListAttributeCallback>
 {
 public:
     MTRFlowMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4549,7 +4555,7 @@ private:
 };
 
 class MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralCommissioningBasicCommissioningInfoStructAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralCommissioningBasicCommissioningInfoStructAttributeCallback>
 {
 public:
     MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4579,7 +4585,7 @@ private:
 };
 
 class MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralCommissioningGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralCommissioningGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4607,7 +4613,7 @@ private:
 };
 
 class MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralCommissioningAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralCommissioningAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4635,7 +4641,7 @@ private:
 };
 
 class MTRGeneralCommissioningAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralCommissioningAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralCommissioningAttributeListListAttributeCallback>
 {
 public:
     MTRGeneralCommissioningAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4663,7 +4669,7 @@ private:
 };
 
 class MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralDiagnosticsNetworkInterfacesListAttributeCallback>
 {
 public:
     MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4693,7 +4699,7 @@ private:
 };
 
 class MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>
 {
 public:
     MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4721,7 +4727,7 @@ private:
 };
 
 class MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>
 {
 public:
     MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4749,7 +4755,7 @@ private:
 };
 
 class MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>
 {
 public:
     MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4777,7 +4783,7 @@ private:
 };
 
 class MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralDiagnosticsGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4805,7 +4811,7 @@ private:
 };
 
 class MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralDiagnosticsAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4833,7 +4839,7 @@ private:
 };
 
 class MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralDiagnosticsAttributeListListAttributeCallback>
 {
 public:
     MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4861,7 +4867,7 @@ private:
 };
 
 class MTRGroupKeyManagementGroupKeyMapListAttributeCallbackBridge
-    : public MTRCallbackBridge<GroupKeyManagementGroupKeyMapListAttributeCallback>
+    : public MTRCallbackBridge<MTR GroupKeyManagementGroupKeyMapListAttributeCallback>
 {
 public:
     MTRGroupKeyManagementGroupKeyMapListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4891,7 +4897,7 @@ private:
 };
 
 class MTRGroupKeyManagementGroupTableListAttributeCallbackBridge
-    : public MTRCallbackBridge<GroupKeyManagementGroupTableListAttributeCallback>
+    : public MTRCallbackBridge<MTR GroupKeyManagementGroupTableListAttributeCallback>
 {
 public:
     MTRGroupKeyManagementGroupTableListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4921,7 +4927,7 @@ private:
 };
 
 class MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<GroupKeyManagementGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR GroupKeyManagementGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4949,7 +4955,7 @@ private:
 };
 
 class MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<GroupKeyManagementAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR GroupKeyManagementAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -4977,7 +4983,7 @@ private:
 };
 
 class MTRGroupKeyManagementAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<GroupKeyManagementAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR GroupKeyManagementAttributeListListAttributeCallback>
 {
 public:
     MTRGroupKeyManagementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5005,7 +5011,7 @@ private:
 };
 
 class MTRGroupsGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<GroupsGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR GroupsGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRGroupsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -5033,7 +5039,7 @@ private:
 };
 
 class MTRGroupsAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<GroupsAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR GroupsAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRGroupsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -5060,7 +5066,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRGroupsAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<GroupsAttributeListListAttributeCallback>
+class MTRGroupsAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<MTR GroupsAttributeListListAttributeCallback>
 {
 public:
     MTRGroupsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -5087,7 +5093,7 @@ private:
 };
 
 class MTRIdentifyGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<IdentifyGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR IdentifyGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRIdentifyGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5115,7 +5121,7 @@ private:
 };
 
 class MTRIdentifyAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<IdentifyAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR IdentifyAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRIdentifyAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5142,7 +5148,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRIdentifyAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<IdentifyAttributeListListAttributeCallback>
+class MTRIdentifyAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<MTR IdentifyAttributeListListAttributeCallback>
 {
 public:
     MTRIdentifyAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -5169,7 +5175,7 @@ private:
 };
 
 class MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<IlluminanceMeasurementGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR IlluminanceMeasurementGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5197,7 +5203,7 @@ private:
 };
 
 class MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<IlluminanceMeasurementAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR IlluminanceMeasurementAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5225,7 +5231,7 @@ private:
 };
 
 class MTRIlluminanceMeasurementAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<IlluminanceMeasurementAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR IlluminanceMeasurementAttributeListListAttributeCallback>
 {
 public:
     MTRIlluminanceMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5253,7 +5259,7 @@ private:
 };
 
 class MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<KeypadInputGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR KeypadInputGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5281,7 +5287,7 @@ private:
 };
 
 class MTRKeypadInputAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<KeypadInputAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR KeypadInputAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRKeypadInputAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5309,7 +5315,7 @@ private:
 };
 
 class MTRKeypadInputAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<KeypadInputAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR KeypadInputAttributeListListAttributeCallback>
 {
 public:
     MTRKeypadInputAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -5337,7 +5343,7 @@ private:
 };
 
 class MTRLevelControlGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LevelControlGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR LevelControlGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRLevelControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5365,7 +5371,7 @@ private:
 };
 
 class MTRLevelControlAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LevelControlAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR LevelControlAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRLevelControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5393,7 +5399,7 @@ private:
 };
 
 class MTRLevelControlAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LevelControlAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR LevelControlAttributeListListAttributeCallback>
 {
 public:
     MTRLevelControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -5421,7 +5427,7 @@ private:
 };
 
 class MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge
-    : public MTRCallbackBridge<LocalizationConfigurationSupportedLocalesListAttributeCallback>
+    : public MTRCallbackBridge<MTR LocalizationConfigurationSupportedLocalesListAttributeCallback>
 {
 public:
     MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5449,7 +5455,7 @@ private:
 };
 
 class MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LocalizationConfigurationGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR LocalizationConfigurationGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5477,7 +5483,7 @@ private:
 };
 
 class MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LocalizationConfigurationAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR LocalizationConfigurationAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5505,7 +5511,7 @@ private:
 };
 
 class MTRLocalizationConfigurationAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LocalizationConfigurationAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR LocalizationConfigurationAttributeListListAttributeCallback>
 {
 public:
     MTRLocalizationConfigurationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5533,7 +5539,7 @@ private:
 };
 
 class MTRLowPowerGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LowPowerGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR LowPowerGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRLowPowerGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5561,7 +5567,7 @@ private:
 };
 
 class MTRLowPowerAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LowPowerAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR LowPowerAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRLowPowerAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5588,7 +5594,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRLowPowerAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<LowPowerAttributeListListAttributeCallback>
+class MTRLowPowerAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<MTR LowPowerAttributeListListAttributeCallback>
 {
 public:
     MTRLowPowerAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -5614,7 +5620,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRMediaInputInputListListAttributeCallbackBridge : public MTRCallbackBridge<MediaInputInputListListAttributeCallback>
+class MTRMediaInputInputListListAttributeCallbackBridge : public MTRCallbackBridge<MTR MediaInputInputListListAttributeCallback>
 {
 public:
     MTRMediaInputInputListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -5643,7 +5649,7 @@ private:
 };
 
 class MTRMediaInputGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<MediaInputGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR MediaInputGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRMediaInputGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5671,7 +5677,7 @@ private:
 };
 
 class MTRMediaInputAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<MediaInputAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR MediaInputAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRMediaInputAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5698,7 +5704,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRMediaInputAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<MediaInputAttributeListListAttributeCallback>
+class MTRMediaInputAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR MediaInputAttributeListListAttributeCallback>
 {
 public:
     MTRMediaInputAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -5726,7 +5733,7 @@ private:
 };
 
 class MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge
-    : public MTRCallbackBridge<MediaPlaybackSampledPositionStructAttributeCallback>
+    : public MTRCallbackBridge<MTR MediaPlaybackSampledPositionStructAttributeCallback>
 {
 public:
     MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5756,7 +5763,7 @@ private:
 };
 
 class MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<MediaPlaybackGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR MediaPlaybackGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5784,7 +5791,7 @@ private:
 };
 
 class MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<MediaPlaybackAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR MediaPlaybackAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5812,7 +5819,7 @@ private:
 };
 
 class MTRMediaPlaybackAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<MediaPlaybackAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR MediaPlaybackAttributeListListAttributeCallback>
 {
 public:
     MTRMediaPlaybackAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -5840,7 +5847,7 @@ private:
 };
 
 class MTRModeSelectSupportedModesListAttributeCallbackBridge
-    : public MTRCallbackBridge<ModeSelectSupportedModesListAttributeCallback>
+    : public MTRCallbackBridge<MTR ModeSelectSupportedModesListAttributeCallback>
 {
 public:
     MTRModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -5871,7 +5878,7 @@ private:
 };
 
 class MTRModeSelectGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ModeSelectGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ModeSelectGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5899,7 +5906,7 @@ private:
 };
 
 class MTRModeSelectAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ModeSelectAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ModeSelectAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5926,7 +5933,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRModeSelectAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<ModeSelectAttributeListListAttributeCallback>
+class MTRModeSelectAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR ModeSelectAttributeListListAttributeCallback>
 {
 public:
     MTRModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -5954,7 +5962,7 @@ private:
 };
 
 class MTRNetworkCommissioningNetworksListAttributeCallbackBridge
-    : public MTRCallbackBridge<NetworkCommissioningNetworksListAttributeCallback>
+    : public MTRCallbackBridge<MTR NetworkCommissioningNetworksListAttributeCallback>
 {
 public:
     MTRNetworkCommissioningNetworksListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -5985,7 +5993,7 @@ private:
 };
 
 class MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<NetworkCommissioningGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR NetworkCommissioningGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6013,7 +6021,7 @@ private:
 };
 
 class MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<NetworkCommissioningAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR NetworkCommissioningAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6041,7 +6049,7 @@ private:
 };
 
 class MTRNetworkCommissioningAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<NetworkCommissioningAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR NetworkCommissioningAttributeListListAttributeCallback>
 {
 public:
     MTRNetworkCommissioningAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6069,7 +6077,7 @@ private:
 };
 
 class MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallback>
 {
 public:
     MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6097,7 +6105,7 @@ private:
 };
 
 class MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallback>
 {
 public:
     MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6125,7 +6133,7 @@ private:
 };
 
 class MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OtaSoftwareUpdateProviderAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateProviderAttributeListListAttributeCallback>
 {
 public:
     MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6153,7 +6161,7 @@ private:
 };
 
 class MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge
-    : public MTRCallbackBridge<OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback>
 {
 public:
     MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6183,7 +6191,7 @@ private:
 };
 
 class MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallback>
 {
 public:
     MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6211,7 +6219,7 @@ private:
 };
 
 class MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallback>
 {
 public:
     MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6239,7 +6247,7 @@ private:
 };
 
 class MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OtaSoftwareUpdateRequestorAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateRequestorAttributeListListAttributeCallback>
 {
 public:
     MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6267,7 +6275,7 @@ private:
 };
 
 class MTROccupancySensingGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OccupancySensingGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OccupancySensingGeneratedCommandListListAttributeCallback>
 {
 public:
     MTROccupancySensingGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6295,7 +6303,7 @@ private:
 };
 
 class MTROccupancySensingAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OccupancySensingAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OccupancySensingAcceptedCommandListListAttributeCallback>
 {
 public:
     MTROccupancySensingAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6323,7 +6331,7 @@ private:
 };
 
 class MTROccupancySensingAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OccupancySensingAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OccupancySensingAttributeListListAttributeCallback>
 {
 public:
     MTROccupancySensingAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6351,7 +6359,7 @@ private:
 };
 
 class MTROnOffGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OnOffGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OnOffGeneratedCommandListListAttributeCallback>
 {
 public:
     MTROnOffGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -6379,7 +6387,7 @@ private:
 };
 
 class MTROnOffAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OnOffAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OnOffAcceptedCommandListListAttributeCallback>
 {
 public:
     MTROnOffAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -6406,7 +6414,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTROnOffAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<OnOffAttributeListListAttributeCallback>
+class MTROnOffAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<MTR OnOffAttributeListListAttributeCallback>
 {
 public:
     MTROnOffAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -6433,7 +6441,7 @@ private:
 };
 
 class MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback>
 {
 public:
     MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6461,7 +6469,7 @@ private:
 };
 
 class MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback>
 {
 public:
     MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6489,7 +6497,7 @@ private:
 };
 
 class MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OnOffSwitchConfigurationAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OnOffSwitchConfigurationAttributeListListAttributeCallback>
 {
 public:
     MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6517,7 +6525,7 @@ private:
 };
 
 class MTROperationalCredentialsNOCsListAttributeCallbackBridge
-    : public MTRCallbackBridge<OperationalCredentialsNOCsListAttributeCallback>
+    : public MTRCallbackBridge<MTR OperationalCredentialsNOCsListAttributeCallback>
 {
 public:
     MTROperationalCredentialsNOCsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -6548,7 +6556,7 @@ private:
 };
 
 class MTROperationalCredentialsFabricsListAttributeCallbackBridge
-    : public MTRCallbackBridge<OperationalCredentialsFabricsListAttributeCallback>
+    : public MTRCallbackBridge<MTR OperationalCredentialsFabricsListAttributeCallback>
 {
 public:
     MTROperationalCredentialsFabricsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6578,7 +6586,7 @@ private:
 };
 
 class MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge
-    : public MTRCallbackBridge<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>
+    : public MTRCallbackBridge<MTR OperationalCredentialsTrustedRootCertificatesListAttributeCallback>
 {
 public:
     MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6606,7 +6614,7 @@ private:
 };
 
 class MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OperationalCredentialsGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OperationalCredentialsGeneratedCommandListListAttributeCallback>
 {
 public:
     MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6634,7 +6642,7 @@ private:
 };
 
 class MTROperationalCredentialsAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OperationalCredentialsAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OperationalCredentialsAcceptedCommandListListAttributeCallback>
 {
 public:
     MTROperationalCredentialsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6662,7 +6670,7 @@ private:
 };
 
 class MTROperationalCredentialsAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<OperationalCredentialsAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR OperationalCredentialsAttributeListListAttributeCallback>
 {
 public:
     MTROperationalCredentialsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6690,7 +6698,7 @@ private:
 };
 
 class MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceActiveWiredFaultsListAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceActiveWiredFaultsListAttributeCallback>
 {
 public:
     MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6718,7 +6726,7 @@ private:
 };
 
 class MTRPowerSourceActiveBatteryFaultsListAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceActiveBatteryFaultsListAttributeCallback>
 {
 public:
     MTRPowerSourceActiveBatteryFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6746,7 +6754,7 @@ private:
 };
 
 class MTRPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceActiveBatteryChargeFaultsListAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceActiveBatteryChargeFaultsListAttributeCallback>
 {
 public:
     MTRPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6774,7 +6782,7 @@ private:
 };
 
 class MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6802,7 +6810,7 @@ private:
 };
 
 class MTRPowerSourceAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRPowerSourceAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6830,7 +6838,7 @@ private:
 };
 
 class MTRPowerSourceAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceAttributeListListAttributeCallback>
 {
 public:
     MTRPowerSourceAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -6858,7 +6866,7 @@ private:
 };
 
 class MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceConfigurationSourcesListAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceConfigurationSourcesListAttributeCallback>
 {
 public:
     MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6886,7 +6894,7 @@ private:
 };
 
 class MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceConfigurationGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceConfigurationGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6914,7 +6922,7 @@ private:
 };
 
 class MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceConfigurationAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceConfigurationAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6942,7 +6950,7 @@ private:
 };
 
 class MTRPowerSourceConfigurationAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceConfigurationAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceConfigurationAttributeListListAttributeCallback>
 {
 public:
     MTRPowerSourceConfigurationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6970,7 +6978,7 @@ private:
 };
 
 class MTRPressureMeasurementGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<PressureMeasurementGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR PressureMeasurementGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRPressureMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -6998,7 +7006,7 @@ private:
 };
 
 class MTRPressureMeasurementAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<PressureMeasurementAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR PressureMeasurementAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRPressureMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7026,7 +7034,7 @@ private:
 };
 
 class MTRPressureMeasurementAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<PressureMeasurementAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR PressureMeasurementAttributeListListAttributeCallback>
 {
 public:
     MTRPressureMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7054,7 +7062,7 @@ private:
 };
 
 class MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<PumpConfigurationAndControlPumpStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR PumpConfigurationAndControlPumpStatusAttributeCallback>
 {
 public:
     MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7082,7 +7090,7 @@ private:
 };
 
 class MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<PumpConfigurationAndControlGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR PumpConfigurationAndControlGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7110,7 +7118,7 @@ private:
 };
 
 class MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<PumpConfigurationAndControlAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR PumpConfigurationAndControlAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7138,7 +7146,7 @@ private:
 };
 
 class MTRPumpConfigurationAndControlAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<PumpConfigurationAndControlAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR PumpConfigurationAndControlAttributeListListAttributeCallback>
 {
 public:
     MTRPumpConfigurationAndControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7166,7 +7174,7 @@ private:
 };
 
 class MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RelativeHumidityMeasurementGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR RelativeHumidityMeasurementGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7194,7 +7202,7 @@ private:
 };
 
 class MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RelativeHumidityMeasurementAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR RelativeHumidityMeasurementAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7222,7 +7230,7 @@ private:
 };
 
 class MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RelativeHumidityMeasurementAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR RelativeHumidityMeasurementAttributeListListAttributeCallback>
 {
 public:
     MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7250,7 +7258,7 @@ private:
 };
 
 class MTRScenesGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ScenesGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ScenesGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRScenesGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -7278,7 +7286,7 @@ private:
 };
 
 class MTRScenesAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ScenesAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ScenesAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRScenesAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -7305,7 +7313,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRScenesAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<ScenesAttributeListListAttributeCallback>
+class MTRScenesAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<MTR ScenesAttributeListListAttributeCallback>
 {
 public:
     MTRScenesAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -7332,7 +7340,7 @@ private:
 };
 
 class MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge
-    : public MTRCallbackBridge<SoftwareDiagnosticsThreadMetricsListAttributeCallback>
+    : public MTRCallbackBridge<MTR SoftwareDiagnosticsThreadMetricsListAttributeCallback>
 {
 public:
     MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7363,7 +7371,7 @@ private:
 };
 
 class MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<SoftwareDiagnosticsGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR SoftwareDiagnosticsGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7391,7 +7399,7 @@ private:
 };
 
 class MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<SoftwareDiagnosticsAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR SoftwareDiagnosticsAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7419,7 +7427,7 @@ private:
 };
 
 class MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<SoftwareDiagnosticsAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR SoftwareDiagnosticsAttributeListListAttributeCallback>
 {
 public:
     MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7447,7 +7455,7 @@ private:
 };
 
 class MTRSwitchGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<SwitchGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR SwitchGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRSwitchGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -7475,7 +7483,7 @@ private:
 };
 
 class MTRSwitchAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<SwitchAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR SwitchAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRSwitchAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -7502,7 +7510,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRSwitchAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<SwitchAttributeListListAttributeCallback>
+class MTRSwitchAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<MTR SwitchAttributeListListAttributeCallback>
 {
 public:
     MTRSwitchAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -7529,7 +7537,7 @@ private:
 };
 
 class MTRTargetNavigatorTargetListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TargetNavigatorTargetListListAttributeCallback>
+    : public MTRCallbackBridge<MTR TargetNavigatorTargetListListAttributeCallback>
 {
 public:
     MTRTargetNavigatorTargetListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -7560,7 +7568,7 @@ private:
 };
 
 class MTRTargetNavigatorGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TargetNavigatorGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR TargetNavigatorGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRTargetNavigatorGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7588,7 +7596,7 @@ private:
 };
 
 class MTRTargetNavigatorAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TargetNavigatorAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR TargetNavigatorAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRTargetNavigatorAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7616,7 +7624,7 @@ private:
 };
 
 class MTRTargetNavigatorAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TargetNavigatorAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR TargetNavigatorAttributeListListAttributeCallback>
 {
 public:
     MTRTargetNavigatorAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7644,7 +7652,7 @@ private:
 };
 
 class MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TemperatureMeasurementGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR TemperatureMeasurementGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7672,7 +7680,7 @@ private:
 };
 
 class MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TemperatureMeasurementAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR TemperatureMeasurementAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7700,7 +7708,7 @@ private:
 };
 
 class MTRTemperatureMeasurementAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TemperatureMeasurementAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR TemperatureMeasurementAttributeListListAttributeCallback>
 {
 public:
     MTRTemperatureMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7727,7 +7735,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterBitmap8AttributeCallbackBridge : public MTRCallbackBridge<TestClusterBitmap8AttributeCallback>
+class MTRTestClusterBitmap8AttributeCallbackBridge : public MTRCallbackBridge<MTR TestClusterBitmap8AttributeCallback>
 {
 public:
     MTRTestClusterBitmap8AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -7752,7 +7760,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterBitmap16AttributeCallbackBridge : public MTRCallbackBridge<TestClusterBitmap16AttributeCallback>
+class MTRTestClusterBitmap16AttributeCallbackBridge : public MTRCallbackBridge<MTR TestClusterBitmap16AttributeCallback>
 {
 public:
     MTRTestClusterBitmap16AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -7778,7 +7786,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterBitmap32AttributeCallbackBridge : public MTRCallbackBridge<TestClusterBitmap32AttributeCallback>
+class MTRTestClusterBitmap32AttributeCallbackBridge : public MTRCallbackBridge<MTR TestClusterBitmap32AttributeCallback>
 {
 public:
     MTRTestClusterBitmap32AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -7804,7 +7812,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterBitmap64AttributeCallbackBridge : public MTRCallbackBridge<TestClusterBitmap64AttributeCallback>
+class MTRTestClusterBitmap64AttributeCallbackBridge : public MTRCallbackBridge<MTR TestClusterBitmap64AttributeCallback>
 {
 public:
     MTRTestClusterBitmap64AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -7830,7 +7838,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterListInt8uListAttributeCallbackBridge : public MTRCallbackBridge<TestClusterListInt8uListAttributeCallback>
+class MTRTestClusterListInt8uListAttributeCallbackBridge : public MTRCallbackBridge<MTR TestClusterListInt8uListAttributeCallback>
 {
 public:
     MTRTestClusterListInt8uListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -7857,7 +7865,7 @@ private:
 };
 
 class MTRTestClusterListOctetStringListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterListOctetStringListAttributeCallback>
+    : public MTRCallbackBridge<MTR TestClusterListOctetStringListAttributeCallback>
 {
 public:
     MTRTestClusterListOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -7885,7 +7893,7 @@ private:
 };
 
 class MTRTestClusterListStructOctetStringListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterListStructOctetStringListAttributeCallback>
+    : public MTRCallbackBridge<MTR TestClusterListStructOctetStringListAttributeCallback>
 {
 public:
     MTRTestClusterListStructOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7916,7 +7924,7 @@ private:
 };
 
 class MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterListNullablesAndOptionalsStructListAttributeCallback>
+    : public MTRCallbackBridge<MTR TestClusterListNullablesAndOptionalsStructListAttributeCallback>
 {
 public:
     MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -7945,7 +7953,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterStructAttrStructAttributeCallbackBridge : public MTRCallbackBridge<TestClusterStructAttrStructAttributeCallback>
+class MTRTestClusterStructAttrStructAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR TestClusterStructAttrStructAttributeCallback>
 {
 public:
     MTRTestClusterStructAttrStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -7973,7 +7982,7 @@ private:
 };
 
 class MTRTestClusterListLongOctetStringListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterListLongOctetStringListAttributeCallback>
+    : public MTRCallbackBridge<MTR TestClusterListLongOctetStringListAttributeCallback>
 {
 public:
     MTRTestClusterListLongOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8001,7 +8010,7 @@ private:
 };
 
 class MTRTestClusterListFabricScopedListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterListFabricScopedListAttributeCallback>
+    : public MTRCallbackBridge<MTR TestClusterListFabricScopedListAttributeCallback>
 {
 public:
     MTRTestClusterListFabricScopedListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8031,7 +8040,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterNullableBitmap8AttributeCallbackBridge : public MTRCallbackBridge<TestClusterNullableBitmap8AttributeCallback>
+class MTRTestClusterNullableBitmap8AttributeCallbackBridge
+    : public MTRCallbackBridge<MTR TestClusterNullableBitmap8AttributeCallback>
 {
 public:
     MTRTestClusterNullableBitmap8AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -8059,7 +8069,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterNullableBitmap16AttributeCallbackBridge : public MTRCallbackBridge<TestClusterNullableBitmap16AttributeCallback>
+class MTRTestClusterNullableBitmap16AttributeCallbackBridge
+    : public MTRCallbackBridge<MTR TestClusterNullableBitmap16AttributeCallback>
 {
 public:
     MTRTestClusterNullableBitmap16AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -8088,7 +8099,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterNullableBitmap32AttributeCallbackBridge : public MTRCallbackBridge<TestClusterNullableBitmap32AttributeCallback>
+class MTRTestClusterNullableBitmap32AttributeCallbackBridge
+    : public MTRCallbackBridge<MTR TestClusterNullableBitmap32AttributeCallback>
 {
 public:
     MTRTestClusterNullableBitmap32AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -8117,7 +8129,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterNullableBitmap64AttributeCallbackBridge : public MTRCallbackBridge<TestClusterNullableBitmap64AttributeCallback>
+class MTRTestClusterNullableBitmap64AttributeCallbackBridge
+    : public MTRCallbackBridge<MTR TestClusterNullableBitmap64AttributeCallback>
 {
 public:
     MTRTestClusterNullableBitmap64AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -8147,7 +8160,7 @@ private:
 };
 
 class MTRTestClusterNullableStructStructAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterNullableStructStructAttributeCallback>
+    : public MTRCallbackBridge<MTR TestClusterNullableStructStructAttributeCallback>
 {
 public:
     MTRTestClusterNullableStructStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8177,7 +8190,7 @@ private:
 };
 
 class MTRTestClusterGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR TestClusterGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRTestClusterGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8205,7 +8218,7 @@ private:
 };
 
 class MTRTestClusterAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR TestClusterAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRTestClusterAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8233,7 +8246,7 @@ private:
 };
 
 class MTRTestClusterAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR TestClusterAttributeListListAttributeCallback>
 {
 public:
     MTRTestClusterAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -8261,7 +8274,7 @@ private:
 };
 
 class MTRThermostatGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ThermostatGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ThermostatGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRThermostatGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8289,7 +8302,7 @@ private:
 };
 
 class MTRThermostatAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ThermostatAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ThermostatAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRThermostatAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8316,7 +8329,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRThermostatAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<ThermostatAttributeListListAttributeCallback>
+class MTRThermostatAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR ThermostatAttributeListListAttributeCallback>
 {
 public:
     MTRThermostatAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -8344,7 +8358,7 @@ private:
 };
 
 class MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
@@ -8374,7 +8388,7 @@ private:
 };
 
 class MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
@@ -8404,7 +8418,7 @@ private:
 };
 
 class MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ThermostatUserInterfaceConfigurationAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ThermostatUserInterfaceConfigurationAttributeListListAttributeCallback>
 {
 public:
     MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8432,7 +8446,7 @@ private:
 };
 
 class MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>
 {
 public:
     MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8462,7 +8476,7 @@ private:
 };
 
 class MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>
 {
 public:
     MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8492,7 +8506,7 @@ private:
 };
 
 class MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge
-    : public MTRCallbackBridge<ThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallback>
+    : public MTRCallbackBridge<MTR ThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallback>
 {
 public:
     MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8522,7 +8536,7 @@ private:
 };
 
 class MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge
-    : public MTRCallbackBridge<ThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallback>
+    : public MTRCallbackBridge<MTR ThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallback>
 {
 public:
     MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge(dispatch_queue_t queue,
@@ -8555,7 +8569,7 @@ private:
 };
 
 class MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>
 {
 public:
     MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8585,7 +8599,7 @@ private:
 };
 
 class MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8613,7 +8627,7 @@ private:
 };
 
 class MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8641,7 +8655,7 @@ private:
 };
 
 class MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ThreadNetworkDiagnosticsAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR ThreadNetworkDiagnosticsAttributeListListAttributeCallback>
 {
 public:
     MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8669,7 +8683,7 @@ private:
 };
 
 class MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge
-    : public MTRCallbackBridge<TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback>
+    : public MTRCallbackBridge<MTR TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback>
 {
 public:
     MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8699,7 +8713,7 @@ private:
 };
 
 class MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TimeFormatLocalizationGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR TimeFormatLocalizationGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8727,7 +8741,7 @@ private:
 };
 
 class MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TimeFormatLocalizationAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR TimeFormatLocalizationAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8755,7 +8769,7 @@ private:
 };
 
 class MTRTimeFormatLocalizationAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TimeFormatLocalizationAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR TimeFormatLocalizationAttributeListListAttributeCallback>
 {
 public:
     MTRTimeFormatLocalizationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8783,7 +8797,7 @@ private:
 };
 
 class MTRUnitLocalizationGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<UnitLocalizationGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR UnitLocalizationGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRUnitLocalizationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8811,7 +8825,7 @@ private:
 };
 
 class MTRUnitLocalizationAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<UnitLocalizationAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR UnitLocalizationAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRUnitLocalizationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8839,7 +8853,7 @@ private:
 };
 
 class MTRUnitLocalizationAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<UnitLocalizationAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR UnitLocalizationAttributeListListAttributeCallback>
 {
 public:
     MTRUnitLocalizationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8866,7 +8880,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRUserLabelLabelListListAttributeCallbackBridge : public MTRCallbackBridge<UserLabelLabelListListAttributeCallback>
+class MTRUserLabelLabelListListAttributeCallbackBridge : public MTRCallbackBridge<MTR UserLabelLabelListListAttributeCallback>
 {
 public:
     MTRUserLabelLabelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -8895,7 +8909,7 @@ private:
 };
 
 class MTRUserLabelGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<UserLabelGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR UserLabelGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRUserLabelGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8923,7 +8937,7 @@ private:
 };
 
 class MTRUserLabelAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<UserLabelAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR UserLabelAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRUserLabelAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -8950,7 +8964,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRUserLabelAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<UserLabelAttributeListListAttributeCallback>
+class MTRUserLabelAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR UserLabelAttributeListListAttributeCallback>
 {
 public:
     MTRUserLabelAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -8977,7 +8992,7 @@ private:
 };
 
 class MTRWakeOnLanGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<WakeOnLanGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR WakeOnLanGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRWakeOnLanGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -9005,7 +9020,7 @@ private:
 };
 
 class MTRWakeOnLanAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<WakeOnLanAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR WakeOnLanAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRWakeOnLanAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -9032,7 +9047,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRWakeOnLanAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<WakeOnLanAttributeListListAttributeCallback>
+class MTRWakeOnLanAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR WakeOnLanAttributeListListAttributeCallback>
 {
 public:
     MTRWakeOnLanAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -9059,7 +9075,7 @@ private:
 };
 
 class MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -9087,7 +9103,7 @@ private:
 };
 
 class MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -9115,7 +9131,7 @@ private:
 };
 
 class MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<WiFiNetworkDiagnosticsAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR WiFiNetworkDiagnosticsAttributeListListAttributeCallback>
 {
 public:
     MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -9142,7 +9158,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRWindowCoveringConfigStatusAttributeCallbackBridge : public MTRCallbackBridge<WindowCoveringConfigStatusAttributeCallback>
+class MTRWindowCoveringConfigStatusAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR WindowCoveringConfigStatusAttributeCallback>
 {
 public:
     MTRWindowCoveringConfigStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -9168,7 +9185,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRWindowCoveringModeAttributeCallbackBridge : public MTRCallbackBridge<WindowCoveringModeAttributeCallback>
+class MTRWindowCoveringModeAttributeCallbackBridge : public MTRCallbackBridge<MTR WindowCoveringModeAttributeCallback>
 {
 public:
     MTRWindowCoveringModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -9194,7 +9211,7 @@ private:
 };
 
 class MTRWindowCoveringGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<WindowCoveringGeneratedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR WindowCoveringGeneratedCommandListListAttributeCallback>
 {
 public:
     MTRWindowCoveringGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -9222,7 +9239,7 @@ private:
 };
 
 class MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<WindowCoveringAcceptedCommandListListAttributeCallback>
+    : public MTRCallbackBridge<MTR WindowCoveringAcceptedCommandListListAttributeCallback>
 {
 public:
     MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -9250,7 +9267,7 @@ private:
 };
 
 class MTRWindowCoveringAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<WindowCoveringAttributeListListAttributeCallback>
+    : public MTRCallbackBridge<MTR WindowCoveringAttributeListListAttributeCallback>
 {
 public:
     MTRWindowCoveringAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -9278,162 +9295,156 @@ private:
 };
 
 class MTRAccountLoginClusterGetSetupPINResponseCallbackBridge
-    : public MTRCallbackBridge<MTRAccountLoginClusterGetSetupPINResponseCallbackType>
+    : public MTRCallbackBridge<MTR AccountLoginClusterGetSetupPINResponseCallbackType>
 {
 public:
     MTRAccountLoginClusterGetSetupPINResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                             bool keepAlive = false) :
-        MTRCallbackBridge<MTRAccountLoginClusterGetSetupPINResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<AccountLoginClusterGetSetupPINResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data);
 };
 
 class MTRApplicationLauncherClusterLauncherResponseCallbackBridge
-    : public MTRCallbackBridge<MTRApplicationLauncherClusterLauncherResponseCallbackType>
+    : public MTRCallbackBridge<MTR ApplicationLauncherClusterLauncherResponseCallbackType>
 {
 public:
     MTRApplicationLauncherClusterLauncherResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                 MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRApplicationLauncherClusterLauncherResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
+        MTRCallbackBridge<ApplicationLauncherClusterLauncherResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & data);
 };
 
 class MTRChannelClusterChangeChannelResponseCallbackBridge
-    : public MTRCallbackBridge<MTRChannelClusterChangeChannelResponseCallbackType>
+    : public MTRCallbackBridge<MTR ChannelClusterChangeChannelResponseCallbackType>
 {
 public:
     MTRChannelClusterChangeChannelResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                          bool keepAlive = false) :
-        MTRCallbackBridge<MTRChannelClusterChangeChannelResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<ChannelClusterChangeChannelResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data);
 };
 
 class MTRContentLauncherClusterLaunchResponseCallbackBridge
-    : public MTRCallbackBridge<MTRContentLauncherClusterLaunchResponseCallbackType>
+    : public MTRCallbackBridge<MTR ContentLauncherClusterLaunchResponseCallbackType>
 {
 public:
     MTRContentLauncherClusterLaunchResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                           bool keepAlive = false) :
-        MTRCallbackBridge<MTRContentLauncherClusterLaunchResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<ContentLauncherClusterLaunchResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & data);
 };
 
 class MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge
-    : public MTRCallbackBridge<MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackType>
+    : public MTRCallbackBridge<MTR DiagnosticLogsClusterRetrieveLogsResponseCallbackType>
 {
 public:
     MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
+        MTRCallbackBridge<DiagnosticLogsClusterRetrieveLogsResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data);
 };
 
 class MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge
-    : public MTRCallbackBridge<MTRDoorLockClusterGetWeekDayScheduleResponseCallbackType>
+    : public MTRCallbackBridge<MTR DoorLockClusterGetWeekDayScheduleResponseCallbackType>
 {
 public:
     MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRDoorLockClusterGetWeekDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
+        MTRCallbackBridge<DoorLockClusterGetWeekDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data);
 };
 
 class MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge
-    : public MTRCallbackBridge<MTRDoorLockClusterGetYearDayScheduleResponseCallbackType>
+    : public MTRCallbackBridge<MTR DoorLockClusterGetYearDayScheduleResponseCallbackType>
 {
 public:
     MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRDoorLockClusterGetYearDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
+        MTRCallbackBridge<DoorLockClusterGetYearDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data);
 };
 
 class MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge
-    : public MTRCallbackBridge<MTRDoorLockClusterGetHolidayScheduleResponseCallbackType>
+    : public MTRCallbackBridge<MTR DoorLockClusterGetHolidayScheduleResponseCallbackType>
 {
 public:
     MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRDoorLockClusterGetHolidayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
+        MTRCallbackBridge<DoorLockClusterGetHolidayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data);
 };
 
-class MTRDoorLockClusterGetUserResponseCallbackBridge : public MTRCallbackBridge<MTRDoorLockClusterGetUserResponseCallbackType>
+class MTRDoorLockClusterGetUserResponseCallbackBridge : public MTRCallbackBridge<MTR DoorLockClusterGetUserResponseCallbackType>
 {
 public:
     MTRDoorLockClusterGetUserResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                     bool keepAlive = false) :
-        MTRCallbackBridge<MTRDoorLockClusterGetUserResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<DoorLockClusterGetUserResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data);
 };
 
 class MTRDoorLockClusterSetCredentialResponseCallbackBridge
-    : public MTRCallbackBridge<MTRDoorLockClusterSetCredentialResponseCallbackType>
+    : public MTRCallbackBridge<MTR DoorLockClusterSetCredentialResponseCallbackType>
 {
 public:
     MTRDoorLockClusterSetCredentialResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                           bool keepAlive = false) :
-        MTRCallbackBridge<MTRDoorLockClusterSetCredentialResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<DoorLockClusterSetCredentialResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data);
 };
 
 class MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge
-    : public MTRCallbackBridge<MTRDoorLockClusterGetCredentialStatusResponseCallbackType>
+    : public MTRCallbackBridge<MTR DoorLockClusterGetCredentialStatusResponseCallbackType>
 {
 public:
     MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                 MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRDoorLockClusterGetCredentialStatusResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
+        MTRCallbackBridge<DoorLockClusterGetCredentialStatusResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data);
 };
 
 class MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge
-    : public MTRCallbackBridge<MTRGeneralCommissioningClusterArmFailSafeResponseCallbackType>
+    : public MTRCallbackBridge<MTR GeneralCommissioningClusterArmFailSafeResponseCallbackType>
 {
 public:
     MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                     MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRGeneralCommissioningClusterArmFailSafeResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
+        MTRCallbackBridge<GeneralCommissioningClusterArmFailSafeResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
 };
 
 class MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge
-    : public MTRCallbackBridge<MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>
+    : public MTRCallbackBridge<MTR GeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>
 {
 public:
     MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                             MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>(queue, handler, action,
-                                                                                                 OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<GeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
 
     static void
     OnSuccessFn(void * context,
@@ -9441,13 +9452,13 @@ public:
 };
 
 class MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge
-    : public MTRCallbackBridge<MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackType>
+    : public MTRCallbackBridge<MTR GeneralCommissioningClusterCommissioningCompleteResponseCallbackType>
 {
 public:
     MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                               MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackType>(queue, handler, action,
-                                                                                                   OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<GeneralCommissioningClusterCommissioningCompleteResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                                keepAlive){};
 
     static void
     OnSuccessFn(void * context,
@@ -9455,132 +9466,132 @@ public:
 };
 
 class MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge
-    : public MTRCallbackBridge<MTRGroupKeyManagementClusterKeySetReadResponseCallbackType>
+    : public MTRCallbackBridge<MTR GroupKeyManagementClusterKeySetReadResponseCallbackType>
 {
 public:
     MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                  MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRGroupKeyManagementClusterKeySetReadResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+        MTRCallbackBridge<GroupKeyManagementClusterKeySetReadResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data);
 };
 
 class MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge
-    : public MTRCallbackBridge<MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>
+    : public MTRCallbackBridge<MTR GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>
 {
 public:
     MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                            MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                                keepAlive){};
+        MTRCallbackBridge<GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
 
     static void
     OnSuccessFn(void * context,
                 const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data);
 };
 
-class MTRGroupsClusterAddGroupResponseCallbackBridge : public MTRCallbackBridge<MTRGroupsClusterAddGroupResponseCallbackType>
+class MTRGroupsClusterAddGroupResponseCallbackBridge : public MTRCallbackBridge<MTR GroupsClusterAddGroupResponseCallbackType>
 {
 public:
     MTRGroupsClusterAddGroupResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                    bool keepAlive = false) :
-        MTRCallbackBridge<MTRGroupsClusterAddGroupResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<GroupsClusterAddGroupResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType & data);
 };
 
-class MTRGroupsClusterViewGroupResponseCallbackBridge : public MTRCallbackBridge<MTRGroupsClusterViewGroupResponseCallbackType>
+class MTRGroupsClusterViewGroupResponseCallbackBridge : public MTRCallbackBridge<MTR GroupsClusterViewGroupResponseCallbackType>
 {
 public:
     MTRGroupsClusterViewGroupResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                     bool keepAlive = false) :
-        MTRCallbackBridge<MTRGroupsClusterViewGroupResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<GroupsClusterViewGroupResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType & data);
 };
 
 class MTRGroupsClusterGetGroupMembershipResponseCallbackBridge
-    : public MTRCallbackBridge<MTRGroupsClusterGetGroupMembershipResponseCallbackType>
+    : public MTRCallbackBridge<MTR GroupsClusterGetGroupMembershipResponseCallbackType>
 {
 public:
     MTRGroupsClusterGetGroupMembershipResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                              bool keepAlive = false) :
-        MTRCallbackBridge<MTRGroupsClusterGetGroupMembershipResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<GroupsClusterGetGroupMembershipResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType & data);
 };
 
-class MTRGroupsClusterRemoveGroupResponseCallbackBridge : public MTRCallbackBridge<MTRGroupsClusterRemoveGroupResponseCallbackType>
+class MTRGroupsClusterRemoveGroupResponseCallbackBridge : public MTRCallbackBridge<MTR GroupsClusterRemoveGroupResponseCallbackType>
 {
 public:
     MTRGroupsClusterRemoveGroupResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                       bool keepAlive = false) :
-        MTRCallbackBridge<MTRGroupsClusterRemoveGroupResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<GroupsClusterRemoveGroupResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & data);
 };
 
 class MTRKeypadInputClusterSendKeyResponseCallbackBridge
-    : public MTRCallbackBridge<MTRKeypadInputClusterSendKeyResponseCallbackType>
+    : public MTRCallbackBridge<MTR KeypadInputClusterSendKeyResponseCallbackType>
 {
 public:
     MTRKeypadInputClusterSendKeyResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                        bool keepAlive = false) :
-        MTRCallbackBridge<MTRKeypadInputClusterSendKeyResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<KeypadInputClusterSendKeyResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & data);
 };
 
 class MTRMediaPlaybackClusterPlaybackResponseCallbackBridge
-    : public MTRCallbackBridge<MTRMediaPlaybackClusterPlaybackResponseCallbackType>
+    : public MTRCallbackBridge<MTR MediaPlaybackClusterPlaybackResponseCallbackType>
 {
 public:
     MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                           bool keepAlive = false) :
-        MTRCallbackBridge<MTRMediaPlaybackClusterPlaybackResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<MediaPlaybackClusterPlaybackResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & data);
 };
 
 class MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge
-    : public MTRCallbackBridge<MTRNetworkCommissioningClusterScanNetworksResponseCallbackType>
+    : public MTRCallbackBridge<MTR NetworkCommissioningClusterScanNetworksResponseCallbackType>
 {
 public:
     MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                      MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRNetworkCommissioningClusterScanNetworksResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
+        MTRCallbackBridge<NetworkCommissioningClusterScanNetworksResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data);
 };
 
 class MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge
-    : public MTRCallbackBridge<MTRNetworkCommissioningClusterNetworkConfigResponseCallbackType>
+    : public MTRCallbackBridge<MTR NetworkCommissioningClusterNetworkConfigResponseCallbackType>
 {
 public:
     MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                       MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRNetworkCommissioningClusterNetworkConfigResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
+        MTRCallbackBridge<NetworkCommissioningClusterNetworkConfigResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
 };
 
 class MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge
-    : public MTRCallbackBridge<MTRNetworkCommissioningClusterConnectNetworkResponseCallbackType>
+    : public MTRCallbackBridge<MTR NetworkCommissioningClusterConnectNetworkResponseCallbackType>
 {
 public:
     MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                        MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRNetworkCommissioningClusterConnectNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                            keepAlive){};
+        MTRCallbackBridge<NetworkCommissioningClusterConnectNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
 
     static void
     OnSuccessFn(void * context,
@@ -9588,13 +9599,13 @@ public:
 };
 
 class MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge
-    : public MTRCallbackBridge<MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>
 {
 public:
     MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                         MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                             keepAlive){};
+        MTRCallbackBridge<OtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                          keepAlive){};
 
     static void
     OnSuccessFn(void * context,
@@ -9602,13 +9613,13 @@ public:
 };
 
 class MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge
-    : public MTRCallbackBridge<MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>
 {
 public:
     MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                          MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
+        MTRCallbackBridge<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
 
     static void
     OnSuccessFn(void * context,
@@ -9616,26 +9627,26 @@ public:
 };
 
 class MTROperationalCredentialsClusterAttestationResponseCallbackBridge
-    : public MTRCallbackBridge<MTROperationalCredentialsClusterAttestationResponseCallbackType>
+    : public MTRCallbackBridge<MTR OperationalCredentialsClusterAttestationResponseCallbackType>
 {
 public:
     MTROperationalCredentialsClusterAttestationResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                       MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTROperationalCredentialsClusterAttestationResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
+        MTRCallbackBridge<OperationalCredentialsClusterAttestationResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & data);
 };
 
 class MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge
-    : public MTRCallbackBridge<MTROperationalCredentialsClusterCertificateChainResponseCallbackType>
+    : public MTRCallbackBridge<MTR OperationalCredentialsClusterCertificateChainResponseCallbackType>
 {
 public:
     MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                            MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTROperationalCredentialsClusterCertificateChainResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                                keepAlive){};
+        MTRCallbackBridge<OperationalCredentialsClusterCertificateChainResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
 
     static void
     OnSuccessFn(void * context,
@@ -9643,188 +9654,185 @@ public:
 };
 
 class MTROperationalCredentialsClusterCSRResponseCallbackBridge
-    : public MTRCallbackBridge<MTROperationalCredentialsClusterCSRResponseCallbackType>
+    : public MTRCallbackBridge<MTR OperationalCredentialsClusterCSRResponseCallbackType>
 {
 public:
     MTROperationalCredentialsClusterCSRResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                               MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTROperationalCredentialsClusterCSRResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
+        MTRCallbackBridge<OperationalCredentialsClusterCSRResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data);
 };
 
 class MTROperationalCredentialsClusterNOCResponseCallbackBridge
-    : public MTRCallbackBridge<MTROperationalCredentialsClusterNOCResponseCallbackType>
+    : public MTRCallbackBridge<MTR OperationalCredentialsClusterNOCResponseCallbackType>
 {
 public:
     MTROperationalCredentialsClusterNOCResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                               MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTROperationalCredentialsClusterNOCResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
+        MTRCallbackBridge<OperationalCredentialsClusterNOCResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
 };
 
-class MTRScenesClusterAddSceneResponseCallbackBridge : public MTRCallbackBridge<MTRScenesClusterAddSceneResponseCallbackType>
+class MTRScenesClusterAddSceneResponseCallbackBridge : public MTRCallbackBridge<MTR ScenesClusterAddSceneResponseCallbackType>
 {
 public:
     MTRScenesClusterAddSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                    bool keepAlive = false) :
-        MTRCallbackBridge<MTRScenesClusterAddSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<ScenesClusterAddSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType & data);
 };
 
-class MTRScenesClusterViewSceneResponseCallbackBridge : public MTRCallbackBridge<MTRScenesClusterViewSceneResponseCallbackType>
+class MTRScenesClusterViewSceneResponseCallbackBridge : public MTRCallbackBridge<MTR ScenesClusterViewSceneResponseCallbackType>
 {
 public:
     MTRScenesClusterViewSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                     bool keepAlive = false) :
-        MTRCallbackBridge<MTRScenesClusterViewSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<ScenesClusterViewSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & data);
 };
 
-class MTRScenesClusterRemoveSceneResponseCallbackBridge : public MTRCallbackBridge<MTRScenesClusterRemoveSceneResponseCallbackType>
+class MTRScenesClusterRemoveSceneResponseCallbackBridge : public MTRCallbackBridge<MTR ScenesClusterRemoveSceneResponseCallbackType>
 {
 public:
     MTRScenesClusterRemoveSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                       bool keepAlive = false) :
-        MTRCallbackBridge<MTRScenesClusterRemoveSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<ScenesClusterRemoveSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType & data);
 };
 
 class MTRScenesClusterRemoveAllScenesResponseCallbackBridge
-    : public MTRCallbackBridge<MTRScenesClusterRemoveAllScenesResponseCallbackType>
+    : public MTRCallbackBridge<MTR ScenesClusterRemoveAllScenesResponseCallbackType>
 {
 public:
     MTRScenesClusterRemoveAllScenesResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                           bool keepAlive = false) :
-        MTRCallbackBridge<MTRScenesClusterRemoveAllScenesResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<ScenesClusterRemoveAllScenesResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType & data);
 };
 
-class MTRScenesClusterStoreSceneResponseCallbackBridge : public MTRCallbackBridge<MTRScenesClusterStoreSceneResponseCallbackType>
+class MTRScenesClusterStoreSceneResponseCallbackBridge : public MTRCallbackBridge<MTR ScenesClusterStoreSceneResponseCallbackType>
 {
 public:
     MTRScenesClusterStoreSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                      bool keepAlive = false) :
-        MTRCallbackBridge<MTRScenesClusterStoreSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<ScenesClusterStoreSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType & data);
 };
 
 class MTRScenesClusterGetSceneMembershipResponseCallbackBridge
-    : public MTRCallbackBridge<MTRScenesClusterGetSceneMembershipResponseCallbackType>
+    : public MTRCallbackBridge<MTR ScenesClusterGetSceneMembershipResponseCallbackType>
 {
 public:
     MTRScenesClusterGetSceneMembershipResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                              bool keepAlive = false) :
-        MTRCallbackBridge<MTRScenesClusterGetSceneMembershipResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<ScenesClusterGetSceneMembershipResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType & data);
 };
 
 class MTRScenesClusterEnhancedAddSceneResponseCallbackBridge
-    : public MTRCallbackBridge<MTRScenesClusterEnhancedAddSceneResponseCallbackType>
+    : public MTRCallbackBridge<MTR ScenesClusterEnhancedAddSceneResponseCallbackType>
 {
 public:
     MTRScenesClusterEnhancedAddSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                            bool keepAlive = false) :
-        MTRCallbackBridge<MTRScenesClusterEnhancedAddSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<ScenesClusterEnhancedAddSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType & data);
 };
 
 class MTRScenesClusterEnhancedViewSceneResponseCallbackBridge
-    : public MTRCallbackBridge<MTRScenesClusterEnhancedViewSceneResponseCallbackType>
+    : public MTRCallbackBridge<MTR ScenesClusterEnhancedViewSceneResponseCallbackType>
 {
 public:
     MTRScenesClusterEnhancedViewSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                             bool keepAlive = false) :
-        MTRCallbackBridge<MTRScenesClusterEnhancedViewSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<ScenesClusterEnhancedViewSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType & data);
 };
 
-class MTRScenesClusterCopySceneResponseCallbackBridge : public MTRCallbackBridge<MTRScenesClusterCopySceneResponseCallbackType>
+class MTRScenesClusterCopySceneResponseCallbackBridge : public MTRCallbackBridge<MTR ScenesClusterCopySceneResponseCallbackType>
 {
 public:
     MTRScenesClusterCopySceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                     bool keepAlive = false) :
-        MTRCallbackBridge<MTRScenesClusterCopySceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<ScenesClusterCopySceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType & data);
 };
 
 class MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge
-    : public MTRCallbackBridge<MTRTargetNavigatorClusterNavigateTargetResponseCallbackType>
+    : public MTRCallbackBridge<MTR TargetNavigatorClusterNavigateTargetResponseCallbackType>
 {
 public:
     MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                   MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRTargetNavigatorClusterNavigateTargetResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
+        MTRCallbackBridge<TargetNavigatorClusterNavigateTargetResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType & data);
 };
 
 class MTRTestClusterClusterTestSpecificResponseCallbackBridge
-    : public MTRCallbackBridge<MTRTestClusterClusterTestSpecificResponseCallbackType>
+    : public MTRCallbackBridge<MTR TestClusterClusterTestSpecificResponseCallbackType>
 {
 public:
     MTRTestClusterClusterTestSpecificResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                             bool keepAlive = false) :
-        MTRCallbackBridge<MTRTestClusterClusterTestSpecificResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<TestClusterClusterTestSpecificResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & data);
 };
 
 class MTRTestClusterClusterTestAddArgumentsResponseCallbackBridge
-    : public MTRCallbackBridge<MTRTestClusterClusterTestAddArgumentsResponseCallbackType>
+    : public MTRCallbackBridge<MTR TestClusterClusterTestAddArgumentsResponseCallbackType>
 {
 public:
     MTRTestClusterClusterTestAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                 MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRTestClusterClusterTestAddArgumentsResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
+        MTRCallbackBridge<TestClusterClusterTestAddArgumentsResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType & data);
 };
 
 class MTRTestClusterClusterTestSimpleArgumentResponseCallbackBridge
-    : public MTRCallbackBridge<MTRTestClusterClusterTestSimpleArgumentResponseCallbackType>
+    : public MTRCallbackBridge<MTR TestClusterClusterTestSimpleArgumentResponseCallbackType>
 {
 public:
     MTRTestClusterClusterTestSimpleArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                   MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRTestClusterClusterTestSimpleArgumentResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
+        MTRCallbackBridge<TestClusterClusterTestSimpleArgumentResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentResponse::DecodableType & data);
 };
 
 class MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge
-    : public MTRCallbackBridge<MTRTestClusterClusterTestStructArrayArgumentResponseCallbackType>
+    : public MTRCallbackBridge<MTR TestClusterClusterTestStructArrayArgumentResponseCallbackType>
 {
 public:
     MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                        MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRTestClusterClusterTestStructArrayArgumentResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                            keepAlive){};
+        MTRCallbackBridge<TestClusterClusterTestStructArrayArgumentResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
 
     static void
     OnSuccessFn(void * context,
@@ -9832,51 +9840,51 @@ public:
 };
 
 class MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge
-    : public MTRCallbackBridge<MTRTestClusterClusterTestListInt8UReverseResponseCallbackType>
+    : public MTRCallbackBridge<MTR TestClusterClusterTestListInt8UReverseResponseCallbackType>
 {
 public:
     MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                     MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRTestClusterClusterTestListInt8UReverseResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
+        MTRCallbackBridge<TestClusterClusterTestListInt8UReverseResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & data);
 };
 
 class MTRTestClusterClusterTestEnumsResponseCallbackBridge
-    : public MTRCallbackBridge<MTRTestClusterClusterTestEnumsResponseCallbackType>
+    : public MTRCallbackBridge<MTR TestClusterClusterTestEnumsResponseCallbackType>
 {
 public:
     MTRTestClusterClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                          bool keepAlive = false) :
-        MTRCallbackBridge<MTRTestClusterClusterTestEnumsResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<TestClusterClusterTestEnumsResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType & data);
 };
 
 class MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge
-    : public MTRCallbackBridge<MTRTestClusterClusterTestNullableOptionalResponseCallbackType>
+    : public MTRCallbackBridge<MTR TestClusterClusterTestNullableOptionalResponseCallbackType>
 {
 public:
     MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                     MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRTestClusterClusterTestNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
+        MTRCallbackBridge<TestClusterClusterTestNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType & data);
 };
 
 class MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge
-    : public MTRCallbackBridge<MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackType>
+    : public MTRCallbackBridge<MTR TestClusterClusterTestComplexNullableOptionalResponseCallbackType>
 {
 public:
     MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                            MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                                keepAlive){};
+        MTRCallbackBridge<TestClusterClusterTestComplexNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
 
     static void
     OnSuccessFn(void * context,
@@ -9884,50 +9892,50 @@ public:
 };
 
 class MTRTestClusterClusterBooleanResponseCallbackBridge
-    : public MTRCallbackBridge<MTRTestClusterClusterBooleanResponseCallbackType>
+    : public MTRCallbackBridge<MTR TestClusterClusterBooleanResponseCallbackType>
 {
 public:
     MTRTestClusterClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                        bool keepAlive = false) :
-        MTRCallbackBridge<MTRTestClusterClusterBooleanResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<TestClusterClusterBooleanResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType & data);
 };
 
 class MTRTestClusterClusterSimpleStructResponseCallbackBridge
-    : public MTRCallbackBridge<MTRTestClusterClusterSimpleStructResponseCallbackType>
+    : public MTRCallbackBridge<MTR TestClusterClusterSimpleStructResponseCallbackType>
 {
 public:
     MTRTestClusterClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                             bool keepAlive = false) :
-        MTRCallbackBridge<MTRTestClusterClusterSimpleStructResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<TestClusterClusterSimpleStructResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & data);
 };
 
 class MTRTestClusterClusterTestEmitTestEventResponseCallbackBridge
-    : public MTRCallbackBridge<MTRTestClusterClusterTestEmitTestEventResponseCallbackType>
+    : public MTRCallbackBridge<MTR TestClusterClusterTestEmitTestEventResponseCallbackType>
 {
 public:
     MTRTestClusterClusterTestEmitTestEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                  MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRTestClusterClusterTestEmitTestEventResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+        MTRCallbackBridge<TestClusterClusterTestEmitTestEventResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & data);
 };
 
 class MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackBridge
-    : public MTRCallbackBridge<MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType>
+    : public MTRCallbackBridge<MTR TestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType>
 {
 public:
     MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                              MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType>(queue, handler, action,
-                                                                                                  OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<TestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
 
     static void
     OnSuccessFn(void * context,
@@ -9935,20 +9943,19 @@ public:
 };
 
 class MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge
-    : public MTRCallbackBridge<MTRThermostatClusterGetWeeklyScheduleResponseCallbackType>
+    : public MTRCallbackBridge<MTR ThermostatClusterGetWeeklyScheduleResponseCallbackType>
 {
 public:
     MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                 MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MTRThermostatClusterGetWeeklyScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
+        MTRCallbackBridge<ThermostatClusterGetWeeklyScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data);
 };
 
 class MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge
-    : public MTRCallbackBridge<IdentifyClusterIdentifyEffectIdentifierAttributeCallback>
+    : public MTRCallbackBridge<MTR IdentifyClusterIdentifyEffectIdentifierAttributeCallback>
 {
 public:
     MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -9976,7 +9983,7 @@ private:
 };
 
 class MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableIdentifyClusterIdentifyEffectIdentifierAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableIdentifyClusterIdentifyEffectIdentifierAttributeCallback>
 {
 public:
     MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10005,7 +10012,7 @@ private:
 };
 
 class MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge
-    : public MTRCallbackBridge<IdentifyClusterIdentifyEffectVariantAttributeCallback>
+    : public MTRCallbackBridge<MTR IdentifyClusterIdentifyEffectVariantAttributeCallback>
 {
 public:
     MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10033,7 +10040,7 @@ private:
 };
 
 class MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableIdentifyClusterIdentifyEffectVariantAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableIdentifyClusterIdentifyEffectVariantAttributeCallback>
 {
 public:
     MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10062,7 +10069,7 @@ private:
 };
 
 class MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<IdentifyClusterIdentifyIdentifyTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR IdentifyClusterIdentifyIdentifyTypeAttributeCallback>
 {
 public:
     MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10090,7 +10097,7 @@ private:
 };
 
 class MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableIdentifyClusterIdentifyIdentifyTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableIdentifyClusterIdentifyIdentifyTypeAttributeCallback>
 {
 public:
     MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10119,7 +10126,7 @@ private:
 };
 
 class MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge
-    : public MTRCallbackBridge<OnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallback>
+    : public MTRCallbackBridge<MTR OnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallback>
 {
 public:
     MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10147,7 +10154,7 @@ private:
 };
 
 class MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallback>
 {
 public:
     MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10177,7 +10184,7 @@ private:
 };
 
 class MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge
-    : public MTRCallbackBridge<OnOffClusterOnOffDyingLightEffectVariantAttributeCallback>
+    : public MTRCallbackBridge<MTR OnOffClusterOnOffDyingLightEffectVariantAttributeCallback>
 {
 public:
     MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10205,7 +10212,7 @@ private:
 };
 
 class MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallback>
 {
 public:
     MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10234,7 +10241,7 @@ private:
 };
 
 class MTROnOffClusterOnOffEffectIdentifierAttributeCallbackBridge
-    : public MTRCallbackBridge<OnOffClusterOnOffEffectIdentifierAttributeCallback>
+    : public MTRCallbackBridge<MTR OnOffClusterOnOffEffectIdentifierAttributeCallback>
 {
 public:
     MTROnOffClusterOnOffEffectIdentifierAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10262,7 +10269,7 @@ private:
 };
 
 class MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOnOffClusterOnOffEffectIdentifierAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableOnOffClusterOnOffEffectIdentifierAttributeCallback>
 {
 public:
     MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10291,7 +10298,7 @@ private:
 };
 
 class MTROnOffClusterOnOffStartUpOnOffAttributeCallbackBridge
-    : public MTRCallbackBridge<OnOffClusterOnOffStartUpOnOffAttributeCallback>
+    : public MTRCallbackBridge<MTR OnOffClusterOnOffStartUpOnOffAttributeCallback>
 {
 public:
     MTROnOffClusterOnOffStartUpOnOffAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -10319,7 +10326,7 @@ private:
 };
 
 class MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOnOffClusterOnOffStartUpOnOffAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableOnOffClusterOnOffStartUpOnOffAttributeCallback>
 {
 public:
     MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10347,7 +10354,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRLevelControlClusterMoveModeAttributeCallbackBridge : public MTRCallbackBridge<LevelControlClusterMoveModeAttributeCallback>
+class MTRLevelControlClusterMoveModeAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR LevelControlClusterMoveModeAttributeCallback>
 {
 public:
     MTRLevelControlClusterMoveModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -10375,7 +10383,7 @@ private:
 };
 
 class MTRNullableLevelControlClusterMoveModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableLevelControlClusterMoveModeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableLevelControlClusterMoveModeAttributeCallback>
 {
 public:
     MTRNullableLevelControlClusterMoveModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10403,7 +10411,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRLevelControlClusterStepModeAttributeCallbackBridge : public MTRCallbackBridge<LevelControlClusterStepModeAttributeCallback>
+class MTRLevelControlClusterStepModeAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR LevelControlClusterStepModeAttributeCallback>
 {
 public:
     MTRLevelControlClusterStepModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -10431,7 +10440,7 @@ private:
 };
 
 class MTRNullableLevelControlClusterStepModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableLevelControlClusterStepModeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableLevelControlClusterStepModeAttributeCallback>
 {
 public:
     MTRNullableLevelControlClusterStepModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10460,7 +10469,7 @@ private:
 };
 
 class MTRApplianceControlClusterApplianceStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplianceControlClusterApplianceStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplianceControlClusterApplianceStatusAttributeCallback>
 {
 public:
     MTRApplianceControlClusterApplianceStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10488,7 +10497,7 @@ private:
 };
 
 class MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableApplianceControlClusterApplianceStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableApplianceControlClusterApplianceStatusAttributeCallback>
 {
 public:
     MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10517,7 +10526,7 @@ private:
 };
 
 class MTRApplianceControlClusterCommandIdentificationAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplianceControlClusterCommandIdentificationAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplianceControlClusterCommandIdentificationAttributeCallback>
 {
 public:
     MTRApplianceControlClusterCommandIdentificationAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10545,7 +10554,7 @@ private:
 };
 
 class MTRNullableApplianceControlClusterCommandIdentificationAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableApplianceControlClusterCommandIdentificationAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableApplianceControlClusterCommandIdentificationAttributeCallback>
 {
 public:
     MTRNullableApplianceControlClusterCommandIdentificationAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10575,7 +10584,7 @@ private:
 };
 
 class MTRApplianceControlClusterWarningEventAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplianceControlClusterWarningEventAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplianceControlClusterWarningEventAttributeCallback>
 {
 public:
     MTRApplianceControlClusterWarningEventAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10603,7 +10612,7 @@ private:
 };
 
 class MTRNullableApplianceControlClusterWarningEventAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableApplianceControlClusterWarningEventAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableApplianceControlClusterWarningEventAttributeCallback>
 {
 public:
     MTRNullableApplianceControlClusterWarningEventAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10632,7 +10641,7 @@ private:
 };
 
 class MTRAccessControlClusterAuthModeAttributeCallbackBridge
-    : public MTRCallbackBridge<AccessControlClusterAuthModeAttributeCallback>
+    : public MTRCallbackBridge<MTR AccessControlClusterAuthModeAttributeCallback>
 {
 public:
     MTRAccessControlClusterAuthModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -10660,7 +10669,7 @@ private:
 };
 
 class MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableAccessControlClusterAuthModeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableAccessControlClusterAuthModeAttributeCallback>
 {
 public:
     MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10689,7 +10698,7 @@ private:
 };
 
 class MTRAccessControlClusterChangeTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<AccessControlClusterChangeTypeEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR AccessControlClusterChangeTypeEnumAttributeCallback>
 {
 public:
     MTRAccessControlClusterChangeTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10717,7 +10726,7 @@ private:
 };
 
 class MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableAccessControlClusterChangeTypeEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableAccessControlClusterChangeTypeEnumAttributeCallback>
 {
 public:
     MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10746,7 +10755,7 @@ private:
 };
 
 class MTRAccessControlClusterPrivilegeAttributeCallbackBridge
-    : public MTRCallbackBridge<AccessControlClusterPrivilegeAttributeCallback>
+    : public MTRCallbackBridge<MTR AccessControlClusterPrivilegeAttributeCallback>
 {
 public:
     MTRAccessControlClusterPrivilegeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -10774,7 +10783,7 @@ private:
 };
 
 class MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableAccessControlClusterPrivilegeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableAccessControlClusterPrivilegeAttributeCallback>
 {
 public:
     MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10803,7 +10812,7 @@ private:
 };
 
 class MTRBridgedActionsClusterActionErrorEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsClusterActionErrorEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR BridgedActionsClusterActionErrorEnumAttributeCallback>
 {
 public:
     MTRBridgedActionsClusterActionErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10831,7 +10840,7 @@ private:
 };
 
 class MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableBridgedActionsClusterActionErrorEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableBridgedActionsClusterActionErrorEnumAttributeCallback>
 {
 public:
     MTRNullableBridgedActionsClusterActionErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10860,7 +10869,7 @@ private:
 };
 
 class MTRBridgedActionsClusterActionStateEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsClusterActionStateEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR BridgedActionsClusterActionStateEnumAttributeCallback>
 {
 public:
     MTRBridgedActionsClusterActionStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10888,7 +10897,7 @@ private:
 };
 
 class MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableBridgedActionsClusterActionStateEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableBridgedActionsClusterActionStateEnumAttributeCallback>
 {
 public:
     MTRNullableBridgedActionsClusterActionStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10917,7 +10926,7 @@ private:
 };
 
 class MTRBridgedActionsClusterActionTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsClusterActionTypeEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR BridgedActionsClusterActionTypeEnumAttributeCallback>
 {
 public:
     MTRBridgedActionsClusterActionTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10945,7 +10954,7 @@ private:
 };
 
 class MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableBridgedActionsClusterActionTypeEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableBridgedActionsClusterActionTypeEnumAttributeCallback>
 {
 public:
     MTRNullableBridgedActionsClusterActionTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -10974,7 +10983,7 @@ private:
 };
 
 class MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<BridgedActionsClusterEndpointListTypeEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR BridgedActionsClusterEndpointListTypeEnumAttributeCallback>
 {
 public:
     MTRBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11002,7 +11011,7 @@ private:
 };
 
 class MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableBridgedActionsClusterEndpointListTypeEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableBridgedActionsClusterEndpointListTypeEnumAttributeCallback>
 {
 public:
     MTRNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11032,7 +11041,7 @@ private:
 };
 
 class MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge
-    : public MTRCallbackBridge<OtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>
 {
 public:
     MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11060,7 +11069,7 @@ private:
 };
 
 class MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>
 {
 public:
     MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(dispatch_queue_t queue,
@@ -11092,7 +11101,7 @@ private:
 };
 
 class MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge
-    : public MTRCallbackBridge<OtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>
 {
 public:
     MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11120,7 +11129,7 @@ private:
 };
 
 class MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>
 {
 public:
     MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(dispatch_queue_t queue,
@@ -11152,7 +11161,7 @@ private:
 };
 
 class MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<OtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>
 {
 public:
     MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11180,7 +11189,7 @@ private:
 };
 
 class MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>
 {
 public:
     MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(dispatch_queue_t queue,
@@ -11211,7 +11220,7 @@ private:
 };
 
 class MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge
-    : public MTRCallbackBridge<OtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>
 {
 public:
     MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(dispatch_queue_t queue,
@@ -11240,7 +11249,7 @@ private:
 };
 
 class MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>
 {
 public:
     MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(dispatch_queue_t queue,
@@ -11272,7 +11281,7 @@ private:
 };
 
 class MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<OtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>
 {
 public:
     MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11300,7 +11309,7 @@ private:
 };
 
 class MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>
 {
 public:
     MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
@@ -11332,7 +11341,7 @@ private:
 };
 
 class MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<OtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR OtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>
 {
 public:
     MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11360,7 +11369,7 @@ private:
 };
 
 class MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>
 {
 public:
     MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue,
@@ -11392,7 +11401,7 @@ private:
 };
 
 class MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<TimeFormatLocalizationClusterCalendarTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR TimeFormatLocalizationClusterCalendarTypeAttributeCallback>
 {
 public:
     MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11420,7 +11429,7 @@ private:
 };
 
 class MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableTimeFormatLocalizationClusterCalendarTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableTimeFormatLocalizationClusterCalendarTypeAttributeCallback>
 {
 public:
     MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11450,7 +11459,7 @@ private:
 };
 
 class MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge
-    : public MTRCallbackBridge<TimeFormatLocalizationClusterHourFormatAttributeCallback>
+    : public MTRCallbackBridge<MTR TimeFormatLocalizationClusterHourFormatAttributeCallback>
 {
 public:
     MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11478,7 +11487,7 @@ private:
 };
 
 class MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableTimeFormatLocalizationClusterHourFormatAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableTimeFormatLocalizationClusterHourFormatAttributeCallback>
 {
 public:
     MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11507,7 +11516,7 @@ private:
 };
 
 class MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge
-    : public MTRCallbackBridge<UnitLocalizationClusterTempUnitAttributeCallback>
+    : public MTRCallbackBridge<MTR UnitLocalizationClusterTempUnitAttributeCallback>
 {
 public:
     MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11535,7 +11544,7 @@ private:
 };
 
 class MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableUnitLocalizationClusterTempUnitAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableUnitLocalizationClusterTempUnitAttributeCallback>
 {
 public:
     MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11564,7 +11573,7 @@ private:
 };
 
 class MTRPowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceClusterBatChargeFaultTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceClusterBatChargeFaultTypeAttributeCallback>
 {
 public:
     MTRPowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11592,7 +11601,7 @@ private:
 };
 
 class MTRNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullablePowerSourceClusterBatChargeFaultTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullablePowerSourceClusterBatChargeFaultTypeAttributeCallback>
 {
 public:
     MTRNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11621,7 +11630,7 @@ private:
 };
 
 class MTRPowerSourceClusterBatChargeLevelAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceClusterBatChargeLevelAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceClusterBatChargeLevelAttributeCallback>
 {
 public:
     MTRPowerSourceClusterBatChargeLevelAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11649,7 +11658,7 @@ private:
 };
 
 class MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge
-    : public MTRCallbackBridge<NullablePowerSourceClusterBatChargeLevelAttributeCallback>
+    : public MTRCallbackBridge<MTR NullablePowerSourceClusterBatChargeLevelAttributeCallback>
 {
 public:
     MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11678,7 +11687,7 @@ private:
 };
 
 class MTRPowerSourceClusterBatChargeStateAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceClusterBatChargeStateAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceClusterBatChargeStateAttributeCallback>
 {
 public:
     MTRPowerSourceClusterBatChargeStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11706,7 +11715,7 @@ private:
 };
 
 class MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge
-    : public MTRCallbackBridge<NullablePowerSourceClusterBatChargeStateAttributeCallback>
+    : public MTRCallbackBridge<MTR NullablePowerSourceClusterBatChargeStateAttributeCallback>
 {
 public:
     MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11735,7 +11744,7 @@ private:
 };
 
 class MTRPowerSourceClusterBatFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceClusterBatFaultTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceClusterBatFaultTypeAttributeCallback>
 {
 public:
     MTRPowerSourceClusterBatFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -11763,7 +11772,7 @@ private:
 };
 
 class MTRNullablePowerSourceClusterBatFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullablePowerSourceClusterBatFaultTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullablePowerSourceClusterBatFaultTypeAttributeCallback>
 {
 public:
     MTRNullablePowerSourceClusterBatFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11792,7 +11801,7 @@ private:
 };
 
 class MTRPowerSourceClusterBatReplaceabilityAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceClusterBatReplaceabilityAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceClusterBatReplaceabilityAttributeCallback>
 {
 public:
     MTRPowerSourceClusterBatReplaceabilityAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11820,7 +11829,7 @@ private:
 };
 
 class MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge
-    : public MTRCallbackBridge<NullablePowerSourceClusterBatReplaceabilityAttributeCallback>
+    : public MTRCallbackBridge<MTR NullablePowerSourceClusterBatReplaceabilityAttributeCallback>
 {
 public:
     MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11849,7 +11858,7 @@ private:
 };
 
 class MTRPowerSourceClusterPowerSourceStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceClusterPowerSourceStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceClusterPowerSourceStatusAttributeCallback>
 {
 public:
     MTRPowerSourceClusterPowerSourceStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11877,7 +11886,7 @@ private:
 };
 
 class MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullablePowerSourceClusterPowerSourceStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR NullablePowerSourceClusterPowerSourceStatusAttributeCallback>
 {
 public:
     MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11906,7 +11915,7 @@ private:
 };
 
 class MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceClusterWiredCurrentTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceClusterWiredCurrentTypeAttributeCallback>
 {
 public:
     MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11934,7 +11943,7 @@ private:
 };
 
 class MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullablePowerSourceClusterWiredCurrentTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullablePowerSourceClusterWiredCurrentTypeAttributeCallback>
 {
 public:
     MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11963,7 +11972,7 @@ private:
 };
 
 class MTRPowerSourceClusterWiredFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<PowerSourceClusterWiredFaultTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR PowerSourceClusterWiredFaultTypeAttributeCallback>
 {
 public:
     MTRPowerSourceClusterWiredFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -11991,7 +12000,7 @@ private:
 };
 
 class MTRNullablePowerSourceClusterWiredFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullablePowerSourceClusterWiredFaultTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullablePowerSourceClusterWiredFaultTypeAttributeCallback>
 {
 public:
     MTRNullablePowerSourceClusterWiredFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12020,7 +12029,7 @@ private:
 };
 
 class MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralCommissioningClusterCommissioningErrorAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralCommissioningClusterCommissioningErrorAttributeCallback>
 {
 public:
     MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12048,7 +12057,7 @@ private:
 };
 
 class MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableGeneralCommissioningClusterCommissioningErrorAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableGeneralCommissioningClusterCommissioningErrorAttributeCallback>
 {
 public:
     MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12078,7 +12087,7 @@ private:
 };
 
 class MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>
 {
 public:
     MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12106,7 +12115,7 @@ private:
 };
 
 class MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>
 {
 public:
     MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge(dispatch_queue_t queue,
@@ -12138,7 +12147,7 @@ private:
 };
 
 class MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>
 {
 public:
     MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12166,7 +12175,7 @@ private:
 };
 
 class MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>
 {
 public:
     MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(dispatch_queue_t queue,
@@ -12198,7 +12207,7 @@ private:
 };
 
 class MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge
-    : public MTRCallbackBridge<NetworkCommissioningClusterWiFiBandAttributeCallback>
+    : public MTRCallbackBridge<MTR NetworkCommissioningClusterWiFiBandAttributeCallback>
 {
 public:
     MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12226,7 +12235,7 @@ private:
 };
 
 class MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableNetworkCommissioningClusterWiFiBandAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableNetworkCommissioningClusterWiFiBandAttributeCallback>
 {
 public:
     MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12255,7 +12264,7 @@ private:
 };
 
 class MTRDiagnosticLogsClusterLogsIntentAttributeCallbackBridge
-    : public MTRCallbackBridge<DiagnosticLogsClusterLogsIntentAttributeCallback>
+    : public MTRCallbackBridge<MTR DiagnosticLogsClusterLogsIntentAttributeCallback>
 {
 public:
     MTRDiagnosticLogsClusterLogsIntentAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12283,7 +12292,7 @@ private:
 };
 
 class MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDiagnosticLogsClusterLogsIntentAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDiagnosticLogsClusterLogsIntentAttributeCallback>
 {
 public:
     MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12312,7 +12321,7 @@ private:
 };
 
 class MTRDiagnosticLogsClusterLogsStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<DiagnosticLogsClusterLogsStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR DiagnosticLogsClusterLogsStatusAttributeCallback>
 {
 public:
     MTRDiagnosticLogsClusterLogsStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12340,7 +12349,7 @@ private:
 };
 
 class MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDiagnosticLogsClusterLogsStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDiagnosticLogsClusterLogsStatusAttributeCallback>
 {
 public:
     MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12369,7 +12378,7 @@ private:
 };
 
 class MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge
-    : public MTRCallbackBridge<DiagnosticLogsClusterLogsTransferProtocolAttributeCallback>
+    : public MTRCallbackBridge<MTR DiagnosticLogsClusterLogsTransferProtocolAttributeCallback>
 {
 public:
     MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12397,7 +12406,7 @@ private:
 };
 
 class MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallback>
 {
 public:
     MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12427,7 +12436,7 @@ private:
 };
 
 class MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsClusterBootReasonTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralDiagnosticsClusterBootReasonTypeAttributeCallback>
 {
 public:
     MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12455,7 +12464,7 @@ private:
 };
 
 class MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallback>
 {
 public:
     MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12484,7 +12493,7 @@ private:
 };
 
 class MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsClusterHardwareFaultTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralDiagnosticsClusterHardwareFaultTypeAttributeCallback>
 {
 public:
     MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12512,7 +12521,7 @@ private:
 };
 
 class MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallback>
 {
 public:
     MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12542,7 +12551,7 @@ private:
 };
 
 class MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsClusterInterfaceTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralDiagnosticsClusterInterfaceTypeAttributeCallback>
 {
 public:
     MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12570,7 +12579,7 @@ private:
 };
 
 class MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallback>
 {
 public:
     MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12599,7 +12608,7 @@ private:
 };
 
 class MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback>
 {
 public:
     MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12627,7 +12636,7 @@ private:
 };
 
 class MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback>
 {
 public:
     MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12657,7 +12666,7 @@ private:
 };
 
 class MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralDiagnosticsClusterRadioFaultTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR GeneralDiagnosticsClusterRadioFaultTypeAttributeCallback>
 {
 public:
     MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12685,7 +12694,7 @@ private:
 };
 
 class MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallback>
 {
 public:
     MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12714,7 +12723,7 @@ private:
 };
 
 class MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge
-    : public MTRCallbackBridge<ThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallback>
+    : public MTRCallbackBridge<MTR ThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallback>
 {
 public:
     MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12742,7 +12751,7 @@ private:
 };
 
 class MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallback>
 {
 public:
     MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12772,7 +12781,7 @@ private:
 };
 
 class MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge
-    : public MTRCallbackBridge<ThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallback>
+    : public MTRCallbackBridge<MTR ThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallback>
 {
 public:
     MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12800,7 +12809,7 @@ private:
 };
 
 class MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallback>
 {
 public:
     MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12830,7 +12839,7 @@ private:
 };
 
 class MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<ThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR ThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback>
 {
 public:
     MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12858,7 +12867,7 @@ private:
 };
 
 class MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback>
 {
 public:
     MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge(dispatch_queue_t queue,
@@ -12890,7 +12899,7 @@ private:
 };
 
 class MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge
-    : public MTRCallbackBridge<WiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallback>
+    : public MTRCallbackBridge<MTR WiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallback>
 {
 public:
     MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12918,7 +12927,7 @@ private:
 };
 
 class MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallback>
 {
 public:
     MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge(dispatch_queue_t queue,
@@ -12950,7 +12959,7 @@ private:
 };
 
 class MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<WiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR WiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallback>
 {
 public:
     MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -12978,7 +12987,7 @@ private:
 };
 
 class MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallback>
 {
 public:
     MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13008,7 +13017,7 @@ private:
 };
 
 class MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<WiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR WiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallback>
 {
 public:
     MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13036,7 +13045,7 @@ private:
 };
 
 class MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallback>
 {
 public:
     MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge(dispatch_queue_t queue,
@@ -13068,7 +13077,7 @@ private:
 };
 
 class MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<WiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR WiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallback>
 {
 public:
     MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13096,7 +13105,7 @@ private:
 };
 
 class MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallback>
 {
 public:
     MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13126,7 +13135,7 @@ private:
 };
 
 class MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<EthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR EthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallback>
 {
 public:
     MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13154,7 +13163,7 @@ private:
 };
 
 class MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallback>
 {
 public:
     MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13184,7 +13193,7 @@ private:
 };
 
 class MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<AdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR AdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback>
 {
 public:
     MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge(dispatch_queue_t queue,
@@ -13214,7 +13223,7 @@ private:
 };
 
 class MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback>
 {
 public:
     MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge(dispatch_queue_t queue,
@@ -13246,7 +13255,7 @@ private:
 };
 
 class MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge
-    : public MTRCallbackBridge<AdministratorCommissioningClusterStatusCodeAttributeCallback>
+    : public MTRCallbackBridge<MTR AdministratorCommissioningClusterStatusCodeAttributeCallback>
 {
 public:
     MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13274,7 +13283,7 @@ private:
 };
 
 class MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableAdministratorCommissioningClusterStatusCodeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableAdministratorCommissioningClusterStatusCodeAttributeCallback>
 {
 public:
     MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13304,7 +13313,7 @@ private:
 };
 
 class MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<OperationalCredentialsClusterOperationalCertStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR OperationalCredentialsClusterOperationalCertStatusAttributeCallback>
 {
 public:
     MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13332,7 +13341,7 @@ private:
 };
 
 class MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback>
 {
 public:
     MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(dispatch_queue_t queue,
@@ -13364,7 +13373,7 @@ private:
 };
 
 class MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge
-    : public MTRCallbackBridge<GroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback>
+    : public MTRCallbackBridge<MTR GroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback>
 {
 public:
     MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13392,7 +13401,7 @@ private:
 };
 
 class MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback>
 {
 public:
     MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge(dispatch_queue_t queue,
@@ -13423,7 +13432,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlAlarmCodeAttributeCallback>
+class MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR DoorLockClusterDlAlarmCodeAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -13450,7 +13460,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlAlarmCodeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlAlarmCodeAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13479,7 +13489,7 @@ private:
 };
 
 class MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlCredentialRuleAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockClusterDlCredentialRuleAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13507,7 +13517,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlCredentialRuleAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlCredentialRuleAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13536,7 +13546,7 @@ private:
 };
 
 class MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlCredentialTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockClusterDlCredentialTypeAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13564,7 +13574,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlCredentialTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlCredentialTypeAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13593,7 +13603,7 @@ private:
 };
 
 class MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlDataOperationTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockClusterDlDataOperationTypeAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13621,7 +13631,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlDataOperationTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlDataOperationTypeAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13649,7 +13659,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDlDoorStateAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlDoorStateAttributeCallback>
+class MTRDoorLockClusterDlDoorStateAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR DoorLockClusterDlDoorStateAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlDoorStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -13676,7 +13687,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlDoorStateAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlDoorStateAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13705,7 +13716,7 @@ private:
 };
 
 class MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlLockDataTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockClusterDlLockDataTypeAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -13733,7 +13744,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlLockDataTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlLockDataTypeAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13762,7 +13773,7 @@ private:
 };
 
 class MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlLockOperationTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockClusterDlLockOperationTypeAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13790,7 +13801,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlLockOperationTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlLockOperationTypeAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13818,7 +13829,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDlLockStateAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlLockStateAttributeCallback>
+class MTRDoorLockClusterDlLockStateAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR DoorLockClusterDlLockStateAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlLockStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -13845,7 +13857,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlLockStateAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlLockStateAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlLockStateAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlLockStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13873,7 +13885,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDlLockTypeAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlLockTypeAttributeCallback>
+class MTRDoorLockClusterDlLockTypeAttributeCallbackBridge : public MTRCallbackBridge<MTR DoorLockClusterDlLockTypeAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlLockTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -13900,7 +13912,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlLockTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlLockTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlLockTypeAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlLockTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13929,7 +13941,7 @@ private:
 };
 
 class MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlOperatingModeAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockClusterDlOperatingModeAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -13957,7 +13969,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlOperatingModeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlOperatingModeAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -13986,7 +13998,7 @@ private:
 };
 
 class MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlOperationErrorAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockClusterDlOperationErrorAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14014,7 +14026,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlOperationErrorAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlOperationErrorAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14043,7 +14055,7 @@ private:
 };
 
 class MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDlOperationSourceAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockClusterDlOperationSourceAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14071,7 +14083,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlOperationSourceAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlOperationSourceAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14099,7 +14111,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDlStatusAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlStatusAttributeCallback>
+class MTRDoorLockClusterDlStatusAttributeCallbackBridge : public MTRCallbackBridge<MTR DoorLockClusterDlStatusAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -14126,7 +14138,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlStatusAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14153,7 +14165,8 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDlUserStatusAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlUserStatusAttributeCallback>
+class MTRDoorLockClusterDlUserStatusAttributeCallbackBridge
+    : public MTRCallbackBridge<MTR DoorLockClusterDlUserStatusAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlUserStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -14181,7 +14194,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlUserStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlUserStatusAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14209,7 +14222,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDoorLockClusterDlUserTypeAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlUserTypeAttributeCallback>
+class MTRDoorLockClusterDlUserTypeAttributeCallbackBridge : public MTRCallbackBridge<MTR DoorLockClusterDlUserTypeAttributeCallback>
 {
 public:
     MTRDoorLockClusterDlUserTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -14236,7 +14249,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDlUserTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDlUserTypeAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14265,7 +14278,7 @@ private:
 };
 
 class MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDoorLockOperationEventCodeAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockClusterDoorLockOperationEventCodeAttributeCallback>
 {
 public:
     MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14293,7 +14306,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDoorLockOperationEventCodeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDoorLockOperationEventCodeAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14323,7 +14336,7 @@ private:
 };
 
 class MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDoorLockProgrammingEventCodeAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockClusterDoorLockProgrammingEventCodeAttributeCallback>
 {
 public:
     MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14351,7 +14364,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14381,7 +14394,7 @@ private:
 };
 
 class MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDoorLockSetPinOrIdStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockClusterDoorLockSetPinOrIdStatusAttributeCallback>
 {
 public:
     MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14409,7 +14422,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14438,7 +14451,7 @@ private:
 };
 
 class MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDoorLockUserStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockClusterDoorLockUserStatusAttributeCallback>
 {
 public:
     MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14466,7 +14479,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDoorLockUserStatusAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDoorLockUserStatusAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14495,7 +14508,7 @@ private:
 };
 
 class MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterDoorLockUserTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR DoorLockClusterDoorLockUserTypeAttributeCallback>
 {
 public:
     MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14523,7 +14536,7 @@ private:
 };
 
 class MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDoorLockClusterDoorLockUserTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableDoorLockClusterDoorLockUserTypeAttributeCallback>
 {
 public:
     MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14552,7 +14565,7 @@ private:
 };
 
 class MTRWindowCoveringClusterEndProductTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<WindowCoveringClusterEndProductTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR WindowCoveringClusterEndProductTypeAttributeCallback>
 {
 public:
     MTRWindowCoveringClusterEndProductTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14580,7 +14593,7 @@ private:
 };
 
 class MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableWindowCoveringClusterEndProductTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableWindowCoveringClusterEndProductTypeAttributeCallback>
 {
 public:
     MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14608,7 +14621,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRWindowCoveringClusterTypeAttributeCallbackBridge : public MTRCallbackBridge<WindowCoveringClusterTypeAttributeCallback>
+class MTRWindowCoveringClusterTypeAttributeCallbackBridge : public MTRCallbackBridge<MTR WindowCoveringClusterTypeAttributeCallback>
 {
 public:
     MTRWindowCoveringClusterTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -14635,7 +14648,7 @@ private:
 };
 
 class MTRNullableWindowCoveringClusterTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableWindowCoveringClusterTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableWindowCoveringClusterTypeAttributeCallback>
 {
 public:
     MTRNullableWindowCoveringClusterTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14664,7 +14677,7 @@ private:
 };
 
 class MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge
-    : public MTRCallbackBridge<PumpConfigurationAndControlClusterPumpControlModeAttributeCallback>
+    : public MTRCallbackBridge<MTR PumpConfigurationAndControlClusterPumpControlModeAttributeCallback>
 {
 public:
     MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14692,7 +14705,7 @@ private:
 };
 
 class MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallback>
 {
 public:
     MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(dispatch_queue_t queue,
@@ -14724,7 +14737,7 @@ private:
 };
 
 class MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge
-    : public MTRCallbackBridge<PumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>
+    : public MTRCallbackBridge<MTR PumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>
 {
 public:
     MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14752,7 +14765,7 @@ private:
 };
 
 class MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>
 {
 public:
     MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(dispatch_queue_t queue,
@@ -14784,7 +14797,7 @@ private:
 };
 
 class MTRThermostatClusterSetpointAdjustModeAttributeCallbackBridge
-    : public MTRCallbackBridge<ThermostatClusterSetpointAdjustModeAttributeCallback>
+    : public MTRCallbackBridge<MTR ThermostatClusterSetpointAdjustModeAttributeCallback>
 {
 public:
     MTRThermostatClusterSetpointAdjustModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14812,7 +14825,7 @@ private:
 };
 
 class MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableThermostatClusterSetpointAdjustModeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableThermostatClusterSetpointAdjustModeAttributeCallback>
 {
 public:
     MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14841,7 +14854,7 @@ private:
 };
 
 class MTRThermostatClusterThermostatControlSequenceAttributeCallbackBridge
-    : public MTRCallbackBridge<ThermostatClusterThermostatControlSequenceAttributeCallback>
+    : public MTRCallbackBridge<MTR ThermostatClusterThermostatControlSequenceAttributeCallback>
 {
 public:
     MTRThermostatClusterThermostatControlSequenceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14869,7 +14882,7 @@ private:
 };
 
 class MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableThermostatClusterThermostatControlSequenceAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableThermostatClusterThermostatControlSequenceAttributeCallback>
 {
 public:
     MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14899,7 +14912,7 @@ private:
 };
 
 class MTRThermostatClusterThermostatRunningModeAttributeCallbackBridge
-    : public MTRCallbackBridge<ThermostatClusterThermostatRunningModeAttributeCallback>
+    : public MTRCallbackBridge<MTR ThermostatClusterThermostatRunningModeAttributeCallback>
 {
 public:
     MTRThermostatClusterThermostatRunningModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14927,7 +14940,7 @@ private:
 };
 
 class MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableThermostatClusterThermostatRunningModeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableThermostatClusterThermostatRunningModeAttributeCallback>
 {
 public:
     MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14956,7 +14969,7 @@ private:
 };
 
 class MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge
-    : public MTRCallbackBridge<ThermostatClusterThermostatSystemModeAttributeCallback>
+    : public MTRCallbackBridge<MTR ThermostatClusterThermostatSystemModeAttributeCallback>
 {
 public:
     MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -14984,7 +14997,7 @@ private:
 };
 
 class MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableThermostatClusterThermostatSystemModeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableThermostatClusterThermostatSystemModeAttributeCallback>
 {
 public:
     MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15013,7 +15026,7 @@ private:
 };
 
 class MTRFanControlClusterFanModeSequenceTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<FanControlClusterFanModeSequenceTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR FanControlClusterFanModeSequenceTypeAttributeCallback>
 {
 public:
     MTRFanControlClusterFanModeSequenceTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15041,7 +15054,7 @@ private:
 };
 
 class MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableFanControlClusterFanModeSequenceTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableFanControlClusterFanModeSequenceTypeAttributeCallback>
 {
 public:
     MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15070,7 +15083,7 @@ private:
 };
 
 class MTRFanControlClusterFanModeTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<FanControlClusterFanModeTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR FanControlClusterFanModeTypeAttributeCallback>
 {
 public:
     MTRFanControlClusterFanModeTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -15098,7 +15111,7 @@ private:
 };
 
 class MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableFanControlClusterFanModeTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableFanControlClusterFanModeTypeAttributeCallback>
 {
 public:
     MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15127,7 +15140,7 @@ private:
 };
 
 class MTRColorControlClusterColorLoopActionAttributeCallbackBridge
-    : public MTRCallbackBridge<ColorControlClusterColorLoopActionAttributeCallback>
+    : public MTRCallbackBridge<MTR ColorControlClusterColorLoopActionAttributeCallback>
 {
 public:
     MTRColorControlClusterColorLoopActionAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15155,7 +15168,7 @@ private:
 };
 
 class MTRNullableColorControlClusterColorLoopActionAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableColorControlClusterColorLoopActionAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableColorControlClusterColorLoopActionAttributeCallback>
 {
 public:
     MTRNullableColorControlClusterColorLoopActionAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15184,7 +15197,7 @@ private:
 };
 
 class MTRColorControlClusterColorLoopDirectionAttributeCallbackBridge
-    : public MTRCallbackBridge<ColorControlClusterColorLoopDirectionAttributeCallback>
+    : public MTRCallbackBridge<MTR ColorControlClusterColorLoopDirectionAttributeCallback>
 {
 public:
     MTRColorControlClusterColorLoopDirectionAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15212,7 +15225,7 @@ private:
 };
 
 class MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableColorControlClusterColorLoopDirectionAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableColorControlClusterColorLoopDirectionAttributeCallback>
 {
 public:
     MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15241,7 +15254,7 @@ private:
 };
 
 class MTRColorControlClusterColorModeAttributeCallbackBridge
-    : public MTRCallbackBridge<ColorControlClusterColorModeAttributeCallback>
+    : public MTRCallbackBridge<MTR ColorControlClusterColorModeAttributeCallback>
 {
 public:
     MTRColorControlClusterColorModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -15269,7 +15282,7 @@ private:
 };
 
 class MTRNullableColorControlClusterColorModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableColorControlClusterColorModeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableColorControlClusterColorModeAttributeCallback>
 {
 public:
     MTRNullableColorControlClusterColorModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15298,7 +15311,7 @@ private:
 };
 
 class MTRColorControlClusterHueDirectionAttributeCallbackBridge
-    : public MTRCallbackBridge<ColorControlClusterHueDirectionAttributeCallback>
+    : public MTRCallbackBridge<MTR ColorControlClusterHueDirectionAttributeCallback>
 {
 public:
     MTRColorControlClusterHueDirectionAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15326,7 +15339,7 @@ private:
 };
 
 class MTRNullableColorControlClusterHueDirectionAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableColorControlClusterHueDirectionAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableColorControlClusterHueDirectionAttributeCallback>
 {
 public:
     MTRNullableColorControlClusterHueDirectionAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15355,7 +15368,7 @@ private:
 };
 
 class MTRColorControlClusterHueMoveModeAttributeCallbackBridge
-    : public MTRCallbackBridge<ColorControlClusterHueMoveModeAttributeCallback>
+    : public MTRCallbackBridge<MTR ColorControlClusterHueMoveModeAttributeCallback>
 {
 public:
     MTRColorControlClusterHueMoveModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -15383,7 +15396,7 @@ private:
 };
 
 class MTRNullableColorControlClusterHueMoveModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableColorControlClusterHueMoveModeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableColorControlClusterHueMoveModeAttributeCallback>
 {
 public:
     MTRNullableColorControlClusterHueMoveModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15412,7 +15425,7 @@ private:
 };
 
 class MTRColorControlClusterHueStepModeAttributeCallbackBridge
-    : public MTRCallbackBridge<ColorControlClusterHueStepModeAttributeCallback>
+    : public MTRCallbackBridge<MTR ColorControlClusterHueStepModeAttributeCallback>
 {
 public:
     MTRColorControlClusterHueStepModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -15440,7 +15453,7 @@ private:
 };
 
 class MTRNullableColorControlClusterHueStepModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableColorControlClusterHueStepModeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableColorControlClusterHueStepModeAttributeCallback>
 {
 public:
     MTRNullableColorControlClusterHueStepModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15469,7 +15482,7 @@ private:
 };
 
 class MTRColorControlClusterSaturationMoveModeAttributeCallbackBridge
-    : public MTRCallbackBridge<ColorControlClusterSaturationMoveModeAttributeCallback>
+    : public MTRCallbackBridge<MTR ColorControlClusterSaturationMoveModeAttributeCallback>
 {
 public:
     MTRColorControlClusterSaturationMoveModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15497,7 +15510,7 @@ private:
 };
 
 class MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableColorControlClusterSaturationMoveModeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableColorControlClusterSaturationMoveModeAttributeCallback>
 {
 public:
     MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15526,7 +15539,7 @@ private:
 };
 
 class MTRColorControlClusterSaturationStepModeAttributeCallbackBridge
-    : public MTRCallbackBridge<ColorControlClusterSaturationStepModeAttributeCallback>
+    : public MTRCallbackBridge<MTR ColorControlClusterSaturationStepModeAttributeCallback>
 {
 public:
     MTRColorControlClusterSaturationStepModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15554,7 +15567,7 @@ private:
 };
 
 class MTRNullableColorControlClusterSaturationStepModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableColorControlClusterSaturationStepModeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableColorControlClusterSaturationStepModeAttributeCallback>
 {
 public:
     MTRNullableColorControlClusterSaturationStepModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15583,7 +15596,7 @@ private:
 };
 
 class MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<IlluminanceMeasurementClusterLightSensorTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR IlluminanceMeasurementClusterLightSensorTypeAttributeCallback>
 {
 public:
     MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15611,7 +15624,7 @@ private:
 };
 
 class MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallback>
 {
 public:
     MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15641,7 +15654,7 @@ private:
 };
 
 class MTRChannelClusterChannelStatusEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<ChannelClusterChannelStatusEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR ChannelClusterChannelStatusEnumAttributeCallback>
 {
 public:
     MTRChannelClusterChannelStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15669,7 +15682,7 @@ private:
 };
 
 class MTRNullableChannelClusterChannelStatusEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableChannelClusterChannelStatusEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableChannelClusterChannelStatusEnumAttributeCallback>
 {
 public:
     MTRNullableChannelClusterChannelStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15698,7 +15711,7 @@ private:
 };
 
 class MTRChannelClusterLineupInfoTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<ChannelClusterLineupInfoTypeEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR ChannelClusterLineupInfoTypeEnumAttributeCallback>
 {
 public:
     MTRChannelClusterLineupInfoTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15726,7 +15739,7 @@ private:
 };
 
 class MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableChannelClusterLineupInfoTypeEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableChannelClusterLineupInfoTypeEnumAttributeCallback>
 {
 public:
     MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15755,7 +15768,7 @@ private:
 };
 
 class MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<TargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR TargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback>
 {
 public:
     MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15783,7 +15796,7 @@ private:
 };
 
 class MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback>
 {
 public:
     MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
@@ -15815,7 +15828,7 @@ private:
 };
 
 class MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<MediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR MediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback>
 {
 public:
     MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15843,7 +15856,7 @@ private:
 };
 
 class MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback>
 {
 public:
     MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15873,7 +15886,7 @@ private:
 };
 
 class MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<MediaPlaybackClusterPlaybackStateEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR MediaPlaybackClusterPlaybackStateEnumAttributeCallback>
 {
 public:
     MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15901,7 +15914,7 @@ private:
 };
 
 class MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableMediaPlaybackClusterPlaybackStateEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableMediaPlaybackClusterPlaybackStateEnumAttributeCallback>
 {
 public:
     MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15930,7 +15943,7 @@ private:
 };
 
 class MTRMediaInputClusterInputTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<MediaInputClusterInputTypeEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR MediaInputClusterInputTypeEnumAttributeCallback>
 {
 public:
     MTRMediaInputClusterInputTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -15958,7 +15971,7 @@ private:
 };
 
 class MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableMediaInputClusterInputTypeEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableMediaInputClusterInputTypeEnumAttributeCallback>
 {
 public:
     MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -15987,7 +16000,7 @@ private:
 };
 
 class MTRKeypadInputClusterCecKeyCodeAttributeCallbackBridge
-    : public MTRCallbackBridge<KeypadInputClusterCecKeyCodeAttributeCallback>
+    : public MTRCallbackBridge<MTR KeypadInputClusterCecKeyCodeAttributeCallback>
 {
 public:
     MTRKeypadInputClusterCecKeyCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -16015,7 +16028,7 @@ private:
 };
 
 class MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableKeypadInputClusterCecKeyCodeAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableKeypadInputClusterCecKeyCodeAttributeCallback>
 {
 public:
     MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16044,7 +16057,7 @@ private:
 };
 
 class MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<KeypadInputClusterKeypadInputStatusEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR KeypadInputClusterKeypadInputStatusEnumAttributeCallback>
 {
 public:
     MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16072,7 +16085,7 @@ private:
 };
 
 class MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableKeypadInputClusterKeypadInputStatusEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableKeypadInputClusterKeypadInputStatusEnumAttributeCallback>
 {
 public:
     MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16101,7 +16114,7 @@ private:
 };
 
 class MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<ContentLauncherClusterContentLaunchStatusEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR ContentLauncherClusterContentLaunchStatusEnumAttributeCallback>
 {
 public:
     MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16129,7 +16142,7 @@ private:
 };
 
 class MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableContentLauncherClusterContentLaunchStatusEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableContentLauncherClusterContentLaunchStatusEnumAttributeCallback>
 {
 public:
     MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16159,7 +16172,7 @@ private:
 };
 
 class MTRContentLauncherClusterMetricTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<ContentLauncherClusterMetricTypeEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR ContentLauncherClusterMetricTypeEnumAttributeCallback>
 {
 public:
     MTRContentLauncherClusterMetricTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16187,7 +16200,7 @@ private:
 };
 
 class MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableContentLauncherClusterMetricTypeEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableContentLauncherClusterMetricTypeEnumAttributeCallback>
 {
 public:
     MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16216,7 +16229,7 @@ private:
 };
 
 class MTRContentLauncherClusterParameterEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<ContentLauncherClusterParameterEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR ContentLauncherClusterParameterEnumAttributeCallback>
 {
 public:
     MTRContentLauncherClusterParameterEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16244,7 +16257,7 @@ private:
 };
 
 class MTRNullableContentLauncherClusterParameterEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableContentLauncherClusterParameterEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableContentLauncherClusterParameterEnumAttributeCallback>
 {
 public:
     MTRNullableContentLauncherClusterParameterEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16273,7 +16286,7 @@ private:
 };
 
 class MTRAudioOutputClusterOutputTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<AudioOutputClusterOutputTypeEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR AudioOutputClusterOutputTypeEnumAttributeCallback>
 {
 public:
     MTRAudioOutputClusterOutputTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16301,7 +16314,7 @@ private:
 };
 
 class MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableAudioOutputClusterOutputTypeEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableAudioOutputClusterOutputTypeEnumAttributeCallback>
 {
 public:
     MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16330,7 +16343,7 @@ private:
 };
 
 class MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback>
 {
 public:
     MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
@@ -16360,7 +16373,7 @@ private:
 };
 
 class MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback>
 {
 public:
     MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
@@ -16392,7 +16405,7 @@ private:
 };
 
 class MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplicationBasicClusterApplicationStatusEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplicationBasicClusterApplicationStatusEnumAttributeCallback>
 {
 public:
     MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16420,7 +16433,7 @@ private:
 };
 
 class MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableApplicationBasicClusterApplicationStatusEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableApplicationBasicClusterApplicationStatusEnumAttributeCallback>
 {
 public:
     MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16449,7 +16462,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRMessagingClusterEventIdAttributeCallbackBridge : public MTRCallbackBridge<MessagingClusterEventIdAttributeCallback>
+class MTRMessagingClusterEventIdAttributeCallbackBridge : public MTRCallbackBridge<MTR MessagingClusterEventIdAttributeCallback>
 {
 public:
     MTRMessagingClusterEventIdAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -16476,7 +16489,7 @@ private:
 };
 
 class MTRNullableMessagingClusterEventIdAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableMessagingClusterEventIdAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableMessagingClusterEventIdAttributeCallback>
 {
 public:
     MTRNullableMessagingClusterEventIdAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16504,7 +16517,7 @@ private:
 };
 
 class MTRMessagingClusterMessagingControlConfirmationAttributeCallbackBridge
-    : public MTRCallbackBridge<MessagingClusterMessagingControlConfirmationAttributeCallback>
+    : public MTRCallbackBridge<MTR MessagingClusterMessagingControlConfirmationAttributeCallback>
 {
 public:
     MTRMessagingClusterMessagingControlConfirmationAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16532,7 +16545,7 @@ private:
 };
 
 class MTRNullableMessagingClusterMessagingControlConfirmationAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableMessagingClusterMessagingControlConfirmationAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableMessagingClusterMessagingControlConfirmationAttributeCallback>
 {
 public:
     MTRNullableMessagingClusterMessagingControlConfirmationAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16562,7 +16575,7 @@ private:
 };
 
 class MTRMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge
-    : public MTRCallbackBridge<MessagingClusterMessagingControlEnhancedConfirmationAttributeCallback>
+    : public MTRCallbackBridge<MTR MessagingClusterMessagingControlEnhancedConfirmationAttributeCallback>
 {
 public:
     MTRMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16590,7 +16603,7 @@ private:
 };
 
 class MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallback>
 {
 public:
     MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge(dispatch_queue_t queue,
@@ -16622,7 +16635,7 @@ private:
 };
 
 class MTRMessagingClusterMessagingControlImportanceAttributeCallbackBridge
-    : public MTRCallbackBridge<MessagingClusterMessagingControlImportanceAttributeCallback>
+    : public MTRCallbackBridge<MTR MessagingClusterMessagingControlImportanceAttributeCallback>
 {
 public:
     MTRMessagingClusterMessagingControlImportanceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16650,7 +16663,7 @@ private:
 };
 
 class MTRNullableMessagingClusterMessagingControlImportanceAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableMessagingClusterMessagingControlImportanceAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableMessagingClusterMessagingControlImportanceAttributeCallback>
 {
 public:
     MTRNullableMessagingClusterMessagingControlImportanceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16680,7 +16693,7 @@ private:
 };
 
 class MTRMessagingClusterMessagingControlTransmissionAttributeCallbackBridge
-    : public MTRCallbackBridge<MessagingClusterMessagingControlTransmissionAttributeCallback>
+    : public MTRCallbackBridge<MTR MessagingClusterMessagingControlTransmissionAttributeCallback>
 {
 public:
     MTRMessagingClusterMessagingControlTransmissionAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16708,7 +16721,7 @@ private:
 };
 
 class MTRNullableMessagingClusterMessagingControlTransmissionAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableMessagingClusterMessagingControlTransmissionAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableMessagingClusterMessagingControlTransmissionAttributeCallback>
 {
 public:
     MTRNullableMessagingClusterMessagingControlTransmissionAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16738,7 +16751,7 @@ private:
 };
 
 class MTRApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplianceEventsAndAlertClusterEventIdentificationAttributeCallback>
+    : public MTRCallbackBridge<MTR ApplianceEventsAndAlertClusterEventIdentificationAttributeCallback>
 {
 public:
     MTRApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
@@ -16766,7 +16779,7 @@ private:
 };
 
 class MTRNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallback>
 {
 public:
     MTRNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge(dispatch_queue_t queue,
@@ -16798,7 +16811,7 @@ private:
 };
 
 class MTRTestClusterClusterSimpleEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterClusterSimpleEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR TestClusterClusterSimpleEnumAttributeCallback>
 {
 public:
     MTRTestClusterClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
@@ -16826,7 +16839,7 @@ private:
 };
 
 class MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableTestClusterClusterSimpleEnumAttributeCallback>
+    : public MTRCallbackBridge<MTR NullableTestClusterClusterSimpleEnumAttributeCallback>
 {
 public:
     MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
