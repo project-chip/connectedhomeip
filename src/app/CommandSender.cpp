@@ -140,7 +140,7 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
         suppressErrorStatusResponse = true;
-        err = StatusResponse::ProcessStatusResponse(std::move(aPayload));
+        err                         = StatusResponse::ProcessStatusResponse(std::move(aPayload));
         SuccessOrExit(err);
     }
 

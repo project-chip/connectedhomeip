@@ -477,7 +477,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
         suppressErrorStatusResponse = true;
-        err = StatusResponse::ProcessStatusResponse(std::move(aPayload));
+        err                         = StatusResponse::ProcessStatusResponse(std::move(aPayload));
         SuccessOrExit(err);
     }
     else
@@ -499,7 +499,6 @@ exit:
             mpCallback->OnError(this, err);
         }
     }
-
 
     if (mState != State::AwaitingResponse || err != CHIP_NO_ERROR)
     {

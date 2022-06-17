@@ -64,8 +64,10 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
-Protocols::InteractionModel::Status CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & payloadHeader,
-                                                  System::PacketBufferHandle && payload, bool isTimedInvoke)
+Protocols::InteractionModel::Status CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
+                                                                           const PayloadHeader & payloadHeader,
+                                                                           System::PacketBufferHandle && payload,
+                                                                           bool isTimedInvoke)
 {
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
     System::PacketBufferHandle response;
@@ -106,12 +108,16 @@ Protocols::InteractionModel::Status CommandHandler::ProcessInvokeRequest(System:
     reader.Init(std::move(payload));
     VerifyOrReturnError(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::InvalidAction);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    VerifyOrReturnError(invokeRequestMessage.CheckSchemaValidity() == CHIP_NO_ERROR, Protocols::InteractionModel::Status::InvalidAction);
+    VerifyOrReturnError(invokeRequestMessage.CheckSchemaValidity() == CHIP_NO_ERROR,
+                        Protocols::InteractionModel::Status::InvalidAction);
 #endif
 
-    VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::InvalidAction);
-    VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::InvalidAction);
-    VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::InvalidAction);
+    VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR,
+                        Protocols::InteractionModel::Status::InvalidAction);
+    VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR,
+                        Protocols::InteractionModel::Status::InvalidAction);
+    VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR,
+                        Protocols::InteractionModel::Status::InvalidAction);
     VerifyOrReturnError(mTimedRequest == isTimedInvoke, Protocols::InteractionModel::Status::UnsupportedAccess);
     invokeRequests.GetReader(&invokeRequestsReader);
 
@@ -125,13 +131,16 @@ Protocols::InteractionModel::Status CommandHandler::ProcessInvokeRequest(System:
 
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
-        VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), Protocols::InteractionModel::Status::InvalidAction);
+        VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(),
+                            Protocols::InteractionModel::Status::InvalidAction);
         CommandDataIB::Parser commandData;
-        VerifyOrReturnError(commandData.Init(invokeRequestsReader) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::InvalidAction);
+        VerifyOrReturnError(commandData.Init(invokeRequestsReader) == CHIP_NO_ERROR,
+                            Protocols::InteractionModel::Status::InvalidAction);
 
         if (mpExchangeCtx->IsGroupExchangeContext())
         {
-            VerifyOrReturnError(ProcessGroupCommandDataIB(commandData) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::Failure);
+            VerifyOrReturnError(ProcessGroupCommandDataIB(commandData) == CHIP_NO_ERROR,
+                                Protocols::InteractionModel::Status::Failure);
         }
         else
         {
@@ -150,10 +159,11 @@ Protocols::InteractionModel::Status CommandHandler::ProcessInvokeRequest(System:
 }
 
 CHIP_ERROR CommandHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                           System::PacketBufferHandle && aPayload)
+                                             System::PacketBufferHandle && aPayload)
 {
     ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
-    CHIP_ERROR err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+    CHIP_ERROR err =
+        StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     if (mpExchangeCtx != nullptr && mpExchangeCtx->IsSendExpected() && err != CHIP_NO_ERROR)
     {
         // We have to manually close the exchange, because we called

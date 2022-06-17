@@ -46,7 +46,7 @@
 namespace chip {
 namespace app {
 
-class CommandHandler: public Messaging::ExchangeDelegate
+class CommandHandler : public Messaging::ExchangeDelegate
 {
 public:
     /*
@@ -147,7 +147,7 @@ public:
      * the timer verification has already been done.
      */
     Protocols::InteractionModel::Status OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                      System::PacketBufferHandle && payload, bool isTimedInvoke);
+                                                               System::PacketBufferHandle && payload, bool isTimedInvoke);
     CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus);
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);

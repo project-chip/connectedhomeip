@@ -644,10 +644,10 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedMsg(nlTestSuit
 
 void TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext)
 {
-    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
     app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
     TestExchangeDelegate delegate;
-    commandHandler.mpExchangeCtx = ctx.NewExchangeToAlice(&delegate);
+    commandHandler.mpExchangeCtx              = ctx.NewExchangeToAlice(&delegate);
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     // Use some invalid endpoint / cluster / command.

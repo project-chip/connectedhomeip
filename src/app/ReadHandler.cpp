@@ -309,7 +309,8 @@ CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchange
                                          System::PacketBufferHandle && aPayload)
 {
     ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
-    CHIP_ERROR err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+    CHIP_ERROR err =
+        StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     if (mpExchangeCtx != nullptr && mpExchangeCtx->IsSendExpected() && err != CHIP_NO_ERROR)
     {
         // We have to manually close the exchange, because we called

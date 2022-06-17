@@ -263,8 +263,9 @@ void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
 }
 
 Protocols::InteractionModel::Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
-                                                          const PayloadHeader & aPayloadHeader,
-                                                          System::PacketBufferHandle && aPayload, bool aIsTimedInvoke)
+                                                                                   const PayloadHeader & aPayloadHeader,
+                                                                                   System::PacketBufferHandle && aPayload,
+                                                                                   bool aIsTimedInvoke)
 {
     CommandHandler * commandHandler = mCommandHandlerObjs.CreateObject(this);
     if (commandHandler == nullptr)
