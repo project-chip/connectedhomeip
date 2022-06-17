@@ -41,7 +41,7 @@ _CHEF_ZZZ_ROOT = os.path.join(_CHEF_SCRIPT_PATH, "zzz_generated")
 _CI_DEVICE_MANIFEST_NAME = "INPUTMD5.txt"
 _CI_ZAP_MANIFEST_NAME = "ZAPSHA.txt"
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_meta.json")
-_CI_ALLOW_LIST = ["lighting-app"]
+_CI_ALLOW_LIST = ["rootnode_dimmablelight_gY80DaqEUL"]
 
 gen_dir = ""  # Filled in after sample app type is read from args.
 
