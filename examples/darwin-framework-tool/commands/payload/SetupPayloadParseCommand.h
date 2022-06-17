@@ -18,13 +18,16 @@
 
 #pragma once
 
-#include <commands/common/Command.h>
 #import <CHIP/CHIP.h>
+#include <commands/common/Command.h>
 
-class SetupPayloadParseCommand : public Command
-{
+class SetupPayloadParseCommand : public Command {
 public:
-    SetupPayloadParseCommand() : Command("parse-setup-payload") { AddArgument("payload", &mCode); }
+    SetupPayloadParseCommand()
+        : Command("parse-setup-payload")
+    {
+        AddArgument("payload", &mCode);
+    }
     CHIP_ERROR Run() override;
     static bool IsQRCode(NSString * codeString);
 

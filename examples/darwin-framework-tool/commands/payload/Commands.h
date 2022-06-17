@@ -24,7 +24,7 @@ void registerCommandsPayload(Commands & commands)
 {
     const char * clusterName      = "Payload";
     commands_list clusterCommands = {
-        make_unique<SetupPayloadParseCommand>(),              //
+        make_unique<SetupPayloadParseCommand>(), //
     };
 
     commands.Register(clusterName, clusterCommands);

@@ -17,8 +17,8 @@
  */
 
 #include "SetupPayloadParseCommand.h"
-#import <CHIP/CHIPError_Internal.h>
 #import <CHIP/CHIP.h>
+#import <CHIP/CHIPError_Internal.h>
 
 using namespace ::chip;
 
@@ -28,8 +28,7 @@ namespace {
 
 NSString * CustomFlowString(CHIPCommissioningFlow flow)
 {
-    switch (flow)
-    {
+    switch (flow) {
     case kCommissioningFlowStandard:
         return @"STANDARD";
     case kCommissioningFlowUserActionRequired:
@@ -65,9 +64,7 @@ CHIP_ERROR SetupPayloadParseCommand::Run()
     CHIPOnboardingPayloadType codeType;
     if (IsQRCode(codeString)) {
         codeType = CHIPOnboardingPayloadTypeQRCode;
-    }
-    else
-    {
+    } else {
         codeType = CHIPOnboardingPayloadTypeManualCode;
     }
     payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:codeString ofType:codeType error:&error];
@@ -85,43 +82,31 @@ CHIP_ERROR SetupPayloadParseCommand::Print(CHIPSetupPayload * payload)
     NSLog(@"Version:       %@", payload.version);
     NSLog(@"VendorID:      %@", payload.vendorID);
     NSLog(@"ProductID:     %@", payload.productID);
-    NSLog(@"Custom flow:   %lu    (%@)", payload.commissioningFlow,
-                    CustomFlowString(payload.commissioningFlow));
+    NSLog(@"Custom flow:   %lu    (%@)", payload.commissioningFlow, CustomFlowString(payload.commissioningFlow));
     {
-        NSMutableString * humanFlags = [[NSMutableString alloc]init];
+        NSMutableString * humanFlags = [[NSMutableString alloc] init];
 
-        if (payload.rendezvousInformation)
-        {
-            if (payload.rendezvousInformation & kRendezvousInformationNone)
-            {
+        if (payload.rendezvousInformation) {
+            if (payload.rendezvousInformation & kRendezvousInformationNone) {
                 [humanFlags appendString:@"NONE"];
-            }
-            else
-            {
-                if (payload.rendezvousInformation & kRendezvousInformationSoftAP)
-                {
+            } else {
+                if (payload.rendezvousInformation & kRendezvousInformationSoftAP) {
                     [humanFlags appendString:@"SoftAP"];
                 }
-                if (payload.rendezvousInformation & kRendezvousInformationBLE)
-                {
-                    if (!humanFlags)
-                    {
+                if (payload.rendezvousInformation & kRendezvousInformationBLE) {
+                    if (!humanFlags) {
                         [humanFlags appendString:@", "];
                     }
                     [humanFlags appendString:@"BLE"];
                 }
-                if (payload.rendezvousInformation & kRendezvousInformationOnNetwork)
-                {
-                    if (!humanFlags)
-                    {
+                if (payload.rendezvousInformation & kRendezvousInformationOnNetwork) {
+                    if (!humanFlags) {
                         [humanFlags appendString:@", "];
                     }
                     [humanFlags appendString:@"ON NETWORK"];
                 }
             }
-        }
-        else
-        {
+        } else {
             [humanFlags appendString:@"NONE"];
         }
 
@@ -130,29 +115,23 @@ CHIP_ERROR SetupPayloadParseCommand::Print(CHIPSetupPayload * payload)
     NSLog(@"Discriminator: %@", payload.discriminator);
     NSLog(@"Passcode:      %@", payload.setUpPINCode);
 
-    if (payload.serialNumber)
-    {
+    if (payload.serialNumber) {
         NSLog(@"SerialNumber: %@", payload.serialNumber);
     }
     NSError * error;
     NSArray<CHIPOptionalQRCodeInfo *> * optionalVendorData = [payload getAllOptionalVendorData:&error];
-    if (error)
-    {
+    if (error) {
         LogNSError("Error: ", error);
         return CHIP_ERROR_INTERNAL;
     }
-    for (const CHIPOptionalQRCodeInfo * info : optionalVendorData)
-    {
+    for (const CHIPOptionalQRCodeInfo * info : optionalVendorData) {
         bool isTypeString = info.infoType == [[NSNumber alloc] initWithInt:kOptionalQRCodeInfoTypeString];
-        bool isTypeInt32  = info.infoType == [[NSNumber alloc] initWithInt:kOptionalQRCodeInfoTypeInt32];
+        bool isTypeInt32 = info.infoType == [[NSNumber alloc] initWithInt:kOptionalQRCodeInfoTypeInt32];
         VerifyOrReturnError(isTypeString || isTypeInt32, CHIP_ERROR_INVALID_ARGUMENT);
 
-        if (isTypeString)
-        {
+        if (isTypeString) {
             NSLog(@"OptionalQRCodeInfo: tag=%@,string value=%@", info.tag, info.stringValue);
-        }
-        else
-        {
+        } else {
             NSLog(@"OptionalQRCodeInfo: tag=%@,int value=%@", info.tag, info.integerValue);
         }
     }
@@ -160,7 +139,4 @@ CHIP_ERROR SetupPayloadParseCommand::Print(CHIPSetupPayload * payload)
     return CHIP_NO_ERROR;
 }
 
-bool SetupPayloadParseCommand::IsQRCode(NSString * codeString)
-{
-    return [codeString hasPrefix:@"MT:"];
-}
+bool SetupPayloadParseCommand::IsQRCode(NSString * codeString) { return [codeString hasPrefix:@"MT:"]; }
