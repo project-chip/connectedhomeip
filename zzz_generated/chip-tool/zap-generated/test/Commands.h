@@ -18322,7 +18322,7 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.A0000 && MC_MEDIAINPUT.S.A0001"),
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && MC_MEDIAINPUT.S.A0000 && MC_MEDIAINPUT.S.A0001"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
