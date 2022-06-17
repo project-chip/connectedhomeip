@@ -15,9 +15,15 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct FactoryDataString
 {
@@ -47,6 +53,11 @@ struct FactoryData
     uint16_t discriminator;
     uint32_t passcode;
     struct FactoryDataString user;
+
+    bool vendorIdPresent;
+    bool productIdPresent;
+    bool hwVerPresent;
+    bool discriminatorPresent;
 };
 
 /**
@@ -58,4 +69,8 @@ struct FactoryData
  *
  * @returns true on success, false otherwise.
  */
-bool GetFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData * factoryData);
+bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData * factoryData);
+
+#ifdef __cplusplus
+}
+#endif

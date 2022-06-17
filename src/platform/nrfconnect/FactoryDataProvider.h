@@ -24,9 +24,7 @@
 #include <drivers/flash.h>
 #include <pm_config.h>
 
-extern "C" {
 #include "FactoryDataParser.h"
-}
 
 namespace chip {
 namespace DeviceLayer {
@@ -68,11 +66,7 @@ class FactoryDataProvider : public chip::Credentials::DeviceAttestationCredentia
                             public DeviceInstanceInfoProvider
 {
 public:
-    FactoryDataProvider()
-    {
-        mFactoryData = {};
-        LoadFactoryData();
-    }
+    CHIP_ERROR Init();
 
     // ===== Members functions that implement the DeviceAttestationCredentialsProvider
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & outBuffer) override;
@@ -106,8 +100,6 @@ private:
     static constexpr uint32_t kFactoryDataPartitionAddress = PM_FACTORY_DATA_ADDRESS;
     static constexpr uint8_t kDACPrivateKeyLength          = 32;
     static constexpr uint8_t kDACPublicKeyLength           = 65;
-
-    void LoadFactoryData();
 
     struct FactoryData mFactoryData;
     FlashFactoryData mFlashFactoryData;

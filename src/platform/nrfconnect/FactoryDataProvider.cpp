@@ -36,22 +36,26 @@ CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P
 namespace DeviceLayer {
 
 template <class FlashFactoryData>
-void FactoryDataProvider<FlashFactoryData>::LoadFactoryData()
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
 {
     uint8_t * factoryData = nullptr;
     size_t factoryDataSize;
 
-    if (mFlashFactoryData.GetFactoryDataPartition(factoryData, factoryDataSize) != CHIP_NO_ERROR)
+    CHIP_ERROR error = mFlashFactoryData.GetFactoryDataPartition(factoryData, factoryDataSize);
+
+    if (error != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to read factory data partition");
-        return;
+        return error;
     }
 
-    if (!GetFactoryData(factoryData, factoryDataSize, &mFactoryData))
+    if (!ParseFactoryData(factoryData, factoryDataSize, &mFactoryData))
     {
-        ChipLogError(DeviceLayer, "Failed to load factory data");
-        return;
+        ChipLogError(DeviceLayer, "Failed to parse factory data");
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
+
+    return CHIP_NO_ERROR;
 }
 
 template <class FlashFactoryData>
@@ -149,9 +153,9 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
 
-    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(digestToSign), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(!mFactoryData.dac_cert.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    ReturnErrorCodeIf(!mFactoryData.dac_priv_key.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     // Extract public key from DAC cert.
     ByteSpan dacCertSpan{ reinterpret_cast<uint8_t *>(mFactoryData.dac_cert.data), mFactoryData.dac_cert.len };
@@ -169,6 +173,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
 template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
+    VerifyOrReturnError(mFactoryData.discriminatorPresent, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     setupDiscriminator = mFactoryData.discriminator;
     return CHIP_NO_ERROR;
 }
@@ -244,6 +249,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetVendorName(char * buf, size
 template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetVendorId(uint16_t & vendorId)
 {
+    VerifyOrReturnError(mFactoryData.vendorIdPresent, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     vendorId = mFactoryData.vendor_id;
     return CHIP_NO_ERROR;
 }
@@ -263,6 +269,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetProductName(char * buf, siz
 template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetProductId(uint16_t & productId)
 {
+    VerifyOrReturnError(mFactoryData.productIdPresent, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     productId = mFactoryData.product_id;
     return CHIP_NO_ERROR;
 }
@@ -282,6 +289,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetSerialNumber(char * buf, si
 template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
+    VerifyOrReturnError(mFactoryData.date_year != 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     year  = mFactoryData.date_year;
     month = mFactoryData.date_month;
     day   = mFactoryData.date_day;
@@ -291,6 +299,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetManufacturingDate(uint16_t 
 template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetHardwareVersion(uint16_t & hardwareVersion)
 {
+    VerifyOrReturnError(mFactoryData.hwVerPresent, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     hardwareVersion = mFactoryData.hw_ver;
     return CHIP_NO_ERROR;
 }

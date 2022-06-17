@@ -21,37 +21,47 @@
 #include <zcbor_decode.h>
 
 #include <ctype.h>
+#include <string.h>
 
-#define MAX_FACTORY_DATA_ELEMENTS 19
-#define MIN_FACTORY_DATA_ELEMENTS 15
+#define MAX_FACTORY_DATA_NESTING_LEVEL 3
 
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 
-bool GetFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData * factoryData)
+static inline bool uint16_decode(zcbor_state_t * states, uint16_t * value)
 {
-    uint32_t elementsCount = 0;
-    bool keyNotFound;
+    uint32_t u32;
 
-    ZCBOR_STATE_D(states, MAX_FACTORY_DATA_ELEMENTS, buffer, bufferSize, 1);
+    if (zcbor_uint32_decode(states, &u32))
+    {
+        *value = (uint16_t) u32;
+        return true;
+    }
+
+    return false;
+}
+
+bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData * factoryData)
+{
+    memset(factoryData, 0, sizeof(*factoryData));
+    ZCBOR_STATE_D(states, MAX_FACTORY_DATA_NESTING_LEVEL, buffer, bufferSize, 1);
 
     bool res = zcbor_map_start_decode(states);
     struct zcbor_string currentString;
 
     while (res)
     {
-        keyNotFound = false;
-        res         = res && zcbor_tstr_decode(states, &currentString);
+        res = zcbor_tstr_decode(states, &currentString);
 
         if (!res)
         {
+            res = true;
             break;
         }
 
         if (strncmp("hw_ver", (const char *) currentString.value, currentString.len) == 0)
         {
-            uint32_t hw_ver;
-            res                 = res && zcbor_uint32_decode(states, &hw_ver);
-            factoryData->hw_ver = hw_ver;
+            res = res && uint16_decode(states, &factoryData->hw_ver);
+            factoryData->hwVerPresent = res;
         }
         else if (strncmp("spake2_it", (const char *) currentString.value, currentString.len) == 0)
         {
@@ -59,21 +69,18 @@ bool GetFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData * 
         }
         else if (strncmp("vendor_id", (const char *) currentString.value, currentString.len) == 0)
         {
-            uint32_t vendor_id;
-            res                    = res && zcbor_uint32_decode(states, &vendor_id);
-            factoryData->vendor_id = vendor_id;
+            res = res && uint16_decode(states, &factoryData->vendor_id);
+            factoryData->vendorIdPresent = res;
         }
         else if (strncmp("product_id", (const char *) currentString.value, currentString.len) == 0)
         {
-            uint32_t product_id;
-            res                     = res && zcbor_uint32_decode(states, &product_id);
-            factoryData->product_id = product_id;
+            res = res && uint16_decode(states, &factoryData->product_id);
+            factoryData->productIdPresent = res;
         }
         else if (strncmp("discriminator", (const char *) currentString.value, currentString.len) == 0)
         {
-            uint32_t discriminator;
-            res                        = res && zcbor_uint32_decode(states, &discriminator);
-            factoryData->discriminator = discriminator;
+            res = res && uint16_decode(states, &factoryData->discriminator);
+            factoryData->discriminatorPresent = res;
         }
         else if (strncmp("passcode", (const char *) currentString.value, currentString.len) == 0)
         {
@@ -144,17 +151,9 @@ bool GetFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData * 
         }
         else
         {
-            keyNotFound = true;
-            res         = res && zcbor_any_skip(states, NULL);
-        }
-
-        if (!keyNotFound && res)
-        {
-            elementsCount++;
+            res = res && zcbor_any_skip(states, NULL);
         }
     }
 
-    res = zcbor_list_map_end_force_decode(states);
-
-    return res && elementsCount >= MIN_FACTORY_DATA_ELEMENTS;
+    return res && zcbor_list_map_end_force_decode(states);
 }
