@@ -522,14 +522,34 @@ void DefaultOTARequestor::TriggerImmediateQueryInternal()
     ConnectToProvider(kQueryImage);
 }
 
-OTARequestorInterface::OTATriggerResult DefaultOTARequestor::TriggerImmediateQuery()
+CHIP_ERROR DefaultOTARequestor::TriggerImmediateQuery(FabricIndex fabricIndex)
 {
     ProviderLocationType providerLocation;
-    bool listExhausted = false;
-    if (mOtaRequestorDriver->GetNextProviderLocation(providerLocation, listExhausted) != true)
+    bool providerFound = false;
+
+    if (fabricIndex == kUndefinedFabricIndex)
+    {
+        bool listExhausted = false;
+        providerFound      = mOtaRequestorDriver->GetNextProviderLocation(providerLocation, listExhausted);
+    }
+    else
+    {
+        for (auto providerIter = mDefaultOtaProviderList.Begin(); providerIter.Next();)
+        {
+            providerLocation = providerIter.GetValue();
+
+            if (providerLocation.GetFabricIndex() == fabricIndex)
+            {
+                providerFound = true;
+                break;
+            }
+        }
+    }
+
+    if (!providerFound)
     {
         ChipLogError(SoftwareUpdate, "No OTA Providers available");
-        return kNoProviderKnown;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
     SetCurrentProviderLocation(providerLocation);
@@ -537,7 +557,7 @@ OTARequestorInterface::OTATriggerResult DefaultOTARequestor::TriggerImmediateQue
     // Go through the driver as it has additional logic to execute
     mOtaRequestorDriver->SendQueryImage();
 
-    return kTriggerSuccessful;
+    return CHIP_NO_ERROR;
 }
 
 void DefaultOTARequestor::DownloadUpdate()
