@@ -99,6 +99,6 @@ static_library("framework") {
   public_configs = [ ":darwin_config" ]
 }
 
-group("CHIP") {
+group("matter") {
   public_deps = [ ":framework" ]
 }

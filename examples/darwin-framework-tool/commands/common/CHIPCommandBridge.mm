@@ -61,13 +61,13 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     MTRToolKeypair * nocSigner = [[MTRToolKeypair alloc] init];
     storage = [[MTRToolPersistentStorageDelegate alloc] init];
 
-    auto factory = [MatterControllerFactory sharedInstance];
+    auto factory = [MTRControllerFactory sharedInstance];
     if (factory == nil) {
         ChipLogError(chipTool, "Controller factory is nil");
         return CHIP_ERROR_INTERNAL;
     }
 
-    auto params = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    auto params = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
     params.port = @(kListenPort);
     params.startServer = YES;
 
@@ -139,7 +139,7 @@ CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
     mControllers.clear();
     mCurrentController = nil;
 
-    [[MatterControllerFactory sharedInstance] shutdown];
+    [[MTRControllerFactory sharedInstance] shutdown];
 
     return CHIP_NO_ERROR;
 }

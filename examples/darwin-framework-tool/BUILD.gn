@@ -25,6 +25,11 @@ config("config") {
     ".",
     "${chip_root}/zzz_generated/darwin-framework-tool",
     "${chip_root}/examples/chip-tool/commands/clusters/ComplexArgument.h",
+    "/tmp/macos_framework_output",
+  ]
+
+  framework_dirs = [
+    "/tmp/macos_framework_output",
   ]
 
   defines = [
@@ -67,7 +72,7 @@ executable("darwin-framework-tool") {
   }
 
   if (config_enable_yaml_tests) {
-    sources += [ "${chip_root}/zzz_generated/darwin-framework-tool/zap-generated/cluster/CHIPTestClustersObjc.mm" ]
+    sources += [ "${chip_root}/zzz_generated/darwin-framework-tool/zap-generated/cluster/MTRTestClustersObjc.mm" ]
   }
 
   deps = [
@@ -79,6 +84,8 @@ executable("darwin-framework-tool") {
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
   ]
+
+  frameworks = [ "Matter.framework" ]
 
   public_configs = [ ":config" ]
 
