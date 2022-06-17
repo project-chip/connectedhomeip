@@ -622,3 +622,222 @@ PICS:
           "Can the MeasuredValue attribute changed by physical control at the
           device?"
       id: MANUAL_FLOW_CHANGE
+
+    #Media clusters
+    - label:
+          "Does the DUT support the Keypad Input server cluster Navigation Keys?"
+      id: MC_KEYPADINPUT.S.NV
+
+    - label:
+          "Does the DUT support the Keypad Input server cluster Location Keys?"
+      id: MC_KEYPADINPUT.S.LK
+
+    - label: "Does the DUT support the Keypad Input server cluster Number Keys?"
+      id: MC_KEYPADINPUT.S.NK
+
+    - label:
+          "Does the DUT support the Application Launcher server cluster
+          Application Platform feature?"
+      id: MC_APPLAUNCHER.S.AP
+
+    - label:
+          "Does the DUT support the Application Launcher server cluster
+          CatalogList attribute?"
+      id: MC_APPLAUNCHER.S.A0000
+
+    - label:
+          "Does the DUT support the Application Launcher server cluster
+          CurrentApp attribute?"
+      id: MC_APPLAUNCHER.S.A0001
+
+    - label:
+          "Does the DUT support the Media Input server cluster InputList
+          attribute?"
+      id: MC_MEDIAINPUT.S.A0000
+
+    - label:
+          "Does the DUT support the Media Input server cluster CurrentInput
+          attribute?"
+      id: MC_MEDIAINPUT.S.A0001
+
+    - label:
+          "Does the DUT support the Media Input server cluster Name Updates
+          feature?"
+      id: MC_MEDIAINPUT.S.NU
+
+    - label:
+          "Does the DUT support the Channel server cluster Channel List feature?"
+      id: MC_CHANNEL.S.CL
+
+    - label:
+          "Does the DUT support the Channel server cluster Lineup Info feature?"
+      id: MC_CHANNEL.S.LI
+
+    - label:
+          "Does the DUT support the Channel server cluster ChannelList
+          attribute?"
+      id: MC_CHANNEL.S.A0000
+
+    - label: "Does the DUT support the Channel server cluster Lineup attribute?"
+      id: MC_CHANNEL.S.A0001
+
+    - label:
+          "Does the DUT support the Channel server cluster CurrentChannel
+          attribute?"
+      id: MC_CHANNEL.S.A0002
+
+    - label:
+          "Does the DUT support the Channel server cluster ChangeChannel
+          command?"
+      id: MC_CHANNEL.S.C0000
+
+    - label:
+          "Does the DUT support the Channel server cluster ChangeChannelByNumber
+          command?"
+      id: MC_CHANNEL.S.C0002
+
+    - label:
+          "Does the DUT support the Channel server cluster SkipChannel command?"
+      id: MC_CHANNEL.S.C0003
+
+    - label:
+          "Does the DUT support the Media Playback server cluster Advanced Seek
+          feature?"
+      id: MC_MEDIAPLAYBACK.S.AS
+
+    - label:
+          "Does the DUT support the Media Playback server cluster Variable Speed
+          feature?"
+      id: MC_MEDIAPLAYBACK.S.VS
+
+    - label:
+          "Does the DUT the Audio Output server cluster Name Updates feature?"
+      id: NAMEUPDATES
+
+    - label:
+          "Does the DUT support the Target Navigator server cluster
+          CurrentTarget attribute?"
+      id: MC_TGTNAV.S.A0001
+
+    - label:
+          "Does the DUT support the Application Basic server cluster VendorName
+          attribute?"
+      id: MC_APBSC.S.A0000
+
+    - label:
+          "Does the DUT support the Application Basic server cluster VendorID
+          attribute?"
+      id: MC_APBSC.S.A0001
+
+    - label:
+          "Does the DUT support the Application Basic server cluster ProductID
+          attribute?"
+      id: MC_APBSC.S.A0003
+
+    - label:
+          "Does the DUT support the Content Launcher server cluster Content
+          Search feature?"
+      id: MC_CONTENTLAUNCHER.S.CS
+
+    - label:
+          "Does the DUT support the Content Launcher server cluster Content
+          Search feature?"
+      id: MC_CONTENTLAUNCHER.S.UP
+
+    - label:
+          "Does the DUT support the Content Launcher server cluster AcceptHeader
+          attribute?"
+      id: MC_CONTENTLAUNCHER.S.A0000
+
+    - label:
+          "Does the DUT support the Content Launcher server cluster
+          SupportedStreamingProtocols attribute?"
+      id: MC_CONTENTLAUNCHER.S.A0001
+
+    - label: "Does the device implement the Tolerance attribute?"
+      id: PRS.S.A0003
+
+    - label: "Does the device implement the Occupancy attribute?"
+      id: OCC.S.A0000
+
+    - label: "Does the device implement the OccupancySensorType attribute?"
+      id: OCC.S.A0001
+
+    - label:
+          "Does the device implement the OccupancySensorTypeBitmap attribute?"
+      id: OCC.S.A0002
+
+    - label:
+          "Does the device implement the PIROccupiedToUnoccupiedDelay attribute?"
+      id: OCC.S.A0010
+
+    - label:
+          "Does the device implement the PIRUnoccupiedToOccupiedDelay attribute?"
+      id: OCC.S.A0011
+
+    - label:
+          "Does the device implement the PIRUnoccupiedToOccupiedThreshold
+          attribute?"
+      id: OCC.S.A0012
+
+    - label:
+          "Does the device implement the UltrasonicOccupiedToUnoccupiedDelay
+          attribute?"
+      id: OCC.S.A0020
+
+    - label:
+          "Does the device implement the UltrasonicUnoccupiedToOccupiedDelay
+          attribute?"
+      id: OCC.S.A0021
+
+    - label:
+          "Does the device implement the UltrasonicUnoccupiedToOccupiedThreshold
+          attribute?"
+      id: OCC.S.A0022
+
+    - label:
+          "Does the device implement the
+          PhysicalContactOccupiedToUnoccupiedDelay attribute?"
+      id: OCC.S.A0030
+
+    - label:
+          "Does the device implement the
+          PhysicalContactUnoccupiedToOccupiedDelay attribute?"
+      id: OCC.S.A0031
+
+    - label:
+          "Does the device implement the
+          PhysicalContactUnoccupiedToOccupiedThreshold attribute?"
+      id: OCC.S.A0032
+
+    - label: "Does the device implement the Tolerance attribute?"
+      id: FLW.S.A0003
+
+    - label: "Does the DUT(server) support the Hue/Saturation feature?"
+      id: CC.S.F00
+
+    - label: "Does the DUT(server) support the Enhanced Hue feature?"
+      id: CC.S.F01
+
+    - label: "Does the DUT(server) support the Color Loop feature?"
+      id: CC.S.F02
+
+    - label: "Does the DUT(server) support the Color XY feature?"
+      id: CC.S.F03
+
+    - label: "Does the DUT(server) support the Color Temperature feature?"
+      id: CC.S.F04
+
+    - label: "Does the device support extended range and resolution?"
+      id: PRS.S.F00
+
+    - label:
+          "Does the DUT(server) support the Frequency attributes and behavior
+          feature?"
+      id: LVL.S.F02
+
+    - label: "Does the DUT(server) support the MaxLevel attribute?"
+      id: LVL.S.A0003
+
+    - label: "Does the DUT(server) support the MinLevel attribute?"
+      id: LVL.S.A0002

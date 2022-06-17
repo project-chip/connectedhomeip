@@ -28,13 +28,21 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
           value: 1
           constraints:
               type: uint16
+
+    - label: "Read the optional global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
@@ -43,21 +51,6 @@ tests:
           value: [65528, 65529, 65531, 65532, 65533]
           constraints:
               type: list
-
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
@@ -75,13 +68,12 @@ tests:
           constraints:
               type: list
 
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label:
-          "Read FeatureMap attribute from the DUT and Verify that the DUT
-          response indicates either value 0 or throws a general error if the
-          attribute is not supported"
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
       verification: |
-          ./chip-tool lowpower read feature-map 1 1
-          [1645780669.465220][5069:5074] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86
+          Not implemented in chip-tool
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT

@@ -28,6 +28,27 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Reads Minlevel attribute from DUT"
+      command: "readAttribute"
+      attribute: "min level"
+      response:
+          saveAs: MinlevelValue
+          constraints:
+              type: uint8
+
+    - label: "sends a Move to level command"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "level"
+                value: 1
+              - name: "transitionTime"
+                value: 0
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
     - label: "reads max level attribute from DUT"
       command: "readAttribute"
       attribute: "max level"
@@ -60,30 +81,23 @@ tests:
                     per second or as close as possible to this rate and
                     completes moving to its maximum level"
 
-    - label: "Wait 3000ms"
+    - label: "Wait 9000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 3000
+                value: 9000
 
-    - label: "reads CurrentLevel attribute from DUT"
+    - label: "Reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.A0003
       command: "readAttribute"
       attribute: "current level"
       response:
           value: MaxlevelValue
 
-    - label: "reads min level attribute from DUT"
-      command: "readAttribute"
-      attribute: "min level"
-      response:
-          saveAs: MinlevelValue
-          constraints:
-              type: uint8
-
-    - label: "sends a Move down command"
-      command: "Move"
+    - label: "sends a MoveWithOnOff command"
+      command: "MoveWithOnOff"
       arguments:
           values:
               - name: "moveMode"
@@ -116,10 +130,11 @@ tests:
 
     # For lighting Device type current level minimal value is 1
     - label: "reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.A0002
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 1
+          value: MinlevelValue
           constraints:
               minValue: 0
               maxValue: 1
@@ -152,13 +167,6 @@ tests:
           values:
               - name: "ms"
                 value: 100
-
-    - label: "reads CurrentLevel attribute from DUT"
-      command: "readAttribute"
-      attribute: "current level"
-      response:
-          constraints:
-              notValue: 255
 
     - label: "user prompt message"
       cluster: "LogCommands"
