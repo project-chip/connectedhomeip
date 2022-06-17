@@ -489,7 +489,8 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.do_build:
-        branch = shell.run_cmd("git branch | awk -v FS=' ' '/\*/{print $NF}' | sed 's|[()]||g'", return_cmd_output=True).replace("\n", "")
+        branch = shell.run_cmd(
+            "git branch | awk -v FS=' ' '/\*/{print $NF}' | sed 's|[()]||g'", return_cmd_output=True).replace("\n", "")
         commit_id = shell.run_cmd("git rev-parse HEAD", return_cmd_output=True).replace("\n", "")
 
         if options.use_zzz:
