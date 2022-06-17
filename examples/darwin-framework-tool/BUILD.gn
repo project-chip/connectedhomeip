@@ -24,6 +24,7 @@ config("config") {
   include_dirs = [
     ".",
     "${chip_root}/zzz_generated/darwin-framework-tool",
+    "${chip_root}/zzz_generated/controller-clusters",
     "${chip_root}/examples/chip-tool/commands/clusters/ComplexArgument.h",
   ]
 
@@ -44,6 +45,11 @@ config("config") {
 
 executable("darwin-framework-tool") {
   sources = [
+    # We have to include privilege-storage.cpp here, not in the "Darwin
+    # framework" library, because otherwise the weak symbols from
+    # RequiredPrivilege.cpp mean we never actually pull in the function from
+    # privilege-storage.cpp.
+    "${chip_root}/src/app/util/privilege-storage.cpp",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
     "commands/clusters/ClusterCommandBridge.h",
     "commands/clusters/ModelCommandBridge.mm",

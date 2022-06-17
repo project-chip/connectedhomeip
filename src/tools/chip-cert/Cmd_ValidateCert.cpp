@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -97,10 +97,10 @@ enum
     kMaxCerts = 16,
 };
 
-const char * gTargetCertFileName = nullptr;
-const char * gCACertFileNames[kMaxCerts - 1];
-bool gCACertIsTrusted[kMaxCerts - 1];
-size_t gNumCertFileNames = 0;
+const char * gTargetCertFileName         = nullptr;
+const char * gCACertFileNames[kMaxCerts] = { nullptr };
+bool gCACertIsTrusted[kMaxCerts]         = { false };
+size_t gNumCertFileNames                 = 0;
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
@@ -108,6 +108,11 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
     {
     case 'c':
     case 't':
+        if (gNumCertFileNames >= kMaxCerts)
+        {
+            PrintArgError("%s: Too many certificate files\n", progName);
+            return false;
+        }
         gCACertFileNames[gNumCertFileNames]   = arg;
         gCACertIsTrusted[gNumCertFileNames++] = (id == 't');
         break;

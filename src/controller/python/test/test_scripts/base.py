@@ -848,6 +848,10 @@ class BaseTestHelper:
             # thread changes 5 times, and sleeps for 3 seconds in between. Add an additional 3 seconds of slack. Timeout is in seconds.
             changeThread.join(18.0)
 
+            #
+            # Clean-up by shutting down the sub. Otherwise, we're going to get callbacks through OnValueChange on what will soon become an invalid
+            # execution context above.
+            #
             subscription.Shutdown()
 
             if changeThread.is_alive():
