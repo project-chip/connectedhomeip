@@ -78,7 +78,7 @@ def checkPythonVersion():
 def setupArgumentsParser():
     parser = argparse.ArgumentParser(
         description='Generate content from ZAP files')
-    parser.add_argument('--type', default='all', choices=['all', 'tests'],
+    parser.add_argument('--type', default='all', choices=['all', 'specific', 'tests'],
                         help='Choose which content type to generate (default: all)')
     parser.add_argument('--tests', default='all', choices=['all', 'chip-tool', 'darwin-framework-tool', 'app1', 'app2'],
                         help='When generating tests only target, Choose which tests to generate (default: all)')
@@ -201,6 +201,8 @@ def getTargets(type, test_target):
     if type == 'all':
         targets.extend(getGlobalTemplatesTargets())
         targets.extend(getTestsTemplatesTargets('all'))
+        targets.extend(getSpecificTemplatesTargets())
+    elif type == 'specific':
         targets.extend(getSpecificTemplatesTargets())
     elif type == 'tests':
         targets.extend(getTestsTemplatesTargets(test_target))
