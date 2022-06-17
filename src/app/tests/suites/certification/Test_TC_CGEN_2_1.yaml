@@ -72,21 +72,19 @@ tests:
           the BasicCommissioningInfo attribute has the following field:
           FailSafeExpiryLengthSeconds field value is within a duration range of
           0 to 65535"
-      verification: |
-          ./chip-tool generalcommissioning read basic-commissioning-info 1 0
-          [1651131078.723121][4686:4691] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0001 DataVersion: 3151774872
-          55555555555555555555
-          [1651131078.723431][4686:4691] CHIP:EM: Sending Standalone Ack for MessageCounter:2959333 on exchange 17319
-      disabled: true
+      command: "readAttribute"
+      attribute: "BasicCommissioningInfo"
+
+    - label: "Step 6 TC-CGEN-2.1"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+                value:
+                    "Step 6 is implicitly validating the
+                    attribute(BasicCommissioningInfo) constraints, as long as
+                    the payload is being parsed successfully"
 
     - label: "TH1 reads SupportsConcurrentConnection attribute from the DUT"
       command: "readAttribute"
