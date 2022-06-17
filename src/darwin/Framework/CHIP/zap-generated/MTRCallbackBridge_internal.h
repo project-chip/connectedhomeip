@@ -1153,12 +1153,12 @@ public:
     static void OnSuccessFn(void * context);
 };
 
-class MTRCommandSuccessCallbackBridge : public MTRCallbackBridge<CommandSuccessCallback>
+class MTRCommandSuccessCallbackBridge : public MTRCallbackBridge<MTRCommandSuccessCallback>
 {
 public:
     MTRCommandSuccessCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                     bool keepAlive = false) :
-        MTRCallbackBridge<CommandSuccessCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<MTRCommandSuccessCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::NullObjectType &);
 };
@@ -1814,12 +1814,12 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRVendorIdAttributeCallbackBridge : public MTRCallbackBridge<VendorIdAttributeCallback>
+class MTRVendorIdAttributeCallbackBridge : public MTRCallbackBridge<MTRVendorIdAttributeCallback>
 {
 public:
     MTRVendorIdAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                        bool keepAlive = false) :
-        MTRCallbackBridge<VendorIdAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<MTRVendorIdAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, chip::VendorId value);
 };
