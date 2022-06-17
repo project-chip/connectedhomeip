@@ -98,7 +98,7 @@ private:
     bool mKeepAlive;
 
     chip::Callback::Callback<T> mSuccess;
-    chip::Callback::Callback<MTRDefaultFailureCallbackType> mFailure;
+    chip::Callback::Callback<DefaultFailureCallbackType> mFailure;
 
     // Measure the time it took for the callback to trigger
     NSDate * mRequestTime;
