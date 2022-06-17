@@ -4,13 +4,13 @@
     {{#if (isStrEqual partial-type "Command")}}
       MTR{{> @partial-block}}Type
     {{else}}
-      {{> @partial-block}}
+      MTR{{> @partial-block}}
     {{/if}}
   {{else}}
-    {{> @partial-block}}
+    MTR{{> @partial-block}}
   {{/if}}
 {{/inline}}
-class MTR{{> @partial-block}}Bridge : public MTRCallbackBridge<MTR{{>callbackType}}>
+class MTR{{> @partial-block}}Bridge : public MTRCallbackBridge<{{>callbackType}}>
 {
 public:
     MTR{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, bool keepAlive = false)
