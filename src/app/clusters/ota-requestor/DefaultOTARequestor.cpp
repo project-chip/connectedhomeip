@@ -548,14 +548,17 @@ CHIP_ERROR DefaultOTARequestor::TriggerImmediateQuery(FabricIndex fabricIndex)
 
     if (!providerFound)
     {
-        ChipLogError(SoftwareUpdate, "No OTA Providers available");
-        return CHIP_ERROR_INCORRECT_STATE;
+        ChipLogError(SoftwareUpdate, "No OTA Providers available for immediate query");
+        return CHIP_ERROR_NOT_FOUND;
     }
 
     SetCurrentProviderLocation(providerLocation);
 
     // Go through the driver as it has additional logic to execute
     mOtaRequestorDriver->SendQueryImage();
+
+    ChipLogProgress(SoftwareUpdate, "Triggered immediate OTA query for fabric: 0x%x",
+                    static_cast<unsigned>(providerLocation.GetFabricIndex()));
 
     return CHIP_NO_ERROR;
 }

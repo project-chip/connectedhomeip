@@ -59,6 +59,8 @@ K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(Ap
 
 namespace {
 
+// NOTE! This key is for test/certification only and should not be available in production devices.
+// Ideally, it should be a part of the factory data set.
 constexpr uint8_t kTestEventTriggerEnableKey[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                      0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
