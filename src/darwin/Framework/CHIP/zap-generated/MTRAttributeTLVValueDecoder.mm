@@ -31,7 +31,7 @@
 using namespace chip;
 using namespace chip::app;
 
-id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     switch (aPath.mClusterId) {
     case Clusters::AccessControl::Id: {

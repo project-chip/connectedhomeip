@@ -1036,8 +1036,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            MTRGeneralDiagnosticsClusterNetworkFaultChangeEvent * value =
-                [MTRGeneralDiagnosticsClusterNetworkFaultChangeEvent new];
+            MTRGeneralDiagnosticsClusterNetworkFaultChangeEvent * value = [MTRGeneralDiagnosticsClusterNetworkFaultChangeEvent new];
 
             do {
                 NSArray * _Nonnull memberValue;

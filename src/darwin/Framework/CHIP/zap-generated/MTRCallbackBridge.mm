@@ -5513,8 +5513,7 @@ void MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
@@ -7562,8 +7561,7 @@ void MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTROperationalCredentialsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROperationalCredentialsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<MTROperationalCredentialsGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
@@ -8216,8 +8214,7 @@ void MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBrid
 void MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -8336,8 +8333,7 @@ void MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBrid
 void MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -9027,8 +9023,7 @@ void MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
@@ -9534,8 +9529,7 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
@@ -10127,9 +10121,8 @@ void MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCal
 void MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(
-            context);
+    auto * self = static_cast<MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(
+        context);
     if (!self->mQueue) {
         return;
     }
@@ -10169,8 +10162,8 @@ void MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCall
 void MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(
-        context);
+    auto * self
+        = static_cast<MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10437,8 +10430,7 @@ void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBrid
 void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10634,8 +10626,7 @@ void MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
@@ -11148,8 +11139,7 @@ void MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
@@ -13406,8 +13396,7 @@ void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBrid
 void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -13718,8 +13707,7 @@ void MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
@@ -14247,9 +14235,8 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCal
 void MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge *>(
-            context);
+    auto * self = static_cast<MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge *>(
+        context);
     if (!self->mQueue) {
         return;
     }
@@ -14274,8 +14261,7 @@ void MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBrid
 void MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14304,8 +14290,8 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCall
 void MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge *>(
-        context);
+    auto * self
+        = static_cast<MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14327,8 +14313,7 @@ void MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
@@ -14472,9 +14457,8 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCal
 void MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(
-            context);
+    auto * self = static_cast<MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(
+        context);
     if (!self->mQueue) {
         return;
     }
@@ -14499,8 +14483,7 @@ void MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBrid
 void MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14529,8 +14512,8 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCall
 void MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(
-        context);
+    auto * self
+        = static_cast<MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -15265,8 +15248,8 @@ void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished(void * context)
+void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
 {
     auto * self
         = static_cast<MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge *>(
@@ -15635,8 +15618,7 @@ void MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
@@ -15797,8 +15779,7 @@ void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBrid
 void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -15903,8 +15884,8 @@ void MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished(void * context)
+void MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
 {
     auto * self
         = static_cast<MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge *>(
@@ -15963,9 +15944,8 @@ void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCal
 void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge *>(
-            context);
+    auto * self = static_cast<MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge *>(
+        context);
     if (!self->mQueue) {
         return;
     }
@@ -16291,8 +16271,7 @@ void MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBrid
 void MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -17287,8 +17266,7 @@ void MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBrid
 void MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -17629,8 +17607,7 @@ void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBrid
 void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -17659,8 +17636,8 @@ void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCall
 void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge *>(
-        context);
+    auto * self
+        = static_cast<MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -17815,8 +17792,7 @@ void MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
@@ -18656,8 +18632,7 @@ void MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBrid
 void MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -19347,9 +19322,8 @@ void MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCal
 void MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSubscriptionBridge *>(
-            context);
+    auto * self = static_cast<MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSubscriptionBridge *>(
+        context);
     if (!self->mQueue) {
         return;
     }

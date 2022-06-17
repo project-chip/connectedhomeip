@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Access Control
  *
  */
-@interface CHIPTestAccessControl : CHIPAccessControl
+@interface MTRTestAccessControl : MTRAccessControl
 
 - (void)writeAttributeSubjectsPerAccessControlEntryWithValue:(NSNumber * _Nonnull)value
                                            completionHandler:(StatusCompletion)completionHandler;
@@ -47,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Account Login
  *
  */
-@interface CHIPTestAccountLogin : CHIPAccountLogin
+@interface MTRTestAccountLogin : MTRAccountLogin
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -61,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster AdministratorCommissioning
  *
  */
-@interface CHIPTestAdministratorCommissioning : CHIPAdministratorCommissioning
+@interface MTRTestAdministratorCommissioning : MTRAdministratorCommissioning
 
 - (void)writeAttributeWindowStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAdminFabricIndexWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -78,13 +78,13 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Application Basic
  *
  */
-@interface CHIPTestApplicationBasic : CHIPApplicationBasic
+@interface MTRTestApplicationBasic : MTRApplicationBasic
 
 - (void)writeAttributeVendorNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeVendorIDWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeApplicationNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeProductIDWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeApplicationWithValue:(CHIPApplicationBasicClusterApplicationBasicApplication * _Nonnull)value
+- (void)writeAttributeApplicationWithValue:(MTRApplicationBasicClusterApplicationBasicApplication * _Nonnull)value
                          completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeApplicationVersionWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -101,7 +101,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Application Launcher
  *
  */
-@interface CHIPTestApplicationLauncher : CHIPApplicationLauncher
+@interface MTRTestApplicationLauncher : MTRApplicationLauncher
 
 - (void)writeAttributeCatalogListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -116,7 +116,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Audio Output
  *
  */
-@interface CHIPTestAudioOutput : CHIPAudioOutput
+@interface MTRTestAudioOutput : MTRAudioOutput
 
 - (void)writeAttributeOutputListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeCurrentOutputWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -132,7 +132,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Barrier Control
  *
  */
-@interface CHIPTestBarrierControl : CHIPBarrierControl
+@interface MTRTestBarrierControl : MTRBarrierControl
 
 - (void)writeAttributeBarrierMovingStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeBarrierSafetyStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -150,7 +150,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Basic
  *
  */
-@interface CHIPTestBasic : CHIPBasic
+@interface MTRTestBasic : MTRBasic
 
 - (void)writeAttributeDataModelRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeVendorNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -170,7 +170,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeSerialNumberWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeReachableWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeUniqueIDWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeCapabilityMinimaWithValue:(CHIPBasicClusterCapabilityMinimaStruct * _Nonnull)value
+- (void)writeAttributeCapabilityMinimaWithValue:(MTRBasicClusterCapabilityMinimaStruct * _Nonnull)value
                               completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -184,7 +184,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Binary Input (Basic)
  *
  */
-@interface CHIPTestBinaryInputBasic : CHIPBinaryInputBasic
+@interface MTRTestBinaryInputBasic : MTRBinaryInputBasic
 
 - (void)writeAttributePolarityWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeStatusFlagsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -201,7 +201,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Binding
  *
  */
-@interface CHIPTestBinding : CHIPBinding
+@interface MTRTestBinding : MTRBinding
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -215,7 +215,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Boolean State
  *
  */
-@interface CHIPTestBooleanState : CHIPBooleanState
+@interface MTRTestBooleanState : MTRBooleanState
 
 - (void)writeAttributeStateValueWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -230,7 +230,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Bridged Actions
  *
  */
-@interface CHIPTestBridgedActions : CHIPBridgedActions
+@interface MTRTestBridgedActions : MTRBridgedActions
 
 - (void)writeAttributeActionListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeEndpointListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -247,7 +247,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Bridged Device Basic
  *
  */
-@interface CHIPTestBridgedDeviceBasic : CHIPBridgedDeviceBasic
+@interface MTRTestBridgedDeviceBasic : MTRBridgedDeviceBasic
 
 - (void)writeAttributeVendorNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeVendorIDWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -277,12 +277,12 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Channel
  *
  */
-@interface CHIPTestChannel : CHIPChannel
+@interface MTRTestChannel : MTRChannel
 
 - (void)writeAttributeChannelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeLineupWithValue:(CHIPChannelClusterLineupInfo * _Nullable)value
+- (void)writeAttributeLineupWithValue:(MTRChannelClusterLineupInfo * _Nullable)value
                     completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeCurrentChannelWithValue:(CHIPChannelClusterChannelInfo * _Nullable)value
+- (void)writeAttributeCurrentChannelWithValue:(MTRChannelClusterChannelInfo * _Nullable)value
                             completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -296,7 +296,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Color Control
  *
  */
-@interface CHIPTestColorControl : CHIPColorControl
+@interface MTRTestColorControl : MTRColorControl
 
 - (void)writeAttributeCurrentHueWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeCurrentSaturationWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -354,7 +354,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Content Launcher
  *
  */
-@interface CHIPTestContentLauncher : CHIPContentLauncher
+@interface MTRTestContentLauncher : MTRContentLauncher
 
 - (void)writeAttributeAcceptHeaderWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -369,7 +369,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Descriptor
  *
  */
-@interface CHIPTestDescriptor : CHIPDescriptor
+@interface MTRTestDescriptor : MTRDescriptor
 
 - (void)writeAttributeDeviceListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeServerListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -387,7 +387,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Diagnostic Logs
  *
  */
-@interface CHIPTestDiagnosticLogs : CHIPDiagnosticLogs
+@interface MTRTestDiagnosticLogs : MTRDiagnosticLogs
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -401,7 +401,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Door Lock
  *
  */
-@interface CHIPTestDoorLock : CHIPDoorLock
+@interface MTRTestDoorLock : MTRDoorLock
 
 - (void)writeAttributeLockStateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeLockTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -443,7 +443,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Electrical Measurement
  *
  */
-@interface CHIPTestElectricalMeasurement : CHIPElectricalMeasurement
+@interface MTRTestElectricalMeasurement : MTRElectricalMeasurement
 
 - (void)writeAttributeMeasurementTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeDcVoltageWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -622,7 +622,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Ethernet Network Diagnostics
  *
  */
-@interface CHIPTestEthernetNetworkDiagnostics : CHIPEthernetNetworkDiagnostics
+@interface MTRTestEthernetNetworkDiagnostics : MTREthernetNetworkDiagnostics
 
 - (void)writeAttributePHYRateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeFullDuplexWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
@@ -645,7 +645,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Fan Control
  *
  */
-@interface CHIPTestFanControl : CHIPFanControl
+@interface MTRTestFanControl : MTRFanControl
 
 - (void)writeAttributePercentCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeSpeedMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -664,7 +664,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Fixed Label
  *
  */
-@interface CHIPTestFixedLabel : CHIPFixedLabel
+@interface MTRTestFixedLabel : MTRFixedLabel
 
 - (void)writeAttributeLabelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -679,7 +679,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Flow Measurement
  *
  */
-@interface CHIPTestFlowMeasurement : CHIPFlowMeasurement
+@interface MTRTestFlowMeasurement : MTRFlowMeasurement
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMinMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
@@ -697,9 +697,9 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster General Commissioning
  *
  */
-@interface CHIPTestGeneralCommissioning : CHIPGeneralCommissioning
+@interface MTRTestGeneralCommissioning : MTRGeneralCommissioning
 
-- (void)writeAttributeBasicCommissioningInfoWithValue:(CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nonnull)value
+- (void)writeAttributeBasicCommissioningInfoWithValue:(MTRGeneralCommissioningClusterBasicCommissioningInfo * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeRegulatoryConfigWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeLocationCapabilityWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -717,7 +717,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster General Diagnostics
  *
  */
-@interface CHIPTestGeneralDiagnostics : CHIPGeneralDiagnostics
+@interface MTRTestGeneralDiagnostics : MTRGeneralDiagnostics
 
 - (void)writeAttributeNetworkInterfacesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeRebootCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -742,7 +742,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Group Key Management
  *
  */
-@interface CHIPTestGroupKeyManagement : CHIPGroupKeyManagement
+@interface MTRTestGroupKeyManagement : MTRGroupKeyManagement
 
 - (void)writeAttributeGroupTableWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMaxGroupsPerFabricWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -760,7 +760,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Groups
  *
  */
-@interface CHIPTestGroups : CHIPGroups
+@interface MTRTestGroups : MTRGroups
 
 - (void)writeAttributeNameSupportWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -775,7 +775,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Identify
  *
  */
-@interface CHIPTestIdentify : CHIPIdentify
+@interface MTRTestIdentify : MTRIdentify
 
 - (void)writeAttributeIdentifyTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -790,7 +790,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Illuminance Measurement
  *
  */
-@interface CHIPTestIlluminanceMeasurement : CHIPIlluminanceMeasurement
+@interface MTRTestIlluminanceMeasurement : MTRIlluminanceMeasurement
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMinMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
@@ -809,7 +809,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Keypad Input
  *
  */
-@interface CHIPTestKeypadInput : CHIPKeypadInput
+@interface MTRTestKeypadInput : MTRKeypadInput
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -823,7 +823,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Level Control
  *
  */
-@interface CHIPTestLevelControl : CHIPLevelControl
+@interface MTRTestLevelControl : MTRLevelControl
 
 - (void)writeAttributeCurrentLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeRemainingTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -844,7 +844,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Localization Configuration
  *
  */
-@interface CHIPTestLocalizationConfiguration : CHIPLocalizationConfiguration
+@interface MTRTestLocalizationConfiguration : MTRLocalizationConfiguration
 
 - (void)writeAttributeSupportedLocalesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -859,7 +859,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Low Power
  *
  */
-@interface CHIPTestLowPower : CHIPLowPower
+@interface MTRTestLowPower : MTRLowPower
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -873,7 +873,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Media Input
  *
  */
-@interface CHIPTestMediaInput : CHIPMediaInput
+@interface MTRTestMediaInput : MTRMediaInput
 
 - (void)writeAttributeInputListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeCurrentInputWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -889,12 +889,12 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Media Playback
  *
  */
-@interface CHIPTestMediaPlayback : CHIPMediaPlayback
+@interface MTRTestMediaPlayback : MTRMediaPlayback
 
 - (void)writeAttributeCurrentStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeStartTimeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeDurationWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeSampledPositionWithValue:(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable)value
+- (void)writeAttributeSampledPositionWithValue:(MTRMediaPlaybackClusterPlaybackPosition * _Nullable)value
                              completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributePlaybackSpeedWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeSeekRangeEndWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
@@ -911,7 +911,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Mode Select
  *
  */
-@interface CHIPTestModeSelect : CHIPModeSelect
+@interface MTRTestModeSelect : MTRModeSelect
 
 - (void)writeAttributeDescriptionWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeStandardNamespaceWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
@@ -929,7 +929,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Network Commissioning
  *
  */
-@interface CHIPTestNetworkCommissioning : CHIPNetworkCommissioning
+@interface MTRTestNetworkCommissioning : MTRNetworkCommissioning
 
 - (void)writeAttributeMaxNetworksWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeNetworksWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -953,7 +953,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster OTA Software Update Provider
  *
  */
-@interface CHIPTestOtaSoftwareUpdateProvider : CHIPOtaSoftwareUpdateProvider
+@interface MTRTestOtaSoftwareUpdateProvider : MTROtaSoftwareUpdateProvider
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -967,7 +967,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster OTA Software Update Requestor
  *
  */
-@interface CHIPTestOtaSoftwareUpdateRequestor : CHIPOtaSoftwareUpdateRequestor
+@interface MTRTestOtaSoftwareUpdateRequestor : MTROtaSoftwareUpdateRequestor
 
 - (void)writeAttributeUpdatePossibleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeUpdateStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -985,7 +985,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Occupancy Sensing
  *
  */
-@interface CHIPTestOccupancySensing : CHIPOccupancySensing
+@interface MTRTestOccupancySensing : MTROccupancySensing
 
 - (void)writeAttributeOccupancyWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeOccupancySensorTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1003,7 +1003,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster On/Off
  *
  */
-@interface CHIPTestOnOff : CHIPOnOff
+@interface MTRTestOnOff : MTROnOff
 
 - (void)writeAttributeOnOffWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGlobalSceneControlWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1019,7 +1019,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster On/off Switch Configuration
  *
  */
-@interface CHIPTestOnOffSwitchConfiguration : CHIPOnOffSwitchConfiguration
+@interface MTRTestOnOffSwitchConfiguration : MTROnOffSwitchConfiguration
 
 - (void)writeAttributeSwitchTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1034,7 +1034,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Operational Credentials
  *
  */
-@interface CHIPTestOperationalCredentials : CHIPOperationalCredentials
+@interface MTRTestOperationalCredentials : MTROperationalCredentials
 
 - (void)writeAttributeNOCsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeFabricsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1055,7 +1055,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Power Source
  *
  */
-@interface CHIPTestPowerSource : CHIPPowerSource
+@interface MTRTestPowerSource : MTRPowerSource
 
 - (void)writeAttributeStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeOrderWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1116,7 +1116,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Power Source Configuration
  *
  */
-@interface CHIPTestPowerSourceConfiguration : CHIPPowerSourceConfiguration
+@interface MTRTestPowerSourceConfiguration : MTRPowerSourceConfiguration
 
 - (void)writeAttributeSourcesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1131,7 +1131,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Pressure Measurement
  *
  */
-@interface CHIPTestPressureMeasurement : CHIPPressureMeasurement
+@interface MTRTestPressureMeasurement : MTRPressureMeasurement
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMinMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
@@ -1154,7 +1154,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Pump Configuration and Control
  *
  */
-@interface CHIPTestPumpConfigurationAndControl : CHIPPumpConfigurationAndControl
+@interface MTRTestPumpConfigurationAndControl : MTRPumpConfigurationAndControl
 
 - (void)writeAttributeMaxPressureWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMaxSpeedWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
@@ -1189,7 +1189,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Relative Humidity Measurement
  *
  */
-@interface CHIPTestRelativeHumidityMeasurement : CHIPRelativeHumidityMeasurement
+@interface MTRTestRelativeHumidityMeasurement : MTRRelativeHumidityMeasurement
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMinMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
@@ -1207,7 +1207,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Scenes
  *
  */
-@interface CHIPTestScenes : CHIPScenes
+@interface MTRTestScenes : MTRScenes
 
 - (void)writeAttributeSceneCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeCurrentSceneWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1227,7 +1227,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Software Diagnostics
  *
  */
-@interface CHIPTestSoftwareDiagnostics : CHIPSoftwareDiagnostics
+@interface MTRTestSoftwareDiagnostics : MTRSoftwareDiagnostics
 
 - (void)writeAttributeThreadMetricsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeCurrentHeapFreeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1246,7 +1246,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Switch
  *
  */
-@interface CHIPTestSwitch : CHIPSwitch
+@interface MTRTestSwitch : MTRSwitch
 
 - (void)writeAttributeNumberOfPositionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeCurrentPositionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1263,7 +1263,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Target Navigator
  *
  */
-@interface CHIPTestTargetNavigator : CHIPTargetNavigator
+@interface MTRTestTargetNavigator : MTRTargetNavigator
 
 - (void)writeAttributeTargetListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeCurrentTargetWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1279,7 +1279,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Temperature Measurement
  *
  */
-@interface CHIPTestTemperatureMeasurement : CHIPTemperatureMeasurement
+@interface MTRTestTemperatureMeasurement : MTRTemperatureMeasurement
 
 - (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMinMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
@@ -1297,7 +1297,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Test Cluster
  *
  */
-@interface CHIPTestTestCluster : CHIPTestCluster
+@interface MTRTestTestCluster : MTRTestCluster
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1311,7 +1311,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Thermostat
  *
  */
-@interface CHIPTestThermostat : CHIPThermostat
+@interface MTRTestThermostat : MTRThermostat
 
 - (void)writeAttributeLocalTemperatureWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeOutdoorTemperatureWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
@@ -1360,7 +1360,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Thermostat User Interface Configuration
  *
  */
-@interface CHIPTestThermostatUserInterfaceConfiguration : CHIPThermostatUserInterfaceConfiguration
+@interface MTRTestThermostatUserInterfaceConfiguration : MTRThermostatUserInterfaceConfiguration
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1374,7 +1374,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Thread Network Diagnostics
  *
  */
-@interface CHIPTestThreadNetworkDiagnostics : CHIPThreadNetworkDiagnostics
+@interface MTRTestThreadNetworkDiagnostics : MTRThreadNetworkDiagnostics
 
 - (void)writeAttributeChannelWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeRoutingRoleWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
@@ -1447,11 +1447,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeActiveTimestampWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributePendingTimestampWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeDelayWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeSecurityPolicyWithValue:(CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable)value
+- (void)writeAttributeSecurityPolicyWithValue:(MTRThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable)value
                             completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeChannelMaskWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeOperationalDatasetComponentsWithValue:
-            (CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable)value
+            (MTRThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable)value
                                           completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeActiveNetworkFaultsListWithValue:(NSArray * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler;
@@ -1467,7 +1467,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Time Format Localization
  *
  */
-@interface CHIPTestTimeFormatLocalization : CHIPTimeFormatLocalization
+@interface MTRTestTimeFormatLocalization : MTRTimeFormatLocalization
 
 - (void)writeAttributeSupportedCalendarTypesWithValue:(NSArray * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler;
@@ -1483,7 +1483,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Unit Localization
  *
  */
-@interface CHIPTestUnitLocalization : CHIPUnitLocalization
+@interface MTRTestUnitLocalization : MTRUnitLocalization
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1497,7 +1497,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster User Label
  *
  */
-@interface CHIPTestUserLabel : CHIPUserLabel
+@interface MTRTestUserLabel : MTRUserLabel
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1511,7 +1511,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Wake on LAN
  *
  */
-@interface CHIPTestWakeOnLan : CHIPWakeOnLan
+@interface MTRTestWakeOnLan : MTRWakeOnLan
 
 - (void)writeAttributeMACAddressWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1526,7 +1526,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster WiFi Network Diagnostics
  *
  */
-@interface CHIPTestWiFiNetworkDiagnostics : CHIPWiFiNetworkDiagnostics
+@interface MTRTestWiFiNetworkDiagnostics : MTRWiFiNetworkDiagnostics
 
 - (void)writeAttributeBssidWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeSecurityTypeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
@@ -1557,7 +1557,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster Window Covering
  *
  */
-@interface CHIPTestWindowCovering : CHIPWindowCovering
+@interface MTRTestWindowCovering : MTRWindowCovering
 
 - (void)writeAttributeTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributePhysicalClosedLimitLiftWithValue:(NSNumber * _Nonnull)value
