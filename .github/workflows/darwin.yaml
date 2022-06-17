@@ -98,7 +98,8 @@ jobs:
           ls -la ~/Library/Developer/Xcode/DerivedData/Build
           ls -la ~/Library/Developer/Xcode/DerivedData/Build/Products
           ls -la ~/Library/Developer/Xcode/DerivedData/Build/Products/Debug
-          mv ~/Library/Developer/Xcode/DerivedData/Build/Products/Debug/Matter.framework /tmp/macos_framework_output
+          ls -la /Users/runner/work/connectedhomeip/connectedhomeip/src/darwin/Framework/build/Release/
+          mv /Users/runner/work/connectedhomeip/connectedhomeip/src/darwin/Framework/build/Release/Matter.framework /tmp/macos_framework_output
       - name: Clean Build
         run: xcodebuild clean
         working-directory: src/darwin/Framework
