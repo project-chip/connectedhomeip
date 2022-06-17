@@ -146,7 +146,7 @@ static void schedule(EndpointId endpoint, uint32_t delayMs)
 
 static void deactivate(EndpointId endpoint)
 {
-    DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<uintptr_t>(endpoint));
+    DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<void*>(static_cast<uintptr_t>(endpoint)));
 }
 
 static EmberAfLevelControlState * getState(EndpointId endpoint)
