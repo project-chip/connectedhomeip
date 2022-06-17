@@ -52,6 +52,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
+#include <platform/Linux/GlibTypeDeleter.h>
 #endif
 
 #ifndef CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD
