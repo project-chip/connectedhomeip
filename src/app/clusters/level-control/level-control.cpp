@@ -115,10 +115,11 @@ static EmberAfLevelControlState * getState(EndpointId endpoint);
 
 static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level, uint16_t transitionTimeDs,
                                         uint8_t optionMask, uint8_t optionOverride, uint16_t storedLevel);
-static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride);
-static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTimeDs, uint8_t optionMask,
+static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMode, uint8_t rate, uint8_t optionMask,
                         uint8_t optionOverride);
-static void stopHandler(CommandId commandId, uint8_t optionMask, uint8_t optionOverride);
+static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTimeDs,
+                        uint8_t optionMask, uint8_t optionOverride);
+static void stopHandler(EndpointId endpoint, CommandId commandId, uint8_t optionMask, uint8_t optionOverride);
 
 static void setOnOffValue(EndpointId endpoint, bool onOff);
 static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs);
@@ -457,7 +458,7 @@ bool emberAfLevelControlClusterMoveCallback(app::CommandHandler * commandObj, co
     auto & optionOverride = commandData.optionOverride;
 
     emberAfLevelControlClusterPrintln("%pMOVE %x %x", "RX level-control:", moveMode, rate);
-    moveHandler(Commands::Move::Id, moveMode, rate, optionMask, optionOverride);
+    moveHandler(commandPath.mEndpointId, Commands::Move::Id, moveMode, rate, optionMask, optionOverride);
     return true;
 }
 
@@ -468,7 +469,7 @@ bool emberAfLevelControlClusterMoveWithOnOffCallback(app::CommandHandler * comma
     auto & rate     = commandData.rate;
 
     emberAfLevelControlClusterPrintln("%pMOVE_WITH_ON_OFF %x %x", "RX level-control:", moveMode, rate);
-    moveHandler(Commands::MoveWithOnOff::Id, moveMode, rate, 0xFF, 0xFF);
+    moveHandler(commandPath.mEndpointId, Commands::MoveWithOnOff::Id, moveMode, rate, 0xFF, 0xFF);
     return true;
 }
 
@@ -482,7 +483,7 @@ bool emberAfLevelControlClusterStepCallback(app::CommandHandler * commandObj, co
     auto & optionOverride = commandData.optionOverride;
 
     emberAfLevelControlClusterPrintln("%pSTEP %x %x %2x", "RX level-control:", stepMode, stepSize, transitionTime);
-    stepHandler(Commands::Step::Id, stepMode, stepSize, transitionTime, optionMask, optionOverride);
+    stepHandler(commandPath.mEndpointId, Commands::Step::Id, stepMode, stepSize, transitionTime, optionMask, optionOverride);
     return true;
 }
 
@@ -494,7 +495,7 @@ bool emberAfLevelControlClusterStepWithOnOffCallback(app::CommandHandler * comma
     auto & transitionTime = commandData.transitionTime;
 
     emberAfLevelControlClusterPrintln("%pSTEP_WITH_ON_OFF %x %x %2x", "RX level-control:", stepMode, stepSize, transitionTime);
-    stepHandler(Commands::StepWithOnOff::Id, stepMode, stepSize, transitionTime, 0xFF, 0xFF);
+    stepHandler(commandPath.mEndpointId, Commands::StepWithOnOff::Id, stepMode, stepSize, transitionTime, 0xFF, 0xFF);
     return true;
 }
 
@@ -505,7 +506,7 @@ bool emberAfLevelControlClusterStopCallback(app::CommandHandler * commandObj, co
     auto & optionOverride = commandData.optionOverride;
 
     emberAfLevelControlClusterPrintln("%pSTOP", "RX level-control:");
-    stopHandler(Commands::Stop::Id, optionMask, optionOverride);
+    stopHandler(commandPath.mEndpointId, Commands::Stop::Id, optionMask, optionOverride);
     return true;
 }
 
@@ -513,7 +514,7 @@ bool emberAfLevelControlClusterStopWithOnOffCallback(app::CommandHandler * comma
                                                      const Commands::StopWithOnOff::DecodableType & commandData)
 {
     emberAfLevelControlClusterPrintln("%pSTOP_WITH_ON_OFF", "RX level-control:");
-    stopHandler(Commands::StopWithOnOff::Id, 0xFF, 0xFF);
+    stopHandler(commandPath.mEndpointId, Commands::StopWithOnOff::Id, 0xFF, 0xFF);
     return true;
 }
 
@@ -656,9 +657,9 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
     return status;
 }
 
-static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
+static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMode, uint8_t rate, uint8_t optionMask,
+                        uint8_t optionOverride)
 {
-    EndpointId endpoint              = emberAfCurrentEndpoint();
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
     uint8_t currentLevel;
@@ -768,10 +769,9 @@ send_default_response:
     emberAfSendImmediateDefaultResponse(status);
 }
 
-static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTimeDs, uint8_t optionMask,
-                        uint8_t optionOverride)
+static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTimeDs,
+                        uint8_t optionMask, uint8_t optionOverride)
 {
-    EndpointId endpoint              = emberAfCurrentEndpoint();
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
     uint8_t currentLevel;
@@ -890,9 +890,8 @@ send_default_response:
     emberAfSendImmediateDefaultResponse(status);
 }
 
-static void stopHandler(CommandId commandId, uint8_t optionMask, uint8_t optionOverride)
+static void stopHandler(EndpointId endpoint, CommandId commandId, uint8_t optionMask, uint8_t optionOverride)
 {
-    EndpointId endpoint              = emberAfCurrentEndpoint();
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
 
