@@ -134,7 +134,7 @@ class {{filename}}: public TestCommandBridge
         return {{command}}("{{identity}}", value);
         {{else}}
         MTRDevice * device = GetDevice("{{identity}}");
-        MTRCHIPTest{{asUpperCamelCase cluster}} * cluster = [[MTRTest{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:mCallbackQueue];
+        MTRTest{{asUpperCamelCase cluster}} * cluster = [[MTRTest{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         {{#if isCommand}}
