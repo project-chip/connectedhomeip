@@ -151,15 +151,18 @@ void BleTransportCapabilitiesRequestMessage::SetSupportedProtocolVersion(uint8_t
 {
     uint8_t mask;
 
-    // If even-index, store version in lower 4 bits; else, higher 4 bits.
+    // Version array is 4-bit, highest nibble first:
+    //    (Ver[0] | Ver[1]) on byte 1, (Ver[2], Ver[3]) on byte 2 and so on
+    //
+    // This means that even indexes are shifted, odd ones are not.
     if (index % 2 == 0)
-    {
-        mask = 0x0F;
-    }
-    else
     {
         mask    = 0xF0;
         version = static_cast<uint8_t>(version << 4);
+    }
+    else
+    {
+        mask = 0x0F;
     }
 
     version &= mask;
@@ -728,7 +731,10 @@ BleTransportProtocolVersion BleLayer::GetHighestSupportedProtocolVersion(const B
 {
     BleTransportProtocolVersion retVersion = kBleTransportProtocolVersion_None;
 
-    uint8_t shift_width = 4;
+    // NOTE: shift ordering MUST pick the high nibble according to the spec
+    //       Versions are 4-bit and the SPEC defines array being HIGH nibble first,
+    //       followed by old nibble.
+    uint8_t shift_width = 0;
 
     for (int i = 0; i < NUM_SUPPORTED_PROTOCOL_VERSIONS; i++)
     {
@@ -737,14 +743,21 @@ BleTransportProtocolVersion BleLayer::GetHighestSupportedProtocolVersion(const B
         uint8_t version = reqMsg.mSupportedProtocolVersions[(i / 2)];
         version         = (version >> shift_width) & 0x0F; // Grab just the nibble we want.
 
+        if (version == kBleTransportProtocolVersion_None)
+        {
+            // NOTE: we do NOT break here as an end of list even though spec seems
+            //       to indicate 0 is an end of list as the entries are ordered.
+            //
+            // The reason for this is that early matter implementations would
+            // send the protocol version flipped (low nibble has the version,
+            // high nibble is 0), effectively having Ver[0] == 0 and Ver[1] == 4
+            continue;
+        }
+
         if ((version >= CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION) &&
             (version <= CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION) && (version > retVersion))
         {
             retVersion = static_cast<BleTransportProtocolVersion>(version);
-        }
-        else if (version == kBleTransportProtocolVersion_None) // Signifies end of supported versions list
-        {
-            break;
         }
     }
 
