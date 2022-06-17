@@ -45,7 +45,7 @@ tests:
           "Precondition : Set DUT EnhancedCurrentHue to 0x4000 using
           EnhancedMoveToHue command"
       command: "EnhancedMoveToHue"
-      PICS: CR_ENHANCEDMOVETOHUE
+      PICS: CC.S.C40.Rsp
       arguments:
           values:
               - name: "enhancedHue"
