@@ -1002,8 +1002,7 @@ function chip_tests_iterate_expected_list(values, options)
 {
   values = values.map(value => {
     return {
-      global: this.global, parent: this.parent, name: this.name, type: this.type, isArray: false,
-          isNullable: false, value: value,
+      global: this.global, parent: this.parent, name: this.name, type: this.type, isArray: false, isNullable: false, value: value,
     }
   });
 
