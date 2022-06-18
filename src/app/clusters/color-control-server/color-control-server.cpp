@@ -1975,7 +1975,7 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransit
  */
 EmberAfStatus ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorTemperature, uint16_t transitionTime)
 {
-    EndpointId endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = aEndpoint;
 
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
     VerifyOrReturnError(colorTempTransitionState != nullptr, EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
@@ -2451,12 +2451,6 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
 /**********************************************************
  * Callbacks Implementation
  *********************************************************/
-
-void emberAfPluginColorControlServerStopTransition(void)
-{
-    EndpointId endpoint = emberAfCurrentEndpoint();
-    ColorControlServer::Instance().stopAllColorTransitions(endpoint);
-}
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
