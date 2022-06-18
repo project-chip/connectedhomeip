@@ -387,6 +387,23 @@ void SessionManager::ExpireAllPASEPairings()
     });
 }
 
+void SessionManager::ReleaseSessionsForFabricExceptOne(FabricIndex fabricIndex, const SessionHandle & deferred)
+{
+    VerifyOrDie(deferred->IsSecureSession());
+    SecureSession * deferredSecureSession = deferred->AsSecureSession();
+
+    mSecureSessions.ForEachSession([&](auto session) {
+        if (session->GetPeer().GetFabricIndex() == fabricIndex)
+        {
+            if (session == deferredSecureSession)
+                session->MarkInactive();
+            else
+                session->MarkForRemoval();
+        }
+        return Loop::Continue;
+    });
+}
+
 Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,
                                                         const ScopedNodeId & sessionEvictionHint)
 {

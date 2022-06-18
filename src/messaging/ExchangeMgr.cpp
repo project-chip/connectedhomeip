@@ -376,5 +376,23 @@ void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * deleg
     });
 }
 
+void ExchangeManager::AbortExchangesForFabricExceptOne(FabricIndex fabricIndex, ExchangeContext * deferred)
+{
+    VerifyOrDie(deferred->HasSessionHandle() && deferred->GetSessionHandle()->IsSecureSession());
+
+    mContextPool.ForEachActiveObject([&](auto * ec) {
+        if (ec->HasSessionHandle() && ec->GetSessionHandle()->GetFabricIndex() == fabricIndex)
+        {
+            if (ec == deferred)
+                ec->SetAutoReleaseSession();
+            else
+                ec->Abort();
+        }
+        return Loop::Continue;
+    });
+
+    mSessionManager->ReleaseSessionsForFabricExceptOne(fabricIndex, deferred->GetSessionHandle());
+}
+
 } // namespace Messaging
 } // namespace chip
