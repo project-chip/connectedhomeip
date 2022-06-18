@@ -20,40 +20,11 @@
 #include "driver/gpio.h"
 #include "esp_log.h"
 
-#if CONFIG_LED_TYPE_RMT
-#include "driver/rmt.h"
-#include "led_strip.h"
-#else
-#include "driver/ledc.h"
-#include "hal/ledc_types.h"
-#endif
-
-class LEDWidget
+class Button
 {
 public:
+    typedef void (*ButtonPressCallback)(void);
+
     void Init(void);
-    void Set(bool state);
-    void Toggle(void);
-
-    void SetBrightness(uint8_t brightness);
-    void UpdateState();
-#if CONFIG_LED_TYPE_RMT
-    void SetColor(uint8_t Hue, uint8_t Saturation);
-#endif
-    uint8_t GetLevel(void);
-    bool IsTurnedOn(void);
-
-private:
-    bool mState;
-    uint8_t mBrightness;
-
-#if CONFIG_LED_TYPE_RMT
-    uint8_t mHue;
-    uint8_t mSaturation;
-    led_strip_t * mStrip;
-#else
-    gpio_num_t mGPIONum;
-#endif
-
-    void DoSet(void);
+    void SetButtonPressCallback(ButtonPressCallback button_callback);
 };
