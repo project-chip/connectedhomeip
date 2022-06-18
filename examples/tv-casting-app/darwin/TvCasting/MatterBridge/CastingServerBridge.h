@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#import "DiscoveredNodeData.h"
 #import <Foundation/Foundation.h>
 
 #ifndef CastingServerBridge_h
@@ -22,10 +23,20 @@
 
 @interface CastingServerBridge : NSObject
 
-+ (CastingServerBridge *)getSharedInstance;
++ (CastingServerBridge * _Nullable)getSharedInstance;
 
-// TBD: placeholder will be replaced with true CastingServer functions
-- (int)add:(int)a secondNum:(int)b;
+- (void)discoverCommissioners:(dispatch_queue_t _Nonnull)clientQueue
+    discoveryRequestSentHandler:(nullable void (^)(bool))discoveryRequestSentHandler;
+
+- (void)getDiscoveredCommissioner:(int)index
+                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    discoveredCommissionerHandler:(nullable void (^)(DiscoveredNodeData * _Nullable))discoveredCommissionerHandler;
+
+- (void)sendUserDirectedCommissioningRequest:(NSString * _Nonnull)commissionerIpAddress
+                            commissionerPort:(uint16_t)commissionerPort
+                           platformInterface:(unsigned int)platformInterface
+                                 clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                       udcRequestSentHandler:(nullable void (^)(bool))udcRequestSentHandler;
 
 @end
 

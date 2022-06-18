@@ -321,7 +321,10 @@ void TestCommandInteraction::TestDataResponseHelper(nlTestSuite * apSuite, void 
         }
         onSuccessWasCalled = true;
     };
-    auto readFailureCb = [&onFailureWasCalled](const ConcreteDataAttributePath *, CHIP_ERROR aError) { onFailureWasCalled = true; };
+    auto readFailureCb = [&onFailureWasCalled](const ConcreteDataAttributePath *, CHIP_ERROR aError) {
+        onFailureWasCalled = true;
+        ChipLogError(NotSpecified, "TEST FAILURE: %" CHIP_ERROR_FORMAT, aError.Format());
+    };
 
     chip::Controller::ReadAttribute<TestCluster::Attributes::AcceptedCommandList::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, readSuccessCb, readFailureCb);

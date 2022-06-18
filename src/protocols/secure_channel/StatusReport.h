@@ -19,6 +19,7 @@
 #pragma once
 
 #include <lib/support/BufferWriter.h>
+#include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -44,7 +45,7 @@ public:
      *  @param protocolId Must specify a ProtocolId which consists of Vendor Id (upper 16 bits) and ProtocolId (lower 16 bits)
      *  @param protocolCode A code defined by the specified protocol which provides more information about the status
      */
-    StatusReport(GeneralStatusCode generalCode, uint32_t protocolId, uint16_t protocolCode);
+    StatusReport(GeneralStatusCode generalCode, Protocols::Id protocolId, uint16_t protocolCode);
 
     //
     /**
@@ -55,7 +56,7 @@ public:
      *  @param protocolCode A code defined by the specified protocol which provides more information about the status
      *  @param protocolData A \c PacketBufferHandle containing the protocol-specific data
      */
-    StatusReport(GeneralStatusCode generalCode, uint32_t protocolId, uint16_t protocolCode,
+    StatusReport(GeneralStatusCode generalCode, Protocols::Id protocolId, uint16_t protocolCode,
                  System::PacketBufferHandle protocolData);
 
     /**
@@ -88,13 +89,13 @@ public:
     size_t Size() const;
 
     GeneralStatusCode GetGeneralCode() const { return mGeneralCode; }
-    uint32_t GetProtocolId() const { return mProtocolId; }
+    Protocols::Id GetProtocolId() const { return mProtocolId; }
     uint16_t GetProtocolCode() const { return mProtocolCode; }
     const System::PacketBufferHandle & GetProtocolData() const { return mProtocolData; }
 
 private:
     GeneralStatusCode mGeneralCode;
-    uint32_t mProtocolId;
+    Protocols::Id mProtocolId;
     uint16_t mProtocolCode;
 
     System::PacketBufferHandle mProtocolData;

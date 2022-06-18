@@ -27,9 +27,16 @@ network.
     -   [Detokenizer script](#detokenizer)
     -   [Notes](#detokenizer-notes)
     -   [Known issues](#detokenizer-known-issues)
--   [OTA](#ota) - [Writing the SSBL](#ssbl) - [Writing the PSECT](#psect) -
-    [Writing the application](#appwrite) - [OTA Testing](#otatesting) -
-    [Known issues](#otaissues)
+-   [Tinycrypt ECC operations](#tinycrypt)
+    -   [Building steps](#tinycrypt-building-steps)
+-   [OTA](#ota)
+
+    -   [Writing the SSBL](#ssbl)
+    -   [Writing the PSECT](#psect)
+    -   [Writing the application](#appwrite)
+    -   [OTA Testing](#otatesting)
+    -   [Known issues](#otaissues)
+
     </hr>
 
 <a name="intro"></a>
@@ -182,18 +189,17 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W061_SDK_ROOT=/home/use
 user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w/k32w0
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W061_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"mbedtls\" chip_with_se05x=0"
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W061_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"mbedtls\" chip_with_se05x=0 mbedtls_use_tinycrypt=true chip_pw_tokenizer_logging=true mbedtls_repo=\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\""
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ ninja -C out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ $NXP_K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
 
     -   with Secure element
         Exactly the same steps as above but set chip_with_se05x=1 in the gn command
-        and add arguments chip_pw_tokenizer_logging=true chip_enable_ota_requestor=false
+        and add argument chip_enable_ota_requestor=false
 
-Note that options chip_pw_tokenizer_logging=true and
-chip_enable_ota_requestor=false are required for building with Secure Element.
-These can be changed if building without Secure Element
+Note that option chip_enable_ota_requestor=false are required for building with
+Secure Element. These can be changed if building without Secure Element
 
 Note that "patch_k32w_sdk.sh" script must be run for patching the K32W061 SDK
 2.6.4.
@@ -298,6 +304,25 @@ script won't find them in the special-created sections.
 If run, closed and rerun with the serial option on the same serial port, the
 detokenization script will get stuck and not show any logs. The solution is to
 unplug and plug the board and then rerun the script.
+
+<a name="tinycrypt"></a>
+
+## Tinycrypt ECC operations
+
+<a name="tinycrypt-building-steps"></a>
+
+### Building steps
+
+Note: This solution is temporary.
+
+In order to use the tinycrypt ecc operations, use the following build arguments:
+
+-   Build without Secure element (_chip_with_se05x=0_), with tinycrypt enabled
+    (_mbedtls_use_tinycrypt=true_) and with the `NXPmicro/mbedtls` library
+    (_mbedtls_repo=`\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\"`_).
+
+To disable tinycrypt ecc operations, simply build without
+_mbedtls_use_tinycrypt=true_ and without _mbedtls_repo_.
 
 <a name="ota"></a>
 

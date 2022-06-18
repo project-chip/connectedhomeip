@@ -4578,614 +4578,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation CHIPIasZoneClusterZoneEnrollResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _enrollResponseCode = @(0);
-
-        _zoneId = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: enrollResponseCode:%@; zoneId:%@; >",
-                                             NSStringFromClass([self class]), _enrollResponseCode, _zoneId];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasZoneClusterZoneStatusChangeNotificationParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _zoneStatus = @(0);
-
-        _extendedStatus = @(0);
-
-        _zoneId = @(0);
-
-        _delay = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneStatus:%@; extendedStatus:%@; zoneId:%@; delay:%@; >",
-                                             NSStringFromClass([self class]), _zoneStatus, _extendedStatus, _zoneId, _delay];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasZoneClusterInitiateNormalOperationModeParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasZoneClusterZoneEnrollRequestParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _zoneType = @(0);
-
-        _manufacturerCode = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneType:%@; manufacturerCode:%@; >",
-                                             NSStringFromClass([self class]), _zoneType, _manufacturerCode];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasZoneClusterInitiateTestModeParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _testModeDuration = @(0);
-
-        _currentZoneSensitivityLevel = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: testModeDuration:%@; currentZoneSensitivityLevel:%@; >",
-                                             NSStringFromClass([self class]), _testModeDuration, _currentZoneSensitivityLevel];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasZoneClusterInitiateNormalOperationModeResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasZoneClusterInitiateTestModeResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterArmParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _armMode = @(0);
-
-        _armDisarmCode = @"";
-
-        _zoneId = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: armMode:%@; armDisarmCode:%@; zoneId:%@; >",
-                                             NSStringFromClass([self class]), _armMode, _armDisarmCode, _zoneId];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterArmResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _armNotification = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: armNotification:%@; >", NSStringFromClass([self class]), _armNotification];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterBypassParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _numberOfZones = @(0);
-
-        _zoneIds = [NSArray array];
-
-        _armDisarmCode = @"";
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: numberOfZones:%@; zoneIds:%@; armDisarmCode:%@; >",
-                                             NSStringFromClass([self class]), _numberOfZones, _zoneIds, _armDisarmCode];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterGetZoneIdMapResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _section0 = @(0);
-
-        _section1 = @(0);
-
-        _section2 = @(0);
-
-        _section3 = @(0);
-
-        _section4 = @(0);
-
-        _section5 = @(0);
-
-        _section6 = @(0);
-
-        _section7 = @(0);
-
-        _section8 = @(0);
-
-        _section9 = @(0);
-
-        _section10 = @(0);
-
-        _section11 = @(0);
-
-        _section12 = @(0);
-
-        _section13 = @(0);
-
-        _section14 = @(0);
-
-        _section15 = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString
-        stringWithFormat:
-            @"<%@: section0:%@; section1:%@; section2:%@; section3:%@; section4:%@; section5:%@; section6:%@; section7:%@; "
-            @"section8:%@; section9:%@; section10:%@; section11:%@; section12:%@; section13:%@; section14:%@; section15:%@; >",
-        NSStringFromClass([self class]), _section0, _section1, _section2, _section3, _section4, _section5, _section6, _section7,
-        _section8, _section9, _section10, _section11, _section12, _section13, _section14, _section15];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterEmergencyParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterGetZoneInformationResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _zoneId = @(0);
-
-        _zoneType = @(0);
-
-        _ieeeAddress = @(0);
-
-        _zoneLabel = @"";
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneId:%@; zoneType:%@; ieeeAddress:%@; zoneLabel:%@; >",
-                                             NSStringFromClass([self class]), _zoneId, _zoneType, _ieeeAddress, _zoneLabel];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterFireParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterZoneStatusChangedParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _zoneId = @(0);
-
-        _zoneStatus = @(0);
-
-        _audibleNotification = @(0);
-
-        _zoneLabel = @"";
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: zoneId:%@; zoneStatus:%@; audibleNotification:%@; zoneLabel:%@; >",
-                  NSStringFromClass([self class]), _zoneId, _zoneStatus, _audibleNotification, _zoneLabel];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterPanicParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterPanelStatusChangedParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _panelStatus = @(0);
-
-        _secondsRemaining = @(0);
-
-        _audibleNotification = @(0);
-
-        _alarmStatus = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: panelStatus:%@; secondsRemaining:%@; audibleNotification:%@; alarmStatus:%@; >",
-                  NSStringFromClass([self class]), _panelStatus, _secondsRemaining, _audibleNotification, _alarmStatus];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterGetZoneIdMapParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterGetPanelStatusResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _panelStatus = @(0);
-
-        _secondsRemaining = @(0);
-
-        _audibleNotification = @(0);
-
-        _alarmStatus = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: panelStatus:%@; secondsRemaining:%@; audibleNotification:%@; alarmStatus:%@; >",
-                  NSStringFromClass([self class]), _panelStatus, _secondsRemaining, _audibleNotification, _alarmStatus];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterGetZoneInformationParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _zoneId = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneId:%@; >", NSStringFromClass([self class]), _zoneId];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterSetBypassedZoneListParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _numberOfZones = @(0);
-
-        _zoneIds = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: numberOfZones:%@; zoneIds:%@; >", NSStringFromClass([self class]), _numberOfZones, _zoneIds];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterGetPanelStatusParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterBypassResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _numberOfZones = @(0);
-
-        _bypassResult = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: numberOfZones:%@; bypassResult:%@; >",
-                                             NSStringFromClass([self class]), _numberOfZones, _bypassResult];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterGetBypassedZoneListParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterGetZoneStatusResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _zoneStatusComplete = @(0);
-
-        _numberOfZones = @(0);
-
-        _zoneStatusResult = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: zoneStatusComplete:%@; numberOfZones:%@; zoneStatusResult:%@; >",
-                  NSStringFromClass([self class]), _zoneStatusComplete, _numberOfZones, _zoneStatusResult];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasAceClusterGetZoneStatusParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _startingZoneId = @(0);
-
-        _maxNumberOfZoneIds = @(0);
-
-        _zoneStatusMaskFlag = @(0);
-
-        _zoneStatusMask = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: startingZoneId:%@; maxNumberOfZoneIds:%@; zoneStatusMaskFlag:%@; zoneStatusMask:%@; >",
-                  NSStringFromClass([self class]), _startingZoneId, _maxNumberOfZoneIds, _zoneStatusMaskFlag, _zoneStatusMask];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasWdClusterStartWarningParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _warningInfo = @(0);
-
-        _warningDuration = @(0);
-
-        _strobeDutyCycle = @(0);
-
-        _strobeLevel = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: warningInfo:%@; warningDuration:%@; strobeDutyCycle:%@; strobeLevel:%@; >",
-                  NSStringFromClass([self class]), _warningInfo, _warningDuration, _strobeDutyCycle, _strobeLevel];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPIasWdClusterSquawkParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _squawkInfo = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: squawkInfo:%@; >", NSStringFromClass([self class]), _squawkInfo];
-    return descriptionString;
-}
-
-@end
 @implementation CHIPChannelClusterChangeChannelParams
 - (instancetype)init
 {
@@ -5890,6 +5282,473 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPMessagingClusterDisplayMessageParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageId = @(0);
+
+        _messageControl = @(0);
+
+        _startTime = @(0);
+
+        _durationInMinutes = @(0);
+
+        _message = @"";
+
+        _optionalExtendedMessageControl = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: messageId:%@; messageControl:%@; startTime:%@; durationInMinutes:%@; message:%@; "
+                                   @"optionalExtendedMessageControl:%@; >",
+                  NSStringFromClass([self class]), _messageId, _messageControl, _startTime, _durationInMinutes, _message,
+                  _optionalExtendedMessageControl];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPMessagingClusterGetLastMessageParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPMessagingClusterCancelMessageParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageId = @(0);
+
+        _messageControl = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: messageId:%@; messageControl:%@; >", NSStringFromClass([self class]), _messageId, _messageControl];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPMessagingClusterMessageConfirmationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageId = @(0);
+
+        _confirmationTime = @(0);
+
+        _messageConfirmationControl = @(0);
+
+        _messageResponse = [NSData data];
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: messageId:%@; confirmationTime:%@; messageConfirmationControl:%@; messageResponse:%@; >",
+                  NSStringFromClass([self class]), _messageId, _confirmationTime, _messageConfirmationControl,
+                  [_messageResponse base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPMessagingClusterDisplayProtectedMessageParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageId = @(0);
+
+        _messageControl = @(0);
+
+        _startTime = @(0);
+
+        _durationInMinutes = @(0);
+
+        _message = @"";
+
+        _optionalExtendedMessageControl = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: messageId:%@; messageControl:%@; startTime:%@; durationInMinutes:%@; message:%@; "
+                                   @"optionalExtendedMessageControl:%@; >",
+                  NSStringFromClass([self class]), _messageId, _messageControl, _startTime, _durationInMinutes, _message,
+                  _optionalExtendedMessageControl];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPMessagingClusterGetMessageCancellationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _earliestImplementationTime = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: earliestImplementationTime:%@; >", NSStringFromClass([self class]), _earliestImplementationTime];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPMessagingClusterCancelAllMessagesParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _implementationDateTime = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: implementationDateTime:%@; >", NSStringFromClass([self class]), _implementationDateTime];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPApplianceEventsAndAlertClusterGetAlertsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPApplianceEventsAndAlertClusterGetAlertsResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _alertsCount = @(0);
+
+        _alertStructures = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: alertsCount:%@; alertStructures:%@; >",
+                                             NSStringFromClass([self class]), _alertsCount, _alertStructures];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPApplianceEventsAndAlertClusterAlertsNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _alertsCount = @(0);
+
+        _alertStructures = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: alertsCount:%@; alertStructures:%@; >",
+                                             NSStringFromClass([self class]), _alertsCount, _alertStructures];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPApplianceEventsAndAlertClusterEventsNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _eventHeader = @(0);
+
+        _eventId = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: eventHeader:%@; eventId:%@; >", NSStringFromClass([self class]), _eventHeader, _eventId];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPApplianceStatisticsClusterLogNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeStamp = @(0);
+
+        _logId = @(0);
+
+        _logLength = @(0);
+
+        _logPayload = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeStamp:%@; logId:%@; logLength:%@; logPayload:%@; >",
+                                             NSStringFromClass([self class]), _timeStamp, _logId, _logLength, _logPayload];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPApplianceStatisticsClusterLogRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _logId = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: logId:%@; >", NSStringFromClass([self class]), _logId];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPApplianceStatisticsClusterLogResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeStamp = @(0);
+
+        _logId = @(0);
+
+        _logLength = @(0);
+
+        _logPayload = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeStamp:%@; logId:%@; logLength:%@; logPayload:%@; >",
+                                             NSStringFromClass([self class]), _timeStamp, _logId, _logLength, _logPayload];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPApplianceStatisticsClusterLogQueueRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPApplianceStatisticsClusterLogQueueResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _logQueueSize = @(0);
+
+        _logIds = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: logQueueSize:%@; logIds:%@; >", NSStringFromClass([self class]), _logQueueSize, _logIds];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPApplianceStatisticsClusterStatisticsAvailableParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _logQueueSize = @(0);
+
+        _logIds = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: logQueueSize:%@; logIds:%@; >", NSStringFromClass([self class]), _logQueueSize, _logIds];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _profileCount = @(0);
+
+        _profileIntervalPeriod = @(0);
+
+        _maxNumberOfIntervals = @(0);
+
+        _listOfAttributes = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: profileCount:%@; profileIntervalPeriod:%@; maxNumberOfIntervals:%@; listOfAttributes:%@; >",
+        NSStringFromClass([self class]), _profileCount, _profileIntervalPeriod, _maxNumberOfIntervals, _listOfAttributes];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPElectricalMeasurementClusterGetProfileInfoCommandParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _startTime = @(0);
+
+        _status = @(0);
+
+        _profileIntervalPeriod = @(0);
+
+        _numberOfIntervalsDelivered = @(0);
+
+        _attributeId = @(0);
+
+        _intervals = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTime:%@; status:%@; profileIntervalPeriod:%@; "
+                                                              @"numberOfIntervalsDelivered:%@; attributeId:%@; intervals:%@; >",
+                                             NSStringFromClass([self class]), _startTime, _status, _profileIntervalPeriod,
+                                             _numberOfIntervalsDelivered, _attributeId, _intervals];
+    return descriptionString;
+}
+
+@end
+@implementation CHIPElectricalMeasurementClusterGetMeasurementProfileCommandParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _attributeId = @(0);
+
+        _startTime = @(0);
+
+        _numberOfIntervals = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeId:%@; startTime:%@; numberOfIntervals:%@; >",
+                                             NSStringFromClass([self class]), _attributeId, _startTime, _numberOfIntervals];
     return descriptionString;
 }
 
@@ -6635,473 +6494,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPMessagingClusterDisplayMessageParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _messageId = @(0);
-
-        _messageControl = @(0);
-
-        _startTime = @(0);
-
-        _durationInMinutes = @(0);
-
-        _message = @"";
-
-        _optionalExtendedMessageControl = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: messageId:%@; messageControl:%@; startTime:%@; durationInMinutes:%@; message:%@; "
-                                   @"optionalExtendedMessageControl:%@; >",
-                  NSStringFromClass([self class]), _messageId, _messageControl, _startTime, _durationInMinutes, _message,
-                  _optionalExtendedMessageControl];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPMessagingClusterGetLastMessageParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPMessagingClusterCancelMessageParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _messageId = @(0);
-
-        _messageControl = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: messageId:%@; messageControl:%@; >", NSStringFromClass([self class]), _messageId, _messageControl];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPMessagingClusterMessageConfirmationParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _messageId = @(0);
-
-        _confirmationTime = @(0);
-
-        _messageConfirmationControl = @(0);
-
-        _messageResponse = [NSData data];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: messageId:%@; confirmationTime:%@; messageConfirmationControl:%@; messageResponse:%@; >",
-                  NSStringFromClass([self class]), _messageId, _confirmationTime, _messageConfirmationControl,
-                  [_messageResponse base64EncodedStringWithOptions:0]];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPMessagingClusterDisplayProtectedMessageParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _messageId = @(0);
-
-        _messageControl = @(0);
-
-        _startTime = @(0);
-
-        _durationInMinutes = @(0);
-
-        _message = @"";
-
-        _optionalExtendedMessageControl = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: messageId:%@; messageControl:%@; startTime:%@; durationInMinutes:%@; message:%@; "
-                                   @"optionalExtendedMessageControl:%@; >",
-                  NSStringFromClass([self class]), _messageId, _messageControl, _startTime, _durationInMinutes, _message,
-                  _optionalExtendedMessageControl];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPMessagingClusterGetMessageCancellationParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _earliestImplementationTime = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: earliestImplementationTime:%@; >", NSStringFromClass([self class]), _earliestImplementationTime];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPMessagingClusterCancelAllMessagesParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _implementationDateTime = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: implementationDateTime:%@; >", NSStringFromClass([self class]), _implementationDateTime];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPApplianceEventsAndAlertClusterGetAlertsParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPApplianceEventsAndAlertClusterGetAlertsResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _alertsCount = @(0);
-
-        _alertStructures = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: alertsCount:%@; alertStructures:%@; >",
-                                             NSStringFromClass([self class]), _alertsCount, _alertStructures];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPApplianceEventsAndAlertClusterAlertsNotificationParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _alertsCount = @(0);
-
-        _alertStructures = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: alertsCount:%@; alertStructures:%@; >",
-                                             NSStringFromClass([self class]), _alertsCount, _alertStructures];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPApplianceEventsAndAlertClusterEventsNotificationParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _eventHeader = @(0);
-
-        _eventId = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: eventHeader:%@; eventId:%@; >", NSStringFromClass([self class]), _eventHeader, _eventId];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPApplianceStatisticsClusterLogNotificationParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _timeStamp = @(0);
-
-        _logId = @(0);
-
-        _logLength = @(0);
-
-        _logPayload = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeStamp:%@; logId:%@; logLength:%@; logPayload:%@; >",
-                                             NSStringFromClass([self class]), _timeStamp, _logId, _logLength, _logPayload];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPApplianceStatisticsClusterLogRequestParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _logId = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: logId:%@; >", NSStringFromClass([self class]), _logId];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPApplianceStatisticsClusterLogResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _timeStamp = @(0);
-
-        _logId = @(0);
-
-        _logLength = @(0);
-
-        _logPayload = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeStamp:%@; logId:%@; logLength:%@; logPayload:%@; >",
-                                             NSStringFromClass([self class]), _timeStamp, _logId, _logLength, _logPayload];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPApplianceStatisticsClusterLogQueueRequestParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPApplianceStatisticsClusterLogQueueResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _logQueueSize = @(0);
-
-        _logIds = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: logQueueSize:%@; logIds:%@; >", NSStringFromClass([self class]), _logQueueSize, _logIds];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPApplianceStatisticsClusterStatisticsAvailableParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _logQueueSize = @(0);
-
-        _logIds = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: logQueueSize:%@; logIds:%@; >", NSStringFromClass([self class]), _logQueueSize, _logIds];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _profileCount = @(0);
-
-        _profileIntervalPeriod = @(0);
-
-        _maxNumberOfIntervals = @(0);
-
-        _listOfAttributes = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: profileCount:%@; profileIntervalPeriod:%@; maxNumberOfIntervals:%@; listOfAttributes:%@; >",
-        NSStringFromClass([self class]), _profileCount, _profileIntervalPeriod, _maxNumberOfIntervals, _listOfAttributes];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPElectricalMeasurementClusterGetProfileInfoCommandParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _startTime = @(0);
-
-        _status = @(0);
-
-        _profileIntervalPeriod = @(0);
-
-        _numberOfIntervalsDelivered = @(0);
-
-        _attributeId = @(0);
-
-        _intervals = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTime:%@; status:%@; profileIntervalPeriod:%@; "
-                                                              @"numberOfIntervalsDelivered:%@; attributeId:%@; intervals:%@; >",
-                                             NSStringFromClass([self class]), _startTime, _status, _profileIntervalPeriod,
-                                             _numberOfIntervalsDelivered, _attributeId, _intervals];
-    return descriptionString;
-}
-
-@end
-@implementation CHIPElectricalMeasurementClusterGetMeasurementProfileCommandParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _attributeId = @(0);
-
-        _startTime = @(0);
-
-        _numberOfIntervals = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeId:%@; startTime:%@; numberOfIntervals:%@; >",
-                                             NSStringFromClass([self class]), _attributeId, _startTime, _numberOfIntervals];
     return descriptionString;
 }
 

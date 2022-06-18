@@ -1,0 +1,83 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 98.1. [TC-FLABEL-1.1] Global Attributes [DUT-server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads the ClusterRevision from DUT"
+      verification: |
+          ./chip-tool fixedlabel read cluster-revision 1 0
+
+          [1651124058.497301][2367:2372] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_FFFD DataVersion: 3688229931
+          [1651124058.498753][2367:2372] CHIP:TOO:   ClusterRevision: 1
+          [1651124058.498906][2367:2372] CHIP:EM: Sending Standalone Ack for MessageCounter:8872582 on exchange 60871i
+      disabled: true
+
+    - label: "TH reads the FeatureMap from DUT"
+      verification: |
+          ./chip-tool fixedlabel read feature-map 1 0
+
+          [1653459204.749193][24610:24615] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_FFFC DataVersion: 4022759920
+          [1653459204.749266][24610:24615] CHIP:TOO:   FeatureMap: 0
+          [1653459204.749410][24610:24615] CHIP:EM: Sending Standalone Ack for MessageCounter:7681110 on exchange 50174i
+      disabled: true
+
+    - label: "TH reads AttributeList from DUT"
+      verification: |
+          ./chip-tool fixedlabel read attribute-list 1 0
+
+
+          [1651124128.610488][2381:2386] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_FFFB DataVersion: 3688229931
+          [1651124128.610670][2381:2386] CHIP:TOO:   AttributeList: 5 entries
+          [1651124128.610719][2381:2386] CHIP:TOO:     [1]: 0
+          [1651124128.610758][2381:2386] CHIP:TOO:     [2]: 65528
+          [1651124128.610794][2381:2386] CHIP:TOO:     [3]: 65529
+          [1651124128.610831][2381:2386] CHIP:TOO:     [4]: 65531
+          [1651124128.610867][2381:2386] CHIP:TOO:     [5]: 65533
+          [1651124128.611068][2381:2386] CHIP:EM: Sending Standalone Ack for MessageCounter:12258956 on exchange 48899i
+      disabled: true
+
+    - label: "TH reads EventList from DUT"
+      verification: |
+          Out of scope for V1.0
+      disabled: true
+
+    - label: "TH reads AcceptedCommandList from DUT"
+      verification: |
+          ./chip-tool fixedlabel read accepted-command-list 1 0
+
+          [1651124239.450485][2392:2397] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_FFF9 DataVersion: 3688229931
+          [1651124239.450576][2392:2397] CHIP:TOO:   AcceptedCommandList: 0 entries
+          [1651124239.450713][2392:2397] CHIP:EM: Sending Standalone Ack for MessageCounter:5032784 on exchange 23524i
+      disabled: true
+
+    - label: "TH reads GeneratedCommandList from DUT"
+      verification: |
+          ./chip-tool fixedlabel read generated-command-list 1 0
+
+          [1651124266.980698][2527:2532] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_FFF8 DataVersion: 3688229931
+          [1651124266.980776][2527:2532] CHIP:TOO:   GeneratedCommandList: 0 entries
+          [1651124266.980897][2527:2532] CHIP:EM: Sending Standalone Ack for MessageCounter:11345894 on exchange 5110i
+      disabled: true

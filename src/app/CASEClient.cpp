@@ -30,6 +30,8 @@ CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddres
                                         const ReliableMessageProtocolConfig & remoteMRPConfig,
                                         SessionEstablishmentDelegate * delegate)
 {
+    VerifyOrReturnError(mInitParams.fabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     // Create a UnauthenticatedSession for CASE pairing.
     Optional<SessionHandle> session = mInitParams.sessionManager->CreateUnauthenticatedSession(peerAddress, remoteMRPConfig);
     VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
@@ -45,7 +47,7 @@ CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddres
 
     mCASESession.SetGroupDataProvider(mInitParams.groupDataProvider);
     ReturnErrorOnFailure(mCASESession.EstablishSession(
-        *mInitParams.sessionManager, mInitParams.fabricTable, mInitParams.fabricIndex, peer.GetNodeId(), exchange,
+        *mInitParams.sessionManager, mInitParams.fabricTable, ScopedNodeId{ peer.GetNodeId(), mInitParams.fabricIndex }, exchange,
         mInitParams.sessionResumptionStorage, mInitParams.certificateValidityPolicy, delegate, mInitParams.mrpLocalConfig));
 
     return CHIP_NO_ERROR;

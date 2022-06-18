@@ -62,7 +62,8 @@ configuration from it. Some actions required before establishing full
 communication are described below.
 
 The example can be configured to use the secure bootloader and utilize it for
-performing over-the-air Device Firmware Upgrade using Bluetooth LE.
+performing over-the-air Device Firmware Upgrade using Bluetooth LE. The device
+works as a Thread Synchronized Sleepy End Device.
 
 ### Bluetooth LE advertising
 
@@ -110,6 +111,20 @@ requests to start sending the update packages.
 
 An OTA Requestor is a node that wants to download a new firmware image and sends
 requests to an OTA Provider to start the update process.
+
+#### Simple Management Protocol
+
+Simple Management Protocol (SMP) is a basic transfer encoding that is used for
+device management purposes, including application image management. SMP supports
+using different transports, such as Bluetooth LE, UDP, or serial USB/UART.
+
+In this example, the Matter device runs the SMP Server to download the
+application update image using the Bluetooth LE transport.
+
+See the
+[Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
+section to learn how to enable SMP and use it for the DFU purpose in this
+example.
 
 #### Bootloader
 
@@ -374,25 +389,17 @@ features like logs and command-line interface, run the following command:
 Remember to replace _build-target_ with the build target name of the Nordic
 Semiconductor's kit you own.
 
-### Building with low-power configuration
-
-You can build the example using the low-power configuration, which enables
-Thread's Synchronized Sleepy End Device mode and disables debug features, such
-as the UART console or the **LED 1** usage.
-
-To build for the low-power configuration, run the following command with
-_build-target_ replaced with the build target name of the Nordic Semiconductor's
-kit you own (for example `nrf52840dk_nrf52840`):
-
-    $ west build -b build-target -- -DOVERLAY_CONFIG=overlay-low_power.conf
-
-For example, use the following command for `nrf52840dk_nrf52840`:
-
-    $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=overlay-low_power.conf
-
 ### Building with Device Firmware Upgrade support
 
 Support for DFU using Matter OTA is enabled by default.
+
+To enable DFU over Bluetooth LE, run the following command with _build-target_
+replaced with the build target name of the Nordic Semiconductor kit you are
+using (for example `nrf52840dk_nrf52840`):
+
+    ```
+    $ west build -b build-target -- -DCONFIG_CHIP_DFU_OVER_BT_SMP=y
+    ```
 
 To completely disable support for DFU, run the following command with
 _build-target_ replaced with the build target name of the Nordic Semiconductor

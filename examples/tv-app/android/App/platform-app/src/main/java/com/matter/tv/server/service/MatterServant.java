@@ -26,25 +26,26 @@ import chip.platform.AndroidBleManager;
 import chip.platform.AndroidChipPlatform;
 import chip.platform.ChipMdnsCallbackImpl;
 import chip.platform.DiagnosticDataProviderImpl;
+import chip.platform.NsdManagerServiceBrowser;
 import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
 import com.matter.tv.server.MatterCommissioningPrompter;
 import com.matter.tv.server.handlers.ContentAppEndpointManagerImpl;
 import com.matter.tv.server.model.ContentApp;
-import com.tcl.chip.tvapp.ChannelManagerStub;
-import com.tcl.chip.tvapp.Clusters;
-import com.tcl.chip.tvapp.ContentLaunchManagerStub;
-import com.tcl.chip.tvapp.DACProviderStub;
-import com.tcl.chip.tvapp.DeviceEventProvider;
-import com.tcl.chip.tvapp.KeypadInputManagerStub;
-import com.tcl.chip.tvapp.LevelManagerStub;
-import com.tcl.chip.tvapp.LowPowerManagerStub;
-import com.tcl.chip.tvapp.MediaInputManagerStub;
-import com.tcl.chip.tvapp.MediaPlaybackManagerStub;
-import com.tcl.chip.tvapp.OnOffManagerStub;
-import com.tcl.chip.tvapp.TvApp;
-import com.tcl.chip.tvapp.WakeOnLanManagerStub;
+import com.matter.tv.server.tvapp.ChannelManagerStub;
+import com.matter.tv.server.tvapp.Clusters;
+import com.matter.tv.server.tvapp.ContentLaunchManagerStub;
+import com.matter.tv.server.tvapp.DACProviderStub;
+import com.matter.tv.server.tvapp.DeviceEventProvider;
+import com.matter.tv.server.tvapp.KeypadInputManagerStub;
+import com.matter.tv.server.tvapp.LevelManagerStub;
+import com.matter.tv.server.tvapp.LowPowerManagerStub;
+import com.matter.tv.server.tvapp.MediaInputManagerStub;
+import com.matter.tv.server.tvapp.MediaPlaybackManagerStub;
+import com.matter.tv.server.tvapp.OnOffManagerStub;
+import com.matter.tv.server.tvapp.TvApp;
+import com.matter.tv.server.tvapp.WakeOnLanManagerStub;
 
 public class MatterServant {
 
@@ -132,6 +133,7 @@ public class MatterServant {
             new PreferencesKeyValueStoreManager(applicationContext),
             new PreferencesConfigurationManager(applicationContext),
             new NsdManagerServiceResolver(applicationContext),
+            new NsdManagerServiceBrowser(applicationContext),
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
 
@@ -143,7 +145,7 @@ public class MatterServant {
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
 
-    mTvApp.postServerInit();
+    mTvApp.postServerInit(new ContentAppEndpointManagerImpl(context));
   }
 
   public void restart() {

@@ -11,6 +11,7 @@ import chip.platform.AndroidBleManager;
 import chip.platform.AndroidChipPlatform;
 import chip.platform.ChipMdnsCallbackImpl;
 import chip.platform.DiagnosticDataProviderImpl;
+import chip.platform.NsdManagerServiceBrowser;
 import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity
             new PreferencesKeyValueStoreManager(applicationContext),
             new PreferencesConfigurationManager(applicationContext),
             new NsdManagerServiceResolver(applicationContext),
+            new NsdManagerServiceBrowser(applicationContext),
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
 

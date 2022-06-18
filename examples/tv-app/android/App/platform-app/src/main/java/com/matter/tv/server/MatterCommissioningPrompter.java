@@ -10,8 +10,8 @@ import android.util.Log;
 import android.widget.EditText;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
-import com.tcl.chip.tvapp.UserPrompter;
-import com.tcl.chip.tvapp.UserPrompterResolver;
+import com.matter.tv.server.tvapp.UserPrompter;
+import com.matter.tv.server.tvapp.UserPrompterResolver;
 
 public class MatterCommissioningPrompter extends UserPrompterResolver implements UserPrompter {
 

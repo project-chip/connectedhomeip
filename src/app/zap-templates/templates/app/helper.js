@@ -57,7 +57,6 @@ var endpointClusterWithInit = [
   'Basic',
   'Color Control',
   'Groups',
-  'IAS Zone',
   'Identify',
   'Level Control',
   'Localization Configuration',
@@ -78,7 +77,6 @@ var endpointClusterWithAttributeChanged = [
   'Fan Control',
 ];
 var endpointClusterWithPreAttribute = [
-  'IAS Zone',
   'Door Lock',
   'Pump Configuration and Control',
   'Thermostat User Interface Configuration',
@@ -88,7 +86,6 @@ var endpointClusterWithPreAttribute = [
   'Fan Control',
   'Thermostat',
 ];
-var endpointClusterWithMessageSent = [ 'IAS Zone' ];
 
 /**
  * Populate the GENERATED_FUNCTIONS field
@@ -116,12 +113,6 @@ function chip_endpoint_generated_functions()
       if (endpointClusterWithAttributeChanged.includes(clusterName)) {
         functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) Matter${
             cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
-        hasFunctionArray = true
-      }
-
-      if (endpointClusterWithMessageSent.includes(clusterName)) {
-        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
-            cHelper.asCamelCased(clusterName, false)}ClusterServerMessageSentCallback,\\\n`)
         hasFunctionArray = true
       }
 
@@ -207,11 +198,6 @@ function chip_endpoint_cluster_list()
 
       if (endpointClusterWithPreAttribute.includes(clusterName)) {
         c.mask.push('PRE_ATTRIBUTE_CHANGED_FUNCTION')
-        hasFunctionArray = true
-      }
-
-      if (endpointClusterWithMessageSent.includes(clusterName)) {
-        c.mask.push('MESSAGE_SENT_FUNCTION')
         hasFunctionArray = true
       }
 
@@ -741,9 +727,6 @@ function isWeaklyTypedEnum(label)
     "HueDirection",
     "HueMoveMode",
     "HueStepMode",
-    "IasEnrollResponseCode",
-    "IasZoneState",
-    "IasZoneType",
     "IdentifyEffectIdentifier",
     "IdentifyEffectVariant",
     "IdentifyIdentifyType",

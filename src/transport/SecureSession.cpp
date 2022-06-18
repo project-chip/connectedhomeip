@@ -39,10 +39,32 @@ void SecureSession::MarkForRemoval()
         NotifySessionReleased();
         return;
     case State::kActive:
+    case State::kInactive:
         Release(); // Decrease the ref which is retained at Activate
         mState = State::kPendingRemoval;
         NotifySessionReleased();
         return;
+    case State::kPendingRemoval:
+        // Do nothing
+        return;
+    }
+}
+
+void SecureSession::MarkInactive()
+{
+    ChipLogDetail(Inet, "SecureSession[%p]: MarkInactive Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
+                  mLocalSessionId);
+    ReferenceCountedHandle<Transport::Session> ref(*this);
+    switch (mState)
+    {
+    case State::kPairing:
+        VerifyOrDie(false);
+        return;
+    case State::kActive:
+        // By setting this state, IsActiveSession() will return false, which prevents creating new exchanges.
+        mState = State::kInactive;
+        return;
+    case State::kInactive:
     case State::kPendingRemoval:
         // Do nothing
         return;

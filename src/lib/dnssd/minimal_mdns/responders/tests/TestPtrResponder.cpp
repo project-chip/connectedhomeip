@@ -39,7 +39,7 @@ const QNamePart kTargetNames[] = { "point", "to", "this" };
 class PtrResponseAccumulator : public ResponderDelegate
 {
 public:
-    PtrResponseAccumulator(nlTestSuite * suite) : mSuite(suite) {}
+    PtrResponseAccumulator(nlTestSuite * suite, const uint32_t expectedTtl) : mSuite(suite), mExpectedTtl(expectedTtl) {}
     void AddResponse(const ResourceRecord & record) override
     {
 
@@ -72,6 +72,7 @@ public:
             NL_TEST_ASSERT(mSuite, start == (buffer + out.Needed()));
             NL_TEST_ASSERT(mSuite, data.GetName() == FullQName(kNames));
             NL_TEST_ASSERT(mSuite, data.GetType() == QType::PTR);
+            NL_TEST_ASSERT(mSuite, data.GetTtlSeconds() == mExpectedTtl);
 
             NL_TEST_ASSERT(mSuite, ParsePtrRecord(data.GetData(), validDataRange, &target));
             NL_TEST_ASSERT(mSuite, target == FullQName(kTargetNames));
@@ -80,6 +81,7 @@ public:
 
 private:
     nlTestSuite * mSuite;
+    const uint32_t mExpectedTtl;
 };
 
 void TestPtrResponse(nlTestSuite * inSuite, void * inContext)
@@ -93,7 +95,7 @@ void TestPtrResponse(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, responder.GetQType() == QType::PTR);
     NL_TEST_ASSERT(inSuite, responder.GetQName() == kNames);
 
-    PtrResponseAccumulator acc(inSuite);
+    PtrResponseAccumulator acc(inSuite, ResourceRecord::kDefaultTtl);
     chip::Inet::IPPacketInfo packetInfo;
 
     packetInfo.SrcAddress  = ipAddress;
@@ -102,12 +104,36 @@ void TestPtrResponse(nlTestSuite * inSuite, void * inContext)
     packetInfo.DestPort    = kMdnsPort;
     packetInfo.Interface   = InterfaceId::Null();
 
-    responder.AddAllResponses(&packetInfo, &acc);
+    responder.AddAllResponses(&packetInfo, &acc, ResponseConfiguration());
+}
+
+void TestPtrResponseOverrideTtl(nlTestSuite * inSuite, void * inContext)
+{
+    IPAddress ipAddress;
+    NL_TEST_ASSERT(inSuite, IPAddress::FromString("2607:f8b0:4005:804::200e", ipAddress));
+
+    PtrResponder responder(kNames, kTargetNames);
+
+    NL_TEST_ASSERT(inSuite, responder.GetQClass() == QClass::IN);
+    NL_TEST_ASSERT(inSuite, responder.GetQType() == QType::PTR);
+    NL_TEST_ASSERT(inSuite, responder.GetQName() == kNames);
+
+    PtrResponseAccumulator acc(inSuite, 123);
+    chip::Inet::IPPacketInfo packetInfo;
+
+    packetInfo.SrcAddress  = ipAddress;
+    packetInfo.DestAddress = ipAddress;
+    packetInfo.SrcPort     = kMdnsPort;
+    packetInfo.DestPort    = kMdnsPort;
+    packetInfo.Interface   = InterfaceId::Null();
+
+    responder.AddAllResponses(&packetInfo, &acc, ResponseConfiguration().SetTtlSecondsOverride(123));
 }
 
 const nlTest sTests[] = {
-    NL_TEST_DEF("TestPtrResponse", TestPtrResponse), //
-    NL_TEST_SENTINEL()                               //
+    NL_TEST_DEF("TestPtrResponse", TestPtrResponse),                       //
+    NL_TEST_DEF("TestPtrResponseOverrideTtl", TestPtrResponseOverrideTtl), //
+    NL_TEST_SENTINEL()                                                     //
 };
 
 } // namespace

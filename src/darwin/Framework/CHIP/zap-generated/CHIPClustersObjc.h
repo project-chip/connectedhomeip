@@ -22100,6 +22100,14 @@ typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringConfigStatus) {
     CHIPWindowCoveringConfigStatusTiltEncoderControlled = 0x40,
 };
 
+typedef NS_OPTIONS(uint32_t, CHIPWindowCoveringFeature) {
+    CHIPWindowCoveringFeatureLift = 0x1,
+    CHIPWindowCoveringFeatureTilt = 0x2,
+    CHIPWindowCoveringFeaturePositionAwareLift = 0x4,
+    CHIPWindowCoveringFeatureAbsolutePosition = 0x8,
+    CHIPWindowCoveringFeaturePositionAwareTilt = 0x10,
+};
+
 typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringMode) {
     CHIPWindowCoveringModeMotorDirectionReversed = 0x1,
     CHIPWindowCoveringModeCalibrationMode = 0x2,
@@ -22107,33 +22115,25 @@ typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringMode) {
     CHIPWindowCoveringModeLedFeedback = 0x8,
 };
 
-typedef NS_OPTIONS(uint32_t, CHIPWindowCoveringWcFeature) {
-    CHIPWindowCoveringWcFeatureLift = 0x1,
-    CHIPWindowCoveringWcFeatureTilt = 0x2,
-    CHIPWindowCoveringWcFeaturePositionAwareLift = 0x4,
-    CHIPWindowCoveringWcFeatureAbsolutePosition = 0x8,
-    CHIPWindowCoveringWcFeaturePositionAwareTilt = 0x10,
+typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringOperationalStatus) {
+    CHIPWindowCoveringOperationalStatusGlobal = 0x3,
+    CHIPWindowCoveringOperationalStatusLift = 0xC,
+    CHIPWindowCoveringOperationalStatusTilt = 0x30,
 };
 
-typedef NS_OPTIONS(uint8_t, CHIPWindowCoveringWcOperationalStatus) {
-    CHIPWindowCoveringWcOperationalStatusGlobal = 0x3,
-    CHIPWindowCoveringWcOperationalStatusLift = 0xC,
-    CHIPWindowCoveringWcOperationalStatusTilt = 0x30,
-};
-
-typedef NS_OPTIONS(uint16_t, CHIPWindowCoveringWcSafetyStatus) {
-    CHIPWindowCoveringWcSafetyStatusRemoteLockout = 0x1,
-    CHIPWindowCoveringWcSafetyStatusTamperDetection = 0x2,
-    CHIPWindowCoveringWcSafetyStatusFailedCommunication = 0x4,
-    CHIPWindowCoveringWcSafetyStatusPositionFailure = 0x8,
-    CHIPWindowCoveringWcSafetyStatusThermalProtection = 0x10,
-    CHIPWindowCoveringWcSafetyStatusObstacleDetected = 0x20,
-    CHIPWindowCoveringWcSafetyStatusPower = 0x40,
-    CHIPWindowCoveringWcSafetyStatusStopInput = 0x80,
-    CHIPWindowCoveringWcSafetyStatusMotorJammed = 0x100,
-    CHIPWindowCoveringWcSafetyStatusHardwareFailure = 0x200,
-    CHIPWindowCoveringWcSafetyStatusManualOperation = 0x400,
-    CHIPWindowCoveringWcSafetyStatusProtection = 0x800,
+typedef NS_OPTIONS(uint16_t, CHIPWindowCoveringSafetyStatus) {
+    CHIPWindowCoveringSafetyStatusRemoteLockout = 0x1,
+    CHIPWindowCoveringSafetyStatusTamperDetection = 0x2,
+    CHIPWindowCoveringSafetyStatusFailedCommunication = 0x4,
+    CHIPWindowCoveringSafetyStatusPositionFailure = 0x8,
+    CHIPWindowCoveringSafetyStatusThermalProtection = 0x10,
+    CHIPWindowCoveringSafetyStatusObstacleDetected = 0x20,
+    CHIPWindowCoveringSafetyStatusPower = 0x40,
+    CHIPWindowCoveringSafetyStatusStopInput = 0x80,
+    CHIPWindowCoveringSafetyStatusMotorJammed = 0x100,
+    CHIPWindowCoveringSafetyStatusHardwareFailure = 0x200,
+    CHIPWindowCoveringSafetyStatusManualOperation = 0x400,
+    CHIPWindowCoveringSafetyStatusProtection = 0x800,
 };
 
 typedef NS_ENUM(uint8_t, CHIPPumpConfigurationAndControlPumpControlMode) {
@@ -22338,144 +22338,6 @@ typedef NS_ENUM(uint8_t, CHIPIlluminanceMeasurementLightSensorType) {
 
 typedef NS_OPTIONS(uint32_t, CHIPPressureMeasurementPressureFeature) {
     CHIPPressureMeasurementPressureFeatureEXT = 0x1,
-};
-
-typedef NS_ENUM(uint8_t, CHIPIasZoneIasEnrollResponseCode) {
-    CHIPIasZoneIasEnrollResponseCodeSuccess = 0x00,
-    CHIPIasZoneIasEnrollResponseCodeNotSupported = 0x01,
-    CHIPIasZoneIasEnrollResponseCodeNoEnrollPermit = 0x02,
-    CHIPIasZoneIasEnrollResponseCodeTooManyZones = 0x03,
-};
-
-typedef NS_ENUM(uint16_t, CHIPIasZoneType) {
-    CHIPIasZoneTypeStandardCie = 0x00,
-    CHIPIasZoneTypeMotionSensor = 0x0D,
-    CHIPIasZoneTypeContactSwitch = 0x15,
-    CHIPIasZoneTypeFireSensor = 0x28,
-    CHIPIasZoneTypeWaterSensor = 0x2A,
-    CHIPIasZoneTypeGasSensor = 0x2B,
-    CHIPIasZoneTypePersonalEmergencyDevice = 0x2C,
-    CHIPIasZoneTypeVibrationMovementSensor = 0x2D,
-    CHIPIasZoneTypeRemoteControl = 0x10F,
-    CHIPIasZoneTypeKeyFob = 0x115,
-    CHIPIasZoneTypeKeypad = 0x21D,
-    CHIPIasZoneTypeStandardWarningDevice = 0x225,
-    CHIPIasZoneTypeGlassBreakSensor = 0x226,
-    CHIPIasZoneTypeCarbonMonoxideSensor = 0x227,
-    CHIPIasZoneTypeSecurityRepeater = 0x229,
-    CHIPIasZoneTypeInvalidZoneType = 0xFFFF,
-};
-
-typedef NS_OPTIONS(uint16_t, CHIPIasZoneStatus) {
-    CHIPIasZoneStatusAlarm1 = 0x1,
-    CHIPIasZoneStatusAlarm2 = 0x2,
-    CHIPIasZoneStatusTamper = 0x4,
-    CHIPIasZoneStatusBattery = 0x8,
-    CHIPIasZoneStatusSupervisionReports = 0x10,
-    CHIPIasZoneStatusRestoreReports = 0x20,
-    CHIPIasZoneStatusTrouble = 0x40,
-    CHIPIasZoneStatusAC = 0x80,
-    CHIPIasZoneStatusTest = 0x100,
-    CHIPIasZoneStatusBatteryDefect = 0x200,
-};
-
-typedef NS_ENUM(uint8_t, CHIPIasAceAlarmStatus) {
-    CHIPIasAceAlarmStatusNoAlarm = 0x00,
-    CHIPIasAceAlarmStatusBurglar = 0x01,
-    CHIPIasAceAlarmStatusFire = 0x02,
-    CHIPIasAceAlarmStatusEmergency = 0x03,
-    CHIPIasAceAlarmStatusPolicePanic = 0x04,
-    CHIPIasAceAlarmStatusFirePanic = 0x05,
-    CHIPIasAceAlarmStatusEmergencyPanic = 0x06,
-};
-
-typedef NS_ENUM(uint8_t, CHIPIasAceArmMode) {
-    CHIPIasAceArmModeDisarm = 0x00,
-    CHIPIasAceArmModeArmDayHomeZonesOnly = 0x01,
-    CHIPIasAceArmModeArmNightSleepZonesOnly = 0x02,
-    CHIPIasAceArmModeArmAllZones = 0x03,
-};
-
-typedef NS_ENUM(uint8_t, CHIPIasAceArmNotification) {
-    CHIPIasAceArmNotificationAllZonesDisarmed = 0x00,
-    CHIPIasAceArmNotificationOnlyDayHomeZonesArmed = 0x01,
-    CHIPIasAceArmNotificationOnlyNightSleepZonesArmed = 0x02,
-    CHIPIasAceArmNotificationAllZonesArmed = 0x03,
-    CHIPIasAceArmNotificationInvalidArmDisarmCode = 0x04,
-    CHIPIasAceArmNotificationNotReadyToArm = 0x05,
-    CHIPIasAceArmNotificationAlreadyDisarmed = 0x06,
-};
-
-typedef NS_ENUM(uint8_t, CHIPIasAceAudibleNotification) {
-    CHIPIasAceAudibleNotificationMute = 0x00,
-    CHIPIasAceAudibleNotificationDefaultSound = 0x01,
-};
-
-typedef NS_ENUM(uint8_t, CHIPIasAceBypassResult) {
-    CHIPIasAceBypassResultZoneBypassed = 0x00,
-    CHIPIasAceBypassResultZoneNotBypassed = 0x01,
-    CHIPIasAceBypassResultNotAllowed = 0x02,
-    CHIPIasAceBypassResultInvalidZoneId = 0x03,
-    CHIPIasAceBypassResultUnknownZoneId = 0x04,
-    CHIPIasAceBypassResultInvalidArmDisarmCode = 0x05,
-};
-
-typedef NS_ENUM(uint8_t, CHIPIasAcePanelStatus) {
-    CHIPIasAcePanelStatusPanelDisarmed = 0x00,
-    CHIPIasAcePanelStatusArmedStay = 0x01,
-    CHIPIasAcePanelStatusArmedNight = 0x02,
-    CHIPIasAcePanelStatusArmedAway = 0x03,
-    CHIPIasAcePanelStatusExitDelay = 0x04,
-    CHIPIasAcePanelStatusEntryDelay = 0x05,
-    CHIPIasAcePanelStatusNotReadyToArm = 0x06,
-    CHIPIasAcePanelStatusInAlarm = 0x07,
-    CHIPIasAcePanelStatusArmingStay = 0x08,
-    CHIPIasAcePanelStatusArmingNight = 0x09,
-    CHIPIasAcePanelStatusArmingAway = 0x0A,
-};
-
-typedef NS_ENUM(uint16_t, CHIPIasAceIasZoneType) {
-    CHIPIasAceIasZoneTypeStandardCie = 0x00,
-    CHIPIasAceIasZoneTypeMotionSensor = 0x0D,
-    CHIPIasAceIasZoneTypeContactSwitch = 0x15,
-    CHIPIasAceIasZoneTypeFireSensor = 0x28,
-    CHIPIasAceIasZoneTypeWaterSensor = 0x2A,
-    CHIPIasAceIasZoneTypeGasSensor = 0x2B,
-    CHIPIasAceIasZoneTypePersonalEmergencyDevice = 0x2C,
-    CHIPIasAceIasZoneTypeVibrationMovementSensor = 0x2D,
-    CHIPIasAceIasZoneTypeRemoteControl = 0x10F,
-    CHIPIasAceIasZoneTypeKeyFob = 0x115,
-    CHIPIasAceIasZoneTypeKeypad = 0x21D,
-    CHIPIasAceIasZoneTypeStandardWarningDevice = 0x225,
-    CHIPIasAceIasZoneTypeGlassBreakSensor = 0x226,
-    CHIPIasAceIasZoneTypeCarbonMonoxideSensor = 0x227,
-    CHIPIasAceIasZoneTypeSecurityRepeater = 0x229,
-    CHIPIasAceIasZoneTypeInvalidZoneType = 0xFFFF,
-};
-
-typedef NS_OPTIONS(uint16_t, CHIPIasAceIasZoneStatus) {
-    CHIPIasAceIasZoneStatusAlarm1 = 0x1,
-    CHIPIasAceIasZoneStatusAlarm2 = 0x2,
-    CHIPIasAceIasZoneStatusTamper = 0x4,
-    CHIPIasAceIasZoneStatusBattery = 0x8,
-    CHIPIasAceIasZoneStatusSupervisionReports = 0x10,
-    CHIPIasAceIasZoneStatusRestoreReports = 0x20,
-    CHIPIasAceIasZoneStatusTrouble = 0x40,
-    CHIPIasAceIasZoneStatusAC = 0x80,
-    CHIPIasAceIasZoneStatusTest = 0x100,
-    CHIPIasAceIasZoneStatusBatteryDefect = 0x200,
-};
-
-typedef NS_OPTIONS(uint8_t, CHIPIasWdSquawkInfo) {
-    CHIPIasWdSquawkInfoMode = 0xF0,
-    CHIPIasWdSquawkInfoStrobe = 0x8,
-    CHIPIasWdSquawkInfoLevel = 0x3,
-};
-
-typedef NS_OPTIONS(uint8_t, CHIPIasWdWarningInfo) {
-    CHIPIasWdWarningInfoMode = 0xF0,
-    CHIPIasWdWarningInfoStrobe = 0xC,
-    CHIPIasWdWarningInfoSirenLevel = 0x3,
 };
 
 typedef NS_ENUM(uint8_t, CHIPChannelStatus) {
@@ -22702,47 +22564,6 @@ typedef NS_ENUM(uint8_t, CHIPApplicationBasicApplicationStatus) {
     CHIPApplicationBasicApplicationStatusActiveVisibleNotFocus = 0x03,
 };
 
-typedef NS_ENUM(uint8_t, CHIPTestClusterSimple) {
-    CHIPTestClusterSimpleUnspecified = 0x00,
-    CHIPTestClusterSimpleValueA = 0x01,
-    CHIPTestClusterSimpleValueB = 0x02,
-    CHIPTestClusterSimpleValueC = 0x03,
-};
-
-typedef NS_OPTIONS(uint16_t, CHIPTestClusterBitmap16MaskMap) {
-    CHIPTestClusterBitmap16MaskMapMaskVal1 = 0x1,
-    CHIPTestClusterBitmap16MaskMapMaskVal2 = 0x2,
-    CHIPTestClusterBitmap16MaskMapMaskVal3 = 0x4,
-    CHIPTestClusterBitmap16MaskMapMaskVal4 = 0x4000,
-};
-
-typedef NS_OPTIONS(uint32_t, CHIPTestClusterBitmap32MaskMap) {
-    CHIPTestClusterBitmap32MaskMapMaskVal1 = 0x1,
-    CHIPTestClusterBitmap32MaskMapMaskVal2 = 0x2,
-    CHIPTestClusterBitmap32MaskMapMaskVal3 = 0x4,
-    CHIPTestClusterBitmap32MaskMapMaskVal4 = 0x40000000,
-};
-
-typedef NS_OPTIONS(uint64_t, CHIPTestClusterBitmap64MaskMap) {
-    CHIPTestClusterBitmap64MaskMapMaskVal1 = 0x1,
-    CHIPTestClusterBitmap64MaskMapMaskVal2 = 0x2,
-    CHIPTestClusterBitmap64MaskMapMaskVal3 = 0x4,
-    CHIPTestClusterBitmap64MaskMapMaskVal4 = 0x4000000000000000,
-};
-
-typedef NS_OPTIONS(uint8_t, CHIPTestClusterBitmap8MaskMap) {
-    CHIPTestClusterBitmap8MaskMapMaskVal1 = 0x1,
-    CHIPTestClusterBitmap8MaskMapMaskVal2 = 0x2,
-    CHIPTestClusterBitmap8MaskMapMaskVal3 = 0x4,
-    CHIPTestClusterBitmap8MaskMapMaskVal4 = 0x40,
-};
-
-typedef NS_OPTIONS(uint8_t, CHIPTestClusterSimpleBitmap) {
-    CHIPTestClusterSimpleBitmapValueA = 0x1,
-    CHIPTestClusterSimpleBitmapValueB = 0x2,
-    CHIPTestClusterSimpleBitmapValueC = 0x4,
-};
-
 typedef NS_ENUM(uint8_t, CHIPMessagingEventId) {
     CHIPMessagingEventIdMeterCoverRemoved = 0x00,
     CHIPMessagingEventIdMeterCoverClosed = 0x01,
@@ -22884,6 +22705,47 @@ typedef NS_OPTIONS(uint32_t, CHIPApplianceEventsAndAlertAlertStructure) {
     CHIPApplianceEventsAndAlertAlertStructureAlertId = 0xFF,
     CHIPApplianceEventsAndAlertAlertStructureCategory = 0xF00,
     CHIPApplianceEventsAndAlertAlertStructurePresenceRecovery = 0x3000,
+};
+
+typedef NS_ENUM(uint8_t, CHIPTestClusterSimple) {
+    CHIPTestClusterSimpleUnspecified = 0x00,
+    CHIPTestClusterSimpleValueA = 0x01,
+    CHIPTestClusterSimpleValueB = 0x02,
+    CHIPTestClusterSimpleValueC = 0x03,
+};
+
+typedef NS_OPTIONS(uint16_t, CHIPTestClusterBitmap16MaskMap) {
+    CHIPTestClusterBitmap16MaskMapMaskVal1 = 0x1,
+    CHIPTestClusterBitmap16MaskMapMaskVal2 = 0x2,
+    CHIPTestClusterBitmap16MaskMapMaskVal3 = 0x4,
+    CHIPTestClusterBitmap16MaskMapMaskVal4 = 0x4000,
+};
+
+typedef NS_OPTIONS(uint32_t, CHIPTestClusterBitmap32MaskMap) {
+    CHIPTestClusterBitmap32MaskMapMaskVal1 = 0x1,
+    CHIPTestClusterBitmap32MaskMapMaskVal2 = 0x2,
+    CHIPTestClusterBitmap32MaskMapMaskVal3 = 0x4,
+    CHIPTestClusterBitmap32MaskMapMaskVal4 = 0x40000000,
+};
+
+typedef NS_OPTIONS(uint64_t, CHIPTestClusterBitmap64MaskMap) {
+    CHIPTestClusterBitmap64MaskMapMaskVal1 = 0x1,
+    CHIPTestClusterBitmap64MaskMapMaskVal2 = 0x2,
+    CHIPTestClusterBitmap64MaskMapMaskVal3 = 0x4,
+    CHIPTestClusterBitmap64MaskMapMaskVal4 = 0x4000000000000000,
+};
+
+typedef NS_OPTIONS(uint8_t, CHIPTestClusterBitmap8MaskMap) {
+    CHIPTestClusterBitmap8MaskMapMaskVal1 = 0x1,
+    CHIPTestClusterBitmap8MaskMapMaskVal2 = 0x2,
+    CHIPTestClusterBitmap8MaskMapMaskVal3 = 0x4,
+    CHIPTestClusterBitmap8MaskMapMaskVal4 = 0x40,
+};
+
+typedef NS_OPTIONS(uint8_t, CHIPTestClusterSimpleBitmap) {
+    CHIPTestClusterSimpleBitmapValueA = 0x1,
+    CHIPTestClusterSimpleBitmapValueB = 0x2,
+    CHIPTestClusterSimpleBitmapValueC = 0x4,
 };
 
 NS_ASSUME_NONNULL_END

@@ -28,6 +28,7 @@ config("darwin_config") {
 
 static_library("framework") {
   sources = [
+    "${chip_root}/src/app/clusters/ota-provider/ota-provider.cpp",
     "CHIP.h",
     "CHIPAttestationTrustStoreBridge.mm",
     "CHIPCluster.mm",
@@ -87,12 +88,13 @@ static_library("framework") {
 
   public_deps = [
     "${chip_root}/src/controller",
-    "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
+
+  include_dirs = [ "${chip_root}/zzz_generated/controller-clusters" ]
 
   frameworks = [ "Security.framework" ]
 

@@ -21,19 +21,6 @@
 #include "platform/bootloader/api/application_properties.h"
 #include <app/server/Server.h>
 
-#define BOOTLOADER_SUPPORT_CERTIFICATES 1
-#define APPLICATION_CERTIFICATE_VERSION (1UL)
-
-#if defined(BOOTLOADER_SUPPORT_CERTIFICATES)
-const ApplicationCertificate_t sl_app_certificate = {
-    .structVersion = APPLICATION_CERTIFICATE_VERSION,
-    .flags         = { 0U },
-    .key           = { 0U },
-    .version       = 0,
-    .signature     = { 0U },
-};
-#endif
-
 // Header used for building the image GBL file
 #define APP_PROPERTIES_VERSION 1
 #define APP_PROPERTIES_ID                                                                                                          \
@@ -71,15 +58,11 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
       /// Unique ID (e.g. UUID/GUID) for the product this application is built for
       .productId = APP_PROPERTIES_ID,
     },
-#if defined(BOOTLOADER_SUPPORT_CERTIFICATES)
-  // If certificate based boot chain is enabled, the bootloader binary will be provided with
-  // a certificate that does not contain any key.
-  // A valid certificate needs to be injected to the bootloader images using Simplicity Commander.
-  // Simplicity Commander will replace this certificate.
-    .cert = (ApplicationCertificate_t *)&sl_app_certificate,
-#else
+
+    /// Pointer to information about the certificate
     .cert = NULL,
-#endif
+
+    /// Pointer to Long Token Data Section
     .longTokenSectionAddress = NULL,
 };
 

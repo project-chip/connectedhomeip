@@ -66,7 +66,7 @@ public:
 /// Implementations extend this class with implementation-specific data like
 /// storing the 'last known good address' and 'scores' or any additional data
 /// required to figure out when a resolve is ok.
-class NodeLookupHandleBase : public IntrusiveListNodeBase
+class NodeLookupHandleBase : public IntrusiveListNodeBase<>
 {
 public:
     NodeLookupHandleBase() {}

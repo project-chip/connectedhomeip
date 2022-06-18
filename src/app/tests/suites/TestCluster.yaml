@@ -1562,10 +1562,10 @@ tests:
       arguments:
           value:
               [
-                  { fabricIndex: 0, operationalCert: "Test0" },
-                  { fabricIndex: 1, operationalCert: "Test1" },
-                  { fabricIndex: 2, operationalCert: "Test2" },
-                  { fabricIndex: 3, operationalCert: "Test3" },
+                  { member1: 0, member2: "Test0" },
+                  { member1: 1, member2: "Test1" },
+                  { member1: 2, member2: "Test2" },
+                  { member1: 3, member2: "Test3" },
               ]
 
     - label: "Read attribute LIST With List of LIST_STRUCT_OCTET_STRING"
@@ -1574,10 +1574,10 @@ tests:
       response:
           value:
               [
-                  { fabricIndex: 0, operationalCert: "Test0" },
-                  { fabricIndex: 1, operationalCert: "Test1" },
-                  { fabricIndex: 2, operationalCert: "Test2" },
-                  { fabricIndex: 3, operationalCert: "Test3" },
+                  { member1: 0, member2: "Test0" },
+                  { member1: 1, member2: "Test1" },
+                  { member1: 2, member2: "Test2" },
+                  { member1: 3, member2: "Test3" },
               ]
 
     # Tests for Nullables and Optionals

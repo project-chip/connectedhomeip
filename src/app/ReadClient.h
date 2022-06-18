@@ -66,16 +66,18 @@ public:
         virtual ~Callback() = default;
 
         /**
-         * Used to signal the commencement of processing of the first attribute report received in a given exchange.
+         * Used to signal the commencement of processing of the first attribute or event report received in a given exchange.
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
+         *
+         * Once OnReportBegin has been called, either OnReportEnd or OnError will be called before OnDone.
          *
          */
         virtual void OnReportBegin() {}
 
         /**
-         * Used to signal the completion of processing of the last attribute report in a given exchange.
+         * Used to signal the completion of processing of the last attribute or event report in a given exchange.
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
@@ -118,6 +120,7 @@ public:
 
         /**
          * OnSubscriptionEstablished will be called when a subscription is established for the given subscription transaction.
+         * If using auto resubscription, OnSubscriptionEstablished will be called whenever resubscription is established.
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
@@ -125,6 +128,16 @@ public:
          * @param[in] aSubscriptionId The identifier of the subscription that was established.
          */
         virtual void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) {}
+
+        /**
+         * OnResubscriptionAttempt will be called when a re-subscription has been scheduled as a result of the termination of an
+         * in-progress or previously active subscription. This object MUST continue to exist after this call is completed. The
+         * application shall wait until it receives an OnDone call to destroy the object.
+         *
+         * @param[in] aTerminationCause The cause of failure of the subscription that just terminated.
+         * @param[in] aNextResubscribeIntervalMsec How long we will wait before trying to auto-resubscribe.
+         */
+        virtual void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) {}
 
         /**
          * OnError will be called when an error occurs *after* a successful call to SendRequest(). The following
@@ -276,10 +289,10 @@ public:
     CHIP_ERROR GetReportingIntervals(uint16_t & aMinIntervalFloorSeconds, uint16_t & aMaxIntervalCeilingSeconds) const
     {
         VerifyOrReturnError(IsSubscriptionType(), CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(IsSubscriptionIdle(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsSubscriptionActive(), CHIP_ERROR_INCORRECT_STATE);
 
         aMinIntervalFloorSeconds   = mMinIntervalFloorSeconds;
-        aMaxIntervalCeilingSeconds = mMaxIntervalCeilingSeconds;
+        aMaxIntervalCeilingSeconds = mMaxInterval;
 
         return CHIP_NO_ERROR;
     }
@@ -338,7 +351,7 @@ private:
      *
      */
     bool IsIdle() const { return mState == ClientState::Idle; }
-    bool IsSubscriptionIdle() const { return mState == ClientState::SubscriptionActive; }
+    bool IsSubscriptionActive() const { return mState == ClientState::SubscriptionActive; }
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
 
@@ -365,7 +378,17 @@ private:
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     const char * GetStateStr() const;
-    bool ResubscribeIfNeeded();
+
+    /*
+     * Checks if we should re-subscribe based on the specified re-subscription policy. If we should, re-subscription is scheduled
+     * aNextResubscribeIntervalMsec is updated accordingly, and true is returned.
+     *
+     * If we should not resubscribe, false is returned.
+     *
+     *  @param[out]    aNextResubscribeIntervalMsec    How long we will wait before trying to auto-resubscribe.
+     */
+    bool ResubscribeIfNeeded(uint32_t & aNextResubscribeIntervalMsec);
+
     // Specialized request-sending functions.
     CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
     // SendSubscribeRequest performs som validation on aSubscribePrepareParams
@@ -374,6 +397,8 @@ private:
     CHIP_ERROR SendSubscribeRequestImpl(const ReadPrepareParams & aSubscribePrepareParams);
     void UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath);
     static void OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState);
+    // Called to ensure OnReportBegin is called before calling OnEventData or OnAttributeData
+    void NoteReportingData();
 
     /*
      * Called internally to signal the completion of all work on this object, gracefully close the
@@ -392,18 +417,18 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback & mpCallback;
-    ClientState mState                  = ClientState::Idle;
-    bool mIsInitialReport               = true;
-    bool mIsPrimingReports              = true;
-    bool mPendingMoreChunks             = false;
-    uint16_t mMinIntervalFloorSeconds   = 0;
-    uint16_t mMaxIntervalCeilingSeconds = 0;
-    SubscriptionId mSubscriptionId      = 0;
-    NodeId mPeerNodeId                  = kUndefinedNodeId;
-    FabricIndex mFabricIndex            = kUndefinedFabricIndex;
-    InteractionType mInteractionType    = InteractionType::Read;
+    ClientState mState                = ClientState::Idle;
+    bool mIsReporting                 = false;
+    bool mIsInitialReport             = true;
+    bool mIsPrimingReports            = true;
+    bool mPendingMoreChunks           = false;
+    uint16_t mMinIntervalFloorSeconds = 0;
+    uint16_t mMaxInterval             = 0;
+    SubscriptionId mSubscriptionId    = 0;
+    NodeId mPeerNodeId                = kUndefinedNodeId;
+    FabricIndex mFabricIndex          = kUndefinedFabricIndex;
+    InteractionType mInteractionType  = InteractionType::Read;
     Timestamp mEventTimestamp;
-    bool mSawAttributeReportsInCurrentReport = false;
 
     ReadClient * mpNext                 = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;

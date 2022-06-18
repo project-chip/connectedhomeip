@@ -67,9 +67,9 @@ public:
     }
 
     /**
-     * Check whether we have an ack to piggyback on the message we are sending.
-     * If true, TakePendingPeerAckMessageCounter will return a valid value that
-     * should be included as an ack in the message.
+     * Check whether we have a mPendingPeerAckMessageCounter. The counter is
+     * valid once we receive a message which requests an ack. Once
+     * mPendingPeerAckMessageCounter is valid, it never stops being valid.
      */
     bool HasPiggybackAckPending() const;
 
@@ -103,26 +103,6 @@ public:
     void SetAutoRequestAck(bool autoReqAck);
 
     /**
-     *  Determine whether the ChipExchangeManager should not send an
-     *  acknowledgement.
-     *
-     *  For internal, debug use only.
-     */
-    bool ShouldDropAckDebug() const;
-
-    /**
-     *  Set whether the ChipExchangeManager should not send acknowledgements
-     *  for this context.
-     *
-     *  For internal, debug use only.
-     *
-     *  @param[in]  inDropAckDebug  A Boolean indicating whether (true) or not
-     *                         (false) the acknowledgements should be not
-     *                         sent for the exchange.
-     */
-    void SetDropAckDebug(bool inDropAckDebug);
-
-    /**
      *  Determine whether there is already an acknowledgment pending to be sent to the peer on this exchange.
      *
      *  @return Returns 'true' if there is already an acknowledgment pending  on this exchange, else 'false'.
@@ -140,6 +120,14 @@ public:
 
     /// Determine whether this exchange is requesting Sleepy End Device active mode
     bool IsRequestingActiveMode() const;
+
+    /// Determine whether this exchange is a EphemeralExchange for replying a StandaloneAck
+    bool IsEphemeralExchange() const;
+
+    // If SetAutoReleaseSession() is called, this exchange must be using a SecureSession, and should
+    // evict it when the exchange is done with all its work (including any MRP traffic).
+    void SetAutoReleaseSession();
+    bool ReleaseSessionOnDestruction();
 
     /**
      * Get the reliable message manager that corresponds to this reliable
@@ -159,29 +147,31 @@ protected:
         /// When set, automatically request an acknowledgment whenever a message is sent via UDP.
         kFlagAutoRequestAck = (1u << 2),
 
-        /// Internal and debug only: when set, the exchange layer does not send an acknowledgment.
-        kFlagDropAckDebug = (1u << 3),
-
         /// When set, signifies there is a message which hasn't been acknowledged.
-        kFlagMessageNotAcked = (1u << 4),
+        kFlagMessageNotAcked = (1u << 3),
 
         /// When set, signifies that there is an acknowledgment pending to be sent back.
-        kFlagAckPending = (1u << 5),
+        kFlagAckPending = (1u << 4),
 
-        /// When set, signifies that there has once been an acknowledgment
-        /// pending to be sent back.  In that case,
-        /// mPendingPeerAckMessageCounter is a valid message counter value for
-        /// some message we have needed to acknowledge in the past.
-        kFlagAckMessageCounterIsValid = (1u << 6),
+        /// When set, signifies that mPendingPeerAckMessageCounter is valid.
+        /// The counter is valid once we receive a message which requests an ack.
+        /// Once mPendingPeerAckMessageCounter is valid, it never stops being valid.
+        kFlagAckMessageCounterIsValid = (1u << 5),
 
         /// When set, signifies that this exchange is waiting for a call to SendMessage.
-        kFlagWillSendMessage = (1u << 7),
+        kFlagWillSendMessage = (1u << 6),
 
         /// When set, we have had Close() or Abort() called on us already.
-        kFlagClosed = (1u << 8),
+        kFlagClosed = (1u << 7),
 
         /// When set, signifies that the exchange is requesting Sleepy End Device active mode.
-        kFlagActiveMode = (1u << 9),
+        kFlagActiveMode = (1u << 8),
+
+        /// When set, signifies that the exchange created sorely for replying a StandaloneAck
+        kFlagEphemeralExchange = (1u << 9),
+
+        /// When set, automatically release the session when this exchange is destroyed.
+        kFlagAutoReleaseSession = (1u << 10),
     };
 
     BitFlags<Flags> mFlags; // Internal state flags
@@ -228,11 +218,6 @@ inline bool ReliableMessageContext::IsMessageNotAcked() const
     return mFlags.Has(Flags::kFlagMessageNotAcked);
 }
 
-inline bool ReliableMessageContext::ShouldDropAckDebug() const
-{
-    return mFlags.Has(Flags::kFlagDropAckDebug);
-}
-
 inline bool ReliableMessageContext::HasPiggybackAckPending() const
 {
     return mFlags.Has(Flags::kFlagAckMessageCounterIsValid);
@@ -253,11 +238,6 @@ inline void ReliableMessageContext::SetAckPending(bool inAckPending)
     mFlags.Set(Flags::kFlagAckPending, inAckPending);
 }
 
-inline void ReliableMessageContext::SetDropAckDebug(bool inDropAckDebug)
-{
-    mFlags.Set(Flags::kFlagDropAckDebug, inDropAckDebug);
-}
-
 inline void ReliableMessageContext::SetMessageNotAcked(bool messageNotAcked)
 {
     mFlags.Set(Flags::kFlagMessageNotAcked, messageNotAcked);
@@ -266,6 +246,21 @@ inline void ReliableMessageContext::SetMessageNotAcked(bool messageNotAcked)
 inline void ReliableMessageContext::SetRequestingActiveMode(bool activeMode)
 {
     mFlags.Set(Flags::kFlagActiveMode, activeMode);
+}
+
+inline bool ReliableMessageContext::IsEphemeralExchange() const
+{
+    return mFlags.Has(Flags::kFlagEphemeralExchange);
+}
+
+inline void ReliableMessageContext::SetAutoReleaseSession()
+{
+    mFlags.Set(Flags::kFlagAutoReleaseSession, true);
+}
+
+inline bool ReliableMessageContext::ReleaseSessionOnDestruction()
+{
+    return mFlags.Has(Flags::kFlagAutoReleaseSession);
 }
 
 } // namespace Messaging

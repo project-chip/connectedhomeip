@@ -39,8 +39,25 @@ public class ChipDeviceController {
     return;
   }
 
+  /**
+   * Returns a new {@link ChipDeviceController} with ephemerally generated operational credentials.
+   */
   public ChipDeviceController() {
     deviceControllerPtr = newDeviceController();
+  }
+
+  /**
+   * Returns a new {@link ChipDeviceController} which uses the provided {@code operationalKeyConfig}
+   * as its operating credentials.
+   */
+  public ChipDeviceController(OperationalKeyConfig operationalKeyConfig) {
+    deviceControllerPtr =
+        newDeviceController(
+            operationalKeyConfig.getKeypairDelegate(),
+            operationalKeyConfig.getTrustedRootCertificate(),
+            operationalKeyConfig.getIntermediateCertificate(),
+            operationalKeyConfig.getNodeOperationalCertificate(),
+            operationalKeyConfig.getIpkEpochKey());
   }
 
   public void setCompletionListener(CompletionListener listener) {
@@ -292,6 +309,18 @@ public class ChipDeviceController {
     updateDevice(deviceControllerPtr, fabricId, deviceId);
   }
 
+  /**
+   * Get commmissionible Node. Commmissionible Node results are able to get using {@link
+   * ChipDeviceController.getDiscoveredDevice}.
+   */
+  public void discoverCommissionableNodes() {
+    discoverCommissionableNodes(deviceControllerPtr);
+  }
+
+  public DiscoveredDevice getDiscoveredDevice(int idx) {
+    return getDiscoveredDevice(deviceControllerPtr, idx);
+  }
+
   public boolean openPairingWindow(long devicePtr, int duration) {
     return openPairingWindow(deviceControllerPtr, devicePtr, duration);
   }
@@ -300,6 +329,22 @@ public class ChipDeviceController {
       long devicePtr, int duration, long iteration, int discriminator, long setupPinCode) {
     return openPairingWindowWithPIN(
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode);
+  }
+
+  public boolean openPairingWindowCallback(
+      long devicePtr, int duration, OpenCommissioningCallback callback) {
+    return openPairingWindowCallback(deviceControllerPtr, devicePtr, duration, callback);
+  }
+
+  public boolean openPairingWindowWithPINCallback(
+      long devicePtr,
+      int duration,
+      long iteration,
+      int discriminator,
+      long setupPinCode,
+      OpenCommissioningCallback callback) {
+    return openPairingWindowWithPINCallback(
+        deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode, callback);
   }
 
   /* Shutdown all cluster attribute subscriptions for a given device */
@@ -386,7 +431,16 @@ public class ChipDeviceController {
       long devicePtr,
       List<ChipAttributePath> attributePaths);
 
-  private native long newDeviceController();
+  private long newDeviceController() {
+    return newDeviceController(null, null, null, null, null);
+  }
+
+  private native long newDeviceController(
+      @Nullable KeypairDelegate keypairDelegate,
+      @Nullable byte[] rootCertificate,
+      @Nullable byte[] intermediateCertificate,
+      @Nullable byte[] operationalCertificate,
+      @Nullable byte[] ipk);
 
   private native void pairDevice(
       long deviceControllerPtr,
@@ -436,6 +490,10 @@ public class ChipDeviceController {
 
   private native void updateDevice(long deviceControllerPtr, long fabricId, long deviceId);
 
+  private native void discoverCommissionableNodes(long deviceControllerPtr);
+
+  private native DiscoveredDevice getDiscoveredDevice(long deviceControllerPtr, int idx);
+
   private native boolean openPairingWindow(long deviceControllerPtr, long devicePtr, int duration);
 
   private native boolean openPairingWindowWithPIN(
@@ -445,6 +503,18 @@ public class ChipDeviceController {
       long iteration,
       int discriminator,
       long setupPinCode);
+
+  private native boolean openPairingWindowCallback(
+      long deviceControllerPtr, long devicePtr, int duration, OpenCommissioningCallback callback);
+
+  private native boolean openPairingWindowWithPINCallback(
+      long deviceControllerPtr,
+      long devicePtr,
+      int duration,
+      long iteration,
+      int discriminator,
+      long setupPinCode,
+      OpenCommissioningCallback callback);
 
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
 

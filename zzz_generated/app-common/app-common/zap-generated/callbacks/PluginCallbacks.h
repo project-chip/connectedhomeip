@@ -209,12 +209,6 @@ void __attribute__((weak)) MatterChloroformConcentrationMeasurementPluginClientI
 void MatterChloroformConcentrationMeasurementPluginServerInitCallback();
 void __attribute__((weak)) MatterSodiumConcentrationMeasurementPluginClientInitCallback() {}
 void MatterSodiumConcentrationMeasurementPluginServerInitCallback();
-void __attribute__((weak)) MatterIasZonePluginClientInitCallback() {}
-void MatterIasZonePluginServerInitCallback();
-void __attribute__((weak)) MatterIasAcePluginClientInitCallback() {}
-void MatterIasAcePluginServerInitCallback();
-void __attribute__((weak)) MatterIasWdPluginClientInitCallback() {}
-void MatterIasWdPluginServerInitCallback();
 void __attribute__((weak)) MatterWakeOnLanPluginClientInitCallback() {}
 void MatterWakeOnLanPluginServerInitCallback();
 void __attribute__((weak)) MatterChannelPluginClientInitCallback() {}
@@ -239,8 +233,6 @@ void __attribute__((weak)) MatterApplicationBasicPluginClientInitCallback() {}
 void MatterApplicationBasicPluginServerInitCallback();
 void __attribute__((weak)) MatterAccountLoginPluginClientInitCallback() {}
 void MatterAccountLoginPluginServerInitCallback();
-void __attribute__((weak)) MatterTestClusterPluginClientInitCallback() {}
-void MatterTestClusterPluginServerInitCallback();
 void __attribute__((weak)) MatterMessagingPluginClientInitCallback() {}
 void MatterMessagingPluginServerInitCallback();
 void __attribute__((weak)) MatterApplianceIdentificationPluginClientInitCallback() {}
@@ -253,3 +245,5 @@ void __attribute__((weak)) MatterApplianceStatisticsPluginClientInitCallback() {
 void MatterApplianceStatisticsPluginServerInitCallback();
 void __attribute__((weak)) MatterElectricalMeasurementPluginClientInitCallback() {}
 void MatterElectricalMeasurementPluginServerInitCallback();
+void __attribute__((weak)) MatterTestClusterPluginClientInitCallback() {}
+void MatterTestClusterPluginServerInitCallback();

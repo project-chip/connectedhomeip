@@ -37,37 +37,42 @@ constexpr TLV::Tag kUpdateNocCommandTag = TLV::ContextTag(2);
 
 void FailSafeContext::HandleArmFailSafeTimer(System::Layer * layer, void * aAppState)
 {
-    FailSafeContext * context = reinterpret_cast<FailSafeContext *>(aAppState);
-    context->FailSafeTimerExpired();
+    FailSafeContext * failSafeContext = reinterpret_cast<FailSafeContext *>(aAppState);
+    failSafeContext->FailSafeTimerExpired();
+}
+
+void FailSafeContext::HandleMaxCumulativeFailSafeTimer(System::Layer * layer, void * aAppState)
+{
+    FailSafeContext * failSafeContext = reinterpret_cast<FailSafeContext *>(aAppState);
+    failSafeContext->FailSafeTimerExpired();
 }
 
 void FailSafeContext::HandleDisarmFailSafe(intptr_t arg)
 {
-    FailSafeContext * this_ = reinterpret_cast<FailSafeContext *>(arg);
-
-    this_->mFailSafeBusy = false;
-
-    if (ConfigurationMgr().SetFailSafeArmed(false) != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to set FailSafeArmed config to false");
-    }
-
-    if (DeleteFromStorage() != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to delete FailSafeContext from configuration");
-    }
+    FailSafeContext * failSafeContext = reinterpret_cast<FailSafeContext *>(arg);
+    failSafeContext->DisarmFailSafe();
 }
 
 void FailSafeContext::FailSafeTimerExpired()
 {
+    if (!IsFailSafeArmed())
+    {
+        // In case this was a pending timer event in event loop, and we had
+        // done CommissioningComplete or manual disarm.
+        return;
+    }
+
+    ChipLogProgress(FailSafe, "Fail-safe timer expired");
     ScheduleFailSafeCleanup(mFabricIndex, mAddNocCommandHasBeenInvoked, mUpdateNocCommandHasBeenInvoked);
 }
 
 void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addNocCommandInvoked, bool updateNocCommandInvoked)
 {
-    ResetState();
-
-    mFailSafeBusy = true;
+    // Not armed, but busy so cannot rearm (via General Commissioning cluster) until the flushing
+    // via `HandleDisarmFailSafe` path is complete.
+    // TODO: This is hacky and we need to remove all this event pushing business, to keep all fail-safe logic-only.
+    mFailSafeBusy  = true;
+    mFailSafeArmed = false;
 
     ChipDeviceEvent event;
     event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
@@ -78,7 +83,7 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
 
     if (status != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to post fail-safe timer expired: %" CHIP_ERROR_FORMAT, status.Format());
+        ChipLogError(FailSafe, "Failed to post fail-safe timer expired: %" CHIP_ERROR_FORMAT, status.Format());
     }
 
     PlatformMgr().ScheduleWork(HandleDisarmFailSafe, reinterpret_cast<intptr_t>(this));
@@ -86,26 +91,50 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
 
 CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength)
 {
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    bool cancelTimersIfError = false;
+    if (!mFailSafeArmed)
+    {
+        System::Clock::Timeout maxCumulativeTimeout = System::Clock::Seconds32(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC);
+        SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(maxCumulativeTimeout, HandleMaxCumulativeFailSafeTimer, this));
+        cancelTimersIfError = true;
+    }
+
+    SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafeTimer, this));
+    SuccessOrExit(err = CommitToStorage());
+    SuccessOrExit(err = ConfigurationMgr().SetFailSafeArmed(true));
+
     mFailSafeArmed = true;
     mFabricIndex   = accessingFabricIndex;
 
-    ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafeTimer, this));
-    ReturnErrorOnFailure(CommitToStorage());
-    ReturnErrorOnFailure(ConfigurationMgr().SetFailSafeArmed(true));
+exit:
 
-    return CHIP_NO_ERROR;
+    if (err != CHIP_NO_ERROR && cancelTimersIfError)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
+        DeviceLayer::SystemLayer().CancelTimer(HandleMaxCumulativeFailSafeTimer, this);
+    }
+    return err;
 }
 
-CHIP_ERROR FailSafeContext::DisarmFailSafe()
+void FailSafeContext::DisarmFailSafe()
 {
+    DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleMaxCumulativeFailSafeTimer, this);
+
     ResetState();
 
-    DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
+    if (ConfigurationMgr().SetFailSafeArmed(false) != CHIP_NO_ERROR)
+    {
+        ChipLogError(FailSafe, "Failed to set FailSafeArmed config to false");
+    }
 
-    ReturnErrorOnFailure(ConfigurationMgr().SetFailSafeArmed(false));
-    ReturnErrorOnFailure(DeleteFromStorage());
+    if (DeleteFromStorage() != CHIP_NO_ERROR)
+    {
+        ChipLogError(FailSafe, "Failed to delete FailSafeContext from configuration");
+    }
 
-    return CHIP_NO_ERROR;
+    ChipLogProgress(FailSafe, "Fail-safe cleanly disarmed");
 }
 
 CHIP_ERROR FailSafeContext::SetAddNocCommandInvoked(FabricIndex nocFabricIndex)
@@ -191,7 +220,11 @@ void FailSafeContext::ForceFailSafeTimerExpiry()
     {
         return;
     }
+
+    // Cancel the timer since we force its action
     DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleMaxCumulativeFailSafeTimer, this);
+
     FailSafeTimerExpired();
 }
 

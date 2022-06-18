@@ -160,16 +160,26 @@ public:
      *   Allocate a secure session and non-colliding session ID in the secure
      *   session table.
      *
+     *   If we're either establishing or just finished establishing a session to a peer in either initiator or responder
+     *   roles, the node id of that peer should be provided in sessionEvictionHint. Else, it should be initialized
+     *   to a default-constructed ScopedNodeId().
+     *
      * @return SessionHandle with a reference to a SecureSession, else NullOptional on failure
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType);
+    Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType,
+                                            const ScopedNodeId & sessionEvictionHint);
 
     void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(const ScopedNodeId & node);
     void ExpireAllPairingsForPeerExceptPending(const ScopedNodeId & node);
     void ExpireAllPairingsForFabric(FabricIndex fabric);
     void ExpireAllPASEPairings();
+
+    // This API is used by commands that need to release all existing sessions on a fabric but need to make sure the response to the
+    // command still goes out on the exchange the command came in on. This API flags that the release of the session used by the
+    // exchange is deferred until the exchange is done.
+    void ReleaseSessionsForFabricExceptOne(FabricIndex fabricIndex, const SessionHandle & deferred);
 
     /**
      * @brief
