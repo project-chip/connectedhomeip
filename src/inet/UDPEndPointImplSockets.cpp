@@ -136,7 +136,7 @@ CHIP_ERROR IPv4Bind(int socket, const IPAddress & address, uint16_t port)
     {
         // Allow socket transmitting broadcast packets.
         constexpr int enable = 1;
-        setsockopt(socket, SOL_SOCKET, SO_BROADCAST, &enable, sizeof(enable));
+        //setsockopt(socket, SOL_SOCKET, SO_BROADCAST, &enable, sizeof(enable));
 
 #ifdef IP_MULTICAST_IF
         // Instruct the kernel that any messages to multicast destinations should be
@@ -771,16 +771,16 @@ CHIP_ERROR UDPEndPointImplSockets::IPv4JoinLeaveMulticastGroupImpl(InterfaceId a
     }
     VerifyOrReturnError(lInterfaceAddressFound, INET_ERROR_ADDRESS_NOT_FOUND);
 
-    struct ip_mreq lMulticastRequest;
-    memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));
-    lMulticastRequest.imr_interface = lInterfaceAddress.ToIPv4();
-    lMulticastRequest.imr_multiaddr = aAddress.ToIPv4();
+    // struct ip_mreq lMulticastRequest;
+    // memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));
+    // lMulticastRequest.imr_interface = lInterfaceAddress.ToIPv4();
+    // lMulticastRequest.imr_multiaddr = aAddress.ToIPv4();
 
-    const int command = join ? IP_ADD_MEMBERSHIP : IP_DROP_MEMBERSHIP;
-    if (setsockopt(mSocket, IPPROTO_IP, command, &lMulticastRequest, sizeof(lMulticastRequest)) != 0)
-    {
-        return CHIP_ERROR_POSIX(errno);
-    }
+    // const int command = join ? IP_ADD_MEMBERSHIP : IP_DROP_MEMBERSHIP;
+    // if (setsockopt(mSocket, IPPROTO_IP, command, &lMulticastRequest, sizeof(lMulticastRequest)) != 0)
+    // {
+    //     return CHIP_ERROR_POSIX(errno);
+    // }
     return CHIP_NO_ERROR;
 }
 

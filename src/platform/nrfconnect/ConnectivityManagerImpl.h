@@ -24,12 +24,18 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
 #endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.h>
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include "ConnectivityManagerImplWiFi.h"
+#else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
+#endif
 
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -57,7 +63,11 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+                                      public ConnectivityManagerImplWiFi
+#else
                                       public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>
+#endif
 {
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -92,7 +102,7 @@ inline ConnectivityManager & ConnectivityMgr(void)
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
  * chip applications can use this to gain access to features of the ConnectivityManager
- * that are specific to the ESP32 platform.
+ * that are specific to the nrfconnect platform.
  */
 inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
 {

@@ -64,6 +64,20 @@ static_library("nrfconnect") {
     }
   }
 
+  if (chip_enable_wifi) {
+    sources += [
+      "ConnectivityManagerImplWiFi.cpp",
+      "ConnectivityManagerImplWiFi.h",
+      "NetworkCommissioningDriver.cpp",
+      "NetworkCommissioningDriver.h",
+      "../Zephyr/WiFiManager.h"
+    ]
+    if (chip_mdns == "platform") {
+      sources += [ "../Zephyr/DnssdImpl.cpp" ]
+      deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    }
+  }
+
   if (chip_enable_nfc) {
     sources += [
       "../Zephyr/NFCManagerImpl.cpp",
@@ -74,7 +88,7 @@ static_library("nrfconnect") {
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
+      "OTAImageProcessorImpl.h"
     ]
   }
 

@@ -29,6 +29,7 @@
 
 void StartDefaultThreadNetwork(void)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     chip::Thread::OperationalDataset dataset{};
     uint8_t xpanid[8];
     constexpr uint8_t masterkey[] = {
@@ -47,4 +48,5 @@ void StartDefaultThreadNetwork(void)
     chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(true);
 
     chip::app::DnssdServer::Instance().StartServer();
+#endif
 }

@@ -45,7 +45,9 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
 #endif
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    InitWiFi();
+#endif
     return CHIP_NO_ERROR;
 }
 
@@ -54,6 +56,9 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     // Forward the event to the generic base classes as needed.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    OnWiFiPlatformEvent(event);
 #endif
 }
 

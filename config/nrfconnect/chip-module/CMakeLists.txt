@@ -219,6 +219,7 @@ chip_gn_arg_bool  ("chip_progress_logging"                  CONFIG_MATTER_LOG_LE
 chip_gn_arg_bool  ("chip_detail_logging"                    CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
 chip_gn_arg_bool  ("chip_automation_logging"                "false")
 chip_gn_arg_bool  ("chip_malloc_sys_heap"                   CONFIG_CHIP_MALLOC_SYS_HEAP)
+chip_gn_arg_bool  ("chip_enable_wifi"                       "true")
 
 if (CONFIG_CHIP_ROTATING_DEVICE_ID)
     chip_gn_arg_bool("chip_enable_rotating_device_id"          "true")
