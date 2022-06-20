@@ -89,7 +89,6 @@ endmacro()
 # ==============================================================================
 # Prepare CHIP configuration based on the project configuration
 # ==============================================================================
-
 # Set paths
 if (NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../.. REALPATH)
@@ -98,61 +97,24 @@ endif()
 set(GN_ROOT_TARGET ${CHIP_ROOT}/config/openiotsdk/chip-gn)
 
 # Prepare compiler flags
+# All Open IoT SDK targets
+list(APPEND ALL_SDK_TARGETS)
 
-if (TARGET mdh-reference-platforms-for-arm)
-    get_target_common_compile_flags(CHIP_MDH_ARM_CFLAGS mdh-reference-platforms-for-arm)
-    list(APPEND CHIP_CFLAGS ${CHIP_MDH_ARM_CFLAGS})
-    get_target_common_compile_flags(CHIP_MCU_DRIVER_HAL_CFLAGS mcu-driver-hal)
-    list(APPEND CHIP_CFLAGS ${CHIP_MCU_DRIVER_HAL_CFLAGS}) 
-endif()
+foreach(source_dir ${SDK_SOURCES_BINARY_DIRS})
+    get_all_cmake_targets(SDK_TARGETS ${source_dir})
+    list(APPEND ALL_SDK_TARGETS ${SDK_TARGETS})
+endforeach()
 
-if (TARGET cmsis-rtos-api)
-    get_target_common_compile_flags(CHIP_CMSIS_RTOS_API_CFLAGS cmsis-rtos-api)
-    list(APPEND CHIP_CFLAGS ${CHIP_CMSIS_RTOS_API_CFLAGS})    
-    get_target_common_compile_flags(CHIP_CMSIS_RTOS_CORE_CFLAGS cmsis-core)
-    list(APPEND CHIP_CFLAGS ${CHIP_CMSIS_RTOS_CORE_CFLAGS})
-endif()
+# Exclude unnecessary targets
+list(FILTER ALL_SDK_TARGETS EXCLUDE REGEX "^.*linker.*|.*example.*|.*apps.*|.*doc.*|dist|lib$")
 
-if (TARGET freertos-cmsis-rtos)
-    get_target_common_compile_flags(CHIP_FREERTOS_CMSIS_RTOS_CFLAGS freertos-cmsis-rtos)
-    list(APPEND CHIP_CFLAGS ${CHIP_FREERTOS_CMSIS_RTOS_CFLAGS})
-    get_target_common_compile_flags(CHIP_FREERTOS_KERNEL_CFLAGS freertos-kernel)
-    list(APPEND CHIP_CFLAGS ${CHIP_FREERTOS_KERNEL_CFLAGS})
-endif()
+foreach(target ${ALL_SDK_TARGETS})
+    get_target_common_compile_flags(SDK_TARGET_CFLAGS ${target})
+    list(APPEND CHIP_CFLAGS ${SDK_TARGET_CFLAGS})
+endforeach()
 
-if (TARGET mbedtls)
-    get_target_common_compile_flags(CHIP_MBEDTLS_CFLAGS mbedtls)
-    list(APPEND CHIP_CFLAGS ${CHIP_MBEDTLS_CFLAGS})
-endif()
-
-if (TARGET iotsdk-ip-network-api)
-    get_target_common_compile_flags(CHIP_IP_NETOWORK_CFLAGS iotsdk-ip-network-api)
-    list(APPEND CHIP_CFLAGS ${CHIP_IP_NETOWORK_CFLAGS})
-endif()
-
-if (TARGET lwipcore)
-    get_target_common_compile_flags(CHIP_LWIP_CFLAGS lwipcore)
-    list(APPEND CHIP_CFLAGS ${CHIP_LWIP_CFLAGS})
-endif()
-
-if (TARGET lwip-cmsis-port)
-    get_target_common_compile_flags(CHIP_LWIP_CMSIS_PORT_CFLAGS lwip-cmsis-port)
-    list(APPEND CHIP_CFLAGS ${CHIP_LWIP_CMSIS_PORT_CFLAGS})
-    get_target_common_compile_flags(CHIP_LWIP_OPTS_CFLAGS lwipopts)
-    list(APPEND CHIP_CFLAGS ${CHIP_LWIP_OPTS_CFLAGS})
-    get_target_common_compile_flags(CHIP_LWIP_CMSIS_SYS_CFLAGS lwip-cmsis-sys)
-    list(APPEND CHIP_CFLAGS ${CHIP_LWIP_CMSIS_SYS_CFLAGS})
-endif()
-
-if (TARGET iotsdk-blockdevice)
-    get_target_common_compile_flags(CHIP_STORAGE_BLOCK_DEVICE_CFLAGS iotsdk-blockdevice)
-    list(APPEND CHIP_CFLAGS ${CHIP_STORAGE_BLOCK_DEVICE_CFLAGS})
-endif()
-
-if (TARGET iotsdk-tdbstore)
-    get_target_common_compile_flags(CHIP_STORAGE_KV_STORE_CFLAGS iotsdk-tdbstore)
-    list(APPEND CHIP_CFLAGS ${CHIP_STORAGE_KV_STORE_CFLAGS})
-endif()
+# Remove duplicated flags
+list(REMOVE_DUPLICATES CHIP_CFLAGS)
 
 get_gnu_cpp_standard(CHIP_CFLAGS_CC)
 
@@ -265,11 +227,12 @@ ExternalProject_Add(
 )
 
 # ==============================================================================
-# Define 'chip' target that exposes CHIP headers & libraries to the application
+# Define 'openiotsdk-chip' target that exposes CHIP and Open IoT SDK 
+# headers & libraries to the application
 # ==============================================================================
-add_library(chip INTERFACE)
-target_compile_definitions(chip INTERFACE CHIP_HAVE_CONFIG_H)
-target_include_directories(chip INTERFACE
+add_library(openiotsdk-chip INTERFACE)
+target_compile_definitions(openiotsdk-chip INTERFACE CHIP_HAVE_CONFIG_H)
+target_include_directories(openiotsdk-chip INTERFACE
     ${CHIP_ROOT}/src
     ${CHIP_ROOT}/src/include
     ${CHIP_ROOT}/src/lib
@@ -278,9 +241,18 @@ target_include_directories(chip INTERFACE
     ${CHIP_ROOT}/zzz_generated/app-common
     ${CMAKE_CURRENT_BINARY_DIR}/gen/include
 )
-target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
-target_link_libraries(chip INTERFACE -Wl,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)
-add_dependencies(chip chip-gn)
+target_link_directories(openiotsdk-chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
+target_link_libraries(openiotsdk-chip INTERFACE -Wl,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)
+target_link_libraries(openiotsdk-chip INTERFACE
+    $<$<TARGET_EXISTS:mcu-driver-hal>:mcu-driver-hal>
+    $<$<TARGET_EXISTS:mcu-driver-bootstrap>:mcu-driver-bootstrap>
+    $<$<TARGET_EXISTS:mdh-reference-platforms-for-arm>:mdh-reference-platforms-for-arm>
+    $<$<TARGET_EXISTS:mbedtls>:mbedtls>
+    $<$<TARGET_EXISTS:lwipcore>:lwipcore>
+    $<$<TARGET_EXISTS:iotsdk-ip-network-api>:iotsdk-ip-network-api>
+    $<$<TARGET_EXISTS:iotsdk-serial-retarget>:$<TARGET_OBJECTS:iotsdk-serial-retarget>>
+)
+add_dependencies(openiotsdk-chip chip-gn)
 
 # ==============================================================================
 # Parent target configuration according to CHIP component usage
