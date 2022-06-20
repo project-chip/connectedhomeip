@@ -87,6 +87,11 @@ void SecureSession::MarkAsDefunct()
         //
         return;
 
+    case State::kInactive:
+        //
+        // Once a session is marked Inactive, we CANNOT bring it back to either being active or defunct.
+        //
+        FALLTHROUGH;
     case State::kPendingEviction:
         //
         // Once a session is headed for eviction, we CANNOT bring it back to either being active or defunct.
@@ -113,6 +118,7 @@ void SecureSession::MarkForEviction()
     case State::kDefunct:
         FALLTHROUGH;
     case State::kActive:
+        FALLTHROUGH;
     case State::kInactive:
         Release(); // Decrease the ref which is retained at Activate
         MoveToState(State::kPendingEviction);
@@ -132,15 +138,17 @@ void SecureSession::MarkInactive()
     ReferenceCountedHandle<Transport::Session> ref(*this);
     switch (mState)
     {
-    case State::kPairing:
+    case State::kEstablishing:
         VerifyOrDie(false);
         return;
+    case State::kDefunct:
+        FALLTHROUGH;
     case State::kActive:
         // By setting this state, IsActiveSession() will return false, which prevents creating new exchanges.
         mState = State::kInactive;
         return;
     case State::kInactive:
-    case State::kPendingRemoval:
+    case State::kPendingEviction:
         // Do nothing
         return;
     }

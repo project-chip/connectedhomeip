@@ -297,7 +297,7 @@ private:
         // In addition to any existing SessionHolders holding a reference to this session, the SessionManager
         // maintains a reference as well to the session that will only be relinquished when MarkForEviction is called.
         //
-        kDefunct = 4,
+        kDefunct = 3,
 
         //
         // The session has been marked for eviction and is pending deallocation. All SessionHolders would have already
@@ -306,14 +306,14 @@ private:
         //
         // When all SessionHandles go out of scope, the session will be released automatically.
         //
-        kPendingEviction = 3,
+        kPendingEviction = 4,
 
         //
         // The session is still functional but it can't yield any new outbound or inbound exchanges.
         // This is meant to be used in conjunction with ExchangeManager::AbortExchangesForFabricExceptOne, with the one
         // exceptional exchange handling out of this state when it finishes whatever it needs the session for.
         //
-        kInactive = 4,
+        kInactive = 5,
     };
 
     const char * StateToString(State state) const;

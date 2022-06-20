@@ -379,7 +379,7 @@ void SessionManager::ReleaseSessionsForFabricExceptOne(FabricIndex fabricIndex, 
             if (session == deferredSecureSession)
                 session->MarkInactive();
             else
-                session->MarkForRemoval();
+                session->MarkForEviction();
         }
         return Loop::Continue;
     });

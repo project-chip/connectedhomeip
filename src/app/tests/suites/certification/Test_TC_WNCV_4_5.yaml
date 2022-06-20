@@ -56,7 +56,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 500
+                value: 1000
 
     - label: "1c: TH sends StopMotion command to DUT"
       command: "StopMotion"
