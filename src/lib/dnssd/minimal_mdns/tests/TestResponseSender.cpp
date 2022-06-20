@@ -98,7 +98,7 @@ void SrvAnyResponseToInstance(nlTestSuite * inSuite, void * inContext)
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
     common.server.AddExpectedRecord(&common.srvRecord);
-    responseSender.Respond(1, queryData, &common.packetInfo);
+    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
 
     NL_TEST_ASSERT(inSuite, common.server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, common.server.GetHeaderFound());
@@ -120,7 +120,7 @@ void SrvTxtAnyResponseToInstance(nlTestSuite * inSuite, void * inContext)
     // We requested ANY on the host name, expect both back.
     common.server.AddExpectedRecord(&common.srvRecord);
     common.server.AddExpectedRecord(&common.txtRecord);
-    responseSender.Respond(1, queryData, &common.packetInfo);
+    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
 
     NL_TEST_ASSERT(inSuite, common.server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, common.server.GetHeaderFound());
@@ -145,7 +145,7 @@ void PtrSrvTxtAnyResponseToServiceName(nlTestSuite * inSuite, void * inContext)
     common.server.AddExpectedRecord(&common.srvRecord);
     common.server.AddExpectedRecord(&common.txtRecord);
 
-    responseSender.Respond(1, queryData, &common.packetInfo);
+    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
 
     NL_TEST_ASSERT(inSuite, common.server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, common.server.GetHeaderFound());
@@ -169,7 +169,7 @@ void PtrSrvTxtAnyResponseToInstance(nlTestSuite * inSuite, void * inContext)
     common.server.AddExpectedRecord(&common.srvRecord);
     common.server.AddExpectedRecord(&common.txtRecord);
 
-    responseSender.Respond(1, queryData, &common.packetInfo);
+    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
 
     NL_TEST_ASSERT(inSuite, common.server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, common.server.GetHeaderFound());
@@ -192,7 +192,7 @@ void PtrSrvTxtSrvResponseToInstance(nlTestSuite * inSuite, void * inContext)
     // We didn't set the txt as an additional on the srv name so expect only srv.
     common.server.AddExpectedRecord(&common.srvRecord);
 
-    responseSender.Respond(1, queryData, &common.packetInfo);
+    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
 
     NL_TEST_ASSERT(inSuite, common.server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, common.server.GetHeaderFound());
@@ -216,7 +216,7 @@ void PtrSrvTxtAnyResponseToServiceListing(nlTestSuite * inSuite, void * inContex
     PtrResourceRecord serviceRecord = PtrResourceRecord(common.dnsSd, common.ptrRecord.GetName());
     common.server.AddExpectedRecord(&serviceRecord);
 
-    responseSender.Respond(1, queryData, &common.packetInfo);
+    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
 
     NL_TEST_ASSERT(inSuite, common.server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, common.server.GetHeaderFound());
@@ -230,15 +230,15 @@ void NoQueryResponder(nlTestSuite * inSuite, void * inContext)
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
     common.recordWriter.WriteQName(common.dnsSd);
-    responseSender.Respond(1, queryData, &common.packetInfo);
+    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
     NL_TEST_ASSERT(inSuite, !common.server.GetSendCalled());
 
     common.recordWriter.WriteQName(common.service);
-    responseSender.Respond(1, queryData, &common.packetInfo);
+    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
     NL_TEST_ASSERT(inSuite, !common.server.GetSendCalled());
 
     common.recordWriter.WriteQName(common.instance);
-    responseSender.Respond(1, queryData, &common.packetInfo);
+    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
     NL_TEST_ASSERT(inSuite, !common.server.GetSendCalled());
 }
 
@@ -304,7 +304,7 @@ void PtrSrvTxtMultipleRespondersToInstance(nlTestSuite * inSuite, void * inConte
     common1.server.AddExpectedRecord(&common2.srvRecord);
     common1.server.AddExpectedRecord(&common2.txtRecord);
 
-    responseSender.Respond(1, queryData, &common1.packetInfo);
+    responseSender.Respond(1, queryData, &common1.packetInfo, ResponseConfiguration());
 
     NL_TEST_ASSERT(inSuite, common1.server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, common1.server.GetHeaderFound());
@@ -338,7 +338,7 @@ void PtrSrvTxtMultipleRespondersToServiceListing(nlTestSuite * inSuite, void * i
     PtrResourceRecord serviceRecord2 = PtrResourceRecord(common2.dnsSd, common2.ptrRecord.GetName());
     common1.server.AddExpectedRecord(&serviceRecord2);
 
-    responseSender.Respond(1, queryData, &common1.packetInfo);
+    responseSender.Respond(1, queryData, &common1.packetInfo, ResponseConfiguration());
 
     NL_TEST_ASSERT(inSuite, common1.server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, common1.server.GetHeaderFound());
