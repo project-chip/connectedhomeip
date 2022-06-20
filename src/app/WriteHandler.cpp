@@ -142,7 +142,8 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
         ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
         if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
         {
-            err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+            err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext,
+                                       false /*aExpectResponse*/);
         }
         Close();
         return err;
