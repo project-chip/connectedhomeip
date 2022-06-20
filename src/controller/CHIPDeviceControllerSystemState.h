@@ -106,10 +106,11 @@ class DeviceControllerSystemState
     using CASEClientPool        = DeviceControllerSystemStateParams::CASEClientPool;
 
 public:
-    ~DeviceControllerSystemState() {
-      VerifyOrDie(mRefCount == 0);
+    ~DeviceControllerSystemState()
+    {
+        VerifyOrDie(mRefCount == 0);
 
-      Shutdown();
+        Shutdown();
     }
 
     DeviceControllerSystemState(DeviceControllerSystemStateParams params) :
