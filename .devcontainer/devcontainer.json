@@ -24,6 +24,7 @@
     // Add the IDs of extensions you want installed when the container is created in the array below.
     "extensions": [
         "aaron-bond.better-comments",
+        "augustocdias.tasks-shell-input",
         "christian-kohler.path-intellisense",
         "eamodio.gitlens",
         "editorconfig.editorconfig",

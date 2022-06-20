@@ -364,28 +364,29 @@ void ChannelManager::InitializeWithObjects(jobject managerObject)
     jclass managerClass = env->GetObjectClass(mChannelManagerObject);
     VerifyOrReturn(managerClass != nullptr, ChipLogError(Zcl, "Failed to get ChannelManager Java class"));
 
-    mGetChannelListMethod = env->GetMethodID(managerClass, "getChannelList", "()[Lcom/tcl/chip/tvapp/ChannelInfo;");
+    mGetChannelListMethod = env->GetMethodID(managerClass, "getChannelList", "()[Lcom/matter/tv/server/tvapp/ChannelInfo;");
     if (mGetChannelListMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ChannelManager 'getChannelList' method");
         env->ExceptionClear();
     }
 
-    mGetLineupMethod = env->GetMethodID(managerClass, "getLineup", "()Lcom/tcl/chip/tvapp/ChannelLineupInfo;");
+    mGetLineupMethod = env->GetMethodID(managerClass, "getLineup", "()Lcom/matter/tv/server/tvapp/ChannelLineupInfo;");
     if (mGetLineupMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ChannelManager 'getLineup' method");
         env->ExceptionClear();
     }
 
-    mGetCurrentChannelMethod = env->GetMethodID(managerClass, "getCurrentChannel", "()Lcom/tcl/chip/tvapp/ChannelInfo;");
+    mGetCurrentChannelMethod = env->GetMethodID(managerClass, "getCurrentChannel", "()Lcom/matter/tv/server/tvapp/ChannelInfo;");
     if (mGetCurrentChannelMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ChannelManager 'getCurrentChannel' method");
         env->ExceptionClear();
     }
 
-    mChangeChannelMethod = env->GetMethodID(managerClass, "changeChannel", "(Ljava/lang/String;)Lcom/tcl/chip/tvapp/ChannelInfo;");
+    mChangeChannelMethod =
+        env->GetMethodID(managerClass, "changeChannel", "(Ljava/lang/String;)Lcom/matter/tv/server/tvapp/ChannelInfo;");
     if (mChangeChannelMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ChannelManager 'changeChannel' method");

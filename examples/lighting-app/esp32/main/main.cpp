@@ -16,7 +16,8 @@
  */
 
 #include "DeviceCallbacks.h"
-#include "LEDWidget.h"
+
+#include "AppTask.h"
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 
@@ -33,8 +34,6 @@
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
-
-LEDWidget AppLED;
 
 static const char * TAG = "light-app";
 
@@ -90,7 +89,12 @@ extern "C" void app_main()
         return;
     }
 #endif
-    AppLED.Init();
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+
+    error = GetAppTask().StartAppTask();
+    if (error != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %s", ErrorStr(error));
+    }
 }

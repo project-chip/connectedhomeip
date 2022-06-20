@@ -59,7 +59,6 @@
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterSwitchPluginServerInitCallback();                                                                                        \
     MatterTargetNavigatorPluginClientInitCallback();                                                                               \
-    MatterTestClusterPluginServerInitCallback();                                                                                   \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
     MatterTimeFormatLocalizationPluginServerInitCallback();                                                                        \
     MatterUnitLocalizationPluginServerInitCallback();                                                                              \

@@ -39,8 +39,25 @@ public class ChipDeviceController {
     return;
   }
 
+  /**
+   * Returns a new {@link ChipDeviceController} with ephemerally generated operational credentials.
+   */
   public ChipDeviceController() {
     deviceControllerPtr = newDeviceController();
+  }
+
+  /**
+   * Returns a new {@link ChipDeviceController} which uses the provided {@code operationalKeyConfig}
+   * as its operating credentials.
+   */
+  public ChipDeviceController(OperationalKeyConfig operationalKeyConfig) {
+    deviceControllerPtr =
+        newDeviceController(
+            operationalKeyConfig.getKeypairDelegate(),
+            operationalKeyConfig.getTrustedRootCertificate(),
+            operationalKeyConfig.getIntermediateCertificate(),
+            operationalKeyConfig.getNodeOperationalCertificate(),
+            operationalKeyConfig.getIpkEpochKey());
   }
 
   public void setCompletionListener(CompletionListener listener) {
@@ -414,7 +431,16 @@ public class ChipDeviceController {
       long devicePtr,
       List<ChipAttributePath> attributePaths);
 
-  private native long newDeviceController();
+  private long newDeviceController() {
+    return newDeviceController(null, null, null, null, null);
+  }
+
+  private native long newDeviceController(
+      @Nullable KeypairDelegate keypairDelegate,
+      @Nullable byte[] rootCertificate,
+      @Nullable byte[] intermediateCertificate,
+      @Nullable byte[] operationalCertificate,
+      @Nullable byte[] ipk);
 
   private native void pairDevice(
       long deviceControllerPtr,

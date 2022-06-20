@@ -615,7 +615,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         err = HandleTXCharComplete(event);
         break;
 
-    case DeviceEventType::kFabricMembershipChange:
     case DeviceEventType::kServiceProvisioningChange:
     case DeviceEventType::kAccountPairingChange:
 

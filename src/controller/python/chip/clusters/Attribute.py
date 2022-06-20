@@ -516,8 +516,9 @@ class SubscriptionTransaction:
             return
 
         handle = chip.native.GetLibraryHandle()
-        handle.pychip_ReadClient_Abort(
-            self._readTransaction._pReadClient, self._readTransaction._pReadCallback)
+        builtins.chipStack.Call(
+            lambda: handle.pychip_ReadClient_Abort(
+                self._readTransaction._pReadClient, self._readTransaction._pReadCallback))
         self._isDone = True
 
     def __del__(self):
@@ -853,8 +854,9 @@ def WriteAttributes(future: Future, eventLoop, device, attributes: List[Attribut
 
     transaction = AsyncWriteTransaction(future, eventLoop)
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-    res = handle.pychip_WriteClient_WriteAttributes(
-        ctypes.py_object(transaction), device, ctypes.c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), ctypes.c_size_t(len(attributes)), *writeargs)
+    res = builtins.chipStack.Call(
+        lambda: handle.pychip_WriteClient_WriteAttributes(
+            ctypes.py_object(transaction), device, ctypes.c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), ctypes.c_size_t(len(attributes)), *writeargs))
     if res != 0:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res
@@ -954,17 +956,18 @@ def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributeP
     params.IsFabricFiltered = fabricFiltered
     params = _ReadParams.build(params)
 
-    res = handle.pychip_ReadClient_Read(
-        ctypes.py_object(transaction),
-        ctypes.byref(readClientObj),
-        ctypes.byref(readCallbackObj),
-        device,
-        ctypes.c_char_p(params),
-        ctypes.c_size_t(0 if attributes is None else len(attributes)),
-        ctypes.c_size_t(
-            0 if dataVersionFilters is None else len(dataVersionFilters)),
-        ctypes.c_size_t(0 if events is None else len(events)),
-        *readargs)
+    res = builtins.chipStack.Call(
+        lambda: handle.pychip_ReadClient_Read(
+            ctypes.py_object(transaction),
+            ctypes.byref(readClientObj),
+            ctypes.byref(readCallbackObj),
+            device,
+            ctypes.c_char_p(params),
+            ctypes.c_size_t(0 if attributes is None else len(attributes)),
+            ctypes.c_size_t(
+                0 if dataVersionFilters is None else len(dataVersionFilters)),
+            ctypes.c_size_t(0 if events is None else len(events)),
+            *readargs))
 
     transaction.SetClientObjPointers(readClientObj, readCallbackObj)
 

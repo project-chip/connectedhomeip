@@ -1,5 +1,5 @@
 {
-    "ci_allow_list": ["lighting-app"],
+    "ci_allow_list": ["rootnode_dimmablelight_gY80DaqEUL"],
     "cd_platforms": {
         "linux": "linux_x86",
         "esp32": "m5stack",

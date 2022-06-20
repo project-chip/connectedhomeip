@@ -25,16 +25,13 @@
     MatterAccessControlPluginServerInitCallback();                                                                                 \
     MatterAdministratorCommissioningPluginServerInitCallback();                                                                    \
     MatterBasicPluginServerInitCallback();                                                                                         \
+    MatterBindingPluginServerInitCallback();                                                                                       \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
-    MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
-    MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterFlowMeasurementPluginClientInitCallback();                                                                               \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
     MatterGroupKeyManagementPluginServerInitCallback();                                                                            \
-    MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
-    MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \
@@ -42,9 +39,5 @@
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterPressureMeasurementPluginClientInitCallback();                                                                           \
     MatterPumpConfigurationAndControlPluginClientInitCallback();                                                                   \
-    MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
-    MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
-    MatterTimeFormatLocalizationPluginServerInitCallback();                                                                        \
-    MatterUnitLocalizationPluginServerInitCallback();                                                                              \
-    MatterUserLabelPluginServerInitCallback();
+    MatterThreadNetworkDiagnosticsPluginServerInitCallback();

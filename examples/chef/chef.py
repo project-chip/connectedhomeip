@@ -351,7 +351,8 @@ def main(argv: Sequence[str]) -> None:
     parser.add_option("-g", "--zapgui", help="runs zap GUI display to allow editing of data model",
                       action="store_true", dest="do_run_gui")
     parser.add_option("-d", "--device", dest="sample_device_type_name",
-                      help="specifies device type. Default is lighting. See info above for supported device types", metavar="TARGET", default="lighting")
+                      help="specifies device type. Default is lighting. See info above for supported device types",
+                      metavar="TARGET", choices=_DEVICE_LIST)
     parser.add_option("-t", "--target", type='choice',
                       action='store',
                       dest="build_target",
@@ -377,7 +378,7 @@ def main(argv: Sequence[str]) -> None:
     parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Uses --use_zzz. Chef exits after completion.",
                       dest="build_all", action="store_true")
     parser.add_option(
-        "", "--ci", help="Builds Chef examples defined in _CI_ALLOW_LIST. Uses --use_zzz. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
+        "", "--ci", help="Builds Chef examples defined in cicd_config. Uses --use_zzz. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
 
     options, _ = parser.parse_args(argv)
 
@@ -646,6 +647,10 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.do_build:
+        branch = shell.run_cmd(
+            "git branch | awk -v FS=' ' '/\*/{print $NF}' | sed 's|[()]||g'", return_cmd_output=True).replace("\n", "")
+        commit_id = shell.run_cmd("git rev-parse HEAD", return_cmd_output=True).replace("\n", "")
+
         if options.use_zzz:
             flush_print("Using pre-generated ZAP output")
             zzz_dir = os.path.join(_CHEF_SCRIPT_PATH,
@@ -731,7 +736,7 @@ def main(argv: Sequence[str]) -> None:
                         chip_shell_cmd_server = false
                         chip_build_libshell = true
                         chip_config_network_layer_ble = false
-                        target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.do_rpc else '0'}"]
+                        target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.do_rpc else '0'}", "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\\"{branch}:{commit_id}\\""]
                         """))
             with open(f"{_CHEF_SCRIPT_PATH}/linux/sample.gni", "w") as f:
                 f.write(textwrap.dedent(f"""\
