@@ -84,7 +84,7 @@ struct DeviceControllerSystemStateParams
     // Params that will be deallocated via Platform::Delete in
     // DeviceControllerSystemState::Shutdown.
     DeviceTransportMgr * transportMgr                                             = nullptr;
-    SessionResumptionStorage * sessionResumptionStorage                           = nullptr;
+    Platform::UniquePtr<SessionResumptionStorage> sessionResumptionStorage;
     Credentials::CertificateValidityPolicy * certificateValidityPolicy            = nullptr;
     SessionManager * sessionMgr                                                   = nullptr;
     Protocols::SecureChannel::UnsolicitedStatusHandler * unsolicitedStatusHandler = nullptr;
@@ -114,7 +114,8 @@ public:
         mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable), mCASEServer(params.caseServer),
         mCASESessionManager(params.caseSessionManager), mOperationalDevicePool(params.operationalDevicePool),
         mCASEClientPool(params.caseClientPool), mGroupDataProvider(params.groupDataProvider),
-        mFabricTableDelegate(params.fabricTableDelegate)
+        mFabricTableDelegate(params.fabricTableDelegate),
+        mSessionResumptionStorage(std::move(params.sessionResumptionStorage))
     {
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
@@ -140,7 +141,7 @@ public:
         }
         else if (mRefCount == 0)
         {
-            this->~DeviceControllerSystemState();
+            Platform::Delete(this);
         }
     };
     bool IsInitialized()
@@ -187,6 +188,7 @@ private:
     CASEClientPool * mCASEClientPool                                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider                            = nullptr;
     FabricTable::Delegate * mFabricTableDelegate                                   = nullptr;
+    Platform::UniquePtr<SessionResumptionStorage> mSessionResumptionStorage;
 
     // If mTempFabricTable is not null, it was created during
     // DeviceControllerFactory::InitSystemState and needs to be

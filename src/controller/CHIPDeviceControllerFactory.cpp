@@ -151,13 +151,17 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                             ));
 
     stateParams.sessionMgr                                    = chip::Platform::New<SessionManager>();
-    SimpleSessionResumptionStorage * sessionResumptionStorage = chip::Platform::New<SimpleSessionResumptionStorage>();
-    stateParams.sessionResumptionStorage                      = sessionResumptionStorage;
     stateParams.certificateValidityPolicy                     = params.certificateValidityPolicy;
     stateParams.unsolicitedStatusHandler                      = Platform::New<Protocols::SecureChannel::UnsolicitedStatusHandler>();
     stateParams.exchangeMgr                                   = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager                         = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider                             = params.groupDataProvider;
+
+    // This is constructed with a base class deleter so we can std::move it into
+    // stateParams without a manual conversion below.
+    auto sessionResumptionStorage =
+        std::unique_ptr<SimpleSessionResumptionStorage, Platform::Deleter<chip::SessionResumptionStorage>>(
+            Platform::New<SimpleSessionResumptionStorage>());
 
     // if no fabricTable was provided, create one and track it in stateParams for cleanup
     FabricTable * tempFabricTable = nullptr;
@@ -168,6 +172,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage, params.operationalKeystore));
     }
     ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));
+    stateParams.sessionResumptionStorage = std::move(sessionResumptionStorage);
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
     ReturnErrorOnFailure(delegate->Init(stateParams.sessionMgr, stateParams.groupDataProvider));
@@ -194,7 +199,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
         // Enable listening for session establishment messages.
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
-            stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, stateParams.sessionResumptionStorage,
+            stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, stateParams.sessionResumptionStorage.get(),
             stateParams.certificateValidityPolicy, stateParams.groupDataProvider));
 
         //
@@ -228,7 +233,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     DeviceProxyInitParams deviceInitParams = {
         .sessionManager           = stateParams.sessionMgr,
-        .sessionResumptionStorage = stateParams.sessionResumptionStorage,
+        .sessionResumptionStorage = stateParams.sessionResumptionStorage.get(),
         .exchangeMgr              = stateParams.exchangeMgr,
         .fabricTable              = stateParams.fabricTable,
         .clientPool               = stateParams.caseClientPool,
@@ -246,7 +251,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer, sessionManagerConfig));
 
     // store the system state
-    mSystemState = chip::Platform::New<DeviceControllerSystemState>(stateParams);
+    mSystemState = chip::Platform::New<DeviceControllerSystemState>(std::move(stateParams));
     mSystemState->SetTempFabricTable(tempFabricTable);
     ChipLogDetail(Controller, "System State Initialized...");
     return CHIP_NO_ERROR;
@@ -318,7 +323,6 @@ void DeviceControllerFactory::Shutdown()
     if (mSystemState != nullptr)
     {
         mSystemState->Release();
-        chip::Platform::Delete(mSystemState);
         mSystemState = nullptr;
     }
     mFabricIndependentStorage = nullptr;
