@@ -54,7 +54,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         ChipLogProgress(AppServer, "Commissioning completed successfully");
         DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
         mCommissioningTimeoutTimerArmed = false;
-        Cleanup(/* expireFailSafeTimer */ true);
+        Cleanup();
         mServer->GetSecureSessionManager().ExpireAllPASEPairings();
         // That should have cleared out mPASESession.
 #if CONFIG_NETWORK_LAYER_BLE
@@ -100,14 +100,9 @@ void CommissioningWindowManager::ResetState()
     mCommissioningTimeoutTimerArmed = false;
 }
 
-void CommissioningWindowManager::Cleanup(bool expireFailSafeTimer)
+void CommissioningWindowManager::Cleanup()
 {
     StopAdvertisement(/* aShuttingDown = */ false);
-    if (expireFailSafeTimer)
-    {
-        ExpireFailSafeIfArmed();
-    }
-
     ResetState();
 }
 
@@ -135,7 +130,7 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
     {
         // The commissioning attempts limit was exceeded, or listening for
         // commmissioning connections failed.
-        Cleanup(/* expireFailSafeTimer */ true);
+        Cleanup();
 
         if (mAppDelegate != nullptr)
         {
@@ -277,7 +272,7 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds16 co
     CHIP_ERROR err = OpenCommissioningWindow(commissioningTimeout);
     if (err != CHIP_NO_ERROR)
     {
-        Cleanup(/* expireFailSafeTimer */ true);
+        Cleanup();
     }
 
     return err;
@@ -308,7 +303,7 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(Seconds16
     CHIP_ERROR err = OpenCommissioningWindow(commissioningTimeout);
     if (err != CHIP_NO_ERROR)
     {
-        Cleanup(/* expireFailSafeTimer */ true);
+        Cleanup();
     }
     return err;
 }
@@ -327,7 +322,7 @@ void CommissioningWindowManager::CloseCommissioningWindow()
         }
 #endif
         ChipLogProgress(AppServer, "Closing pairing window");
-        Cleanup(/* expireFailSafeTimer */ false);
+        Cleanup();
     }
 }
 
