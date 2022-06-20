@@ -85,6 +85,7 @@
 //
 #define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 150
 
-#define CONFIG_IM_BUILD_FOR_UNIT_TEST 1
+// Safe to enable this flag since standalone is associated with host and not a device.
+#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
 
 #endif /* CHIPPROJECTCONFIG_H */

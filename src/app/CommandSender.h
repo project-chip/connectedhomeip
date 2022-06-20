@@ -173,7 +173,7 @@ public:
 
     CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     /**
      * Version of AddRequestData that allows sending a message that is
      * guaranteed to fail due to requiring a timed invoke but not providing a
@@ -186,7 +186,7 @@ public:
         mSuppressResponse = aSuppressResponse;
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
     }
-#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
     template <typename CommandDataT>
