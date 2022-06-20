@@ -124,11 +124,6 @@ public:
     /// Determine whether this exchange is a EphemeralExchange for replying a StandaloneAck
     bool IsEphemeralExchange() const;
 
-    // If SetAutoReleaseSession() is called, this exchange must be using a SecureSession, and should
-    // evict it when the exchange is done with all its work (including any MRP traffic).
-    void SetAutoReleaseSession();
-    bool ReleaseSessionOnDestruction();
-
     /**
      * Get the reliable message manager that corresponds to this reliable
      * message context.
@@ -251,16 +246,6 @@ inline void ReliableMessageContext::SetRequestingActiveMode(bool activeMode)
 inline bool ReliableMessageContext::IsEphemeralExchange() const
 {
     return mFlags.Has(Flags::kFlagEphemeralExchange);
-}
-
-inline void ReliableMessageContext::SetAutoReleaseSession()
-{
-    mFlags.Set(Flags::kFlagAutoReleaseSession, true);
-}
-
-inline bool ReliableMessageContext::ReleaseSessionOnDestruction()
-{
-    return mFlags.Has(Flags::kFlagAutoReleaseSession);
 }
 
 } // namespace Messaging

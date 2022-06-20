@@ -376,10 +376,10 @@ void SessionManager::ReleaseSessionsForFabricExceptOne(FabricIndex fabricIndex, 
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetPeer().GetFabricIndex() == fabricIndex)
         {
-            if (session == deferredSecureSession)
-                session->MarkInactive();
-            else
+            if (session != deferredSecureSession)
+            {
                 session->MarkForEviction();
+            }
         }
         return Loop::Continue;
     });

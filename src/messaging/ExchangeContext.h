@@ -184,6 +184,17 @@ public:
     // using this function is recommended.
     void SetResponseTimeout(Timeout timeout);
 
+    // This API is used by commands that need to shut down all existing
+    // sessions/exchanges on a fabric but need to make sure the response to the
+    // command still goes out on the exchange the command came in on.  This API
+    // will ensure that all secure sessions for the fabric this exchanges is on
+    // are released except the one this exchange is using, and will release
+    // that session once this exchange is done sending the response.
+    //
+    // This API is a no-op if called on an exchange that is not using a
+    // SecureSession.
+    void AbortAllOtherCommunicationOnFabric();
+
 private:
     Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate   = nullptr;
@@ -274,7 +285,22 @@ private:
     void UpdateSEDIntervalMode(bool activeMode);
 
     static ExchangeMessageDispatch & GetMessageDispatch(bool isEphemeralExchange, ExchangeDelegate * delegate);
+
+    // If SetAutoReleaseSession() is called, this exchange must be using a SecureSession, and should
+    // evict it when the exchange is done with all its work (including any MRP traffic).
+    inline void SetAutoReleaseSession();
+    inline bool ReleaseSessionOnDestruction();
 };
+
+inline void ExchangeContext::SetAutoReleaseSession()
+{
+    mFlags.Set(Flags::kFlagAutoReleaseSession, true);
+}
+
+inline bool ExchangeContext::ReleaseSessionOnDestruction()
+{
+    return mFlags.Has(Flags::kFlagAutoReleaseSession);
+}
 
 } // namespace Messaging
 } // namespace chip

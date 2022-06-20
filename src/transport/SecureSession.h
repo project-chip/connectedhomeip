@@ -170,8 +170,12 @@ public:
      */
     void MarkAsDefunct();
 
-    // Used to prevent any new exchange created on the session while the existing exchanges finish their work.
-    void MarkInactive();
+    // Used to make the session look like it's being released, while allowing
+    // the passed-in holder (which must be holding this session) to continue
+    // holding it for now until it completes the work it's going.  This API also
+    // puts the session into a state in which no new exchanges can be created on
+    // this session.
+    void MarkInactive(SessionHolder & deferred);
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kSecure; }
 #if CHIP_PROGRESS_LOGGING

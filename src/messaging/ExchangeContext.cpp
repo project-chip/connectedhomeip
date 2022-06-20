@@ -326,7 +326,13 @@ ExchangeContext::~ExchangeContext()
     VerifyOrDie(!IsAckPending());
 
     if (ReleaseSessionOnDestruction() && mSession)
-        mSession->AsSecureSession()->MarkForEviction();
+    {
+        // Move the session out of the older for the eviction, so it doesn't try
+        // to notify us in our destructor.
+        const auto & session = mSession.Get();
+        mSession.Release();
+        session.Value()->AsSecureSession()->MarkForEviction();
+    }
 
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
     // Make sure that the exchange withdraws the request for Sleepy End Device active mode.
@@ -571,6 +577,20 @@ ExchangeMessageDispatch & ExchangeContext::GetMessageDispatch(bool isEphemeralEx
         return delegate->GetMessageDispatch();
 
     return ApplicationExchangeDispatch::Instance();
+}
+
+void ExchangeContext::AbortAllOtherCommunicationOnFabric()
+{
+    if (!mSession || !mSession->IsSecureSession())
+    {
+        return;
+    }
+
+    GetExchangeMgr()->GetSessionManager()->ReleaseSessionsForFabricExceptOne(mSession->GetFabricIndex(), mSession.Get().Value());
+
+    mSession->AsSecureSession()->MarkInactive(mSession);
+
+    SetAutoReleaseSession();
 }
 
 } // namespace Messaging

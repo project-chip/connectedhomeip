@@ -131,7 +131,7 @@ void SecureSession::MarkForEviction()
     }
 }
 
-void SecureSession::MarkInactive()
+void SecureSession::MarkInactive(SessionHolder & deferred)
 {
     ChipLogDetail(Inet, "SecureSession[%p]: MarkInactive Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
                   mLocalSessionId);
@@ -144,12 +144,18 @@ void SecureSession::MarkInactive()
     case State::kDefunct:
         FALLTHROUGH;
     case State::kActive:
+        // Make sure we don't notify "deferred" that we're being removed.  This
+        // ensures that "deferred" is in fact in our holder list.
+        RemoveHolder(deferred);
         // By setting this state, IsActiveSession() will return false, which prevents creating new exchanges.
-        mState = State::kInactive;
+        MoveToState(State::kInactive);
+        NotifySessionReleased();
+        // Add the holder back.
+        AddHolder(deferred);
         return;
     case State::kInactive:
     case State::kPendingEviction:
-        // Do nothing
+        VerifyOrDie(false);
         return;
     }
 }
