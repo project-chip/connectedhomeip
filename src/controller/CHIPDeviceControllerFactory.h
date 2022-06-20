@@ -135,8 +135,9 @@ public:
     //
     // Some clients do not prefer a complete shutdown of the stack being initiated if
     // all device controllers have ceased to exist. To avoid that, this method has been
-    // created to permit retention of the underlying system state to avoid that.
+    // created to permit retention of the underlying system state.
     //
+    // NB: The system state will still be freed in Shutdown() regardless of this call.
     void RetainSystemState() { (void) mSystemState->Retain(); }
 
     //
@@ -212,7 +213,7 @@ public:
     };
 
 private:
-    DeviceControllerFactory(){};
+    DeviceControllerFactory() {}
     void PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params);
     CHIP_ERROR InitSystemState(FactoryInitParams params);
     CHIP_ERROR InitSystemState();

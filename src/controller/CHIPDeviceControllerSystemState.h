@@ -83,8 +83,8 @@ struct DeviceControllerSystemStateParams
 
     // Params that will be deallocated via Platform::Delete in
     // DeviceControllerSystemState::Shutdown.
-    DeviceTransportMgr * transportMgr                                             = nullptr;
-    SessionResumptionStorage * sessionResumptionStorage                           = nullptr;
+    DeviceTransportMgr * transportMgr = nullptr;
+    Platform::UniquePtr<SessionResumptionStorage> sessionResumptionStorage;
     Credentials::CertificateValidityPolicy * certificateValidityPolicy            = nullptr;
     SessionManager * sessionMgr                                                   = nullptr;
     Protocols::SecureChannel::UnsolicitedStatusHandler * unsolicitedStatusHandler = nullptr;
@@ -106,7 +106,12 @@ class DeviceControllerSystemState
     using CASEClientPool        = DeviceControllerSystemStateParams::CASEClientPool;
 
 public:
-    ~DeviceControllerSystemState(){};
+    ~DeviceControllerSystemState() {
+      VerifyOrDie(mRefCount == 0);
+
+      Shutdown();
+    }
+
     DeviceControllerSystemState(DeviceControllerSystemStateParams params) :
         mSystemLayer(params.systemLayer), mTCPEndPointManager(params.tcpEndPointManager),
         mUDPEndPointManager(params.udpEndPointManager), mTransportMgr(params.transportMgr), mSessionMgr(params.sessionMgr),
@@ -114,7 +119,7 @@ public:
         mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable), mCASEServer(params.caseServer),
         mCASESessionManager(params.caseSessionManager), mOperationalDevicePool(params.operationalDevicePool),
         mCASEClientPool(params.caseClientPool), mGroupDataProvider(params.groupDataProvider),
-        mFabricTableDelegate(params.fabricTableDelegate)
+        mFabricTableDelegate(params.fabricTableDelegate), mSessionResumptionStorage(std::move(params.sessionResumptionStorage))
     {
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
@@ -132,15 +137,9 @@ public:
     {
         VerifyOrDie(mRefCount > 0);
 
-        mRefCount--;
-        if (mRefCount == 1)
+        if (--mRefCount == 0)
         {
-            // Only the factory should have a ref now, shutdown and release the underlying objects
             Shutdown();
-        }
-        else if (mRefCount == 0)
-        {
-            this->~DeviceControllerSystemState();
         }
     };
     bool IsInitialized()
@@ -167,7 +166,7 @@ public:
     void SetTempFabricTable(FabricTable * tempFabricTable) { mTempFabricTable = tempFabricTable; }
 
 private:
-    DeviceControllerSystemState(){};
+    DeviceControllerSystemState() {}
 
     System::Layer * mSystemLayer                                   = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * mTCPEndPointManager = nullptr;
@@ -187,13 +186,14 @@ private:
     CASEClientPool * mCASEClientPool                                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider                            = nullptr;
     FabricTable::Delegate * mFabricTableDelegate                                   = nullptr;
+    Platform::UniquePtr<SessionResumptionStorage> mSessionResumptionStorage;
 
     // If mTempFabricTable is not null, it was created during
     // DeviceControllerFactory::InitSystemState and needs to be
     // freed during shutdown
     FabricTable * mTempFabricTable = nullptr;
 
-    std::atomic<uint32_t> mRefCount{ 1 };
+    std::atomic<uint32_t> mRefCount{ 0 };
 
     CHIP_ERROR Shutdown();
 };
