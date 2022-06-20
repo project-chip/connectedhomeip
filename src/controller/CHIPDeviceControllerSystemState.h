@@ -83,7 +83,7 @@ struct DeviceControllerSystemStateParams
 
     // Params that will be deallocated via Platform::Delete in
     // DeviceControllerSystemState::Shutdown.
-    DeviceTransportMgr * transportMgr                                             = nullptr;
+    DeviceTransportMgr * transportMgr = nullptr;
     Platform::UniquePtr<SessionResumptionStorage> sessionResumptionStorage;
     Credentials::CertificateValidityPolicy * certificateValidityPolicy            = nullptr;
     SessionManager * sessionMgr                                                   = nullptr;
@@ -114,8 +114,7 @@ public:
         mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable), mCASEServer(params.caseServer),
         mCASESessionManager(params.caseSessionManager), mOperationalDevicePool(params.operationalDevicePool),
         mCASEClientPool(params.caseClientPool), mGroupDataProvider(params.groupDataProvider),
-        mFabricTableDelegate(params.fabricTableDelegate),
-        mSessionResumptionStorage(std::move(params.sessionResumptionStorage))
+        mFabricTableDelegate(params.fabricTableDelegate), mSessionResumptionStorage(std::move(params.sessionResumptionStorage))
     {
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;

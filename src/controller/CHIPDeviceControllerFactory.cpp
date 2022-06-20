@@ -150,12 +150,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
                                                             ));
 
-    stateParams.sessionMgr                                    = chip::Platform::New<SessionManager>();
-    stateParams.certificateValidityPolicy                     = params.certificateValidityPolicy;
-    stateParams.unsolicitedStatusHandler                      = Platform::New<Protocols::SecureChannel::UnsolicitedStatusHandler>();
-    stateParams.exchangeMgr                                   = chip::Platform::New<Messaging::ExchangeManager>();
-    stateParams.messageCounterManager                         = chip::Platform::New<secure_channel::MessageCounterManager>();
-    stateParams.groupDataProvider                             = params.groupDataProvider;
+    stateParams.sessionMgr                = chip::Platform::New<SessionManager>();
+    stateParams.certificateValidityPolicy = params.certificateValidityPolicy;
+    stateParams.unsolicitedStatusHandler  = Platform::New<Protocols::SecureChannel::UnsolicitedStatusHandler>();
+    stateParams.exchangeMgr               = chip::Platform::New<Messaging::ExchangeManager>();
+    stateParams.messageCounterManager     = chip::Platform::New<secure_channel::MessageCounterManager>();
+    stateParams.groupDataProvider         = params.groupDataProvider;
 
     // This is constructed with a base class deleter so we can std::move it into
     // stateParams without a manual conversion below.
