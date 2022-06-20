@@ -114,7 +114,7 @@ protected:
         SessionHandle session(*this);
         while (!mHolders.Empty())
         {
-            mHolders.begin()->SessionReleased(); // OnSessionReleased must remove the item from the linked list
+            mHolders.begin()->SessionReleased(); // SessionReleased must remove the item from the linked list
         }
     }
 

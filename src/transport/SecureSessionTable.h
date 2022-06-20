@@ -147,7 +147,8 @@ public:
         return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
     }
 
-    // Select SessionHolders which are pointing a session with the same peer as the given session. Shift them the the given session.
+    // Select SessionHolders which are pointing to a session with the same peer as the given session. Shift them to the given
+    // session.
     // This is an internal API, using raw pointer to a session is allowed here.
     void NewerSessionAvailable(SecureSession * session)
     {
@@ -158,10 +159,10 @@ public:
 
             SessionHandle ref(*oldSession);
 
-            // This will update all SessionHolder pointing to oldSession, to the provided session.
+            // This will give all SessionHolders pointing to oldSession a chance to switch to the provided session
             //
-            // See comment of SessionDelegate::GetNewSessionHandlingPolicy about how session auto-shifting works, and how to disable
-            // it for specific SessionHolder in specific scenario.
+            // See documentationon for SessionDelegate::GetNewSessionHandlingPolicy about how session auto-shifting works, and how
+            // to disable it for a specific SessionHolder in a specific scenario.
             if (oldSession->GetSecureSessionType() == SecureSession::Type::kCASE && oldSession->GetPeer() == session->GetPeer() &&
                 oldSession->GetPeerCATs() == session->GetPeerCATs())
             {

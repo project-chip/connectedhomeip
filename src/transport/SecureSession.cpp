@@ -149,11 +149,12 @@ void SecureSession::Release()
 
 void SecureSession::NewerSessionAvailable(const SessionHandle & session)
 {
-    // Shift to the new session, checks are performed by the subclass implementation which is the caller.
+    // Shift to the new session, checks are performed by the the caller SecureSessionTable::NewerSessionAvailable.
     IntrusiveList<SessionHolder>::Iterator iter = mHolders.begin();
     while (iter != mHolders.end())
     {
-        // The iterator can be invalid once it is migrated to another session. So we store its next before it is happening.
+        // The iterator can be invalid once the session holder is migrated to another session. So we store its next value before
+        // notifying the holder.
         IntrusiveList<SessionHolder>::Iterator next = iter;
         ++next;
 

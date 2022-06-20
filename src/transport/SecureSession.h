@@ -209,6 +209,8 @@ public:
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
     // This should be a private API, only meant to be called by SecureSessionTable
+    // Session holders to this session may shift to the target session regarding SessionDelegate::GetNewSessionHandlingPolicy.
+    // It requires that the target sessoin is also a CASE session, having the same peer and CATs as this session.
     void NewerSessionAvailable(const SessionHandle & session);
 
 private:
