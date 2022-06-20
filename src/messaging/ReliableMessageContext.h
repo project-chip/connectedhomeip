@@ -161,7 +161,8 @@ protected:
         /// When set, signifies that this exchange is waiting for a call to SendMessage.
         kFlagWillSendMessage = (1u << 6),
 
-        /// When set, we have had Close() or Abort() called on us already.
+        /// When set, signifies that the exchange is closed. All applications have already lost their refs to the exchange, and the
+        ///           only possible ref is the retrans entry in MPR.
         kFlagClosed = (1u << 7),
 
         /// When set, signifies that the exchange is requesting Sleepy End Device active mode.

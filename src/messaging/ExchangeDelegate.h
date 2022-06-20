@@ -90,17 +90,19 @@ public:
 
     /**
      * @brief
-     *   This function is the protocol callback to invoke when the associated
-     *   exchange context is being closed.
+     *   This function is the protocol callback to invoke when the associated exchange context is being closed.
      *
-     *   If the exchange was in a state where it was expecting a message to be
-     *   sent due to an earlier WillSendMessage call or because the exchange has
-     *   just been created as an initiator, the consumer is holding a reference
-     *   to the exchange and it's the consumer's responsibility to call
-     *   Release() on the exchange at some point.  The usual way this happens is
-     *   that the consumer tries to send its message, that fails, and the
-     *   consumer calls Close() on the exchange.  Calling Close() after an
-     *   OnExchangeClosing() notification is allowed in this situation.
+     *   The exchange is getting released soon after this callback. If there is no message pending in the retrans queue in MRP, the
+     *   exchange will be released immediately after this callback, otherwise the exchange is released after the retrans entry is
+     *   removed, by either receiving an acknowledgment or give up. There is no way to prevent the exchange from releasing at this
+     *   stage.
+     *
+     *   The user do not need to call Close or Abort to release the reference when this callback is triggered, the reference is
+     *   already released. The user can call Abort if it want to clear the retrans entry of the last message, and speed up releasing
+     *   the exchange.
+     *
+     *   The user MUST release all pointers to the exchange in the callback, because the exchange is getting release soon, or else
+     *   they become dangling pointer.
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */

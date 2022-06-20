@@ -228,16 +228,38 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     }
 }
 
-void ExchangeContext::DoClose(bool clearRetransTable)
+void ExchangeContext::DoClose(bool clearRetransTable, bool shouldCallResponseTimout)
 {
-    mFlags.Set(Flags::kFlagClosed);
+    // Hold a ref to ourselves so we can make calls into our delegate that might
+    // decrease our refcount without worrying about use-after-free.
+    ExchangeHandle ref(*this);
 
-    // Clear protocol callbacks
-    if (mDelegate != nullptr)
+    VerifyOrDie(!mFlags.Has(Flags::kFlagClosed));
+    mFlags.Set(Flags::kFlagClosed);
+    // This releases refcount assigned in constructor. The initial refcount is associated with kFlagClosed. The DoClose function is
+    // not re-entrant, it is triggered once and only once when kFlagClosed is changing from false to ture.
+    Release();
+
+    bool callResponseTimout = false;
+
+    if (IsResponseExpected())
     {
-        mDelegate->OnExchangeClosing(this);
+        // The application has closed the exchange, call its response timeout callback.
+        CancelResponseTimer();
+        SetResponseExpected(false);
+
+        // If we trigger the callback here and the user calls Close or Abort in the callback, it becomes too complicated to handle.
+        // Defer OnResponseTimeout callback until we have committed our state.
+        callResponseTimout = true;
     }
-    mDelegate = nullptr;
+    else
+    {
+        // Either we're expecting a send or we are in our "just allocated, first send has not happened yet" state.
+        if (IsSendExpected())
+        {
+            mFlags.Clear(Flags::kFlagWillSendMessage);
+        }
+    }
 
     // Closure of an exchange context is based on ref counting. The Protocol, when it calls DoClose(), indicates that
     // it is done with the exchange context and the message layer sets all callbacks to NULL and does not send anything
@@ -252,42 +274,51 @@ void ExchangeContext::DoClose(bool clearRetransTable)
         mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
     }
 
-    // Cancel the response timer.
-    CancelResponseTimer();
+    // Call deferred OnResponseTimeout
+    if (mDelegate != nullptr && callResponseTimout && shouldCallResponseTimout)
+        mDelegate->OnResponseTimeout(this);
+
+    // Check for mDelegate again, because mDelegate can be cleared during OnResponseTimeout event
+    if (mDelegate != nullptr)
+        mDelegate->OnExchangeClosing(this);
+
+    mDelegate = nullptr;
 }
 
-/**
- *  Gracefully close an exchange context. This call decrements the
- *  reference count and releases the exchange when the reference
- *  count goes to zero.
- *
- */
 void ExchangeContext::Close()
 {
-    VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
+    if (mFlags.Has(Flags::kFlagClosed))
+    {
+        return;
+    }
 
-#if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec - close[" ChipLogFormatExchange "], %s", ChipLogValueExchange(this), __func__);
-#endif
+    if (IsResponseExpected())
+    {
+        // Close should not be called on a exchange which is waiting for a response. In normal procedure, close can only be called
+        // when an exchange is finishing its work. There is no chance that an exchange is finishing its work while waiting for a
+        // response.
+        //
+        // This is caused by a faulty implementation of an application, leave a error message for the application to fix it.
+        ChipLogError(ExchangeManager, "Close called when waiting for response on exchange " ChipLogFormatExchange,
+                     ChipLogValueExchange(this));
+    }
 
-    DoClose(false);
-    Release();
+    // The graceful shutdown should take care of retransmitting the last message using MRP.
+    // Do not trigger OnResponseTimeout when user is closing the exchange.
+    DoClose(false /* clearRetransTable */, false /* shouldCallResponseTimout */);
 }
-/**
- *  Abort the Exchange context immediately and release all
- *  references to it.
- *
- */
+
 void ExchangeContext::Abort()
 {
-    VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
+    if (mFlags.Has(Flags::kFlagClosed))
+    {
+        // Exchange is already being closed. It may occur when Abort is called on a closed exchange.
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
+        return;
+    }
 
-#if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec - abort[" ChipLogFormatExchange "], %s", ChipLogValueExchange(this), __func__);
-#endif
-
-    DoClose(true);
-    Release();
+    // Do not trigger OnResponseTimeout when user is aborting the exchange.
+    DoClose(true /* clearRetransTable */, false /* shouldCallResponseTimout */);
 }
 
 void ExchangeContextDeletor::Release(ExchangeContext * ec)
@@ -307,6 +338,8 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     mSession.Grab(session);
     mFlags.Set(Flags::kFlagInitiator, Initiator);
     mFlags.Set(Flags::kFlagEphemeralExchange, isEphemeralExchange);
+    if (!isEphemeralExchange && Initiator)
+        WillSendMessage();
     mDelegate = delegate;
 
     SetAckPending(false);
@@ -333,11 +366,6 @@ ExchangeContext::~ExchangeContext()
     UpdateSEDIntervalMode(false);
 #endif
 
-    // Ideally, in this scenario, the retransmit table should
-    // be clear of any outstanding messages for this context and
-    // the boolean parameter passed to DoClose() should not matter.
-
-    DoClose(false);
     mExchangeMgr = nullptr;
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
@@ -373,40 +401,12 @@ void ExchangeContext::OnSessionReleased()
 {
     if (mFlags.Has(Flags::kFlagClosed))
     {
-        // Exchange is already being closed. It may occur when closing an exchange after sending
-        // RemoveFabric response which triggers removal of all sessions for the given fabric.
+        // Exchange is already closed.
         mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
         return;
     }
 
-    // Hold a ref to ourselves so we can make calls into our delegate that might
-    // decrease our refcount without worrying about use-after-free.
-    ExchangeHandle ref(*this);
-
-    if (IsResponseExpected())
-    {
-        // If we're waiting on a response, we now know it's never going to show up
-        // and we should notify our delegate accordingly.
-        CancelResponseTimer();
-        // We want to Abort, not just Close, so that RMP bits are cleared, so
-        // don't let NotifyResponseTimeout close us.
-        NotifyResponseTimeout(/* aCloseIfNeeded = */ false);
-        Abort();
-    }
-    else
-    {
-        // Either we're expecting a send or we are in our "just allocated, first
-        // send has not happened yet" state.
-        //
-        // Just mark ourselves as closed.  The consumer is responsible for
-        // releasing us.  See documentation for
-        // ExchangeDelegate::OnExchangeClosing.
-        if (IsSendExpected())
-        {
-            mFlags.Clear(Flags::kFlagWillSendMessage);
-        }
-        DoClose(true /* clearRetransTable */);
-    }
+    DoClose(true /* clearRetransTable */, true /* shouldCallResponseTimout */);
 }
 
 CHIP_ERROR ExchangeContext::StartResponseTimer()
@@ -440,10 +440,10 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
     if (ec == nullptr)
         return;
 
-    ec->NotifyResponseTimeout(/* aCloseIfNeeded = */ true);
+    ec->NotifyResponseTimeout();
 }
 
-void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
+void ExchangeContext::NotifyResponseTimeout()
 {
     SetResponseExpected(false);
 
@@ -455,10 +455,7 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
         delegate->OnResponseTimeout(this);
     }
 
-    if (aCloseIfNeeded)
-    {
-        MessageHandled();
-    }
+    MessageHandled();
 }
 
 CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader, MessageFlags msgFlags,

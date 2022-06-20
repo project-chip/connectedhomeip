@@ -165,12 +165,10 @@ public:
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
-    /*
-     * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange
-     * can hold onto it while it's out of their direct control to make sure it isn't closed before everyone's ready.
-     * A customized version of reference counting is used since there are some extra stuff to do within Release.
-     */
+    /// @brief Gracefully close an exchange context. This function can be call at any time on a valid exchange.
     void Close();
+
+    /// @brief Abort the Exchange context immediately. This function can be call at any time on a valid exchange.
     void Abort();
 
     // Applies a suggested response timeout value based on the session type and the given upper layer processing time for
@@ -239,14 +237,14 @@ private:
      * response.  If aCloseIfNeeded is true, check whether the exchange needs to
      * be closed.
      */
-    void NotifyResponseTimeout(bool aCloseIfNeeded);
+    void NotifyResponseTimeout();
 
     CHIP_ERROR StartResponseTimer();
 
     void CancelResponseTimer();
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState);
 
-    void DoClose(bool clearRetransTable);
+    void DoClose(bool clearRetransTable, bool shouldCallResponseTimout);
 
     /**
      * We have handled an application-level message in some way and should
