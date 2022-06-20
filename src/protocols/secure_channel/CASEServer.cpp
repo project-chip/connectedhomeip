@@ -132,8 +132,7 @@ void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyE
     //
     VerifyOrDie(GetSession().PrepareForSessionEstablishment(*mSessionManager, mFabrics, mSessionResumptionStorage,
                                                             mCertificateValidityPolicy, this, previouslyEstablishedPeer,
-                                                            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())) ==
-                CHIP_NO_ERROR);
+                                                            GetLocalMRPConfig()) == CHIP_NO_ERROR);
 
     //
     // PairingSession::mSecureSessionHolder is a weak-reference. If MarkForEviction is called on this session, the session is

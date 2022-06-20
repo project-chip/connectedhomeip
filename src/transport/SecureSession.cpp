@@ -40,11 +40,11 @@ void SecureSession::Activate(const ScopedNodeId & localNode, const ScopedNodeId 
     VerifyOrDie(!((mSecureSessionType == Type::kCASE) &&
                   (!IsOperationalNodeId(peerNode.GetNodeId()) || !IsOperationalNodeId(localNode.GetNodeId()))));
 
-    mPeerNodeId    = peerNode.GetNodeId();
-    mLocalNodeId   = localNode.GetNodeId();
-    mPeerCATs      = peerCATs;
-    mPeerSessionId = peerSessionId;
-    mMRPConfig     = config;
+    mPeerNodeId      = peerNode.GetNodeId();
+    mLocalNodeId     = localNode.GetNodeId();
+    mPeerCATs        = peerCATs;
+    mPeerSessionId   = peerSessionId;
+    mRemoteMRPConfig = config;
     SetFabricIndex(peerNode.GetFabricIndex());
 
     Retain(); // This ref is released inside MarkForEviction
