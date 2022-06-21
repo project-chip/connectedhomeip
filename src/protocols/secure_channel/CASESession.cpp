@@ -193,7 +193,7 @@ CHIP_ERROR
 CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabricTable,
                                             SessionResumptionStorage * sessionResumptionStorage,
                                             Credentials::CertificateValidityPolicy * policy,
-                                            SessionEstablishmentDelegate * delegate, ScopedNodeId previouslyEstablishedPeer,
+                                            SessionEstablishmentDelegate * delegate, const ScopedNodeId & previouslyEstablishedPeer,
                                             Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     // Below VerifyOrReturnError is not SuccessOrExit since we only want to goto `exit:` after

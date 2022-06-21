@@ -322,7 +322,7 @@ async function asTypedExpression(value, type)
   return `static_cast<${resultType}>(${value})`;
 }
 
-async function asTypedLiteral(value, type)
+async function asTypedLiteral(value, type, cookie)
 {
   const valueIsANumber = !isNaN(value);
   if (!valueIsANumber) {
@@ -335,6 +335,7 @@ async function asTypedLiteral(value, type)
     return value + 'L';
   case 'int64_t':
     return value + 'LL';
+  case 'uint8_t':
   case 'uint16_t':
     return value + 'U';
   case 'uint32_t':

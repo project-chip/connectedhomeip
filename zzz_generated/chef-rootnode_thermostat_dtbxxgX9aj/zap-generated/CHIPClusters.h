@@ -37,13 +37,6 @@ public:
     ~BindingCluster() {}
 };
 
-class DLL_EXPORT FanControlCluster : public ClusterBase
-{
-public:
-    FanControlCluster() : ClusterBase(app::Clusters::FanControl::Id) {}
-    ~FanControlCluster() {}
-};
-
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
@@ -51,11 +44,18 @@ public:
     ~OtaSoftwareUpdateProviderCluster() {}
 };
 
-class DLL_EXPORT OccupancySensingCluster : public ClusterBase
+class DLL_EXPORT FanControlCluster : public ClusterBase
 {
 public:
-    OccupancySensingCluster() : ClusterBase(app::Clusters::OccupancySensing::Id) {}
-    ~OccupancySensingCluster() {}
+    FanControlCluster() : ClusterBase(app::Clusters::FanControl::Id) {}
+    ~FanControlCluster() {}
+};
+
+class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
+{
+public:
+    TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
+    ~TemperatureMeasurementCluster() {}
 };
 
 class DLL_EXPORT RelativeHumidityMeasurementCluster : public ClusterBase
@@ -65,11 +65,11 @@ public:
     ~RelativeHumidityMeasurementCluster() {}
 };
 
-class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
+class DLL_EXPORT OccupancySensingCluster : public ClusterBase
 {
 public:
-    TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
-    ~TemperatureMeasurementCluster() {}
+    OccupancySensingCluster() : ClusterBase(app::Clusters::OccupancySensing::Id) {}
+    ~OccupancySensingCluster() {}
 };
 
 } // namespace Controller

@@ -87,7 +87,7 @@ public:
     CHIP_ERROR PrepareForSessionEstablishment(
         SessionManager & sessionManager, FabricTable * fabricTable, SessionResumptionStorage * sessionResumptionStorage,
         Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
-        ScopedNodeId previouslyEstablishedPeer,
+        const ScopedNodeId & previouslyEstablishedPeer,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**

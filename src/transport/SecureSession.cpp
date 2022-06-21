@@ -26,25 +26,106 @@ void SecureSessionDeleter::Release(SecureSession * entry)
     entry->mTable.ReleaseSession(entry);
 }
 
-void SecureSession::MarkForRemoval()
+const char * SecureSession::StateToString(State state) const
 {
-    ChipLogDetail(Inet, "SecureSession[%p]: MarkForRemoval Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
+    switch (state)
+    {
+    case State::kEstablishing:
+        return "kEstablishing";
+        break;
+
+    case State::kActive:
+        return "kActive";
+        break;
+
+    case State::kDefunct:
+        return "kDefunct";
+        break;
+
+    case State::kPendingEviction:
+        return "kPendingEviction";
+        break;
+
+    default:
+        return "???";
+        break;
+    }
+}
+
+void SecureSession::MoveToState(State targetState)
+{
+    if (mState != targetState)
+    {
+        ChipLogProgress(SecureChannel, "SecureSession[%p]: Moving from state '%s' --> '%s'", this, StateToString(mState),
+                        StateToString(targetState));
+        mState = targetState;
+    }
+}
+
+void SecureSession::MarkAsDefunct()
+{
+    ChipLogDetail(Inet, "SecureSession[%p]: MarkAsDefunct Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
                   mLocalSessionId);
     ReferenceCountedHandle<Transport::Session> ref(*this);
+
     switch (mState)
     {
-    case State::kPairing:
-        mState = State::kPendingRemoval;
+    case State::kEstablishing:
+        //
+        // A session can only be marked as defunct from the state of Active.
+        //
+        VerifyOrDie(false);
+        return;
+
+    case State::kActive:
+        MoveToState(State::kDefunct);
+        return;
+
+    case State::kDefunct:
+        //
+        // Do nothing
+        //
+        return;
+
+    case State::kInactive:
+        //
+        // Once a session is marked Inactive, we CANNOT bring it back to either being active or defunct.
+        //
+        FALLTHROUGH;
+    case State::kPendingEviction:
+        //
+        // Once a session is headed for eviction, we CANNOT bring it back to either being active or defunct.
+        //
+        VerifyOrDie(false);
+        return;
+    }
+}
+
+void SecureSession::MarkForEviction()
+{
+    ChipLogDetail(Inet, "SecureSession[%p]: MarkForEviction Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
+                  mLocalSessionId);
+    ReferenceCountedHandle<Transport::Session> ref(*this);
+
+    switch (mState)
+    {
+    case State::kEstablishing:
+        MoveToState(State::kPendingEviction);
         // Interrupt the pairing
         NotifySessionReleased();
         return;
+
+    case State::kDefunct:
+        FALLTHROUGH;
     case State::kActive:
+        FALLTHROUGH;
     case State::kInactive:
         Release(); // Decrease the ref which is retained at Activate
-        mState = State::kPendingRemoval;
+        MoveToState(State::kPendingEviction);
         NotifySessionReleased();
         return;
-    case State::kPendingRemoval:
+
+    case State::kPendingEviction:
         // Do nothing
         return;
     }
@@ -57,15 +138,17 @@ void SecureSession::MarkInactive()
     ReferenceCountedHandle<Transport::Session> ref(*this);
     switch (mState)
     {
-    case State::kPairing:
+    case State::kEstablishing:
         VerifyOrDie(false);
         return;
+    case State::kDefunct:
+        FALLTHROUGH;
     case State::kActive:
         // By setting this state, IsActiveSession() will return false, which prevents creating new exchanges.
         mState = State::kInactive;
         return;
     case State::kInactive:
-    case State::kPendingRemoval:
+    case State::kPendingEviction:
         // Do nothing
         return;
     }

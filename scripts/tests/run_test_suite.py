@@ -235,14 +235,14 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
         for test in context.obj.tests:
-            test_start = time.time()
+            test_start = time.monotonic()
             try:
                 test.Run(runner, apps_register, paths, pics_file)
-                test_end = time.time()
+                test_end = time.monotonic()
                 logging.info('%-20s - Completed in %0.2f seconds' %
                              (test.name, (test_end - test_start)))
             except Exception:
-                test_end = time.time()
+                test_end = time.monotonic()
                 logging.exception('%s - FAILED in %0.2f seconds' %
                                   (test.name, (test_end - test_start)))
                 apps_register.uninit()
