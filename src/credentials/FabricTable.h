@@ -410,22 +410,6 @@ public:
      */
     CHIP_ERROR SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime);
 
-    /*
-     * Commit the Last Known Good Time by deleting the fail-safe backup from
-     * storage.
-     *
-     * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
-     */
-    CHIP_ERROR CommitLastKnownGoodChipEpochTime() { return mLastKnownGoodTime.CommitLastKnownGoodChipEpochTime(); }
-
-    /*
-     * Revert the Last Known Good Time to the fail-safe backup value in
-     * persistence if any exists.
-     *
-     * @return CHIP_NO_ERROR on success, else an appopriate CHIP_ERROR
-     */
-    CHIP_ERROR RevertLastKnownGoodChipEpochTime() { return mLastKnownGoodTime.RevertLastKnownGoodChipEpochTime(); }
-
     uint8_t FabricCount() const { return mFabricCount; }
 
     ConstFabricIterator cbegin() const { return ConstFabricIterator(mStates, 0, CHIP_CONFIG_MAX_FABRICS); }
@@ -748,8 +732,6 @@ private:
     FabricIndex mFabricIndexWithPendingState = kUndefinedFabricIndex;
 
     LastKnownGoodTime mLastKnownGoodTime;
-    // Pneding last known good time gathered from the last pending cert operations
-    System::Clock::Seconds32 mPendingLastKnownGoodTime;
 
     // We may not have an mNextAvailableFabricIndex if our table is as large as
     // it can go and is full.
