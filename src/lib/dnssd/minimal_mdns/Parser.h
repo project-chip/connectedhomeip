@@ -42,10 +42,12 @@ public:
     QClass GetClass() const { return mClass; }
     bool RequestedUnicastAnswer() const { return mAnswerViaUnicast; }
 
-    /// Boot advertisement is an internal query meant to advertise all available
-    /// services at device startup time.
-    bool IsBootAdvertising() const { return mIsBootAdvertising; }
-    void SetIsBootAdvertising(bool isBootAdvertising) { mIsBootAdvertising = isBootAdvertising; }
+    /// Internal broadcasts will advertise all available data and will not apply
+    /// any broadcast filtering. Intent is for paths such as:
+    ///   - boot time advertisement: advertise all services available
+    ///   - stop-time advertisement: advertise a TTL of 0 as services are removed
+    bool IsInternalBroadcast() const { return mIsInternalBroadcast; }
+    void SetIsInternalBroadcast(bool isInternalBroadcast) { mIsInternalBroadcast = isInternalBroadcast; }
 
     SerializedQNameIterator GetName() const { return mNameIterator; }
 
@@ -65,9 +67,9 @@ private:
     bool mAnswerViaUnicast = false;
     SerializedQNameIterator mNameIterator;
 
-    /// Flag as a boot-time internal query. This allows query replies
-    /// to be built accordingly.
-    bool mIsBootAdvertising = false;
+    /// Flag as an internal broadcast, controls reply construction (e.g. no
+    /// filtering applied)
+    bool mIsInternalBroadcast = false;
 };
 
 class ResourceData

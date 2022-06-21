@@ -27,8 +27,7 @@ def zap_cmd_handler(args: argparse.Namespace) -> None:
     elif args.rename_file:
         name = zap_file_parser.generate_name(zap_file_path)
         dirpath = os.path.dirname(zap_file_path)
-        hash_string = zap_file_parser.generate_hash(zap_file_path)
-        output_path = os.path.join(dirpath, f"{name}-{hash_string}.zap")
+        output_path = os.path.join(dirpath, f"{name}.zap")
         shutil.move(zap_file_path, output_path)
         print(f"Renamed from: {zap_file_path} to {output_path}")
     elif args.generate_hash_metadata:

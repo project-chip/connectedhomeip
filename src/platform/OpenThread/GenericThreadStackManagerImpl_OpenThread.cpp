@@ -2075,11 +2075,11 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     size_t entryId                           = 0;
     FixedBufferAllocator alloc;
 
-    Impl()->LockThreadStack();
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(aInstanceName, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aName, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(mSrpClient.mIsInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
-    VerifyOrExit(aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(aName, error = CHIP_ERROR_INVALID_ARGUMENT);
+    Impl()->LockThreadStack();
 
     // Try to find an empty slot in array for the new service and
     // remove the possible existing entry from anywhere in the list
@@ -2168,12 +2168,11 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveSrpServic
     CHIP_ERROR error                         = CHIP_NO_ERROR;
     typename SrpClient::Service * srpService = nullptr;
 
-    VerifyOrExit(mSrpClient.mIsInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(aInstanceName, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aName, CHIP_ERROR_INVALID_ARGUMENT);
 
     Impl()->LockThreadStack();
-
-    VerifyOrExit(aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(aName, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Check if service to remove exists.
     for (typename SrpClient::Service & service : mSrpClient.mServices)
@@ -2218,7 +2217,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSr
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    VerifyOrExit(mSrpClient.mIsInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
 
     Impl()->LockThreadStack();
 
@@ -2244,7 +2243,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
     CHIP_ERROR error = CHIP_NO_ERROR;
     Inet::IPAddress hostAddress;
 
-    VerifyOrExit(mSrpClient.mIsInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
 
     Impl()->LockThreadStack();
 

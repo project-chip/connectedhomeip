@@ -21,19 +21,23 @@
 namespace mdns {
 namespace Minimal {
 
-void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate)
+void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
+                                    const ResponseConfiguration & configuration)
 {
     chip::Inet::IPAddress addr;
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
         if ((it.GetInterfaceId() == source->Interface) && (it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv4())
         {
-            delegate->AddResponse(IPResourceRecord(GetQName(), addr));
+            IPResourceRecord record(GetQName(), addr);
+            configuration.Adjust(record);
+            delegate->AddResponse(record);
         }
     }
 }
 
-void IPv6Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate)
+void IPv6Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
+                                    const ResponseConfiguration & configuration)
 {
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
@@ -45,7 +49,9 @@ void IPv6Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, Res
         chip::Inet::IPAddress addr;
         if ((it.GetInterfaceId() == source->Interface) && (it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv6())
         {
-            delegate->AddResponse(IPResourceRecord(GetQName(), addr));
+            IPResourceRecord record(GetQName(), addr);
+            configuration.Adjust(record);
+            delegate->AddResponse(record);
         }
     }
 }

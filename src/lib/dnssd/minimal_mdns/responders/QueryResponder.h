@@ -252,7 +252,8 @@ public:
     /// Implementation of the responder delegate.
     ///
     /// Adds responses for all known _dns-sd services.
-    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override;
+    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
+                         const ResponseConfiguration & configuration) override;
 
     QueryResponderIterator begin(QueryResponderRecordFilter * filter)
     {

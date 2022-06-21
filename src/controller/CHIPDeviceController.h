@@ -45,6 +45,7 @@
 #include <credentials/FabricTable.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -63,8 +64,6 @@
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
-
-#include <controller/CHIPDeviceControllerSystemState.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -170,6 +169,18 @@ public:
 
     /**
      * This function finds the device corresponding to peerNodeId, and establishes
+     * @brief
+     *   Looks up the PeerAddress for an established CASE session.
+     *
+     * @param[in] nodeId the PeerId of the session to be found
+     * @param[out] addr the PeerAddress to be filled on success
+     *
+     * @return CHIP_ERROR CHIP_ERROR_NOT_CONNECTED if no CASE session exists for the device
+     */
+    CHIP_ERROR GetPeerAddress(NodeId nodeId, Transport::PeerAddress & addr);
+
+    /**
+     * This function finds the device corresponding to deviceId, and establishes
      * a CASE session with it.
      *
      * Once the CASE session is successfully established the `onConnectedDevice`

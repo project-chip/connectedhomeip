@@ -448,6 +448,9 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
                         static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
                         ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
     }
+
+    // This is triggered by operation credential server so there is nothing additional that we need to do.
+    void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
 };
 
 OpCredsFabricTableDelegate gFabricDelegate;

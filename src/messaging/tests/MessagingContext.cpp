@@ -64,6 +64,9 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
         ReturnErrorOnFailure(CreateSessionBobToAlice());
         ReturnErrorOnFailure(CreateSessionAliceToBob());
         ReturnErrorOnFailure(CreateSessionBobToFriends());
+
+        ReturnErrorOnFailure(CreatePASESessionCharlieToDavid());
+        ReturnErrorOnFailure(CreatePASESessionDavidToCharlie());
     }
 
     return CHIP_NO_ERROR;
@@ -109,6 +112,20 @@ CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
                                                         mAliceFabricIndex, mBobAddress, CryptoContext::SessionRole::kResponder);
 }
 
+CHIP_ERROR MessagingContext::CreatePASESessionCharlieToDavid()
+{
+    return mSessionManager.InjectPaseSessionWithTestKey(mSessionCharlieToDavid, kCharlieKeyId, 0xdeadbeef, kDavidKeyId,
+                                                        kUndefinedFabricIndex, mDavidAddress,
+                                                        CryptoContext::SessionRole::kInitiator);
+}
+
+CHIP_ERROR MessagingContext::CreatePASESessionDavidToCharlie()
+{
+    return mSessionManager.InjectPaseSessionWithTestKey(mSessionDavidToCharlie, kDavidKeyId, 0xcafe, kCharlieKeyId,
+                                                        kUndefinedFabricIndex, mCharlieAddress,
+                                                        CryptoContext::SessionRole::kResponder);
+}
+
 CHIP_ERROR MessagingContext::CreateSessionBobToFriends()
 {
     mSessionBobToFriends.Emplace(GetFriendsGroupId(), mBobFabricIndex);
@@ -127,6 +144,18 @@ SessionHandle MessagingContext::GetSessionAliceToBob()
     return std::move(sessionHandle.Value());
 }
 
+SessionHandle MessagingContext::GetSessionCharlieToDavid()
+{
+    auto sessionHandle = mSessionCharlieToDavid.Get();
+    return std::move(sessionHandle.Value());
+}
+
+SessionHandle MessagingContext::GetSessionDavidToCharlie()
+{
+    auto sessionHandle = mSessionDavidToCharlie.Get();
+    return std::move(sessionHandle.Value());
+}
+
 SessionHandle MessagingContext::GetSessionBobToFriends()
 {
     return SessionHandle(mSessionBobToFriends.Value());
@@ -136,7 +165,7 @@ void MessagingContext::ExpireSessionBobToAlice()
 {
     if (mSessionBobToAlice)
     {
-        mSessionManager.ExpirePairing(mSessionBobToAlice.Get().Value());
+        mSessionBobToAlice.Get().Value()->AsSecureSession()->MarkForEviction();
     }
 }
 
@@ -144,7 +173,7 @@ void MessagingContext::ExpireSessionAliceToBob()
 {
     if (mSessionAliceToBob)
     {
-        mSessionManager.ExpirePairing(mSessionAliceToBob.Get().Value());
+        mSessionAliceToBob.Get().Value()->AsSecureSession()->MarkForEviction();
     }
 }
 

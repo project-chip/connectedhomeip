@@ -38,7 +38,7 @@ class EmptyResponder : public RecordResponder
 {
 public:
     EmptyResponder(const FullQName & qName) : RecordResponder(QType::NULLVALUE, qName) {}
-    void AddAllResponses(const chip::Inet::IPPacketInfo *, ResponderDelegate *) override {}
+    void AddAllResponses(const chip::Inet::IPPacketInfo *, ResponderDelegate *, const ResponseConfiguration &) override {}
 };
 
 class DnssdReplyAccumulator : public ResponderDelegate
@@ -111,7 +111,7 @@ void RespondsToDnsSdQueries(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, responder.GetQName() == kDnsSdname);
 
     DnssdReplyAccumulator accumulator(inSuite);
-    responder.AddAllResponses(nullptr, &accumulator);
+    responder.AddAllResponses(nullptr, &accumulator, ResponseConfiguration());
 
     NL_TEST_ASSERT(inSuite, accumulator.Captures().size() == 2);
     if (accumulator.Captures().size() == 2)
@@ -160,7 +160,7 @@ void NonDiscoverableService(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, responder.AddResponder(&empty2).SetReportInServiceListing(true).IsValid());
 
     DnssdReplyAccumulator accumulator(inSuite);
-    responder.AddAllResponses(nullptr, &accumulator);
+    responder.AddAllResponses(nullptr, &accumulator, ResponseConfiguration());
 
     NL_TEST_ASSERT(inSuite, accumulator.Captures().size() == 1);
     if (accumulator.Captures().size() == 1)

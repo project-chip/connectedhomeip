@@ -454,6 +454,12 @@ private:
             (void) fabricIndex;
         }
 
+        void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+        {
+            (void) fabricTable;
+            (void) fabricIndex;
+        }
+
     private:
         Server * mServer = nullptr;
     };

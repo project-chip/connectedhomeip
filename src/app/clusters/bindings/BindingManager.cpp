@@ -48,6 +48,9 @@ class BindingFabricTableDelegate : public chip::FabricTable::Delegate
 
     // Intentionally left blank
     void OnFabricPersistedToStorage(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
+
+    // Intentionally left blank
+    void OnFabricNOCUpdated(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
 };
 
 BindingFabricTableDelegate gFabricTableDelegate;

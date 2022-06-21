@@ -41,7 +41,7 @@ _CHEF_ZZZ_ROOT = os.path.join(_CHEF_SCRIPT_PATH, "zzz_generated")
 _CI_DEVICE_MANIFEST_NAME = "INPUTMD5.txt"
 _CI_ZAP_MANIFEST_NAME = "ZAPSHA.txt"
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_meta.json")
-_CI_ALLOW_LIST = ["lighting-app"]
+_CI_ALLOW_LIST = ["rootnode_dimmablelight_gY80DaqEUL"]
 
 gen_dir = ""  # Filled in after sample app type is read from args.
 
@@ -231,7 +231,8 @@ def main(argv: Sequence[str]) -> None:
     parser.add_option("-g", "--zapgui", help="runs zap GUI display to allow editing of data model",
                       action="store_true", dest="do_run_gui")
     parser.add_option("-d", "--device", dest="sample_device_type_name",
-                      help="specifies device type. Default is lighting. See info above for supported device types", metavar="TARGET", default="lighting")
+                      help="specifies device type. Default is lighting. See info above for supported device types",
+                      metavar="TARGET", choices=_DEVICE_LIST)
     parser.add_option("-t", "--target", type='choice',
                       action='store',
                       dest="build_target",

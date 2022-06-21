@@ -187,6 +187,8 @@ protected:
      */
     CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader);
 
+    bool IsSessionEstablishmentInProgress();
+
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear();
 

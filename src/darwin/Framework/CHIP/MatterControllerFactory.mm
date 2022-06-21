@@ -45,6 +45,7 @@ using namespace chip::Controller;
 
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
 static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
+static NSString * const kErrorDACVerifierInit = @"Init failure while creating the device attestation verifier";
 static NSString * const kInfoFactoryShutdown = @"Shutting down the Matter controller factory";
 static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
 static NSString * const kErrorControllersInit = @"Init controllers array failure";
@@ -64,6 +65,7 @@ static NSString * const kErrorKeystoreInit = @"Init failure while initializing p
 @property (readonly) Credentials::GroupDataProviderImpl * groupDataProvider;
 @property (readonly) NSMutableArray<CHIPDeviceController *> * controllers;
 @property (readonly) PersistentStorageOperationalKeystore * keystore;
+@property () chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier;
 
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
                     params:(CHIPDeviceControllerStartupParams *)params
@@ -156,6 +158,11 @@ static NSString * const kErrorKeystoreInit = @"Init failure while initializing p
 
 - (void)cleanupStartupObjects
 {
+    if (_deviceAttestationVerifier) {
+        delete _deviceAttestationVerifier;
+        _deviceAttestationVerifier = nullptr;
+    }
+
     if (_attestationTrustStoreBridge) {
         delete _attestationTrustStoreBridge;
         _attestationTrustStoreBridge = nullptr;
@@ -209,17 +216,22 @@ static NSString * const kErrorKeystoreInit = @"Init failure while initializing p
         }
 
         // Initialize device attestation verifier
+        const Credentials::AttestationTrustStore * trustStore;
         if (startupParams.paaCerts) {
             _attestationTrustStoreBridge = new CHIPAttestationTrustStoreBridge(startupParams.paaCerts);
             if (_attestationTrustStoreBridge == nullptr) {
                 CHIP_LOG_ERROR("Error: %@", kErrorAttestationTrustStoreInit);
                 return;
             }
-            chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(_attestationTrustStoreBridge));
+            trustStore = _attestationTrustStoreBridge;
         } else {
             // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-            const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-            chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
+            trustStore = Credentials::GetTestAttestationTrustStore();
+        }
+        _deviceAttestationVerifier = new Credentials::DefaultDACVerifier(trustStore);
+        if (_deviceAttestationVerifier == nullptr) {
+            CHIP_LOG_ERROR("Error: %@", kErrorDACVerifierInit);
+            return;
         }
 
         chip::Controller::FactoryInitParams params;

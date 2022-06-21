@@ -28,7 +28,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -38,7 +38,9 @@ tests:
 
     ##if condition needed #Issue 10988
     - label: "Read the optional global attribute constraints: FeatureMap"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS:
+          PICS_SKIP_SAMPLE_APP && (TSTAT_HEAT || TSTAT_COOL || TSTAT_OCC ||
+          TSTAT_SCH || TSTAT_SB || TSTAT_AUTO)
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -70,26 +72,16 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    #Issue 17971
     - label: "Read the global attribute: AcceptedCommandList"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
 
-    #Issue 17971
     - label: "Read the global attribute: GeneratedCommandList"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list

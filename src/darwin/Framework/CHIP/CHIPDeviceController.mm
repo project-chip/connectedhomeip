@@ -44,6 +44,7 @@
 #include <controller/CommissioningWindowOpener.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
@@ -277,6 +278,7 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
             commissionerParams.controllerNOC = noc;
         }
         commissionerParams.controllerVendorId = static_cast<chip::VendorId>([startupParams.vendorId unsignedShortValue]);
+        commissionerParams.deviceAttestationVerifier = _factory.deviceAttestationVerifier;
 
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
 

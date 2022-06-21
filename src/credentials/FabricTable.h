@@ -335,6 +335,11 @@ public:
          **/
         virtual void OnFabricPersistedToStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
 
+        /**
+         * Gets called when operational credentials are changed.
+         **/
+        virtual void OnFabricNOCUpdated(FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
+
         // Intrusive list pointer for FabricTable to manage the entries.
         Delegate * next = nullptr;
     };
@@ -350,6 +355,12 @@ public:
     // Returns CHIP_ERROR_NOT_FOUND if there is no fabric for that index.
     CHIP_ERROR Delete(FabricIndex fabricIndex);
     void DeleteAllFabrics();
+
+    // TODO this #if CONFIG_BUILD_FOR_HOST_UNIT_TEST is temporary. There is a change incoming soon
+    // that will allow triggering NOC update directly.
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    void SendUpdateFabricNotificationForTest(FabricIndex fabricIndex) { NotifyNOCUpdatedOnFabric(fabricIndex); }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     FabricInfo * FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
@@ -722,6 +733,8 @@ private:
      * fabric table accordingly.
      */
     CHIP_ERROR ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader);
+
+    CHIP_ERROR NotifyNOCUpdatedOnFabric(FabricIndex fabricIndex);
 
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     // Used for UpdateNOC pending fabric updates

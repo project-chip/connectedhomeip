@@ -203,6 +203,12 @@ public:
             (void) fabricIndex;
         }
 
+        void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+        {
+            (void) fabricTable;
+            (void) fabricIndex;
+        }
+
     private:
         SessionManager * mSessionManager                    = nullptr;
         Credentials::GroupDataProvider * mGroupDataProvider = nullptr;

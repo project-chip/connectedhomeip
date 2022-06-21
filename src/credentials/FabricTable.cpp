@@ -707,6 +707,20 @@ public:
     System::Clock::Seconds32 mLatestNotBefore;
 };
 
+CHIP_ERROR FabricTable::NotifyNOCUpdatedOnFabric(FabricIndex fabricIndex)
+{
+    FabricTable::Delegate * delegate = mDelegateListRoot;
+    while (delegate)
+    {
+        // It is possible that delegate will remove itself from the list in OnFabricNOCUpdated,
+        // so we grab the next delegate in the list now.
+        FabricTable::Delegate * nextDelegate = delegate->next;
+        delegate->OnFabricNOCUpdated(*this, fabricIndex);
+        delegate = nextDelegate;
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR
 FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
                               uint16_t vendorId, FabricIndex * outputIndex)
@@ -931,8 +945,11 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
         FabricTable::Delegate * delegate = mDelegateListRoot;
         while (delegate)
         {
+            // It is possible that delegate will remove itself from the list in OnFabricDeletedFromStorage,
+            // so we grab the next delegate in the list now.
+            FabricTable::Delegate * nextDelegate = delegate->next;
             delegate->OnFabricDeletedFromStorage(*this, fabricIndex);
-            delegate = delegate->next;
+            delegate = nextDelegate;
         }
     }
 
@@ -1613,6 +1630,9 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
 
     mStateFlags.Set(StateFlags::kIsUpdatePending);
     mStateFlags.Set(StateFlags::kIsPendingFabricDataPresent);
+
+    // Notify that NOC was updated (at least transiently)
+    NotifyNOCUpdatedOnFabric(fabricIndex);
 
     return CHIP_NO_ERROR;
 }
