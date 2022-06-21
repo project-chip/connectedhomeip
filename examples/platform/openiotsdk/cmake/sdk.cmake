@@ -104,6 +104,11 @@ if(TARGET mbedtls-config)
             ${OPEN_IOT_SDK_CONFIG}/mbedtls
     )
 
+    target_sources(mbedtls-config 
+        INTERFACE
+            ${OPEN_IOT_SDK_CONFIG}/mbedtls/platform_alt.cpp
+    )
+
     target_compile_definitions(mbedtls-config
         INTERFACE
             MBEDTLS_CONFIG_FILE="mbedtls_config.h"
