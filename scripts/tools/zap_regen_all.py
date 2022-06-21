@@ -115,8 +115,8 @@ def getGlobalTemplatesTargets():
                 ZAPGenerateTarget(filepath, output_dir=output_dir, template=template))
             continue
 
-        #if example_name == "chef":
-        #    continue
+        if example_name == "chef":
+            example_name = "chef-"+os.path.basename(filepath)[:-len(".zap")]
 
         logging.info("Found example %s (via %s)" %
                      (example_name, str(filepath)))
