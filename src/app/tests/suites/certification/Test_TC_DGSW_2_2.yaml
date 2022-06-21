@@ -1,0 +1,52 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 43.2.2. [TC-DGSW-2.2] Event functionality with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Software Diagnostics"
+    endpoint: 0
+
+tests:
+    - label:
+          "Reads a list of SoftwareFault struct from DUT and data type in each
+          field of the struct must match the value listed in spec"
+      verification: |
+          Not implemented in SDK
+          /chip-tool softwarediagnostics read-event software-fault 1 0
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1649682271.390023][9722:9727] CHIP:TOO:          Event number: 4
+          [16
+          49682271.390072][9722:9727] CHIP:TOO:          Priority: Info
+          [1649682271.390120][9722:9727] CHIP:TOO:          Timestamp: 30512303
+          [1649682271.390253][9722:9727] CHIP:TOO:   SoftwareFault: {
+          [1649682271.390304][9722:9727] CHIP:TOO:     SoftwareFault: {
+          [1649682271.390365][9722:9727] CHIP:TOO:       Id: 11927
+          [1649682271.390413][9722:9727] CHIP:TOO:       Name: 11927
+          [1649682271.390464][9722:9727] CHIP:TOO:       FaultRecording: 4661756C745265636F7264696E67
+          [1649682271.390516][9722:9727] CHIP:TOO:      }
+          [1649682271.390562][9722:9727] CHIP:TOO:    }
+          [1649682271.390714][9722:9727] CHIP:EM: Sending Standalone Ack for MessageCounter:4574884 on exchange 14495i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter '0' for success"
+              - name: "expectedValue"
+                value: 0

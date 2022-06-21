@@ -41,6 +41,7 @@ tests:
           value: 1
 
     - label: "Check current hue attribute value matched before any change"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -50,6 +51,7 @@ tests:
               maxValue: 254
 
     - label: "Check Saturation attribute value matched before any change"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -59,6 +61,7 @@ tests:
               maxValue: 254
 
     - label: "Move To current hue and saturation command"
+      PICS: CC.S.C06.Rsp
       command: "MoveToHueAndSaturation"
       arguments:
           values:
@@ -84,6 +87,7 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -95,6 +99,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:

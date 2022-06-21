@@ -41,6 +41,7 @@ tests:
 
     - label: "Reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
+      PICS: CC.S.A4000
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
@@ -49,6 +50,7 @@ tests:
               maxValue: 65535
 
     - label: "Enhanced Step Hue Up command"
+      PICS: CC.S.C42.Rsp
       command: "EnhancedStepHue"
       arguments:
           values:
@@ -73,6 +75,7 @@ tests:
 
     - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
+      PICS: CC.S.A4000
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
@@ -81,6 +84,7 @@ tests:
               maxValue: 65535
 
     - label: "Enhanced Step Hue Down command"
+      PICS: CC.S.C42.Rsp
       command: "EnhancedStepHue"
       arguments:
           values:
@@ -105,6 +109,7 @@ tests:
 
     - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
+      PICS: CC.S.A4000
       attribute: "EnhancedCurrentHue"
       response:
           constraints:

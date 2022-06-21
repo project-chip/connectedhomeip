@@ -41,6 +41,7 @@ tests:
 
     - label: "Check EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
+      PICS: CC.S.A4000
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
@@ -49,6 +50,7 @@ tests:
               maxValue: 65535
 
     - label: "Enhanced Move Hue Up command"
+      PICS: CC.S.C41.Rsp
       command: "EnhancedMoveHue"
       arguments:
           values:
@@ -72,6 +74,7 @@ tests:
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -91,6 +94,7 @@ tests:
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -110,6 +114,7 @@ tests:
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -119,6 +124,7 @@ tests:
               maxValue: 65535
 
     - label: "Enhanced Move Hue Stop command"
+      PICS: CC.S.C41.Rsp
       command: "EnhancedMoveHue"
       arguments:
           values:
@@ -134,6 +140,7 @@ tests:
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -142,7 +149,8 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Enhanced Move Hue Down command "
+    - label: "Enhanced Move Hue Down command"
+      PICS: CC.S.C41.Rsp
       command: "EnhancedMoveHue"
       arguments:
           values:
@@ -166,6 +174,7 @@ tests:
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -185,6 +194,7 @@ tests:
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -204,6 +214,7 @@ tests:
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -213,6 +224,7 @@ tests:
               maxValue: 65535
 
     - label: "Enhanced Move Hue Stop command"
+      PICS: CC.S.C41.Rsp
       command: "EnhancedMoveHue"
       arguments:
           values:
@@ -228,6 +240,7 @@ tests:
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:

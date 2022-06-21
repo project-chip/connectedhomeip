@@ -42,6 +42,7 @@ tests:
     - label:
           "Check Saturation attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -52,6 +53,7 @@ tests:
 
     - label: "Move saturation up command"
       command: "MoveSaturation"
+      PICS: CC.S.C04.Rsp
       arguments:
           values:
               - name: "MoveMode"
@@ -74,6 +76,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -93,6 +96,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -112,6 +116,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -121,6 +126,7 @@ tests:
               maxValue: 254
 
     - label: "Move saturation down command"
+      PICS: CC.S.C04.Rsp
       command: "MoveSaturation"
       arguments:
           values:
@@ -144,6 +150,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -163,6 +170,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -182,6 +190,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -191,6 +200,7 @@ tests:
               maxValue: 254
 
     - label: "Move saturation up command"
+      PICS: CC.S.C04.Rsp
       command: "MoveSaturation"
       arguments:
           values:
@@ -214,6 +224,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -233,6 +244,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -252,6 +264,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -262,6 +275,7 @@ tests:
 
     - label: "Move saturation stop command"
       command: "MoveSaturation"
+      PICS: CC.S.C04.Rsp
       arguments:
           values:
               - name: "MoveMode"
@@ -284,6 +298,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -303,6 +318,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -322,6 +338,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -331,6 +348,7 @@ tests:
               maxValue: 254
 
     - label: "Move saturation down command"
+      PICS: CC.S.C04.Rsp
       command: "MoveSaturation"
       arguments:
           values:
@@ -354,6 +372,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -373,6 +392,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -392,6 +412,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -401,6 +422,7 @@ tests:
               maxValue: 254
 
     - label: "Move saturation stop command"
+      PICS: CC.S.C04.Rsp
       command: "MoveSaturation"
       arguments:
           values:
@@ -424,6 +446,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -443,6 +466,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -462,6 +486,7 @@ tests:
     - label:
           "Check current saturation attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
