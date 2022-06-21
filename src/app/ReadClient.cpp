@@ -429,7 +429,8 @@ exit:
     {
         if (!suppressErrorStatusResponse)
         {
-            err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+            err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext,
+                                       false /*aExpectResponse*/);
         }
     }
 

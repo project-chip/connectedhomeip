@@ -615,7 +615,9 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     commandSender.MoveToState(app::CommandSender::State::ResponseReceived);
     commandSender.NotifyResult(CHIP_ERROR_INVALID_MESSAGE_TYPE, nullptr, true);
 
-    NL_TEST_ASSERT(apSuite, mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 && mockCommandSenderDelegate.onErrorCalledTimes == 1);
+    NL_TEST_ASSERT(apSuite,
+                   mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
+                       mockCommandSenderDelegate.onErrorCalledTimes == 1);
 
     // Decrease CommandHandler refcount and send response
     asyncCommandHandle = nullptr;
@@ -626,7 +628,7 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-//Command Sender sends the invoke request, handler run this async command,
+// Command Sender sends the invoke request, handler run this async command,
 void TestCommandInteraction::TestCommandInvalidMessage2(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -652,7 +654,9 @@ void TestCommandInteraction::TestCommandInvalidMessage2(nlTestSuite * apSuite, v
     chip::app::InteractionModelEngine::GetInstance()->ActiveCommandHandlerAt(0)->OnUnknownMsgType();
     ctx.StepDrainAndServiceIO();
 
-    NL_TEST_ASSERT(apSuite, mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 && mockCommandSenderDelegate.onErrorCalledTimes == 1);
+    NL_TEST_ASSERT(apSuite,
+                   mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
+                       mockCommandSenderDelegate.onErrorCalledTimes == 1);
 
     chip::app::InteractionModelEngine::GetInstance()->ActiveCommandHandlerAt(0)->DecrementHoldOff();
     asyncCommandHandle = nullptr;

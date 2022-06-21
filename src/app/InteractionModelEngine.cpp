@@ -167,7 +167,7 @@ CommandHandler * InteractionModelEngine::ActiveCommandHandlerAt(unsigned int aIn
         return nullptr;
     }
 
-    unsigned int i    = 0;
+    unsigned int i       = 0;
     CommandHandler * ret = nullptr;
 
     mCommandHandlerObjs.ForEachActiveObject([aIndex, &i, &ret](CommandHandler * handler) {

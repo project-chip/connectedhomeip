@@ -98,10 +98,7 @@ public:
         }
     }
 
-    void StepDrainAndServiceIO()
-    {
-        mIOContext.DriveIO();
-    }
+    void StepDrainAndServiceIO() { mIOContext.DriveIO(); }
 
 private:
     Test::IOContext mIOContext;

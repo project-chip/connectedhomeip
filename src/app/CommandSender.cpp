@@ -150,17 +150,18 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
 
 exit:
     return NotifyResult(err, apExchangeContext, suppressErrorStatusResponse);
-
 }
 
-CHIP_ERROR CommandSender::NotifyResult(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext, bool aSuppressErrorStatusResponse)
+CHIP_ERROR CommandSender::NotifyResult(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
+                                       bool aSuppressErrorStatusResponse)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (aError != CHIP_NO_ERROR)
     {
         if (!aSuppressErrorStatusResponse)
         {
-            err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+            err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext,
+                                       false /*aExpectResponse*/);
         }
 
         if (mpCallback != nullptr)

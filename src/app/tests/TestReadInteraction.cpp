@@ -181,10 +181,7 @@ public:
         mReadError = true;
     }
 
-    void OnDone(chip::app::ReadClient *) override
-    {
-        ChipLogDetail(DataManagement, "OnDone is called");
-    }
+    void OnDone(chip::app::ReadClient *) override { ChipLogDetail(DataManagement, "OnDone is called"); }
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
