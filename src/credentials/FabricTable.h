@@ -326,14 +326,14 @@ public:
         /**
          * Gets called when a fabric in Fabric Table is persisted to storage, by CommitPendingFabricData.
          **/
-        virtual void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) {};
+        virtual void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex){};
 
         /**
          * Gets called when operational credentials are changed, which may not be persistent.
          *
          * Can be used to affect what is needed for UpdateNOC prior to commit.
          **/
-        virtual void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) {};
+        virtual void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex){};
 
         // Intrusive list pointer for FabricTable to manage the entries.
         Delegate * next = nullptr;

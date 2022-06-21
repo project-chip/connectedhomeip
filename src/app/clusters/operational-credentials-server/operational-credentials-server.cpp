@@ -430,11 +430,9 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
 
         ChipLogProgress(Zcl,
                         "OpCreds: Fabric  index 0x%x was committed to storage. Compressed Fabric Id 0x" ChipLogFormatX64
-                        ", FabricId " ChipLogFormatX64
-                        ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
+                        ", FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
                         static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
-                        ChipLogValueX64(fabric->GetFabricId()),
-                        ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
+                        ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
     }
 };
 

@@ -626,10 +626,9 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric, FabricIndex newFabr
 
     ChipLogProgress(FabricProvisioning,
                     "Fabric index 0x%x was retrieved from storage. Compressed FabricId 0x" ChipLogFormatX64
-                    ", FabricId 0x" ChipLogFormatX64
-                    ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
-                    static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()), ChipLogValueX64(fabric->GetFabricId()),
-                    ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
+                    ", FabricId 0x" ChipLogFormatX64 ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
+                    static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
+                    ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
 
     return CHIP_NO_ERROR;
 }
