@@ -603,8 +603,8 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 0));
-                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
-                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5U));
+                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2U));
                     VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
                     VerifyOrReturn(CheckValueNonNull("acl[0].targets", iter_0.GetValue().targets));
                     {
@@ -635,10 +635,10 @@ private:
                         VerifyOrReturn(
                             CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_3, 3));
                     }
-                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 1));
-                    VerifyOrReturn(CheckValue("acl[1].privilege", iter_0.GetValue().privilege, 1));
-                    VerifyOrReturn(CheckValue("acl[1].authMode", iter_0.GetValue().authMode, 2));
+                    VerifyOrReturn(CheckValue("acl[1].privilege", iter_0.GetValue().privilege, 1U));
+                    VerifyOrReturn(CheckValue("acl[1].authMode", iter_0.GetValue().authMode, 2U));
                     VerifyOrReturn(CheckValueNonNull("acl[1].subjects", iter_0.GetValue().subjects));
                     {
                         auto iter_3 = iter_0.GetValue().subjects.Value().begin();
@@ -686,10 +686,10 @@ private:
                         VerifyOrReturn(
                             CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_3, 3));
                     }
-                    VerifyOrReturn(CheckValue("acl[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[1].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 2));
-                    VerifyOrReturn(CheckValue("acl[2].privilege", iter_0.GetValue().privilege, 3));
-                    VerifyOrReturn(CheckValue("acl[2].authMode", iter_0.GetValue().authMode, 3));
+                    VerifyOrReturn(CheckValue("acl[2].privilege", iter_0.GetValue().privilege, 3U));
+                    VerifyOrReturn(CheckValue("acl[2].authMode", iter_0.GetValue().authMode, 3U));
                     VerifyOrReturn(CheckValueNonNull("acl[2].subjects", iter_0.GetValue().subjects));
                     {
                         auto iter_3 = iter_0.GetValue().subjects.Value().begin();
@@ -737,7 +737,7 @@ private:
                         VerifyOrReturn(
                             CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[2].targets.Value()", iter_3, 3));
                     }
-                    VerifyOrReturn(CheckValue("acl[2].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[2].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acl", iter_0, 3));
                 }
             }
@@ -754,17 +754,17 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 0));
-                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
-                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5U));
+                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2U));
                     VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
                     VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
-                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 1));
-                    VerifyOrReturn(CheckValue("acl[1].privilege", iter_0.GetValue().privilege, 1));
-                    VerifyOrReturn(CheckValue("acl[1].authMode", iter_0.GetValue().authMode, 2));
+                    VerifyOrReturn(CheckValue("acl[1].privilege", iter_0.GetValue().privilege, 1U));
+                    VerifyOrReturn(CheckValue("acl[1].authMode", iter_0.GetValue().authMode, 2U));
                     VerifyOrReturn(CheckValueNull("acl[1].subjects", iter_0.GetValue().subjects));
                     VerifyOrReturn(CheckValueNull("acl[1].targets", iter_0.GetValue().targets));
-                    VerifyOrReturn(CheckValue("acl[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[1].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acl", iter_0, 2));
                 }
             }
@@ -781,11 +781,11 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 0));
-                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
-                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5U));
+                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2U));
                     VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
                     VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
-                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acl", iter_0, 1));
                 }
             }
@@ -802,11 +802,11 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 0));
-                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
-                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5U));
+                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2U));
                     VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
                     VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
-                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acl", iter_0, 1));
                 }
             }
@@ -823,11 +823,11 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 0));
-                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
-                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5U));
+                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2U));
                     VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
                     VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
-                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acl", iter_0, 1));
                 }
             }
@@ -844,11 +844,11 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 0));
-                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
-                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5U));
+                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2U));
                     VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
                     VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
-                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acl", iter_0, 1));
                 }
             }
@@ -865,11 +865,11 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 0));
-                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
-                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5U));
+                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2U));
                     VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
                     VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
-                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acl", iter_0, 1));
                 }
             }
@@ -886,11 +886,11 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 0));
-                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
-                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5U));
+                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2U));
                     VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
                     VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
-                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acl", iter_0, 1));
                 }
             }
@@ -907,8 +907,8 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 0));
-                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
-                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5U));
+                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2U));
                     VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
                     VerifyOrReturn(CheckValueNonNull("acl[0].targets", iter_0.GetValue().targets));
                     {
@@ -939,10 +939,10 @@ private:
                         VerifyOrReturn(
                             CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_3, 3));
                     }
-                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 1));
-                    VerifyOrReturn(CheckValue("acl[1].privilege", iter_0.GetValue().privilege, 1));
-                    VerifyOrReturn(CheckValue("acl[1].authMode", iter_0.GetValue().authMode, 2));
+                    VerifyOrReturn(CheckValue("acl[1].privilege", iter_0.GetValue().privilege, 1U));
+                    VerifyOrReturn(CheckValue("acl[1].authMode", iter_0.GetValue().authMode, 2U));
                     VerifyOrReturn(CheckValueNonNull("acl[1].subjects", iter_0.GetValue().subjects));
                     {
                         auto iter_3 = iter_0.GetValue().subjects.Value().begin();
@@ -990,10 +990,10 @@ private:
                         VerifyOrReturn(
                             CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_3, 3));
                     }
-                    VerifyOrReturn(CheckValue("acl[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[1].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 2));
-                    VerifyOrReturn(CheckValue("acl[2].privilege", iter_0.GetValue().privilege, 3));
-                    VerifyOrReturn(CheckValue("acl[2].authMode", iter_0.GetValue().authMode, 3));
+                    VerifyOrReturn(CheckValue("acl[2].privilege", iter_0.GetValue().privilege, 3U));
+                    VerifyOrReturn(CheckValue("acl[2].authMode", iter_0.GetValue().authMode, 3U));
                     VerifyOrReturn(CheckValueNonNull("acl[2].subjects", iter_0.GetValue().subjects));
                     {
                         auto iter_3 = iter_0.GetValue().subjects.Value().begin();
@@ -1041,7 +1041,7 @@ private:
                         VerifyOrReturn(
                             CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[2].targets.Value()", iter_3, 3));
                     }
-                    VerifyOrReturn(CheckValue("acl[2].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[2].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acl", iter_0, 3));
                 }
             }
@@ -1058,11 +1058,11 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 0));
-                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
-                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+                    VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5U));
+                    VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2U));
                     VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
                     VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
-                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acl", iter_0, 1));
                 }
             }
@@ -1151,7 +1151,7 @@ private:
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
                                                                                                               3);
                 }
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
                 listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
@@ -1192,7 +1192,7 @@ private:
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
                                                                                                               3);
                 }
-                listHolder_0->mList[1].fabricIndex = 0;
+                listHolder_0->mList[1].fabricIndex = 0U;
 
                 listHolder_0->mList[2].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(3);
                 listHolder_0->mList[2].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(3);
@@ -1233,7 +1233,7 @@ private:
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
                                                                                                               3);
                 }
-                listHolder_0->mList[2].fabricIndex = 0;
+                listHolder_0->mList[2].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 3);
@@ -1259,7 +1259,7 @@ private:
                 listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
                 listHolder_0->mList[0].subjects.SetNull();
                 listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
                 listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
@@ -1270,7 +1270,7 @@ private:
 
                 listHolder_0->mList[1].targets.Value() =
                     chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>();
-                listHolder_0->mList[1].fabricIndex = 0;
+                listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 2);
@@ -1296,13 +1296,13 @@ private:
                 listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
                 listHolder_0->mList[0].subjects.SetNull();
                 listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
                 listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(3);
                 listHolder_0->mList[1].subjects.SetNull();
                 listHolder_0->mList[1].targets.SetNull();
-                listHolder_0->mList[1].fabricIndex = 0;
+                listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 2);
@@ -1328,13 +1328,13 @@ private:
                 listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
                 listHolder_0->mList[0].subjects.SetNull();
                 listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
                 listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(1);
                 listHolder_0->mList[1].subjects.SetNull();
                 listHolder_0->mList[1].targets.SetNull();
-                listHolder_0->mList[1].fabricIndex = 0;
+                listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 2);
@@ -1360,7 +1360,7 @@ private:
                 listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
                 listHolder_0->mList[0].subjects.SetNull();
                 listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
                 listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
@@ -1373,7 +1373,7 @@ private:
                     listHolder_0->mList[1].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 1);
                 }
                 listHolder_0->mList[1].targets.SetNull();
-                listHolder_0->mList[1].fabricIndex = 0;
+                listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 2);
@@ -1399,7 +1399,7 @@ private:
                 listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
                 listHolder_0->mList[0].subjects.SetNull();
                 listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
                 listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
@@ -1418,7 +1418,7 @@ private:
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
                                                                                                               1);
                 }
-                listHolder_0->mList[1].fabricIndex = 0;
+                listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 2);
@@ -1444,7 +1444,7 @@ private:
                 listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
                 listHolder_0->mList[0].subjects.SetNull();
                 listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
                 listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
@@ -1476,7 +1476,7 @@ private:
                     listHolder_0->mList[1].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 20);
                 }
                 listHolder_0->mList[1].targets.SetNull();
-                listHolder_0->mList[1].fabricIndex = 0;
+                listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 2);
@@ -1502,7 +1502,7 @@ private:
                 listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
                 listHolder_0->mList[0].subjects.SetNull();
                 listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
                 listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
@@ -1617,7 +1617,7 @@ private:
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
                                                                                                               20);
                 }
-                listHolder_0->mList[1].fabricIndex = 0;
+                listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 2);
@@ -1668,7 +1668,7 @@ private:
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
                                                                                                               3);
                 }
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
                 listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
@@ -1709,7 +1709,7 @@ private:
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
                                                                                                               3);
                 }
-                listHolder_0->mList[1].fabricIndex = 0;
+                listHolder_0->mList[1].fabricIndex = 0U;
 
                 listHolder_0->mList[2].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(3);
                 listHolder_0->mList[2].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(3);
@@ -1750,7 +1750,7 @@ private:
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
                                                                                                               3);
                 }
-                listHolder_0->mList[2].fabricIndex = 0;
+                listHolder_0->mList[2].fabricIndex = 0U;
 
                 listHolder_0->mList[3].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
                 listHolder_0->mList[3].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
@@ -1791,7 +1791,7 @@ private:
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
                                                                                                               3);
                 }
-                listHolder_0->mList[3].fabricIndex = 0;
+                listHolder_0->mList[3].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 4);
@@ -1817,7 +1817,7 @@ private:
                 listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
                 listHolder_0->mList[0].subjects.SetNull();
                 listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 1);
@@ -2097,7 +2097,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("statusFlags", value, 0));
+                VerifyOrReturn(CheckValue("statusFlags", value, 0U));
             }
             break;
         case 9:
@@ -2106,8 +2106,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 15));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 15U));
             }
             break;
         case 10:
@@ -2118,7 +2118,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("statusFlags", value, 0));
+                VerifyOrReturn(CheckValue("statusFlags", value, 0U));
             }
             break;
         default:
@@ -2198,7 +2198,7 @@ private:
             LogStep(10, "Write the default values to mandatory non-global attribute: StatusFlags");
             ListFreer listFreer;
             uint8_t value;
-            value = 0;
+            value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), BinaryInputBasic::Id,
                                   BinaryInputBasic::Attributes::StatusFlags::Id, value, chip::NullOptional, chip::NullOptional);
         }
@@ -2273,7 +2273,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("statusFlags", value, 0));
+                VerifyOrReturn(CheckValue("statusFlags", value, 0U));
             }
             break;
         case 4:
@@ -2297,7 +2297,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("statusFlags", value, 0));
+                VerifyOrReturn(CheckValue("statusFlags", value, 0U));
             }
             break;
         case 7:
@@ -2305,7 +2305,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("statusFlags", value, 0));
+                VerifyOrReturn(CheckValue("statusFlags", value, 0U));
             }
             break;
         case 8:
@@ -2313,7 +2313,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("statusFlags", value, 0));
+                VerifyOrReturn(CheckValue("statusFlags", value, 0U));
             }
             break;
         default:
@@ -3034,7 +3034,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentHue", value, 0));
+                VerifyOrReturn(CheckValue("currentHue", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
@@ -3043,7 +3043,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentSaturation", value, 0));
+                VerifyOrReturn(CheckValue("currentSaturation", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
@@ -3106,7 +3106,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorMode", value, 1));
+                VerifyOrReturn(CheckValue("colorMode", value, 1U));
             }
             break;
         case 10:
@@ -3115,8 +3115,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 2));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 2U));
             }
             break;
         case 11:
@@ -3124,7 +3124,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("options", value, 0));
+                VerifyOrReturn(CheckValue("options", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
             }
             break;
@@ -3142,7 +3142,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("enhancedColorMode", value, 1));
+                VerifyOrReturn(CheckValue("enhancedColorMode", value, 1U));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
             }
             break;
@@ -3151,7 +3151,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
@@ -3160,7 +3160,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopDirection", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopDirection", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
@@ -3296,8 +3296,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 4));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 4U));
             }
             break;
         case 29:
@@ -3319,8 +3319,8 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 6));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 6U));
             }
             break;
         case 31:
@@ -4021,8 +4021,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 4:
@@ -4038,8 +4038,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 7:
@@ -4052,8 +4052,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 9:
@@ -4066,8 +4066,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 11:
@@ -4083,8 +4083,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 14:
@@ -4097,8 +4097,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 16:
@@ -4111,8 +4111,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 18:
@@ -4128,8 +4128,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 21:
@@ -4142,8 +4142,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 23:
@@ -4156,8 +4156,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 25:
@@ -4173,8 +4173,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 28:
@@ -4187,8 +4187,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 30:
@@ -4201,8 +4201,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 32:
@@ -4259,11 +4259,11 @@ private:
             LogStep(4, "Move to hue shortest distance command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHue::Type value;
-            value.hue             = 150;
+            value.hue             = 150U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
             value.transitionTime  = 300U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToHue::Id, value,
                                chip::NullOptional
 
@@ -4309,11 +4309,11 @@ private:
             LogStep(11, "Move to hue longest distance command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHue::Type value;
-            value.hue             = 200;
+            value.hue             = 200U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(1);
             value.transitionTime  = 300U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToHue::Id, value,
                                chip::NullOptional
 
@@ -4359,11 +4359,11 @@ private:
             LogStep(18, "Move to hue up command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHue::Type value;
-            value.hue             = 250;
+            value.hue             = 250U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(2);
             value.transitionTime  = 300U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToHue::Id, value,
                                chip::NullOptional
 
@@ -4409,11 +4409,11 @@ private:
             LogStep(25, "Move to hue down command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHue::Type value;
-            value.hue             = 225;
+            value.hue             = 225U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(3);
             value.transitionTime  = 300U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToHue::Id, value,
                                chip::NullOptional
 
@@ -4529,8 +4529,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 4:
@@ -4546,8 +4546,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 7:
@@ -4560,8 +4560,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 9:
@@ -4574,8 +4574,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 11:
@@ -4591,8 +4591,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 14:
@@ -4605,8 +4605,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 16:
@@ -4619,8 +4619,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 18:
@@ -4636,8 +4636,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 21:
@@ -4650,8 +4650,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 23:
@@ -4664,8 +4664,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 25:
@@ -4681,8 +4681,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 28:
@@ -4695,8 +4695,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 30:
@@ -4709,8 +4709,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 32:
@@ -4768,9 +4768,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
-            value.rate            = 50;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.rate            = 50U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveHue::Id, value,
                                chip::NullOptional
 
@@ -4817,9 +4817,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
-            value.rate            = 50;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.rate            = 50U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveHue::Id, value,
                                chip::NullOptional
 
@@ -4866,9 +4866,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
-            value.rate            = 50;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.rate            = 50U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveHue::Id, value,
                                chip::NullOptional
 
@@ -4915,9 +4915,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
-            value.rate            = 50;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.rate            = 50U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveHue::Id, value,
                                chip::NullOptional
 
@@ -5033,8 +5033,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 4:
@@ -5050,8 +5050,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 7:
@@ -5067,8 +5067,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 10:
@@ -5126,10 +5126,10 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepHue::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
-            value.stepSize        = 5;
-            value.transitionTime  = 25;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.stepSize        = 5U;
+            value.transitionTime  = 25U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepHue::Id, value,
                                chip::NullOptional
 
@@ -5152,10 +5152,10 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepHue::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(3);
-            value.stepSize        = 5;
-            value.transitionTime  = 25;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.stepSize        = 5U;
+            value.transitionTime  = 25U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepHue::Id, value,
                                chip::NullOptional
 
@@ -5247,8 +5247,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 4:
@@ -5264,8 +5264,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 7:
@@ -5278,8 +5278,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 9:
@@ -5292,8 +5292,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 11:
@@ -5350,10 +5350,10 @@ private:
             LogStep(4, "Move to saturation command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type value;
-            value.saturation      = 90;
+            value.saturation      = 90U;
             value.transitionTime  = 10U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToSaturation::Id,
                                value, chip::NullOptional
 
@@ -5469,8 +5469,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 4:
@@ -5486,8 +5486,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 7:
@@ -5500,8 +5500,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 9:
@@ -5514,8 +5514,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 11:
@@ -5531,8 +5531,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 14:
@@ -5545,8 +5545,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 16:
@@ -5559,8 +5559,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 18:
@@ -5576,8 +5576,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 21:
@@ -5590,8 +5590,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 23:
@@ -5604,8 +5604,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 25:
@@ -5621,8 +5621,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 28:
@@ -5635,8 +5635,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 30:
@@ -5649,8 +5649,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 32:
@@ -5666,8 +5666,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 35:
@@ -5680,8 +5680,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 37:
@@ -5694,8 +5694,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 39:
@@ -5711,8 +5711,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 42:
@@ -5725,8 +5725,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 44:
@@ -5739,8 +5739,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 46:
@@ -5798,9 +5798,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(1);
-            value.rate            = 5;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.rate            = 5U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id, value,
                                chip::NullOptional
 
@@ -5847,9 +5847,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(3);
-            value.rate            = 5;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.rate            = 5U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id, value,
                                chip::NullOptional
 
@@ -5896,9 +5896,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(1);
-            value.rate            = 5;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.rate            = 5U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id, value,
                                chip::NullOptional
 
@@ -5945,9 +5945,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(0);
-            value.rate            = 5;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.rate            = 5U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id, value,
                                chip::NullOptional
 
@@ -5994,9 +5994,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(3);
-            value.rate            = 5;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.rate            = 5U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id, value,
                                chip::NullOptional
 
@@ -6043,9 +6043,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(0);
-            value.rate            = 5;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.rate            = 5U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id, value,
                                chip::NullOptional
 
@@ -6161,8 +6161,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 4:
@@ -6178,8 +6178,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 7:
@@ -6195,8 +6195,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 10:
@@ -6254,10 +6254,10 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepSaturation::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::SaturationStepMode>(1);
-            value.stepSize        = 15;
-            value.transitionTime  = 10;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.stepSize        = 15U;
+            value.transitionTime  = 10U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepSaturation::Id, value,
                                chip::NullOptional
 
@@ -6280,10 +6280,10 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepSaturation::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::SaturationStepMode>(3);
-            value.stepSize        = 20;
-            value.transitionTime  = 10;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.stepSize        = 20U;
+            value.transitionTime  = 10U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepSaturation::Id, value,
                                chip::NullOptional
 
@@ -6375,8 +6375,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 4:
@@ -6385,8 +6385,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 5:
@@ -6402,8 +6402,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 8:
@@ -6412,8 +6412,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 9:
@@ -6475,11 +6475,11 @@ private:
             LogStep(5, "Move To current hue and saturation command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type value;
-            value.hue             = 40;
-            value.saturation      = 160;
+            value.hue             = 40U;
+            value.saturation      = 160U;
             value.transitionTime  = 10U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToHueAndSaturation::Id,
                                value, chip::NullOptional
 
@@ -6679,8 +6679,8 @@ private:
             value.colorX          = 200U;
             value.colorY          = 300U;
             value.transitionTime  = 20U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToColor::Id, value,
                                chip::NullOptional
 
@@ -6902,8 +6902,8 @@ private:
             chip::app::Clusters::ColorControl::Commands::MoveColor::Type value;
             value.rateX           = 15;
             value.rateY           = 20;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColor::Id, value,
                                chip::NullOptional
 
@@ -6930,8 +6930,8 @@ private:
             LogStep(9, "Stop Move Step command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id, value,
                                chip::NullOptional
 
@@ -7124,8 +7124,8 @@ private:
             value.stepX           = 15;
             value.stepY           = 20;
             value.transitionTime  = 50U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepColor::Id, value,
                                chip::NullOptional
 
@@ -7299,8 +7299,8 @@ private:
             chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type value;
             value.colorTemperature = 100U;
             value.transitionTime   = 10U;
-            value.optionsMask      = 0;
-            value.optionsOverride  = 0;
+            value.optionsMask      = 0U;
+            value.optionsOverride  = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -7640,8 +7640,8 @@ private:
             value.rate                          = 10U;
             value.colorTemperatureMinimumMireds = 1U;
             value.colorTemperatureMaximumMireds = 255U;
-            value.optionsMask                   = 0;
-            value.optionsOverride               = 0;
+            value.optionsMask                   = 0U;
+            value.optionsOverride               = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -7691,8 +7691,8 @@ private:
             value.rate                          = 20U;
             value.colorTemperatureMinimumMireds = 1U;
             value.colorTemperatureMaximumMireds = 255U;
-            value.optionsMask                   = 0;
-            value.optionsOverride               = 0;
+            value.optionsMask                   = 0U;
+            value.optionsOverride               = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -7742,8 +7742,8 @@ private:
             value.rate                          = 10U;
             value.colorTemperatureMinimumMireds = 1U;
             value.colorTemperatureMaximumMireds = 255U;
-            value.optionsMask                   = 0;
-            value.optionsOverride               = 0;
+            value.optionsMask                   = 0U;
+            value.optionsOverride               = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -7757,8 +7757,8 @@ private:
             value.rate                          = 10U;
             value.colorTemperatureMinimumMireds = 1U;
             value.colorTemperatureMaximumMireds = 255U;
-            value.optionsMask                   = 0;
-            value.optionsOverride               = 0;
+            value.optionsMask                   = 0U;
+            value.optionsOverride               = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -7808,8 +7808,8 @@ private:
             value.rate                          = 20U;
             value.colorTemperatureMinimumMireds = 1U;
             value.colorTemperatureMaximumMireds = 255U;
-            value.optionsMask                   = 0;
-            value.optionsOverride               = 0;
+            value.optionsMask                   = 0U;
+            value.optionsOverride               = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -7823,8 +7823,8 @@ private:
             value.rate                          = 10U;
             value.colorTemperatureMinimumMireds = 1U;
             value.colorTemperatureMaximumMireds = 255U;
-            value.optionsMask                   = 0;
-            value.optionsOverride               = 0;
+            value.optionsMask                   = 0U;
+            value.optionsOverride               = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -8093,8 +8093,8 @@ private:
             value.transitionTime                = 50U;
             value.colorTemperatureMinimumMireds = 5U;
             value.colorTemperatureMaximumMireds = 100U;
-            value.optionsMask                   = 0;
-            value.optionsOverride               = 0;
+            value.optionsMask                   = 0U;
+            value.optionsOverride               = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -8145,8 +8145,8 @@ private:
             value.transitionTime                = 50U;
             value.colorTemperatureMinimumMireds = 5U;
             value.colorTemperatureMaximumMireds = 100U;
-            value.optionsMask                   = 0;
-            value.optionsOverride               = 0;
+            value.optionsMask                   = 0U;
+            value.optionsOverride               = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -8501,8 +8501,8 @@ private:
             value.enhancedHue     = 1025U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
             value.transitionTime  = 1U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
@@ -8520,8 +8520,8 @@ private:
             value.enhancedHue     = 1100U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
             value.transitionTime  = 300U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
@@ -8570,8 +8570,8 @@ private:
             value.enhancedHue     = 1150U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(1);
             value.transitionTime  = 300U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
@@ -8620,8 +8620,8 @@ private:
             value.enhancedHue     = 1200U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(2);
             value.transitionTime  = 300U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
@@ -8670,8 +8670,8 @@ private:
             value.enhancedHue     = 1300U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(3);
             value.transitionTime  = 300U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
@@ -8963,8 +8963,8 @@ private:
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
             value.rate            = 50U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveHue::Id, value,
                                chip::NullOptional
 
@@ -9012,8 +9012,8 @@ private:
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
             value.rate            = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveHue::Id, value,
                                chip::NullOptional
 
@@ -9030,8 +9030,8 @@ private:
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
             value.rate            = 5U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveHue::Id, value,
                                chip::NullOptional
 
@@ -9079,8 +9079,8 @@ private:
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
             value.rate            = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveHue::Id, value,
                                chip::NullOptional
 
@@ -9260,8 +9260,8 @@ private:
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(0);
             value.stepSize        = 50U;
             value.transitionTime  = 1U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedStepHue::Id, value,
                                chip::NullOptional
 
@@ -9286,8 +9286,8 @@ private:
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
             value.stepSize        = 75U;
             value.transitionTime  = 1U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedStepHue::Id, value,
                                chip::NullOptional
 
@@ -9455,10 +9455,10 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type value;
             value.enhancedHue     = 1200U;
-            value.saturation      = 90;
+            value.saturation      = 90U;
             value.transitionTime  = 10U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id, value, chip::NullOptional
 
@@ -9553,8 +9553,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 5:
@@ -9566,8 +9566,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 7:
@@ -9580,8 +9580,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 9:
@@ -9593,8 +9593,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 11:
@@ -9606,8 +9606,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 13:
@@ -9620,8 +9620,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 15:
@@ -9824,9 +9824,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
-            value.rate            = 50;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.rate            = 50U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveHue::Id, value,
                                chip::NullOptional
 
@@ -9841,8 +9841,8 @@ private:
             LogStep(5, "Stop Move Step command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id, value,
                                chip::NullOptional
 
@@ -9870,9 +9870,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(1);
-            value.rate            = 5;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.rate            = 5U;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id, value,
                                chip::NullOptional
 
@@ -9887,8 +9887,8 @@ private:
             LogStep(11, "Stop Move Step command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id, value,
                                chip::NullOptional
 
@@ -9917,8 +9917,8 @@ private:
             chip::app::Clusters::ColorControl::Commands::MoveColor::Type value;
             value.rateX           = 15;
             value.rateY           = 20;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColor::Id, value,
                                chip::NullOptional
 
@@ -9938,8 +9938,8 @@ private:
             LogStep(18, "Stop Move Step command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id, value,
                                chip::NullOptional
 
@@ -9980,8 +9980,8 @@ private:
             value.rate                          = 10U;
             value.colorTemperatureMinimumMireds = 1U;
             value.colorTemperatureMaximumMireds = 255U;
-            value.optionsMask                   = 0;
-            value.optionsOverride               = 0;
+            value.optionsMask                   = 0U;
+            value.optionsOverride               = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
@@ -9996,8 +9996,8 @@ private:
             LogStep(26, "Stop Move Step command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id, value,
                                chip::NullOptional
 
@@ -10026,8 +10026,8 @@ private:
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
             value.rate            = 50U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveHue::Id, value,
                                chip::NullOptional
 
@@ -10042,8 +10042,8 @@ private:
             LogStep(32, "Stop Move Step command");
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id, value,
                                chip::NullOptional
 
@@ -10151,7 +10151,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 0U));
             }
             break;
         case 6:
@@ -10162,7 +10162,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopDirection", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopDirection", value, 0U));
             }
             break;
         case 8:
@@ -10195,7 +10195,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 1));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 1U));
             }
             break;
         case 14:
@@ -10251,7 +10251,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 0U));
             }
             break;
         case 22:
@@ -10279,7 +10279,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopDirection", value, 1));
+                VerifyOrReturn(CheckValue("colorLoopDirection", value, 1U));
             }
             break;
         case 26:
@@ -10290,7 +10290,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 1));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 1U));
             }
             break;
         case 28:
@@ -10346,7 +10346,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 0U));
             }
             break;
         case 36:
@@ -10389,7 +10389,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopDirection", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopDirection", value, 0U));
             }
             break;
         case 43:
@@ -10400,7 +10400,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 1));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 1U));
             }
             break;
         case 45:
@@ -10456,7 +10456,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 0U));
             }
             break;
         case 53:
@@ -10484,7 +10484,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopDirection", value, 1));
+                VerifyOrReturn(CheckValue("colorLoopDirection", value, 1U));
             }
             break;
         case 57:
@@ -10495,7 +10495,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 1));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 1U));
             }
             break;
         case 59:
@@ -10551,7 +10551,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 0U));
             }
             break;
         case 67:
@@ -10624,8 +10624,8 @@ private:
             value.enhancedHue     = 16384U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
             value.transitionTime  = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
@@ -10636,13 +10636,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -10659,13 +10659,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -10682,13 +10682,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 30U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -10705,13 +10705,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(8);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(8U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 160U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -10728,13 +10728,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -10790,13 +10790,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -10825,13 +10825,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -10848,13 +10848,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -10910,13 +10910,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -10948,8 +10948,8 @@ private:
             value.enhancedHue     = 40960U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
             value.transitionTime  = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
@@ -10973,13 +10973,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -10996,13 +10996,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(2);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -11058,13 +11058,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -11093,13 +11093,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -11116,13 +11116,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(2);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -11178,13 +11178,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -11288,7 +11288,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 0U));
             }
             break;
         case 6:
@@ -11296,7 +11296,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopDirection", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopDirection", value, 0U));
             }
             break;
         case 7:
@@ -11323,7 +11323,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 1));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 1U));
             }
             break;
         case 11:
@@ -11379,7 +11379,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopDirection", value, 1));
+                VerifyOrReturn(CheckValue("colorLoopDirection", value, 1U));
             }
             break;
         case 19:
@@ -11427,7 +11427,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 0U));
             }
             break;
         case 26:
@@ -11500,8 +11500,8 @@ private:
             value.enhancedHue     = 16384U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
             value.transitionTime  = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
@@ -11512,13 +11512,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 30U;
             value.startHue        = 160U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -11553,13 +11553,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -11615,13 +11615,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -11670,13 +11670,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -11779,7 +11779,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 0U));
             }
             break;
         case 6:
@@ -11787,7 +11787,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopDirection", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopDirection", value, 0U));
             }
             break;
         case 7:
@@ -11814,7 +11814,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 1));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 1U));
             }
             break;
         case 11:
@@ -11909,7 +11909,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 0));
+                VerifyOrReturn(CheckValue("colorLoopActive", value, 0U));
             }
             break;
         case 25:
@@ -11982,8 +11982,8 @@ private:
             value.enhancedHue     = 16384U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
             value.transitionTime  = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
@@ -11994,13 +11994,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 30U;
             value.startHue        = 160U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -12035,13 +12035,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -12097,13 +12097,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 60U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -12146,13 +12146,13 @@ private:
             VerifyOrDo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
-            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
+            value.updateFlags     = static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1U);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
             value.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
             value.time            = 0U;
             value.startHue        = 0U;
-            value.optionsMask     = 0;
-            value.optionsOverride = 0;
+            value.optionsMask     = 0U;
+            value.optionsOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
@@ -12851,8 +12851,8 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 9));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 9U));
             }
             break;
         case 2:
@@ -13793,8 +13793,8 @@ private:
             {
                 chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 2));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 2U));
             }
             break;
         case 5:
@@ -13802,8 +13802,8 @@ private:
             {
                 chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 2));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 2U));
             }
             break;
         case 6:
@@ -14120,8 +14120,8 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 6));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 6U));
             }
             break;
         case 11:
@@ -14498,8 +14498,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
             }
             break;
         default:
@@ -15677,7 +15677,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentLevel", value, 254));
+                VerifyOrReturn(CheckValue("currentLevel", value, 254U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
@@ -15695,10 +15695,10 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("minLevel", value, 1));
+                VerifyOrReturn(CheckValue("minLevel", value, 1U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 1));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 1U));
             }
             break;
         case 6:
@@ -15782,7 +15782,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("options", value, 0));
+                VerifyOrReturn(CheckValue("options", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
             }
             break;
@@ -15820,10 +15820,10 @@ private:
             LogStep(1, "Reset level to 254");
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
-            value.level          = 254;
+            value.level          = 254U;
             value.transitionTime = 0U;
-            value.optionMask     = 1;
-            value.optionOverride = 1;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
@@ -15995,7 +15995,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("onLevel", value));
-                VerifyOrReturn(CheckValue("onLevel.Value()", value.Value(), 254));
+                VerifyOrReturn(CheckValue("onLevel.Value()", value.Value(), 254U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
                 VerifyOrReturn(CheckConstraintNotValue("value", value, OnLevelValue));
             }
@@ -16052,7 +16052,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("defaultMoveRate", value));
-                VerifyOrReturn(CheckValue("defaultMoveRate.Value()", value.Value(), 50));
+                VerifyOrReturn(CheckValue("defaultMoveRate.Value()", value.Value(), 50U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
@@ -16065,7 +16065,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("defaultMoveRate", value));
-                VerifyOrReturn(CheckValue("defaultMoveRate.Value()", value.Value(), 100));
+                VerifyOrReturn(CheckValue("defaultMoveRate.Value()", value.Value(), 100U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
@@ -16087,7 +16087,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("startUpCurrentLevel", value));
-                VerifyOrReturn(CheckValue("startUpCurrentLevel.Value()", value.Value(), 254));
+                VerifyOrReturn(CheckValue("startUpCurrentLevel.Value()", value.Value(), 254U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
                 VerifyOrReturn(CheckConstraintNotValue("value", value, StartUpCurrentLevelValue));
             }
@@ -16145,7 +16145,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 254;
+            value.Value() = 254U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::OnLevel::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -16202,7 +16202,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 100;
+            value.Value() = 100U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::DefaultMoveRate::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -16221,7 +16221,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 254;
+            value.Value() = 254U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id,
                                   LevelControl::Attributes::StartUpCurrentLevel::Id, value, chip::NullOptional, chip::NullOptional);
         }
@@ -16319,7 +16319,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentLevel", value, 64));
+                VerifyOrReturn(CheckValue("currentLevel", value, 64U));
             }
             break;
         case 7:
@@ -16334,7 +16334,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentLevel", value, 100));
+                VerifyOrReturn(CheckValue("currentLevel", value, 100U));
             }
             break;
         case 10:
@@ -16357,7 +16357,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentLevel", value, 128));
+                VerifyOrReturn(CheckValue("currentLevel", value, 128U));
             }
             break;
         case 14:
@@ -16408,10 +16408,10 @@ private:
             LogStep(4, "sends a Move to level command");
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
-            value.level          = 64;
+            value.level          = 64U;
             value.transitionTime = 65535U;
-            value.optionMask     = 1;
-            value.optionOverride = 1;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
@@ -16433,10 +16433,10 @@ private:
             LogStep(7, "sends a Move to level command");
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
-            value.level          = 100;
+            value.level          = 100U;
             value.transitionTime = 100U;
-            value.optionMask     = 1;
-            value.optionOverride = 1;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
@@ -16463,10 +16463,10 @@ private:
             LogStep(11, "sends a Move to level command");
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
-            value.level          = 128;
+            value.level          = 128U;
             value.transitionTime = 65535U;
-            value.optionMask     = 1;
-            value.optionOverride = 1;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
@@ -16488,10 +16488,10 @@ private:
             LogStep(14, "Reset level to 254");
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
-            value.level          = 254;
+            value.level          = 254U;
             value.transitionTime = 0U;
-            value.optionMask     = 1;
-            value.optionOverride = 1;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
@@ -16606,9 +16606,9 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentLevel", value, 1));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 1));
+                VerifyOrReturn(CheckValue("currentLevel", value, 1U));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 1U));
             }
             break;
         case 11:
@@ -16632,7 +16632,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, 255));
+                VerifyOrReturn(CheckConstraintNotValue("value", value, 255U));
             }
             break;
         case 15:
@@ -16678,9 +16678,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Move::Type value;
             value.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(0);
-            value.rate           = 32;
-            value.optionMask     = 1;
-            value.optionOverride = 1;
+            value.rate           = 32U;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Move::Id, value,
                                chip::NullOptional
 
@@ -16718,9 +16718,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Move::Type value;
             value.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(1);
-            value.rate           = 64;
-            value.optionMask     = 1;
-            value.optionOverride = 1;
+            value.rate           = 64U;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Move::Id, value,
                                chip::NullOptional
 
@@ -16758,9 +16758,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Move::Type value;
             value.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(0);
-            value.rate           = 255;
-            value.optionMask     = 1;
-            value.optionOverride = 1;
+            value.rate           = 255U;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Move::Id, value,
                                chip::NullOptional
 
@@ -16791,10 +16791,10 @@ private:
             LogStep(16, "Reset level to 254");
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
-            value.level          = 254;
+            value.level          = 254U;
             value.transitionTime = 0U;
-            value.optionMask     = 1;
-            value.optionOverride = 1;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
@@ -16948,10 +16948,10 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Step::Type value;
             value.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(1);
-            value.stepSize       = 100;
+            value.stepSize       = 100U;
             value.transitionTime = 20U;
-            value.optionMask     = 0;
-            value.optionOverride = 0;
+            value.optionMask     = 0U;
+            value.optionOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Step::Id, value,
                                chip::NullOptional
 
@@ -16974,10 +16974,10 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Step::Type value;
             value.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(0);
-            value.stepSize       = 64;
+            value.stepSize       = 64U;
             value.transitionTime = 2U;
-            value.optionMask     = 0;
-            value.optionOverride = 0;
+            value.optionMask     = 0U;
+            value.optionOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Step::Id, value,
                                chip::NullOptional
 
@@ -17000,10 +17000,10 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Step::Type value;
             value.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(1);
-            value.stepSize       = 64;
+            value.stepSize       = 64U;
             value.transitionTime = 2U;
-            value.optionMask     = 0;
-            value.optionOverride = 0;
+            value.optionMask     = 0U;
+            value.optionOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Step::Id, value,
                                chip::NullOptional
 
@@ -17025,10 +17025,10 @@ private:
             LogStep(11, "Reset level to 254");
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
-            value.level          = 254;
+            value.level          = 254U;
             value.transitionTime = 0U;
-            value.optionMask     = 1;
-            value.optionOverride = 1;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
@@ -17111,8 +17111,8 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 1));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 1U));
                 CurrentLevelValue = value;
             }
             break;
@@ -17178,10 +17178,10 @@ private:
             LogStep(2, "Precondition: set DUT to lowest point");
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
-            value.level          = 0;
+            value.level          = 0U;
             value.transitionTime = 0U;
-            value.optionMask     = 1;
-            value.optionOverride = 1;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
@@ -17204,9 +17204,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Move::Type value;
             value.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(0);
-            value.rate           = 1;
-            value.optionMask     = 1;
-            value.optionOverride = 1;
+            value.rate           = 1U;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Move::Id, value,
                                chip::NullOptional
 
@@ -17223,8 +17223,8 @@ private:
             LogStep(7, "Sends stop command to DUT");
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Stop::Type value;
-            value.optionMask     = 0;
-            value.optionOverride = 0;
+            value.optionMask     = 0U;
+            value.optionOverride = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Stop::Id, value,
                                chip::NullOptional
 
@@ -17239,10 +17239,10 @@ private:
             LogStep(9, "Reset level to 254");
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
-            value.level          = 254;
+            value.level          = 254U;
             value.transitionTime = 0U;
-            value.optionMask     = 1;
-            value.optionOverride = 1;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
@@ -20433,7 +20433,7 @@ private:
             {
                 chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 1));
+                VerifyOrReturn(CheckValue("status", value.status, 1U));
 
                 VerifyOrReturn(
                     CheckValueAsString("data", value.data, chip::ByteSpan(chip::Uint8::from_const_char("Hello World"), 11)));
@@ -20444,7 +20444,7 @@ private:
             {
                 chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 1));
+                VerifyOrReturn(CheckValue("status", value.status, 1U));
 
                 VerifyOrReturn(
                     CheckValueAsString("data", value.data, chip::ByteSpan(chip::Uint8::from_const_char("Hello World"), 11)));
@@ -20455,7 +20455,7 @@ private:
             {
                 chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 2));
+                VerifyOrReturn(CheckValue("status", value.status, 2U));
 
                 VerifyOrReturn(
                     CheckValueAsString("data", value.data, chip::ByteSpan(chip::Uint8::from_const_char("Hello World"), 11)));
@@ -20581,7 +20581,7 @@ private:
             {
                 chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(
                     CheckValueAsString("data", value.data, chip::ByteSpan(chip::Uint8::from_const_char("Hello World"), 11)));
@@ -20592,7 +20592,7 @@ private:
             {
                 chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value, 0));
+                VerifyOrReturn(CheckValue("status", value, 0U));
             }
             break;
         default:
@@ -20694,7 +20694,7 @@ private:
             {
                 chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value, 0));
+                VerifyOrReturn(CheckValue("status", value, 0U));
             }
             break;
         default:
@@ -20880,7 +20880,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentInput", value, 1));
+                VerifyOrReturn(CheckValue("currentInput", value, 1U));
             }
             break;
         default:
@@ -20915,7 +20915,7 @@ private:
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::SelectInput::Type value;
-            value.index = 1;
+            value.index = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::SelectInput::Id, value,
                                chip::NullOptional
 
@@ -21119,7 +21119,7 @@ private:
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::RenameInput::Type value;
-            value.index = 1;
+            value.index = 1U;
             value.name  = chip::Span<const char>("A1garbage: not in length on purpose", 2);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::RenameInput::Id, value,
                                chip::NullOptional
@@ -21131,7 +21131,7 @@ private:
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::RenameInput::Type value;
-            value.index = 1;
+            value.index = 1U;
             value.name  = chip::Span<const char>("A2garbage: not in length on purpose", 2);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::RenameInput::Id, value,
                                chip::NullOptional
@@ -21551,7 +21551,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentOutput", value, 1));
+                VerifyOrReturn(CheckValue("currentOutput", value, 1U));
             }
             break;
         default:
@@ -21586,7 +21586,7 @@ private:
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type value;
-            value.index = 1;
+            value.index = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Commands::SelectOutput::Id, value,
                                chip::NullOptional
 
@@ -21693,7 +21693,7 @@ private:
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type value;
-            value.index = 1;
+            value.index = 1U;
             value.name  = chip::Span<const char>("CertTestgarbage: not in length on purpose", 8);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Commands::RenameOutput::Id, value,
                                chip::NullOptional
@@ -21785,7 +21785,7 @@ private:
             {
                 chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
             }
             break;
         case 4:
@@ -21793,7 +21793,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentTarget", value, mTargetvalue1.HasValue() ? mTargetvalue1.Value() : 1));
+                VerifyOrReturn(CheckValue("currentTarget", value, mTargetvalue1.HasValue() ? mTargetvalue1.Value() : 1U));
             }
             break;
         case 5:
@@ -21809,7 +21809,7 @@ private:
             {
                 chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
             }
             break;
         case 7:
@@ -21817,7 +21817,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentTarget", value, mTargetvalue2.HasValue() ? mTargetvalue2.Value() : 2));
+                VerifyOrReturn(CheckValue("currentTarget", value, mTargetvalue2.HasValue() ? mTargetvalue2.Value() : 2U));
             }
             break;
         default:
@@ -21857,7 +21857,7 @@ private:
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type value;
-            value.target = mTargetvalue1.HasValue() ? mTargetvalue1.Value() : 1;
+            value.target = mTargetvalue1.HasValue() ? mTargetvalue1.Value() : 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id, TargetNavigator::Commands::NavigateTarget::Id,
                                value, chip::NullOptional
 
@@ -21879,7 +21879,7 @@ private:
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type value;
-            value.target = mTargetvalue2.HasValue() ? mTargetvalue2.Value() : 2;
+            value.target = mTargetvalue2.HasValue() ? mTargetvalue2.Value() : 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id, TargetNavigator::Commands::NavigateTarget::Id,
                                value, chip::NullOptional
 
@@ -21987,8 +21987,8 @@ private:
             {
                 chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3U));
             }
             break;
         case 8:
@@ -24639,7 +24639,7 @@ private:
                     listHolder_0->mList[0].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 1);
                 }
                 listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 1;
+                listHolder_0->mList[0].fabricIndex = 1U;
 
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(3);
                 listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
@@ -24659,7 +24659,7 @@ private:
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
                                                                                                               1);
                 }
-                listHolder_0->mList[1].fabricIndex = 1;
+                listHolder_0->mList[1].fabricIndex = 1U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 2);
@@ -24956,8 +24956,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 1));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 1U));
             }
             break;
         case 2:
@@ -24968,7 +24968,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("occupancy", value, 0));
+                VerifyOrReturn(CheckValue("occupancy", value, 0U));
             }
             break;
         case 4:
@@ -24976,7 +24976,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("occupancySensorType", value, 0));
+                VerifyOrReturn(CheckValue("occupancySensorType", value, 0U));
             }
             break;
         case 5:
@@ -24985,8 +24985,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3U));
             }
             break;
         case 6:
@@ -24998,8 +24998,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3U));
             }
             break;
         case 8:
@@ -25008,8 +25008,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 273));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 273U));
             }
             break;
         case 9:
@@ -25021,8 +25021,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 273));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 273U));
             }
             break;
         case 11:
@@ -25109,7 +25109,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("pirUnoccupiedToOccupiedThreshold", value, 1));
+                VerifyOrReturn(CheckValue("pirUnoccupiedToOccupiedThreshold", value, 1U));
             }
             break;
         case 19:
@@ -25122,8 +25122,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 20:
@@ -25142,7 +25142,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("pirUnoccupiedToOccupiedThreshold", value, 1));
+                VerifyOrReturn(CheckValue("pirUnoccupiedToOccupiedThreshold", value, 1U));
             }
             break;
         case 22:
@@ -25218,10 +25218,10 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("ultrasonicUnoccupiedToOccupiedThreshold", value, 1));
+                VerifyOrReturn(CheckValue("ultrasonicUnoccupiedToOccupiedThreshold", value, 1U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 29:
@@ -25240,7 +25240,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("ultrasonicUnoccupiedToOccupiedThreshold", value, 1));
+                VerifyOrReturn(CheckValue("ultrasonicUnoccupiedToOccupiedThreshold", value, 1U));
             }
             break;
         case 31:
@@ -25338,7 +25338,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("physicalContactUnoccupiedToOccupiedThreshold", value, 1));
+                VerifyOrReturn(CheckValue("physicalContactUnoccupiedToOccupiedThreshold", value, 1U));
             }
             break;
         case 40:
@@ -25351,8 +25351,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 41:
@@ -25371,7 +25371,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("physicalContactUnoccupiedToOccupiedThreshold", value, 1));
+                VerifyOrReturn(CheckValue("physicalContactUnoccupiedToOccupiedThreshold", value, 1U));
             }
             break;
         default:
@@ -25405,7 +25405,7 @@ private:
             LogStep(2, "Writes the respective default value to mandatory attribute: Occupancy");
             ListFreer listFreer;
             uint8_t value;
-            value = 0;
+            value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id, OccupancySensing::Attributes::Occupancy::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -25428,7 +25428,7 @@ private:
             LogStep(6, "Writes the respective default value to mandatory attribute: OccupancySensorType");
             ListFreer listFreer;
             uint8_t value;
-            value = 0;
+            value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id,
                                   OccupancySensing::Attributes::OccupancySensorType::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -25447,7 +25447,7 @@ private:
             LogStep(9, "Writes the respective default value to mandatory attribute: OccupancySensorTypeBitmap");
             ListFreer listFreer;
             uint8_t value;
-            value = 1;
+            value = 1U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id,
                                   OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -25514,7 +25514,7 @@ private:
             LogStep(20, "Writes the respective default value to optional attribute: PIRUnoccupiedToOccupiedThreshold");
             ListFreer listFreer;
             uint8_t value;
-            value = 1;
+            value = 1U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id,
                                   OccupancySensing::Attributes::PirUnoccupiedToOccupiedThreshold::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -25572,7 +25572,7 @@ private:
             LogStep(29, "Writes the respective default value to optional attribute: UltrasonicUnoccupiedToOccupiedThreshold");
             ListFreer listFreer;
             uint8_t value;
-            value = 1;
+            value = 1U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id,
                                   OccupancySensing::Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -25653,7 +25653,7 @@ private:
             LogStep(41, "Writes the respective default value to optional attribute: PhysicalContactUnoccupiedToOccupiedThreshold");
             ListFreer listFreer;
             uint8_t value;
-            value = 1;
+            value = 1U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id,
                                   OccupancySensing::Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -26377,7 +26377,7 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("startUpOnOff", value));
-                VerifyOrReturn(CheckValue("startUpOnOff.Value()", value.Value(), 0));
+                VerifyOrReturn(CheckValue("startUpOnOff.Value()", value.Value(), 0U));
             }
             break;
         case 4:
@@ -26902,8 +26902,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3U));
             }
             break;
         case 2:
@@ -26944,8 +26944,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 1));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 1U));
             }
             break;
         case 7:
@@ -27018,8 +27018,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 2));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 2U));
             }
             break;
         case 16:
@@ -27036,8 +27036,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3U));
             }
             break;
         case 18:
@@ -27125,8 +27125,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3U));
             }
             break;
         case 28:
@@ -28201,8 +28201,8 @@ private:
                 chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3U));
             }
             break;
         case 16:
@@ -28211,8 +28211,8 @@ private:
                 chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 7));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 7U));
             }
             break;
         case 17:
@@ -28287,8 +28287,8 @@ private:
                 chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3U));
             }
             break;
         case 23:
@@ -28301,8 +28301,8 @@ private:
                 chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 7));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 7U));
             }
             break;
         default:
@@ -28495,7 +28495,7 @@ private:
             {
                 chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("effectiveOperationMode", value, 1));
+                VerifyOrReturn(CheckValue("effectiveOperationMode", value, 1U));
             }
             break;
         case 3:
@@ -28506,7 +28506,7 @@ private:
             {
                 chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("effectiveOperationMode", value, 2));
+                VerifyOrReturn(CheckValue("effectiveOperationMode", value, 2U));
             }
             break;
         case 5:
@@ -28517,7 +28517,7 @@ private:
             {
                 chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("effectiveOperationMode", value, 3));
+                VerifyOrReturn(CheckValue("effectiveOperationMode", value, 3U));
             }
             break;
         default:
@@ -28643,7 +28643,7 @@ private:
             {
                 chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("effectiveOperationMode", value, 0));
+                VerifyOrReturn(CheckValue("effectiveOperationMode", value, 0U));
             }
             break;
         case 3:
@@ -28654,7 +28654,7 @@ private:
             {
                 chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("effectiveControlMode", value, 0));
+                VerifyOrReturn(CheckValue("effectiveControlMode", value, 0U));
             }
             break;
         case 5:
@@ -28665,7 +28665,7 @@ private:
             {
                 chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("effectiveControlMode", value, 1));
+                VerifyOrReturn(CheckValue("effectiveControlMode", value, 1U));
             }
             break;
         case 7:
@@ -28676,7 +28676,7 @@ private:
             {
                 chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("effectiveControlMode", value, 2));
+                VerifyOrReturn(CheckValue("effectiveControlMode", value, 2U));
             }
             break;
         case 9:
@@ -28687,7 +28687,7 @@ private:
             {
                 chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("effectiveControlMode", value, 3));
+                VerifyOrReturn(CheckValue("effectiveControlMode", value, 3U));
             }
             break;
         case 11:
@@ -28698,7 +28698,7 @@ private:
             {
                 chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("effectiveControlMode", value, 5));
+                VerifyOrReturn(CheckValue("effectiveControlMode", value, 5U));
             }
             break;
         case 13:
@@ -28709,7 +28709,7 @@ private:
             {
                 chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("effectiveControlMode", value, 7));
+                VerifyOrReturn(CheckValue("effectiveControlMode", value, 7U));
             }
             break;
         default:
@@ -29756,7 +29756,7 @@ private:
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
 
-                VerifyOrReturn(CheckValue("commissioningMode", value.commissioningMode, 1));
+                VerifyOrReturn(CheckValue("commissioningMode", value.commissioningMode, 1U));
             }
             shouldContinue = true;
             break;
@@ -29817,7 +29817,7 @@ private:
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
 
-                VerifyOrReturn(CheckConstraintMinValue("value.numIPs", value.numIPs, 1));
+                VerifyOrReturn(CheckConstraintMinValue("value.numIPs", value.numIPs, 1U));
             }
             shouldContinue = true;
             break;
@@ -29973,7 +29973,7 @@ private:
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
 
-                VerifyOrReturn(CheckValue("commissioningMode", value.commissioningMode, 1));
+                VerifyOrReturn(CheckValue("commissioningMode", value.commissioningMode, 1U));
             }
             shouldContinue = true;
             break;
@@ -30034,7 +30034,7 @@ private:
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
 
-                VerifyOrReturn(CheckConstraintMinValue("value.numIPs", value.numIPs, 1));
+                VerifyOrReturn(CheckConstraintMinValue("value.numIPs", value.numIPs, 1U));
             }
             shouldContinue = true;
             break;
@@ -30457,9 +30457,9 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("numberOfPositions", value, 2));
+                VerifyOrReturn(CheckValue("numberOfPositions", value, 2U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 2));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 2U));
             }
             break;
         case 2:
@@ -30467,9 +30467,9 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentPosition", value, 0));
+                VerifyOrReturn(CheckValue("currentPosition", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
             }
             break;
         case 3:
@@ -30477,9 +30477,9 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("multiPressMax", value, 2));
+                VerifyOrReturn(CheckValue("multiPressMax", value, 2U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 2));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 2U));
             }
             break;
         default:
@@ -31195,8 +31195,8 @@ private:
                 chip::app::Clusters::Thermostat::ThermostatControlSequence value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
             }
             break;
         case 17:
@@ -31205,8 +31205,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 9));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 9U));
             }
             break;
         case 18:
@@ -31261,8 +31261,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 6));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 6U));
             }
             break;
         case 27:
@@ -32329,10 +32329,10 @@ private:
             {
                 chip::app::Clusters::Thermostat::ThermostatControlSequence value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("controlSequenceOfOperation", value, 4));
+                VerifyOrReturn(CheckValue("controlSequenceOfOperation", value, 4U));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
             }
             break;
         case 58:
@@ -32343,7 +32343,7 @@ private:
             {
                 chip::app::Clusters::Thermostat::ThermostatControlSequence value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("controlSequenceOfOperation", value, 2));
+                VerifyOrReturn(CheckValue("controlSequenceOfOperation", value, 2U));
             }
             break;
         case 60:
@@ -33418,8 +33418,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 1));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 1U));
             }
             break;
         case 2:
@@ -33428,8 +33428,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
             }
             break;
         case 3:
@@ -33438,8 +33438,8 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 1));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 1U));
             }
             break;
         default:
@@ -33632,7 +33632,7 @@ private:
             VerifyOrDo(!ShouldSkip("A_TEMPERATURE_DISPLAY_MODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
-            value = 0;
+            value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -33650,7 +33650,7 @@ private:
             VerifyOrDo(!ShouldSkip("A_TEMPERATURE_DISPLAY_MODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
-            value = 1;
+            value = 1U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -33668,7 +33668,7 @@ private:
             VerifyOrDo(!ShouldSkip("A_TEMPERATURE_DISPLAY_MODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
-            value = 2;
+            value = 2U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -33678,7 +33678,7 @@ private:
             VerifyOrDo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
-            value = 0;
+            value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -33696,7 +33696,7 @@ private:
             VerifyOrDo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
-            value = 1;
+            value = 1U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -33714,7 +33714,7 @@ private:
             VerifyOrDo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
-            value = 2;
+            value = 2U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -33732,7 +33732,7 @@ private:
             VerifyOrDo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
-            value = 3;
+            value = 3U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -33750,7 +33750,7 @@ private:
             VerifyOrDo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
-            value = 4;
+            value = 4U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -33768,7 +33768,7 @@ private:
             VerifyOrDo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
-            value = 5;
+            value = 5U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -33786,7 +33786,7 @@ private:
             VerifyOrDo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
-            value = 6;
+            value = 6U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -33796,7 +33796,7 @@ private:
             VerifyOrDo(!ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
-            value = 0;
+            value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -33815,7 +33815,7 @@ private:
             VerifyOrDo(!ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
-            value = 1;
+            value = 1U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -33834,7 +33834,7 @@ private:
             VerifyOrDo(!ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
-            value = 2;
+            value = 2U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -34008,8 +34008,8 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "RoutingRole"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 6));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 6U));
             }
             break;
         case 5:
@@ -36167,8 +36167,8 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
             }
             break;
         case 4:
@@ -36755,8 +36755,8 @@ private:
                 chip::app::Clusters::WindowCovering::Type value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 9));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 9U));
             }
             break;
         case 2:
@@ -36765,8 +36765,8 @@ private:
                 chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 63));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 63U));
             }
             break;
         case 3:
@@ -36775,8 +36775,8 @@ private:
                 chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 63));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 63U));
             }
             break;
         case 4:
@@ -36785,8 +36785,8 @@ private:
                 chip::app::Clusters::WindowCovering::EndProductType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 23));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 23U));
             }
             break;
         case 5:
@@ -36795,8 +36795,8 @@ private:
                 chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 15));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 15U));
             }
             break;
         case 6:
@@ -36970,8 +36970,8 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "Percent"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100U));
             }
             break;
         case 25:
@@ -36980,8 +36980,8 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "Percent"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100U));
             }
             break;
         default:
@@ -37041,7 +37041,7 @@ private:
             VerifyOrDo(!ShouldSkip("A_MODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0);
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -37315,8 +37315,8 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 4));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 4U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127U));
             }
             break;
         case 3:
@@ -37327,8 +37327,8 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127U));
             }
             break;
         case 5:
@@ -37339,8 +37339,8 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127U));
                 configStatusValA = value;
             }
             break;
@@ -37355,8 +37355,8 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127U));
             }
             break;
         case 10:
@@ -37364,8 +37364,8 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127U));
             }
             break;
         case 11:
@@ -37379,8 +37379,8 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127U));
                 configStatusValB = value;
             }
             break;
@@ -37395,8 +37395,8 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127U));
             }
             break;
         case 17:
@@ -37404,8 +37404,8 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 127U));
             }
             break;
         case 18:
@@ -37438,7 +37438,7 @@ private:
             VerifyOrDo(!ShouldSkip("WNCV_REVERSAL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(1);
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(1U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -37453,7 +37453,7 @@ private:
             VerifyOrDo(!ShouldSkip("WNCV_REVERSAL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0);
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -37468,7 +37468,7 @@ private:
             VerifyOrDo(!ShouldSkip("WNCV_CALIBRATION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(2);
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(2U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -37493,7 +37493,7 @@ private:
             VerifyOrDo(!ShouldSkip("WNCV_CALIBRATION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0);
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -37524,7 +37524,7 @@ private:
             VerifyOrDo(!ShouldSkip("WNCV_MAINTENANCE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(4);
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(4U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -37549,7 +37549,7 @@ private:
             VerifyOrDo(!ShouldSkip("WNCV_MAINTENANCE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0);
+            value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -37626,8 +37626,8 @@ private:
                 chip::app::Clusters::WindowCovering::Type value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 9));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 9U));
             }
             break;
         default:
@@ -37708,10 +37708,10 @@ private:
             {
                 chip::app::Clusters::WindowCovering::EndProductType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("endProductType", value, 0));
+                VerifyOrReturn(CheckValue("endProductType", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 23));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 23U));
             }
             break;
         default:
@@ -37810,8 +37810,8 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100U));
             }
             break;
         case 5:
@@ -37830,8 +37830,8 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100U));
             }
             break;
         case 7:
@@ -37877,8 +37877,8 @@ private:
                 chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 5));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 21));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 5U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 21U));
             }
             shouldContinue = true;
             break;
@@ -37902,8 +37902,8 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 99));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 99U));
             }
             break;
         case 17:
@@ -37922,8 +37922,8 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 99));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 99U));
             }
             break;
         case 19:
@@ -37938,7 +37938,7 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("operationalStatus", value, 0));
+                VerifyOrReturn(CheckValue("operationalStatus", value, 0U));
             }
             break;
         case 22:
@@ -38215,8 +38215,8 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 99));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 99U));
             }
             break;
         case 5:
@@ -38235,8 +38235,8 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 99));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 99U));
             }
             break;
         case 7:
@@ -38282,8 +38282,8 @@ private:
                 chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 10));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 42));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 10U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 42U));
             }
             shouldContinue = true;
             break;
@@ -38307,8 +38307,8 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100U));
             }
             break;
         case 17:
@@ -38327,8 +38327,8 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100U));
             }
             break;
         case 19:
@@ -38343,7 +38343,7 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("operationalStatus", value, 0));
+                VerifyOrReturn(CheckValue("operationalStatus", value, 0U));
             }
             break;
         case 22:
@@ -38634,7 +38634,7 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("operationalStatus", value, 0));
+                VerifyOrReturn(CheckValue("operationalStatus", value, 0U));
             }
             shouldContinue = true;
             break;
@@ -38647,7 +38647,7 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("operationalStatus", value, 0));
+                VerifyOrReturn(CheckValue("operationalStatus", value, 0U));
             }
             break;
         case 11:
@@ -38892,7 +38892,7 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("operationalStatus", value, 0));
+                VerifyOrReturn(CheckValue("operationalStatus", value, 0U));
             }
             break;
         case 6:
@@ -38910,7 +38910,7 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("currentPositionLiftPercentage", value));
-                VerifyOrReturn(CheckValue("currentPositionLiftPercentage.Value()", value.Value(), 0));
+                VerifyOrReturn(CheckValue("currentPositionLiftPercentage.Value()", value.Value(), 0U));
             }
             break;
         case 8:
@@ -38928,7 +38928,7 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("currentPositionTiltPercentage", value));
-                VerifyOrReturn(CheckValue("currentPositionTiltPercentage.Value()", value.Value(), 0));
+                VerifyOrReturn(CheckValue("currentPositionTiltPercentage.Value()", value.Value(), 0U));
             }
             break;
         default:
@@ -39084,7 +39084,7 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("operationalStatus", value, 0));
+                VerifyOrReturn(CheckValue("operationalStatus", value, 0U));
             }
             break;
         case 6:
@@ -39102,7 +39102,7 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("currentPositionLiftPercentage", value));
-                VerifyOrReturn(CheckValue("currentPositionLiftPercentage.Value()", value.Value(), 100));
+                VerifyOrReturn(CheckValue("currentPositionLiftPercentage.Value()", value.Value(), 100U));
             }
             break;
         case 8:
@@ -39120,7 +39120,7 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("currentPositionTiltPercentage", value));
-                VerifyOrReturn(CheckValue("currentPositionTiltPercentage.Value()", value.Value(), 100));
+                VerifyOrReturn(CheckValue("currentPositionTiltPercentage.Value()", value.Value(), 100U));
             }
             break;
         default:
@@ -39295,7 +39295,7 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("operationalStatus", value, 0));
+                VerifyOrReturn(CheckValue("operationalStatus", value, 0U));
             }
             break;
         case 9:
@@ -39313,7 +39313,7 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("currentPositionLiftPercentage", value));
-                VerifyOrReturn(CheckValue("currentPositionLiftPercentage.Value()", value.Value(), 25));
+                VerifyOrReturn(CheckValue("currentPositionLiftPercentage.Value()", value.Value(), 25U));
             }
             break;
         case 11:
@@ -39341,7 +39341,7 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("operationalStatus", value, 0));
+                VerifyOrReturn(CheckValue("operationalStatus", value, 0U));
             }
             break;
         case 16:
@@ -39359,7 +39359,7 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("currentPositionLiftPercentage", value));
-                VerifyOrReturn(CheckValue("currentPositionLiftPercentage.Value()", value.Value(), 75));
+                VerifyOrReturn(CheckValue("currentPositionLiftPercentage.Value()", value.Value(), 75U));
             }
             break;
         default:
@@ -39591,7 +39591,7 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("operationalStatus", value, 0));
+                VerifyOrReturn(CheckValue("operationalStatus", value, 0U));
             }
             break;
         case 9:
@@ -39609,7 +39609,7 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("currentPositionTiltPercentage", value));
-                VerifyOrReturn(CheckValue("currentPositionTiltPercentage.Value()", value.Value(), 30));
+                VerifyOrReturn(CheckValue("currentPositionTiltPercentage.Value()", value.Value(), 30U));
             }
             break;
         case 11:
@@ -39637,7 +39637,7 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("operationalStatus", value, 0));
+                VerifyOrReturn(CheckValue("operationalStatus", value, 0U));
             }
             break;
         case 16:
@@ -39655,7 +39655,7 @@ private:
                 chip::app::DataModel::Nullable<chip::Percent> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("currentPositionTiltPercentage", value));
-                VerifyOrReturn(CheckValue("currentPositionTiltPercentage.Value()", value.Value(), 60));
+                VerifyOrReturn(CheckValue("currentPositionTiltPercentage.Value()", value.Value(), 60U));
             }
             break;
         default:
@@ -39865,8 +39865,8 @@ private:
                 VerifyOrReturn(CheckValueNonNull("currentPositionLiftPercentage", value));
                 VerifyOrReturn(CheckValue("currentPositionLiftPercentage.Value()", value.Value(),
                                           static_cast<uint8_t>(attrCurrentPositionLiftPercent100ths.Value() / 100)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100U));
             }
             break;
         case 3:
@@ -40016,8 +40016,8 @@ private:
                 VerifyOrReturn(CheckValueNonNull("currentPositionTiltPercentage", value));
                 VerifyOrReturn(CheckValue("currentPositionTiltPercentage.Value()", value.Value(),
                                           static_cast<uint8_t>(attrCurrentPositionTiltPercent100ths.Value() / 100)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 100U));
             }
             break;
         case 3:
@@ -40433,11 +40433,11 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("targetList", iter_0, 0));
-                    VerifyOrReturn(CheckValue("targetList[0].identifier", iter_0.GetValue().identifier, 1));
+                    VerifyOrReturn(CheckValue("targetList[0].identifier", iter_0.GetValue().identifier, 1U));
                     VerifyOrReturn(
                         CheckValueAsString("targetList[0].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("targetList", iter_0, 1));
-                    VerifyOrReturn(CheckValue("targetList[1].identifier", iter_0.GetValue().identifier, 2));
+                    VerifyOrReturn(CheckValue("targetList[1].identifier", iter_0.GetValue().identifier, 2U));
                     VerifyOrReturn(
                         CheckValueAsString("targetList[1].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("targetList", iter_0, 2));
@@ -40449,7 +40449,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentTarget", value, 0));
+                VerifyOrReturn(CheckValue("currentTarget", value, 0U));
             }
             break;
         case 3:
@@ -40457,7 +40457,7 @@ private:
             {
                 chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("data response", 13)));
@@ -40499,7 +40499,7 @@ private:
             LogStep(3, "Navigate Target Request Command");
             ListFreer listFreer;
             chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type value;
-            value.target = 1;
+            value.target = 1U;
             value.data.Emplace();
             value.data.Value() = chip::Span<const char>("1garbage: not in length on purpose", 1);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id, TargetNavigator::Commands::NavigateTarget::Id,
@@ -40561,16 +40561,16 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("outputList", iter_0, 0));
-                    VerifyOrReturn(CheckValue("outputList[0].index", iter_0.GetValue().index, 1));
-                    VerifyOrReturn(CheckValue("outputList[0].outputType", iter_0.GetValue().outputType, 0));
+                    VerifyOrReturn(CheckValue("outputList[0].index", iter_0.GetValue().index, 1U));
+                    VerifyOrReturn(CheckValue("outputList[0].outputType", iter_0.GetValue().outputType, 0U));
                     VerifyOrReturn(CheckValueAsString("outputList[0].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("outputList", iter_0, 1));
-                    VerifyOrReturn(CheckValue("outputList[1].index", iter_0.GetValue().index, 2));
-                    VerifyOrReturn(CheckValue("outputList[1].outputType", iter_0.GetValue().outputType, 0));
+                    VerifyOrReturn(CheckValue("outputList[1].index", iter_0.GetValue().index, 2U));
+                    VerifyOrReturn(CheckValue("outputList[1].outputType", iter_0.GetValue().outputType, 0U));
                     VerifyOrReturn(CheckValueAsString("outputList[1].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("outputList", iter_0, 2));
-                    VerifyOrReturn(CheckValue("outputList[2].index", iter_0.GetValue().index, 3));
-                    VerifyOrReturn(CheckValue("outputList[2].outputType", iter_0.GetValue().outputType, 0));
+                    VerifyOrReturn(CheckValue("outputList[2].index", iter_0.GetValue().index, 3U));
+                    VerifyOrReturn(CheckValue("outputList[2].outputType", iter_0.GetValue().outputType, 0U));
                     VerifyOrReturn(CheckValueAsString("outputList[2].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("outputList", iter_0, 3));
                 }
@@ -40581,7 +40581,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentOutput", value, 1));
+                VerifyOrReturn(CheckValue("currentOutput", value, 1U));
             }
             break;
         case 3:
@@ -40598,17 +40598,17 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("outputList", iter_0, 0));
-                    VerifyOrReturn(CheckValue("outputList[0].index", iter_0.GetValue().index, 1));
-                    VerifyOrReturn(CheckValue("outputList[0].outputType", iter_0.GetValue().outputType, 0));
+                    VerifyOrReturn(CheckValue("outputList[0].index", iter_0.GetValue().index, 1U));
+                    VerifyOrReturn(CheckValue("outputList[0].outputType", iter_0.GetValue().outputType, 0U));
                     VerifyOrReturn(
                         CheckValueAsString("outputList[0].name", iter_0.GetValue().name, chip::CharSpan("HDMI Test", 9)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("outputList", iter_0, 1));
-                    VerifyOrReturn(CheckValue("outputList[1].index", iter_0.GetValue().index, 2));
-                    VerifyOrReturn(CheckValue("outputList[1].outputType", iter_0.GetValue().outputType, 0));
+                    VerifyOrReturn(CheckValue("outputList[1].index", iter_0.GetValue().index, 2U));
+                    VerifyOrReturn(CheckValue("outputList[1].outputType", iter_0.GetValue().outputType, 0U));
                     VerifyOrReturn(CheckValueAsString("outputList[1].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("outputList", iter_0, 2));
-                    VerifyOrReturn(CheckValue("outputList[2].index", iter_0.GetValue().index, 3));
-                    VerifyOrReturn(CheckValue("outputList[2].outputType", iter_0.GetValue().outputType, 0));
+                    VerifyOrReturn(CheckValue("outputList[2].index", iter_0.GetValue().index, 3U));
+                    VerifyOrReturn(CheckValue("outputList[2].outputType", iter_0.GetValue().outputType, 0U));
                     VerifyOrReturn(CheckValueAsString("outputList[2].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("outputList", iter_0, 3));
                 }
@@ -40650,7 +40650,7 @@ private:
             LogStep(3, "Select Output Command");
             ListFreer listFreer;
             chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type value;
-            value.index = 1;
+            value.index = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Commands::SelectOutput::Id, value,
                                chip::NullOptional
 
@@ -40660,7 +40660,7 @@ private:
             LogStep(4, "Rename Output Command");
             ListFreer listFreer;
             chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type value;
-            value.index = 1;
+            value.index = 1U;
             value.name  = chip::Span<const char>("HDMI Testgarbage: not in length on purpose", 9);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Commands::RenameOutput::Id, value,
                                chip::NullOptional
@@ -40747,7 +40747,7 @@ private:
             {
                 chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueAsString("data", value.data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
             }
@@ -40757,7 +40757,7 @@ private:
             {
                 chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueAsString("data", value.data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
             }
@@ -40767,7 +40767,7 @@ private:
             {
                 chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueAsString("data", value.data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
             }
@@ -40896,7 +40896,7 @@ private:
             {
                 chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
             }
             break;
         default:
@@ -41207,7 +41207,7 @@ private:
             {
                 chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value, 0));
+                VerifyOrReturn(CheckValue("status", value, 0U));
             }
             break;
         case 6:
@@ -41356,7 +41356,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::PlaybackStateEnum value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentState", value, 0));
+                VerifyOrReturn(CheckValue("currentState", value, 0U));
             }
             break;
         case 2:
@@ -41419,7 +41419,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("data response", 13)));
@@ -41430,7 +41430,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("data response", 13)));
@@ -41441,7 +41441,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("data response", 13)));
@@ -41452,7 +41452,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("data response", 13)));
@@ -41463,7 +41463,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("data response", 13)));
@@ -41474,7 +41474,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("data response", 13)));
@@ -41485,7 +41485,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("data response", 13)));
@@ -41496,7 +41496,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("data response", 13)));
@@ -41507,7 +41507,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("data response", 13)));
@@ -41529,7 +41529,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("data response", 13)));
@@ -41551,7 +41551,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("data response", 13)));
@@ -41860,7 +41860,7 @@ private:
                 VerifyOrReturn(CheckValuePresent("lineup.Value().postalCode", value.Value().postalCode));
                 VerifyOrReturn(CheckValueAsString("lineup.Value().postalCode.Value()", value.Value().postalCode.Value(),
                                                   chip::CharSpan("98052", 5)));
-                VerifyOrReturn(CheckValue("lineup.Value().lineupInfoType", value.Value().lineupInfoType, 0));
+                VerifyOrReturn(CheckValue("lineup.Value().lineupInfoType", value.Value().lineupInfoType, 0U));
             }
             break;
         case 3:
@@ -41887,7 +41887,7 @@ private:
             {
                 chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("data response", 13)));
@@ -42120,7 +42120,7 @@ private:
             {
                 chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("exampleData", 11)));
@@ -42131,7 +42131,7 @@ private:
             {
                 chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("data", value.data));
                 VerifyOrReturn(CheckValueAsString("data.Value()", value.data.Value(), chip::CharSpan("exampleData", 11)));
@@ -42352,14 +42352,14 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("inputList", iter_0, 0));
-                    VerifyOrReturn(CheckValue("inputList[0].index", iter_0.GetValue().index, 1));
-                    VerifyOrReturn(CheckValue("inputList[0].inputType", iter_0.GetValue().inputType, 4));
+                    VerifyOrReturn(CheckValue("inputList[0].index", iter_0.GetValue().index, 1U));
+                    VerifyOrReturn(CheckValue("inputList[0].inputType", iter_0.GetValue().inputType, 4U));
                     VerifyOrReturn(CheckValueAsString("inputList[0].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
                     VerifyOrReturn(CheckValueAsString("inputList[0].description", iter_0.GetValue().description,
                                                       chip::CharSpan("High-Definition Multimedia Interface", 36)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("inputList", iter_0, 1));
-                    VerifyOrReturn(CheckValue("inputList[1].index", iter_0.GetValue().index, 2));
-                    VerifyOrReturn(CheckValue("inputList[1].inputType", iter_0.GetValue().inputType, 4));
+                    VerifyOrReturn(CheckValue("inputList[1].index", iter_0.GetValue().index, 2U));
+                    VerifyOrReturn(CheckValue("inputList[1].inputType", iter_0.GetValue().inputType, 4U));
                     VerifyOrReturn(CheckValueAsString("inputList[1].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
                     VerifyOrReturn(CheckValueAsString("inputList[1].description", iter_0.GetValue().description,
                                                       chip::CharSpan("High-Definition Multimedia Interface", 36)));
@@ -42372,7 +42372,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentInput", value, 1));
+                VerifyOrReturn(CheckValue("currentInput", value, 1U));
             }
             break;
         case 3:
@@ -42395,14 +42395,14 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("inputList", iter_0, 0));
-                    VerifyOrReturn(CheckValue("inputList[0].index", iter_0.GetValue().index, 1));
-                    VerifyOrReturn(CheckValue("inputList[0].inputType", iter_0.GetValue().inputType, 4));
+                    VerifyOrReturn(CheckValue("inputList[0].index", iter_0.GetValue().index, 1U));
+                    VerifyOrReturn(CheckValue("inputList[0].inputType", iter_0.GetValue().inputType, 4U));
                     VerifyOrReturn(CheckValueAsString("inputList[0].name", iter_0.GetValue().name, chip::CharSpan("HDMI Test", 9)));
                     VerifyOrReturn(CheckValueAsString("inputList[0].description", iter_0.GetValue().description,
                                                       chip::CharSpan("High-Definition Multimedia Interface", 36)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("inputList", iter_0, 1));
-                    VerifyOrReturn(CheckValue("inputList[1].index", iter_0.GetValue().index, 2));
-                    VerifyOrReturn(CheckValue("inputList[1].inputType", iter_0.GetValue().inputType, 4));
+                    VerifyOrReturn(CheckValue("inputList[1].index", iter_0.GetValue().index, 2U));
+                    VerifyOrReturn(CheckValue("inputList[1].inputType", iter_0.GetValue().inputType, 4U));
                     VerifyOrReturn(CheckValueAsString("inputList[1].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
                     VerifyOrReturn(CheckValueAsString("inputList[1].description", iter_0.GetValue().description,
                                                       chip::CharSpan("High-Definition Multimedia Interface", 36)));
@@ -42446,7 +42446,7 @@ private:
             LogStep(3, "Select Input Command");
             ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::SelectInput::Type value;
-            value.index = 1;
+            value.index = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::SelectInput::Id, value,
                                chip::NullOptional
 
@@ -42474,7 +42474,7 @@ private:
             LogStep(6, "Rename Input Command");
             ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::RenameInput::Type value;
-            value.index = 1;
+            value.index = 1U;
             value.name  = chip::Span<const char>("HDMI Testgarbage: not in length on purpose", 9);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::RenameInput::Id, value,
                                chip::NullOptional
@@ -42562,7 +42562,7 @@ private:
             {
                 chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("returnValue", value.returnValue, 7));
+                VerifyOrReturn(CheckValue("returnValue", value.returnValue, 7U));
             }
             break;
         case 4:
@@ -42570,7 +42570,7 @@ private:
             {
                 chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("returnValue", value.returnValue, 20));
+                VerifyOrReturn(CheckValue("returnValue", value.returnValue, 20U));
             }
             break;
         case 5:
@@ -42611,7 +42611,7 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("bitmap8", value, 0));
+                VerifyOrReturn(CheckValue("bitmap8", value, 0U));
             }
             break;
         case 12:
@@ -42622,7 +42622,7 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("bitmap8", value, 255));
+                VerifyOrReturn(CheckValue("bitmap8", value, 255U));
             }
             break;
         case 14:
@@ -42633,7 +42633,7 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("bitmap8", value, 0));
+                VerifyOrReturn(CheckValue("bitmap8", value, 0U));
             }
             break;
         case 16:
@@ -42731,7 +42731,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("int8u", value, 0));
+                VerifyOrReturn(CheckValue("int8u", value, 0U));
             }
             break;
         case 32:
@@ -42742,7 +42742,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("int8u", value, 255));
+                VerifyOrReturn(CheckValue("int8u", value, 255U));
             }
             break;
         case 34:
@@ -42753,7 +42753,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("int8u", value, 0));
+                VerifyOrReturn(CheckValue("int8u", value, 0U));
             }
             break;
         case 36:
@@ -43119,7 +43119,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("enum8", value, 0));
+                VerifyOrReturn(CheckValue("enum8", value, 0U));
             }
             break;
         case 98:
@@ -43130,7 +43130,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("enum8", value, 255));
+                VerifyOrReturn(CheckValue("enum8", value, 255U));
             }
             break;
         case 100:
@@ -43141,7 +43141,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("enum8", value, 0));
+                VerifyOrReturn(CheckValue("enum8", value, 0U));
             }
             break;
         case 102:
@@ -43573,7 +43573,7 @@ private:
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("arg1", value.arg1, 20003U));
 
-                VerifyOrReturn(CheckValue("arg2", value.arg2, 101));
+                VerifyOrReturn(CheckValue("arg2", value.arg2, 101U));
             }
             break;
         case 155:
@@ -43629,13 +43629,13 @@ private:
             {
                 chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("arg1.a", value.arg1.a, 17));
+                VerifyOrReturn(CheckValue("arg1.a", value.arg1.a, 17U));
                 VerifyOrReturn(CheckValue("arg1.b", value.arg1.b, false));
-                VerifyOrReturn(CheckValue("arg1.c", value.arg1.c, 2));
+                VerifyOrReturn(CheckValue("arg1.c", value.arg1.c, 2U));
                 VerifyOrReturn(
                     CheckValueAsString("arg1.d", value.arg1.d, chip::ByteSpan(chip::Uint8::from_const_char("octet_string"), 12)));
                 VerifyOrReturn(CheckValueAsString("arg1.e", value.arg1.e, chip::CharSpan("char_string", 11)));
-                VerifyOrReturn(CheckValue("arg1.f", value.arg1.f, 1));
+                VerifyOrReturn(CheckValue("arg1.f", value.arg1.f, 1U));
                 VerifyOrReturn(CheckValue("arg1.g", value.arg1.g, 0.1f));
                 VerifyOrReturn(CheckValue("arg1.h", value.arg1.h, 0.1));
             }
@@ -43664,23 +43664,23 @@ private:
                 {
                     auto iter_0 = value.arg1.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.arg1)>("arg1", iter_0, 0));
-                    VerifyOrReturn(CheckValue("arg1[0]", iter_0.GetValue(), 9));
+                    VerifyOrReturn(CheckValue("arg1[0]", iter_0.GetValue(), 9U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.arg1)>("arg1", iter_0, 1));
-                    VerifyOrReturn(CheckValue("arg1[1]", iter_0.GetValue(), 8));
+                    VerifyOrReturn(CheckValue("arg1[1]", iter_0.GetValue(), 8U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.arg1)>("arg1", iter_0, 2));
-                    VerifyOrReturn(CheckValue("arg1[2]", iter_0.GetValue(), 7));
+                    VerifyOrReturn(CheckValue("arg1[2]", iter_0.GetValue(), 7U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.arg1)>("arg1", iter_0, 3));
-                    VerifyOrReturn(CheckValue("arg1[3]", iter_0.GetValue(), 6));
+                    VerifyOrReturn(CheckValue("arg1[3]", iter_0.GetValue(), 6U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.arg1)>("arg1", iter_0, 4));
-                    VerifyOrReturn(CheckValue("arg1[4]", iter_0.GetValue(), 5));
+                    VerifyOrReturn(CheckValue("arg1[4]", iter_0.GetValue(), 5U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.arg1)>("arg1", iter_0, 5));
-                    VerifyOrReturn(CheckValue("arg1[5]", iter_0.GetValue(), 4));
+                    VerifyOrReturn(CheckValue("arg1[5]", iter_0.GetValue(), 4U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.arg1)>("arg1", iter_0, 6));
-                    VerifyOrReturn(CheckValue("arg1[6]", iter_0.GetValue(), 3));
+                    VerifyOrReturn(CheckValue("arg1[6]", iter_0.GetValue(), 3U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.arg1)>("arg1", iter_0, 7));
-                    VerifyOrReturn(CheckValue("arg1[7]", iter_0.GetValue(), 2));
+                    VerifyOrReturn(CheckValue("arg1[7]", iter_0.GetValue(), 2U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.arg1)>("arg1", iter_0, 8));
-                    VerifyOrReturn(CheckValue("arg1[8]", iter_0.GetValue(), 1));
+                    VerifyOrReturn(CheckValue("arg1[8]", iter_0.GetValue(), 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value.arg1)>("arg1", iter_0, 9));
                 }
             }
@@ -43739,13 +43739,13 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listInt8u", iter_0, 0));
-                    VerifyOrReturn(CheckValue("listInt8u[0]", iter_0.GetValue(), 1));
+                    VerifyOrReturn(CheckValue("listInt8u[0]", iter_0.GetValue(), 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listInt8u", iter_0, 1));
-                    VerifyOrReturn(CheckValue("listInt8u[1]", iter_0.GetValue(), 2));
+                    VerifyOrReturn(CheckValue("listInt8u[1]", iter_0.GetValue(), 2U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listInt8u", iter_0, 2));
-                    VerifyOrReturn(CheckValue("listInt8u[2]", iter_0.GetValue(), 3));
+                    VerifyOrReturn(CheckValue("listInt8u[2]", iter_0.GetValue(), 3U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listInt8u", iter_0, 3));
-                    VerifyOrReturn(CheckValue("listInt8u[3]", iter_0.GetValue(), 4));
+                    VerifyOrReturn(CheckValue("listInt8u[3]", iter_0.GetValue(), 4U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("listInt8u", iter_0, 4));
                 }
             }
@@ -43818,11 +43818,11 @@ private:
                 VerifyOrReturn(CheckValue("wasNull.Value()", value.wasNull.Value(), false));
 
                 VerifyOrReturn(CheckValuePresent("value", value.value));
-                VerifyOrReturn(CheckValue("value.Value()", value.value.Value(), 5));
+                VerifyOrReturn(CheckValue("value.Value()", value.value.Value(), 5U));
 
                 VerifyOrReturn(CheckValuePresent("originalValue", value.originalValue));
                 VerifyOrReturn(CheckValueNonNull("originalValue.Value()", value.originalValue.Value()));
-                VerifyOrReturn(CheckValue("originalValue.Value().Value()", value.originalValue.Value().Value(), 5));
+                VerifyOrReturn(CheckValue("originalValue.Value().Value()", value.originalValue.Value().Value(), 5U));
             }
             break;
         case 177:
@@ -43879,11 +43879,11 @@ private:
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().nullableList.Value())>(
                             "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_3, 0));
                         VerifyOrReturn(
-                            CheckValue("listNullablesAndOptionalsStruct[0].nullableList.Value()[0]", iter_3.GetValue(), 1));
+                            CheckValue("listNullablesAndOptionalsStruct[0].nullableList.Value()[0]", iter_3.GetValue(), 1U));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().nullableList.Value())>(
                             "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_3, 1));
                         VerifyOrReturn(
-                            CheckValue("listNullablesAndOptionalsStruct[0].nullableList.Value()[1]", iter_3.GetValue(), 2));
+                            CheckValue("listNullablesAndOptionalsStruct[0].nullableList.Value()[1]", iter_3.GetValue(), 2U));
                         VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().nullableList.Value())>(
                             "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_3, 2));
                     }
@@ -43933,7 +43933,7 @@ private:
                 chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableBitmap8", value));
-                VerifyOrReturn(CheckValue("nullableBitmap8.Value()", value.Value(), 254));
+                VerifyOrReturn(CheckValue("nullableBitmap8.Value()", value.Value(), 254U));
             }
             break;
         case 188:
@@ -43945,7 +43945,7 @@ private:
                 chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableBitmap8", value));
-                VerifyOrReturn(CheckValue("nullableBitmap8.Value()", value.Value(), 254));
+                VerifyOrReturn(CheckValue("nullableBitmap8.Value()", value.Value(), 254U));
 
                 nullableValue254 = value;
             }
@@ -44083,7 +44083,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableInt8u", value));
-                VerifyOrReturn(CheckValue("nullableInt8u.Value()", value.Value(), 0));
+                VerifyOrReturn(CheckValue("nullableInt8u.Value()", value.Value(), 0U));
             }
             break;
         case 213:
@@ -44095,7 +44095,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableInt8u", value));
-                VerifyOrReturn(CheckValue("nullableInt8u.Value()", value.Value(), 254));
+                VerifyOrReturn(CheckValue("nullableInt8u.Value()", value.Value(), 254U));
             }
             break;
         case 215:
@@ -44107,7 +44107,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableInt8u", value));
-                VerifyOrReturn(CheckValue("nullableInt8u.Value()", value.Value(), 254));
+                VerifyOrReturn(CheckValue("nullableInt8u.Value()", value.Value(), 254U));
             }
             break;
         case 217:
@@ -44134,8 +44134,8 @@ private:
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 221:
@@ -44143,7 +44143,7 @@ private:
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintNotValue("value", value, 254U));
             }
             break;
         case 222:
@@ -44154,8 +44154,8 @@ private:
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
         case 224:
@@ -44163,7 +44163,7 @@ private:
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, 129));
+                VerifyOrReturn(CheckConstraintNotValue("value", value, 129U));
             }
             break;
         case 225:
@@ -44833,7 +44833,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableEnum8", value));
-                VerifyOrReturn(CheckValue("nullableEnum8.Value()", value.Value(), 0));
+                VerifyOrReturn(CheckValue("nullableEnum8.Value()", value.Value(), 0U));
             }
             break;
         case 330:
@@ -44845,7 +44845,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableEnum8", value));
-                VerifyOrReturn(CheckValue("nullableEnum8.Value()", value.Value(), 254));
+                VerifyOrReturn(CheckValue("nullableEnum8.Value()", value.Value(), 254U));
             }
             break;
         case 332:
@@ -44857,7 +44857,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableEnum8", value));
-                VerifyOrReturn(CheckValue("nullableEnum8.Value()", value.Value(), 254));
+                VerifyOrReturn(CheckValue("nullableEnum8.Value()", value.Value(), 254U));
             }
             break;
         case 334:
@@ -44927,7 +44927,7 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableEnumAttr", value));
-                VerifyOrReturn(CheckValue("nullableEnumAttr.Value()", value.Value(), 0));
+                VerifyOrReturn(CheckValue("nullableEnumAttr.Value()", value.Value(), 0U));
             }
             break;
         case 346:
@@ -44939,7 +44939,7 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableEnumAttr", value));
-                VerifyOrReturn(CheckValue("nullableEnumAttr.Value()", value.Value(), 254));
+                VerifyOrReturn(CheckValue("nullableEnumAttr.Value()", value.Value(), 254U));
             }
             break;
         case 348:
@@ -44951,7 +44951,7 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableEnumAttr", value));
-                VerifyOrReturn(CheckValue("nullableEnumAttr.Value()", value.Value(), 254));
+                VerifyOrReturn(CheckValue("nullableEnumAttr.Value()", value.Value(), 254U));
 
                 nullableEnumAttr254 = value;
             }
@@ -45148,13 +45148,13 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listInt8u", iter_0, 0));
-                    VerifyOrReturn(CheckValue("listInt8u[0]", iter_0.GetValue(), 1));
+                    VerifyOrReturn(CheckValue("listInt8u[0]", iter_0.GetValue(), 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listInt8u", iter_0, 1));
-                    VerifyOrReturn(CheckValue("listInt8u[1]", iter_0.GetValue(), 2));
+                    VerifyOrReturn(CheckValue("listInt8u[1]", iter_0.GetValue(), 2U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listInt8u", iter_0, 2));
-                    VerifyOrReturn(CheckValue("listInt8u[2]", iter_0.GetValue(), 3));
+                    VerifyOrReturn(CheckValue("listInt8u[2]", iter_0.GetValue(), 3U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listInt8u", iter_0, 3));
-                    VerifyOrReturn(CheckValue("listInt8u[3]", iter_0.GetValue(), 4));
+                    VerifyOrReturn(CheckValue("listInt8u[3]", iter_0.GetValue(), 4U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("listInt8u", iter_0, 4));
                 }
             }
@@ -45170,13 +45170,13 @@ private:
                 {
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listInt8u", iter_0, 0));
-                    VerifyOrReturn(CheckValue("listInt8u[0]", iter_0.GetValue(), 5));
+                    VerifyOrReturn(CheckValue("listInt8u[0]", iter_0.GetValue(), 5U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listInt8u", iter_0, 1));
-                    VerifyOrReturn(CheckValue("listInt8u[1]", iter_0.GetValue(), 6));
+                    VerifyOrReturn(CheckValue("listInt8u[1]", iter_0.GetValue(), 6U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listInt8u", iter_0, 2));
-                    VerifyOrReturn(CheckValue("listInt8u[2]", iter_0.GetValue(), 7));
+                    VerifyOrReturn(CheckValue("listInt8u[2]", iter_0.GetValue(), 7U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listInt8u", iter_0, 3));
-                    VerifyOrReturn(CheckValue("listInt8u[3]", iter_0.GetValue(), 8));
+                    VerifyOrReturn(CheckValue("listInt8u[3]", iter_0.GetValue(), 8U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("listInt8u", iter_0, 4));
                 }
             }
@@ -45187,7 +45187,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 70));
+                VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 70U));
             }
             break;
         case 378:
@@ -45207,7 +45207,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 70));
+                VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 70U));
             }
             break;
         case 383:
@@ -45218,7 +45218,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 20));
+                VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 20U));
             }
             break;
         case 385:
@@ -45229,7 +45229,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 100));
+                VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 100U));
             }
             break;
         case 387:
@@ -45240,7 +45240,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 50));
+                VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 50U));
             }
             break;
         case 389:
@@ -45432,7 +45432,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableRangeRestrictedInt8u", value));
-                VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 70));
+                VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 70U));
             }
             break;
         case 426:
@@ -45453,7 +45453,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableRangeRestrictedInt8u", value));
-                VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 70));
+                VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 70U));
             }
             break;
         case 431:
@@ -45465,7 +45465,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableRangeRestrictedInt8u", value));
-                VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 20));
+                VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 20U));
             }
             break;
         case 433:
@@ -45477,7 +45477,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableRangeRestrictedInt8u", value));
-                VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 100));
+                VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 100U));
             }
             break;
         case 435:
@@ -45489,7 +45489,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableRangeRestrictedInt8u", value));
-                VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 50));
+                VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 50U));
             }
             break;
         case 437:
@@ -45830,12 +45830,12 @@ private:
             {
                 chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("structAttr.a", value.a, 5));
+                VerifyOrReturn(CheckValue("structAttr.a", value.a, 5U));
                 VerifyOrReturn(CheckValue("structAttr.b", value.b, true));
-                VerifyOrReturn(CheckValue("structAttr.c", value.c, 2));
+                VerifyOrReturn(CheckValue("structAttr.c", value.c, 2U));
                 VerifyOrReturn(CheckValueAsString("structAttr.d", value.d, chip::ByteSpan(chip::Uint8::from_const_char("abc"), 3)));
                 VerifyOrReturn(CheckValueAsString("structAttr.e", value.e, chip::CharSpan("", 0)));
-                VerifyOrReturn(CheckValue("structAttr.f", value.f, 17));
+                VerifyOrReturn(CheckValue("structAttr.f", value.f, 17U));
                 VerifyOrReturn(CheckValue("structAttr.g", value.g, 1.5f));
                 VerifyOrReturn(CheckValue("structAttr.h", value.h, 3.14159265358979));
             }
@@ -45893,8 +45893,8 @@ private:
             LogStep(4, "Send Test Add Arguments Command");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type value;
-            value.arg1 = 3;
-            value.arg2 = 17;
+            value.arg1 = 3U;
+            value.arg2 = 17U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestAddArguments::Id, value,
                                chip::NullOptional
 
@@ -45904,8 +45904,8 @@ private:
             LogStep(5, "Send failing Test Add Arguments Command");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type value;
-            value.arg1 = 250;
-            value.arg2 = 6;
+            value.arg1 = 250U;
+            value.arg2 = 6U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestAddArguments::Id, value,
                                chip::NullOptional
 
@@ -45951,7 +45951,7 @@ private:
             LogStep(12, "Write attribute BITMAP8 Max Value");
             ListFreer listFreer;
             chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
-            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(255);
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(255U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap8::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -45964,7 +45964,7 @@ private:
             LogStep(14, "Write attribute BITMAP8 Min Value");
             ListFreer listFreer;
             chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
-            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(0);
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(0U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap8::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -46075,7 +46075,7 @@ private:
             LogStep(32, "Write attribute INT8U Max Value");
             ListFreer listFreer;
             uint8_t value;
-            value = 255;
+            value = 255U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int8u::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -46088,7 +46088,7 @@ private:
             LogStep(34, "Write attribute INT8U Min Value");
             ListFreer listFreer;
             uint8_t value;
-            value = 0;
+            value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int8u::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -46489,7 +46489,7 @@ private:
             LogStep(98, "Write attribute ENUM8 Max Value");
             ListFreer listFreer;
             uint8_t value;
-            value = 255;
+            value = 255U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum8::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -46502,7 +46502,7 @@ private:
             LogStep(100, "Write attribute ENUM8 Min Value");
             ListFreer listFreer;
             uint8_t value;
-            value = 0;
+            value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum8::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -46923,12 +46923,12 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type value;
 
-            value.arg1.a = 0;
+            value.arg1.a = 0U;
             value.arg1.b = true;
             value.arg1.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg1.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
             value.arg1.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-            value.arg1.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+            value.arg1.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
             value.arg1.g = 0.0f;
             value.arg1.h = 0;
 
@@ -46942,12 +46942,12 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type value;
 
-            value.arg1.a = 0;
+            value.arg1.a = 0U;
             value.arg1.b = false;
             value.arg1.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg1.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
             value.arg1.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-            value.arg1.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+            value.arg1.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
             value.arg1.g = 0.0f;
             value.arg1.h = 0;
 
@@ -46961,15 +46961,15 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type value;
 
-            value.arg1.a = 0;
+            value.arg1.a = 0U;
             value.arg1.b = true;
 
-            value.arg1.c.a = 0;
+            value.arg1.c.a = 0U;
             value.arg1.c.b = true;
             value.arg1.c.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg1.c.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
             value.arg1.c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-            value.arg1.c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+            value.arg1.c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
             value.arg1.c.g = 0.0f;
             value.arg1.c.h = 0;
 
@@ -46983,15 +46983,15 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type value;
 
-            value.arg1.a = 0;
+            value.arg1.a = 0U;
             value.arg1.b = true;
 
-            value.arg1.c.a = 0;
+            value.arg1.c.a = 0U;
             value.arg1.c.b = false;
             value.arg1.c.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg1.c.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
             value.arg1.c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-            value.arg1.c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+            value.arg1.c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
             value.arg1.c.g = 0.0f;
             value.arg1.c.h = 0;
 
@@ -47005,15 +47005,15 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type value;
 
-            value.arg1.a = 0;
+            value.arg1.a = 0U;
             value.arg1.b = true;
 
-            value.arg1.c.a = 0;
+            value.arg1.c.a = 0U;
             value.arg1.c.b = true;
             value.arg1.c.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg1.c.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
             value.arg1.c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-            value.arg1.c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+            value.arg1.c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
             value.arg1.c.g = 0.0f;
             value.arg1.c.h = 0;
 
@@ -47021,23 +47021,23 @@ private:
                 auto * listHolder_1 = new ListHolder<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>(2);
                 listFreer.add(listHolder_1);
 
-                listHolder_1->mList[0].a = 1;
+                listHolder_1->mList[0].a = 1U;
                 listHolder_1->mList[0].b = true;
                 listHolder_1->mList[0].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(3);
                 listHolder_1->mList[0].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                 listHolder_1->mList[0].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                listHolder_1->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_1->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
                 listHolder_1->mList[0].g = 0.0f;
                 listHolder_1->mList[0].h = 0;
 
-                listHolder_1->mList[1].a = 2;
+                listHolder_1->mList[1].a = 2U;
                 listHolder_1->mList[1].b = true;
                 listHolder_1->mList[1].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(3);
                 listHolder_1->mList[1].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                 listHolder_1->mList[1].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                listHolder_1->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_1->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
                 listHolder_1->mList[1].g = 0.0f;
                 listHolder_1->mList[1].h = 0;
 
@@ -47069,8 +47069,8 @@ private:
             {
                 auto * listHolder_1 = new ListHolder<uint8_t>(2);
                 listFreer.add(listHolder_1);
-                listHolder_1->mList[0] = 0;
-                listHolder_1->mList[1] = 255;
+                listHolder_1->mList[0] = 0U;
+                listHolder_1->mList[1] = 255U;
                 value.arg1.g           = chip::app::DataModel::List<uint8_t>(listHolder_1->mList, 2);
             }
 
@@ -47084,15 +47084,15 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type value;
 
-            value.arg1.a = 0;
+            value.arg1.a = 0U;
             value.arg1.b = true;
 
-            value.arg1.c.a = 0;
+            value.arg1.c.a = 0U;
             value.arg1.c.b = true;
             value.arg1.c.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg1.c.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
             value.arg1.c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-            value.arg1.c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+            value.arg1.c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
             value.arg1.c.g = 0.0f;
             value.arg1.c.h = 0;
 
@@ -47100,23 +47100,23 @@ private:
                 auto * listHolder_1 = new ListHolder<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>(2);
                 listFreer.add(listHolder_1);
 
-                listHolder_1->mList[0].a = 1;
+                listHolder_1->mList[0].a = 1U;
                 listHolder_1->mList[0].b = true;
                 listHolder_1->mList[0].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(3);
                 listHolder_1->mList[0].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                 listHolder_1->mList[0].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                listHolder_1->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_1->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
                 listHolder_1->mList[0].g = 0.0f;
                 listHolder_1->mList[0].h = 0;
 
-                listHolder_1->mList[1].a = 2;
+                listHolder_1->mList[1].a = 2U;
                 listHolder_1->mList[1].b = false;
                 listHolder_1->mList[1].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(3);
                 listHolder_1->mList[1].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                 listHolder_1->mList[1].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                listHolder_1->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_1->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
                 listHolder_1->mList[1].g = 0.0f;
                 listHolder_1->mList[1].h = 0;
 
@@ -47148,8 +47148,8 @@ private:
             {
                 auto * listHolder_1 = new ListHolder<uint8_t>(2);
                 listFreer.add(listHolder_1);
-                listHolder_1->mList[0] = 0;
-                listHolder_1->mList[1] = 255;
+                listHolder_1->mList[0] = 0U;
+                listHolder_1->mList[1] = 255U;
                 value.arg1.g           = chip::app::DataModel::List<uint8_t>(listHolder_1->mList, 2);
             }
 
@@ -47163,12 +47163,12 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::Type value;
 
-            value.arg1.a = 17;
+            value.arg1.a = 17U;
             value.arg1.b = false;
             value.arg1.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg1.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
             value.arg1.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-            value.arg1.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+            value.arg1.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
             value.arg1.g = 0.1f;
             value.arg1.h = 0.1;
 
@@ -47185,15 +47185,15 @@ private:
             {
                 auto * listHolder_0 = new ListHolder<uint8_t>(9);
                 listFreer.add(listHolder_0);
-                listHolder_0->mList[0] = 1;
-                listHolder_0->mList[1] = 2;
-                listHolder_0->mList[2] = 3;
-                listHolder_0->mList[3] = 4;
-                listHolder_0->mList[4] = 5;
-                listHolder_0->mList[5] = 6;
-                listHolder_0->mList[6] = 7;
-                listHolder_0->mList[7] = 8;
-                listHolder_0->mList[8] = 9;
+                listHolder_0->mList[0] = 1U;
+                listHolder_0->mList[1] = 2U;
+                listHolder_0->mList[2] = 3U;
+                listHolder_0->mList[3] = 4U;
+                listHolder_0->mList[4] = 5U;
+                listHolder_0->mList[5] = 6U;
+                listHolder_0->mList[6] = 7U;
+                listHolder_0->mList[7] = 8U;
+                listHolder_0->mList[8] = 9U;
                 value.arg1             = chip::app::DataModel::List<uint8_t>(listHolder_0->mList, 9);
             }
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -47209,16 +47209,16 @@ private:
             {
                 auto * listHolder_0 = new ListHolder<uint8_t>(10);
                 listFreer.add(listHolder_0);
-                listHolder_0->mList[0] = 1;
-                listHolder_0->mList[1] = 2;
-                listHolder_0->mList[2] = 3;
-                listHolder_0->mList[3] = 4;
-                listHolder_0->mList[4] = 5;
-                listHolder_0->mList[5] = 6;
-                listHolder_0->mList[6] = 7;
-                listHolder_0->mList[7] = 8;
-                listHolder_0->mList[8] = 9;
-                listHolder_0->mList[9] = 0;
+                listHolder_0->mList[0] = 1U;
+                listHolder_0->mList[1] = 2U;
+                listHolder_0->mList[2] = 3U;
+                listHolder_0->mList[3] = 4U;
+                listHolder_0->mList[4] = 5U;
+                listHolder_0->mList[5] = 6U;
+                listHolder_0->mList[6] = 7U;
+                listHolder_0->mList[7] = 8U;
+                listHolder_0->mList[8] = 9U;
+                listHolder_0->mList[9] = 0U;
                 value.arg1             = chip::app::DataModel::List<uint8_t>(listHolder_0->mList, 10);
             }
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -47234,15 +47234,15 @@ private:
             {
                 auto * listHolder_0 = new ListHolder<uint8_t>(9);
                 listFreer.add(listHolder_0);
-                listHolder_0->mList[0] = 1;
-                listHolder_0->mList[1] = 2;
-                listHolder_0->mList[2] = 3;
-                listHolder_0->mList[3] = 4;
-                listHolder_0->mList[4] = 5;
-                listHolder_0->mList[5] = 6;
-                listHolder_0->mList[6] = 7;
-                listHolder_0->mList[7] = 8;
-                listHolder_0->mList[8] = 9;
+                listHolder_0->mList[0] = 1U;
+                listHolder_0->mList[1] = 2U;
+                listHolder_0->mList[2] = 3U;
+                listHolder_0->mList[3] = 4U;
+                listHolder_0->mList[4] = 5U;
+                listHolder_0->mList[5] = 6U;
+                listHolder_0->mList[6] = 7U;
+                listHolder_0->mList[7] = 8U;
+                listHolder_0->mList[8] = 9U;
                 value.arg1             = chip::app::DataModel::List<uint8_t>(listHolder_0->mList, 9);
             }
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -47270,23 +47270,23 @@ private:
                 auto * listHolder_0 = new ListHolder<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>(2);
                 listFreer.add(listHolder_0);
 
-                listHolder_0->mList[0].a = 0;
+                listHolder_0->mList[0].a = 0U;
                 listHolder_0->mList[0].b = true;
                 listHolder_0->mList[0].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
                 listHolder_0->mList[0].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("first_octet_stringgarbage: not in length on purpose"), 18);
                 listHolder_0->mList[0].e = chip::Span<const char>("first_char_stringgarbage: not in length on purpose", 17);
-                listHolder_0->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_0->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
                 listHolder_0->mList[0].g = 0.0f;
                 listHolder_0->mList[0].h = 0;
 
-                listHolder_0->mList[1].a = 1;
+                listHolder_0->mList[1].a = 1U;
                 listHolder_0->mList[1].b = true;
                 listHolder_0->mList[1].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(3);
                 listHolder_0->mList[1].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("second_octet_stringgarbage: not in length on purpose"), 19);
                 listHolder_0->mList[1].e = chip::Span<const char>("second_char_stringgarbage: not in length on purpose", 18);
-                listHolder_0->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_0->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
                 listHolder_0->mList[1].g = 0.0f;
                 listHolder_0->mList[1].h = 0;
 
@@ -47307,23 +47307,23 @@ private:
                 auto * listHolder_0 = new ListHolder<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>(2);
                 listFreer.add(listHolder_0);
 
-                listHolder_0->mList[0].a = 1;
+                listHolder_0->mList[0].a = 1U;
                 listHolder_0->mList[0].b = true;
                 listHolder_0->mList[0].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(3);
                 listHolder_0->mList[0].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("second_octet_stringgarbage: not in length on purpose"), 19);
                 listHolder_0->mList[0].e = chip::Span<const char>("second_char_stringgarbage: not in length on purpose", 18);
-                listHolder_0->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_0->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
                 listHolder_0->mList[0].g = 0.0f;
                 listHolder_0->mList[0].h = 0;
 
-                listHolder_0->mList[1].a = 0;
+                listHolder_0->mList[1].a = 0U;
                 listHolder_0->mList[1].b = false;
                 listHolder_0->mList[1].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
                 listHolder_0->mList[1].d =
                     chip::ByteSpan(chip::Uint8::from_const_char("first_octet_stringgarbage: not in length on purpose"), 18);
                 listHolder_0->mList[1].e = chip::Span<const char>("first_char_stringgarbage: not in length on purpose", 17);
-                listHolder_0->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_0->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
                 listHolder_0->mList[1].g = 0.0f;
                 listHolder_0->mList[1].h = 0;
 
@@ -47345,16 +47345,16 @@ private:
                 auto * listHolder_0 = new ListHolder<chip::app::Clusters::TestCluster::Structs::NestedStructList::Type>(1);
                 listFreer.add(listHolder_0);
 
-                listHolder_0->mList[0].a = 0;
+                listHolder_0->mList[0].a = 0U;
                 listHolder_0->mList[0].b = true;
 
-                listHolder_0->mList[0].c.a = 0;
+                listHolder_0->mList[0].c.a = 0U;
                 listHolder_0->mList[0].c.b = true;
                 listHolder_0->mList[0].c.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
                 listHolder_0->mList[0].c.d =
                     chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
                 listHolder_0->mList[0].c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-                listHolder_0->mList[0].c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_0->mList[0].c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
                 listHolder_0->mList[0].c.g = 0.0f;
                 listHolder_0->mList[0].c.h = 0;
 
@@ -47362,23 +47362,23 @@ private:
                     auto * listHolder_2 = new ListHolder<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>(2);
                     listFreer.add(listHolder_2);
 
-                    listHolder_2->mList[0].a = 1;
+                    listHolder_2->mList[0].a = 1U;
                     listHolder_2->mList[0].b = true;
                     listHolder_2->mList[0].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(3);
                     listHolder_2->mList[0].d =
                         chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                     listHolder_2->mList[0].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                    listHolder_2->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                    listHolder_2->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
                     listHolder_2->mList[0].g = 0.0f;
                     listHolder_2->mList[0].h = 0;
 
-                    listHolder_2->mList[1].a = 2;
+                    listHolder_2->mList[1].a = 2U;
                     listHolder_2->mList[1].b = true;
                     listHolder_2->mList[1].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(3);
                     listHolder_2->mList[1].d =
                         chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                     listHolder_2->mList[1].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                    listHolder_2->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                    listHolder_2->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
                     listHolder_2->mList[1].g = 0.0f;
                     listHolder_2->mList[1].h = 0;
 
@@ -47411,8 +47411,8 @@ private:
                 {
                     auto * listHolder_2 = new ListHolder<uint8_t>(2);
                     listFreer.add(listHolder_2);
-                    listHolder_2->mList[0]   = 0;
-                    listHolder_2->mList[1]   = 255;
+                    listHolder_2->mList[0]   = 0U;
+                    listHolder_2->mList[1]   = 255U;
                     listHolder_0->mList[0].g = chip::app::DataModel::List<uint8_t>(listHolder_2->mList, 2);
                 }
 
@@ -47433,16 +47433,16 @@ private:
                 auto * listHolder_0 = new ListHolder<chip::app::Clusters::TestCluster::Structs::NestedStructList::Type>(1);
                 listFreer.add(listHolder_0);
 
-                listHolder_0->mList[0].a = 0;
+                listHolder_0->mList[0].a = 0U;
                 listHolder_0->mList[0].b = true;
 
-                listHolder_0->mList[0].c.a = 0;
+                listHolder_0->mList[0].c.a = 0U;
                 listHolder_0->mList[0].c.b = true;
                 listHolder_0->mList[0].c.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
                 listHolder_0->mList[0].c.d =
                     chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
                 listHolder_0->mList[0].c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
-                listHolder_0->mList[0].c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                listHolder_0->mList[0].c.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
                 listHolder_0->mList[0].c.g = 0.0f;
                 listHolder_0->mList[0].c.h = 0;
 
@@ -47450,23 +47450,23 @@ private:
                     auto * listHolder_2 = new ListHolder<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>(2);
                     listFreer.add(listHolder_2);
 
-                    listHolder_2->mList[0].a = 1;
+                    listHolder_2->mList[0].a = 1U;
                     listHolder_2->mList[0].b = true;
                     listHolder_2->mList[0].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(3);
                     listHolder_2->mList[0].d =
                         chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                     listHolder_2->mList[0].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                    listHolder_2->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                    listHolder_2->mList[0].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
                     listHolder_2->mList[0].g = 0.0f;
                     listHolder_2->mList[0].h = 0;
 
-                    listHolder_2->mList[1].a = 2;
+                    listHolder_2->mList[1].a = 2U;
                     listHolder_2->mList[1].b = false;
                     listHolder_2->mList[1].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(3);
                     listHolder_2->mList[1].d =
                         chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
                     listHolder_2->mList[1].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
-                    listHolder_2->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
+                    listHolder_2->mList[1].f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(1U);
                     listHolder_2->mList[1].g = 0.0f;
                     listHolder_2->mList[1].h = 0;
 
@@ -47499,8 +47499,8 @@ private:
                 {
                     auto * listHolder_2 = new ListHolder<uint8_t>(2);
                     listFreer.add(listHolder_2);
-                    listHolder_2->mList[0]   = 0;
-                    listHolder_2->mList[1]   = 255;
+                    listHolder_2->mList[0]   = 0U;
+                    listHolder_2->mList[1]   = 255U;
                     listHolder_0->mList[0].g = chip::app::DataModel::List<uint8_t>(listHolder_2->mList, 2);
                 }
 
@@ -47520,10 +47520,10 @@ private:
             {
                 auto * listHolder_0 = new ListHolder<uint8_t>(4);
                 listFreer.add(listHolder_0);
-                listHolder_0->mList[0] = 1;
-                listHolder_0->mList[1] = 2;
-                listHolder_0->mList[2] = 3;
-                listHolder_0->mList[3] = 4;
+                listHolder_0->mList[0] = 1U;
+                listHolder_0->mList[1] = 2U;
+                listHolder_0->mList[2] = 3U;
+                listHolder_0->mList[3] = 4U;
                 value                  = chip::app::DataModel::List<uint8_t>(listHolder_0->mList, 4);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::ListInt8u::Id, value,
@@ -47599,7 +47599,7 @@ private:
             chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type value;
             value.arg1.Emplace();
             value.arg1.Value().SetNonNull();
-            value.arg1.Value().Value() = 5;
+            value.arg1.Value().Value() = 5U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestNullableOptionalRequest::Id, value, chip::NullOptional
 
@@ -47692,7 +47692,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
             value.SetNonNull();
-            value.Value() = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(254);
+            value.Value() = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(254U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -47706,7 +47706,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
             value.SetNonNull();
-            value.Value() = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(255);
+            value.Value() = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(255U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -47861,7 +47861,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 0;
+            value.Value() = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -47875,7 +47875,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 254;
+            value.Value() = 254U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -47889,7 +47889,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 255;
+            value.Value() = 255U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -47931,7 +47931,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 128;
+            value.Value() = 128U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -48620,7 +48620,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 0;
+            value.Value() = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -48634,7 +48634,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 254;
+            value.Value() = 254U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -48648,7 +48648,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 255;
+            value.Value() = 255U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -48935,10 +48935,10 @@ private:
             {
                 auto * listHolder_0 = new ListHolder<uint8_t>(4);
                 listFreer.add(listHolder_0);
-                listHolder_0->mList[0] = 5;
-                listHolder_0->mList[1] = 6;
-                listHolder_0->mList[2] = 7;
-                listHolder_0->mList[3] = 8;
+                listHolder_0->mList[0] = 5U;
+                listHolder_0->mList[1] = 6U;
+                listHolder_0->mList[2] = 7U;
+                listHolder_0->mList[3] = 8U;
                 value                  = chip::app::DataModel::List<uint8_t>(listHolder_0->mList, 4);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::ListInt8u::Id, value,
@@ -48957,7 +48957,7 @@ private:
             LogStep(378, "Write min value to a range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             uint8_t value;
-            value = 0;
+            value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8u::Id, value, chip::NullOptional, chip::NullOptional);
         }
@@ -48965,7 +48965,7 @@ private:
             LogStep(379, "Write just-below-range value to a range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             uint8_t value;
-            value = 19;
+            value = 19U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8u::Id, value, chip::NullOptional, chip::NullOptional);
         }
@@ -48973,7 +48973,7 @@ private:
             LogStep(380, "Write just-above-range value to a range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             uint8_t value;
-            value = 101;
+            value = 101U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8u::Id, value, chip::NullOptional, chip::NullOptional);
         }
@@ -48981,7 +48981,7 @@ private:
             LogStep(381, "Write max value to a range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             uint8_t value;
-            value = 255;
+            value = 255U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8u::Id, value, chip::NullOptional, chip::NullOptional);
         }
@@ -48994,7 +48994,7 @@ private:
             LogStep(383, "Write min valid value to a range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             uint8_t value;
-            value = 20;
+            value = 20U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8u::Id, value, chip::NullOptional, chip::NullOptional);
         }
@@ -49007,7 +49007,7 @@ private:
             LogStep(385, "Write max valid value to a range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             uint8_t value;
-            value = 100;
+            value = 100U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8u::Id, value, chip::NullOptional, chip::NullOptional);
         }
@@ -49020,7 +49020,7 @@ private:
             LogStep(387, "Write middle valid value to a range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             uint8_t value;
-            value = 50;
+            value = 50U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8u::Id, value, chip::NullOptional, chip::NullOptional);
         }
@@ -49296,7 +49296,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 0;
+            value.Value() = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -49306,7 +49306,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 19;
+            value.Value() = 19U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -49316,7 +49316,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 101;
+            value.Value() = 101U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -49326,7 +49326,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 254;
+            value.Value() = 254U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -49341,7 +49341,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 20;
+            value.Value() = 20U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -49356,7 +49356,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 100;
+            value.Value() = 100U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -49371,7 +49371,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 50;
+            value.Value() = 50U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -49763,12 +49763,12 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type value;
 
-            value.a = 5;
+            value.a = 5U;
             value.b = true;
             value.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.d = chip::ByteSpan(chip::Uint8::from_const_char("abcgarbage: not in length on purpose"), 3);
             value.e = chip::Span<const char>("garbage: not in length on purpose", 0);
-            value.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(17);
+            value.f = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::SimpleBitmap>>(17U);
             value.g = 1.5f;
             value.h = 3.14159265358979;
 
@@ -50169,9 +50169,9 @@ private:
             {
                 chip::app::DataModel::DecodableList<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintContains("value", value, 2));
-                VerifyOrReturn(CheckConstraintContains("value", value, 3));
-                VerifyOrReturn(CheckConstraintContains("value", value, 4));
+                VerifyOrReturn(CheckConstraintContains("value", value, 2U));
+                VerifyOrReturn(CheckConstraintContains("value", value, 3U));
+                VerifyOrReturn(CheckConstraintContains("value", value, 4U));
             }
             break;
         case 3:
@@ -50179,8 +50179,8 @@ private:
             {
                 chip::app::DataModel::DecodableList<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintExcludes("value", value, 0));
-                VerifyOrReturn(CheckConstraintExcludes("value", value, 5));
+                VerifyOrReturn(CheckConstraintExcludes("value", value, 0U));
+                VerifyOrReturn(CheckConstraintExcludes("value", value, 5U));
             }
             break;
         case 4:
@@ -50342,10 +50342,10 @@ private:
             {
                 auto * listHolder_0 = new ListHolder<uint8_t>(4);
                 listFreer.add(listHolder_0);
-                listHolder_0->mList[0] = 1;
-                listHolder_0->mList[1] = 2;
-                listHolder_0->mList[2] = 3;
-                listHolder_0->mList[3] = 4;
+                listHolder_0->mList[0] = 1U;
+                listHolder_0->mList[1] = 2U;
+                listHolder_0->mList[2] = 3U;
+                listHolder_0->mList[3] = 4U;
                 value                  = chip::app::DataModel::List<uint8_t>(listHolder_0->mList, 4);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::ListInt8u::Id, value,
@@ -50660,8 +50660,8 @@ private:
                 {
                     chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
                     VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 1));
-                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 2));
+                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 1U));
+                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 2U));
                     VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, true));
                 }
                 mTestSubStepIndex++;
@@ -50679,8 +50679,8 @@ private:
                 {
                     chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
                     VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 1));
-                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 2));
+                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 1U));
+                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 2U));
                     VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, true));
                 }
                 mTestSubStepIndex++;
@@ -50714,8 +50714,8 @@ private:
                 {
                     chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
                     VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 1));
-                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 2));
+                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 1U));
+                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 2U));
                     VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, true));
                 }
                 mTestSubStepIndex++;
@@ -50725,8 +50725,8 @@ private:
                 {
                     chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
                     VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 3));
-                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 4));
+                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 3U));
+                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 4U));
                     VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, false));
                 }
                 mTestSubStepIndex++;
@@ -50744,8 +50744,8 @@ private:
                 {
                     chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
                     VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 1));
-                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 2));
+                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 1U));
+                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 2U));
                     VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, true));
                 }
                 mTestSubStepIndex++;
@@ -50755,8 +50755,8 @@ private:
                 {
                     chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
                     VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 3));
-                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 4));
+                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 3U));
+                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 4U));
                     VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, false));
                 }
                 mTestSubStepIndex++;
@@ -50782,8 +50782,8 @@ private:
                 {
                     chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
                     VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 4));
-                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 5));
+                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 4U));
+                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 5U));
                     VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, true));
                 }
                 shouldContinue = true;
@@ -50832,7 +50832,7 @@ private:
             LogStep(3, "Generate an event on the accessory");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type value;
-            value.arg1 = 1;
+            value.arg1 = 1U;
             value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
             value.arg3 = true;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestEmitTestEventRequest::Id,
@@ -50862,7 +50862,7 @@ private:
             LogStep(7, "Generate a second event on the accessory");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type value;
-            value.arg1 = 3;
+            value.arg1 = 3U;
             value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(4);
             value.arg3 = false;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestEmitTestEventRequest::Id,
@@ -50886,7 +50886,7 @@ private:
             LogStep(10, "Generate a third event on the accessory");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type value;
-            value.arg1 = 4;
+            value.arg1 = 4U;
             value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(5);
             value.arg3 = true;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestEmitTestEventRequest::Id,
@@ -51101,7 +51101,7 @@ private:
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
 
-                VerifyOrReturn(CheckValue("commissioningMode", value.commissioningMode, 1));
+                VerifyOrReturn(CheckValue("commissioningMode", value.commissioningMode, 1U));
             }
             shouldContinue = true;
             break;
@@ -51151,7 +51151,7 @@ private:
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
 
-                VerifyOrReturn(CheckConstraintMinValue("value.numIPs", value.numIPs, 1));
+                VerifyOrReturn(CheckConstraintMinValue("value.numIPs", value.numIPs, 1U));
             }
             shouldContinue = true;
             break;
@@ -51588,7 +51588,7 @@ private:
             {
                 chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("returnValue", value.returnValue, 20));
+                VerifyOrReturn(CheckValue("returnValue", value.returnValue, 20U));
 
                 TestAddArgumentDefaultValue = value.returnValue;
             }
@@ -51646,7 +51646,7 @@ private:
             {
                 chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("bitmap8", value, 0));
+                VerifyOrReturn(CheckValue("bitmap8", value, 0U));
 
                 readAttributeBitmap8DefaultValue = value;
             }
@@ -51774,7 +51774,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("int8u", value, 0));
+                VerifyOrReturn(CheckValue("int8u", value, 0U));
 
                 readAttributeInt8uDefaultValue = value;
             }
@@ -52030,7 +52030,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("enum8", value, 0));
+                VerifyOrReturn(CheckValue("enum8", value, 0U));
 
                 readAttributeEnum8DefaultValue = value;
             }
@@ -52348,8 +52348,8 @@ private:
             LogStep(1, "Send Test Add Arguments Command");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type value;
-            value.arg1 = 3;
-            value.arg2 = 17;
+            value.arg1 = 3U;
+            value.arg2 = 17U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestAddArguments::Id, value,
                                chip::NullOptional
 
@@ -52359,8 +52359,8 @@ private:
             LogStep(2, "Send Test Add Arguments Command");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type value;
-            value.arg1 = 3;
-            value.arg2 = 17;
+            value.arg1 = 3U;
+            value.arg2 = 17U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestAddArguments::Id, value,
                                chip::NullOptional
 
@@ -52370,7 +52370,7 @@ private:
             LogStep(3, "Send Test Add Arguments Command");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type value;
-            value.arg1 = 3;
+            value.arg1 = 3U;
             value.arg2 = TestAddArgumentDefaultValue;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestAddArguments::Id, value,
                                chip::NullOptional
@@ -52417,7 +52417,7 @@ private:
             LogStep(10, "Write attribute BITMAP8 Not Default Value");
             ListFreer listFreer;
             chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
-            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(1);
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(1U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap8::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -52541,7 +52541,7 @@ private:
             LogStep(30, "Write attribute INT8U Not Default Value");
             ListFreer listFreer;
             uint8_t value;
-            value = 1;
+            value = 1U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int8u::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -52789,7 +52789,7 @@ private:
             LogStep(70, "Write attribute ENUM8 Not Default Value");
             ListFreer listFreer;
             uint8_t value;
-            value = 1;
+            value = 1U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum8::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -53090,7 +53090,7 @@ private:
             {
                 chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("returnValue", value.returnValue, 20));
+                VerifyOrReturn(CheckValue("returnValue", value.returnValue, 20U));
 
                 TestAddArgumentDefaultValue = value.returnValue;
             }
@@ -53101,7 +53101,7 @@ private:
                 chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("returnValue", value.returnValue,
-                                          mReturnValueWithArg1.HasValue() ? mReturnValueWithArg1.Value() : 25));
+                                          mReturnValueWithArg1.HasValue() ? mReturnValueWithArg1.Value() : 25U));
             }
             break;
         default:
@@ -53130,8 +53130,8 @@ private:
             LogStep(1, "Send Test Add Arguments Command");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type value;
-            value.arg1 = 3;
-            value.arg2 = 17;
+            value.arg1 = 3U;
+            value.arg2 = 17U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestAddArguments::Id, value,
                                chip::NullOptional
 
@@ -53141,7 +53141,7 @@ private:
             LogStep(2, "Send Test Add Arguments Command");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type value;
-            value.arg1 = mArg1.HasValue() ? mArg1.Value() : 5;
+            value.arg1 = mArg1.HasValue() ? mArg1.Value() : 5U;
             value.arg2 = TestAddArgumentDefaultValue;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestAddArguments::Id, value,
                                chip::NullOptional
@@ -53770,7 +53770,7 @@ private:
             {
                 chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 3));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 3U));
             }
             break;
         case 11:
@@ -53789,7 +53789,7 @@ private:
             {
                 chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 4));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 4U));
             }
             break;
         case 14:
@@ -53816,7 +53816,7 @@ private:
             {
                 chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 0));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 0U));
             }
             break;
         case 19:
@@ -53832,7 +53832,7 @@ private:
             {
                 chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 4));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 4U));
             }
             break;
         case 21:
@@ -53848,7 +53848,7 @@ private:
             {
                 chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 2));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 2U));
             }
             break;
         case 23:
@@ -53864,7 +53864,7 @@ private:
             {
                 chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 0));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 0U));
             }
             break;
         case 25:
@@ -53880,7 +53880,7 @@ private:
             {
                 chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 0));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 0U));
             }
             break;
         case 27:
@@ -53896,7 +53896,7 @@ private:
             {
                 chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 0));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 0U));
             }
             break;
         case 29:
@@ -54290,7 +54290,7 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 4));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 4U));
             }
             break;
         case 2:
@@ -54299,7 +54299,7 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
             }
             break;
         case 3:
@@ -54308,7 +54308,7 @@ private:
                 chip::FabricIndex value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
                 ourFabricIndex = value;
             }
             break;
@@ -54317,7 +54317,7 @@ private:
             {
                 chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("statusCode", value.statusCode, 11));
+                VerifyOrReturn(CheckValue("statusCode", value.statusCode, 11U));
             }
             break;
         case 5:
@@ -54341,7 +54341,7 @@ private:
             {
                 chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("statusCode", value.statusCode, 0));
+                VerifyOrReturn(CheckValue("statusCode", value.statusCode, 0U));
 
                 VerifyOrReturn(CheckValuePresent("fabricIndex", value.fabricIndex));
                 VerifyOrReturn(CheckValue("fabricIndex.Value()", value.fabricIndex.Value(), ourFabricIndex));
@@ -54404,7 +54404,7 @@ private:
             LogStep(4, "Remove nonexistent fabric");
             ListFreer listFreer;
             chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type value;
-            value.fabricIndex = 243;
+            value.fabricIndex = 243U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
                                OperationalCredentials::Commands::RemoveFabric::Id, value, chip::NullOptional
 
@@ -54507,7 +54507,7 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("supportedModes", iter_0, 0));
                     VerifyOrReturn(
                         CheckValueAsString("supportedModes[0].label", iter_0.GetValue().label, chip::CharSpan("Black", 5)));
-                    VerifyOrReturn(CheckValue("supportedModes[0].mode", iter_0.GetValue().mode, 0));
+                    VerifyOrReturn(CheckValue("supportedModes[0].mode", iter_0.GetValue().mode, 0U));
                     {
                         auto iter_2 = iter_0.GetValue().semanticTags.begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().semanticTags)>(
@@ -54518,7 +54518,7 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("supportedModes", iter_0, 1));
                     VerifyOrReturn(
                         CheckValueAsString("supportedModes[1].label", iter_0.GetValue().label, chip::CharSpan("Cappuccino", 10)));
-                    VerifyOrReturn(CheckValue("supportedModes[1].mode", iter_0.GetValue().mode, 4));
+                    VerifyOrReturn(CheckValue("supportedModes[1].mode", iter_0.GetValue().mode, 4U));
                     {
                         auto iter_2 = iter_0.GetValue().semanticTags.begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().semanticTags)>(
@@ -54529,7 +54529,7 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("supportedModes", iter_0, 2));
                     VerifyOrReturn(
                         CheckValueAsString("supportedModes[2].label", iter_0.GetValue().label, chip::CharSpan("Espresso", 8)));
-                    VerifyOrReturn(CheckValue("supportedModes[2].mode", iter_0.GetValue().mode, 7));
+                    VerifyOrReturn(CheckValue("supportedModes[2].mode", iter_0.GetValue().mode, 7U));
                     {
                         auto iter_2 = iter_0.GetValue().semanticTags.begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().semanticTags)>(
@@ -54546,7 +54546,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentMode", value, 0));
+                VerifyOrReturn(CheckValue("currentMode", value, 0U));
             }
             break;
         case 5:
@@ -54555,7 +54555,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("startUpMode", value));
-                VerifyOrReturn(CheckValue("startUpMode.Value()", value.Value(), 0));
+                VerifyOrReturn(CheckValue("startUpMode.Value()", value.Value(), 0U));
             }
             break;
         case 6:
@@ -54574,7 +54574,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentMode", value, 4));
+                VerifyOrReturn(CheckValue("currentMode", value, 4U));
 
                 currentModeBeforeToggle = value;
             }
@@ -54608,7 +54608,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("onMode", value));
-                VerifyOrReturn(CheckValue("onMode.Value()", value.Value(), 7));
+                VerifyOrReturn(CheckValue("onMode.Value()", value.Value(), 7U));
 
                 OnModeValue = value;
             }
@@ -54639,7 +54639,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("startUpMode", value));
-                VerifyOrReturn(CheckValue("startUpMode.Value()", value.Value(), 7));
+                VerifyOrReturn(CheckValue("startUpMode.Value()", value.Value(), 7U));
             }
             break;
         case 22:
@@ -54664,7 +54664,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentMode", value, 4));
+                VerifyOrReturn(CheckValue("currentMode", value, 4U));
             }
             break;
         case 28:
@@ -54683,7 +54683,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentMode", value, 7));
+                VerifyOrReturn(CheckValue("currentMode", value, 7U));
             }
             break;
         default:
@@ -54742,7 +54742,7 @@ private:
             LogStep(7, "Change to Supported Mode");
             ListFreer listFreer;
             chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type value;
-            value.newMode = 4;
+            value.newMode = 4U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Commands::ChangeToMode::Id, value,
                                chip::NullOptional
 
@@ -54757,7 +54757,7 @@ private:
             LogStep(9, "Change to Unsupported Mode");
             ListFreer listFreer;
             chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type value;
-            value.newMode = 2;
+            value.newMode = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Commands::ChangeToMode::Id, value,
                                chip::NullOptional
 
@@ -54789,7 +54789,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 2;
+            value.Value() = 2U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Attributes::OnMode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -54798,7 +54798,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 7;
+            value.Value() = 7U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Attributes::OnMode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -54833,7 +54833,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 2;
+            value.Value() = 2U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Attributes::StartUpMode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -54842,7 +54842,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 7;
+            value.Value() = 7U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Attributes::StartUpMode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -54855,7 +54855,7 @@ private:
             LogStep(22, "Change CurrentMode to another value");
             ListFreer listFreer;
             chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type value;
-            value.newMode = 0;
+            value.newMode = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Commands::ChangeToMode::Id, value,
                                chip::NullOptional
 
@@ -54866,7 +54866,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 4;
+            value.Value() = 4U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Attributes::OnMode::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -54976,7 +54976,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("commissionedFabrics", value, 1));
+                VerifyOrReturn(CheckValue("commissionedFabrics", value, 1U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
@@ -54986,7 +54986,7 @@ private:
                 chip::FabricIndex value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 1));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
                 ourFabricIndex = value;
             }
             break;
@@ -55442,7 +55442,7 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("binding", iter_0, 0));
                     VerifyOrReturn(CheckValuePresent("binding[0].group", iter_0.GetValue().group));
                     VerifyOrReturn(CheckValue("binding[0].group.Value()", iter_0.GetValue().group.Value(), 1U));
-                    VerifyOrReturn(CheckValue("binding[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("binding[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("binding", iter_0, 1));
                     VerifyOrReturn(CheckValuePresent("binding[1].node", iter_0.GetValue().node));
                     VerifyOrReturn(CheckValue("binding[1].node.Value()", iter_0.GetValue().node.Value(), 1ULL));
@@ -55450,13 +55450,13 @@ private:
                     VerifyOrReturn(CheckValue("binding[1].endpoint.Value()", iter_0.GetValue().endpoint.Value(), 1U));
                     VerifyOrReturn(CheckValuePresent("binding[1].cluster", iter_0.GetValue().cluster));
                     VerifyOrReturn(CheckValue("binding[1].cluster.Value()", iter_0.GetValue().cluster.Value(), 6UL));
-                    VerifyOrReturn(CheckValue("binding[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("binding[1].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("binding", iter_0, 2));
                     VerifyOrReturn(CheckValuePresent("binding[2].node", iter_0.GetValue().node));
                     VerifyOrReturn(CheckValue("binding[2].node.Value()", iter_0.GetValue().node.Value(), 2ULL));
                     VerifyOrReturn(CheckValuePresent("binding[2].endpoint", iter_0.GetValue().endpoint));
                     VerifyOrReturn(CheckValue("binding[2].endpoint.Value()", iter_0.GetValue().endpoint.Value(), 1U));
-                    VerifyOrReturn(CheckValue("binding[2].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("binding[2].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("binding", iter_0, 3));
                 }
             }
@@ -55476,7 +55476,7 @@ private:
                     VerifyOrReturn(CheckValue("binding[0].node.Value()", iter_0.GetValue().node.Value(), 3ULL));
                     VerifyOrReturn(CheckValuePresent("binding[0].endpoint", iter_0.GetValue().endpoint));
                     VerifyOrReturn(CheckValue("binding[0].endpoint.Value()", iter_0.GetValue().endpoint.Value(), 1U));
-                    VerifyOrReturn(CheckValue("binding[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("binding[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("binding", iter_0, 1));
                 }
             }
@@ -55491,7 +55491,7 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("binding", iter_0, 0));
                     VerifyOrReturn(CheckValuePresent("binding[0].group", iter_0.GetValue().group));
                     VerifyOrReturn(CheckValue("binding[0].group.Value()", iter_0.GetValue().group.Value(), 1U));
-                    VerifyOrReturn(CheckValue("binding[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("binding[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("binding", iter_0, 1));
                     VerifyOrReturn(CheckValuePresent("binding[1].node", iter_0.GetValue().node));
                     VerifyOrReturn(CheckValue("binding[1].node.Value()", iter_0.GetValue().node.Value(), 1ULL));
@@ -55499,13 +55499,13 @@ private:
                     VerifyOrReturn(CheckValue("binding[1].endpoint.Value()", iter_0.GetValue().endpoint.Value(), 1U));
                     VerifyOrReturn(CheckValuePresent("binding[1].cluster", iter_0.GetValue().cluster));
                     VerifyOrReturn(CheckValue("binding[1].cluster.Value()", iter_0.GetValue().cluster.Value(), 6UL));
-                    VerifyOrReturn(CheckValue("binding[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("binding[1].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("binding", iter_0, 2));
                     VerifyOrReturn(CheckValuePresent("binding[2].node", iter_0.GetValue().node));
                     VerifyOrReturn(CheckValue("binding[2].node.Value()", iter_0.GetValue().node.Value(), 2ULL));
                     VerifyOrReturn(CheckValuePresent("binding[2].endpoint", iter_0.GetValue().endpoint));
                     VerifyOrReturn(CheckValue("binding[2].endpoint.Value()", iter_0.GetValue().endpoint.Value(), 1U));
-                    VerifyOrReturn(CheckValue("binding[2].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("binding[2].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("binding", iter_0, 3));
                 }
             }
@@ -55555,7 +55555,7 @@ private:
                 auto * listHolder_0 = new ListHolder<chip::app::Clusters::Binding::Structs::TargetStruct::Type>(2);
                 listFreer.add(listHolder_0);
 
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 listHolder_0->mList[1].node.Emplace();
                 listHolder_0->mList[1].node.Value() = 1ULL;
@@ -55565,7 +55565,7 @@ private:
                 listHolder_0->mList[1].endpoint.Value() = 1U;
                 listHolder_0->mList[1].cluster.Emplace();
                 listHolder_0->mList[1].cluster.Value() = 6UL;
-                listHolder_0->mList[1].fabricIndex     = 0;
+                listHolder_0->mList[1].fabricIndex     = 0U;
 
                 value =
                     chip::app::DataModel::List<chip::app::Clusters::Binding::Structs::TargetStruct::Type>(listHolder_0->mList, 2);
@@ -55584,7 +55584,7 @@ private:
 
                 listHolder_0->mList[0].group.Emplace();
                 listHolder_0->mList[0].group.Value() = 1U;
-                listHolder_0->mList[0].fabricIndex   = 0;
+                listHolder_0->mList[0].fabricIndex   = 0U;
 
                 listHolder_0->mList[1].node.Emplace();
                 listHolder_0->mList[1].node.Value() = 1ULL;
@@ -55592,13 +55592,13 @@ private:
                 listHolder_0->mList[1].endpoint.Value() = 1U;
                 listHolder_0->mList[1].cluster.Emplace();
                 listHolder_0->mList[1].cluster.Value() = 6UL;
-                listHolder_0->mList[1].fabricIndex     = 0;
+                listHolder_0->mList[1].fabricIndex     = 0U;
 
                 listHolder_0->mList[2].node.Emplace();
                 listHolder_0->mList[2].node.Value() = 2ULL;
                 listHolder_0->mList[2].endpoint.Emplace();
                 listHolder_0->mList[2].endpoint.Value() = 1U;
-                listHolder_0->mList[2].fabricIndex      = 0;
+                listHolder_0->mList[2].fabricIndex      = 0U;
 
                 value =
                     chip::app::DataModel::List<chip::app::Clusters::Binding::Structs::TargetStruct::Type>(listHolder_0->mList, 3);
@@ -55624,7 +55624,7 @@ private:
                 listHolder_0->mList[0].node.Value() = 3ULL;
                 listHolder_0->mList[0].endpoint.Emplace();
                 listHolder_0->mList[0].endpoint.Value() = 1U;
-                listHolder_0->mList[0].fabricIndex      = 0;
+                listHolder_0->mList[0].fabricIndex      = 0U;
 
                 value =
                     chip::app::DataModel::List<chip::app::Clusters::Binding::Structs::TargetStruct::Type>(listHolder_0->mList, 1);
@@ -55888,7 +55888,7 @@ private:
             {
                 chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 0));
+                VerifyOrReturn(CheckValue("errorCode", value.errorCode, 0U));
             }
             break;
         case 4:
@@ -56062,7 +56062,7 @@ private:
             {
                 chip::app::Clusters::FanControl::FanModeType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("fanMode", value, 3));
+                VerifyOrReturn(CheckValue("fanMode", value, 3U));
             }
             break;
         case 3:
@@ -56073,7 +56073,7 @@ private:
             {
                 chip::app::Clusters::FanControl::FanModeSequenceType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("fanModeSequence", value, 5));
+                VerifyOrReturn(CheckValue("fanModeSequence", value, 5U));
             }
             break;
         case 5:
@@ -56085,7 +56085,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("percentSetting", value));
-                VerifyOrReturn(CheckValue("percentSetting.Value()", value.Value(), 84));
+                VerifyOrReturn(CheckValue("percentSetting.Value()", value.Value(), 84U));
             }
             break;
         case 7:
@@ -56094,7 +56094,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("speedSetting", value));
-                VerifyOrReturn(CheckValue("speedSetting.Value()", value.Value(), 84));
+                VerifyOrReturn(CheckValue("speedSetting.Value()", value.Value(), 84U));
             }
             break;
         case 8:
@@ -56102,7 +56102,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("speedCurrent", value, 84));
+                VerifyOrReturn(CheckValue("speedCurrent", value, 84U));
             }
             break;
         case 9:
@@ -56114,7 +56114,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("percentSetting", value));
-                VerifyOrReturn(CheckValue("percentSetting.Value()", value.Value(), 84));
+                VerifyOrReturn(CheckValue("percentSetting.Value()", value.Value(), 84U));
             }
             break;
         case 11:
@@ -56126,7 +56126,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("speedSetting", value));
-                VerifyOrReturn(CheckValue("speedSetting.Value()", value.Value(), 73));
+                VerifyOrReturn(CheckValue("speedSetting.Value()", value.Value(), 73U));
             }
             break;
         case 13:
@@ -56135,7 +56135,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("percentSetting", value));
-                VerifyOrReturn(CheckValue("percentSetting.Value()", value.Value(), 73));
+                VerifyOrReturn(CheckValue("percentSetting.Value()", value.Value(), 73U));
             }
             break;
         case 14:
@@ -56143,7 +56143,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("percentCurrent", value, 73));
+                VerifyOrReturn(CheckValue("percentCurrent", value, 73U));
             }
             break;
         case 15:
@@ -56155,7 +56155,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("speedSetting", value));
-                VerifyOrReturn(CheckValue("speedSetting.Value()", value.Value(), 73));
+                VerifyOrReturn(CheckValue("speedSetting.Value()", value.Value(), 73U));
             }
             break;
         case 17:
@@ -56167,7 +56167,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("percentSetting", value));
-                VerifyOrReturn(CheckValue("percentSetting.Value()", value.Value(), 0));
+                VerifyOrReturn(CheckValue("percentSetting.Value()", value.Value(), 0U));
             }
             break;
         case 19:
@@ -56175,7 +56175,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("percentCurrent", value, 0));
+                VerifyOrReturn(CheckValue("percentCurrent", value, 0U));
             }
             break;
         case 20:
@@ -56184,7 +56184,7 @@ private:
                 chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("speedSetting", value));
-                VerifyOrReturn(CheckValue("speedSetting.Value()", value.Value(), 0));
+                VerifyOrReturn(CheckValue("speedSetting.Value()", value.Value(), 0U));
             }
             break;
         case 21:
@@ -56192,7 +56192,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("speedCurrent", value, 0));
+                VerifyOrReturn(CheckValue("speedCurrent", value, 0U));
             }
             break;
         case 22:
@@ -56267,7 +56267,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 84;
+            value.Value() = 84U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::PercentSetting::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -56304,7 +56304,7 @@ private:
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = 73;
+            value.Value() = 73U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::SpeedSetting::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
@@ -57277,21 +57277,21 @@ private:
                 VerifyOrReturn(CheckValueNull("userUniqueId", value.userUniqueId));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNull("credentials", value.credentials));
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
@@ -57315,21 +57315,21 @@ private:
                 VerifyOrReturn(CheckValueNull("userUniqueId", value.userUniqueId));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNull("credentials", value.credentials));
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
@@ -57351,21 +57351,21 @@ private:
                 VerifyOrReturn(CheckValue("userUniqueId.Value()", value.userUniqueId.Value(), 305441741UL));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNull("credentials", value.credentials));
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
@@ -57387,21 +57387,21 @@ private:
                 VerifyOrReturn(CheckValue("userUniqueId.Value()", value.userUniqueId.Value(), 305441741UL));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 3));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 3U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNull("credentials", value.credentials));
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
@@ -57423,21 +57423,21 @@ private:
                 VerifyOrReturn(CheckValue("userUniqueId.Value()", value.userUniqueId.Value(), 305441741UL));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 3));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 3U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 6));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 6U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNull("credentials", value.credentials));
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
@@ -57459,21 +57459,21 @@ private:
                 VerifyOrReturn(CheckValue("userUniqueId.Value()", value.userUniqueId.Value(), 305441741UL));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 3));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 3U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 6));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 6U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 2));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 2U));
 
                 VerifyOrReturn(CheckValueNull("credentials", value.credentials));
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
@@ -57495,21 +57495,21 @@ private:
                 VerifyOrReturn(CheckValue("userUniqueId.Value()", value.userUniqueId.Value(), 466460832UL));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 1));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("credentials", value.credentials));
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
@@ -57531,21 +57531,21 @@ private:
                 VerifyOrReturn(CheckValue("userUniqueId.Value()", value.userUniqueId.Value(), 12648430UL));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 1));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 2));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 2U));
 
                 VerifyOrReturn(CheckValueNull("credentials", value.credentials));
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
@@ -57566,21 +57566,21 @@ private:
                 VerifyOrReturn(CheckValueNull("userUniqueId", value.userUniqueId));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNull("credentials", value.credentials));
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
@@ -57637,21 +57637,21 @@ private:
                 VerifyOrReturn(CheckValueNull("userUniqueId", value.userUniqueId));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNull("credentials", value.credentials));
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
                 VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
@@ -57755,7 +57755,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
@@ -57777,28 +57777,28 @@ private:
                 VerifyOrReturn(CheckValueNull("userUniqueId", value.userUniqueId));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentials", value.credentials));
                 {
                     auto iter_1 = value.credentials.Value().begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 0));
-                    VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 1));
+                    VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 1U));
                     VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 1));
                 }
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
@@ -57814,10 +57814,10 @@ private:
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
             }
@@ -57827,7 +57827,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -57840,7 +57840,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -57884,7 +57884,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -57905,31 +57905,31 @@ private:
                 VerifyOrReturn(CheckValueNull("userUniqueId", value.userUniqueId));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentials", value.credentials));
                 {
                     auto iter_1 = value.credentials.Value().begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 0));
-                    VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 1));
+                    VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 1U));
                     VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 1));
-                    VerifyOrReturn(CheckValue("credentials.Value()[1].credentialType", iter_1.GetValue().credentialType, 2));
+                    VerifyOrReturn(CheckValue("credentials.Value()[1].credentialType", iter_1.GetValue().credentialType, 2U));
                     VerifyOrReturn(CheckValue("credentials.Value()[1].credentialIndex", iter_1.GetValue().credentialIndex, 2U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 2));
                 }
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
@@ -57945,10 +57945,10 @@ private:
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
             }
@@ -57958,7 +57958,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -57971,7 +57971,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -57983,7 +57983,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -57996,7 +57996,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58009,7 +58009,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58022,7 +58022,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58035,7 +58035,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58048,7 +58048,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58061,7 +58061,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58074,7 +58074,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 2));
+                VerifyOrReturn(CheckValue("status", value.status, 2U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58087,7 +58087,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 2));
+                VerifyOrReturn(CheckValue("status", value.status, 2U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58100,7 +58100,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58113,7 +58113,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 2U));
@@ -58127,7 +58127,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 2));
+                VerifyOrReturn(CheckValue("status", value.status, 2U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58140,7 +58140,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58161,34 +58161,34 @@ private:
                 VerifyOrReturn(CheckValueNull("userUniqueId", value.userUniqueId));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentials", value.credentials));
                 {
                     auto iter_1 = value.credentials.Value().begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 0));
-                    VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 1));
+                    VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 1U));
                     VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 1));
-                    VerifyOrReturn(CheckValue("credentials.Value()[1].credentialType", iter_1.GetValue().credentialType, 2));
+                    VerifyOrReturn(CheckValue("credentials.Value()[1].credentialType", iter_1.GetValue().credentialType, 2U));
                     VerifyOrReturn(CheckValue("credentials.Value()[1].credentialIndex", iter_1.GetValue().credentialIndex, 2U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 2));
-                    VerifyOrReturn(CheckValue("credentials.Value()[2].credentialType", iter_1.GetValue().credentialType, 2));
+                    VerifyOrReturn(CheckValue("credentials.Value()[2].credentialType", iter_1.GetValue().credentialType, 2U));
                     VerifyOrReturn(CheckValue("credentials.Value()[2].credentialIndex", iter_1.GetValue().credentialIndex, 4U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 3));
                 }
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
                 VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
@@ -58199,7 +58199,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58220,37 +58220,37 @@ private:
                 VerifyOrReturn(CheckValueNull("userUniqueId", value.userUniqueId));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentials", value.credentials));
                 {
                     auto iter_1 = value.credentials.Value().begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 0));
-                    VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 1));
+                    VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 1U));
                     VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 1));
-                    VerifyOrReturn(CheckValue("credentials.Value()[1].credentialType", iter_1.GetValue().credentialType, 2));
+                    VerifyOrReturn(CheckValue("credentials.Value()[1].credentialType", iter_1.GetValue().credentialType, 2U));
                     VerifyOrReturn(CheckValue("credentials.Value()[1].credentialIndex", iter_1.GetValue().credentialIndex, 2U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 2));
-                    VerifyOrReturn(CheckValue("credentials.Value()[2].credentialType", iter_1.GetValue().credentialType, 2));
+                    VerifyOrReturn(CheckValue("credentials.Value()[2].credentialType", iter_1.GetValue().credentialType, 2U));
                     VerifyOrReturn(CheckValue("credentials.Value()[2].credentialIndex", iter_1.GetValue().credentialIndex, 4U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 3));
-                    VerifyOrReturn(CheckValue("credentials.Value()[3].credentialType", iter_1.GetValue().credentialType, 1));
+                    VerifyOrReturn(CheckValue("credentials.Value()[3].credentialType", iter_1.GetValue().credentialType, 1U));
                     VerifyOrReturn(CheckValue("credentials.Value()[3].credentialIndex", iter_1.GetValue().credentialIndex, 5U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 4));
                 }
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
                 VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
@@ -58289,34 +58289,34 @@ private:
                 VerifyOrReturn(CheckValueNull("userUniqueId", value.userUniqueId));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentials", value.credentials));
                 {
                     auto iter_1 = value.credentials.Value().begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 0));
-                    VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 2));
+                    VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 2U));
                     VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 2U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 1));
-                    VerifyOrReturn(CheckValue("credentials.Value()[1].credentialType", iter_1.GetValue().credentialType, 2));
+                    VerifyOrReturn(CheckValue("credentials.Value()[1].credentialType", iter_1.GetValue().credentialType, 2U));
                     VerifyOrReturn(CheckValue("credentials.Value()[1].credentialIndex", iter_1.GetValue().credentialIndex, 4U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 2));
-                    VerifyOrReturn(CheckValue("credentials.Value()[2].credentialType", iter_1.GetValue().credentialType, 1));
+                    VerifyOrReturn(CheckValue("credentials.Value()[2].credentialType", iter_1.GetValue().credentialType, 1U));
                     VerifyOrReturn(CheckValue("credentials.Value()[2].credentialIndex", iter_1.GetValue().credentialIndex, 5U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 3));
                 }
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("nextUserIndex", value.nextUserIndex));
                 VerifyOrReturn(CheckValue("nextUserIndex.Value()", value.nextUserIndex.Value(), 2U));
@@ -58373,7 +58373,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 2U));
@@ -58449,28 +58449,28 @@ private:
                 VerifyOrReturn(CheckValueNull("userUniqueId", value.userUniqueId));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentials", value.credentials));
                 {
                     auto iter_1 = value.credentials.Value().begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 0));
-                    VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 1));
+                    VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 1U));
                     VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 5U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 1));
                 }
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
@@ -58506,7 +58506,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 2U));
@@ -58520,7 +58520,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 3U));
@@ -58534,7 +58534,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 4U));
@@ -58703,7 +58703,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58715,7 +58715,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
@@ -58736,28 +58736,28 @@ private:
                 VerifyOrReturn(CheckValueNull("userUniqueId", value.userUniqueId));
 
                 VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
-                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("userType", value.userType));
-                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
-                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
 
                 VerifyOrReturn(CheckValueNonNull("credentials", value.credentials));
                 {
                     auto iter_1 = value.credentials.Value().begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 0));
-                    VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 0));
+                    VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 0U));
                     VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 0U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value.credentials.Value())>("credentials.Value()", iter_1, 1));
                 }
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
@@ -58773,10 +58773,10 @@ private:
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
-                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
-                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
 
                 VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
             }
@@ -58786,7 +58786,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58861,7 +58861,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
@@ -58875,7 +58875,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58888,7 +58888,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58901,7 +58901,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58914,7 +58914,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -58927,7 +58927,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 137));
+                VerifyOrReturn(CheckValue("status", value.status, 137U));
 
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
 
@@ -60603,7 +60603,7 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("lockState", value));
-                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 2));
+                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 2U));
             }
             break;
         case 3:
@@ -60615,7 +60615,7 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("lockState", value));
-                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 1));
+                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 1U));
             }
             break;
         case 5:
@@ -60623,7 +60623,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
@@ -60641,7 +60641,7 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("lockState", value));
-                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 1));
+                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 1U));
             }
             break;
         case 8:
@@ -60653,7 +60653,7 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("lockState", value));
-                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 2));
+                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 2U));
             }
             break;
         case 10:
@@ -60665,7 +60665,7 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("lockState", value));
-                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 2));
+                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 2U));
             }
             break;
         case 12:
@@ -60677,7 +60677,7 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("lockState", value));
-                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 1));
+                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 1U));
             }
             break;
         case 14:
@@ -60884,7 +60884,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
@@ -60908,7 +60908,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("numberOfWeekDaySchedulesSupportedPerUser", value, 10));
+                VerifyOrReturn(CheckValue("numberOfWeekDaySchedulesSupportedPerUser", value, 10U));
 
                 NumberOfWeekDaySchedulesSupportedPerUser = value;
             }
@@ -60918,7 +60918,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("numberOfYearDaySchedulesSupportedPerUser", value, 10));
+                VerifyOrReturn(CheckValue("numberOfYearDaySchedulesSupportedPerUser", value, 10U));
 
                 NumberOfYearDaySchedulesSupportedPerUser = value;
             }
@@ -60928,7 +60928,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("numberOfHolidaySchedulesSupported", value, 10));
+                VerifyOrReturn(CheckValue("numberOfHolidaySchedulesSupported", value, 10U));
 
                 NumberOfHolidaySchedulesSupported = value;
             }
@@ -60980,11 +60980,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 21:
@@ -60992,11 +60992,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 0));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 0U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
             }
             break;
         case 22:
@@ -61009,7 +61009,7 @@ private:
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
             }
             break;
         case 23:
@@ -61017,11 +61017,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 0U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
             }
             break;
         case 24:
@@ -61029,11 +61029,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, static_cast<uint16_t>(NumberOfTotalUsersSupported + 1)));
 
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
             }
             break;
         case 25:
@@ -61041,11 +61041,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 26:
@@ -61071,11 +61071,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 33:
@@ -61083,11 +61083,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 0));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 0U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
             }
             break;
         case 34:
@@ -61100,7 +61100,7 @@ private:
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
             }
             break;
         case 35:
@@ -61108,11 +61108,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 0U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
             }
             break;
         case 36:
@@ -61120,11 +61120,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, static_cast<uint16_t>(NumberOfTotalUsersSupported + 1)));
 
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
             }
             break;
         case 37:
@@ -61132,11 +61132,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 38:
@@ -61156,9 +61156,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 43:
@@ -61166,9 +61166,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 0));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 0U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
             }
             break;
         case 44:
@@ -61179,7 +61179,7 @@ private:
                 VerifyOrReturn(
                     CheckValue("holidayIndex", value.holidayIndex, static_cast<uint8_t>(NumberOfHolidaySchedulesSupported + 1)));
 
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
             }
             break;
         case 45:
@@ -61190,9 +61190,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
@@ -61201,7 +61201,7 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
 
                 VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
-                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0U));
             }
             break;
         case 47:
@@ -61212,26 +61212,26 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
-                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1U));
 
                 VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
-                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 15));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 15U));
 
                 VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
-                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 16));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 16U));
 
                 VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
-                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 18));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 18U));
 
                 VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
-                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 0));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 0U));
             }
             break;
         case 49:
@@ -61242,11 +61242,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
@@ -61275,26 +61275,26 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
-                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1U));
 
                 VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
-                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 15));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 15U));
 
                 VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
-                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 16));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 16U));
 
                 VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
-                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 18));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 18U));
 
                 VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
-                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 0));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 0U));
             }
             break;
         case 57:
@@ -61302,11 +61302,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
@@ -61320,9 +61320,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
@@ -61331,7 +61331,7 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
 
                 VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
-                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0U));
             }
             break;
         case 59:
@@ -61354,26 +61354,26 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
-                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1U));
 
                 VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
-                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 15));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 15U));
 
                 VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
-                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 16));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 16U));
 
                 VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
-                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 18));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 18U));
 
                 VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
-                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 0));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 0U));
             }
             break;
         case 65:
@@ -61381,11 +61381,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
@@ -61399,9 +61399,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
@@ -61410,7 +61410,7 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
 
                 VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
-                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0U));
             }
             break;
         case 67:
@@ -61424,26 +61424,26 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
-                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1U));
 
                 VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
-                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 15));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 15U));
 
                 VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
-                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 16));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 16U));
 
                 VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
-                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 18));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 18U));
 
                 VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
-                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 0));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 0U));
             }
             break;
         case 70:
@@ -61451,11 +61451,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
@@ -61469,9 +61469,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
@@ -61480,7 +61480,7 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
 
                 VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
-                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0U));
             }
             break;
         case 72:
@@ -61491,26 +61491,26 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 2));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 2U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
-                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 2));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 2U));
 
                 VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
-                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 0));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 0U));
 
                 VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
-                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0U));
 
                 VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
-                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23U));
 
                 VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
-                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59U));
             }
             break;
         case 74:
@@ -61521,11 +61521,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 9000UL));
@@ -61542,9 +61542,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 123456UL));
@@ -61553,7 +61553,7 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 1234567UL));
 
                 VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
-                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 1));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 1U));
             }
             break;
         case 78:
@@ -61564,11 +61564,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 80:
@@ -61579,11 +61579,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 2));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 2U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 82:
@@ -61591,11 +61591,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
@@ -61609,11 +61609,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 9000UL));
@@ -61627,9 +61627,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
@@ -61638,7 +61638,7 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
 
                 VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
-                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0U));
             }
             break;
         case 85:
@@ -61646,9 +61646,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 123456UL));
@@ -61657,7 +61657,7 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 1234567UL));
 
                 VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
-                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 1));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 1U));
             }
             break;
         case 86:
@@ -61671,11 +61671,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 89:
@@ -61686,11 +61686,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 91:
@@ -61698,26 +61698,26 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
-                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 2));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 2U));
 
                 VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
-                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 0));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 0U));
 
                 VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
-                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0U));
 
                 VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
-                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23U));
 
                 VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
-                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59U));
             }
             break;
         case 92:
@@ -61734,26 +61734,26 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
-                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1U));
 
                 VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
-                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 0));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 0U));
 
                 VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
-                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0U));
 
                 VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
-                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23U));
 
                 VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
-                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59U));
             }
             break;
         case 96:
@@ -61764,11 +61764,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 4));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 4U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 9000UL));
@@ -61785,26 +61785,26 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 4));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 4U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
-                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 64));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 64U));
 
                 VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
-                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 23));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 23U));
 
                 VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
-                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0U));
 
                 VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
-                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23U));
 
                 VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
-                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59U));
             }
             break;
         case 100:
@@ -61815,11 +61815,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 55555UL));
@@ -61836,11 +61836,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 104:
@@ -61848,11 +61848,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 4));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 4U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 105:
@@ -61860,11 +61860,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 4));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 4U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 106:
@@ -61872,11 +61872,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 107:
@@ -61884,9 +61884,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
@@ -61895,7 +61895,7 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
 
                 VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
-                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0U));
             }
             break;
         case 108:
@@ -61903,9 +61903,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 123456UL));
@@ -61914,7 +61914,7 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 1234567UL));
 
                 VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
-                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 1));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 1U));
             }
             break;
         case 109:
@@ -61927,7 +61927,7 @@ private:
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, NumberOfHolidaySchedulesSupported));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 1UL));
@@ -61936,7 +61936,7 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 100UL));
 
                 VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
-                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 4));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 4U));
             }
             break;
         case 111:
@@ -61944,7 +61944,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
@@ -61967,9 +61967,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 12345UL));
@@ -61978,7 +61978,7 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 12345689UL));
 
                 VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
-                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 0U));
             }
             break;
         case 116:
@@ -61986,9 +61986,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 117:
@@ -61998,7 +61998,7 @@ private:
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, NumberOfHolidaySchedulesSupported));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 1UL));
@@ -62007,7 +62007,7 @@ private:
                 VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 100UL));
 
                 VerifyOrReturn(CheckValuePresent("operatingMode", value.operatingMode));
-                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 4));
+                VerifyOrReturn(CheckValue("operatingMode.Value()", value.operatingMode.Value(), 4U));
             }
             break;
         case 118:
@@ -62015,26 +62015,26 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
-                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1U));
 
                 VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
-                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 0));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 0U));
 
                 VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
-                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0U));
 
                 VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
-                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23U));
 
                 VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
-                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59U));
             }
             break;
         case 119:
@@ -62042,11 +62042,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 9000UL));
@@ -62063,9 +62063,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 122:
@@ -62073,9 +62073,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2));
+                VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 123:
@@ -62085,7 +62085,7 @@ private:
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("holidayIndex", value.holidayIndex, NumberOfHolidaySchedulesSupported));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
             }
             break;
         case 124:
@@ -62093,26 +62093,26 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("daysMask", value.daysMask));
-                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1));
+                VerifyOrReturn(CheckValue("daysMask.Value()", value.daysMask.Value(), 1U));
 
                 VerifyOrReturn(CheckValuePresent("startHour", value.startHour));
-                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 0));
+                VerifyOrReturn(CheckValue("startHour.Value()", value.startHour.Value(), 0U));
 
                 VerifyOrReturn(CheckValuePresent("startMinute", value.startMinute));
-                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0));
+                VerifyOrReturn(CheckValue("startMinute.Value()", value.startMinute.Value(), 0U));
 
                 VerifyOrReturn(CheckValuePresent("endHour", value.endHour));
-                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23));
+                VerifyOrReturn(CheckValue("endHour.Value()", value.endHour.Value(), 23U));
 
                 VerifyOrReturn(CheckValuePresent("endMinute", value.endMinute));
-                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59));
+                VerifyOrReturn(CheckValue("endMinute.Value()", value.endMinute.Value(), 59U));
             }
             break;
         case 125:
@@ -62120,11 +62120,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 9000UL));
@@ -62200,13 +62200,13 @@ private:
             LogStep(6, "Create Week Day schedule with 0 index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 0;
+            value.weekDayIndex = 0U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
-            value.startHour    = 15;
-            value.startMinute  = 16;
-            value.endHour      = 18;
-            value.endMinute    = 0;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1U);
+            value.startHour    = 15U;
+            value.startMinute  = 16U;
+            value.endHour      = 18U;
+            value.endMinute    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62218,11 +62218,11 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1);
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
-            value.startHour    = 15;
-            value.startMinute  = 16;
-            value.endHour      = 18;
-            value.endMinute    = 0;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1U);
+            value.startHour    = 15U;
+            value.startMinute  = 16U;
+            value.endHour      = 18U;
+            value.endMinute    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62232,13 +62232,13 @@ private:
             LogStep(8, "Create Week Day schedule with 0 user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 0U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
-            value.startHour    = 15;
-            value.startMinute  = 16;
-            value.endHour      = 18;
-            value.endMinute    = 0;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1U);
+            value.startHour    = 15U;
+            value.startMinute  = 16U;
+            value.endHour      = 18U;
+            value.endMinute    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62248,13 +62248,13 @@ private:
             LogStep(9, "Create Week Day schedule with out-of-bounds user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
-            value.startHour    = 15;
-            value.startMinute  = 16;
-            value.endHour      = 18;
-            value.endMinute    = 0;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1U);
+            value.startHour    = 15U;
+            value.startMinute  = 16U;
+            value.endHour      = 18U;
+            value.endMinute    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62264,13 +62264,13 @@ private:
             LogStep(10, "Create Week Day schedule for non-existing user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 2U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
-            value.startHour    = 15;
-            value.startMinute  = 16;
-            value.endHour      = 18;
-            value.endMinute    = 0;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1U);
+            value.startHour    = 15U;
+            value.startMinute  = 16U;
+            value.endHour      = 18U;
+            value.endMinute    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62280,13 +62280,13 @@ private:
             LogStep(11, "Create Week Day schedule with 0 days mask");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(0);
-            value.startHour    = 15;
-            value.startMinute  = 16;
-            value.endHour      = 18;
-            value.endMinute    = 0;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(0U);
+            value.startHour    = 15U;
+            value.startMinute  = 16U;
+            value.endHour      = 18U;
+            value.endMinute    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62296,13 +62296,13 @@ private:
             LogStep(12, "Create Week Day schedule for Sunday and Monday");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(3);
-            value.startHour    = 15;
-            value.startMinute  = 16;
-            value.endHour      = 18;
-            value.endMinute    = 0;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(3U);
+            value.startHour    = 15U;
+            value.startMinute  = 16U;
+            value.endHour      = 18U;
+            value.endMinute    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62312,13 +62312,13 @@ private:
             LogStep(13, "Create Week Day schedule for Sunday Wednesday and Saturday");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(73);
-            value.startHour    = 15;
-            value.startMinute  = 16;
-            value.endHour      = 18;
-            value.endMinute    = 0;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(73U);
+            value.startHour    = 15U;
+            value.startMinute  = 16U;
+            value.endHour      = 18U;
+            value.endMinute    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62328,13 +62328,13 @@ private:
             LogStep(14, "Create Week Day schedule with invalid start hour");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
-            value.startHour    = 24;
-            value.startMinute  = 16;
-            value.endHour      = 18;
-            value.endMinute    = 0;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1U);
+            value.startHour    = 24U;
+            value.startMinute  = 16U;
+            value.endHour      = 18U;
+            value.endMinute    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62344,13 +62344,13 @@ private:
             LogStep(15, "Create Week Day schedule with invalid start minute");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
-            value.startHour    = 15;
-            value.startMinute  = 60;
-            value.endHour      = 18;
-            value.endMinute    = 0;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1U);
+            value.startHour    = 15U;
+            value.startMinute  = 60U;
+            value.endHour      = 18U;
+            value.endMinute    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62360,13 +62360,13 @@ private:
             LogStep(16, "Create Week Day schedule with invalid end hour");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
-            value.startHour    = 15;
-            value.startMinute  = 16;
-            value.endHour      = 24;
-            value.endMinute    = 0;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1U);
+            value.startHour    = 15U;
+            value.startMinute  = 16U;
+            value.endHour      = 24U;
+            value.endMinute    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62376,13 +62376,13 @@ private:
             LogStep(17, "Create Week Day schedule with invalid end minute");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
-            value.startHour    = 15;
-            value.startMinute  = 16;
-            value.endHour      = 18;
-            value.endMinute    = 60;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1U);
+            value.startHour    = 15U;
+            value.startMinute  = 16U;
+            value.endHour      = 18U;
+            value.endMinute    = 60U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62392,13 +62392,13 @@ private:
             LogStep(18, "Create Week Day schedule with start hour later that end hour");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
-            value.startHour    = 19;
-            value.startMinute  = 16;
-            value.endHour      = 18;
-            value.endMinute    = 0;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1U);
+            value.startHour    = 19U;
+            value.startMinute  = 16U;
+            value.endHour      = 18U;
+            value.endMinute    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62408,13 +62408,13 @@ private:
             LogStep(19, "Create Week Day schedule with start minute later that end minute when hours are equal");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
-            value.startHour    = 15;
-            value.startMinute  = 50;
-            value.endHour      = 15;
-            value.endMinute    = 49;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1U);
+            value.startHour    = 15U;
+            value.startMinute  = 50U;
+            value.endHour      = 15U;
+            value.endMinute    = 49U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62424,7 +62424,7 @@ private:
             LogStep(20, "Make sure that previous operations did not create a schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -62435,7 +62435,7 @@ private:
             LogStep(21, "Get Week Day schedule with 0 index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 0;
+            value.weekDayIndex = 0U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -62457,7 +62457,7 @@ private:
             LogStep(23, "Get Week Day schedule with 0 user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -62468,7 +62468,7 @@ private:
             LogStep(24, "Get Week Day schedule with out-of-bounds user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -62479,7 +62479,7 @@ private:
             LogStep(25, "Get Week Day schedule with non-existing user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -62490,7 +62490,7 @@ private:
             LogStep(26, "Create Year Day schedule with 0 index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
-            value.yearDayIndex   = 0;
+            value.yearDayIndex   = 0U;
             value.userIndex      = 1U;
             value.localStartTime = 12345UL;
             value.localEndTime   = 12345689UL;
@@ -62516,7 +62516,7 @@ private:
             LogStep(28, "Create Year Day schedule with 0 user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
-            value.yearDayIndex   = 1;
+            value.yearDayIndex   = 1U;
             value.userIndex      = 0U;
             value.localStartTime = 12345UL;
             value.localEndTime   = 12345689UL;
@@ -62529,7 +62529,7 @@ private:
             LogStep(29, "Create Year Day schedule with out-of-bounds user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
-            value.yearDayIndex   = 1;
+            value.yearDayIndex   = 1U;
             value.userIndex      = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
             value.localStartTime = 12345UL;
             value.localEndTime   = 12345689UL;
@@ -62542,7 +62542,7 @@ private:
             LogStep(30, "Create Year Day schedule for non-existing user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
-            value.yearDayIndex   = 1;
+            value.yearDayIndex   = 1U;
             value.userIndex      = 2U;
             value.localStartTime = 12345UL;
             value.localEndTime   = 12345689UL;
@@ -62555,7 +62555,7 @@ private:
             LogStep(31, "Create Year Day schedule with start hour later that end hour");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
-            value.yearDayIndex   = 1;
+            value.yearDayIndex   = 1U;
             value.userIndex      = 1U;
             value.localStartTime = 12345689UL;
             value.localEndTime   = 12345688UL;
@@ -62568,7 +62568,7 @@ private:
             LogStep(32, "Make sure that previous operations did not create a schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -62579,7 +62579,7 @@ private:
             LogStep(33, "Get Year Day schedule with 0 index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 0;
+            value.yearDayIndex = 0U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -62601,7 +62601,7 @@ private:
             LogStep(35, "Get Year Day schedule with 0 user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -62612,7 +62612,7 @@ private:
             LogStep(36, "Get Year Day schedule with out-of-bounds user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -62623,7 +62623,7 @@ private:
             LogStep(37, "Get Year Day schedule with non-existing user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -62634,7 +62634,7 @@ private:
             LogStep(38, "Create Holiday schedule with 0 index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type value;
-            value.holidayIndex   = 0;
+            value.holidayIndex   = 0U;
             value.localStartTime = 12345UL;
             value.localEndTime   = 12345689UL;
             value.operatingMode  = static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(0);
@@ -62660,7 +62660,7 @@ private:
             LogStep(40, "Create Holiday schedule with start hour later that end hour");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type value;
-            value.holidayIndex   = 1;
+            value.holidayIndex   = 1U;
             value.localStartTime = 12345689UL;
             value.localEndTime   = 12345688UL;
             value.operatingMode  = static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(0);
@@ -62673,7 +62673,7 @@ private:
             LogStep(41, "Create Holiday schedule with invalid operating mode");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type value;
-            value.holidayIndex   = 1;
+            value.holidayIndex   = 1U;
             value.localStartTime = 12345UL;
             value.localEndTime   = 12345689UL;
             value.operatingMode  = static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(5);
@@ -62686,7 +62686,7 @@ private:
             LogStep(42, "Make sure that previous operations did not create a schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 1;
+            value.holidayIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62696,7 +62696,7 @@ private:
             LogStep(43, "Get Holiday schedule with 0 index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 0;
+            value.holidayIndex = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62716,7 +62716,7 @@ private:
             LogStep(45, "Create Holiday schedule with valid parameters");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type value;
-            value.holidayIndex   = 1;
+            value.holidayIndex   = 1U;
             value.localStartTime = 12345UL;
             value.localEndTime   = 12345689UL;
             value.operatingMode  = static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(0);
@@ -62729,7 +62729,7 @@ private:
             LogStep(46, "Verify created schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 1;
+            value.holidayIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62739,13 +62739,13 @@ private:
             LogStep(47, "Create Week Day schedule with valid parameters");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
-            value.startHour    = 15;
-            value.startMinute  = 16;
-            value.endHour      = 18;
-            value.endMinute    = 0;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1U);
+            value.startHour    = 15U;
+            value.startMinute  = 16U;
+            value.endHour      = 18U;
+            value.endMinute    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62755,7 +62755,7 @@ private:
             LogStep(48, "Verify created schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -62766,7 +62766,7 @@ private:
             LogStep(49, "Create Year Day schedule with valid parameters");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
-            value.yearDayIndex   = 1;
+            value.yearDayIndex   = 1U;
             value.userIndex      = 1U;
             value.localStartTime = 12345UL;
             value.localEndTime   = 12345689UL;
@@ -62779,7 +62779,7 @@ private:
             LogStep(50, "Verify created schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -62790,7 +62790,7 @@ private:
             LogStep(51, "Clear Week Day schedule with 0 index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
-            value.weekDayIndex = 0;
+            value.weekDayIndex = 0U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -62812,7 +62812,7 @@ private:
             LogStep(53, "Clear Week Day schedule with 0 user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -62823,7 +62823,7 @@ private:
             LogStep(54, "Clear Week Day schedule with out-of-bounds user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -62834,7 +62834,7 @@ private:
             LogStep(55, "Clear Week Day schedule with non-existing user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -62845,7 +62845,7 @@ private:
             LogStep(56, "Make sure that week day schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -62856,7 +62856,7 @@ private:
             LogStep(57, "Make sure that year day schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -62867,7 +62867,7 @@ private:
             LogStep(58, "Make sure that holiday schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 1;
+            value.holidayIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62877,7 +62877,7 @@ private:
             LogStep(59, "Clear Year Day schedule with 0 index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
-            value.yearDayIndex = 0;
+            value.yearDayIndex = 0U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -62899,7 +62899,7 @@ private:
             LogStep(61, "Clear Year Day schedule with 0 user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -62910,7 +62910,7 @@ private:
             LogStep(62, "Clear Year Day schedule with out-of-bounds user index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -62921,7 +62921,7 @@ private:
             LogStep(63, "Clear Year Day schedule with non-existing user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -62932,7 +62932,7 @@ private:
             LogStep(64, "Make sure that week day schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -62943,7 +62943,7 @@ private:
             LogStep(65, "Make sure that year day schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -62954,7 +62954,7 @@ private:
             LogStep(66, "Make sure that holiday schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 1;
+            value.holidayIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62964,7 +62964,7 @@ private:
             LogStep(67, "Clear Holiday schedule with 0 index");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type value;
-            value.holidayIndex = 0;
+            value.holidayIndex = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -62984,7 +62984,7 @@ private:
             LogStep(69, "Make sure that week day schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -62995,7 +62995,7 @@ private:
             LogStep(70, "Make sure that year day schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -63006,7 +63006,7 @@ private:
             LogStep(71, "Make sure that holiday schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 1;
+            value.holidayIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63016,13 +63016,13 @@ private:
             LogStep(72, "Create another Week Day schedule with valid parameters");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 2;
+            value.weekDayIndex = 2U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2);
-            value.startHour    = 0;
-            value.startMinute  = 0;
-            value.endHour      = 23;
-            value.endMinute    = 59;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2U);
+            value.startHour    = 0U;
+            value.startMinute  = 0U;
+            value.endHour      = 23U;
+            value.endMinute    = 59U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63032,7 +63032,7 @@ private:
             LogStep(73, "Verify created week day schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 2;
+            value.weekDayIndex = 2U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -63043,7 +63043,7 @@ private:
             LogStep(74, "Create another Year Day schedule with valid parameters");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
-            value.yearDayIndex   = 2;
+            value.yearDayIndex   = 2U;
             value.userIndex      = 1U;
             value.localStartTime = 9000UL;
             value.localEndTime   = 888888888UL;
@@ -63056,7 +63056,7 @@ private:
             LogStep(75, "Verify created year day schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 2;
+            value.yearDayIndex = 2U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -63067,7 +63067,7 @@ private:
             LogStep(76, "Create another Holiday schedule with valid parameters");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type value;
-            value.holidayIndex   = 2;
+            value.holidayIndex   = 2U;
             value.localStartTime = 123456UL;
             value.localEndTime   = 1234567UL;
             value.operatingMode  = static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(1);
@@ -63080,7 +63080,7 @@ private:
             LogStep(77, "Verify created holiday schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 2;
+            value.holidayIndex = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63090,7 +63090,7 @@ private:
             LogStep(78, "Clear a single week day schedule for the first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -63101,7 +63101,7 @@ private:
             LogStep(79, "Verify cleared week day schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -63112,7 +63112,7 @@ private:
             LogStep(80, "Clear all remaining week day schedules for the first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
-            value.weekDayIndex = 254;
+            value.weekDayIndex = 254U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -63123,7 +63123,7 @@ private:
             LogStep(81, "Verify cleared week schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 2;
+            value.weekDayIndex = 2U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -63134,7 +63134,7 @@ private:
             LogStep(82, "Make sure that first year day schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -63145,7 +63145,7 @@ private:
             LogStep(83, "Make sure that second year day schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 2;
+            value.yearDayIndex = 2U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -63156,7 +63156,7 @@ private:
             LogStep(84, "Make sure that first holiday schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 1;
+            value.holidayIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63166,7 +63166,7 @@ private:
             LogStep(85, "Make sure that second holiday schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 2;
+            value.holidayIndex = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63176,13 +63176,13 @@ private:
             LogStep(86, "Create another Week Day schedule with valid parameters");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2);
-            value.startHour    = 0;
-            value.startMinute  = 0;
-            value.endHour      = 23;
-            value.endMinute    = 59;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2U);
+            value.startHour    = 0U;
+            value.startMinute  = 0U;
+            value.endHour      = 23U;
+            value.endMinute    = 59U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63192,7 +63192,7 @@ private:
             LogStep(87, "Clear a single year day schedule for the first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -63203,7 +63203,7 @@ private:
             LogStep(88, "Verify cleared year day schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -63214,7 +63214,7 @@ private:
             LogStep(89, "Clear all remaining year schedules for the first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
-            value.yearDayIndex = 254;
+            value.yearDayIndex = 254U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -63225,7 +63225,7 @@ private:
             LogStep(90, "Verify that second year day schedule was cleared");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 2;
+            value.yearDayIndex = 2U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -63236,7 +63236,7 @@ private:
             LogStep(91, "Verify created week day schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -63247,7 +63247,7 @@ private:
             LogStep(92, "Clear all remaining week day schedules for the first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
-            value.weekDayIndex = 254;
+            value.weekDayIndex = 254U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -63274,13 +63274,13 @@ private:
             LogStep(94, "Create Week Day schedule with valid parameters for first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
-            value.startHour    = 0;
-            value.startMinute  = 0;
-            value.endHour      = 23;
-            value.endMinute    = 59;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1U);
+            value.startHour    = 0U;
+            value.startMinute  = 0U;
+            value.endHour      = 23U;
+            value.endMinute    = 59U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63290,7 +63290,7 @@ private:
             LogStep(95, "Verify created week day schedule for first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -63301,7 +63301,7 @@ private:
             LogStep(96, "Create Year Day schedule for first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
-            value.yearDayIndex   = 4;
+            value.yearDayIndex   = 4U;
             value.userIndex      = 1U;
             value.localStartTime = 9000UL;
             value.localEndTime   = 888888888UL;
@@ -63314,7 +63314,7 @@ private:
             LogStep(97, "Verify created year day schedule for first");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 4;
+            value.yearDayIndex = 4U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -63325,13 +63325,13 @@ private:
             LogStep(98, "Create Week Day schedule with valid parameters for second user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 4;
+            value.weekDayIndex = 4U;
             value.userIndex    = 2U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(64);
-            value.startHour    = 23;
-            value.startMinute  = 0;
-            value.endHour      = 23;
-            value.endMinute    = 59;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(64U);
+            value.startHour    = 23U;
+            value.startMinute  = 0U;
+            value.endHour      = 23U;
+            value.endMinute    = 59U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63341,7 +63341,7 @@ private:
             LogStep(99, "Verify created week day schedule for first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 4;
+            value.weekDayIndex = 4U;
             value.userIndex    = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -63352,7 +63352,7 @@ private:
             LogStep(100, "Create Year Day schedule for second user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
-            value.yearDayIndex   = 1;
+            value.yearDayIndex   = 1U;
             value.userIndex      = 1U;
             value.localStartTime = 55555UL;
             value.localEndTime   = 7777777UL;
@@ -63365,7 +63365,7 @@ private:
             LogStep(101, "Verify created year day schedule for first");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -63386,7 +63386,7 @@ private:
             LogStep(103, "Make sure clearing first user also cleared week day schedules");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -63397,7 +63397,7 @@ private:
             LogStep(104, "Make sure clearing first user also cleared year day schedules");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 4;
+            value.yearDayIndex = 4U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -63408,7 +63408,7 @@ private:
             LogStep(105, "Make sure clearing second user also cleared week day schedules");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 4;
+            value.weekDayIndex = 4U;
             value.userIndex    = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -63419,7 +63419,7 @@ private:
             LogStep(106, "Make sure clearing second user also cleared year day schedules");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -63430,7 +63430,7 @@ private:
             LogStep(107, "Make sure that first holiday schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 1;
+            value.holidayIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63440,7 +63440,7 @@ private:
             LogStep(108, "Make sure that second holiday schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 2;
+            value.holidayIndex = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63491,13 +63491,13 @@ private:
             LogStep(112, "Create Week Day schedule for first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
-            value.startHour    = 0;
-            value.startMinute  = 0;
-            value.endHour      = 23;
-            value.endMinute    = 59;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1U);
+            value.startHour    = 0U;
+            value.startMinute  = 0U;
+            value.endHour      = 23U;
+            value.endMinute    = 59U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63507,7 +63507,7 @@ private:
             LogStep(113, "Create Year Day schedule for first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
-            value.yearDayIndex   = 1;
+            value.yearDayIndex   = 1U;
             value.userIndex      = 1U;
             value.localStartTime = 9000UL;
             value.localEndTime   = 888888888UL;
@@ -63520,7 +63520,7 @@ private:
             LogStep(114, "Clear a single holiday schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type value;
-            value.holidayIndex = 2;
+            value.holidayIndex = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63530,7 +63530,7 @@ private:
             LogStep(115, "Make sure that first holiday schedule was not deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 1;
+            value.holidayIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63540,7 +63540,7 @@ private:
             LogStep(116, "Make sure that second holiday schedule was deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 2;
+            value.holidayIndex = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63560,7 +63560,7 @@ private:
             LogStep(118, "Make sure clearing holiday schedule did not clear week day schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -63571,7 +63571,7 @@ private:
             LogStep(119, "Make sure clearing holiday schedule did not clear year day schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -63582,7 +63582,7 @@ private:
             LogStep(120, "Clear all remaining holiday schedules");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type value;
-            value.holidayIndex = 254;
+            value.holidayIndex = 254U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63592,7 +63592,7 @@ private:
             LogStep(121, "Make sure that first holiday is still deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 1;
+            value.holidayIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63602,7 +63602,7 @@ private:
             LogStep(122, "Make sure that second holiday schedule was deleted");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type value;
-            value.holidayIndex = 2;
+            value.holidayIndex = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
@@ -63622,7 +63622,7 @@ private:
             LogStep(124, "Make sure clearing holiday schedule did not clear week day schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -63633,7 +63633,7 @@ private:
             LogStep(125, "Make sure clearing holiday schedule did not clear year day schedule");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -63709,7 +63709,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
@@ -63747,7 +63747,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("userCodeTemporaryDisableTime", value, 5));
+                VerifyOrReturn(CheckValue("userCodeTemporaryDisableTime", value, 5U));
             }
             break;
         case 14:
@@ -63851,7 +63851,7 @@ private:
             LogStep(7, "TH writes WrongCodeEntryLimit attribute value as 3 on the DUT");
             ListFreer listFreer;
             uint8_t value;
-            value = 3;
+            value = 3U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Attributes::WrongCodeEntryLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -63859,7 +63859,7 @@ private:
             LogStep(8, "TH writes UserCodeTemporaryDisableTime attribute value as 5 seconds on the DUT");
             ListFreer listFreer;
             uint8_t value;
-            value = 5;
+            value = 5U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
                                   DoorLock::Attributes::UserCodeTemporaryDisableTime::Id, value, chip::NullOptional,
                                   chip::NullOptional);
@@ -63988,7 +63988,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
@@ -64024,7 +64024,7 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("lockState", value));
-                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 1));
+                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 1U));
             }
             break;
         case 8:
@@ -64181,7 +64181,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
@@ -64217,7 +64217,7 @@ private:
                 chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("lockState", value));
-                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 1));
+                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 1U));
             }
             break;
         default:
@@ -64361,7 +64361,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
@@ -64375,7 +64375,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("numberOfWeekDaySchedulesSupportedPerUser", value, 10));
+                VerifyOrReturn(CheckValue("numberOfWeekDaySchedulesSupportedPerUser", value, 10U));
 
                 NumberOfWeekDaySchedulesSupportedPerUser = value;
             }
@@ -64398,25 +64398,25 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value.weekDayIndex", value.weekDayIndex, 1));
+                VerifyOrReturn(CheckConstraintMinValue("value.weekDayIndex", value.weekDayIndex, 1U));
                 VerifyOrReturn(CheckConstraintMinValue("value.userIndex", value.userIndex, 1U));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckConstraintHasValue("value.daysMask", value.daysMask, true));
-                VerifyOrReturn(CheckConstraintMinValue("value.daysMask.Value()", value.daysMask.Value(), 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value.daysMask.Value()", value.daysMask.Value(), 6));
+                VerifyOrReturn(CheckConstraintMinValue("value.daysMask.Value()", value.daysMask.Value(), 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value.daysMask.Value()", value.daysMask.Value(), 6U));
                 VerifyOrReturn(CheckConstraintHasValue("value.startHour", value.startHour, true));
-                VerifyOrReturn(CheckConstraintMinValue("value.startHour.Value()", value.startHour.Value(), 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value.startHour.Value()", value.startHour.Value(), 23));
+                VerifyOrReturn(CheckConstraintMinValue("value.startHour.Value()", value.startHour.Value(), 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value.startHour.Value()", value.startHour.Value(), 23U));
                 VerifyOrReturn(CheckConstraintHasValue("value.startMinute", value.startMinute, true));
-                VerifyOrReturn(CheckConstraintMinValue("value.startMinute.Value()", value.startMinute.Value(), 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value.startMinute.Value()", value.startMinute.Value(), 59));
+                VerifyOrReturn(CheckConstraintMinValue("value.startMinute.Value()", value.startMinute.Value(), 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value.startMinute.Value()", value.startMinute.Value(), 59U));
                 VerifyOrReturn(CheckConstraintHasValue("value.endHour", value.endHour, true));
-                VerifyOrReturn(CheckConstraintMinValue("value.endHour.Value()", value.endHour.Value(), 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value.endHour.Value()", value.endHour.Value(), 23));
+                VerifyOrReturn(CheckConstraintMinValue("value.endHour.Value()", value.endHour.Value(), 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value.endHour.Value()", value.endHour.Value(), 23U));
                 VerifyOrReturn(CheckConstraintHasValue("value.endMinute", value.endMinute, true));
-                VerifyOrReturn(CheckConstraintMinValue("value.endMinute.Value()", value.endMinute.Value(), 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value.endMinute.Value()", value.endMinute.Value(), 59));
+                VerifyOrReturn(CheckConstraintMinValue("value.endMinute.Value()", value.endMinute.Value(), 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value.endMinute.Value()", value.endMinute.Value(), 59U));
             }
             break;
         case 6:
@@ -64427,11 +64427,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 0));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 0U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
 
                 VerifyOrReturn(CheckConstraintHasValue("value.daysMask", value.daysMask, false));
 
@@ -64452,11 +64452,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 2));
+                VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 2U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
 
                 VerifyOrReturn(CheckConstraintHasValue("value.daysMask", value.daysMask, false));
 
@@ -64523,13 +64523,13 @@ private:
             LogStep(4, "Send Set Week Day Schedule Command to DUT");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2);
-            value.startHour    = 15;
-            value.startMinute  = 45;
-            value.endHour      = 16;
-            value.endMinute    = 55;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2U);
+            value.startHour    = 15U;
+            value.startMinute  = 45U;
+            value.endHour      = 16U;
+            value.endMinute    = 55U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -64539,7 +64539,7 @@ private:
             LogStep(5, "send GetWeekDay Schedule Command ");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 1;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -64550,13 +64550,13 @@ private:
             LogStep(6, "Send Set Week Day Schedule Command to DUT and verify INVALID_COMMAND response");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
-            value.weekDayIndex = 0;
+            value.weekDayIndex = 0U;
             value.userIndex    = 1U;
-            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(7);
-            value.startHour    = 15;
-            value.startMinute  = 45;
-            value.endHour      = 16;
-            value.endMinute    = 55;
+            value.daysMask     = static_cast<chip::BitMask<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(7U);
+            value.startHour    = 15U;
+            value.startMinute  = 45U;
+            value.endHour      = 16U;
+            value.endMinute    = 55U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -64566,7 +64566,7 @@ private:
             LogStep(7, "send GetWeekDay Schedule Command to DUT and verify INVALID_COMMAND response");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 0;
+            value.weekDayIndex = 0U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -64577,7 +64577,7 @@ private:
             LogStep(8, "Clear all week day schedules for the first user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
-            value.weekDayIndex = 254;
+            value.weekDayIndex = 254U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -64588,7 +64588,7 @@ private:
             LogStep(9, "send GetWeekDay Schedule Command ");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
-            value.weekDayIndex = 2;
+            value.weekDayIndex = 2U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
@@ -64648,7 +64648,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
@@ -64662,7 +64662,7 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 2U));
@@ -64676,7 +64676,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("numberOfYearDaySchedulesSupportedPerUser", value, 10));
+                VerifyOrReturn(CheckValue("numberOfYearDaySchedulesSupportedPerUser", value, 10U));
 
                 NumberOfYearDaySchedulesSupportedPerUser = value;
             }
@@ -64699,9 +64699,9 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintMinValue("value.yearDayIndex", value.yearDayIndex, 1));
+                VerifyOrReturn(CheckConstraintMinValue("value.yearDayIndex", value.yearDayIndex, 1U));
                 VerifyOrReturn(CheckConstraintMinValue("value.userIndex", value.userIndex, 1U));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckConstraintHasValue("value.localStartTime", value.localStartTime, true));
                 VerifyOrReturn(CheckConstraintType("value.localStartTime.Value()", "", "epoch-s"));
@@ -64717,11 +64717,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 21U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 133));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
 
                 VerifyOrReturn(CheckConstraintHasValue("value.localStartTime", value.localStartTime, false));
 
@@ -64733,11 +64733,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 10));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 10U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 5U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
 
                 VerifyOrReturn(CheckConstraintHasValue("value.localStartTime", value.localStartTime, false));
 
@@ -64749,11 +64749,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
 
                 VerifyOrReturn(CheckConstraintHasValue("value.localStartTime", value.localStartTime, false));
 
@@ -64768,11 +64768,11 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2U));
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
                 VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 10UL));
@@ -64853,7 +64853,7 @@ private:
             LogStep(5, "Send Set Year Day Schedule Command to DUT");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
-            value.yearDayIndex   = 1;
+            value.yearDayIndex   = 1U;
             value.userIndex      = 1U;
             value.localStartTime = 10UL;
             value.localEndTime   = 20UL;
@@ -64866,7 +64866,7 @@ private:
             LogStep(6, "send Get Year Day Schedule Command");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 1;
+            value.yearDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -64877,7 +64877,7 @@ private:
             LogStep(7, "Send Set Year Day Schedule Command to DUT and verify INVALID_COMMAND response");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
-            value.yearDayIndex   = 0;
+            value.yearDayIndex   = 0U;
             value.userIndex      = 10U;
             value.localStartTime = 30UL;
             value.localEndTime   = 10UL;
@@ -64890,7 +64890,7 @@ private:
             LogStep(8, "send Get Year Day Schedule Command to DUT and Verify INVALID_FIELD response");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 2;
+            value.yearDayIndex = 2U;
             value.userIndex    = 21U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -64901,7 +64901,7 @@ private:
             LogStep(9, "send Get Year Day Schedule Command to DUT and verify NOT_FOUND response");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 10;
+            value.yearDayIndex = 10U;
             value.userIndex    = 5U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -64912,7 +64912,7 @@ private:
             LogStep(10, "send Get Year Day Schedule Command  to DUT and verify NOT_FOUND response ");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 2;
+            value.yearDayIndex = 2U;
             value.userIndex    = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -64923,7 +64923,7 @@ private:
             LogStep(11, "Send Set Year Day Schedule Command to DUT");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
-            value.yearDayIndex   = 2;
+            value.yearDayIndex   = 2U;
             value.userIndex      = 2U;
             value.localStartTime = 10UL;
             value.localEndTime   = 20UL;
@@ -64936,7 +64936,7 @@ private:
             LogStep(12, "send Get Year Day Schedule Command ");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 2;
+            value.yearDayIndex = 2U;
             value.userIndex    = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
@@ -65447,7 +65447,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
             }
@@ -65457,7 +65457,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 258U));
             }
@@ -65557,7 +65557,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
             }
@@ -65567,7 +65567,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 258U));
             }
@@ -65771,11 +65771,11 @@ private:
 
                 listHolder_0->mList[0].groupId       = 257U;
                 listHolder_0->mList[0].groupKeySetID = 417U;
-                listHolder_0->mList[0].fabricIndex   = 0;
+                listHolder_0->mList[0].fabricIndex   = 0U;
 
                 listHolder_0->mList[1].groupId       = 258U;
                 listHolder_0->mList[1].groupKeySetID = 418U;
-                listHolder_0->mList[1].fabricIndex   = 0;
+                listHolder_0->mList[1].fabricIndex   = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(
                     listHolder_0->mList, 2);
@@ -65796,13 +65796,13 @@ private:
                 listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
                 listHolder_0->mList[0].subjects.SetNull();
                 listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(4);
                 listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(3);
                 listHolder_0->mList[1].subjects.SetNull();
                 listHolder_0->mList[1].targets.SetNull();
-                listHolder_0->mList[1].fabricIndex = 0;
+                listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 2);
@@ -65895,7 +65895,7 @@ private:
                 listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
                 listHolder_0->mList[0].subjects.SetNull();
                 listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 1);
@@ -66030,11 +66030,11 @@ private:
 
                 listHolder_0->mList[0].groupId       = 257U;
                 listHolder_0->mList[0].groupKeySetID = 417U;
-                listHolder_0->mList[0].fabricIndex   = 0;
+                listHolder_0->mList[0].fabricIndex   = 0U;
 
                 listHolder_0->mList[1].groupId       = 258U;
                 listHolder_0->mList[1].groupKeySetID = 418U;
-                listHolder_0->mList[1].fabricIndex   = 0;
+                listHolder_0->mList[1].fabricIndex   = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(
                     listHolder_0->mList, 2);
@@ -66055,13 +66055,13 @@ private:
                 listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
                 listHolder_0->mList[0].subjects.SetNull();
                 listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(4);
                 listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(3);
                 listHolder_0->mList[1].subjects.SetNull();
                 listHolder_0->mList[1].targets.SetNull();
-                listHolder_0->mList[1].fabricIndex = 0;
+                listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 2);
@@ -66146,7 +66146,7 @@ private:
                 listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
                 listHolder_0->mList[0].subjects.SetNull();
                 listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 0;
+                listHolder_0->mList[0].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 1);
@@ -66204,7 +66204,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 135));
+                VerifyOrReturn(CheckValue("status", value.status, 135U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 0U));
             }
@@ -66214,7 +66214,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 1U));
             }
@@ -66224,7 +66224,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 1U));
             }
@@ -66234,7 +66234,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 1U));
 
@@ -66246,7 +66246,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 4369U));
             }
@@ -66271,7 +66271,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 32767U));
             }
@@ -66281,7 +66281,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 1U));
 
@@ -66293,7 +66293,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 135));
+                VerifyOrReturn(CheckValue("status", value.status, 135U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 0U));
             }
@@ -66303,7 +66303,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 4U));
             }
@@ -66313,7 +66313,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 1U));
 
@@ -66325,7 +66325,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 4369U));
             }
@@ -66353,7 +66353,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 1U));
             }
@@ -66363,7 +66363,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 4369U));
             }
@@ -66373,7 +66373,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 139));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 32767U));
             }
@@ -66679,7 +66679,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
             }
@@ -66689,7 +66689,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 258U));
             }
@@ -66706,7 +66706,7 @@ private:
                 chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("groupKeySet.groupKeySetID", value.groupKeySet.groupKeySetID, 417U));
-                VerifyOrReturn(CheckValue("groupKeySet.groupKeySecurityPolicy", value.groupKeySet.groupKeySecurityPolicy, 0));
+                VerifyOrReturn(CheckValue("groupKeySet.groupKeySecurityPolicy", value.groupKeySet.groupKeySecurityPolicy, 0U));
                 VerifyOrReturn(CheckValueNull("groupKeySet.epochKey0", value.groupKeySet.epochKey0));
                 VerifyOrReturn(CheckValueNonNull("groupKeySet.epochStartTime0", value.groupKeySet.epochStartTime0));
                 VerifyOrReturn(
@@ -66739,11 +66739,11 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("groupKeyMap", iter_0, 0));
                     VerifyOrReturn(CheckValue("groupKeyMap[0].groupId", iter_0.GetValue().groupId, 257U));
                     VerifyOrReturn(CheckValue("groupKeyMap[0].groupKeySetID", iter_0.GetValue().groupKeySetID, 417U));
-                    VerifyOrReturn(CheckValue("groupKeyMap[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("groupKeyMap[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("groupKeyMap", iter_0, 1));
                     VerifyOrReturn(CheckValue("groupKeyMap[1].groupId", iter_0.GetValue().groupId, 258U));
                     VerifyOrReturn(CheckValue("groupKeyMap[1].groupKeySetID", iter_0.GetValue().groupKeySetID, 418U));
-                    VerifyOrReturn(CheckValue("groupKeyMap[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("groupKeyMap[1].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("groupKeyMap", iter_0, 2));
                 }
             }
@@ -66762,13 +66762,13 @@ private:
                     VerifyOrReturn(CheckValuePresent("groupTable[0].groupName", iter_0.GetValue().groupName));
                     VerifyOrReturn(CheckValueAsString("groupTable[0].groupName.Value()", iter_0.GetValue().groupName.Value(),
                                                       chip::CharSpan("Group #1", 8)));
-                    VerifyOrReturn(CheckValue("groupTable[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("groupTable[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("groupTable", iter_0, 1));
                     VerifyOrReturn(CheckValue("groupTable[1].groupId", iter_0.GetValue().groupId, 258U));
                     VerifyOrReturn(CheckValuePresent("groupTable[1].groupName", iter_0.GetValue().groupName));
                     VerifyOrReturn(CheckValueAsString("groupTable[1].groupName.Value()", iter_0.GetValue().groupName.Value(),
                                                       chip::CharSpan("Group #2", 8)));
-                    VerifyOrReturn(CheckValue("groupTable[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("groupTable[1].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("groupTable", iter_0, 2));
                 }
             }
@@ -66785,7 +66785,7 @@ private:
                 chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("groupKeySet.groupKeySetID", value.groupKeySet.groupKeySetID, 418U));
-                VerifyOrReturn(CheckValue("groupKeySet.groupKeySecurityPolicy", value.groupKeySet.groupKeySecurityPolicy, 1));
+                VerifyOrReturn(CheckValue("groupKeySet.groupKeySecurityPolicy", value.groupKeySet.groupKeySecurityPolicy, 1U));
                 VerifyOrReturn(CheckValueNull("groupKeySet.epochKey0", value.groupKeySet.epochKey0));
                 VerifyOrReturn(CheckValueNonNull("groupKeySet.epochStartTime0", value.groupKeySet.epochStartTime0));
                 VerifyOrReturn(
@@ -66805,7 +66805,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
             }
@@ -66824,7 +66824,7 @@ private:
                     VerifyOrReturn(CheckValuePresent("groupTable[0].groupName", iter_0.GetValue().groupName));
                     VerifyOrReturn(CheckValueAsString("groupTable[0].groupName.Value()", iter_0.GetValue().groupName.Value(),
                                                       chip::CharSpan("Group #2", 8)));
-                    VerifyOrReturn(CheckValue("groupTable[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+                    VerifyOrReturn(CheckValue("groupTable[0].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("groupTable", iter_0, 1));
                 }
             }
@@ -66994,7 +66994,7 @@ private:
 
                 listHolder_0->mList[0].groupId       = 258U;
                 listHolder_0->mList[0].groupKeySetID = 0U;
-                listHolder_0->mList[0].fabricIndex   = 1;
+                listHolder_0->mList[0].fabricIndex   = 1U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(
                     listHolder_0->mList, 1);
@@ -67013,11 +67013,11 @@ private:
 
                 listHolder_0->mList[0].groupId       = 257U;
                 listHolder_0->mList[0].groupKeySetID = 417U;
-                listHolder_0->mList[0].fabricIndex   = 1;
+                listHolder_0->mList[0].fabricIndex   = 1U;
 
                 listHolder_0->mList[1].groupId       = 258U;
                 listHolder_0->mList[1].groupKeySetID = 418U;
-                listHolder_0->mList[1].fabricIndex   = 1;
+                listHolder_0->mList[1].fabricIndex   = 1U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(
                     listHolder_0->mList, 2);
@@ -69281,7 +69281,7 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
 
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
             }
@@ -69373,7 +69373,7 @@ private:
 
                 listHolder_0->mList[0].groupId       = 257U;
                 listHolder_0->mList[0].groupKeySetID = 417U;
-                listHolder_0->mList[0].fabricIndex   = 1;
+                listHolder_0->mList[0].fabricIndex   = 1U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(
                     listHolder_0->mList, 1);
@@ -69394,7 +69394,7 @@ private:
                 listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
                 listHolder_0->mList[0].subjects.SetNull();
                 listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 1;
+                listHolder_0->mList[0].fabricIndex = 1U;
 
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(3);
                 listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(3);
@@ -69407,7 +69407,7 @@ private:
                     listHolder_0->mList[1].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 1);
                 }
                 listHolder_0->mList[1].targets.SetNull();
-                listHolder_0->mList[1].fabricIndex = 1;
+                listHolder_0->mList[1].fabricIndex = 1U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                     listHolder_0->mList, 2);
@@ -75507,7 +75507,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::PlaybackStateEnum value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentState", value, 1));
+                VerifyOrReturn(CheckValue("currentState", value, 1U));
             }
             break;
         case 4:
@@ -75526,7 +75526,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::PlaybackStateEnum value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentState", value, 0));
+                VerifyOrReturn(CheckValue("currentState", value, 0U));
             }
             break;
         case 7:
@@ -75545,7 +75545,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::PlaybackStateEnum value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentState", value, 1));
+                VerifyOrReturn(CheckValue("currentState", value, 1U));
             }
             break;
         case 10:
@@ -75564,7 +75564,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::PlaybackStateEnum value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentState", value, 2));
+                VerifyOrReturn(CheckValue("currentState", value, 2U));
             }
             break;
         default:
@@ -75744,7 +75744,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::PlaybackStateEnum value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentState", value, 1));
+                VerifyOrReturn(CheckValue("currentState", value, 1U));
             }
             break;
         case 4:
@@ -75763,7 +75763,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::PlaybackStateEnum value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentState", value, 0));
+                VerifyOrReturn(CheckValue("currentState", value, 0U));
             }
             break;
         case 7:
@@ -76247,7 +76247,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::PlaybackStateEnum value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentState", value, 1));
+                VerifyOrReturn(CheckValue("currentState", value, 1U));
             }
             break;
         case 4:
@@ -76274,7 +76274,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::PlaybackStateEnum value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentState", value, 0));
+                VerifyOrReturn(CheckValue("currentState", value, 0U));
             }
             break;
         case 8:
@@ -76320,7 +76320,7 @@ private:
             {
                 chip::app::Clusters::MediaPlayback::PlaybackStateEnum value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentState", value, 0));
+                VerifyOrReturn(CheckValue("currentState", value, 0U));
             }
             break;
         case 15:
@@ -78282,7 +78282,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("windowStatus", value, 0));
+                VerifyOrReturn(CheckValue("windowStatus", value, 0U));
             }
             break;
         case 5:
@@ -78293,7 +78293,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("windowStatus", value, 0));
+                VerifyOrReturn(CheckValue("windowStatus", value, 0U));
             }
             break;
         default:
@@ -78419,7 +78419,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("windowStatus", value, 0));
+                VerifyOrReturn(CheckValue("windowStatus", value, 0U));
             }
             break;
         case 5:
@@ -78430,7 +78430,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("windowStatus", value, 0));
+                VerifyOrReturn(CheckValue("windowStatus", value, 0U));
             }
             break;
         default:
@@ -81704,7 +81704,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("occupancy", value, 0));
+                VerifyOrReturn(CheckValue("occupancy", value, 0U));
 
                 OccupancyValue = value;
             }
@@ -84442,7 +84442,7 @@ private:
             LogStep(35, "9a:Sends OnWithTimedOff command to DUT");
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
@@ -84467,7 +84467,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
@@ -84487,7 +84487,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
@@ -84507,7 +84507,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
@@ -84527,7 +84527,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
@@ -84600,7 +84600,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
@@ -84670,7 +84670,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
@@ -84747,7 +84747,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
@@ -84793,7 +84793,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
@@ -84854,7 +84854,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
@@ -84884,7 +84884,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
@@ -84904,7 +84904,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
@@ -84967,7 +84967,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
@@ -85030,7 +85030,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
@@ -85093,7 +85093,7 @@ private:
             VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
-            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0);
+            value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0U);
             value.onTime       = 300U;
             value.offWaitTime  = 300U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
