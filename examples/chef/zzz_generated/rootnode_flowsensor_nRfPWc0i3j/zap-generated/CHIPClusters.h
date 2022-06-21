@@ -30,18 +30,18 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT BindingCluster : public ClusterBase
-{
-public:
-    BindingCluster() : ClusterBase(app::Clusters::Binding::Id) {}
-    ~BindingCluster() {}
-};
-
 class DLL_EXPORT GroupsCluster : public ClusterBase
 {
 public:
     GroupsCluster() : ClusterBase(app::Clusters::Groups::Id) {}
     ~GroupsCluster() {}
+};
+
+class DLL_EXPORT BindingCluster : public ClusterBase
+{
+public:
+    BindingCluster() : ClusterBase(app::Clusters::Binding::Id) {}
+    ~BindingCluster() {}
 };
 
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
