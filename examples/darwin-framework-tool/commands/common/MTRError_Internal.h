@@ -20,6 +20,8 @@
 #include <app/MessageDef/StatusIB.h>
 #include <lib/core/CHIPError.h>
 
+#include <Matter/Matter.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRError (TestExtensions)

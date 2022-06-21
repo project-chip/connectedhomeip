@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#import "MTRError.h"
-#import "MTRError_Internal.h"
+#import <Matter/Matter.h>
+#include "MTRError_Internal.h"
 
 #import <app/MessageDef/StatusIB.h>
 #import <app/util/af-enums.h>

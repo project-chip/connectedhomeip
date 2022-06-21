@@ -32,7 +32,7 @@
 
 #import <Matter/Matter.h>
 
-#import "MTRError_Internal.h"
+#include "../common/MTRError_Internal.h"
 
 class TestCommandBridge;
 
