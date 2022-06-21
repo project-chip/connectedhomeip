@@ -31,7 +31,6 @@
 #include <zap-generated/cluster/CHIPTestClustersObjc.h>
 
 #import <Matter/Matter.h>
-#import <Matter/MTRError_Internal.h>
 
 class TestCommandBridge;
 

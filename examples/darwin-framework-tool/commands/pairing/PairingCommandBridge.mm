@@ -17,7 +17,6 @@
  */
 
 #import <Matter/Matter.h>
-#import <Matter/MTRError_Internal.h>
 
 #include "../common/CHIPCommandBridge.h"
 #include "PairingCommandBridge.h"

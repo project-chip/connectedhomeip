@@ -20,7 +20,6 @@
 
 #import "CHIPToolKeypair.h"
 #import <Matter/Matter.h>
-#import <Matter/MTRError_Internal.h>
 
 #include <core/CHIPBuildConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
