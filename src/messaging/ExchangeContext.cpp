@@ -583,7 +583,7 @@ void ExchangeContext::AbortAllOtherCommunicationOnFabric()
 {
     if (!mSession || !mSession->IsSecureSession())
     {
-        ChipLogError(ExchangeManager, "AbortAllOtherCommunicationOnFabric called on a non-PASE/CASE session");
+        ChipLogError(ExchangeManager, "AbortAllOtherCommunicationOnFabric called when we don't have a PASE/CASE session");
         return;
     }
 

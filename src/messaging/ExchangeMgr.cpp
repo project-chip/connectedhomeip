@@ -236,7 +236,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                         packetHeader.GetDestinationGroupId().Value());
     }
 
-    // Do not handle messages that don't match an existing exchange on a
+    // Do not handle messages that don't match an existing exchange on an
     // inactive session, since we should not be creating new exchanges there.
     if (!session->IsActiveSession())
     {
