@@ -22,8 +22,8 @@
 void DynamicAttributeList::Add(chip::AttributeId id, EmberAfAttributeType type, uint16_t maxSize, EmberAfClusterMask mask)
 {
     // Do what DECLARE_DYNAMIC_ATTRIBUTE does.
-    mAttributeDecls.emplace_back(EmberAfAttributeMetadata{
-        id, type, maxSize, (uint8_t) (mask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)), ZAP_EMPTY_DEFAULT() });
+    mAttributeDecls.emplace_back(
+        EmberAfAttributeMetadata{ id, type, maxSize, (uint8_t)(mask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)), ZAP_EMPTY_DEFAULT() });
 }
 
 void DynamicAttributeList::Add(EmberAfAttributeMetadata metadata)
