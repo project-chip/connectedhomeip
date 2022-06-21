@@ -95,6 +95,25 @@ CHIP_ERROR EFR32MatterConfig::InitOpenThread(void)
 }
 #endif // CHIP_ENABLE_OPENTHREAD
 
+void EFR32MatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+{
+    OTAConfig::Init();
+}
+
+void EFR32MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg)
+{
+    // Initialize OTA only when Thread or WiFi connectivity is established
+    if (((event->Type == DeviceEventType::kThreadConnectivityChange) &&
+         (event->ThreadConnectivityChange.Result == kConnectivity_Established)) ||
+        ((event->Type == DeviceEventType::kInternetConnectivityChange) &&
+         (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)))
+    {
+        EFR32_LOG("Scheduling OTA Requestor initialization")
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
+                                                    InitOTARequestorHandler, nullptr);
+    }
+}
+
 CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 {
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
@@ -139,16 +158,15 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
     chip::Server::GetInstance().Init(initParams);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
+    // OTA Requestor initialization will be triggered by the connectivity events
+    PlatformMgr().AddEventHandler(ConnectivityEventCallback, reinterpret_cast<intptr_t>(nullptr));
+
     EFR32_LOG("Starting Platform Manager Event Loop");
     ReturnErrorOnFailure(PlatformMgr().StartEventLoopTask());
 
 #ifdef SL_WIFI
     InitWiFi();
 #endif
-    // Init Matter OTA
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    OTAConfig::Init();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
 #ifdef ENABLE_CHIP_SHELL
     chip::startShellTask();
