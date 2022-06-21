@@ -106,7 +106,13 @@ class DeviceControllerSystemState
     using CASEClientPool        = DeviceControllerSystemStateParams::CASEClientPool;
 
 public:
-    ~DeviceControllerSystemState(){};
+    ~DeviceControllerSystemState()
+    {
+        // We could get here if a DeviceControllerFactory is shut down
+        // without ever creating any controllers, so our refcount never goes
+        // above 1.  In that case we need to make sure we call Shutdown().
+        Shutdown();
+    };
     DeviceControllerSystemState(DeviceControllerSystemStateParams params) :
         mSystemLayer(params.systemLayer), mTCPEndPointManager(params.tcpEndPointManager),
         mUDPEndPointManager(params.udpEndPointManager), mTransportMgr(params.transportMgr), mSessionMgr(params.sessionMgr),
@@ -194,6 +200,8 @@ private:
     FabricTable * mTempFabricTable = nullptr;
 
     std::atomic<uint32_t> mRefCount{ 1 };
+
+    bool mHaveShutDown = false;
 
     CHIP_ERROR Shutdown();
 };
