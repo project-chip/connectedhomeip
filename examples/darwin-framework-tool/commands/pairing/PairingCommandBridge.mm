@@ -23,13 +23,15 @@
 #include "PairingDelegateBridge.h"
 #include <lib/support/logging/CHIPLogging.h>
 
+#import "MTRError_Internal.h"
+
 using namespace ::chip;
 using namespace ::chip::Controller;
 
 void PairingCommandBridge::SetUpPairingDelegate()
 {
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
-    MTRToolPairingDelegate * pairing = [[MTRToolPairingDelegate alloc] init];
+    CHIPToolPairingDelegate * pairing = [[CHIPToolPairingDelegate alloc] init];
     MTRCommissioningParameters * params = [[MTRCommissioningParameters alloc] init];
 
     [pairing setDeviceID:mNodeId];

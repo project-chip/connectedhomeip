@@ -32,6 +32,8 @@
 
 #import <Matter/Matter.h>
 
+#import "MTRError_Internal.h"
+
 class TestCommandBridge;
 
 NS_ASSUME_NONNULL_BEGIN

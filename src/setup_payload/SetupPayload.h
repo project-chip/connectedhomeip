@@ -37,7 +37,7 @@ namespace chip {
 const int kVersionFieldLengthInBits              = 3;
 const int kVendorIDFieldLengthInBits             = 16;
 const int kProductIDFieldLengthInBits            = 16;
-const int kCommissioningFlowFieldLengthInBits    = 2;
+const int MTRCommissioningFlowFieldLengthInBits    = 2;
 const int kRendezvousInfoFieldLengthInBits       = 8;
 const int kPayloadDiscriminatorFieldLengthInBits = 12;
 const int kSetupPINCodeFieldLengthInBits         = 27;
@@ -73,7 +73,7 @@ const int kTotalPayloadDataSizeInBits =
     kVersionFieldLengthInBits +
     kVendorIDFieldLengthInBits +
     kProductIDFieldLengthInBits +
-    kCommissioningFlowFieldLengthInBits +
+    MTRCommissioningFlowFieldLengthInBits +
     kRendezvousInfoFieldLengthInBits +
     kPayloadDiscriminatorFieldLengthInBits +
     kSetupPINCodeFieldLengthInBits +

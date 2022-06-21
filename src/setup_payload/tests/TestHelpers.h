@@ -102,7 +102,7 @@ inline std::string toBinaryRepresentation(std::string base38Result)
     pos -= kProductIDFieldLengthInBits;
     binaryResult.insert(pos, " ");
 
-    pos -= kCommissioningFlowFieldLengthInBits;
+    pos -= MTRCommissioningFlowFieldLengthInBits;
     binaryResult.insert(pos, " ");
 
     pos -= kRendezvousInfoFieldLengthInBits;

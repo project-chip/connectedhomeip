@@ -56,7 +56,7 @@ bool PayloadContents::isValidQRCodePayload() const
         return false;
     }
 
-    if (static_cast<uint8_t>(commissioningFlow) > static_cast<uint8_t>((1 << kCommissioningFlowFieldLengthInBits) - 1))
+    if (static_cast<uint8_t>(commissioningFlow) > static_cast<uint8_t>((1 << MTRCommissioningFlowFieldLengthInBits) - 1))
     {
         return false;
     }

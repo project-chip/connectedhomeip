@@ -24,6 +24,8 @@
 #include <core/CHIPBuildConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 
+#import "MTRError_Internal.h"
+
 const uint16_t kListenPort = 5541;
 static CHIPToolPersistentStorageDelegate * storage = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
@@ -57,8 +59,8 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
         return CHIP_NO_ERROR;
     }
     NSData * ipk;
-    MTRToolKeypair * nocSigner = [[MTRToolKeypair alloc] init];
-    storage = [[MTRToolPersistentStorageDelegate alloc] init];
+    CHIPToolKeypair * nocSigner = [[CHIPToolKeypair alloc] init];
+    storage = [[CHIPToolPersistentStorageDelegate alloc] init];
 
     auto factory = [MTRControllerFactory sharedInstance];
     if (factory == nil) {

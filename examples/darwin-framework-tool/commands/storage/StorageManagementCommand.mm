@@ -24,7 +24,7 @@ static CHIPToolPersistentStorageDelegate * storage = nil;
 
 CHIP_ERROR StorageClearAll::Run()
 {
-    storage = [[MTRToolPersistentStorageDelegate alloc] init];
+    storage = [[CHIPToolPersistentStorageDelegate alloc] init];
     if (![storage deleteAllStorage]) {
         return CHIP_ERROR_INTERNAL;
     }

@@ -711,7 +711,7 @@
 
     [self updateResultViewUI:_setupPayloadView];
 
-    if (payload.commissioningFlow == kCommissioningFlowCustom) {
+    if (payload.commissioningFlow == MTRCommissioningFlowCustom) {
         _readFromLedgerButton.hidden = NO;
     }
 }
@@ -731,7 +731,7 @@
             continue;
         }
 
-        BOOL isTypeString = [info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeString]];
+        BOOL isTypeString = [info.infoType isEqualToNumber:[NSNumber numberWithInt:MTROptionalQRCodeInfoTypeString]];
         if (!isTypeString) {
             return;
         }
@@ -752,14 +752,14 @@
 - (void)handleRendezVous:(MTRSetupPayload *)payload rawPayload:(NSString *)rawPayload
 {
     switch (payload.rendezvousInformation) {
-    case kRendezvousInformationNone:
-    case kRendezvousInformationOnNetwork:
-    case kRendezvousInformationBLE:
-    case kRendezvousInformationAllMask:
+    case MTRRendezvousInformationNone:
+    case MTRRendezvousInformationOnNetwork:
+    case MTRRendezvousInformationBLE:
+    case MTRRendezvousInformationAllMask:
         NSLog(@"Rendezvous Default");
         [self handleRendezVousDefault:rawPayload];
         break;
-    case kRendezvousInformationSoftAP:
+    case MTRRendezvousInformationSoftAP:
         NSLog(@"Rendezvous Wi-Fi");
         [self handleRendezVousWiFi:[self getNetworkName:payload.discriminator]];
         break;
