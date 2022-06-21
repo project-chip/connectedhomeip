@@ -123,7 +123,6 @@ tests:
           value: 0
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
@@ -142,7 +141,6 @@ tests:
                 value: "Verify that the media play has reversed direction"
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
