@@ -40289,7 +40289,7 @@ private:
             LogStep(3, "1b: TH Waits for 100ms-1s");
             ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 500UL;
+            value.ms = 5000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 4: {
@@ -40323,7 +40323,7 @@ private:
             LogStep(7, "2b: TH Waits for 100ms-1s");
             ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 500UL;
+            value.ms = 5000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 8: {

@@ -19,6 +19,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Pool.h>
+#include <lib/support/SortUtils.h>
 #include <system/TimeSource.h>
 #include <transport/SecureSession.h>
 
@@ -63,36 +64,7 @@ public:
     Optional<SessionHandle> CreateNewSecureSessionForTest(SecureSession::Type secureSessionType, uint16_t localSessionId,
                                                           NodeId localNodeId, NodeId peerNodeId, CATValues peerCATs,
                                                           uint16_t peerSessionId, FabricIndex fabricIndex,
-                                                          const ReliableMessageProtocolConfig & config)
-    {
-        if (secureSessionType == SecureSession::Type::kCASE)
-        {
-            if ((fabricIndex == kUndefinedFabricIndex) || (localNodeId == kUndefinedNodeId) || (peerNodeId == kUndefinedNodeId))
-            {
-                return Optional<SessionHandle>::Missing();
-            }
-        }
-        else if (secureSessionType == SecureSession::Type::kPASE)
-        {
-            if ((fabricIndex != kUndefinedFabricIndex) || (localNodeId != kUndefinedNodeId) || (peerNodeId != kUndefinedNodeId))
-            {
-                // TODO: This secure session type is infeasible! We must fix the tests
-                if (false)
-                {
-                    return Optional<SessionHandle>::Missing();
-                }
-                else
-                {
-                    (void) fabricIndex;
-                }
-            }
-        }
-
-        SecureSession * result = mEntries.CreateObject(*this, secureSessionType, localSessionId, localNodeId, peerNodeId, peerCATs,
-                                                       peerSessionId, fabricIndex, config);
-        return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
-    }
-
+                                                          const ReliableMessageProtocolConfig & config);
     /**
      * Allocate a new secure session out of the internal resource pool with a
      * non-colliding session ID and increments mNextSessionId to give a clue to
@@ -102,20 +74,7 @@ public:
      * @returns allocated session, or NullOptional on failure
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> CreateNewSecureSession(SecureSession::Type secureSessionType)
-    {
-        Optional<SessionHandle> rv = Optional<SessionHandle>::Missing();
-        auto sessionId             = FindUnusedSessionId();
-        SecureSession * allocated  = nullptr;
-        VerifyOrExit(sessionId.HasValue(), rv = Optional<SessionHandle>::Missing());
-        allocated = mEntries.CreateObject(*this, secureSessionType, sessionId.Value());
-        VerifyOrExit(allocated != nullptr, rv = Optional<SessionHandle>::Missing());
-        rv             = MakeOptional<SessionHandle>(*allocated);
-        mNextSessionId = sessionId.Value() == kMaxSessionID ? static_cast<uint16_t>(kUnsecuredSessionId + 1)
-                                                            : static_cast<uint16_t>(sessionId.Value() + 1);
-    exit:
-        return rv;
-    }
+    Optional<SessionHandle> CreateNewSecureSession(SecureSession::Type secureSessionType, ScopedNodeId sessionEvictionHint);
 
     void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }
 
@@ -133,21 +92,100 @@ public:
      * @return the session if found, NullOptional if not found
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> FindSecureSessionByLocalKey(uint16_t localSessionId)
-    {
-        SecureSession * result = nullptr;
-        mEntries.ForEachActiveObject([&](auto session) {
-            if (session->GetLocalSessionId() == localSessionId)
-            {
-                result = session;
-                return Loop::Break;
-            }
-            return Loop::Continue;
-        });
-        return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
-    }
+    Optional<SessionHandle> FindSecureSessionByLocalKey(uint16_t localSessionId);
 
 private:
+    friend class TestSecureSessionTable;
+
+    /**
+     * This provides a sortable wrapper for a SecureSession object. A SecureSession
+     * isn't directly sortable since it is not swappable (i.e meet criteria for ValueSwappable).
+     *
+     * However, this wrapper has a stable pointer to a SecureSession while being swappable with
+     * another instance of it.
+     *
+     */
+    struct SortableSession
+    {
+    public:
+        void swap(SortableSession & other)
+        {
+            SortableSession tmp(other);
+            other.mSession = mSession;
+            mSession       = tmp.mSession;
+        }
+
+        const Transport::SecureSession * operator->() const { return mSession; }
+
+    private:
+        SecureSession * mSession;
+        friend class SecureSessionTable;
+    };
+
+    /**
+     *
+     * Encapsulates all the necessary context for an eviction policy callback
+     * to implement its specific policy. The context is provided to the callee
+     * with the expectation that it'll call Sort() with a comparator function provided
+     * to get the list of sessions sorted in the desired order.
+     *
+     */
+    class EvictionPolicyContext
+    {
+    public:
+        /*
+         * Called by the policy implementor to sort the list of sessions given a comparator
+         * function. The provided function shall have the following signature:
+         *
+         * bool CompareFunc(const SortableSession &a, const SortableSession &b);
+         *
+         * If a is a better candidate than b, true should be returned. Else, return false.
+         *
+         * NOTE: Sort() can be called multiple times.
+         *
+         */
+        template <typename CompareFunc>
+        void Sort(CompareFunc func)
+        {
+            Sorting::BubbleSort(mSessionList.begin(), mSessionList.size(), func);
+        }
+
+        const ScopedNodeId & GetSessionEvictionHint() const { return mSessionEvictionHint; }
+
+    private:
+        EvictionPolicyContext(Span<SortableSession> sessionList, ScopedNodeId sessionEvictionHint)
+        {
+            mSessionList         = sessionList;
+            mSessionEvictionHint = sessionEvictionHint;
+        }
+
+        friend class SecureSessionTable;
+        Span<SortableSession> mSessionList;
+        ScopedNodeId mSessionEvictionHint;
+    };
+
+    /**
+     *
+     * This implements the following eviction policy:
+     *
+     *  - Sessions are sorted with their state as the primary sort key and activity time as the secondary
+     *    sort key.
+     *  - The primary sort key places defunct sessions ahead of active ones, ahead of anything else.
+     *  - The secondary sort key places older sessions ahead of newer sessions. This ensures
+     *    we're prioritizing reaping less active sessions over more recently active sessions (activity
+     *    in either TX or RX).
+     *
+     */
+    void DefaultEvictionPolicy(EvictionPolicyContext & evictionContext);
+
+    /**
+     *
+     * Evicts a session from the session table using the DefaultEvictionPolicy implementation.
+     *
+     */
+    SecureSession * EvictAndAllocate(uint16_t localSessionId, SecureSession::Type secureSessionType,
+                                     const ScopedNodeId & sessionEvictionHint);
+
     /**
      * Find an available session ID that is unused in the secure session table.
      *
@@ -162,59 +200,10 @@ private:
      * @return an unused session ID if any is found, else NullOptional
      */
     CHECK_RETURN_VALUE
-    Optional<uint16_t> FindUnusedSessionId()
-    {
-        uint16_t candidate_base = 0;
-        uint64_t candidate_mask = 0;
-        for (uint32_t i = 0; i <= kMaxSessionID; i += 64)
-        {
-            // candidate_base is the base session ID we are searching from.
-            // We have a 64-bit mask anchored at this ID and iterate over the
-            // whole session table, setting bits in the mask for in-use IDs.
-            // If we can iterate through the entire session table and have
-            // any bits clear in the mask, we have available session IDs.
-            candidate_base = static_cast<uint16_t>(i + mNextSessionId);
-            candidate_mask = 0;
-            {
-                uint16_t shift = static_cast<uint16_t>(kUnsecuredSessionId - candidate_base);
-                if (shift <= 63)
-                {
-                    candidate_mask |= (1ULL << shift); // kUnsecuredSessionId is never available
-                }
-            }
-            mEntries.ForEachActiveObject([&](auto session) {
-                uint16_t shift = static_cast<uint16_t>(session->GetLocalSessionId() - candidate_base);
-                if (shift <= 63)
-                {
-                    candidate_mask |= (1ULL << shift);
-                }
-                if (candidate_mask == UINT64_MAX)
-                {
-                    return Loop::Break; // No bits clear means this bucket is full.
-                }
-                return Loop::Continue;
-            });
-            if (candidate_mask != UINT64_MAX)
-            {
-                break; // Any bit clear means we have an available ID in this bucket.
-            }
-        }
-        if (candidate_mask != UINT64_MAX)
-        {
-            uint16_t offset = 0;
-            while (candidate_mask & 1)
-            {
-                candidate_mask >>= 1;
-                ++offset;
-            }
-            uint16_t available = static_cast<uint16_t>(candidate_base + offset);
-            return MakeOptional<uint16_t>(available);
-        }
+    Optional<uint16_t> FindUnusedSessionId();
 
-        return NullOptional;
-    }
-
-    BitMapObjectPool<SecureSession, CHIP_CONFIG_SECURE_SESSION_POOL_SIZE> mEntries;
+    bool mRunningEvictionLogic = false;
+    ObjectPool<SecureSession, CHIP_CONFIG_SECURE_SESSION_POOL_SIZE> mEntries;
     uint16_t mNextSessionId = 0;
 };
 
