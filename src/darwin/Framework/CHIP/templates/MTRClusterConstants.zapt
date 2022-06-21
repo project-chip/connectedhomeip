@@ -10,7 +10,7 @@
 
 typedef NS_ENUM(uint32_t, MTRClusterIDType) {
 {{#zcl_clusters}}
-kMTRCluster{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+MTRCluster{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
 {{/zcl_clusters}}
 };
 
@@ -20,7 +20,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
 // Global attributes
 {{#zcl_attributes_server}}
 {{#unless clusterRef}}
-kMTRClusterGlobalAttribute{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
 {{/unless}}
 {{/zcl_attributes_server}}
 
@@ -30,9 +30,9 @@ kMTRClusterGlobalAttribute{{asUpperCamelCase label}}ID = {{asMEI manufacturerCod
 // Cluster {{asUpperCamelCase parent.label}} attributes
 {{/first}}
 {{#if clusterRef}}
-kMTRCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+MTRCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
 {{else}}
-kMTRCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID = kMTRClusterGlobalAttribute{{asUpperCamelCase label}}ID,
+MTRCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID = MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID,
 {{/if}}
 {{#last}}
 
@@ -49,7 +49,7 @@ typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
 {{#first}}
 // Cluster {{asUpperCamelCase parent.label}} commands
 {{/first}}
-kMTRCluster{{asUpperCamelCase parent.label}}Command{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+MTRCluster{{asUpperCamelCase parent.label}}Command{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
 {{#last}}
 
 {{/last}}
@@ -65,7 +65,7 @@ typedef NS_ENUM(uint32_t, MTRClusterEventIDType) {
 {{#first}}
 // Cluster {{asUpperCamelCase parent.label}} events
 {{/first}}
-kMTRCluster{{asUpperCamelCase parent.label}}Event{{asUpperCamelCase name}}ID = {{asMEI manufacturerCode code}},
+MTRCluster{{asUpperCamelCase parent.label}}Event{{asUpperCamelCase name}}ID = {{asMEI manufacturerCode code}},
 {{#last}}
 
 {{/last}}

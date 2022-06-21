@@ -45,23 +45,23 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::Protocols::InteractionModel;
 
-NSString * const KMTRAttributePathKey = @"attributePath";
-NSString * const KMTRCommandPathKey = @"commandPath";
-NSString * const KMTRDataKey = @"data";
-NSString * const KMTRErrorKey = @"error";
-NSString * const KMTRTypeKey = @"type";
-NSString * const KMTRValueKey = @"value";
-NSString * const KMTRContextTagKey = @"contextTag";
-NSString * const KMTRSignedIntegerValueType = @"SignedInteger";
-NSString * const KMTRUnsignedIntegerValueType = @"UnsignedInteger";
-NSString * const KMTRBooleanValueType = @"Boolean";
-NSString * const KMTRUTF8StringValueType = @"UTF8String";
-NSString * const KMTROctetStringValueType = @"OctetString";
-NSString * const KMTRFloatValueType = @"Float";
-NSString * const KMTRDoubleValueType = @"Double";
-NSString * const KMTRNullValueType = @"Null";
-NSString * const KMTRStructureValueType = @"Structure";
-NSString * const KMTRArrayValueType = @"Array";
+NSString * const MTRAttributePathKey = @"attributePath";
+NSString * const MTRCommandPathKey = @"commandPath";
+NSString * const MTRDataKey = @"data";
+NSString * const MTRErrorKey = @"error";
+NSString * const MTRTypeKey = @"type";
+NSString * const MTRValueKey = @"value";
+NSString * const MTRContextTagKey = @"contextTag";
+NSString * const MTRSignedIntegerValueType = @"SignedInteger";
+NSString * const MTRUnsignedIntegerValueType = @"UnsignedInteger";
+NSString * const MTRBooleanValueType = @"Boolean";
+NSString * const MTRUTF8StringValueType = @"UTF8String";
+NSString * const MTROctetStringValueType = @"OctetString";
+NSString * const MTRFloatValueType = @"Float";
+NSString * const MTRDoubleValueType = @"Double";
+NSString * const MTRNullValueType = @"Null";
+NSString * const MTRStructureValueType = @"Structure";
+NSString * const MTRArrayValueType = @"Array";
 
 class NSObjectDataValueCallbackBridge;
 
@@ -454,8 +454,8 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             CHIP_LOG_ERROR("Error(%s): TLV signed integer decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:KMTRSignedIntegerValueType, KMTRTypeKey,
-                             [NSNumber numberWithLongLong:val], KMTRValueKey, nil];
+        return [NSDictionary dictionaryWithObjectsAndKeys:MTRSignedIntegerValueType, MTRTypeKey,
+                             [NSNumber numberWithLongLong:val], MTRValueKey, nil];
     }
     case chip::TLV::kTLVType_UnsignedInteger: {
         uint64_t val;
@@ -464,8 +464,8 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             CHIP_LOG_ERROR("Error(%s): TLV unsigned integer decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:KMTRUnsignedIntegerValueType, KMTRTypeKey,
-                             [NSNumber numberWithUnsignedLongLong:val], KMTRValueKey, nil];
+        return [NSDictionary dictionaryWithObjectsAndKeys:MTRUnsignedIntegerValueType, MTRTypeKey,
+                             [NSNumber numberWithUnsignedLongLong:val], MTRValueKey, nil];
     }
     case chip::TLV::kTLVType_Boolean: {
         bool val;
@@ -475,14 +475,14 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             return nil;
         }
         return [NSDictionary
-            dictionaryWithObjectsAndKeys:KMTRBooleanValueType, KMTRTypeKey, [NSNumber numberWithBool:val], KMTRValueKey, nil];
+            dictionaryWithObjectsAndKeys:MTRBooleanValueType, MTRTypeKey, [NSNumber numberWithBool:val], MTRValueKey, nil];
     }
     case chip::TLV::kTLVType_FloatingPointNumber: {
         // Try float first
         float floatValue;
         CHIP_ERROR err = data->Get(floatValue);
         if (err == CHIP_NO_ERROR) {
-            return @ { KMTRTypeKey : KMTRFloatValueType, KMTRValueKey : [NSNumber numberWithFloat:floatValue] };
+            return @ { MTRTypeKey : MTRFloatValueType, MTRValueKey : [NSNumber numberWithFloat:floatValue] };
         }
         double val;
         err = data->Get(val);
@@ -491,7 +491,7 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             return nil;
         }
         return [NSDictionary
-            dictionaryWithObjectsAndKeys:KMTRDoubleValueType, KMTRTypeKey, [NSNumber numberWithDouble:val], KMTRValueKey, nil];
+            dictionaryWithObjectsAndKeys:MTRDoubleValueType, MTRTypeKey, [NSNumber numberWithDouble:val], MTRValueKey, nil];
     }
     case chip::TLV::kTLVType_UTF8String: {
         uint32_t len = data->GetLength();
@@ -501,8 +501,8 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             CHIP_LOG_ERROR("Error(%s): TLV UTF8String decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:KMTRUTF8StringValueType, KMTRTypeKey,
-                             [[NSString alloc] initWithBytes:ptr length:len encoding:NSUTF8StringEncoding], KMTRValueKey, nil];
+        return [NSDictionary dictionaryWithObjectsAndKeys:MTRUTF8StringValueType, MTRTypeKey,
+                             [[NSString alloc] initWithBytes:ptr length:len encoding:NSUTF8StringEncoding], MTRValueKey, nil];
     }
     case chip::TLV::kTLVType_ByteString: {
         uint32_t len = data->GetLength();
@@ -512,21 +512,21 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             CHIP_LOG_ERROR("Error(%s): TLV ByteString decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:KMTROctetStringValueType, KMTRTypeKey,
-                             [NSData dataWithBytes:ptr length:len], KMTRValueKey, nil];
+        return [NSDictionary dictionaryWithObjectsAndKeys:MTROctetStringValueType, MTRTypeKey,
+                             [NSData dataWithBytes:ptr length:len], MTRValueKey, nil];
     }
     case chip::TLV::kTLVType_Null: {
-        return [NSDictionary dictionaryWithObjectsAndKeys:KMTRNullValueType, KMTRTypeKey, nil];
+        return [NSDictionary dictionaryWithObjectsAndKeys:MTRNullValueType, MTRTypeKey, nil];
     }
     case chip::TLV::kTLVType_Structure:
     case chip::TLV::kTLVType_Array: {
         NSString * typeName;
         switch (dataTLVType) {
         case chip::TLV::kTLVType_Structure:
-            typeName = KMTRStructureValueType;
+            typeName = MTRStructureValueType;
             break;
         case chip::TLV::kTLVType_Array:
-            typeName = KMTRArrayValueType;
+            typeName = MTRArrayValueType;
             break;
         default:
             typeName = @"Unsupported";
@@ -547,9 +547,9 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
                 return nil;
             }
             NSMutableDictionary * arrayElement = [NSMutableDictionary dictionary];
-            [arrayElement setObject:value forKey:KMTRDataKey];
+            [arrayElement setObject:value forKey:MTRDataKey];
             if (dataTLVType == chip::TLV::kTLVType_Structure) {
-                [arrayElement setObject:[NSNumber numberWithUnsignedLong:TagNumFromTag(tag)] forKey:KMTRContextTagKey];
+                [arrayElement setObject:[NSNumber numberWithUnsignedLong:TagNumFromTag(tag)] forKey:MTRContextTagKey];
             }
             [array addObject:arrayElement];
         }
@@ -562,7 +562,7 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             CHIP_LOG_ERROR("Error(%s): TLV container exiting failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:typeName, KMTRTypeKey, array, KMTRValueKey, nil];
+        return [NSDictionary dictionaryWithObjectsAndKeys:typeName, MTRTypeKey, array, MTRValueKey, nil];
     }
     default:
         CHIP_LOG_ERROR("Error: Unsupported TLV type for conversion: %u", (unsigned) data->GetType());
@@ -576,65 +576,65 @@ static CHIP_ERROR EncodeTLVFromObject(id object, chip::TLV::TLVWriter & writer, 
         CHIP_LOG_ERROR("Error: Unsupported object to encode: %@", [object class]);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    NSString * typeName = ((NSDictionary *) object)[KMTRTypeKey];
-    id value = ((NSDictionary *) object)[KMTRValueKey];
+    NSString * typeName = ((NSDictionary *) object)[MTRTypeKey];
+    id value = ((NSDictionary *) object)[MTRValueKey];
     if (!typeName) {
         CHIP_LOG_ERROR("Error: Object to encode is corrupt");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if ([typeName isEqualToString:KMTRSignedIntegerValueType]) {
+    if ([typeName isEqualToString:MTRSignedIntegerValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt signed integer type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         return writer.Put(tag, [value longLongValue]);
     }
-    if ([typeName isEqualToString:KMTRUnsignedIntegerValueType]) {
+    if ([typeName isEqualToString:MTRUnsignedIntegerValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt unsigned integer type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         return writer.Put(tag, [value unsignedLongLongValue]);
     }
-    if ([typeName isEqualToString:KMTRBooleanValueType]) {
+    if ([typeName isEqualToString:MTRBooleanValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt boolean type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         return writer.Put(tag, static_cast<bool>([value boolValue]));
     }
-    if ([typeName isEqualToString:KMTRFloatValueType]) {
+    if ([typeName isEqualToString:MTRFloatValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt float type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         return writer.Put(tag, [value floatValue]);
     }
-    if ([typeName isEqualToString:KMTRDoubleValueType]) {
+    if ([typeName isEqualToString:MTRDoubleValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt double type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         return writer.Put(tag, [value doubleValue]);
     }
-    if ([typeName isEqualToString:KMTRNullValueType]) {
+    if ([typeName isEqualToString:MTRNullValueType]) {
         return writer.PutNull(tag);
     }
-    if ([typeName isEqualToString:KMTRUTF8StringValueType]) {
+    if ([typeName isEqualToString:MTRUTF8StringValueType]) {
         if (![value isKindOfClass:[NSString class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt UTF8 string type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         return writer.PutString(tag, [value cStringUsingEncoding:NSUTF8StringEncoding]);
     }
-    if ([typeName isEqualToString:KMTROctetStringValueType]) {
+    if ([typeName isEqualToString:MTROctetStringValueType]) {
         if (![value isKindOfClass:[NSData class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt octet string type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         return writer.Put(tag, chip::ByteSpan(static_cast<const uint8_t *>([value bytes]), [value length]));
     }
-    if ([typeName isEqualToString:KMTRStructureValueType]) {
+    if ([typeName isEqualToString:MTRStructureValueType]) {
         if (![value isKindOfClass:[NSArray class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt structure type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -646,8 +646,8 @@ static CHIP_ERROR EncodeTLVFromObject(id object, chip::TLV::TLVWriter & writer, 
                 CHIP_LOG_ERROR("Error: Structure element to encode has corrupt type: %@", [element class]);
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-            NSNumber * elementTag = element[KMTRContextTagKey];
-            id elementValue = element[KMTRDataKey];
+            NSNumber * elementTag = element[MTRContextTagKey];
+            id elementValue = element[MTRDataKey];
             if (!elementTag || !elementValue) {
                 CHIP_LOG_ERROR("Error: Structure element to encode has corrupt value: %@", element);
                 return CHIP_ERROR_INVALID_ARGUMENT;
@@ -657,7 +657,7 @@ static CHIP_ERROR EncodeTLVFromObject(id object, chip::TLV::TLVWriter & writer, 
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
     }
-    if ([typeName isEqualToString:KMTRArrayValueType]) {
+    if ([typeName isEqualToString:MTRArrayValueType]) {
         if (![value isKindOfClass:[NSArray class]]) {
             CHIP_LOG_ERROR("Error: Object to encode has corrupt array type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -669,7 +669,7 @@ static CHIP_ERROR EncodeTLVFromObject(id object, chip::TLV::TLVWriter & writer, 
                 CHIP_LOG_ERROR("Error: Array element to encode has corrupt type: %@", [element class]);
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-            id elementValue = element[KMTRDataKey];
+            id elementValue = element[MTRDataKey];
             if (!elementValue) {
                 CHIP_LOG_ERROR("Error: Array element to encode has corrupt value: %@", element);
                 return CHIP_ERROR_INVALID_ARGUMENT;
@@ -830,8 +830,8 @@ private:
             auto onSuccessCb
                 = [resultArray, resultSuccess](const app::ConcreteAttributePath & attribPath, const NSObjectData & aData) {
                       [resultArray addObject:@ {
-                          KMTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath],
-                          KMTRDataKey : aData.GetDecodedObject()
+                          MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath],
+                          MTRDataKey : aData.GetDecodedObject()
                       }];
                       if ([resultSuccess count] == 0) {
                           [resultSuccess addObject:[NSNumber numberWithBool:YES]];
@@ -841,8 +841,8 @@ private:
             auto onFailureCb = [resultArray, resultFailure](const app::ConcreteAttributePath * attribPath, CHIP_ERROR aError) {
                 if (attribPath) {
                     [resultArray addObject:@ {
-                        KMTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:*attribPath],
-                        KMTRErrorKey : [MTRError errorForCHIPErrorCode:aError]
+                        MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:*attribPath],
+                        MTRErrorKey : [MTRError errorForCHIPErrorCode:aError]
                     }];
                 } else if ([resultFailure count] == 0) {
                     [resultFailure addObject:[MTRError errorForCHIPErrorCode:aError]];
@@ -875,7 +875,7 @@ private:
                         if ([resultFailure count] > 0) {
                             failureCb(context, [MTRError errorToCHIPErrorCode:resultFailure[0]]);
                         } else if ([resultArray count] > 0) {
-                            failureCb(context, [MTRError errorToCHIPErrorCode:resultArray[0][KMTRErrorKey]]);
+                            failureCb(context, [MTRError errorToCHIPErrorCode:resultArray[0][MTRErrorKey]]);
                         } else {
                             failureCb(context, CHIP_ERROR_READ_FAILED);
                         }
@@ -933,7 +933,7 @@ private:
             auto resultSuccess = [[NSMutableArray alloc] init];
             auto resultFailure = [[NSMutableArray alloc] init];
             auto onSuccessCb = [resultArray, resultSuccess](const app::ConcreteAttributePath & attribPath) {
-                [resultArray addObject:@ { KMTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath] }];
+                [resultArray addObject:@ { MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath] }];
                 if ([resultSuccess count] == 0) {
                     [resultSuccess addObject:[NSNumber numberWithBool:YES]];
                 }
@@ -942,8 +942,8 @@ private:
             auto onFailureCb = [resultArray, resultFailure](const app::ConcreteAttributePath * attribPath, CHIP_ERROR aError) {
                 if (attribPath) {
                     [resultArray addObject:@ {
-                        KMTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:*attribPath],
-                        KMTRErrorKey : [MTRError errorForCHIPErrorCode:aError],
+                        MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:*attribPath],
+                        MTRErrorKey : [MTRError errorForCHIPErrorCode:aError],
                     }];
                 } else {
                     if ([resultFailure count] == 0) {
@@ -960,7 +960,7 @@ private:
                               if ([resultFailure count] > 0) {
                                   failureCb(context, [MTRError errorToCHIPErrorCode:resultFailure[0]]);
                               } else if ([resultArray count] > 0) {
-                                  failureCb(context, [MTRError errorToCHIPErrorCode:resultArray[0][KMTRErrorKey]]);
+                                  failureCb(context, [MTRError errorToCHIPErrorCode:resultArray[0][MTRErrorKey]]);
                               } else {
                                   failureCb(context, CHIP_ERROR_WRITE_FAILED);
                               }
@@ -1068,11 +1068,11 @@ exit:
                                    const app::StatusIB & status, const NSObjectData & responseData) {
                 if (responseData.GetDecodedObject()) {
                     [resultArray addObject:@ {
-                        KMTRCommandPathKey : [[MTRCommandPath alloc] initWithPath:commandPath],
-                        KMTRDataKey : responseData.GetDecodedObject()
+                        MTRCommandPathKey : [[MTRCommandPath alloc] initWithPath:commandPath],
+                        MTRDataKey : responseData.GetDecodedObject()
                     }];
                 } else {
-                    [resultArray addObject:@ { KMTRCommandPathKey : [[MTRCommandPath alloc] initWithPath:commandPath] }];
+                    [resultArray addObject:@ { MTRCommandPathKey : [[MTRCommandPath alloc] initWithPath:commandPath] }];
                 }
                 if ([resultSuccess count] == 0) {
                     [resultSuccess addObject:[NSNumber numberWithBool:YES]];
@@ -1148,7 +1148,7 @@ exit:
             dispatch_async(clientQueue, ^{
                 reportHandler(
                     @[
-                        @ { KMTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy], KMTRDataKey : valueObject }
+                        @ { MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy], MTRDataKey : valueObject }
                     ],
                     nil);
             });

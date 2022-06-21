@@ -233,7 +233,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                 NSMutableArray<NSDictionary<NSString *, id> *> * filteredValues =
                                                     [NSMutableArray arrayWithCapacity:[decodedValues count]];
                                                 for (NSDictionary<NSString *, id> * decodedValue in decodedValues) {
-                                                    MTRAttributePath * attributePath = decodedValue[KMTRAttributePathKey];
+                                                    MTRAttributePath * attributePath = decodedValue[MTRAttributePathKey];
                                                     if ((endpointId == nil || [attributePath.endpoint isEqualToNumber:endpointId])
                                                         && (clusterId == nil || [attributePath.cluster isEqualToNumber:clusterId])
                                                         && (attributeId == nil ||
