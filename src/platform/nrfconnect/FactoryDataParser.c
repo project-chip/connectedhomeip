@@ -58,7 +58,11 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
             break;
         }
 
-        if (strncmp("hw_ver", (const char *) currentString.value, currentString.len) == 0)
+        if (strncmp("version", (const char *) currentString.value, currentString.len) == 0)
+        {
+            res = res && uint16_decode(states, &factoryData->version);
+        }
+        else if (strncmp("hw_ver", (const char *) currentString.value, currentString.len) == 0)
         {
             res                       = res && uint16_decode(states, &factoryData->hw_ver);
             factoryData->hwVerPresent = res;

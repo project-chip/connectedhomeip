@@ -4,6 +4,7 @@
     "description": "A representation of all factory data used in Matter's NrfConnect device",
     "type": "object",
     "required": [
+        "version",
         "sn",
         "vendor_id",
         "product_id",
@@ -21,6 +22,12 @@
         "discriminator"
     ],
     "properties": {
+        "version": {
+            "description": "Current version of the factory data set",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+        },
         "sn": {
             "description": "Serial number of device",
             "type": "string",

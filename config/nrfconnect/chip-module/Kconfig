@@ -16,6 +16,8 @@
 
 rsource "../../zephyr/Kconfig"
 
+if CHIP
+
 config CHIP_NFC_COMMISSIONING
 	bool "Enable NFC commissioning support"
 	default n
@@ -98,10 +100,20 @@ config CHIP_FACTORY_DATA_BUILD
 	  configuration file pm_static.yml.
 	  As a result a new output file factory_data.hex will be created.
 
+config CHIP_FACTORY_DATA_VERSION
+	int
+	default 1
+	help
+	  The Factory data version contains a current version of a factory data 
+	  parameter set that the user cannot change. 
+	  After moving to the next version of the factory data set, change the default value. 
+	  This config is used to validate the version of a factory data set on a device-side 
+	  with the version of factory data saved in the Flash memory.
+
 if CHIP_FACTORY_DATA_BUILD
 
 # Factory data definitions
-config CHIP_MERGE_FACTORY_DATA_WITH_FIRMWARE
+config CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
 	bool "Enable merging generated factory data with the build target .hex file"
 	default y
 	help
@@ -240,3 +252,5 @@ config CHIP_DEVICE_ROTATING_DEVICE_UID
 	help
 	  A device rotating id unique id which will be generated if
 	  this config is not set in prj.conf file.
+
+endif
