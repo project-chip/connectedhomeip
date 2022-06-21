@@ -31,63 +31,63 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *                A response-value is an NSDictionary object with the following key values:
  *
- *                KMTRAttributePathKey : MTRAttributePath object. Included for attribute value.
- *                KMTRCommandPathKey : MTRCommandPath object. Included for command response.
- *                KMTRErrorKey : NSError object. Included to indicate an error.
- *                KMTRDataKey: Data-value NSDictionary object.
+ *                MTRAttributePathKey : MTRAttributePath object. Included for attribute value.
+ *                MTRCommandPathKey : MTRCommandPath object. Included for command response.
+ *                MTRErrorKey : NSError object. Included to indicate an error.
+ *                MTRDataKey: Data-value NSDictionary object.
  *                              Included when there is data and when there is no error.
  *                              The data-value is described below.
  *
  *                A data-value is an NSDictionary object with the following key values:
  *
- *                KMTRTypeKey : data type. KMTRSignedIntegerValueType, KMTRUnsignedIntegerValueType, KMTRBooleanValueType,
- *                               KMTRUTF8StringValueType, KMTROctetStringValueType, KMTRFloatValueType, KMTRDoubleValueType,
- *                               KMTRNullValueType, KMTRStructureValueType or KMTRArrayValueType.
+ *                MTRTypeKey : data type. MTRSignedIntegerValueType, MTRUnsignedIntegerValueType, MTRBooleanValueType,
+ *                               MTRUTF8StringValueType, MTROctetStringValueType, MTRFloatValueType, MTRDoubleValueType,
+ *                               MTRNullValueType, MTRStructureValueType or MTRArrayValueType.
  *
- *                KMTRValueKey : data value. Per each data type, data value shall be the following object:
+ *                MTRValueKey : data value. Per each data type, data value shall be the following object:
  *
- *                          KMTRSignedIntegerValueType: NSNumber object.
- *                          KMTRUnsignedIntegerValueType: NSNumber object.
- *                          KMTRBooleanValueType: NSNumber object.
- *                          KMTRUTF8StringValueType: NSString object.
- *                          KMTROctetStringValueType: NSData object.
- *                          KMTRFloatValueType: NSNumber object.
- *                          KMTRDoubleValueType: NSNumber object.
- *                          KMTRNullValueType: "value" key will not be included.
- *                          KMTRStructureValueType: structure-value NSArray object.
+ *                          MTRSignedIntegerValueType: NSNumber object.
+ *                          MTRUnsignedIntegerValueType: NSNumber object.
+ *                          MTRBooleanValueType: NSNumber object.
+ *                          MTRUTF8StringValueType: NSString object.
+ *                          MTROctetStringValueType: NSData object.
+ *                          MTRFloatValueType: NSNumber object.
+ *                          MTRDoubleValueType: NSNumber object.
+ *                          MTRNullValueType: "value" key will not be included.
+ *                          MTRStructureValueType: structure-value NSArray object.
  *                                                   See below for the definition of structure-value.
- *                          KMTRArrayValueType: Array-value NSArray object. See below for the definition of array-value.
+ *                          MTRArrayValueType: Array-value NSArray object. See below for the definition of array-value.
  *
  *                A structure-value is an NSArray object with NSDictionary objects as its elements. Each dictionary element will
  *                contain the following key values.
  *
- *                KMTRContextTagKey : NSNumber object as context tag.
- *                KMTRDataKey : Data-value NSDictionary object.
+ *                MTRContextTagKey : NSNumber object as context tag.
+ *                MTRDataKey : Data-value NSDictionary object.
  *
  *                An array-value is an NSArray object with NSDictionary objects as its elements. Each dictionary element will
  *                contain the following key values.
  *
- *                KMTRDataKey : Data-value NSDictionary object.
+ *                MTRDataKey : Data-value NSDictionary object.
  */
 typedef void (^MTRDeviceResponseHandler)(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error);
 
-extern NSString * const KMTRAttributePathKey;
-extern NSString * const KMTRCommandPathKey;
-extern NSString * const KMTRDataKey;
-extern NSString * const KMTRErrorKey;
-extern NSString * const KMTRTypeKey;
-extern NSString * const KMTRValueKey;
-extern NSString * const KMTRContextTagKey;
-extern NSString * const KMTRSignedIntegerValueType;
-extern NSString * const KMTRUnsignedIntegerValueType;
-extern NSString * const KMTRBooleanValueType;
-extern NSString * const KMTRUTF8StringValueType;
-extern NSString * const KMTROctetStringValueType;
-extern NSString * const KMTRFloatValueType;
-extern NSString * const KMTRDoubleValueType;
-extern NSString * const KMTRNullValueType;
-extern NSString * const KMTRStructureValueType;
-extern NSString * const KMTRArrayValueType;
+extern NSString * const MTRAttributePathKey;
+extern NSString * const MTRCommandPathKey;
+extern NSString * const MTRDataKey;
+extern NSString * const MTRErrorKey;
+extern NSString * const MTRTypeKey;
+extern NSString * const MTRValueKey;
+extern NSString * const MTRContextTagKey;
+extern NSString * const MTRSignedIntegerValueType;
+extern NSString * const MTRUnsignedIntegerValueType;
+extern NSString * const MTRBooleanValueType;
+extern NSString * const MTRUTF8StringValueType;
+extern NSString * const MTROctetStringValueType;
+extern NSString * const MTRFloatValueType;
+extern NSString * const MTRDoubleValueType;
+extern NSString * const MTRNullValueType;
+extern NSString * const MTRStructureValueType;
+extern NSString * const MTRArrayValueType;
 
 @class MTRAttributeCacheContainer;
 @class MTRReadParams;
@@ -209,7 +209,7 @@ extern NSString * const KMTRArrayValueType;
  * @param commandFields   command fields object. The object must be a data-value NSDictionary object
  *                      as described in the MTRDeviceResponseHandler.
  *                      The attribute must be a Structure, i.e.,
- *                      the NSDictionary KMTRTypeKey key must have the value KMTRStructureValueType.
+ *                      the NSDictionary MTRTypeKey key must have the value MTRStructureValueType.
  *
  * @param timeoutMs   timeout in milliseconds for timed invoke, or nil.
  *

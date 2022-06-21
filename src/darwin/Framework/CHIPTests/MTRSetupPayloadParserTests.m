@@ -39,7 +39,7 @@
 {
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
-                                                                                        ofType:CHIPOnboardingPayloadTypeManualCode
+                                                                                        ofType:MTROnboardingPayloadTypeManualCode
                                                                                          error:&error];
 
     XCTAssertNotNil(payload);
@@ -58,7 +58,7 @@
 {
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
-                                                                                        ofType:CHIPOnboardingPayloadTypeQRCode
+                                                                                        ofType:MTROnboardingPayloadTypeQRCode
                                                                                          error:&error];
 
     XCTAssertNil(payload);
@@ -69,7 +69,7 @@
 {
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
-                                                                                        ofType:CHIPOnboardingPayloadTypeAdmin
+                                                                                        ofType:MTROnboardingPayloadTypeAdmin
                                                                                          error:&error];
 
     XCTAssertNotNil(payload);
@@ -88,7 +88,7 @@
 {
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
-                                                                                        ofType:CHIPOnboardingPayloadTypeQRCode
+                                                                                        ofType:MTROnboardingPayloadTypeQRCode
                                                                                          error:&error];
 
     XCTAssertNil(payload);
@@ -99,7 +99,7 @@
 {
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"MT:R5L90MP500K64J00000"
-                                                                                        ofType:CHIPOnboardingPayloadTypeQRCode
+                                                                                        ofType:MTROnboardingPayloadTypeQRCode
                                                                                          error:&error];
 
     XCTAssertNotNil(payload);
@@ -118,7 +118,7 @@
 {
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"MT:R5L90MP500K64J00000"
-                                                                                        ofType:CHIPOnboardingPayloadTypeAdmin
+                                                                                        ofType:MTROnboardingPayloadTypeAdmin
                                                                                          error:&error];
 
     XCTAssertNil(payload);
@@ -130,7 +130,7 @@
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser
         setupPayloadForOnboardingPayload:@"MT:R5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0"
-                                  ofType:CHIPOnboardingPayloadTypeNFC
+                                  ofType:MTROnboardingPayloadTypeNFC
                                    error:&error];
 
     XCTAssertNotNil(payload);
@@ -150,7 +150,7 @@
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser
         setupPayloadForOnboardingPayload:@"MT:R5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0"
-                                  ofType:CHIPOnboardingPayloadTypeManualCode
+                                  ofType:MTROnboardingPayloadTypeManualCode
                                    error:&error];
 
     XCTAssertNil(payload);

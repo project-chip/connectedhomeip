@@ -80,17 +80,17 @@ static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadPar
     }
     NSMutableArray * result = [NSMutableArray array];
     for (NSDictionary<NSString *, id> * value in values) {
-        if (!value || (value[KMTRAttributePathKey] == nil && value[KMTRCommandPathKey] == nil)) {
+        if (!value || (value[MTRAttributePathKey] == nil && value[MTRCommandPathKey] == nil)) {
             [result addObject:value];
             continue;
         }
         NSMutableDictionary<NSString *, id> * resultValue = [NSMutableDictionary dictionaryWithCapacity:[value count]];
         [resultValue addEntriesFromDictionary:value];
-        if (value[KMTRAttributePathKey]) {
-            resultValue[KMTRAttributePathKey] = encodeAttributePath(value[KMTRAttributePathKey]);
+        if (value[MTRAttributePathKey]) {
+            resultValue[MTRAttributePathKey] = encodeAttributePath(value[MTRAttributePathKey]);
         }
-        if (value[KMTRCommandPathKey]) {
-            resultValue[KMTRCommandPathKey] = encodeCommandPath(value[KMTRCommandPathKey]);
+        if (value[MTRCommandPathKey]) {
+            resultValue[MTRCommandPathKey] = encodeCommandPath(value[MTRCommandPathKey]);
         }
         [result addObject:resultValue];
     }
@@ -105,16 +105,16 @@ static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadPar
     }
     NSMutableArray * result = [NSMutableArray array];
     for (NSDictionary<NSString *, id> * value in values) {
-        if (!value || (value[KMTRAttributePathKey] == nil && value[KMTRCommandPathKey] == nil)) {
+        if (!value || (value[MTRAttributePathKey] == nil && value[MTRCommandPathKey] == nil)) {
             [result addObject:value];
         }
         NSMutableDictionary<NSString *, id> * resultValue = [NSMutableDictionary dictionaryWithCapacity:[value count]];
         [resultValue addEntriesFromDictionary:value];
-        if (value[KMTRAttributePathKey]) {
-            resultValue[KMTRAttributePathKey] = decodeAttributePath(value[KMTRAttributePathKey]);
+        if (value[MTRAttributePathKey]) {
+            resultValue[MTRAttributePathKey] = decodeAttributePath(value[MTRAttributePathKey]);
         }
-        if (value[KMTRCommandPathKey]) {
-            resultValue[KMTRCommandPathKey] = decodeCommandPath(value[KMTRCommandPathKey]);
+        if (value[MTRCommandPathKey]) {
+            resultValue[MTRCommandPathKey] = decodeCommandPath(value[MTRCommandPathKey]);
         }
         [result addObject:resultValue];
     }

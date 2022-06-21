@@ -28,12 +28,12 @@
 {
     MTRSetupPayload * payload;
     switch (type) {
-    case CHIPOnboardingPayloadTypeManualCode:
-    case CHIPOnboardingPayloadTypeAdmin:
+    case MTROnboardingPayloadTypeManualCode:
+    case MTROnboardingPayloadTypeAdmin:
         payload = [self setupPayloadForManualCodeOnboardingPayload:onboardingPayload error:error];
         break;
-    case CHIPOnboardingPayloadTypeQRCode:
-    case CHIPOnboardingPayloadTypeNFC:
+    case MTROnboardingPayloadTypeQRCode:
+    case MTROnboardingPayloadTypeNFC:
         payload = [self setupPayloadForQRCodeOnboardingPayload:onboardingPayload error:error];
         break;
     default:

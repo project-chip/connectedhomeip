@@ -60,20 +60,20 @@ static CHIP_ERROR AppendAttibuteValueToArray(
     if (err == CHIP_NO_ERROR) {
         id obj = NSObjectFromCHIPTLV(&reader);
         if (obj) {
-            [array addObject:@ { KMTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:path], KMTRDataKey : obj }];
+            [array addObject:@ { MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:path], MTRDataKey : obj }];
             return CHIP_NO_ERROR;
         }
         CHIP_LOG_ERROR("Error: Cached value could not be converted to generic NSObject");
         [array addObject:@ {
-            KMTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:path],
-            KMTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_DECODE_FAILED]
+            MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:path],
+            MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_DECODE_FAILED]
         }];
         return CHIP_ERROR_DECODE_FAILED;
     }
     CHIP_LOG_ERROR("Error: Failed to read from attribute cache: %s", err.AsString());
     [array addObject:@ {
-        KMTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:path],
-        KMTRErrorKey : [MTRError errorForCHIPErrorCode:err]
+        MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:path],
+        MTRErrorKey : [MTRError errorForCHIPErrorCode:err]
     }];
     return err;
 }

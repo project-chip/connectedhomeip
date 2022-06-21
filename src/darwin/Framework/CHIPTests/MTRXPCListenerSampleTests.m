@@ -131,7 +131,7 @@ static MTRDeviceController * sController = nil;
 @end
 
 // This sample does not have multiple controllers and hence controller Id shall be the same.
-static NSString * const KMTRDeviceControllerId = @"CHIPController";
+static NSString * const MTRDeviceControllerId = @"CHIPController";
 
 @implementation MTRDeviceControllerServerSample
 
@@ -151,12 +151,12 @@ static NSString * const KMTRDeviceControllerId = @"CHIPController";
 {
     // We are using a shared local device controller and hence no disctinction per fabricId.
     (void) fabricId;
-    completion(KMTRDeviceControllerId, nil);
+    completion(MTRDeviceControllerId, nil);
 }
 
 - (void)getAnyDeviceControllerWithCompletion:(void (^)(id _Nullable controller, NSError * _Nullable error))completion
 {
-    completion(KMTRDeviceControllerId, nil);
+    completion(MTRDeviceControllerId, nil);
 }
 
 - (void)readAttributeWithController:(id)controller
@@ -580,7 +580,7 @@ static MTRDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     __auto_type remoteController = [MTRDeviceController
-        sharedControllerWithId:KMTRDeviceControllerId
+        sharedControllerWithId:MTRDeviceControllerId
                xpcConnectBlock:^NSXPCConnection * _Nonnull {
                    if (mSampleListener.listenerEndpoint) {
                        return [[NSXPCConnection alloc] initWithListenerEndpoint:mSampleListener.listenerEndpoint];
