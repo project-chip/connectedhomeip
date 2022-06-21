@@ -33,7 +33,7 @@ tests:
           "TH reads the ChannelList attribute from the DUT and Verify that the
           response contains a list of the known TV channels"
       verification: |
-          ./chip-tool channel read channel-list 1 1 
+          ./chip-tool channel read channel-list 1 1
           [1651056337.291422][155797:155802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0504 Attribute 0x0000_0000 DataVersion: 2113505570
           [1651056337.291517][155797:155802] CHIP:TOO:   ChannelList: 4 entries
           [1651056337.291571][155797:155802] CHIP:TOO:     [1]: {
