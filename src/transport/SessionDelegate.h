@@ -37,7 +37,7 @@ public:
      *   is suggested to shift to the newly created session.
      *
      *   Our security model is built upon Exchanges and Sessions, but not SessionHolders, such that SessionHolders should be able to
-     *   shift to a new sessoin freely. If an application is holding a session which is not intended to be shifted, it can provide
+     *   shift to a new session freely. If an application is holding a session which is not intended to be shifted, it can provide
      *   its shifting policy by overriding GetNewSessionHandlingPolicy in SessionDelegate. For example SessionHolders inside
      *   ExchangeContext and PairingSession are not eligible for auto-shifting.
      *

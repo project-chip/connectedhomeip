@@ -161,7 +161,7 @@ public:
 
             // This will give all SessionHolders pointing to oldSession a chance to switch to the provided session
             //
-            // See documentationon for SessionDelegate::GetNewSessionHandlingPolicy about how session auto-shifting works, and how
+            // See documentation for SessionDelegate::GetNewSessionHandlingPolicy about how session auto-shifting works, and how
             // to disable it for a specific SessionHolder in a specific scenario.
             if (oldSession->GetSecureSessionType() == SecureSession::Type::kCASE && oldSession->GetPeer() == session->GetPeer() &&
                 oldSession->GetPeerCATs() == session->GetPeerCATs())
