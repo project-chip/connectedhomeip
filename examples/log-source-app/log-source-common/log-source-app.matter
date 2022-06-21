@@ -67,69 +67,6 @@ server cluster AccessControl = 31 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-client cluster DiagnosticLogs = 50 {
-  enum LogsIntent : ENUM8 {
-    kEndUserSupport = 0;
-    kNetworkDiag = 1;
-    kCrashLogs = 2;
-  }
-
-  enum LogsStatus : ENUM8 {
-    kSuccess = 0;
-    kExhausted = 1;
-    kNoLogs = 2;
-    kBusy = 3;
-    kDenied = 4;
-  }
-
-  enum LogsTransferProtocol : ENUM8 {
-    kResponsePayload = 0;
-    kBdx = 1;
-  }
-
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-server cluster DiagnosticLogs = 50 {
-  enum LogsIntent : ENUM8 {
-    kEndUserSupport = 0;
-    kNetworkDiag = 1;
-    kCrashLogs = 2;
-  }
-
-  enum LogsStatus : ENUM8 {
-    kSuccess = 0;
-    kExhausted = 1;
-    kNoLogs = 2;
-    kBusy = 3;
-    kDenied = 4;
-  }
-
-  enum LogsTransferProtocol : ENUM8 {
-    kResponsePayload = 0;
-    kBdx = 1;
-  }
-
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct RetrieveLogsRequestRequest {
-    LogsIntent intent = 0;
-    LogsTransferProtocol requestedProtocol = 1;
-    OCTET_STRING transferFileDesignator = 2;
-  }
-
-  response struct RetrieveLogsResponse = 1 {
-    LogsStatus status = 0;
-    OCTET_STRING content = 1;
-    epoch_s timeStamp = 2;
-    INT32U timeSinceBoot = 3;
-  }
-
-  command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
-}
-
 server cluster GeneralCommissioning = 48 {
   enum CommissioningError : ENUM8 {
     kOk = 0;
@@ -306,6 +243,69 @@ server cluster NetworkCommissioning = 49 {
   command access(invoke: administer) RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
   command access(invoke: administer) ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
   command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
+}
+
+client cluster DiagnosticLogs = 50 {
+  enum LogsIntent : ENUM8 {
+    kEndUserSupport = 0;
+    kNetworkDiag = 1;
+    kCrashLogs = 2;
+  }
+
+  enum LogsStatus : ENUM8 {
+    kSuccess = 0;
+    kExhausted = 1;
+    kNoLogs = 2;
+    kBusy = 3;
+    kDenied = 4;
+  }
+
+  enum LogsTransferProtocol : ENUM8 {
+    kResponsePayload = 0;
+    kBdx = 1;
+  }
+
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+server cluster DiagnosticLogs = 50 {
+  enum LogsIntent : ENUM8 {
+    kEndUserSupport = 0;
+    kNetworkDiag = 1;
+    kCrashLogs = 2;
+  }
+
+  enum LogsStatus : ENUM8 {
+    kSuccess = 0;
+    kExhausted = 1;
+    kNoLogs = 2;
+    kBusy = 3;
+    kDenied = 4;
+  }
+
+  enum LogsTransferProtocol : ENUM8 {
+    kResponsePayload = 0;
+    kBdx = 1;
+  }
+
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct RetrieveLogsRequestRequest {
+    LogsIntent intent = 0;
+    LogsTransferProtocol requestedProtocol = 1;
+    OCTET_STRING transferFileDesignator = 2;
+  }
+
+  response struct RetrieveLogsResponse = 1 {
+    LogsStatus status = 0;
+    OCTET_STRING content = 1;
+    epoch_s timeStamp = 2;
+    INT32U timeSinceBoot = 3;
+  }
+
+  command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 
 server cluster OperationalCredentials = 62 {

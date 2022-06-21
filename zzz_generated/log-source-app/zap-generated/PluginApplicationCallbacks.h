@@ -23,8 +23,8 @@
 
 #define MATTER_PLUGINS_INIT                                                                                                        \
     MatterAccessControlPluginServerInitCallback();                                                                                 \
-    MatterDiagnosticLogsPluginClientInitCallback();                                                                                \
-    MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
+    MatterDiagnosticLogsPluginClientInitCallback();                                                                                \
+    MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
     MatterOperationalCredentialsPluginServerInitCallback();

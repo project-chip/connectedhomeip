@@ -138,42 +138,6 @@ server cluster AccessControl = 31 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster AdministratorCommissioning = 60 {
-  enum CommissioningWindowStatus : ENUM8 {
-    kWindowNotOpen = 0;
-    kEnhancedWindowOpen = 1;
-    kBasicWindowOpen = 2;
-  }
-
-  enum StatusCode : ENUM8 {
-    kBusy = 1;
-    kPAKEParameterError = 2;
-    kWindowNotOpen = 3;
-  }
-
-  readonly attribute int8u windowStatus = 0;
-  readonly attribute fabric_idx adminFabricIndex = 1;
-  readonly attribute int16u adminVendorId = 2;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct OpenCommissioningWindowRequest {
-    INT16U commissioningTimeout = 0;
-    OCTET_STRING PAKEVerifier = 1;
-    INT16U discriminator = 2;
-    INT32U iterations = 3;
-    OCTET_STRING salt = 4;
-  }
-
-  request struct OpenBasicCommissioningWindowRequest {
-    INT16U commissioningTimeout = 0;
-  }
-
-  timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
-}
-
 server cluster Basic = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
@@ -218,8 +182,103 @@ server cluster Basic = 40 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster FixedLabel = 64 {
-  readonly attribute LabelStruct labelList[] = 0;
+server cluster OtaSoftwareUpdateProvider = 41 {
+  enum OTAApplyUpdateAction : ENUM8 {
+    kProceed = 0;
+    kAwaitNextAction = 1;
+    kDiscontinue = 2;
+  }
+
+  enum OTADownloadProtocol : ENUM8 {
+    kBDXSynchronous = 0;
+    kBDXAsynchronous = 1;
+    kHttps = 2;
+    kVendorSpecific = 3;
+  }
+
+  enum OTAQueryStatus : ENUM8 {
+    kUpdateAvailable = 0;
+    kBusy = 1;
+    kNotAvailable = 2;
+    kDownloadProtocolNotSupported = 3;
+  }
+
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct QueryImageRequest {
+    vendor_id vendorId = 0;
+    INT16U productId = 1;
+    INT32U softwareVersion = 2;
+    OTADownloadProtocol protocolsSupported[] = 3;
+    optional INT16U hardwareVersion = 4;
+    optional CHAR_STRING location = 5;
+    optional BOOLEAN requestorCanConsent = 6;
+    optional OCTET_STRING metadataForProvider = 7;
+  }
+
+  request struct ApplyUpdateRequestRequest {
+    OCTET_STRING updateToken = 0;
+    INT32U newVersion = 1;
+  }
+
+  request struct NotifyUpdateAppliedRequest {
+    OCTET_STRING updateToken = 0;
+    INT32U softwareVersion = 1;
+  }
+
+  response struct QueryImageResponse = 1 {
+    OTAQueryStatus status = 0;
+    optional INT32U delayedActionTime = 1;
+    optional CHAR_STRING imageURI = 2;
+    optional INT32U softwareVersion = 3;
+    optional CHAR_STRING softwareVersionString = 4;
+    optional OCTET_STRING updateToken = 5;
+    optional BOOLEAN userConsentNeeded = 6;
+    optional OCTET_STRING metadataForRequestor = 7;
+  }
+
+  response struct ApplyUpdateResponse = 3 {
+    OTAApplyUpdateAction action = 0;
+    INT32U delayedActionTime = 1;
+  }
+
+  command QueryImage(QueryImageRequest): QueryImageResponse = 0;
+  command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
+  command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
+}
+
+server cluster LocalizationConfiguration = 43 {
+  attribute char_string<35> activeLocale = 0;
+  readonly attribute CHAR_STRING supportedLocales[] = 1;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+server cluster TimeFormatLocalization = 44 {
+  enum CalendarType : ENUM8 {
+    kBuddhist = 0;
+    kChinese = 1;
+    kCoptic = 2;
+    kEthiopian = 3;
+    kGregorian = 4;
+    kHebrew = 5;
+    kIndian = 6;
+    kIslamic = 7;
+    kJapanese = 8;
+    kKorean = 9;
+    kPersian = 10;
+    kTaiwanese = 11;
+  }
+
+  enum HourFormat : ENUM8 {
+    k12hr = 0;
+    k24hr = 1;
+  }
+
+  attribute HourFormat hourFormat = 0;
+  attribute CalendarType activeCalendarType = 1;
+  readonly attribute CalendarType supportedCalendarTypes[] = 2;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -281,180 +340,6 @@ server cluster GeneralCommissioning = 48 {
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
   command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
-}
-
-server cluster GeneralDiagnostics = 51 {
-  enum BootReasonType : ENUM8 {
-    kUnspecified = 0;
-    kPowerOnReboot = 1;
-    kBrownOutReset = 2;
-    kSoftwareWatchdogReset = 3;
-    kHardwareWatchdogReset = 4;
-    kSoftwareUpdateCompleted = 5;
-    kSoftwareReset = 6;
-  }
-
-  enum HardwareFaultType : ENUM8 {
-    kUnspecified = 0;
-    kRadio = 1;
-    kSensor = 2;
-    kResettableOverTemp = 3;
-    kNonResettableOverTemp = 4;
-    kPowerSource = 5;
-    kVisualDisplayFault = 6;
-    kAudioOutputFault = 7;
-    kUserInterfaceFault = 8;
-    kNonVolatileMemoryError = 9;
-    kTamperDetected = 10;
-  }
-
-  enum InterfaceType : ENUM8 {
-    kUnspecified = 0;
-    kWiFi = 1;
-    kEthernet = 2;
-    kCellular = 3;
-    kThread = 4;
-  }
-
-  enum NetworkFaultType : ENUM8 {
-    kUnspecified = 0;
-    kHardwareFailure = 1;
-    kNetworkJammed = 2;
-    kConnectionFailed = 3;
-  }
-
-  enum RadioFaultType : ENUM8 {
-    kUnspecified = 0;
-    kWiFiFault = 1;
-    kCellularFault = 2;
-    kThreadFault = 3;
-    kNFCFault = 4;
-    kBLEFault = 5;
-    kEthernetFault = 6;
-  }
-
-  struct NetworkInterfaceType {
-    char_string<32> name = 0;
-    boolean isOperational = 1;
-    nullable boolean offPremiseServicesReachableIPv4 = 2;
-    nullable boolean offPremiseServicesReachableIPv6 = 3;
-    octet_string<8> hardwareAddress = 4;
-    octet_string IPv4Addresses[] = 5;
-    octet_string IPv6Addresses[] = 6;
-    InterfaceType type = 7;
-  }
-
-  critical event HardwareFaultChange = 0 {
-    HardwareFaultType current[] = 0;
-    HardwareFaultType previous[] = 1;
-  }
-
-  critical event RadioFaultChange = 1 {
-    RadioFaultType current[] = 0;
-    RadioFaultType previous[] = 1;
-  }
-
-  critical event NetworkFaultChange = 2 {
-    NetworkFaultType current[] = 0;
-    NetworkFaultType previous[] = 1;
-  }
-
-  critical event BootReason = 3 {
-    BootReasonType bootReason = 0;
-  }
-
-  readonly attribute NetworkInterfaceType networkInterfaces[] = 0;
-  readonly attribute int16u rebootCount = 1;
-  readonly attribute int64u upTime = 2;
-  readonly attribute int32u totalOperationalHours = 3;
-  readonly attribute enum8 bootReasons = 4;
-  readonly attribute ENUM8 activeHardwareFaults[] = 5;
-  readonly attribute ENUM8 activeRadioFaults[] = 6;
-  readonly attribute ENUM8 activeNetworkFaults[] = 7;
-  readonly attribute boolean testEventTriggersEnabled = 8;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct TestEventTriggerRequest {
-    OCTET_STRING enableKey = 0;
-    INT64U eventTrigger = 1;
-  }
-
-  command TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
-}
-
-server cluster GroupKeyManagement = 63 {
-  enum GroupKeySecurityPolicy : ENUM8 {
-    kTrustFirst = 0;
-    kCacheAndSync = 1;
-  }
-
-  struct GroupKeyMapStruct {
-    group_id groupId = 1;
-    int16u groupKeySetID = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
-  struct GroupInfoMapStruct {
-    group_id groupId = 1;
-    endpoint_no endpoints[] = 2;
-    optional char_string<16> groupName = 3;
-    fabric_idx fabricIndex = 254;
-  }
-
-  struct GroupKeySetStruct {
-    int16u groupKeySetID = 0;
-    GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
-    nullable octet_string<16> epochKey0 = 2;
-    nullable epoch_us epochStartTime0 = 3;
-    nullable octet_string<16> epochKey1 = 4;
-    nullable epoch_us epochStartTime1 = 5;
-    nullable octet_string<16> epochKey2 = 6;
-    nullable epoch_us epochStartTime2 = 7;
-  }
-
-  attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
-  readonly attribute GroupInfoMapStruct groupTable[] = 1;
-  readonly attribute int16u maxGroupsPerFabric = 2;
-  readonly attribute int16u maxGroupKeysPerFabric = 3;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct KeySetWriteRequest {
-    GroupKeySetStruct groupKeySet = 0;
-  }
-
-  request struct KeySetReadRequest {
-    INT16U groupKeySetID = 0;
-  }
-
-  request struct KeySetRemoveRequest {
-    INT16U groupKeySetID = 0;
-  }
-
-  request struct KeySetReadAllIndicesRequest {
-    INT16U groupKeySetIDs[] = 0;
-  }
-
-  response struct KeySetReadResponse = 2 {
-    GroupKeySetStruct groupKeySet = 0;
-  }
-
-  response struct KeySetReadAllIndicesResponse = 5 {
-    INT16U groupKeySetIDs[] = 0;
-  }
-
-  command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
-  command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
-  command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
-  command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
-}
-
-server cluster LocalizationConfiguration = 43 {
-  attribute char_string<35> activeLocale = 0;
-  readonly attribute CHAR_STRING supportedLocales[] = 1;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -591,70 +476,140 @@ server cluster NetworkCommissioning = 49 {
   command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
 }
 
-server cluster OtaSoftwareUpdateProvider = 41 {
-  enum OTAApplyUpdateAction : ENUM8 {
-    kProceed = 0;
-    kAwaitNextAction = 1;
-    kDiscontinue = 2;
+server cluster GeneralDiagnostics = 51 {
+  enum BootReasonType : ENUM8 {
+    kUnspecified = 0;
+    kPowerOnReboot = 1;
+    kBrownOutReset = 2;
+    kSoftwareWatchdogReset = 3;
+    kHardwareWatchdogReset = 4;
+    kSoftwareUpdateCompleted = 5;
+    kSoftwareReset = 6;
   }
 
-  enum OTADownloadProtocol : ENUM8 {
-    kBDXSynchronous = 0;
-    kBDXAsynchronous = 1;
-    kHttps = 2;
-    kVendorSpecific = 3;
+  enum HardwareFaultType : ENUM8 {
+    kUnspecified = 0;
+    kRadio = 1;
+    kSensor = 2;
+    kResettableOverTemp = 3;
+    kNonResettableOverTemp = 4;
+    kPowerSource = 5;
+    kVisualDisplayFault = 6;
+    kAudioOutputFault = 7;
+    kUserInterfaceFault = 8;
+    kNonVolatileMemoryError = 9;
+    kTamperDetected = 10;
   }
 
-  enum OTAQueryStatus : ENUM8 {
-    kUpdateAvailable = 0;
-    kBusy = 1;
-    kNotAvailable = 2;
-    kDownloadProtocolNotSupported = 3;
+  enum InterfaceType : ENUM8 {
+    kUnspecified = 0;
+    kWiFi = 1;
+    kEthernet = 2;
+    kCellular = 3;
+    kThread = 4;
   }
 
+  enum NetworkFaultType : ENUM8 {
+    kUnspecified = 0;
+    kHardwareFailure = 1;
+    kNetworkJammed = 2;
+    kConnectionFailed = 3;
+  }
+
+  enum RadioFaultType : ENUM8 {
+    kUnspecified = 0;
+    kWiFiFault = 1;
+    kCellularFault = 2;
+    kThreadFault = 3;
+    kNFCFault = 4;
+    kBLEFault = 5;
+    kEthernetFault = 6;
+  }
+
+  struct NetworkInterfaceType {
+    char_string<32> name = 0;
+    boolean isOperational = 1;
+    nullable boolean offPremiseServicesReachableIPv4 = 2;
+    nullable boolean offPremiseServicesReachableIPv6 = 3;
+    octet_string<8> hardwareAddress = 4;
+    octet_string IPv4Addresses[] = 5;
+    octet_string IPv6Addresses[] = 6;
+    InterfaceType type = 7;
+  }
+
+  critical event HardwareFaultChange = 0 {
+    HardwareFaultType current[] = 0;
+    HardwareFaultType previous[] = 1;
+  }
+
+  critical event RadioFaultChange = 1 {
+    RadioFaultType current[] = 0;
+    RadioFaultType previous[] = 1;
+  }
+
+  critical event NetworkFaultChange = 2 {
+    NetworkFaultType current[] = 0;
+    NetworkFaultType previous[] = 1;
+  }
+
+  critical event BootReason = 3 {
+    BootReasonType bootReason = 0;
+  }
+
+  readonly attribute NetworkInterfaceType networkInterfaces[] = 0;
+  readonly attribute int16u rebootCount = 1;
+  readonly attribute int64u upTime = 2;
+  readonly attribute int32u totalOperationalHours = 3;
+  readonly attribute enum8 bootReasons = 4;
+  readonly attribute ENUM8 activeHardwareFaults[] = 5;
+  readonly attribute ENUM8 activeRadioFaults[] = 6;
+  readonly attribute ENUM8 activeNetworkFaults[] = 7;
+  readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct QueryImageRequest {
-    vendor_id vendorId = 0;
-    INT16U productId = 1;
-    INT32U softwareVersion = 2;
-    OTADownloadProtocol protocolsSupported[] = 3;
-    optional INT16U hardwareVersion = 4;
-    optional CHAR_STRING location = 5;
-    optional BOOLEAN requestorCanConsent = 6;
-    optional OCTET_STRING metadataForProvider = 7;
+  request struct TestEventTriggerRequest {
+    OCTET_STRING enableKey = 0;
+    INT64U eventTrigger = 1;
   }
 
-  request struct ApplyUpdateRequestRequest {
-    OCTET_STRING updateToken = 0;
-    INT32U newVersion = 1;
+  command TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
+}
+
+server cluster AdministratorCommissioning = 60 {
+  enum CommissioningWindowStatus : ENUM8 {
+    kWindowNotOpen = 0;
+    kEnhancedWindowOpen = 1;
+    kBasicWindowOpen = 2;
   }
 
-  request struct NotifyUpdateAppliedRequest {
-    OCTET_STRING updateToken = 0;
-    INT32U softwareVersion = 1;
+  enum StatusCode : ENUM8 {
+    kBusy = 1;
+    kPAKEParameterError = 2;
+    kWindowNotOpen = 3;
   }
 
-  response struct QueryImageResponse = 1 {
-    OTAQueryStatus status = 0;
-    optional INT32U delayedActionTime = 1;
-    optional CHAR_STRING imageURI = 2;
-    optional INT32U softwareVersion = 3;
-    optional CHAR_STRING softwareVersionString = 4;
-    optional OCTET_STRING updateToken = 5;
-    optional BOOLEAN userConsentNeeded = 6;
-    optional OCTET_STRING metadataForRequestor = 7;
+  readonly attribute int8u windowStatus = 0;
+  readonly attribute fabric_idx adminFabricIndex = 1;
+  readonly attribute int16u adminVendorId = 2;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct OpenCommissioningWindowRequest {
+    INT16U commissioningTimeout = 0;
+    OCTET_STRING PAKEVerifier = 1;
+    INT16U discriminator = 2;
+    INT32U iterations = 3;
+    OCTET_STRING salt = 4;
   }
 
-  response struct ApplyUpdateResponse = 3 {
-    OTAApplyUpdateAction action = 0;
-    INT32U delayedActionTime = 1;
+  request struct OpenBasicCommissioningWindowRequest {
+    INT16U commissioningTimeout = 0;
   }
 
-  command QueryImage(QueryImageRequest): QueryImageResponse = 0;
-  command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
-  command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
+  timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
 server cluster OperationalCredentials = 62 {
@@ -764,30 +719,75 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
 
-server cluster TimeFormatLocalization = 44 {
-  enum CalendarType : ENUM8 {
-    kBuddhist = 0;
-    kChinese = 1;
-    kCoptic = 2;
-    kEthiopian = 3;
-    kGregorian = 4;
-    kHebrew = 5;
-    kIndian = 6;
-    kIslamic = 7;
-    kJapanese = 8;
-    kKorean = 9;
-    kPersian = 10;
-    kTaiwanese = 11;
+server cluster GroupKeyManagement = 63 {
+  enum GroupKeySecurityPolicy : ENUM8 {
+    kTrustFirst = 0;
+    kCacheAndSync = 1;
   }
 
-  enum HourFormat : ENUM8 {
-    k12hr = 0;
-    k24hr = 1;
+  struct GroupKeyMapStruct {
+    group_id groupId = 1;
+    int16u groupKeySetID = 2;
+    fabric_idx fabricIndex = 254;
   }
 
-  attribute HourFormat hourFormat = 0;
-  attribute CalendarType activeCalendarType = 1;
-  readonly attribute CalendarType supportedCalendarTypes[] = 2;
+  struct GroupInfoMapStruct {
+    group_id groupId = 1;
+    endpoint_no endpoints[] = 2;
+    optional char_string<16> groupName = 3;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct GroupKeySetStruct {
+    int16u groupKeySetID = 0;
+    GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
+    nullable octet_string<16> epochKey0 = 2;
+    nullable epoch_us epochStartTime0 = 3;
+    nullable octet_string<16> epochKey1 = 4;
+    nullable epoch_us epochStartTime1 = 5;
+    nullable octet_string<16> epochKey2 = 6;
+    nullable epoch_us epochStartTime2 = 7;
+  }
+
+  attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
+  readonly attribute GroupInfoMapStruct groupTable[] = 1;
+  readonly attribute int16u maxGroupsPerFabric = 2;
+  readonly attribute int16u maxGroupKeysPerFabric = 3;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct KeySetWriteRequest {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct KeySetReadRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetRemoveRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetReadAllIndicesRequest {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  response struct KeySetReadResponse = 2 {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  response struct KeySetReadAllIndicesResponse = 5 {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+  command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
+}
+
+server cluster FixedLabel = 64 {
+  readonly attribute LabelStruct labelList[] = 0;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
