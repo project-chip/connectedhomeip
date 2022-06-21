@@ -560,23 +560,10 @@ void DoorLockServer::setCredentialCommandHandler(
     }
 
     // appclusters, 5.2.4.40.3: If the credential data length is out of bounds we should return INVALID_COMMAND
-    // OPTIMIZE: we can move range checking to the single function
-    size_t minSize, maxSize;
-    if (!getCredentialRange(commandPath.mEndpointId, credentialType, minSize, maxSize))
+    auto status = credentialLengthWithinRange(commandPath.mEndpointId, credentialType, credentialData);
+    if (DlStatus::kSuccess != status)
     {
-        emberAfDoorLockClusterPrintln(
-            "[SetCredential] Unable to get min/max range for credential: internal error [endpointId=%d,credentialIndex=%d]",
-            commandPath.mEndpointId, credentialIndex);
-        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
-        return;
-    }
-    if (credentialData.size() < minSize || credentialData.size() > maxSize)
-    {
-        emberAfDoorLockClusterPrintln("[SetCredential] Credential data size is out of range "
-                                      "[endpointId=%d,credentialType=%u,minLength=%u,maxLength=%u,length=%u]",
-                                      commandPath.mEndpointId, to_underlying(credentialType), static_cast<unsigned int>(minSize),
-                                      static_cast<unsigned int>(maxSize), static_cast<unsigned int>(credentialData.size()));
-        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
+        sendSetCredentialResponse(commandObj, commandPath, status, 0, nextAvailableCredentialSlot);
         return;
     }
 
@@ -641,8 +628,8 @@ void DoorLockServer::setCredentialCommandHandler(
     case DlDataOperationType::kAdd: {
         uint16_t createdUserIndex = 0;
 
-        DlStatus status = createCredential(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
-                                           existingCredential, credentialData, userIndex, userStatus, userType, createdUserIndex);
+        status = createCredential(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
+                                  existingCredential, credentialData, userIndex, userStatus, userType, createdUserIndex);
         sendSetCredentialResponse(commandObj, commandPath, status, createdUserIndex, nextAvailableCredentialSlot);
         return;
     }
@@ -661,14 +648,14 @@ void DoorLockServer::setCredentialCommandHandler(
         // if userIndex is NULL then we're changing the programming user PIN
         if (userIndex.IsNull())
         {
-            auto status = modifyProgrammingPIN(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
-                                               existingCredential, credentialData);
+            status = modifyProgrammingPIN(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
+                                          existingCredential, credentialData);
             sendSetCredentialResponse(commandObj, commandPath, status, 0, nextAvailableCredentialSlot);
             return;
         }
 
-        auto status = modifyCredential(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
-                                       existingCredential, credentialData, userIndex.Value(), userStatus, userType);
+        status = modifyCredential(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
+                                  existingCredential, credentialData, userIndex.Value(), userStatus, userType);
         sendSetCredentialResponse(commandObj, commandPath, status, 0, nextAvailableCredentialSlot);
         return;
     }
@@ -1358,7 +1345,8 @@ bool DoorLockServer::credentialIndexValid(chip::EndpointId endpointId, DlCredent
     return true;
 }
 
-bool DoorLockServer::getCredentialRange(chip::EndpointId endpointId, DlCredentialType type, size_t & minSize, size_t & maxSize)
+DlStatus DoorLockServer::credentialLengthWithinRange(chip::EndpointId endpointId, DlCredentialType type,
+                                                     const chip::ByteSpan & credentialData)
 {
     bool statusMin = true, statusMax = true;
     uint8_t minLen, maxLen;
@@ -1375,20 +1363,26 @@ bool DoorLockServer::getCredentialRange(chip::EndpointId endpointId, DlCredentia
         statusMax = GetAttribute(endpointId, Attributes::MaxRFIDCodeLength::Id, Attributes::MaxRFIDCodeLength::Get, maxLen);
         break;
     default:
-        return false;
+        return DlStatus::kFailure;
     }
 
     if (!statusMin || !statusMax)
     {
         ChipLogError(Zcl, "Unable to read attributes to get min/max length for credentials [endpointId=%d,credentialType=%u]",
                      endpointId, to_underlying(type));
-        return false;
+        return DlStatus::kFailure;
     }
 
-    minSize = minLen;
-    maxSize = maxLen;
+    if (credentialData.size() < minLen || credentialData.size() > maxLen)
+    {
+        emberAfDoorLockClusterPrintln("Credential data size is out of range "
+                                      "[endpointId=%d,credentialType=%u,minLength=%u,maxLength=%u,length=%u]",
+                                      endpointId, to_underlying(type), minLen, maxLen,
+                                      static_cast<unsigned int>(credentialData.size()));
+        return DlStatus::kInvalidField;
+    }
 
-    return true;
+    return DlStatus::kSuccess;
 }
 
 bool DoorLockServer::getMaxNumberOfCredentials(chip::EndpointId endpointId, DlCredentialType credentialType,
