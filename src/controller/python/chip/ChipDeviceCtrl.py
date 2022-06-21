@@ -345,7 +345,7 @@ class ChipDeviceController():
 
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetWiFiCredentials(
-                ssid.encode("utf-8"), credentials.encode("utf-8"))
+                ssid, credentials)
         )
 
     def SetThreadOperationalDataset(self, threadOperationalDataset):
