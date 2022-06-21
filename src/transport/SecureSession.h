@@ -71,10 +71,11 @@ public:
                   NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
                   const ReliableMessageProtocolConfig & config) :
         mTable(table),
-        mState(State::kActive), mSecureSessionType(secureSessionType), mLocalNodeId(localNodeId), mPeerNodeId(peerNodeId),
+        mState(State::kEstablishing), mSecureSessionType(secureSessionType), mLocalNodeId(localNodeId), mPeerNodeId(peerNodeId),
         mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mMRPConfig(config)
     {
-        Retain(); // Put the test session in Active state. This ref is released inside MarkForRemoval
+        MoveToState(State::kActive);
+        Retain(); // Put the test session in Active state. This ref is released inside MarkForEviction
         SetFabricIndex(fabric);
         ChipLogDetail(Inet, "SecureSession[%p]: Allocated for Test Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
                       mLocalSessionId);
@@ -87,7 +88,7 @@ public:
      *   receives a local session ID, but no other state.
      */
     SecureSession(SecureSessionTable & table, Type secureSessionType, uint16_t localSessionId) :
-        mTable(table), mState(State::kPairing), mSecureSessionType(secureSessionType), mLocalSessionId(localSessionId)
+        mTable(table), mState(State::kEstablishing), mSecureSessionType(secureSessionType), mLocalSessionId(localSessionId)
     {
         ChipLogDetail(Inet, "SecureSession[%p]: Allocated Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
                       mLocalSessionId);
@@ -102,7 +103,7 @@ public:
     void Activate(const ScopedNodeId & localNode, const ScopedNodeId & peerNode, CATValues peerCATs, uint16_t peerSessionId,
                   const ReliableMessageProtocolConfig & config)
     {
-        VerifyOrDie(mState == State::kPairing);
+        VerifyOrDie(mState == State::kEstablishing);
         VerifyOrDie(peerNode.GetFabricIndex() == localNode.GetFabricIndex());
 
         // PASE sessions must always start unassociated with a Fabric!
@@ -120,8 +121,8 @@ public:
         mMRPConfig     = config;
         SetFabricIndex(peerNode.GetFabricIndex());
 
-        Retain(); // This ref is released inside MarkForRemoval
-        mState = State::kActive;
+        Retain(); // This ref is released inside MarkForEviction
+        MoveToState(State::kActive);
         ChipLogDetail(Inet, "SecureSession[%p]: Activated - Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
                       mLocalSessionId);
     }
@@ -140,9 +141,34 @@ public:
     void Release() override;
 
     bool IsActiveSession() const override { return mState == State::kActive; }
-    bool IsPairing() const { return mState == State::kPairing; }
-    /// @brief Mark as pending removal, all holders to this session will be cleared, and disallow future grab
-    void MarkForRemoval();
+    bool IsEstablishing() const { return mState == State::kEstablishing; }
+    bool IsPendingEviction() const { return mState == State::kPendingEviction; }
+    bool IsDefunct() const { return mState == State::kDefunct; }
+    const char * GetStateStr() const { return StateToString(mState); }
+
+    /*
+     * This marks the session for eviction. It will first detach all SessionHolders attached to this
+     * session by calling 'OnSessionReleased' on each of them. This will force them to release their reference
+     * to the session. If there are no more references left, the session will then be de-allocated.
+     *
+     * Once marked for eviction, the session SHALL NOT ever become active again.
+     *
+     */
+    void MarkForEviction();
+
+    /*
+     * This marks a previously active session as defunct to temporarily prevent it from being used with
+     * new exchanges to send or receive messages on this session. This should be called when there is suspicion of
+     * a loss-of-sync with the session state on the associated peer. This could arise if there is evidence
+     * of transport failure.
+     *
+     * If messages are received thereafter on this session, the session SHALL be put back into the Active state.
+     *
+     * This SHALL only be callable on an active session.
+     * This SHALL NOT detach any existing SessionHolders.
+     *
+     */
+    void MarkAsDefunct();
 
     // Used to prevent any new exchange created on the session while the existing exchanges finish their work.
     void MarkInactive();
@@ -216,6 +242,11 @@ public:
     {
         mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
         MarkActive();
+
+        if (mState == State::kDefunct)
+        {
+            MoveToState(State::kActive);
+        }
     }
 
     bool IsPeerActive() { return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime); }
@@ -234,32 +265,59 @@ public:
 private:
     enum class State : uint8_t
     {
+        //
+        // Denotes a secure session object that is internally
+        // reserved by the stack before and during session establishment.
+        //
         // Although the stack can tolerate eviction of these (releasing one
         // out from under the holder would exhibit as CHIP_ERROR_INCORRECT_STATE
         // during CASE or PASE), intent is that we should not and would leave
         // these untouched until CASE or PASE complete.
         //
-        // During this stage, the reference counter is hold by the PairingSession
-        kPairing = 1,
+        // In this state, the reference count is held by the PairingSession.
+        //
+        kEstablishing = 1,
 
-        // The session is active, ready for use. During this stage, the
-        // reference counter increased by 1 in Activate, and will be decreased
-        // by 1 when MarkForRemoval is called.
+        //
+        // The session is active, ready for use. When transitioning to this state via Activate, the
+        // reference count is incremented by 1, and will subsequently be decremented
+        // by 1 when MarkForEviction is called. This ensures the session remains resident
+        // and active for future use even if there currently are no references to it.
+        //
         kActive = 2,
 
-        // The session is pending for removal, all SessionHolders are already
-        // cleared during MarkForRemoval, no future SessionHolder is able to
-        // grab this session, when all SessionHandles go out of scope, the
-        // session object will be released automatically.
-        kPendingRemoval = 3,
+        //
+        // The session is temporarily disabled due to suspicion of a loss of synchronization
+        // with the session state on the peer (e.g transport failure).
+        // In this state, no new outbound exchanges can be created. However, if we receive valid messages
+        // again on this session, we CAN mark this session as being active again.
+        //
+        // Transitioning to this state does not detach any existing SessionHolders.
+        //
+        // In addition to any existing SessionHolders holding a reference to this session, the SessionManager
+        // maintains a reference as well to the session that will only be relinquished when MarkForEviction is called.
+        //
+        kDefunct = 3,
 
-        // The session is still functional, but it can't yield any new exchanges,
-        // This is meant to be used in conjunction with
-        // ExchangeManager::AbortExchangesForFabricExceptOne, with the one
-        // exceptional exchange handling moving this session out of this state when
-        // it finishes whatever it needs the session for.
-        kInactive = 4,
+        //
+        // The session has been marked for eviction and is pending deallocation. All SessionHolders would have already
+        // been detached in a previous call to MarkForEviction. Future SessionHolders will not be able to attach to
+        // this session.
+        //
+        // When all SessionHandles go out of scope, the session will be released automatically.
+        //
+        kPendingEviction = 4,
+
+        //
+        // The session is still functional but it can't yield any new outbound or inbound exchanges.
+        // This is meant to be used in conjunction with ExchangeManager::AbortExchangesForFabricExceptOne, with the one
+        // exceptional exchange handling out of this state when it finishes whatever it needs the session for.
+        //
+        kInactive = 5,
     };
+
+    const char * StateToString(State state) const;
+    void MoveToState(State targetState);
 
     friend class SecureSessionDeleter;
     SecureSessionTable & mTable;

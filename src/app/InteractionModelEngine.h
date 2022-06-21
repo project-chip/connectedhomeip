@@ -265,7 +265,7 @@ public:
 
     uint16_t GetMinSubscriptionsPerFabric() const;
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool
     //
@@ -397,7 +397,7 @@ private:
 
     inline size_t GetPathPoolCapacityForReads() const
     {
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         return (mPathPoolCapacityForReadsOverride == -1) ? CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS
                                                          : static_cast<size_t>(mPathPoolCapacityForReadsOverride);
 #else
@@ -407,7 +407,7 @@ private:
 
     inline size_t GetReadHandlerPoolCapacityForReads() const
     {
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         return (mReadHandlerCapacityForReadsOverride == -1) ? CHIP_IM_MAX_NUM_READS
                                                             : static_cast<size_t>(mReadHandlerCapacityForReadsOverride);
 #else
@@ -417,7 +417,7 @@ private:
 
     inline size_t GetPathPoolCapacityForSubscriptions() const
     {
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         return (mPathPoolCapacityForSubscriptionsOverride == -1) ? CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS
                                                                  : static_cast<size_t>(mPathPoolCapacityForSubscriptionsOverride);
 #else
@@ -427,7 +427,7 @@ private:
 
     inline size_t GetReadHandlerPoolCapacityForSubscriptions() const
     {
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         return (mReadHandlerCapacityForSubscriptionsOverride == -1)
             ? CHIP_IM_MAX_NUM_SUBSCRIPTIONS
             : static_cast<size_t>(mReadHandlerCapacityForSubscriptionsOverride);
@@ -438,7 +438,7 @@ private:
 
     inline uint8_t GetConfigMaxFabrics() const
     {
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         return (mMaxNumFabricsOverride == -1) ? CHIP_CONFIG_MAX_FABRICS : static_cast<uint8_t>(mMaxNumFabricsOverride);
 #else
         return CHIP_CONFIG_MAX_FABRICS;
@@ -534,7 +534,7 @@ private:
 
     ReadHandler::ApplicationCallback * mpReadHandlerApplicationCallback = nullptr;
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     int mReadHandlerCapacityForSubscriptionsOverride = -1;
     int mPathPoolCapacityForSubscriptionsOverride    = -1;
 

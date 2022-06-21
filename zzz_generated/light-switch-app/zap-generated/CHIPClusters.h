@@ -30,13 +30,6 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT ColorControlCluster : public ClusterBase
-{
-public:
-    ColorControlCluster() : ClusterBase(app::Clusters::ColorControl::Id) {}
-    ~ColorControlCluster() {}
-};
-
 class DLL_EXPORT IdentifyCluster : public ClusterBase
 {
 public:
@@ -44,11 +37,11 @@ public:
     ~IdentifyCluster() {}
 };
 
-class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
+class DLL_EXPORT ScenesCluster : public ClusterBase
 {
 public:
-    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
-    ~OtaSoftwareUpdateProviderCluster() {}
+    ScenesCluster() : ClusterBase(app::Clusters::Scenes::Id) {}
+    ~ScenesCluster() {}
 };
 
 class DLL_EXPORT OnOffCluster : public ClusterBase
@@ -58,11 +51,18 @@ public:
     ~OnOffCluster() {}
 };
 
-class DLL_EXPORT ScenesCluster : public ClusterBase
+class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
-    ScenesCluster() : ClusterBase(app::Clusters::Scenes::Id) {}
-    ~ScenesCluster() {}
+    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
+    ~OtaSoftwareUpdateProviderCluster() {}
+};
+
+class DLL_EXPORT ColorControlCluster : public ClusterBase
+{
+public:
+    ColorControlCluster() : ClusterBase(app::Clusters::ColorControl::Id) {}
+    ~ColorControlCluster() {}
 };
 
 } // namespace Controller
