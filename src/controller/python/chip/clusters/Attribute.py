@@ -584,6 +584,7 @@ class AsyncReadTransaction:
         self._changedPathSet = set()
         self._pReadClient = None
         self._pReadCallback = None
+        self._resultError = None
 
     def SetClientObjPointers(self, pReadClient, pReadCallback):
         self._pReadClient = pReadClient
@@ -592,7 +593,7 @@ class AsyncReadTransaction:
     def GetAllEventValues(self):
         return self._events
 
-    def _handleAttributeData(self, path: AttributePathWithListIndex, dataVersion: int, status: int, data: bytes):
+    def handleAttributeData(self, path: AttributePathWithListIndex, dataVersion: int, status: int, data: bytes):
         try:
             imStatus = status
             try:
@@ -613,10 +614,7 @@ class AsyncReadTransaction:
         except Exception as ex:
             logging.exception(ex)
 
-    def handleAttributeData(self, path: AttributePath, dataVersion: int, status: int, data: bytes):
-        self._handleAttributeData(path, dataVersion, status, data)
-
-    def _handleEventData(self, header: EventHeader, path: EventPath, data: bytes, status: int):
+    def handleEventData(self, header: EventHeader, path: EventPath, data: bytes, status: int):
         try:
             eventType = _EventIndex.get(str(path), None)
             eventValue = None
@@ -655,17 +653,8 @@ class AsyncReadTransaction:
         except Exception as ex:
             logging.exception(ex)
 
-    def handleEventData(self, header: EventHeader, path: EventPath, data: bytes, status: int):
-        self._handleEventData(header, path, data, status)
-
-    def _handleError(self, chipError: int):
-        self._future.set_exception(
-            chip.exceptions.ChipStackError(chipError))
-
     def handleError(self, chipError: int):
-        self._event_loop.call_soon_threadsafe(
-            self._handleError, chipError
-        )
+        self._resultError = chipError
 
     def _handleSubscriptionEstablished(self, subscriptionId):
         if not self._future.done():
@@ -695,9 +684,25 @@ class AsyncReadTransaction:
         self._changedPathSet = set()
 
     def _handleDone(self):
+        #
+        # We only set the exception/result on the future in this _handleDone call (if it hasn't
+        # already been set yet, which can be in the case of subscriptions) since doing so earlier
+        # would result in the callers awaiting the result to
+        # move on, possibly invalidating the provided _event_loop.
+        #
         if not self._future.done():
-            self._future.set_result(AsyncReadTransaction.ReadResponse(
-                attributes=self._cache.attributeCache, events=self._events))
+            if self._resultError:
+                self._future.set_exception(chip.exceptions.ChipStackError(chipError))
+            else:
+                self._future.set_result(AsyncReadTransaction.ReadResponse(
+                    attributes=self._cache.attributeCache, events=self._events))
+
+        #
+        # Decrement the ref on ourselves to match the increment that happened at allocation.
+        # This happens synchronously as part of handling done to ensure the object remains valid
+        # right till the very end.
+        #
+        ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
     def handleDone(self):
         self._event_loop.call_soon_threadsafe(self._handleDone)
@@ -714,31 +719,36 @@ class AsyncWriteTransaction:
     def __init__(self, future: Future, eventLoop):
         self._event_loop = eventLoop
         self._future = future
-        self._res = []
-
-    def _handleResponse(self, path: AttributePath, status: int):
-        try:
-            imStatus = chip.interaction_model.Status(status)
-            self._res.append(AttributeWriteResult(Path=path, Status=imStatus))
-        except:
-            self._res.append(AttributeWriteResult(Path=path, Status=status))
+        self._resultData = []
+        self._resultError = None
 
     def handleResponse(self, path: AttributePath, status: int):
-        self._event_loop.call_soon_threadsafe(
-            self._handleResponse, path, status)
-
-    def _handleError(self, chipError: int):
-        self._future.set_exception(
-            chip.exceptions.ChipStackError(chipError))
+        try:
+            imStatus = chip.interaction_model.Status(status)
+            self._resultData.append(AttributeWriteResult(Path=path, Status=imStatus))
+        except:
+            self._resultData.append(AttributeWriteResult(Path=path, Status=status))
 
     def handleError(self, chipError: int):
-        self._event_loop.call_soon_threadsafe(
-            self._handleError, chipError
-        )
+        self._resultError = chipError
 
     def _handleDone(self):
-        if not self._future.done():
-            self._future.set_result(self._res)
+        #
+        # We only set the exception/result on the future in this _handleDone call,
+        # since doing so earlier would result in the callers awaiting the result to
+        # move on, possibly invalidating the provided _event_loop.
+        #
+        if self._resultError is not None:
+            self._future.set_exception(chip.exceptions.ChipStackError(self._resultError))
+        else:
+            self._future.set_result(self._resultData)
+
+        #
+        # Decrement the ref on ourselves to match the increment that happened at allocation.
+        # This happens synchronously as part of handling done to ensure the object remains valid
+        # right till the very end.
+        #
+        ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
     def handleDone(self):
         self._event_loop.call_soon_threadsafe(self._handleDone)
@@ -803,7 +813,6 @@ def _OnReportEndCallback(closure):
 @_OnReadDoneCallbackFunct
 def _OnReadDoneCallback(closure):
     closure.handleDone()
-    ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
 
 
 _OnWriteResponseCallbackFunct = CFUNCTYPE(
@@ -828,7 +837,6 @@ def _OnWriteErrorCallback(closure, chiperror: int):
 @_OnWriteDoneCallbackFunct
 def _OnWriteDoneCallback(closure):
     closure.handleDone()
-    ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
 
 
 def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: int = None) -> int:
