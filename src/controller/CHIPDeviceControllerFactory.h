@@ -32,6 +32,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <credentials/GroupDataProvider.h>
+#include <credentials/OperationalCertificateStore.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
 namespace chip {
@@ -77,8 +78,9 @@ struct SetupParams
     CommissioningDelegate * defaultCommissioner                        = nullptr;
 };
 
-// TODO everything other than the fabric storage, group data provider and OperationalKeystore
-//  here should be removed. We're blocked because of the need to support !CHIP_DEVICE_LAYER
+// TODO everything other than the fabric storage, group data provider, OperationalKeystore
+// and OperationalCertificateStore here should be removed. We're blocked because of the
+// need to support !CHIP_DEVICE_LAYER
 struct FactoryInitParams
 {
     System::Layer * systemLayer                                        = nullptr;
@@ -89,6 +91,7 @@ struct FactoryInitParams
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager      = nullptr;
     FabricTable * fabricTable                                          = nullptr;
     OperationalKeystore * operationalKeystore                          = nullptr;
+    Credentials::OperationalCertificateStore * opCertStore             = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -174,7 +177,7 @@ public:
             return CHIP_NO_ERROR;
         };
 
-        void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        void OnFabricDeletedFromStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
 
@@ -188,13 +191,13 @@ public:
             }
         };
 
-        void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        void OnFabricRetrievedFromStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
             (void) fabricIndex;
         }
 
-        void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        void OnFabricPersistedToStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
             (void) fabricIndex;
@@ -212,10 +215,11 @@ private:
     CHIP_ERROR InitSystemState();
 
     uint16_t mListenPort;
-    DeviceControllerSystemState * mSystemState            = nullptr;
-    PersistentStorageDelegate * mFabricIndependentStorage = nullptr;
-    Crypto::OperationalKeystore * mOperationalKeystore    = nullptr;
-    bool mEnableServerInteractions                        = false;
+    DeviceControllerSystemState * mSystemState              = nullptr;
+    PersistentStorageDelegate * mFabricIndependentStorage   = nullptr;
+    Crypto::OperationalKeystore * mOperationalKeystore      = nullptr;
+    Credentials::OperationalCertificateStore * mOpCertStore = nullptr;
+    bool mEnableServerInteractions                          = false;
 };
 
 } // namespace Controller

@@ -25,6 +25,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/PersistentStorageOpCertStore.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
@@ -86,6 +87,8 @@ private:
     AndroidOperationalCredentialsIssuerPtr mOpCredsIssuer;
     // TODO: This may need to be injected as a GroupDataProvider*
     chip::Credentials::GroupDataProviderImpl mGroupDataProvider;
+    // TODO: This may need to be injected as an OperationalCertificateStore *
+    chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;

@@ -49,6 +49,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Pool.h>
 #include <lib/support/SafeInt.h>
@@ -168,7 +169,7 @@ public:
     CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**
-     * This function finds the device corresponding to deviceId, and establishes
+     * This function finds the device corresponding to peerNodeId, and establishes
      * a CASE session with it.
      *
      * Once the CASE session is successfully established the `onConnectedDevice`
@@ -181,11 +182,11 @@ public:
      * An error return from this function means that neither callback has been
      * called yet, and neither callback will be called in the future.
      */
-    CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
+    CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
                                   chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
-        VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mSystemState->CASESessionMgr()->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
+        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(PeerId(GetCompressedFabricId(), peerNodeId), onConnection, onFailure);
         return CHIP_NO_ERROR;
     }
 
@@ -193,9 +194,9 @@ public:
      * DEPRECATED - to be removed
      *
      * Forces a DNSSD lookup for the specified device. It finds the corresponding session
-     * for the given nodeID and initiates a DNSSD lookup to find/update the node address
+     * for the given peerNodeId and initiates a DNSSD lookup to find/update the node address
      */
-    CHIP_ERROR UpdateDevice(NodeId deviceId);
+    CHIP_ERROR UpdateDevice(NodeId peerNodeId);
 
     /**
      * @brief
@@ -219,26 +220,64 @@ public:
     /**
      * @brief Get the Compressed Fabric ID assigned to the device.
      */
-    uint64_t GetCompressedFabricId() const { return mLocalId.GetCompressedFabricId(); }
+    uint64_t GetCompressedFabricId() const
+    {
+        const auto * fabricInfo = GetFabricInfo();
+        return (fabricInfo != nullptr) ? static_cast<uint64_t>(fabricInfo->GetCompressedFabricId()) : kUndefinedCompressedFabricId;
+    }
+
+    /**
+     * @brief Get the Compressed Fabric Id as a big-endian 64 bit octet string.
+     *
+     * Output span is resized to 8 bytes on success if it was larger.
+     *
+     * @param outBytes span to contain the compressed fabric ID, must be at least 8 bytes long
+     * @return CHIP_ERROR_BUFFER_TOO_SMALL if `outBytes` is too small, CHIP_ERROR_INVALID_FABRIC_INDEX
+     *         if the controller is somehow not associated with a fabric (internal error!) or
+     *         CHIP_NO_ERROR on success.
+     */
+    CHIP_ERROR GetCompressedFabricIdBytes(MutableByteSpan & outBytes) const;
 
     /**
      * @brief Get the raw Fabric ID assigned to the device.
      */
-    uint64_t GetFabricId() const { return mFabricId; }
+    uint64_t GetFabricId() const
+    {
+        const auto * fabricInfo = GetFabricInfo();
+        return (fabricInfo != nullptr) ? static_cast<uint64_t>(fabricInfo->GetFabricId()) : kUndefinedFabricId;
+    }
 
     /**
      * @brief Get the Node ID of this instance.
      */
-    NodeId GetNodeId() const { return mLocalId.GetNodeId(); }
+    NodeId GetNodeId() const
+    {
+        const auto * fabricInfo = GetFabricInfo();
+        return (fabricInfo != nullptr) ? static_cast<uint64_t>(fabricInfo->GetNodeId()) : kUndefinedNodeId;
+    }
+
+    /**
+     * @brief Get the root public key for the fabric
+     *
+     * @param outRootPublicKey reference to public key object that gets updated on success.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INCORRECT_STATE if fabric table is unset, or another internal error
+     *         on storage access failure.
+     */
+    CHIP_ERROR GetRootPublicKey(Crypto::P256PublicKey & outRootPublicKey) const;
 
     CHIP_ERROR GetFabricIndex(FabricIndex * value)
     {
-        VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr && value != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        *value = mFabricInfo->GetFabricIndex();
+        const auto * fabricInfo = GetFabricInfo();
+        VerifyOrReturnError(mState == State::Initialized && fabricInfo != nullptr && value != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        *value = fabricInfo->GetFabricIndex();
         return CHIP_NO_ERROR;
     }
 
-    FabricInfo * GetFabricInfo() { return mFabricInfo; }
+    FabricIndex GetFabricIndex() const
+    {
+        return mFabricIndex;
+    }
 
     const FabricTable * GetFabricTable() const
     {
@@ -249,7 +288,7 @@ public:
         return mSystemState->Fabrics();
     }
 
-    void ReleaseOperationalDevice(NodeId remoteDeviceId);
+    void ReleaseOperationalDevice(NodeId remoteNodeId);
 
     OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }
 
@@ -289,11 +328,19 @@ protected:
         Initialized
     };
 
+    // This is not public to avoid users of DeviceController relying on "innards" access to
+    // the raw fabric table. Everything needed should be available with getters on DeviceController.
+    const FabricInfo * GetFabricInfo() const
+    {
+        VerifyOrReturnError((mState == State::Initialized) && (mFabricIndex != kUndefinedFabricIndex), nullptr);
+        VerifyOrReturnError(GetFabricTable() != nullptr, nullptr);
+
+        return GetFabricTable()->FindFabricWithIndex(mFabricIndex);
+    }
+
     State mState;
 
-    PeerId mLocalId          = PeerId();
-    FabricId mFabricId       = kUndefinedFabricId;
-    FabricInfo * mFabricInfo = nullptr;
+    FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;

@@ -171,20 +171,20 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     ReturnErrorOnFailure(factory.Init(factoryParams));
     ReturnErrorOnFailure(factory.SetupCommissioner(params, gCommissioner));
 
-    chip::FabricInfo * fabricInfo = gCommissioner.GetFabricInfo();
-    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INTERNAL);
+    FabricIndex fabricIndex = gCommissioner.GetFabricIndex();
+    VerifyOrReturnError(fabricInfo != kUndefinedFabricIndex, CHIP_ERROR_INTERNAL);
 
     uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
     MutableByteSpan compressedFabricIdSpan(compressedFabricId);
-    ReturnErrorOnFailure(fabricInfo->GetCompressedId(compressedFabricIdSpan));
+    ReturnErrorOnFailure(gCommissioner.GetCompressedFabricIdBytes(compressedFabricIdSpan));
     ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
-                    static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+                    static_cast<unsigned>(fabricIndex));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
     // TODO: Once ExampleOperationalCredentialsIssuer has support, set default IPK on it as well so
     // that commissioned devices get the IPK set from real values rather than "test-only" internal hookups.
     ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-    ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
+    ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricIndex, defaultIpk,
                                                                     compressedFabricIdSpan));
 
     gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
@@ -194,7 +194,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     app::DnssdServer::Instance().AdvertiseOperational();
 
     ChipLogProgress(Support, "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
-                    ChipLogValueX64(gCommissioner.GetNodeId()), fabricInfo->GetFabricIndex());
+                    ChipLogValueX64(gCommissioner.GetNodeId()), fabricIndex);
 
     return CHIP_NO_ERROR;
 }

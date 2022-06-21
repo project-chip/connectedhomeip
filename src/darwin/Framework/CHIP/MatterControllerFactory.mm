@@ -230,6 +230,7 @@ static NSString * const kErrorKeystoreInit = @"Init failure while initializing p
             params.enableServerInteractions = true;
         }
 
+        // TODO(boris): Need to set the opCertStore HERE
         params.groupDataProvider = _groupDataProvider;
         params.fabricIndependentStorage = _persistentStorageDelegateBridge;
         params.operationalKeystore = _keystore;

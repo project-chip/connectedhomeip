@@ -104,6 +104,8 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(
         new AndroidDeviceControllerWrapper(std::move(controller), std::move(opCredsIssuerPtr)));
 
+    chip::PersistentStorageDelegate * wrapperStorage = wrapper.get();
+
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
 
     chip::Controller::AndroidOperationalCredentialsIssuer * opCredsIssuer = wrapper->mOpCredsIssuer.get();
@@ -127,9 +129,9 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     initParams.listenPort                      = CHIP_PORT + 1;
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
-    initParams.fabricIndependentStorage        = wrapper.get();
+    initParams.fabricIndependentStorage        = wrapperStorage;
 
-    wrapper->mGroupDataProvider.SetStorageDelegate(wrapper.get());
+    wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
 
     CHIP_ERROR err = wrapper->mGroupDataProvider.Init();
     if (err != CHIP_NO_ERROR)
@@ -138,6 +140,14 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
         return nullptr;
     }
     initParams.groupDataProvider = &wrapper->mGroupDataProvider;
+
+    err = wrapper->mOpCertStore.Init(wrapperStorage);
+    if (err != CHIP_NO_ERROR)
+    {
+        *errInfoOnFailure = err;
+        return nullptr;
+    }
+    initParams.opCertStore = &wrapper->mOpCertStore;
 
     // TODO: Init IPK Epoch Key in opcreds issuer, so that commissionees get the right IPK
     opCredsIssuer->Initialize(*wrapper.get(), wrapper.get()->mJavaObjectRef);
@@ -198,28 +208,21 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     }
 
     // Setup IPK
-    chip::FabricInfo * fabricInfo = wrapper->Controller()->GetFabricInfo();
-    if (fabricInfo == nullptr)
-    {
-        *errInfoOnFailure = CHIP_ERROR_INTERNAL;
-        return nullptr;
-    }
-
     uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
     chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
 
-    *errInfoOnFailure = fabricInfo->GetCompressedId(compressedFabricIdSpan);
+    *errInfoOnFailure = wrapper->Controller()->GetCompressedFabricIdBytes(compressedFabricIdSpan);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;
     }
     ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
-                    static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+                    static_cast<unsigned>(wrapper->Controller()->GetFabricIndex()));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
     chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
 
-    *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(&wrapper->mGroupDataProvider, fabricInfo->GetFabricIndex(),
+    *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(&wrapper->mGroupDataProvider, wrapper->Controller()->GetFabricIndex(),
                                                                 defaultIpk, compressedFabricIdSpan);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {

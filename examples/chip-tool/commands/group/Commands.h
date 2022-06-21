@@ -277,7 +277,7 @@ public:
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
         uint8_t compressed_fabric_id[sizeof(uint64_t)];
         chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
-        ReturnLogErrorOnFailure(CurrentCommissioner().GetFabricInfo()->GetCompressedId(compressed_fabric_id_span));
+        ReturnLogErrorOnFailure(CurrentCommissioner().GetCompressedFabricIdBytes(compressed_fabric_id_span));
 
         if ((keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kCacheAndSync &&
              keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst) ||

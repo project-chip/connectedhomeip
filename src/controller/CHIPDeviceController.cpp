@@ -148,9 +148,14 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
 {
     FabricInfo newFabric;
     constexpr uint32_t chipCertAllocatedLen = kMaxCHIPCertLength;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> rcacBuf;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> icacBuf;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
     Credentials::P256PublicKeySpan rootPublicKeySpan;
     FabricId fabricId;
+    bool hasExternallyOwnedKeypair = false;
+    Crypto::P256Keypair * externalOperationalKeypair = nullptr;
+    VendorId newFabricVendorId = params.controllerVendorId;
 
     // There are three possibilities here in terms of what happens with our
     // operational key:
@@ -161,88 +166,178 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     //    with a key store.
     if (params.hasExternallyOwnedOperationalKeypair)
     {
-        ReturnErrorOnFailure(newFabric.SetExternallyOwnedOperationalKeypair(params.operationalKeypair));
+        hasExternallyOwnedKeypair = true;
+        externalOperationalKeypair = params.operationalKeypair;
     }
     else if (params.operationalKeypair)
     {
-        ReturnErrorOnFailure(newFabric.SetOperationalKeypair(params.operationalKeypair));
+        hasExternallyOwnedKeypair = false;
+        externalOperationalKeypair = params.operationalKeypair;
     }
 
-    newFabric.SetVendorId(params.controllerVendorId);
+    ReturnErrorCodeIf(!rcacBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
+    ReturnErrorCodeIf(!icacBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
+    ReturnErrorCodeIf(!nocBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorCodeIf(!chipCert.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
-    MutableByteSpan chipCertSpan(chipCert.Get(), chipCertAllocatedLen);
+    MutableByteSpan rcacSpan(rcacBuf.Get(), chipCertAllocatedLen);
 
-    ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerRCAC, chipCertSpan));
-    ReturnErrorOnFailure(newFabric.SetRootCert(chipCertSpan));
-    ReturnErrorOnFailure(Credentials::ExtractPublicKeyFromChipCert(chipCertSpan, rootPublicKeySpan));
+    ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerRCAC, rcacSpan));
+    ReturnErrorOnFailure(Credentials::ExtractPublicKeyFromChipCert(rcacSpan, rootPublicKeySpan));
     Crypto::P256PublicKey rootPublicKey{ rootPublicKeySpan };
 
+    MutableByteSpan icacSpan;
     if (params.controllerICAC.empty())
     {
         ChipLogProgress(Controller, "Intermediate CA is not needed");
     }
     else
     {
-        chipCertSpan = MutableByteSpan(chipCert.Get(), chipCertAllocatedLen);
-
-        ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerICAC, chipCertSpan));
-        ReturnErrorOnFailure(newFabric.SetICACert(chipCertSpan));
+        icacSpan = MutableByteSpan(icacBuf.Get(), chipCertAllocatedLen);
+        ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerICAC, icacSpan));
     }
 
-    chipCertSpan = MutableByteSpan(chipCert.Get(), chipCertAllocatedLen);
+    MutableByteSpan nocSpan = MutableByteSpan(nocBuf.Get(), chipCertAllocatedLen);
 
-    ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerNOC, chipCertSpan));
-    ReturnErrorOnFailure(newFabric.SetNOCCert(chipCertSpan));
-    ReturnErrorOnFailure(ExtractFabricIdFromCert(chipCertSpan, &fabricId));
+    ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerNOC, nocSpan));
+    ReturnErrorOnFailure(ExtractFabricIdFromCert(nocSpan, &fabricId));
 
-    mFabricInfo = params.systemState->Fabrics()->FindFabric(rootPublicKey, fabricId);
-    if (mFabricInfo != nullptr)
+    auto * fabricTable = params.systemState->Fabrics();
+    auto * fabricInfo = fabricTable->FindFabric(rootPublicKey, fabricId);
+    bool fabricFoundInTable = (fabricInfo != nullptr);
+
+    FabricIndex fabricIndex = fabricFoundInTable ? fabricInfo->GetFabricIndex() : kUndefinedFabricIndex;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // We have 4 cases to handle legacy usage of direct operational key injection
+    if (externalOperationalKeypair)
     {
-        ReturnErrorOnFailure(params.systemState->Fabrics()->UpdateFabric(mFabricInfo->GetFabricIndex(), newFabric));
+        // Cases 1 and 2: Injected operational keys
+
+        // CASE 1: Fabric update with injected key
+        if (fabricFoundInTable)
+        {
+            err = fabricTable->UpdatePendingFabricWithProvidedOpKey(fabricIndex, nocSpan, icacSpan, externalOperationalKeypair, hasExternallyOwnedKeypair);
+            if (err == CHIP_NO_ERROR)
+            {
+                err = fabricTable->CommitPendingFabricData();
+            }
+            if (err != CHIP_NO_ERROR)
+            {
+                fabricTable->RevertPendingFabricData();
+                return err;
+            }
+
+            fabricInfo = fabricTable->FindFabricWithIndex(fabricIndex);
+            ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        }
+        else
+        // CASE 2: New fabric with injected key
+        {
+            err = fabricTable->AddNewPendingTrustedRootCert(rcacSpan);
+            if (err == CHIP_NO_ERROR)
+            {
+                err = fabricTable->AddNewPendingFabricWithProvidedOpKey(nocSpan, icacSpan, newFabricVendorId, externalOperationalKeypair, hasExternallyOwnedKeypair, &fabricIndex);
+            }
+            if (err == CHIP_NO_ERROR)
+            {
+                err = fabricTable->CommitPendingFabricData();
+            }
+
+            if (err != CHIP_NO_ERROR)
+            {
+                fabricTable->RevertPendingFabricData();
+                return err;
+            }
+
+            fabricInfo = fabricTable->FindFabricWithIndex(fabricIndex);
+            ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        }
     }
     else
     {
-        FabricIndex fabricIndex;
-        ReturnErrorOnFailure(params.systemState->Fabrics()->AddNewFabric(newFabric, &fabricIndex));
-        mFabricInfo = params.systemState->Fabrics()->FindFabricWithIndex(fabricIndex);
-        ReturnErrorCodeIf(mFabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        // Cases 3 and 4: OperationalKeystore has the keys
+
+        // CASE 3: Fabric update with operational keystore
+        if (fabricFoundInTable)
+        {
+            VerifyOrReturnError(fabricTable->HasOperationalKeyForFabric(fabricIndex), CHIP_ERROR_KEY_NOT_FOUND);
+
+            err = fabricTable->UpdatePendingFabricWithOperationalKeystore(fabricIndex, nocSpan, icacSpan);
+            if (err == CHIP_NO_ERROR)
+            {
+                err = fabricTable->CommitPendingFabricData();
+            }
+            if (err != CHIP_NO_ERROR)
+            {
+                fabricTable->RevertPendingFabricData();
+                return err;
+            }
+
+            fabricInfo = fabricTable->FindFabricWithIndex(fabricIndex);
+            ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        }
+        else
+        // CASE 4: New fabric with operational keystore
+        {
+            VerifyOrReturnError(fabricTable->HasOperationalKeyForFabric(fabricIndex), CHIP_ERROR_KEY_NOT_FOUND);
+
+            err = fabricTable->AddNewPendingTrustedRootCert(rcacSpan);
+            if (err == CHIP_NO_ERROR)
+            {
+                err = fabricTable->AddNewPendingFabricWithOperationalKeystore(nocSpan, icacSpan, newFabricVendorId, &fabricIndex);
+            }
+            if (err == CHIP_NO_ERROR)
+            {
+                err = fabricTable->CommitPendingFabricData();
+            }
+
+            if (err != CHIP_NO_ERROR)
+            {
+                fabricTable->RevertPendingFabricData();
+                return err;
+            }
+
+            fabricInfo = fabricTable->FindFabricWithIndex(fabricIndex);
+            ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        }
     }
 
-    mLocalId  = mFabricInfo->GetPeerId();
-    mFabricId = mFabricInfo->GetFabricId();
+    mFabricIndex = fabricIndex;
 
     ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64,
-                    mFabricInfo->GetFabricIndex(), ChipLogValueX64(GetCompressedFabricId()));
+                    GetFabricIndex(), ChipLogValueX64(GetCompressedFabricId()));
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceController::Shutdown()
 {
-    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError((mState == State::Initialized) && (mSystemState != nullptr), CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogDetail(Controller, "Shutting down the controller");
 
     mState = State::NotInitialized;
 
-    if (mFabricInfo != nullptr)
+    if (mFabricIndex != kUndefinedFabricIndex)
     {
         // Shut down any ongoing CASE session activity we have.  We're going to
         // assume that all sessions for our fabric belong to us here.
-        mSystemState->CASESessionMgr()->ReleaseSessionsForFabric(mFabricInfo->GetFabricIndex());
+        mSystemState->CASESessionMgr()->ReleaseSessionsForFabric(mFabricIndex);
 
         // TODO: The CASE session manager does not shut down existing CASE
         // sessions.  It just shuts down any ongoing CASE session establishment
         // we're in the middle of as initiator.  Maybe it should shut down
         // existing sessions too?
-        mSystemState->SessionMgr()->ExpireAllPairingsForFabric(mFabricInfo->GetFabricIndex());
+        mSystemState->SessionMgr()->ExpireAllPairingsForFabric(mFabricIndex);
+
+        FabricTable * fabricTable = mSystemState->Fabrics();
+        if (fabricTable != nullptr)
+        {
+            fabricTable->Forget(mFabricIndex);
+        }
     }
 
-    if (mFabricInfo != nullptr)
-    {
-        mFabricInfo->Reset();
-    }
     mSystemState->Release();
     mSystemState = nullptr;
 
@@ -252,18 +347,18 @@ CHIP_ERROR DeviceController::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-void DeviceController::ReleaseOperationalDevice(NodeId remoteDeviceId)
+void DeviceController::ReleaseOperationalDevice(NodeId remoteNodeId)
 {
-    VerifyOrReturn(mState == State::Initialized && mFabricInfo != nullptr,
+    VerifyOrReturn(mState == State::Initialized && mFabricIndex != kUndefinedFabricIndex,
                    ChipLogError(Controller, "ReleaseOperationalDevice was called in incorrect state"));
-    mSystemState->CASESessionMgr()->ReleaseSession(mFabricInfo->GetPeerIdForNode(remoteDeviceId));
+    mSystemState->CASESessionMgr()->ReleaseSession(PeerId(GetCompressedFabricId(), remoteNodeId));
 }
 
 CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
 {
     ChipLogProgress(Controller, "Force close session for node 0x%" PRIx64, nodeId);
 
-    OperationalDeviceProxy * proxy = mSystemState->CASESessionMgr()->FindExistingSession(mFabricInfo->GetPeerIdForNode(nodeId));
+    OperationalDeviceProxy * proxy = mSystemState->CASESessionMgr()->FindExistingSession(PeerId(GetCompressedFabricId(), nodeId));
     if (proxy == nullptr)
     {
         ChipLogProgress(Controller, "Attempted to close a session that does not exist.");
@@ -1127,9 +1222,9 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
 
     mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(proxy->GetDeviceId());
 
-    if (mFabricInfo != nullptr)
+    if (mFabricIndex != kUndefinedFabricIndex)
     {
-        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(mFabricInfo->GetFabricId());
+        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(GetFabricId());
     }
 
     return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, csrNonce, AttestationSignature, attestationChallenge,
@@ -2131,11 +2226,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
 }
 
-CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId)
+CHIP_ERROR DeviceController::UpdateDevice(NodeId peerNodeId)
 {
-    VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Initialized && mFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INCORRECT_STATE);
 
-    OperationalDeviceProxy * proxy = GetDeviceSession(mFabricInfo->GetPeerIdForNode(deviceId));
+    OperationalDeviceProxy * proxy = GetDeviceSession(PeerId(GetCompressedFabricId(), peerNodeId));
     VerifyOrReturnError(proxy != nullptr, CHIP_ERROR_NOT_FOUND);
 
     return proxy->LookupPeerAddress();
@@ -2154,6 +2249,20 @@ OperationalDeviceProxy * DeviceCommissioner::GetDeviceSession(const PeerId & pee
     // If there is an OperationalDeviceProxy for this peerId now the call to the
     // superclass will return it.
     return DeviceController::GetDeviceSession(peerId);
+}
+
+CHIP_ERROR DeviceController::GetCompressedFabricIdBytes(MutableByteSpan & outBytes) const
+{
+    const auto * fabricInfo = GetFabricInfo();
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
+    return fabricInfo->GetCompressedFabricIdBytes(outBytes);
+}
+
+CHIP_ERROR DeviceController::GetRootPublicKey(Crypto::P256PublicKey & outRootPublicKey) const
+{
+    const auto * fabricTable = GetFabricTable();
+    VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return fabricTable->FetchRootPubkey(mFabricIndex, outRootPublicKey);
 }
 
 } // namespace Controller

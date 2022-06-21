@@ -34,6 +34,8 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/OperationalCertificateStore.h>
+#include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/OperationalKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <inet/InetConfig.h>
@@ -118,6 +120,9 @@ struct ServerInitParams
     TestEventTriggerDelegate * testEventTriggerDelegate = nullptr;
     // Operational keystore with access to the operational keys: MUST be injected.
     Crypto::OperationalKeystore * operationalKeystore = nullptr;
+    // Operational certificate store with access to the operational certs in persisted storage:
+    // MUST be injected.
+    Credentials::OperationalCertificateStore * opCertStore = nullptr;
 };
 
 class IgnoreCertificateValidityPolicy : public Credentials::CertificateValidityPolicy
@@ -204,6 +209,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     {
         static chip::KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
         static chip::PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
+        static chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
         static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
         static IgnoreCertificateValidityPolicy sDefaultCertValidityPolicy;
 
@@ -228,6 +234,15 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
             //          for examples and for now.
             ReturnErrorOnFailure(sPersistentStorageOperationalKeystore.Init(this->persistentStorageDelegate));
             this->operationalKeystore = &sPersistentStorageOperationalKeystore;
+        }
+
+        // OpCertStore can be injected but default to persistent storage default
+        if (this->opCertStore == nullptr)
+        {
+            // WARNING: PersistentStorageOpCertStore::Finish() is never called. It's fine for
+            //          for examples and for now, since all storage is immediate for that impl.
+            ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(this->persistentStorageDelegate));
+            this->opCertStore = &sPersistentStorageOpCertStore;
         }
 
         // Group Data provider injection
@@ -315,6 +330,8 @@ public:
 
     Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
 
+    Credentials::OperationalCertificateStore * GetOpCertStore() { return mOpCertStore; }
+
     /**
      * This function send the ShutDown event before stopping
      * the event loop.
@@ -393,7 +410,7 @@ private:
             return CHIP_NO_ERROR;
         };
 
-        void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        void OnFabricDeletedFromStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
             auto & sessionManager = mServer->GetSecureSessionManager();
@@ -425,13 +442,13 @@ private:
             }
         };
 
-        void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        void OnFabricRetrievedFromStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
             (void) fabricIndex;
         }
 
-        void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        void OnFabricPersistedToStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
             (void) fabricIndex;
@@ -475,6 +492,7 @@ private:
 
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
     Crypto::OperationalKeystore * mOperationalKeystore;
+    Credentials::OperationalCertificateStore * mOpCertStore;
 
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;
