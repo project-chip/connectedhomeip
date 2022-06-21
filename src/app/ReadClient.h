@@ -318,12 +318,12 @@ public:
     // Like SendSubscribeRequest, but allows sending certain forms of invalid
     // subscribe requests that servers are expected to reject, for testing
     // purposes.  Should only be called from tests.
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     CHIP_ERROR SendSubscribeRequestWithoutValidation(const ReadPrepareParams & aReadPrepareParams)
     {
         return SendSubscribeRequestImpl(aReadPrepareParams);
     }
-#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
     friend class TestReadInteraction;
