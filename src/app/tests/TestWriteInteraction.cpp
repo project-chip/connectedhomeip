@@ -598,8 +598,8 @@ void TestWriteInteraction::TestWriteInvalidPath(nlTestSuite * apSuite, void * ap
 
         ctx.DrainAndServiceIO();
 
-        NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 1);
-        NL_TEST_ASSERT(apSuite, callback.mStatus.mStatus == Protocols::InteractionModel::Status::InvalidAction);
+        NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
+        NL_TEST_ASSERT(apSuite, callback.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
     }
 
     {
@@ -617,8 +617,8 @@ void TestWriteInteraction::TestWriteInvalidPath(nlTestSuite * apSuite, void * ap
 
         ctx.DrainAndServiceIO();
 
-        NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 1);
-        NL_TEST_ASSERT(apSuite, callback.mStatus.mStatus == Protocols::InteractionModel::Status::InvalidAction);
+        NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
+        NL_TEST_ASSERT(apSuite, callback.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
     }
 
     // By now we should have closed all exchanges and sent all pending acks, so

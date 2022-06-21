@@ -321,12 +321,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
 
-        if (!dataAttributePath.IsValid())
-        {
-            err = AddStatus(dataAttributePath, StatusIB(Status::InvalidAction));
-            SuccessOrExit(err);
-            continue;
-        }
+        VerifyOrExit(dataAttributePath.IsValid(), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
 
         const auto attributeMetadata = GetAttributeMetadata(dataAttributePath);
         bool currentAttributeIsList  = (attributeMetadata != nullptr && attributeMetadata->attributeType == kListAttributeType);
@@ -440,10 +435,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
 
-        if (!dataAttributePath.IsValidForGroupWrites())
-        {
-            continue;
-        }
+        VerifyOrExit(dataAttributePath.IsValidForGroupWrites(), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
 
         if (!dataAttributePath.IsListOperation() && dataReader.GetType() == TLV::TLVType::kTLVType_Array)
         {
