@@ -68,8 +68,8 @@ class ZAPGenerateTarget:
         subprocess.check_call(cmd)
         if "chef" in self.zap_config:
             af_gen_event = os.path.join(self.output_dir, "af-gen-event.h")
-            af_gen_event_file = open(af_gen_event, "w+")
-            af_gen_event_file.close()
+            with open(af_gen_event, "w+"): # Empty file needed for linux
+                pass
             idl_path = self.zap_config.replace(".zap", ".matter")
             target_path = os.path.join(self.output_dir, os.path.basename(idl_path))
             os.rename(idl_path, target_path)
