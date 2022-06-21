@@ -27,7 +27,7 @@
 
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
-#endif /* RS911X_WIFI */
+#endif /* SL_WIFI */
 
 #if PW_RPC_ENABLED
 #include "Rpc.h"
