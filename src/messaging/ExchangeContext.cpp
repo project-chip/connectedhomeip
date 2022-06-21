@@ -327,9 +327,9 @@ ExchangeContext::~ExchangeContext()
 
     if (ReleaseSessionOnDestruction() && mSession)
     {
-        // Move the session out of the older for the eviction, so it doesn't try
+        // Move the session out of the holder for the eviction, so it doesn't try
         // to notify us in our destructor.
-        const auto & session = mSession.Get();
+        Optional<SessionHandle> session = mSession.Get();
         mSession.Release();
         session.Value()->AsSecureSession()->MarkForEviction();
     }
@@ -583,6 +583,7 @@ void ExchangeContext::AbortAllOtherCommunicationOnFabric()
 {
     if (!mSession || !mSession->IsSecureSession())
     {
+        ChipLogError(ExchangeManager, "AbortAllOtherCommunicationOnFabric called on a non-PASE/CASE session");
         return;
     }
 
