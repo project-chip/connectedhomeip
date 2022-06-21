@@ -103,13 +103,15 @@ void EFR32MatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, voi
 void EFR32MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
     // Initialize OTA only when Thread or WiFi connectivity is established
-    if (((event->Type == DeviceEventType::kThreadConnectivityChange) && (event->ThreadConnectivityChange.Result == kConnectivity_Established)) ||
-        ((event->Type == DeviceEventType::kInternetConnectivityChange) && (event->InternetConnectivityChange.IPv6 == kConnectivity_Established )))
-        {
-            EFR32_LOG("Scheduling OTA Requestor initialization")
-                chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
-                                                       InitOTARequestorHandler, nullptr);
-        }
+    if (((event->Type == DeviceEventType::kThreadConnectivityChange) &&
+         (event->ThreadConnectivityChange.Result == kConnectivity_Established)) ||
+        ((event->Type == DeviceEventType::kInternetConnectivityChange) &&
+         (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)))
+    {
+        EFR32_LOG("Scheduling OTA Requestor initialization")
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
+                                                    InitOTARequestorHandler, nullptr);
+    }
 }
 
 CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
