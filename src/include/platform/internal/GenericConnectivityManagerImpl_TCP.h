@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,20 +15,28 @@
  *    limitations under the License.
  */
 
-#include <platform/ConnectivityManager.h>
+/**
+ *    @file
+ *          Provides a generic implementation of ConnectivityManager features
+ *          for use on platforms that use TCP.
+ */
 
-#include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
+#pragma once
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-#include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
-#endif
+#include <inet/TCPEndPointImpl.h>
 
 namespace chip {
 namespace DeviceLayer {
+namespace Internal {
 
-/** Singleton instance of the ConnectivityManager implementation object.
- */
-ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
+template <class ImplClass>
+class GenericConnectivityManagerImpl_TCP
+{
+public:
+    // ConnectivityManager:
+    static chip::Inet::EndPointManager<Inet::TCPEndPoint> & _TCPEndPointManager();
+};
 
+} // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
