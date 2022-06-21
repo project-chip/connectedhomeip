@@ -22,10 +22,10 @@ NS_ASSUME_NONNULL_BEGIN
 @class MTRSetupPayload;
 
 typedef NS_ENUM(NSUInteger, MTROnboardingPayloadType) {
-    CHIPOnboardingPayloadTypeQRCode = 0,
-    CHIPOnboardingPayloadTypeManualCode,
-    CHIPOnboardingPayloadTypeNFC,
-    CHIPOnboardingPayloadTypeAdmin,
+    MTROnboardingPayloadTypeQRCode = 0,
+    MTROnboardingPayloadTypeManualCode,
+    MTROnboardingPayloadTypeNFC,
+    MTROnboardingPayloadTypeAdmin,
 };
 
 @interface MTROnboardingPayloadParser : NSObject
