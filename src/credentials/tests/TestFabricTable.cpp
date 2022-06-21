@@ -28,8 +28,8 @@
 
 #include <credentials/FabricTable.h>
 
-#include <credentials/tests/CHIPCert_test_vectors.h>
 #include <credentials/PersistentStorageOpCertStore.h>
+#include <credentials/tests/CHIPCert_test_vectors.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/support/CodeUtils.h>
@@ -47,7 +47,7 @@ Crypto::P256Keypair gFabric1OpKey;
 
 class ScopedFabricTable
 {
-  public:
+public:
     ScopedFabricTable() {}
     ~ScopedFabricTable()
     {
@@ -59,21 +59,18 @@ class ScopedFabricTable
     CHIP_ERROR Init(chip::TestPersistentStorageDelegate * storage)
     {
         chip::FabricTable::InitParams initParams;
-        initParams.storage = storage;
+        initParams.storage             = storage;
         initParams.operationalKeystore = &mOpKeyStore;
-        initParams.opCertStore = &mOpCertStore;
+        initParams.opCertStore         = &mOpCertStore;
 
         ReturnErrorOnFailure(mOpKeyStore.Init(storage));
         ReturnErrorOnFailure(mOpCertStore.Init(storage));
         return mFabricTable.Init(initParams);
     }
 
-    FabricTable & GetFabricTable()
-    {
-        return mFabricTable;
-    }
+    FabricTable & GetFabricTable() { return mFabricTable; }
 
-  private:
+private:
     chip::FabricTable mFabricTable;
     chip::PersistentStorageOperationalKeystore mOpKeyStore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
@@ -103,7 +100,8 @@ static CHIP_ERROR LoadTestFabric(nlTestSuite * inSuite, FabricTable & fabricTabl
 
     NL_TEST_ASSERT(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcacSpan) == CHIP_NO_ERROR);
 
-    CHIP_ERROR err = fabricTable.AddNewPendingFabricWithProvidedOpKey(nocSpan, icacSpan, VendorId::TestVendor1, &gFabric1OpKey, /*hasExternallyOwnedKeypair =*/ true, &fabricIndex);
+    CHIP_ERROR err = fabricTable.AddNewPendingFabricWithProvidedOpKey(nocSpan, icacSpan, VendorId::TestVendor1, &gFabric1OpKey,
+                                                                      /*hasExternallyOwnedKeypair =*/true, &fabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     if (doCommit)

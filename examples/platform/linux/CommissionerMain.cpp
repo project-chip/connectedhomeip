@@ -177,15 +177,15 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
     MutableByteSpan compressedFabricIdSpan(compressedFabricId);
     ReturnErrorOnFailure(gCommissioner.GetCompressedFabricIdBytes(compressedFabricIdSpan));
-    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
-                    static_cast<unsigned>(fabricIndex));
+    ChipLogProgress(Support,
+                    "Setting up group data for Fabric Index %u with Compressed Fabric ID:", static_cast<unsigned>(fabricIndex));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
     // TODO: Once ExampleOperationalCredentialsIssuer has support, set default IPK on it as well so
     // that commissioned devices get the IPK set from real values rather than "test-only" internal hookups.
     ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-    ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricIndex, defaultIpk,
-                                                                    compressedFabricIdSpan));
+    ReturnLogErrorOnFailure(
+        chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricIndex, defaultIpk, compressedFabricIdSpan));
 
     gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);

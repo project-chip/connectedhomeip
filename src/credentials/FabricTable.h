@@ -74,10 +74,7 @@ public:
 
     // TODO(#15049): Refactor/rename PeerId to OperationalId or OpId throughout source
     PeerId GetPeerId() const { return PeerId(mCompressedFabricId, mNodeId); }
-    PeerId GetPeerIdForNode(const NodeId node) const
-    {
-        return PeerId(mCompressedFabricId, node);
-    }
+    PeerId GetPeerIdForNode(const NodeId node) const { return PeerId(mCompressedFabricId, node); }
 
     FabricId GetFabricId() const { return mFabricId; }
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
@@ -128,11 +125,11 @@ public:
      */
     void Reset()
     {
-        mNodeId = kUndefinedNodeId;
-        mFabricId = kUndefinedFabricId;
-        mFabricIndex = kUndefinedFabricIndex;
+        mNodeId             = kUndefinedNodeId;
+        mFabricId           = kUndefinedFabricId;
+        mFabricIndex        = kUndefinedFabricIndex;
         mCompressedFabricId = kUndefinedCompressedFabricId;
-        mRootPublicKey = Crypto::P256PublicKey();
+        mRootPublicKey      = Crypto::P256PublicKey();
 
         mVendorId       = VendorId::NotSpecified;
         mFabricLabel[0] = '\0';
@@ -144,7 +141,7 @@ public:
         mOperationalKey = nullptr;
 
         mFabricIndex = kUndefinedFabricIndex;
-        mNodeId = kUndefinedNodeId;
+        mNodeId      = kUndefinedNodeId;
     }
 
     friend class FabricTable;
@@ -157,13 +154,14 @@ protected:
         FabricIndex fabricIndex               = kUndefinedFabricIndex;
         CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
         Crypto::P256PublicKey rootPublicKey;
-        uint16_t vendorId = VendorId::NotSpecified; /**< Vendor ID for commissioner of fabric */
+        uint16_t vendorId                        = VendorId::NotSpecified; /**< Vendor ID for commissioner of fabric */
         Crypto::P256Keypair * operationalKeypair = nullptr;
-        bool hasExternallyOwnedKeypair = false;
+        bool hasExternallyOwnedKeypair           = false;
 
         CHIP_ERROR AreValid() const
         {
-            VerifyOrReturnError((fabricId != kUndefinedFabricId) && (fabricIndex != kUndefinedFabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError((fabricId != kUndefinedFabricId) && (fabricIndex != kUndefinedFabricIndex),
+                                CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(IsOperationalNodeId(nodeId), CHIP_ERROR_INVALID_ARGUMENT);
             // We don't check the root public key validity or the compressed fabric ID, since in the
             // very small usage that exists in private use, the rest shoulkd be OK.
@@ -207,9 +205,9 @@ protected:
         return TLV::EstimateStructOverhead(sizeof(uint16_t), Crypto::P256SerializedKeypair::Capacity());
     }
 
-    NodeId mNodeId                         = kUndefinedNodeId;
-    FabricId mFabricId                     = kUndefinedFabricId;
-    FabricIndex mFabricIndex               = kUndefinedFabricIndex;
+    NodeId mNodeId           = kUndefinedNodeId;
+    FabricId mFabricId       = kUndefinedFabricId;
+    FabricIndex mFabricIndex = kUndefinedFabricIndex;
     // We cache the compressed fabric id since it's used so often and costly to get.
     CompressedFabricId mCompressedFabricId = kUndefinedCompressedFabricId;
     // We cache the root public key since it's used so often and costly to get.
@@ -226,7 +224,8 @@ protected:
     bool mHasExternallyOwnedOperationalKey = false;
 
     CHIP_ERROR CommitToStorage(PersistentStorageDelegate * storage) const;
-    CHIP_ERROR LoadFromStorage(PersistentStorageDelegate * storage, FabricIndex newFabricIndex, const ByteSpan & rcac, const ByteSpan & noc);
+    CHIP_ERROR LoadFromStorage(PersistentStorageDelegate * storage, FabricIndex newFabricIndex, const ByteSpan & rcac,
+                               const ByteSpan & noc);
 };
 
 /**
@@ -310,7 +309,7 @@ public:
         // added as new fabrics need to have directly injected operational keys with FabricInfo::Set*OperationalKey.
         Crypto::OperationalKeystore * operationalKeystore = nullptr;
         // Operational Certificate store to hold the NOC/ICAC/RCAC chains (MANDATORY).
-        Credentials::OperationalCertificateStore *opCertStore = nullptr;
+        Credentials::OperationalCertificateStore * opCertStore = nullptr;
     };
 
     class DLL_EXPORT Delegate
@@ -341,7 +340,7 @@ public:
     };
 
 public:
-    FabricTable() = default;
+    FabricTable()  = default;
     ~FabricTable() = default;
 
     // Non-copyable
@@ -544,13 +543,16 @@ public:
     CHIP_ERROR AddNewPendingTrustedRootCert(const ByteSpan & rcac);
 
     // TODO: REVIEW DOCS
-    CHIP_ERROR AddNewPendingFabricWithOperationalKeystore(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId, FabricIndex * outNewFabricIndex)
+    CHIP_ERROR AddNewPendingFabricWithOperationalKeystore(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
+                                                          FabricIndex * outNewFabricIndex)
     {
         return AddNewPendingFabricCommon(noc, icac, vendorId, nullptr, false, outNewFabricIndex);
     };
 
     // TODO: REVIEW DOCS
-    CHIP_ERROR AddNewPendingFabricWithProvidedOpKey(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned, FabricIndex * outNewFabricIndex)
+    CHIP_ERROR AddNewPendingFabricWithProvidedOpKey(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
+                                                    Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
+                                                    FabricIndex * outNewFabricIndex)
     {
         return AddNewPendingFabricCommon(noc, icac, vendorId, existingOpKey, isExistingOpKeyExternallyOwned, outNewFabricIndex);
     };
@@ -561,7 +563,8 @@ public:
         return UpdatePendingFabricCommon(fabricIndex, noc, icac, nullptr, false);
     }
 
-    CHIP_ERROR UpdatePendingFabricWithProvidedOpKey(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned)
+    CHIP_ERROR UpdatePendingFabricWithProvidedOpKey(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
+                                                    Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned)
     {
         return UpdatePendingFabricCommon(fabricIndex, noc, icac, existingOpKey, isExistingOpKeyExternallyOwned);
     }
@@ -588,14 +591,16 @@ public:
     // Verifies credentials, with the fabric's root under fabricIndex, and extract critical bits.
     // This call is used for CASE.
     CHIP_ERROR VerifyCredentials(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
-                                 Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId, FabricId & outFabricId, NodeId & outNodeId,
-                                 Crypto::P256PublicKey & outNocPubkey, Crypto::P256PublicKey * outRootPublicKey = nullptr) const;
+                                 Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId,
+                                 FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
+                                 Crypto::P256PublicKey * outRootPublicKey = nullptr) const;
 
     // Verifies credentials, using the provided root certificate.
     // This call is done whenever a fabric is "directly" added
     static CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
-                                        Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId, FabricId & outFabricId, NodeId & outNodeId,
-                                        Crypto::P256PublicKey & outNocPubkey, Crypto::P256PublicKey * outRootPublicKey);
+                                        Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId,
+                                        FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
+                                        Crypto::P256PublicKey * outRootPublicKey);
 
     // Validate an NOC chain at time of adding/updating a fabric (uses VerifyCredentials with additional checks).
     // The `existingFabricId` is passed for UpdateNOC, and must match the Fabric, to make sure that we are
@@ -608,11 +613,13 @@ public:
 
     // Add a new fabric for testing. The Operational Key is a raw P256Keypair (public key and private key raw bits) that will
     // get copied (directly) into the fabric table.
-    CHIP_ERROR AddNewFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert, const ByteSpan & opKeySpan, FabricIndex * outFabricIndex);
+    CHIP_ERROR AddNewFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
+                                   const ByteSpan & opKeySpan, FabricIndex * outFabricIndex);
 
     // Same as AddNewFabricForTest, but ignore if we are colliding with same <Root Public Key, Fabric Id>, so
     // that a single fabric table can have N nodes for same fabric. This usually works, but is bad form.
-    CHIP_ERROR AddNewFabricForTestIgnoringCollisions(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert, const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
+    CHIP_ERROR AddNewFabricForTestIgnoringCollisions(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
+                                                     const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
     {
         mStateFlags.Set(StateFlags::kAreCollidingFabricsIgnored);
         CHIP_ERROR err = AddNewFabricForTest(rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
@@ -626,9 +633,9 @@ private:
         // If true, we are in the process of a fail-safe and there was at least one
         // operation that caused partial data in the fabric table.
         kIsPendingFabricDataPresent = (1u << 0),
-        kIsTrustedRootPending = (1u << 1),
-        kIsUpdatePending = (1u << 2),
-        kIsAddPending = (1u << 3),
+        kIsTrustedRootPending       = (1u << 1),
+        kIsUpdatePending            = (1u << 2),
+        kIsAddPending               = (1u << 3),
 
         // Only true when `AllocatePendingOperationalKey` has been called
         kIsOperationalKeyPending = (1u << 4),
@@ -659,10 +666,14 @@ private:
     // Tries to set `mFabricIndexWithPendingState` and returns false if there's a clash
     bool SetPendingDataFabricIndex(FabricIndex fabricIndex);
 
-    CHIP_ERROR AddOrUpdateInner(FabricIndex fabricIndex, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned, uint16_t vendorId, FabricIndex * outputIndex);
+    CHIP_ERROR AddOrUpdateInner(FabricIndex fabricIndex, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
+                                uint16_t vendorId, FabricIndex * outputIndex);
 
-    CHIP_ERROR AddNewPendingFabricCommon(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned, FabricIndex * outNewFabricIndex);
-    CHIP_ERROR UpdatePendingFabricCommon(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned);
+    CHIP_ERROR AddNewPendingFabricCommon(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
+                                         Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
+                                         FabricIndex * outNewFabricIndex);
+    CHIP_ERROR UpdatePendingFabricCommon(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
+                                         Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned);
 
     /**
      * UpdateNextAvailableFabricIndex should only be called when
@@ -703,7 +714,8 @@ private:
      * @param outMatchingFabricIndex - set to the FabricIndex matching the collision or kUndefinedFabricIndex on no collision found
      * @return CHIP_NO_ERROR on successful update of outMatchingFabricIndex or other CHIP_ERROR on internal errors
      */
-    CHIP_ERROR FindExistingFabricByNocChaining(FabricIndex currentFabricIndex, const ByteSpan & noc, FabricIndex &outMatchingFabricIndex) const;
+    CHIP_ERROR FindExistingFabricByNocChaining(FabricIndex currentFabricIndex, const ByteSpan & noc,
+                                               FabricIndex & outMatchingFabricIndex) const;
 
     /**
      * Read our fabric index info from the given TLV reader and set up the
@@ -714,8 +726,8 @@ private:
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     // Used for UpdateNOC pending fabric updates
     FabricInfo mPendingFabric;
-    PersistentStorageDelegate * mStorage               = nullptr;
-    Crypto::OperationalKeystore * mOperationalKeystore = nullptr;
+    PersistentStorageDelegate * mStorage                    = nullptr;
+    Crypto::OperationalKeystore * mOperationalKeystore      = nullptr;
     Credentials::OperationalCertificateStore * mOpCertStore = nullptr;
 
     // FabricTable::Delegate link to first node, since FabricTable::Delegate is a form

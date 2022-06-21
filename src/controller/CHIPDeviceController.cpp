@@ -153,9 +153,9 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
     Credentials::P256PublicKeySpan rootPublicKeySpan;
     FabricId fabricId;
-    bool hasExternallyOwnedKeypair = false;
+    bool hasExternallyOwnedKeypair                   = false;
     Crypto::P256Keypair * externalOperationalKeypair = nullptr;
-    VendorId newFabricVendorId = params.controllerVendorId;
+    VendorId newFabricVendorId                       = params.controllerVendorId;
 
     // There are three possibilities here in terms of what happens with our
     // operational key:
@@ -166,12 +166,12 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     //    with a key store.
     if (params.hasExternallyOwnedOperationalKeypair)
     {
-        hasExternallyOwnedKeypair = true;
+        hasExternallyOwnedKeypair  = true;
         externalOperationalKeypair = params.operationalKeypair;
     }
     else if (params.operationalKeypair)
     {
-        hasExternallyOwnedKeypair = false;
+        hasExternallyOwnedKeypair  = false;
         externalOperationalKeypair = params.operationalKeypair;
     }
 
@@ -201,8 +201,8 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerNOC, nocSpan));
     ReturnErrorOnFailure(ExtractFabricIdFromCert(nocSpan, &fabricId));
 
-    auto * fabricTable = params.systemState->Fabrics();
-    auto * fabricInfo = fabricTable->FindFabric(rootPublicKey, fabricId);
+    auto * fabricTable      = params.systemState->Fabrics();
+    auto * fabricInfo       = fabricTable->FindFabric(rootPublicKey, fabricId);
     bool fabricFoundInTable = (fabricInfo != nullptr);
 
     FabricIndex fabricIndex = fabricFoundInTable ? fabricInfo->GetFabricIndex() : kUndefinedFabricIndex;
@@ -217,7 +217,8 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
         // CASE 1: Fabric update with injected key
         if (fabricFoundInTable)
         {
-            err = fabricTable->UpdatePendingFabricWithProvidedOpKey(fabricIndex, nocSpan, icacSpan, externalOperationalKeypair, hasExternallyOwnedKeypair);
+            err = fabricTable->UpdatePendingFabricWithProvidedOpKey(fabricIndex, nocSpan, icacSpan, externalOperationalKeypair,
+                                                                    hasExternallyOwnedKeypair);
             if (err == CHIP_NO_ERROR)
             {
                 err = fabricTable->CommitPendingFabricData();
@@ -237,7 +238,8 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
             err = fabricTable->AddNewPendingTrustedRootCert(rcacSpan);
             if (err == CHIP_NO_ERROR)
             {
-                err = fabricTable->AddNewPendingFabricWithProvidedOpKey(nocSpan, icacSpan, newFabricVendorId, externalOperationalKeypair, hasExternallyOwnedKeypair, &fabricIndex);
+                err = fabricTable->AddNewPendingFabricWithProvidedOpKey(
+                    nocSpan, icacSpan, newFabricVendorId, externalOperationalKeypair, hasExternallyOwnedKeypair, &fabricIndex);
             }
             if (err == CHIP_NO_ERROR)
             {
@@ -305,8 +307,8 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
 
     mFabricIndex = fabricIndex;
 
-    ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64,
-                    GetFabricIndex(), ChipLogValueX64(GetCompressedFabricId()));
+    ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64, GetFabricIndex(),
+                    ChipLogValueX64(GetCompressedFabricId()));
 
     return CHIP_NO_ERROR;
 }

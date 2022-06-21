@@ -397,8 +397,8 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
     chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-    err = chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), defaultIpk,
-                                                  compressedFabricIdSpan);
+    err =
+        chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), defaultIpk, compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     *outDevCtrl = devCtrl.release();

@@ -587,7 +587,8 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
     FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
     if (fabric == nullptr)
     {
-        SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kInsufficientPrivilege, ourFabricIndex, CharSpan("Current fabric not found"));
+        SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kInsufficientPrivilege, ourFabricIndex,
+                        CharSpan("Current fabric not found"));
         return true;
     }
 
@@ -707,7 +708,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
 
     bool isForUpdateNoc = false;
-    bool hasPendingKey = fabricTable.HasPendingOperationalKey(isForUpdateNoc);
+    bool hasPendingKey  = fabricTable.HasPendingOperationalKey(isForUpdateNoc);
 
     ChipLogProgress(Zcl, "OpCreds: Received an AddNOC command");
 
@@ -737,7 +738,8 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     // missing root. Let's early-bail with InvalidNOC.
     VerifyOrExit(failSafeContext.AddTrustedRootCertHasBeenInvoked(), nocResponse = OperationalCertStatus::kInvalidNOC);
 
-    err = fabricTable.AddNewPendingFabricWithOperationalKeystore(NOCValue, ICACValue.ValueOr(ByteSpan{}), adminVendorId, &newFabricIndex);
+    err = fabricTable.AddNewPendingFabricWithOperationalKeystore(NOCValue, ICACValue.ValueOr(ByteSpan{}), adminVendorId,
+                                                                 &newFabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // From here if we error-out, we should revert the fabric table pending updates
@@ -822,7 +824,8 @@ exit:
         // Success
         else
         {
-            ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", static_cast<unsigned>(newFabricIndex));
+            ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC",
+                            static_cast<unsigned>(newFabricIndex));
         }
     }
     // No NOC response - Failed constraints
@@ -857,7 +860,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     FabricInfo * fabricInfo           = RetrieveCurrentFabric(commandObj);
 
     bool isForUpdateNoc = false;
-    bool hasPendingKey = fabricTable.HasPendingOperationalKey(isForUpdateNoc);
+    bool hasPendingKey  = fabricTable.HasPendingOperationalKey(isForUpdateNoc);
 
     VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, nonDefaultStatus = Status::InvalidCommand);
     VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,

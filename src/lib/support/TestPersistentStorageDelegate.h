@@ -46,8 +46,8 @@ class TestPersistentStorageDelegate : public PersistentStorageDelegate
 public:
     enum class LoggingLevel : unsigned
     {
-        kDisabled = 0,
-        kLogMutation = 1,
+        kDisabled            = 0,
+        kLogMutation         = 1,
         kLogMutationAndReads = 2,
     };
 
@@ -81,7 +81,8 @@ public:
     {
         if (mLoggingLevel >= LoggingLevel::kLogMutation)
         {
-            ChipLogDetail(Test, "TestPersistentStorageDelegate::SyncSetKeyValue, Set key '%s' with data size %u", key, static_cast<unsigned>(size));
+            ChipLogDetail(Test, "TestPersistentStorageDelegate::SyncSetKeyValue, Set key '%s' with data size %u", key,
+                          static_cast<unsigned>(size));
         }
 
         CHIP_ERROR err = SyncSetKeyValueInternal(key, value, size);
@@ -173,10 +174,7 @@ public:
      *
      * @param loggingLevel - logging verbosity level to set
      */
-    virtual void SetLoggingLevel(LoggingLevel loggingLevel)
-    {
-        mLoggingLevel = loggingLevel;
-    }
+    virtual void SetLoggingLevel(LoggingLevel loggingLevel) { mLoggingLevel = loggingLevel; }
 
 protected:
     virtual CHIP_ERROR SyncGetKeyValueInternal(const char * key, void * buffer, uint16_t & size)

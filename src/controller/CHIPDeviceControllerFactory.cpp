@@ -166,7 +166,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.groupDataProvider                             = params.groupDataProvider;
 
     // if no fabricTable was provided, create one and track it in stateParams for cleanup
-    stateParams.fabricTable       = params.fabricTable;
+    stateParams.fabricTable = params.fabricTable;
 
     FabricTable * tempFabricTable = nullptr;
     if (stateParams.fabricTable == nullptr)
@@ -176,12 +176,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         ReturnErrorCodeIf(!newFabricTable, CHIP_ERROR_NO_MEMORY);
 
         FabricTable::InitParams fabricTableInitParams;
-        fabricTableInitParams.storage = params.fabricIndependentStorage;
+        fabricTableInitParams.storage             = params.fabricIndependentStorage;
         fabricTableInitParams.operationalKeystore = params.operationalKeystore;
-        fabricTableInitParams.opCertStore = params.opCertStore;
+        fabricTableInitParams.opCertStore         = params.opCertStore;
         ReturnErrorOnFailure(newFabricTable->Init(fabricTableInitParams));
         stateParams.fabricTable = newFabricTable.release();
-        tempFabricTable = stateParams.fabricTable;
+        tempFabricTable         = stateParams.fabricTable;
     }
 
     ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));

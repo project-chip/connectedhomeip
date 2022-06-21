@@ -19,6 +19,4 @@
 // spec and could not work. It was removed from init, but because of dependencies,
 // this empty body below still exists.
 
-void cmd_send_init()
-{
-}
+void cmd_send_init() {}

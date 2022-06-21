@@ -186,7 +186,8 @@ public:
                                   chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        mSystemState->CASESessionMgr()->FindOrEstablishSession(PeerId(GetCompressedFabricId(), peerNodeId), onConnection, onFailure);
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(PeerId(GetCompressedFabricId(), peerNodeId), onConnection,
+                                                               onFailure);
         return CHIP_NO_ERROR;
     }
 
@@ -274,10 +275,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    FabricIndex GetFabricIndex() const
-    {
-        return mFabricIndex;
-    }
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     const FabricTable * GetFabricTable() const
     {

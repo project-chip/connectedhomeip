@@ -47,7 +47,7 @@ typedef uint8_t InteractionModelRevision;
 typedef uint32_t SubscriptionId;
 
 constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;
-constexpr FabricId kUndefinedFabricId = 0ULL;
+constexpr FabricId kUndefinedFabricId                     = 0ULL;
 
 constexpr FabricIndex kUndefinedFabricIndex = 0;
 constexpr FabricIndex kMinValidFabricIndex  = 1;

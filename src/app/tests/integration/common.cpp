@@ -25,6 +25,8 @@
 #include <errno.h>
 
 #include <app/tests/integration/common.h>
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -32,8 +34,6 @@
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/Constants.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <credentials/PersistentStorageOpCertStore.h>
-#include <crypto/PersistentStorageOperationalKeystore.h>
 
 chip::FabricTable gFabricTable;
 chip::Messaging::ExchangeManager gExchangeManager;
@@ -66,9 +66,9 @@ void InitializeChip(void)
     err = gOperationalKeystore.Init(&gStorage);
     SuccessOrExit(err);
 
-    fabricTableInitParams.storage = &gStorage;
+    fabricTableInitParams.storage             = &gStorage;
     fabricTableInitParams.operationalKeystore = &gOperationalKeystore;
-    fabricTableInitParams.opCertStore = &gOpCertStore;
+    fabricTableInitParams.opCertStore         = &gOpCertStore;
 
     err = gFabricTable.Init(fabricTableInitParams);
     SuccessOrExit(err);

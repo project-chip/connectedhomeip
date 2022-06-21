@@ -228,7 +228,7 @@ ChipError::StorageType pychip_DeviceController_StackInit()
 
     sGroupDataProvider.SetStorageDelegate(sStorageAdapter);
     ReturnErrorOnFailure(sGroupDataProvider.Init().AsInteger());
-    factoryParams.groupDataProvider        = &sGroupDataProvider;
+    factoryParams.groupDataProvider = &sGroupDataProvider;
 
     ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(sStorageAdapter).AsInteger());
     factoryParams.opCertStore = &sPersistentStorageOpCertStore;

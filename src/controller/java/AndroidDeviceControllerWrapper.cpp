@@ -222,8 +222,8 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
 
     chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
 
-    *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(&wrapper->mGroupDataProvider, wrapper->Controller()->GetFabricIndex(),
-                                                                defaultIpk, compressedFabricIdSpan);
+    *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(
+        &wrapper->mGroupDataProvider, wrapper->Controller()->GetFabricIndex(), defaultIpk, compressedFabricIdSpan);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;

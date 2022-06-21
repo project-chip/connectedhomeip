@@ -139,9 +139,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     {
         FabricTable::InitParams fabricTableInitParams;
-        fabricTableInitParams.storage = mDeviceStorage;
+        fabricTableInitParams.storage             = mDeviceStorage;
         fabricTableInitParams.operationalKeystore = mOperationalKeystore;
-        fabricTableInitParams.opCertStore = mOpCertStore;
+        fabricTableInitParams.opCertStore         = mOpCertStore;
 
         err = mFabrics.Init(fabricTableInitParams);
         SuccessOrExit(err);

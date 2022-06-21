@@ -271,8 +271,8 @@ public:
  */
 class OpCertStoreTransaction
 {
-  public:
-    explicit OpCertStoreTransaction(OperationalCertificateStore & store): mStore(store) {}
+public:
+    explicit OpCertStoreTransaction(OperationalCertificateStore & store) : mStore(store) {}
     ~OpCertStoreTransaction()
     {
         // This is a no-op if CommitOpCertsForFabric had been called on the store
@@ -285,7 +285,7 @@ class OpCertStoreTransaction
 
     OperationalCertificateStore * operator->() { return &mStore; }
 
-  private:
+private:
     OperationalCertificateStore & mStore;
 };
 
