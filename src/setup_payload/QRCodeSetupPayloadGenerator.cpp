@@ -165,7 +165,7 @@ static CHIP_ERROR generateBitSet(PayloadContents & payload, MutableByteSpan & bi
     ReturnErrorOnFailure(
         populateBits(bits.data(), offset, payload.productID, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, static_cast<uint64_t>(payload.commissioningFlow),
-                                      kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits));
+                                      MTRCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.rendezvousInformation.Raw(), kRendezvousInfoFieldLengthInBits,
                                       kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.discriminator, kPayloadDiscriminatorFieldLengthInBits,

@@ -292,7 +292,7 @@ void TestSetupPayloadVerify(nlTestSuite * inSuite, void * inContext)
     test_payload.commissioningFlow = CommissioningFlow::kCustom;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload());
 
-    test_payload.commissioningFlow = static_cast<CommissioningFlow>(1 << kCommissioningFlowFieldLengthInBits);
+    test_payload.commissioningFlow = static_cast<CommissioningFlow>(1 << MTRCommissioningFlowFieldLengthInBits);
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid version

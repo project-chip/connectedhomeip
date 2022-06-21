@@ -30,29 +30,29 @@
 - (MTRRendezvousInformationFlags)convertRendezvousFlags:(chip::RendezvousInformationFlags)value
 {
     if (value.Has(chip::RendezvousInformationFlag::kBLE)) {
-        return kRendezvousInformationBLE;
+        return MTRRendezvousInformationBLE;
     }
     if (value.Has(chip::RendezvousInformationFlag::kSoftAP)) {
-        return kRendezvousInformationSoftAP;
+        return MTRRendezvousInformationSoftAP;
     }
     if (value.Has(chip::RendezvousInformationFlag::kOnNetwork)) {
-        return kRendezvousInformationOnNetwork;
+        return MTRRendezvousInformationOnNetwork;
     }
-    return kRendezvousInformationNone;
+    return MTRRendezvousInformationNone;
 }
 
 - (MTRCommissioningFlow)convertCommissioningFlow:(chip::CommissioningFlow)value
 {
     if (value == chip::CommissioningFlow::kStandard) {
-        return kCommissioningFlowStandard;
+        return MTRCommissioningFlowStandard;
     }
     if (value == chip::CommissioningFlow::kUserActionRequired) {
-        return kCommissioningFlowUserActionRequired;
+        return MTRCommissioningFlowUserActionRequired;
     }
     if (value == chip::CommissioningFlow::kCustom) {
-        return kCommissioningFlowCustom;
+        return MTRCommissioningFlowCustom;
     }
-    return kCommissioningFlowInvalid;
+    return MTRCommissioningFlowInvalid;
 }
 
 - (id)initWithSetupPayload:(chip::SetupPayload)setupPayload
@@ -90,11 +90,11 @@
         info.tag = [NSNumber numberWithUnsignedChar:chipInfo.tag];
         switch (chipInfo.type) {
         case chip::optionalQRCodeInfoTypeString:
-            info.infoType = [NSNumber numberWithInt:kOptionalQRCodeInfoTypeString];
+            info.infoType = [NSNumber numberWithInt:MTROptionalQRCodeInfoTypeString];
             info.stringValue = [NSString stringWithUTF8String:chipInfo.data.c_str()];
             break;
         case chip::optionalQRCodeInfoTypeInt32:
-            info.infoType = [NSNumber numberWithInt:kOptionalQRCodeInfoTypeInt32];
+            info.infoType = [NSNumber numberWithInt:MTROptionalQRCodeInfoTypeInt32];
             info.integerValue = [NSNumber numberWithInt:chipInfo.int32];
             break;
         default:

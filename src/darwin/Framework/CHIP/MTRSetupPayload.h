@@ -20,25 +20,25 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, MTRRendezvousInformationFlags) {
-    kRendezvousInformationNone = 0, // Device does not support any method for rendezvous
-    kRendezvousInformationSoftAP = 1 << 0, // Device supports WiFi softAP
-    kRendezvousInformationBLE = 1 << 1, // Device supports BLE
-    kRendezvousInformationOnNetwork = 1 << 2, // Device supports On Network setup
+    MTRRendezvousInformationNone = 0, // Device does not support any method for rendezvous
+    MTRRendezvousInformationSoftAP = 1 << 0, // Device supports WiFi softAP
+    MTRRendezvousInformationBLE = 1 << 1, // Device supports BLE
+    MTRRendezvousInformationOnNetwork = 1 << 2, // Device supports On Network setup
 
-    kRendezvousInformationAllMask = kRendezvousInformationSoftAP | kRendezvousInformationBLE | kRendezvousInformationOnNetwork,
+    MTRRendezvousInformationAllMask = MTRRendezvousInformationSoftAP | MTRRendezvousInformationBLE | MTRRendezvousInformationOnNetwork,
 };
 
 typedef NS_ENUM(NSUInteger, MTRCommissioningFlow) {
-    kCommissioningFlowStandard = 0, // Device automatically enters pairing mode upon power-up
-    kCommissioningFlowUserActionRequired = 1, // Device requires a user interaction to enter pairing mode
-    kCommissioningFlowCustom = 2, // Commissioning steps should be retrieved from the distributed compliance ledger
-    kCommissioningFlowInvalid = 3,
+    MTRCommissioningFlowStandard = 0, // Device automatically enters pairing mode upon power-up
+    MTRCommissioningFlowUserActionRequired = 1, // Device requires a user interaction to enter pairing mode
+    MTRCommissioningFlowCustom = 2, // Commissioning steps should be retrieved from the distributed compliance ledger
+    MTRCommissioningFlowInvalid = 3,
 };
 
 typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
-    kOptionalQRCodeInfoTypeUnknown,
-    kOptionalQRCodeInfoTypeString,
-    kOptionalQRCodeInfoTypeInt32
+    MTROptionalQRCodeInfoTypeUnknown,
+    MTROptionalQRCodeInfoTypeString,
+    MTROptionalQRCodeInfoTypeInt32
 };
 
 @interface MTROptionalQRCodeInfo : NSObject

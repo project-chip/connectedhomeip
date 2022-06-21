@@ -43,11 +43,11 @@ static uint16_t kTestVendorId = 0xFFF1u;
 // Singleton controller we use.
 static MTRDeviceController * sController = nil;
 
-@interface MTRToolPairingDelegate : NSObject <MTRDevicePairingDelegate>
+@interface CHIPToolPairingDelegate : NSObject <MTRDevicePairingDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
 @end
 
-@implementation MTRToolPairingDelegate
+@implementation CHIPToolPairingDelegate
 - (id)initWithExpectation:(XCTestExpectation *)expectation
 {
     self = [super init];
@@ -118,7 +118,7 @@ static MTRDeviceController * sController = nil;
 
     sController = controller;
 
-    MTRToolPairingDelegate * pairing = [[MTRToolPairingDelegate alloc] initWithExpectation:expectation];
+    CHIPToolPairingDelegate * pairing = [[CHIPToolPairingDelegate alloc] initWithExpectation:expectation];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
 
     [controller setPairingDelegate:pairing queue:callbackQueue];

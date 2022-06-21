@@ -346,8 +346,8 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     static_assert(kProductIDFieldLengthInBits <= 16, "Won't fit in uint16_t");
     outPayload.productID = static_cast<uint16_t>(dest);
 
-    ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, kCommissioningFlowFieldLengthInBits));
-    static_assert(kCommissioningFlowFieldLengthInBits <= std::numeric_limits<std::underlying_type_t<CommissioningFlow>>::digits,
+    ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, MTRCommissioningFlowFieldLengthInBits));
+    static_assert(MTRCommissioningFlowFieldLengthInBits <= std::numeric_limits<std::underlying_type_t<CommissioningFlow>>::digits,
                   "Won't fit in CommissioningFlow");
     outPayload.commissioningFlow = static_cast<CommissioningFlow>(dest);
 

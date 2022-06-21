@@ -26,27 +26,27 @@ CHIP_ERROR ModelCommand::RunCommand()
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip-tool.command", DISPATCH_QUEUE_SERIAL);
 
     ChipLogProgress(chipTool, "Sending command to node 0x" ChipLogFormatX64, ChipLogValueX64(mNodeId));
-    [CurrentCommissioner() getConnectedDevice:mNodeId
-                                        queue:callbackQueue
-                            completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
-                                if (error != nil) {
-                                    SetCommandExitStatus(error, "Error getting connected device");
-                                    return;
-                                }
+    [(MTRDeviceController *) CurrentCommissioner() getConnectedDevice:mNodeId
+                                                                queue:callbackQueue
+                                                    completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                                                        if (error != nil) {
+                                                            SetCommandExitStatus(error, "Error getting connected device");
+                                                            return;
+                                                        }
 
-                                CHIP_ERROR err;
-                                if (device == nil) {
-                                    err = CHIP_ERROR_INTERNAL;
-                                } else {
-                                    err = SendCommand(device, mEndPointId);
-                                }
+                                                        CHIP_ERROR err;
+                                                        if (device == nil) {
+                                                            err = CHIP_ERROR_INTERNAL;
+                                                        } else {
+                                                            err = SendCommand(device, mEndPointId);
+                                                        }
 
-                                if (err != CHIP_NO_ERROR) {
-                                    ChipLogError(chipTool, "Error: %s", chip::ErrorStr(err));
-                                    SetCommandExitStatus(err);
-                                    return;
-                                }
-                            }];
+                                                        if (err != CHIP_NO_ERROR) {
+                                                            ChipLogError(chipTool, "Error: %s", chip::ErrorStr(err));
+                                                            SetCommandExitStatus(err);
+                                                            return;
+                                                        }
+                                                    }];
     return CHIP_NO_ERROR;
 }
 

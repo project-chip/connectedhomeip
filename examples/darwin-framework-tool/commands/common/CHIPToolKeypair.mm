@@ -108,7 +108,7 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
     if (err != CHIP_NO_ERROR) {
-        uint8_t tempIPK[MTR::Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+        uint8_t tempIPK[chip::Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
 
         ReturnLogErrorOnFailure(chip::Crypto::DRBG_get_bytes(tempIPK, sizeof(tempIPK)));
 
