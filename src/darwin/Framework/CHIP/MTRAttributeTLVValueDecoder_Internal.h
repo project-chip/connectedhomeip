@@ -26,6 +26,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-id CHIPDecodeAttributeValue(const chip::app::ConcreteAttributePath & aPath, chip::TLV::TLVReader & aReader, CHIP_ERROR * aError);
+id MTRDecodeAttributeValue(const chip::app::ConcreteAttributePath & aPath, chip::TLV::TLVReader & aReader, CHIP_ERROR * aError);
 
 NS_ASSUME_NONNULL_END
