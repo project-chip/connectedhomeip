@@ -1464,7 +1464,7 @@ void SubscriptionCallback::OnAttributeData(
         error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
     } else {
         CHIP_ERROR err;
-        value = CHIPDecodeAttributeValue(aPath, *apData, &err);
+        value = MTRDecodeAttributeValue(aPath, *apData, &err);
         if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB) {
             // We don't know this attribute; just skip it.
             return;
