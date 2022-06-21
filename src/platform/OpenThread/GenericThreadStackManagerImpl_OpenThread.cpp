@@ -2077,7 +2077,7 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::SrpClient::Service::Ma
 {
     size_t myNumSubTypes = 0;
 
-    for (const char * const * mySubType = mService.mSubTypeLabels; mySubType != nullptr && *mySubType != nullptr; ++mySubType)
+    for (const char * const * mySubType = mService.mSubTypeLabels; (mySubType != nullptr) && (*mySubType != nullptr); ++mySubType)
     {
         myNumSubTypes++;
     }
