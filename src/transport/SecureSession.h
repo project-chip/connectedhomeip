@@ -173,7 +173,7 @@ public:
 
     // Used to make the session look like it's being released, while allowing
     // the passed-in holder (which must be holding this session) to continue
-    // holding it for now until it completes the work it's going.  This API also
+    // holding it for now until it completes the work it's doing.  This API also
     // puts the session into a state in which no new exchanges can be created on
     // this session.
     void MarkInactive(SessionHolder & deferred);
