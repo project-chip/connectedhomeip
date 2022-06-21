@@ -38,10 +38,6 @@ _CHEF_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 _REPO_BASE_PATH = os.path.join(_CHEF_SCRIPT_PATH, "../../")
 _DEVICE_FOLDER = os.path.join(_CHEF_SCRIPT_PATH, "devices")
 _DEVICE_LIST = [file[:-4] for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap")]
-_CHEF_ZZZ_ROOT = os.path.join(_CHEF_SCRIPT_PATH, "zzz_generated")
-_CI_DEVICE_MANIFEST_NAME = "INPUTMD5.txt"
-_CI_ZAP_MANIFEST_NAME = "ZAPSHA.txt"
-_CI_MATTER_MD5_EXT = ".MATTERMD5"
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
 _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 
