@@ -46,6 +46,10 @@ const char * SecureSession::StateToString(State state) const
         return "kPendingEviction";
         break;
 
+    case State::kInactive:
+        return "kInactive";
+        break;
+
     default:
         return "???";
         break;
@@ -89,9 +93,12 @@ void SecureSession::MarkAsDefunct()
 
     case State::kInactive:
         //
-        // Once a session is marked Inactive, we CANNOT bring it back to either being active or defunct.
+        // Once a session is marked Inactive, we CANNOT bring it back to either
+        // being active or defunct.  But consumers may not really know this
+        // session is already inactive.  Just ignore the call and stay in
+        // kInactive state.
         //
-        FALLTHROUGH;
+        return;
     case State::kPendingEviction:
         //
         // Once a session is headed for eviction, we CANNOT bring it back to either being active or defunct.
