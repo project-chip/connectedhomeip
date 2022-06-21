@@ -454,7 +454,7 @@ private:
             (void) fabricIndex;
         }
 
-        void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+        void OnFabricNOCUpdated(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
         {
             (void) fabricTable;
             (void) fabricIndex;

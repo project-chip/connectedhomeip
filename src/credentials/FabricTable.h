@@ -338,7 +338,7 @@ public:
         /**
          * Gets called when operational credentials are changed.
          **/
-        virtual void OnFabricNOCUpdated(FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
+        virtual void OnFabricNOCUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
 
         // Intrusive list pointer for FabricTable to manage the entries.
         Delegate * next = nullptr;

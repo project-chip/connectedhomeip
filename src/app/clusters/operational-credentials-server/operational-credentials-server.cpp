@@ -450,7 +450,7 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
     }
 
     // This is triggered by operation credential server so there is nothing additional that we need to do.
-    void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
+    void OnFabricNOCUpdated(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
 };
 
 OpCredsFabricTableDelegate gFabricDelegate;
