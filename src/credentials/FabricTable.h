@@ -304,7 +304,7 @@ public:
     {
         // PersistentStorageDelegate for Fabric Info metadata storage and Fabric Table index (MANDATORY).
         PersistentStorageDelegate * storage = nullptr;
-        // Operational Keystore to abstract access to key. Mandatory for commissionable devices (e.g.
+        // Operational Keystore to abstract access to key. Mandatory for commissionable devices  (e.g.
         // chip::Server-based things) and recommended for controllers. With this set to false, FabricInfo
         // added as new fabrics need to have directly injected operational keys with FabricInfo::Set*OperationalKey.
         Crypto::OperationalKeystore * operationalKeystore = nullptr;
