@@ -241,7 +241,8 @@ def main(argv: Sequence[str]) -> None:
                       metavar="TARGET",
                       default="esp32")
     parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c", action="store_true", dest="do_rpc")
-    parser.add_option("-a", "--automated_test_stamp", help="provide the additional stamp \"branch:commit_id\" as the software version string for automated tests.", action="store_true", dest="do_automated_test_stamp")
+    parser.add_option("-a", "--automated_test_stamp", help="provide the additional stamp \"branch:commit_id\" as the software version string for automated tests.",
+                      action="store_true", dest="do_automated_test_stamp")
     parser.add_option("-v", "--vid", dest="vid", type=int,
                       help="specifies the Vendor ID. Default is 0xFFF1", metavar="VID", default=0xFFF1)
     parser.add_option("-p", "--pid", dest="pid", type=int,
@@ -499,7 +500,8 @@ def main(argv: Sequence[str]) -> None:
             # 64 bytes space could only contain 63 bytes string + 1 byte EOS.
             if len(sw_ver_string) >= 64:
                 truncated_sw_ver_string = f"""{branch[:22]}:{commit_id}"""
-                flush_print(f"""Truncate the software version string from \"{sw_ver_string}\" to \"{truncated_sw_ver_string}\" due to 64 bytes limitation""")
+                flush_print(
+                    f"""Truncate the software version string from \"{sw_ver_string}\" to \"{truncated_sw_ver_string}\" due to 64 bytes limitation""")
                 sw_ver_string = truncated_sw_ver_string
 
         if options.use_zzz:
@@ -581,7 +583,8 @@ def main(argv: Sequence[str]) -> None:
         elif options.build_target == "linux":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/linux")
             with open(f"{_CHEF_SCRIPT_PATH}/linux/args.gni", "w") as f:
-                target_defines = [f"\"CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}\"", f"\"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}\""]
+                target_defines = [
+                    f"\"CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}\"", f"\"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}\""]
                 target_defines.append(f"\"CONFIG_ENABLE_PW_RPC={'1' if options.do_rpc else '0'}\"")
                 if options.do_automated_test_stamp:
                     target_defines.append(f"\"CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\\\"{sw_ver_string}\\\"\"")
