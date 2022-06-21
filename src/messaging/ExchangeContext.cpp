@@ -326,7 +326,7 @@ ExchangeContext::~ExchangeContext()
     VerifyOrDie(!IsAckPending());
 
     if (ReleaseSessionOnDestruction() && mSession)
-        mSession->AsSecureSession()->MarkForRemoval();
+        mSession->AsSecureSession()->MarkForEviction();
 
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
     // Make sure that the exchange withdraws the request for Sleepy End Device active mode.

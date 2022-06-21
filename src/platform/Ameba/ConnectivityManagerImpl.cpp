@@ -34,6 +34,7 @@
 
 #include <platform/Ameba/AmebaUtils.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/BLEManager.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -584,6 +585,13 @@ void ConnectivityManagerImpl::OnStationConnected()
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
     PlatformMgr().PostEventOrDie(&event);
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+
+    if (delegate)
+    {
+        delegate->OnConnectionStatusChanged(
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kConnected));
+    }
 
     UpdateInternetConnectivityState();
 }
@@ -595,6 +603,46 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Lost;
     PlatformMgr().PostEventOrDie(&event);
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+    uint16_t reason                    = NetworkCommissioning::AmebaWiFiDriver::GetInstance().GetLastDisconnectReason();
+    uint8_t associationFailureCause =
+        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kUnknown);
+
+    if (delegate)
+    {
+        switch (reason)
+        {
+        case RTW_NO_ERROR:
+        case RTW_NONE_NETWORK:
+            associationFailureCause =
+                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kSsidNotFound);
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+            break;
+        case RTW_CONNECT_FAIL:
+            associationFailureCause =
+                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAssociationFailed);
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+            break;
+        case RTW_WRONG_PASSWORD:
+            associationFailureCause =
+                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAuthenticationFailed);
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+            break;
+#if defined(CONFIG_PLATFORM_8710C)
+        case RTW_4WAY_HANDSHAKE_TIMEOUT:
+#endif
+        case RTW_DHCP_FAIL:
+        case RTW_UNKNOWN:
+            break;
+
+        default:
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+            break;
+        }
+        delegate->OnDisconnectionDetected(reason);
+        delegate->OnConnectionStatusChanged(
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kNotConnected));
+    }
 
     UpdateInternetConnectivityState();
 }

@@ -193,7 +193,7 @@ CHIP_ERROR
 CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabricTable,
                                             SessionResumptionStorage * sessionResumptionStorage,
                                             Credentials::CertificateValidityPolicy * policy,
-                                            SessionEstablishmentDelegate * delegate, ScopedNodeId previouslyEstablishedPeer,
+                                            SessionEstablishmentDelegate * delegate, const ScopedNodeId & previouslyEstablishedPeer,
                                             Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     // Below VerifyOrReturnError is not SuccessOrExit since we only want to goto `exit:` after
@@ -1727,7 +1727,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     Protocols::SecureChannel::MsgType msgType = static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType());
     SuccessOrExit(err);
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     if (mStopHandshakeAtState.HasValue() && mState == mStopHandshakeAtState.Value())
     {
         mStopHandshakeAtState = Optional<State>::Missing();
@@ -1741,7 +1741,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
         mExchangeCtxt->WillSendMessage();
         return CHIP_NO_ERROR;
     }
-#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 #if CHIP_CONFIG_SLOW_CRYPTO
     if (msgType == Protocols::SecureChannel::MsgType::CASE_Sigma1 || msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2 ||

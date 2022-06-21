@@ -675,12 +675,12 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
                                                            size_t aRequestedEventPathCount)
 {
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     const bool allowUnlimited = !mForceHandlerQuota;
-#else  // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#else  // CONFIG_BUILD_FOR_HOST_UNIT_TEST
        // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
     const bool allowUnlimited = true;
-#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 #else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
     const bool allowUnlimited = false;
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
@@ -859,12 +859,12 @@ Protocols::InteractionModel::Status InteractionModelEngine::EnsureResourceForRea
                                                                                   size_t aRequestedEventPathCount)
 {
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     const bool allowUnlimited = !mForceHandlerQuota;
-#else  // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#else  // CONFIG_BUILD_FOR_HOST_UNIT_TEST
        // If the resources are allocated on the heap, we should be able to handle as many Read / Subscribe requests as possible.
     const bool allowUnlimited = true;
-#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 #else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
     const bool allowUnlimited = false;
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK

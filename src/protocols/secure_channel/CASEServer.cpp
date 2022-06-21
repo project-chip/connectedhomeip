@@ -104,6 +104,17 @@ void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyE
     GetSession().Clear();
 
     //
+    // This releases our reference to a previously pinned session. If that was a successfully established session and is now
+    // active, this will have no effect (the session will remain in the session table).
+    //
+    // If we previously held a session still in the pairing state, it means PairingSession was owning that session. Since it
+    // gave up its reference by the time we got here, releasing the pinned session here will actually result in it being
+    // de-allocated since no one else is holding onto this session. This will mean that when we get to allocating a session below,
+    // we'll at least have one free session available in the session table, and won't need to evict an arbitrary session.
+    //
+    mPinnedSecureSession.ClearValue();
+
+    //
     // Indicate to the underlying CASE session to prepare for session establishment requests coming its way. This will
     // involve allocating a SecureSession that will be held until it's needed for the next CASE session handshake.
     //
@@ -125,7 +136,7 @@ void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyE
                 CHIP_NO_ERROR);
 
     //
-    // PairingSession::mSecureSessionHolder is a weak-reference. If MarkForRemoval is called on this session, the session is
+    // PairingSession::mSecureSessionHolder is a weak-reference. If MarkForEviction is called on this session, the session is
     // going to get de-allocated from underneath us. This session that has just been allocated should *never* get evicted, and
     // remain available till the next hand-shake is received.
     //
@@ -146,7 +157,17 @@ void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyE
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     ChipLogError(Inet, "CASE Session establishment failed: %s", ErrorStr(err));
-    PrepareForSessionEstablishment();
+
+    //
+    // We're not allowed to call methods that will eventually result in calling SessionManager::AllocateSecureSession
+    // from a SessionDelegate::OnSessionReleased callback. Schedule the preparation as an async work item.
+    //
+    mSessionManager->SystemLayer()->ScheduleWork(
+        [](auto * systemLayer, auto * appState) {
+            CASEServer * _this = static_cast<CASEServer *>(appState);
+            _this->PrepareForSessionEstablishment();
+        },
+        this);
 }
 
 void CASEServer::OnSessionEstablished(const SessionHandle & session)

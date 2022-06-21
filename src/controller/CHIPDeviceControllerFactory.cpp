@@ -327,7 +327,13 @@ void DeviceControllerFactory::Shutdown()
 
 CHIP_ERROR DeviceControllerSystemState::Shutdown()
 {
-    VerifyOrReturnError(mRefCount == 1, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mRefCount <= 1, CHIP_ERROR_INCORRECT_STATE);
+    if (mHaveShutDown)
+    {
+        // Nothing else to do here.
+        return CHIP_NO_ERROR;
+    }
+    mHaveShutDown = true;
 
     ChipLogDetail(Controller, "Shutting down the System State, this will teardown the CHIP Stack");
 

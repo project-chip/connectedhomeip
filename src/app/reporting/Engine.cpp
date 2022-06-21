@@ -121,7 +121,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             apReadHandler->ResetPathIterator();
         }
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         uint32_t attributesRead = 0;
 #endif
 
@@ -161,7 +161,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 }
             }
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
             attributesRead++;
             if (attributesRead > mMaxAttributesPerChunk)
             {
@@ -431,7 +431,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     reportDataWriter.Init(std::move(bufHandle));
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     reportDataWriter.ReserveBuffer(mReservedSize);
 #endif
 

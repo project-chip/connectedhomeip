@@ -227,7 +227,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
     // end of container).
     reservedSize = static_cast<uint16_t>(reservedSize + kReservedSizeForTLVEncodingOverhead);
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // ... and for unit tests.
     reservedSize = static_cast<uint16_t>(reservedSize + mReservedSize);
 #endif

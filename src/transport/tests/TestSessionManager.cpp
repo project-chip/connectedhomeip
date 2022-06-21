@@ -660,7 +660,7 @@ static void RandomSessionIdAllocatorOffset(nlTestSuite * inSuite, SessionManager
             Transport::SecureSession::Type::kPASE,
             ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
         NL_TEST_ASSERT(inSuite, handle.HasValue());
-        sessionManager.ExpirePairing(handle.Value());
+        handle.Value()->AsSecureSession()->MarkForEviction();
     }
 }
 
@@ -716,7 +716,7 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, sessionId - prevSessionId == 1 || (sessionId == 1 && prevSessionId == 65535));
         NL_TEST_ASSERT(inSuite, sessionId != 0);
         prevSessionId = sessionId;
-        sessionManager.ExpirePairing(handle.Value());
+        handle.Value()->AsSecureSession()->MarkForEviction();
     }
 
     // Verify that the allocator does not give colliding IDs.
@@ -730,7 +730,7 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
         uint16_t sessionIds[numHandles];
         for (size_t h = 0; h < numHandles; ++h)
         {
-            constexpr int maxOffset = 5000;
+            constexpr int maxOffset = 100;
             handles[h]              = sessionManager.AllocateSession(
                 Transport::SecureSession::Type::kPASE,
                 ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
@@ -758,13 +758,13 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
             {
                 NL_TEST_ASSERT(inSuite, potentialCollision != sessionIds[h]);
             }
-            sessionManager.ExpirePairing(handle.Value());
+            handle.Value()->AsSecureSession()->MarkForEviction();
         }
 
         // Free our allocated sessions.
         for (size_t h = 0; h < numHandles; ++h)
         {
-            sessionManager.ExpirePairing(handles[h].Value());
+            handles[h].Value()->AsSecureSession()->MarkForEviction();
         }
     }
 

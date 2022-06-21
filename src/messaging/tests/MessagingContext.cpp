@@ -155,7 +155,7 @@ void MessagingContext::ExpireSessionBobToAlice()
 {
     if (mSessionBobToAlice)
     {
-        mSessionManager.ExpirePairing(mSessionBobToAlice.Get().Value());
+        mSessionBobToAlice.Get().Value()->AsSecureSession()->MarkForEviction();
     }
 }
 
@@ -163,7 +163,7 @@ void MessagingContext::ExpireSessionAliceToBob()
 {
     if (mSessionAliceToBob)
     {
-        mSessionManager.ExpirePairing(mSessionAliceToBob.Get().Value());
+        mSessionAliceToBob.Get().Value()->AsSecureSession()->MarkForEviction();
     }
 }
 

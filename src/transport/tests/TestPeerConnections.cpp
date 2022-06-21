@@ -53,11 +53,8 @@ const NodeId kCasePeer1NodeId  = 123;
 const NodeId kCasePeer2NodeId  = 6;
 const FabricIndex kFabricIndex = 8;
 
-const NodeId kPasePeerNodeId = kUndefinedNodeId; // PASE is always undefined
-
 const CATValues kPeer1CATs = { { 0xABCD0001, 0xABCE0100, 0xABCD0020 } };
 const CATValues kPeer2CATs = { { 0xABCD0012, kUndefinedCAT, kUndefinedCAT } };
-const CATValues kPeer3CATs;
 
 void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
 {
@@ -94,9 +91,9 @@ void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
     peerCATs = optionalSession.Value()->AsSecureSession()->GetPeerCATs();
     NL_TEST_ASSERT(inSuite, memcmp(&peerCATs, &kPeer2CATs, sizeof(CATValues)) == 0);
 
-    // This define guard will be needed when migrating SecureSessionTable to ObjectPool
-    //#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    // If not using a heap, we can fill the SecureSessionTable
+    //
+    // Fill up the session table.
+    //
     for (int i = 2; i < CHIP_CONFIG_SECURE_SESSION_POOL_SIZE; ++i)
     {
         sessions[i] = connections.CreateNewSecureSessionForTest(SecureSession::Type::kCASE,
@@ -105,10 +102,6 @@ void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, sessions[i].HasValue());
     }
 
-    // Insufficient space for new connections.
-    optionalSession = connections.CreateNewSecureSessionForTest(SecureSession::Type::kPASE, 6, kLocalNodeId, kPasePeerNodeId,
-                                                                kPeer3CATs, 5, kUndefinedFabricIndex, GetLocalMRPConfig());
-    NL_TEST_ASSERT(inSuite, !optionalSession.HasValue());
     //#endif
     System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
@@ -146,6 +139,18 @@ struct ExpiredCallInfo
     PeerAddress lastCallPeerAddress = PeerAddress::Uninitialized();
 };
 
+int Initialize(void * apSuite)
+{
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    return SUCCESS;
+}
+
+int Finalize(void * aContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 } // namespace
 
 // clang-format off
@@ -159,7 +164,7 @@ static const nlTest sTests[] =
 
 int TestPeerConnectionsFn(void)
 {
-    nlTestSuite theSuite = { "Transport-SecureSessionTable", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "Transport-SecureSessionTable", &sTests[0], Initialize, Finalize };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
