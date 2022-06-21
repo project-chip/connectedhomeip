@@ -99,60 +99,6 @@ def check_python_version() -> None:
         exit(1)
 
 
-def check_zap() -> str:
-    """Produces SHA of ZAP submodule for current HEAD.
-
-    Returns:
-      SHA of zap submodule.
-    """
-    shell.run_cmd(f"cd {_REPO_BASE_PATH}")
-    branch = shell.run_cmd("git rev-parse --abbrev-ref HEAD",
-                           return_cmd_output=True)
-    branch = branch.replace("\n", "")
-    command = f"git ls-tree {branch} third_party/zap/repo"
-    zap_commit = shell.run_cmd(command, return_cmd_output=True)
-    zap_commit = zap_commit.split(" ")[2]
-    zap_commit = zap_commit[:zap_commit.index("\t")]
-    flush_print(f"Found zap commit: {zap_commit}")
-    return zap_commit
-
-
-def generate_device_manifest(
-        write_manifest_files: bool = False) -> Dict[str, Any]:
-    """Produces dictionary containing md5 of device dir zap files
-    and zap commit.
-
-    Args:
-        write_manifest_files: Serialize digests in tree.
-    Returns:
-        Dict containing MD5 of device dir zap files.
-    """
-    ci_manifest = {"devices": {}}
-    devices_manifest = ci_manifest["devices"]
-    zap_sha = check_zap()
-    ci_manifest["zap_commit"] = zap_sha
-    for device_name in _DEVICE_LIST:
-        device_file_path = os.path.join(_DEVICE_FOLDER, device_name + ".zap")
-        with open(device_file_path, "rb") as device_file:
-            device_file_data = device_file.read()
-        device_file_md5 = hashlib.md5(device_file_data).hexdigest()
-        devices_manifest[device_name] = device_file_md5
-        flush_print(f"Current digest for {device_name} : {device_file_md5}")
-        if write_manifest_files:
-            device_zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device_name)
-            device_zzz_md5_file = os.path.join(device_zzz_dir, _CI_DEVICE_MANIFEST_NAME)
-            with open(device_zzz_md5_file, "w+") as md5_file:
-                md5_file.write(device_file_md5)
-            device_zzz_zap_sha_file = os.path.join(device_zzz_dir, _CI_ZAP_MANIFEST_NAME)
-            with open(device_zzz_zap_sha_file, "w+") as zap_sha_file:
-                zap_sha_file.write(zap_sha)
-            device_matter_md5_file_path = os.path.join(_DEVICE_FOLDER,
-                                                       device_name+_CI_MATTER_MD5_EXT)
-            with open(device_matter_md5_file_path, "w+") as matter_md5_file:
-                matter_md5_file.write(device_file_md5)
-    return ci_manifest
-
-
 def load_cicd_config() -> Dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
         config = json.loads(config_file.read())
@@ -369,10 +315,6 @@ def main(argv: Sequence[str]) -> None:
                       action="store_true", dest="do_rpc_console")
     parser.add_option("-y", "--tty", help="Enumerated USB tty/serial interface enumerated for your physical device. E.g.: /dev/ACM0",
                       dest="tty", metavar="TTY", default=None)
-    parser.add_option("", "--generate_zzz", help="Populates zzz_generated/chef/<DEVICE_TYPE>/zap-generated with output of ZAP tool for every device in examples/chef/devices. If this flag is set, all other arguments are ignored except for --bootstrap_zap and --validate_zzz.",
-                      dest="generate_zzz", action="store_true")
-    parser.add_option("", "--validate_zzz", help="Checks if cached ZAP output needs to be regenrated, for use in CI. If this flag is set, all other arguments are ignored.",
-                      dest="validate_zzz", action="store_true")
     parser.add_option("", "--use_zzz", help="Use pre generated output from the ZAP tool found in the zzz_generated folder. Used to decrease execution time of CI/CD jobs",
                       dest="use_zzz", action="store_true")
     parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Uses --use_zzz. Chef exits after completion.",
@@ -384,68 +326,6 @@ def main(argv: Sequence[str]) -> None:
 
     splash()
 
-    #
-    # Validate zzz_generated
-    #
-
-    if options.validate_zzz:
-        flush_print(f"Validating\n{_CHEF_ZZZ_ROOT}\n",
-                    with_border=True)
-        fix_instructions = textwrap.dedent("""\
-        Cached files out of date!
-        Please:
-          ./scripts/bootstrap.sh
-          source ./scripts/activate.sh
-          cd ./third_party/zap/repo
-          npm install
-          cd ../../..
-          ./examples/chef/chef.py --generate_zzz
-          git add examples/chef/zzz_generated
-          git add examples/chef/devices
-        Ensure you are running with the latest version of ZAP from master!
-        """)
-        ci_manifest = generate_device_manifest()
-        current_zap = ci_manifest["zap_commit"]
-        for device, device_md5 in ci_manifest["devices"].items():
-            zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device)
-            device_zap_sha_file = os.path.join(zzz_dir, _CI_ZAP_MANIFEST_NAME)
-            device_md5_file = os.path.join(zzz_dir, _CI_DEVICE_MANIFEST_NAME)
-            matter_file = os.path.join(_DEVICE_FOLDER, f"{device}.matter")
-            device_matter_md5_file = os.path.join(_DEVICE_FOLDER,
-                                                  device+_CI_MATTER_MD5_EXT)
-            help_msg = f"{device}: {fix_instructions}"
-            if not os.path.exists(device_zap_sha_file):
-                flush_print(f"ZAP VERSION MISSING {help_msg}")
-                exit(1)
-            else:
-                with open(device_zap_sha_file) as zap_file:
-                    output_cached_zap_sha = zap_file.read()
-                if output_cached_zap_sha != current_zap:
-                    flush_print(f"ZAP VERSION MISMATCH {help_msg}")
-                    exit(1)
-            if not os.path.exists(device_md5_file):
-                flush_print(f"INPUT MD5 MISSING {help_msg}")
-                exit(1)
-            else:
-                with open(device_md5_file) as md5_file:
-                    output_cached_md5 = md5_file.read()
-                if output_cached_md5 != device_md5:
-                    flush_print(f"INPUT MD5 MISMATCH {help_msg}")
-                    exit(1)
-            if not os.path.exists(matter_file):
-                flush_print(f"MISSING MATTER FILE {help_msg}")
-                exit(1)
-            if not os.path.exists(device_matter_md5_file):
-                flush_print(f"MISSING MATTER MD5 {help_msg}")
-                exit(1)
-            else:
-                with open(device_matter_md5_file) as matter_md5:
-                    output_cached_md5 = matter_md5.read()
-                if output_cached_md5 != device_md5:
-                    flush_print(f"MATTER MD5 MISMATCH {help_msg}")
-                    exit(1)
-        flush_print("Cached ZAP output is up to date!")
-        exit(0)
 
     #
     # ZAP bootstrapping
@@ -468,34 +348,6 @@ def main(argv: Sequence[str]) -> None:
         flush_print("Running NPM to install ZAP Node.JS dependencies")
         shell.run_cmd(
             f"cd {_REPO_BASE_PATH}/third_party/zap/repo/ && npm install")
-
-    #
-    # Populate zzz_generated
-    #
-
-    if options.generate_zzz:
-        flush_print(f"Cleaning {_CHEF_ZZZ_ROOT}")
-        if not os.path.exists(_CHEF_ZZZ_ROOT):
-            flush_print(f"{_CHEF_ZZZ_ROOT} doesn't exist; creating")
-            os.mkdir(_CHEF_ZZZ_ROOT)
-        else:
-            flush_print(f"Deleting and recreating existing {_CHEF_ZZZ_ROOT}")
-            shutil.rmtree(_CHEF_ZZZ_ROOT)
-            os.mkdir(_CHEF_ZZZ_ROOT)
-        flush_print(f"Generating files in {_CHEF_ZZZ_ROOT} for all devices")
-        for device_name in _DEVICE_LIST:
-            flush_print(f"Generating files for {device_name}")
-            device_out_dir = os.path.join(_CHEF_ZZZ_ROOT,
-                                          device_name,
-                                          "zap-generated")
-            os.makedirs(device_out_dir)
-            command = f"""\
-            {_REPO_BASE_PATH}/scripts/tools/zap/generate.py
-            {_CHEF_SCRIPT_PATH}/devices/{device_name}.zap -o {device_out_dir}"""
-            shell.run_cmd(unwrap_cmd(command))
-            shell.run_cmd(f"touch {device_out_dir}/af-gen-event.h")
-        generate_device_manifest(write_manifest_files=True)
-        exit(0)
 
     #
     # CI
@@ -653,19 +505,15 @@ def main(argv: Sequence[str]) -> None:
 
         if options.use_zzz:
             flush_print("Using pre-generated ZAP output")
-            zzz_dir = os.path.join(_CHEF_SCRIPT_PATH,
+            zzz_dir = os.path.join(_REPO_BASE_PATH,
                                    "zzz_generated",
-                                   options.sample_device_type_name,
+                                   "chef-"+options.sample_device_type_name,
                                    "zap-generated")
             if not os.path.exists(zzz_dir):
                 flush_print(textwrap.dedent(f"""\
                 You have specified --use_zzz
                 for device {options.sample_device_type_name}
                 which does not exist in the cached ZAP output.
-                To cache ZAP output for this device:
-                ensure {options.sample_device_type_name}.zap
-                is placed in {_DEVICE_FOLDER}
-                run chef with the option --generate_zzz
                 """))
                 exit(1)
             shutil.rmtree(gen_dir, ignore_errors=True)
