@@ -116,6 +116,8 @@ def getGlobalTemplatesTargets():
             continue
 
         if example_name == "chef":
+            if os.path.join("chef", "devices") not in str(filepath):
+                continue
             example_name = "chef-"+os.path.basename(filepath)[:-len(".zap")]
 
         logging.info("Found example %s (via %s)" %
