@@ -129,7 +129,6 @@ public:
         mFabricId           = kUndefinedFabricId;
         mFabricIndex        = kUndefinedFabricIndex;
         mCompressedFabricId = kUndefinedCompressedFabricId;
-        mRootPublicKey      = Crypto::P256PublicKey();
 
         mVendorId       = VendorId::NotSpecified;
         mFabricLabel[0] = '\0';
