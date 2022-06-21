@@ -149,7 +149,11 @@ def bundle(platform: str, device_name: str) -> None:
         flush_print(f"No bundle function for {platform}!")
         exit(1)
     flush_print(f"Copying {matter_file}")
-    src_item = os.path.join(_DEVICE_FOLDER, matter_file)
+    src_item = os.path.join(_REPO_BASE_PATH,
+                            "zzz_generated",
+                            "chef-"+device_name,
+                            "zap-generated",
+                            matter_file)
     dest_item = os.path.join(_CD_STAGING_DIR, matter_file)
     shutil.copy(src_item, dest_item)
     flush_print(f"Generating metadata for {device_name}")
