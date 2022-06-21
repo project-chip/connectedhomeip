@@ -156,8 +156,8 @@
 }
 
 - (void)openBasicCommissioningWindow:(nullable void (^)(bool))commissioningCompleteCallback
-                         clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-    commisisoningWindowOpenedHandler:(nullable void (^)(bool))commisisoningWindowOpenedHandler
+                            clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    commissioningWindowRequestedHandler:(nullable void (^)(bool))commissioningWindowRequestedHandler
 {
     ChipLogProgress(AppServer, "CastingServerBridge().openBasicCommissioningWindow() called");
 
@@ -166,7 +166,7 @@
             [&commissioningCompleteCallback](CHIP_ERROR err) { commissioningCompleteCallback(CHIP_NO_ERROR == err); });
 
         dispatch_async(clientQueue, ^{
-            commisisoningWindowOpenedHandler(CHIP_NO_ERROR == err);
+            commissioningWindowRequestedHandler(CHIP_NO_ERROR == err);
         });
     });
 }
@@ -175,7 +175,7 @@
                contentDisplayStr:(NSString * _Nonnull)contentDisplayStr
        launchUrlResponseCallback:(nullable void (^)(bool))launchUrlResponseCallback
                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-      launcUrlRequestSentHandler:(nullable void (^)(bool))launcUrlRequestSentHandler
+     launchUrlRequestSentHandler:(nullable void (^)(bool))launchUrlRequestSentHandler
 {
     ChipLogProgress(AppServer, "CastingServerBridge().contentLauncherLaunchUrl() called");
 
@@ -184,7 +184,7 @@
             = CastingServer::GetInstance()->ContentLauncherLaunchURL([contentUrl UTF8String], [contentDisplayStr UTF8String],
                 [&launchUrlResponseCallback](CHIP_ERROR err) { launchUrlResponseCallback(CHIP_NO_ERROR == err); });
         dispatch_async(clientQueue, ^{
-            launcUrlRequestSentHandler(CHIP_NO_ERROR == err);
+            launchUrlRequestSentHandler(CHIP_NO_ERROR == err);
         });
     });
 }

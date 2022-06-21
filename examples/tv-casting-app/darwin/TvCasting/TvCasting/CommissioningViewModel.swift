@@ -39,7 +39,7 @@ class CommissioningViewModel: ObservableObject {
                     self.commisisoningComplete = result
                 },
                 clientQueue: DispatchQueue.main,
-                commisisoningWindowOpenedHandler: { (result: Bool) -> () in
+                commissioningWindowRequestedHandler: { (result: Bool) -> () in
                     self.commisisoningWindowOpened = result
                 })
         }

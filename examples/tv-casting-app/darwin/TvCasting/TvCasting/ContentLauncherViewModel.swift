@@ -40,7 +40,7 @@ class ContentLauncherViewModel: ObservableObject {
                         self.status = result ? "Launched URL successfully" : "Launch URL failure!"
                     },
                                               clientQueue: DispatchQueue.main,
-                                              launcUrlRequestSentHandler:
+                                              launchUrlRequestSentHandler:
                                                 { (result: Bool) -> () in
                         self.Log.info("ContentLauncherViewModel.launchUrl.launcUrlRequestSentHandler result \(result)")
                         self.status = result ? "Sent Launch URL request" : "Failed to send Launch URL request!"
