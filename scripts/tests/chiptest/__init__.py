@@ -32,7 +32,7 @@ def AllTests(chip_tool: str):
 
         if name.startswith('TV_') or name.startswith('Test_TC_MC_'):
             target = TestTarget.TV
-        elif name.startswith('DL_'):
+        elif name.startswith('DL_') or name.startswith('Test_TC_DL_'):
             target = TestTarget.LOCK
         elif name.startswith('OTA_'):
             target = TestTarget.OTA
