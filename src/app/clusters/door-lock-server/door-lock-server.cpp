@@ -55,7 +55,7 @@ DoorLockServer DoorLockServer::instance;
 
 class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
 {
-    void OnFabricDeletedFromStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         for (auto endpointId : EnabledEndpointsWithServerCluster(chip::app::Clusters::DoorLock::Id))
         {
@@ -67,15 +67,6 @@ class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
             }
         }
     }
-
-    // Intentionally left blank
-    void OnFabricRetrievedFromStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override {}
-
-    // Intentionally left blank
-    void OnFabricPersistedToStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override {}
-
-    // Intentionally left blank
-    void OnFabricNOCUpdated(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
 };
 static DoorLockClusterFabricDelegate gFabricDelegate;
 

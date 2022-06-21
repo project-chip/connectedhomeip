@@ -584,16 +584,6 @@ CHIP_ERROR FabricTable::StoreFabricMetadata(const FabricInfo * fabricInfo) const
     ReturnErrorOnFailure(fabricInfo->CommitToStorage(mStorage));
 
     ChipLogProgress(FabricProvisioning, "Metadata for Fabric 0x%x persisted to storage.", static_cast<unsigned>(fabricIndex));
-    if (mDelegateListRoot != nullptr)
-    {
-        FabricTable::Delegate * delegate = mDelegateListRoot;
-        while (delegate)
-        {
-            // TODO: Handle callback difference between Add/Update when associated PR has merged
-            delegate->OnFabricPersistedToStorage(*this, fabricIndex);
-            delegate = delegate->next;
-        }
-    }
 
     return CHIP_NO_ERROR;
 }
@@ -634,14 +624,12 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric, FabricIndex newFabr
         return err;
     }
 
-    ChipLogProgress(FabricProvisioning, "Fabric (0x%x) loaded from storage", static_cast<unsigned>(fabric->GetFabricIndex()));
-
-    FabricTable::Delegate * delegate = mDelegateListRoot;
-    while (delegate)
-    {
-        delegate->OnFabricRetrievedFromStorage(*this, fabric->GetFabricIndex());
-        delegate = delegate->next;
-    }
+    ChipLogProgress(FabricProvisioning,
+                    "Fabric index 0x%x was retrieved from storage. Compressed FabricId 0x" ChipLogFormatX64
+                    ", FabricId 0x" ChipLogFormatX64
+                    ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
+                    static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()), ChipLogValueX64(fabric->GetFabricId()),
+                    ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
 
     return CHIP_NO_ERROR;
 }
@@ -707,15 +695,29 @@ public:
     System::Clock::Seconds32 mLatestNotBefore;
 };
 
-CHIP_ERROR FabricTable::NotifyNOCUpdatedOnFabric(FabricIndex fabricIndex)
+CHIP_ERROR FabricTable::NotifyFabricUpdated(FabricIndex fabricIndex)
 {
     FabricTable::Delegate * delegate = mDelegateListRoot;
     while (delegate)
     {
-        // It is possible that delegate will remove itself from the list in OnFabricNOCUpdated,
+        // It is possible that delegate will remove itself from the list in the callback
         // so we grab the next delegate in the list now.
         FabricTable::Delegate * nextDelegate = delegate->next;
-        delegate->OnFabricNOCUpdated(*this, fabricIndex);
+        delegate->OnFabricUpdated(*this, fabricIndex);
+        delegate = nextDelegate;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::NotifyFabricCommitted(FabricIndex fabricIndex)
+{
+    FabricTable::Delegate * delegate = mDelegateListRoot;
+    while (delegate)
+    {
+        // It is possible that delegate will remove itself from the list in the callback
+        // so we grab the next delegate in the list now.
+        FabricTable::Delegate * nextDelegate = delegate->next;
+        delegate->OnFabricCommitted(*this, fabricIndex);
         delegate = nextDelegate;
     }
     return CHIP_NO_ERROR;
@@ -945,10 +947,10 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
         FabricTable::Delegate * delegate = mDelegateListRoot;
         while (delegate)
         {
-            // It is possible that delegate will remove itself from the list in OnFabricDeletedFromStorage,
+            // It is possible that delegate will remove itself from the list in OnFabricRemoved,
             // so we grab the next delegate in the list now.
             FabricTable::Delegate * nextDelegate = delegate->next;
-            delegate->OnFabricDeletedFromStorage(*this, fabricIndex);
+            delegate->OnFabricRemoved(*this, fabricIndex);
             delegate = nextDelegate;
         }
     }
@@ -1632,7 +1634,7 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
     mStateFlags.Set(StateFlags::kIsPendingFabricDataPresent);
 
     // Notify that NOC was updated (at least transiently)
-    NotifyNOCUpdatedOnFabric(fabricIndex);
+    NotifyFabricUpdated(fabricIndex);
 
     return CHIP_NO_ERROR;
 }
@@ -1827,6 +1829,10 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
         Delete(previouslyPendingFabricIndex);
 
         RevertPendingFabricData();
+    }
+    else
+    {
+        NotifyFabricCommitted(fabricIndex);
     }
 
     return stickyError;

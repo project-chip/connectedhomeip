@@ -383,9 +383,9 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
 {
 
     // Gets called when a fabric is deleted from KVS store
-    void OnFabricDeletedFromStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was deleted from fabric storage.", static_cast<unsigned>(fabricIndex));
+        ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
 
         // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
         for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
@@ -421,36 +421,21 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
         }
     }
 
-    // Gets called when a fabric is loaded into the FabricTable from storage
-    void OnFabricRetrievedFromStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override
-    {
-        const FabricInfo * fabric = fabricTable.FindFabricWithIndex(fabricIndex);
-        // Safety check, but should not happen by the code paths involved
-        VerifyOrReturn(fabric != nullptr);
-
-        ChipLogProgress(Zcl,
-                        "OpCreds: Fabric index 0x%x was retrieved from storage. FabricId 0x" ChipLogFormatX64
-                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
-                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
-                        ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
-    }
-
     // Gets called when a fabric in FabricTable is persisted to storage
-    void OnFabricPersistedToStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         const FabricInfo * fabric = fabricTable.FindFabricWithIndex(fabricIndex);
         // Safety check, but should not happen by the code paths involved
         VerifyOrReturn(fabric != nullptr);
 
         ChipLogProgress(Zcl,
-                        "OpCreds: Fabric  index 0x%x was persisted to storage. FabricId " ChipLogFormatX64
+                        "OpCreds: Fabric  index 0x%x was committed to storage. Compressed Fabric Id 0x" ChipLogFormatX64
+                        ", FabricId " ChipLogFormatX64
                         ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
-                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
+                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
+                        ChipLogValueX64(fabric->GetFabricId()),
                         ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
     }
-
-    // This is triggered by operation credential server so there is nothing additional that we need to do.
-    void OnFabricNOCUpdated(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
 };
 
 OpCredsFabricTableDelegate gFabricDelegate;

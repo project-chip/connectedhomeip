@@ -410,7 +410,7 @@ private:
             return CHIP_NO_ERROR;
         };
 
-        void OnFabricDeletedFromStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+        void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
             auto & sessionManager = mServer->GetSecureSessionManager();
@@ -441,24 +441,6 @@ private:
                 }
             }
         };
-
-        void OnFabricRetrievedFromStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override
-        {
-            (void) fabricTable;
-            (void) fabricIndex;
-        }
-
-        void OnFabricPersistedToStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) override
-        {
-            (void) fabricTable;
-            (void) fabricIndex;
-        }
-
-        void OnFabricNOCUpdated(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
-        {
-            (void) fabricTable;
-            (void) fabricIndex;
-        }
 
     private:
         Server * mServer = nullptr;

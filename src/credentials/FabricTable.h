@@ -321,24 +321,19 @@ public:
         /**
          * Gets called when a fabric is deleted, such as on FabricTable::Delete().
          **/
-        virtual void OnFabricDeletedFromStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
+        virtual void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) {}
 
         /**
-         * Gets called when a fabric is loaded into Fabric Table from storage, such as
-         * during FabricTable::Init().
+         * Gets called when a fabric in Fabric Table is persisted to storage, by CommitPendingFabricData.
          **/
-        virtual void OnFabricRetrievedFromStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
+        virtual void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) {};
 
         /**
-         * Gets called when a fabric in Fabric Table is persisted to storage, such as
-         * on FabricTable::AddNewFabric().
+         * Gets called when operational credentials are changed, which may not be persistent.
+         *
+         * Can be used to affect what is needed for UpdateNOC prior to commit.
          **/
-        virtual void OnFabricPersistedToStorage(const FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
-
-        /**
-         * Gets called when operational credentials are changed.
-         **/
-        virtual void OnFabricNOCUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
+        virtual void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) {};
 
         // Intrusive list pointer for FabricTable to manage the entries.
         Delegate * next = nullptr;
@@ -359,7 +354,7 @@ public:
     // TODO this #if CONFIG_BUILD_FOR_HOST_UNIT_TEST is temporary. There is a change incoming soon
     // that will allow triggering NOC update directly.
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    void SendUpdateFabricNotificationForTest(FabricIndex fabricIndex) { NotifyNOCUpdatedOnFabric(fabricIndex); }
+    void SendUpdateFabricNotificationForTest(FabricIndex fabricIndex) { NotifyFabricUpdated(fabricIndex); }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     FabricInfo * FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId);
@@ -734,7 +729,8 @@ private:
      */
     CHIP_ERROR ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader);
 
-    CHIP_ERROR NotifyNOCUpdatedOnFabric(FabricIndex fabricIndex);
+    CHIP_ERROR NotifyFabricUpdated(FabricIndex fabricIndex);
+    CHIP_ERROR NotifyFabricCommitted(FabricIndex fabricIndex);
 
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     // Used for UpdateNOC pending fabric updates
