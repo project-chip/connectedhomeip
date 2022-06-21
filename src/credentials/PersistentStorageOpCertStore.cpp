@@ -224,7 +224,7 @@ CHIP_ERROR PersistentStorageOpCertStore::AddNewTrustedRootCertForFabric(FabricIn
     ReturnErrorCodeIf(!rcacBuf.Alloc(rcac.size()), CHIP_ERROR_NO_MEMORY);
     memcpy(rcacBuf.Get(), rcac.data(), rcac.size());
 
-    mPendingRcac     = std::move(rcacBuf);
+    mPendingRcac = std::move(rcacBuf);
 
     mPendingFabricIndex = fabricIndex;
     mStateFlags.Set(StateFlags::kAddNewTrustedRootCalled);
