@@ -55,6 +55,7 @@
     /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
@@ -85,6 +86,7 @@
     /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
@@ -115,6 +117,7 @@
     /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -138,6 +141,7 @@
     257, /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
     257, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
@@ -159,6 +163,7 @@
     43, /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: manage */ \
     48, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
     49, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
+    51, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
@@ -180,6 +185,7 @@
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
