@@ -19,11 +19,12 @@ import re
 
 from idl.generators import CodeGenerator, GeneratorStorage
 from idl.matter_idl_types import (Idl, ClusterSide, Field, Attribute, Cluster,
-    FieldAttribute, Command, DataType, Struct)
+                                  FieldAttribute, Command, DataType, Struct)
 from idl import matter_idl_types
 from idl.generators.types import (ParseDataType, BasicString, BasicInteger, FundamentalType,
-    IdlType, IdlItemType, IdlEnumType, IdlBitmapType, TypeLookupContext)
+                                  IdlType, IdlItemType, IdlEnumType, IdlBitmapType, TypeLookupContext)
 from typing import Union, List, Set
+
 
 def camel_to_const(s):
     return re.sub("([a-z])([A-Z])", lambda y: y.group(1) + "_" + y.group(2), s).upper()
@@ -79,9 +80,11 @@ def get_field_info(definition: Field, cluster: Cluster, idl: Idl):
     logging.warn('Unknown type: %r' % actual)
     return None
 
+
 def get_array_count(attr: Attribute):
     # TBD how to determine array lengths?
     return 1
+
 
 def get_raw_size_and_type(attr: Attribute, cluster: Cluster, idl: Idl):
     container, cType, size, matterType = get_field_info(attr.definition, cluster, idl)
