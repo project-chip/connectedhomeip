@@ -170,11 +170,14 @@ public:
     Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType,
                                             const ScopedNodeId & sessionEvictionHint);
 
-    void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(const ScopedNodeId & node);
-    void ExpireAllPairingsForPeerExceptPending(const ScopedNodeId & node);
     void ExpireAllPairingsForFabric(FabricIndex fabric);
     void ExpireAllPASEPairings();
+
+    // This API is used by commands that need to release all existing sessions on a fabric but need to make sure the response to the
+    // command still goes out on the exchange the command came in on. This API flags that the release of the session used by the
+    // exchange is deferred until the exchange is done.
+    void ReleaseSessionsForFabricExceptOne(FabricIndex fabricIndex, const SessionHandle & deferred);
 
     /**
      * @brief

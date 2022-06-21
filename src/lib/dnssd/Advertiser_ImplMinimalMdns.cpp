@@ -147,6 +147,12 @@ private:
     Allocator * mAllocator = nullptr;
 };
 
+enum BroadcastAdvertiseType
+{
+    kStarted,     // Advertise at startup of all records added, as required by RFC 6762.
+    kRemovingAll, // sent a TTL 0 for all records, as records are removed
+};
+
 class AdvertiserMinMdns : public ServiceAdvertiser,
                           public MdnsPacketDelegate, // receive query packets
                           public ParserDelegate      // parses queries
@@ -190,10 +196,12 @@ public:
     void OnQuery(const QueryData & data) override;
 
 private:
-    /// Advertise available records configured within the server
+    /// Advertise available records configured within the server.
     ///
-    /// Usable as boot-time advertisement of available SRV records.
-    void AdvertiseRecords();
+    /// Establishes a type of 'Advertise all currently configured items'
+    /// for a specific purpose (e.g. boot time advertises everything, shut-down
+    /// removes all records by advertising a 0 TTL)
+    void AdvertiseRecords(BroadcastAdvertiseType type);
 
     /// Determine if advertisement on the specified interface/address is ok given the
     /// interfaces on which the mDNS server is listening
@@ -311,7 +319,8 @@ void AdvertiserMinMdns::OnQuery(const QueryData & data)
 
     LogQuery(data);
 
-    CHIP_ERROR err = mResponseSender.Respond(mMessageId, data, mCurrentSource);
+    const ResponseConfiguration defaultResponseConfiguration;
+    CHIP_ERROR err = mResponseSender.Respond(mMessageId, data, mCurrentSource, defaultResponseConfiguration);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to reply to query: %s", ErrorStr(err));
@@ -339,7 +348,7 @@ CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::EndPointManager<chip::Inet::UDPEn
 
     ChipLogProgress(Discovery, "CHIP minimal mDNS started advertising.");
 
-    AdvertiseRecords();
+    AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
     mIsInitialized = true;
 
@@ -348,6 +357,8 @@ CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::EndPointManager<chip::Inet::UDPEn
 
 void AdvertiserMinMdns::Shutdown()
 {
+    AdvertiseRecords(BroadcastAdvertiseType::kRemovingAll);
+
     GlobalMinimalMdnsServer::Server().Shutdown();
     mIsInitialized = false;
 }
@@ -418,10 +429,16 @@ OperationalQueryAllocator::Allocator * AdvertiserMinMdns::FindEmptyOperationalAl
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
 {
+
     char nameBuffer[Operational::kInstanceNameMaxLength + 1] = "";
 
-    /// need to set server name
+    // need to set server name
     ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetPeerId()));
+
+    // Advertising data changed. Send a TTL=0 for everything as a refresh,
+    // which will clear caches (including things we are about to remove). Once this is done
+    // we will re-advertise available records with a longer TTL again.
+    AdvertiseRecords(BroadcastAdvertiseType::kRemovingAll);
 
     QNamePart nameCheckParts[]  = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
     FullQName nameCheck         = FullQName(nameCheckParts);
@@ -510,9 +527,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
     ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Operational device'.");
 
-    // Advertise the records we just added as required by RFC 6762.
-    // TODO - Don't announce records that haven't been updated.
-    AdvertiseRecords();
+    AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
     ChipLogProgress(Discovery, "mDNS service published: %s.%s", instanceName.names[1], instanceName.names[2]);
 
@@ -540,6 +555,11 @@ CHIP_ERROR AdvertiserMinMdns::UpdateCommissionableInstanceName()
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
 {
+    // Advertising data changed. Send a TTL=0 for everything as a refresh,
+    // which will clear caches (including things we are about to remove). Once this is done
+    // we will re-advertise available records with a longer TTL again.
+    AdvertiseRecords(BroadcastAdvertiseType::kRemovingAll);
+
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         mQueryResponderAllocatorCommissionable.Clear();
@@ -709,9 +729,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Commissioner device'.");
     }
 
-    // Advertise the records we just added as required by RFC 6762.
-    // TODO - Don't announce records that haven't been updated.
-    AdvertiseRecords();
+    AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
     ChipLogProgress(Discovery, "mDNS service published: %s.%s", instanceName.names[1], instanceName.names[2]);
 
@@ -841,13 +859,20 @@ bool AdvertiserMinMdns::ShouldAdvertiseOn(const chip::Inet::InterfaceId id, cons
     return result;
 }
 
-void AdvertiserMinMdns::AdvertiseRecords()
+void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
 {
     chip::Inet::InterfaceAddressIterator interfaceAddress;
 
     if (!interfaceAddress.Next())
     {
         return;
+    }
+
+    ResponseConfiguration responseConfiguration;
+    if (type == BroadcastAdvertiseType::kRemovingAll)
+    {
+        // make a "remove all records now" broadcast
+        responseConfiguration.SetTtlSecondsOverride(0);
     }
 
     for (; interfaceAddress.HasCurrent(); interfaceAddress.Next())
@@ -883,8 +908,23 @@ void AdvertiserMinMdns::AdvertiseRecords()
         packetInfo.DestPort  = kMdnsPort;
         packetInfo.Interface = interfaceAddress.GetInterfaceId();
 
+        // Advertise all records
+        //
+        // TODO: Consider advertising delta changes.
+        //
+        // Current advertisement does not have a concept of "delta" to only
+        // advertise changes. Current implementation is to always
+        //    1. advertise TTL=0 (clear all caches)
+        //    2. advertise available records (with longer TTL)
+        //
+        // It would be nice if we could selectively advertise what changes, like
+        // send TTL=0 for anything removed/about to be removed (and only those),
+        // then only advertise new items added.
+        //
+        // This optimization likely will take more logic and state storage, so
+        // for now it is not done.
         QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
-        queryData.SetIsBootAdvertising(true);
+        queryData.SetIsInternalBroadcast(true);
 
         for (auto & it : mOperationalResponders)
         {
@@ -893,7 +933,7 @@ void AdvertiserMinMdns::AdvertiseRecords()
         mQueryResponderAllocatorCommissionable.GetQueryResponder()->ClearBroadcastThrottle();
         mQueryResponderAllocatorCommissioner.GetQueryResponder()->ClearBroadcastThrottle();
 
-        CHIP_ERROR err = mResponseSender.Respond(0, queryData, &packetInfo);
+        CHIP_ERROR err = mResponseSender.Respond(0, queryData, &packetInfo, responseConfiguration);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Failed to advertise records: %s", ErrorStr(err));

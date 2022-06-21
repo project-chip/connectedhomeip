@@ -177,6 +177,7 @@ class BaseTestHelper:
         self.controllerNodeId = nodeid
         self.logger = logger
         self.paaTrustStorePath = paaTrustStorePath
+        logging.getLogger().setLevel(logging.DEBUG)
 
     def _WaitForOneDiscoveredDevice(self, timeoutSeconds: int = 2):
         print("Waiting for device responses...")
@@ -355,6 +356,40 @@ class BaseTestHelper:
         if resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningError.kBusyWithOtherAdmin:
             return True
         return False
+
+    async def TestCaseEviction(self, nodeid: int):
+        self.logger.info("Testing CASE eviction")
+
+        minimumCASESessionsPerFabric = 3
+        minimumSupportedFabrics = 16
+
+        #
+        # This test exercises the ability to allocate more sessions than are supported in the
+        # pool configuration. By going beyond (minimumSupportedFabrics * minimumCASESessionsPerFabric),
+        # it starts to test out the eviction logic. This specific test does not validate the specifics
+        # of eviction, just that allocation and CASE session establishment proceeds successfully on both
+        # the controller and target.
+        #
+        for x in range(minimumSupportedFabrics * minimumCASESessionsPerFabric * 3):
+            self.devCtrl.CloseSession(nodeid)
+            await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)])
+
+        self.logger.info("Testing CASE defunct logic")
+
+        #
+        # This tests establishing a subscription on a given CASE session, then mark it defunct (to simulate
+        # encountering a transport timeout on the session).
+        #
+        # At the max interval, we should still have a valid subscription.
+        #
+        sub = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)], reportInterval=(0, 2))
+        await asyncio.sleep(2)
+        self.devCtrl.CloseSession(nodeid)
+        await asyncio.sleep(4)
+
+        sub.Shutdown()
+
+        return True
 
     async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Opening Commissioning Window")
@@ -823,6 +858,7 @@ class BaseTestHelper:
                 # Thread join timed out
                 self.logger.error(f"Failed to join change thread")
                 return False
+
             return True if receivedUpdate == 5 else False
 
         except Exception as ex:

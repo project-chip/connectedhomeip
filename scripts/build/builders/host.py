@@ -195,7 +195,7 @@ class HostBuilder(GnBuilder):
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
                  enable_ble=True, enable_wifi=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
                  use_libfuzzer=False, use_clang=False, interactive_mode=True, extra_tests=False,
-                 use_platform_mdns=False):
+                 use_platform_mdns=False, enable_rpcs=False):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -203,6 +203,9 @@ class HostBuilder(GnBuilder):
         self.app = app
         self.board = board
         self.extra_gn_options = []
+
+        if enable_rpcs:
+            self.extra_gn_options.append('import("//with_pw_rpc.gni")')
 
         if not enable_ipv4:
             self.extra_gn_options.append('chip_inet_config_enable_ipv4=false')

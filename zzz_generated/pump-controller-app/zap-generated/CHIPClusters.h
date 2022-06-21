@@ -30,20 +30,6 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
-{
-public:
-    FlowMeasurementCluster() : ClusterBase(app::Clusters::FlowMeasurement::Id) {}
-    ~FlowMeasurementCluster() {}
-};
-
-class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
-{
-public:
-    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
-    ~OtaSoftwareUpdateProviderCluster() {}
-};
-
 class DLL_EXPORT OnOffCluster : public ClusterBase
 {
 public:
@@ -51,11 +37,11 @@ public:
     ~OnOffCluster() {}
 };
 
-class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
+class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
-    PressureMeasurementCluster() : ClusterBase(app::Clusters::PressureMeasurement::Id) {}
-    ~PressureMeasurementCluster() {}
+    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
+    ~OtaSoftwareUpdateProviderCluster() {}
 };
 
 class DLL_EXPORT PumpConfigurationAndControlCluster : public ClusterBase
@@ -70,6 +56,20 @@ class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
 public:
     TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
     ~TemperatureMeasurementCluster() {}
+};
+
+class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
+{
+public:
+    PressureMeasurementCluster() : ClusterBase(app::Clusters::PressureMeasurement::Id) {}
+    ~PressureMeasurementCluster() {}
+};
+
+class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
+{
+public:
+    FlowMeasurementCluster() : ClusterBase(app::Clusters::FlowMeasurement::Id) {}
+    ~FlowMeasurementCluster() {}
 };
 
 } // namespace Controller
