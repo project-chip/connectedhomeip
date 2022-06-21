@@ -81,6 +81,27 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+            - name: Delete Defaults
+              run: defaults delete com.apple.dt.xctest.tool
+              continue-on-error: true
+            - name: Run macOS Build
+              timeout-minutes: 30
+              # Enable -Werror by hand here, because the Xcode config can't
+              # enable it for various reasons.  Keep whatever Xcode settings
+              # for OTHER_CFLAGS exist by using ${inherited}.
+              #
+              # Disable -Wmacro-redefined because CHIP_DEVICE_CONFIG_ENABLE_MDNS
+              # seems to be unconditionally defined in CHIPDeviceBuildConfig.h,
+              # which is apparently being included after CHIPDeviceConfig.h.
+              run: xcodebuild -target "Matter" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wno-macro-redefined'
+              working-directory: src/darwin/Framework
+            - name: Copying Framework to Temporary Path
+              continue-on-error: true
+              run: |
+                mkdir -p /tmp/macos_framework_output
+                ls -la /Users/runner/work/connectedhomeip/connectedhomeip/src/darwin/Framework/build/Release/
+                mv /Users/runner/work/connectedhomeip/connectedhomeip/src/darwin/Framework/build/Release/Matter.framework /tmp/macos_framework_output
+                ls -la /tmp/macos_framework_output
             - name: Build Apps
               timeout-minutes: 45
               run: |

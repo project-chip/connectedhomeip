@@ -21,7 +21,7 @@
 #import "DeviceSelector.h"
 #import <Matter/Matter.h>
 
-NSString * const kMatterNumLightOnOffCluster = @"OnOffViewController_NumLights";
+NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 @interface OnOffViewController ()
 @property (nonatomic, strong) UITextField * numLightsTextField;
@@ -102,7 +102,7 @@ NSString * const kMatterNumLightOnOffCluster = @"OnOffViewController_NumLights";
     _numLightsTextField = [UITextField new];
     _numLightsOptions = @[ @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"10" ];
     _numLightsTextField.text
-        = CHIPGetDomainValueForKey(kMatterToolDefaultsDomain, kMatterNumLightOnOffCluster) ?: [_numLightsOptions objectAtIndex:0];
+        = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, MTRNumLightOnOffCluster) ?: [_numLightsOptions objectAtIndex:0];
     UIPickerView * numLightsPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 100, 0, 0)];
     _numLightsTextField.inputView = numLightsPicker;
     [numLightsPicker setDataSource:self];
@@ -210,7 +210,7 @@ NSString * const kMatterNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 - (IBAction)pickerDoneClicked:(id)sender
 {
-    CHIPSetDomainValueForKey(kMatterToolDefaultsDomain, kMatterNumLightOnOffCluster, _numLightsTextField.text);
+    CHIPSetDomainValueForKey(MTRToolDefaultsDomain, MTRNumLightOnOffCluster, _numLightsTextField.text);
     [_numLightsTextField resignFirstResponder];
     [self setupStackView];
 }
@@ -219,7 +219,7 @@ NSString * const kMatterNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 - (int)numLightClustersToShow
 {
-    NSString * numClusters = CHIPGetDomainValueForKey(kMatterToolDefaultsDomain, kMatterNumLightOnOffCluster);
+    NSString * numClusters = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, MTRNumLightOnOffCluster);
     int numberOfLights = 1;
 
     if (numClusters) {

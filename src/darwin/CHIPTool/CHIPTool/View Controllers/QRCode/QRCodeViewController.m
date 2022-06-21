@@ -602,7 +602,7 @@
         textField.clearButtonMode = UITextFieldViewModeWhileEditing;
         textField.borderStyle = UITextBorderStyleRoundedRect;
 
-        NSString * networkSSID = CHIPGetDomainValueForKey(kMatterToolDefaultsDomain, kNetworkSSIDDefaultsKey);
+        NSString * networkSSID = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey);
         if ([networkSSID length] > 0) {
             textField.text = networkSSID;
         }
@@ -614,7 +614,7 @@
         textField.borderStyle = UITextBorderStyleRoundedRect;
         textField.secureTextEntry = YES;
 
-        NSString * networkPassword = CHIPGetDomainValueForKey(kMatterToolDefaultsDomain, kNetworkPasswordDefaultsKey);
+        NSString * networkPassword = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey);
         if ([networkPassword length] > 0) {
             textField.text = networkPassword;
         }
@@ -636,11 +636,11 @@
                                                  UITextField * networkPassword = textfields[1];
                                                  if ([networkSSID.text length] > 0) {
                                                      CHIPSetDomainValueForKey(
-                                                         kMatterToolDefaultsDomain, kNetworkSSIDDefaultsKey, networkSSID.text);
+                                                         MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey, networkSSID.text);
                                                  }
 
                                                  if ([networkPassword.text length] > 0) {
-                                                     CHIPSetDomainValueForKey(kMatterToolDefaultsDomain, kNetworkPasswordDefaultsKey,
+                                                     CHIPSetDomainValueForKey(MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey,
                                                          networkPassword.text);
                                                  }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);

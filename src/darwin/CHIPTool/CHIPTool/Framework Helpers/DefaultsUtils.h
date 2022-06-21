@@ -20,7 +20,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString * const kMatterToolDefaultsDomain;
+extern NSString * const MTRToolDefaultsDomain;
 extern NSString * const kNetworkSSIDDefaultsKey;
 extern NSString * const kNetworkPasswordDefaultsKey;
 extern NSString * const kFabricIdKey;

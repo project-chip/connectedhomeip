@@ -18,10 +18,10 @@
 #import "DefaultsUtils.h"
 #import "FabricKeys.h"
 
-NSString * const kMatterToolDefaultsDomain = @"com.apple.chiptool";
+NSString * const MTRToolDefaultsDomain = @"com.apple.chiptool";
 NSString * const kNetworkSSIDDefaultsKey = @"networkSSID";
 NSString * const kNetworkPasswordDefaultsKey = @"networkPassword";
-NSString * const kMatterNextAvailableDeviceIDKey = @"nextDeviceID";
+NSString * const MTRNextAvailableDeviceIDKey = @"nextDeviceID";
 NSString * const kFabricIdKey = @"fabricId";
 NSString * const kDevicePairedKey = @"Paired";
 
@@ -49,9 +49,9 @@ void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key)
 uint64_t CHIPGetNextAvailableDeviceID(void)
 {
     uint64_t nextAvailableDeviceIdentifier = 1;
-    NSNumber * value = CHIPGetDomainValueForKey(kMatterToolDefaultsDomain, kMatterNextAvailableDeviceIDKey);
+    NSNumber * value = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, MTRNextAvailableDeviceIDKey);
     if (!value) {
-        CHIPSetDomainValueForKey(kMatterToolDefaultsDomain, kMatterNextAvailableDeviceIDKey,
+        CHIPSetDomainValueForKey(MTRToolDefaultsDomain, MTRNextAvailableDeviceIDKey,
             [NSNumber numberWithUnsignedLongLong:nextAvailableDeviceIdentifier]);
     } else {
         nextAvailableDeviceIdentifier = [value unsignedLongLongValue];
@@ -62,7 +62,7 @@ uint64_t CHIPGetNextAvailableDeviceID(void)
 
 void CHIPSetNextAvailableDeviceID(uint64_t id)
 {
-    CHIPSetDomainValueForKey(kMatterToolDefaultsDomain, kMatterNextAvailableDeviceIDKey, [NSNumber numberWithUnsignedLongLong:id]);
+    CHIPSetDomainValueForKey(MTRToolDefaultsDomain, MTRNextAvailableDeviceIDKey, [NSNumber numberWithUnsignedLongLong:id]);
 }
 
 static CHIPToolPersistentStorageDelegate * storage = nil;
@@ -159,13 +159,13 @@ BOOL CHIPGetConnectedDeviceWithID(uint64_t deviceId, MTRDeviceConnectionCallback
 
 BOOL CHIPIsDevicePaired(uint64_t deviceId)
 {
-    NSString * PairedString = CHIPGetDomainValueForKey(kMatterToolDefaultsDomain, KeyForPairedDevice(deviceId));
+    NSString * PairedString = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, KeyForPairedDevice(deviceId));
     return [PairedString boolValue];
 }
 
 void CHIPSetDevicePaired(uint64_t deviceId, BOOL paired)
 {
-    CHIPSetDomainValueForKey(kMatterToolDefaultsDomain, KeyForPairedDevice(deviceId), paired ? @"YES" : @"NO");
+    CHIPSetDomainValueForKey(MTRToolDefaultsDomain, KeyForPairedDevice(deviceId), paired ? @"YES" : @"NO");
 }
 
 NSString * KeyForPairedDevice(uint64_t deviceId) { return [NSString stringWithFormat:@"%@%llu", kDevicePairedKey, deviceId]; }
@@ -211,22 +211,22 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
 
 - (nullable NSData *)storageDataForKey:(NSString *)key
 {
-    NSData * value = CHIPGetDomainValueForKey(kMatterToolDefaultsDomain, key);
+    NSData * value = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, key);
     NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
     return value;
 }
 
 - (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key
 {
-    return CHIPSetDomainValueForKey(kMatterToolDefaultsDomain, key, value);
+    return CHIPSetDomainValueForKey(MTRToolDefaultsDomain, key, value);
 }
 
 - (BOOL)removeStorageDataForKey:(NSString *)key
 {
-    if (CHIPGetDomainValueForKey(kMatterToolDefaultsDomain, key) == nil) {
+    if (CHIPGetDomainValueForKey(MTRToolDefaultsDomain, key) == nil) {
         return NO;
     }
-    CHIPRemoveDomainValueForKey(kMatterToolDefaultsDomain, key);
+    CHIPRemoveDomainValueForKey(MTRToolDefaultsDomain, key);
     return YES;
 }
 
