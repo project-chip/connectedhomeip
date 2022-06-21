@@ -33,7 +33,7 @@ jobs:
         strategy:
             matrix:
                 build_variant: [no-ble-tsan-clang]
-                chip_tool: ["", -same-event-loop]
+                chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
@@ -126,7 +126,7 @@ jobs:
         strategy:
             matrix:
                 build_variant: [no-ble-tsan-clang, no-ble-asan-clang]
-                chip_tool: ["", -same-event-loop]
+                chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
