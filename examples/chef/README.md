@@ -65,7 +65,7 @@ All CI jobs for chef can be found in `.github/workflows/chef.yaml`.
 
 These jobs use a platform-specific image with base `chip-build`.
 
-CI jobs call chef with the options `--ci -t <PLATFORM>`. The `--ci`
-option will execute builds for all devices specified in
-`cicd_config["ci_allow_list"]` defined in `chef.py` (so long as these devices
-are also in `/devices`) on the specified platform.
+CI jobs call chef with the options `--ci -t <PLATFORM>`. The `--ci` option will
+execute builds for all devices specified in `cicd_config["ci_allow_list"]`
+defined in `chef.py` (so long as these devices are also in `/devices`) on the
+specified platform.

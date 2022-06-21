@@ -326,7 +326,6 @@ def main(argv: Sequence[str]) -> None:
 
     splash()
 
-
     #
     # ZAP bootstrapping
     #
