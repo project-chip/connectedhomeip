@@ -236,7 +236,13 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                         packetHeader.GetDestinationGroupId().Value());
     }
 
-    // Do not handle unsolicited messages on a inactive session.
+    // Do not handle messages that don't match an existing exchange on a
+    // inactive session, since we should not be creating new exchanges there.
+    if (!session->IsActiveSession()) {
+        ChipLogProgress(ExchangeManager, "Dropping message on inactive session that does not match an existing exchange");
+        return;
+    }
+
     // If it's not a duplicate message, search for an unsolicited message handler if it is marked as being sent by an initiator.
     // Since we didn't find an existing exchange that matches the message, it must be an unsolicited message. However all
     // unsolicited messages must be marked as being from an initiator.

@@ -144,6 +144,7 @@ public:
     bool IsEstablishing() const { return mState == State::kEstablishing; }
     bool IsPendingEviction() const { return mState == State::kPendingEviction; }
     bool IsDefunct() const { return mState == State::kDefunct; }
+    bool IsInactive() const { return mState == State::kInactive; }
     const char * GetStateStr() const { return StateToString(mState); }
 
     /*

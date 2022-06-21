@@ -532,7 +532,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
 
     Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
 
-    if (!secureSession->IsDefunct() && !secureSession->IsActiveSession())
+    if (!secureSession->IsDefunct() && !secureSession->IsActiveSession() && !secureSession->IsInactive())
     {
         ChipLogError(Inet, "Secure transport received message on a session in an invalid state (state = '%s')",
                      secureSession->GetStateStr());
