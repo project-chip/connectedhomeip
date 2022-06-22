@@ -321,7 +321,7 @@ void AppTask::TimerEventHandler(AppEvent * aEvent)
                 LOG_INF("GenericSwitchReleasePress");
                 LightSwitch::GetInstance().GenericSwitchReleasePress();
             }
-            
+
             break;
         case Timer::DimmerTrigger:
             LOG_INF("Dimming started...");
