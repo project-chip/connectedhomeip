@@ -89,16 +89,20 @@ void LightSwitch::DimmerChangeBrightness()
 
 void LightSwitch::GenericSwitchInitialPress()
 {
-    uint8_t newPosition = 1;
+    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        uint8_t pressedPosition = 1;
 
-    Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, newPosition);
-    Clusters::SwitchServer::Instance().OnInitialPress(mLightGenericSwitchEndpointId, newPosition);
+        Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, pressedPosition);
+        Clusters::SwitchServer::Instance().OnInitialPress(mLightGenericSwitchEndpointId, pressedPosition);
+    });
 }
 
 void LightSwitch::GenericSwitchReleasePress()
 {
-    uint8_t previousPosition = 0;
+    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        uint8_t releasedPosition = 0;
 
-    Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, previousPosition);
-    Clusters::SwitchServer::Instance().OnShortRelease(mLightGenericSwitchEndpointId, previousPosition);
+        Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, releasedPosition);
+        Clusters::SwitchServer::Instance().OnShortRelease(mLightGenericSwitchEndpointId, releasedPosition);
+    });
 }

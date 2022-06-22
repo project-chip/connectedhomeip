@@ -218,8 +218,7 @@ void AppTask::ButtonPushHandler(AppEvent * aEvent)
             break;
         case GENERIC_SWITCH_BUTTON:
             LOG_INF("GenericSwitch: InitialPress");
-            sAppTask.StartTimer(Timer::Function, 0);
-            sAppTask.mFunction = TimerFunction::GenericSwitchInitialPress;
+            LightSwitch::GetInstance().GenericSwitchInitialPress();
             break;
         default:
             break;
@@ -268,8 +267,7 @@ void AppTask::ButtonReleaseHandler(AppEvent * aEvent)
             break;
         case GENERIC_SWITCH_BUTTON:
             LOG_INF("GenericSwitch: ShortRelease");
-            sAppTask.StartTimer(Timer::Function, 0);
-            sAppTask.mFunction = TimerFunction::GenericSwitchReleasePress;
+            LightSwitch::GetInstance().GenericSwitchReleasePress();
             break;
         default:
             break;
@@ -309,19 +307,6 @@ void AppTask::TimerEventHandler(AppEvent * aEvent)
                 LOG_INF("Factory Reset triggered");
                 ConfigurationMgr().InitiateFactoryReset();
             }
-            else if (sAppTask.mFunction == TimerFunction::GenericSwitchInitialPress)
-            {
-                sAppTask.mFunction = TimerFunction::NoneSelected;
-                LOG_INF("GenericSwitchInitialPress");
-                LightSwitch::GetInstance().GenericSwitchInitialPress();
-            }
-            else if (sAppTask.mFunction == TimerFunction::GenericSwitchReleasePress)
-            {
-                sAppTask.mFunction = TimerFunction::NoneSelected;
-                LOG_INF("GenericSwitchReleasePress");
-                LightSwitch::GetInstance().GenericSwitchReleasePress();
-            }
-
             break;
         case Timer::DimmerTrigger:
             LOG_INF("Dimming started...");
