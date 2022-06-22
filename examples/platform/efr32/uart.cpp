@@ -221,14 +221,14 @@ void uartConsoleInit(void)
 
 #ifdef EFR32MG24
 
-    //  NVIC_ClearPendingIRQ(EUSART0_RX_IRQn /*USART_IRQ*/);
-    //    NVIC_EnableIRQ(EUSART0_RX_IRQn /*USART_IRQ*/);
+    NVIC_ClearPendingIRQ(EUSART0_RX_IRQn /*USART_IRQ*/);
+    NVIC_EnableIRQ(EUSART0_RX_IRQn /*USART_IRQ*/);
 
-#else //EFR32MG24
+#else // not EFR32MG24
     // Enable USART0 interrupt to wake OT task when data arrives
      NVIC_ClearPendingIRQ(USART_IRQ);
      NVIC_EnableIRQ(USART_IRQ);
-#endif 
+#endif // EFR32MG24
 
 
 #ifdef EFR32MG24
@@ -282,6 +282,7 @@ liss_counter++;
     otSysEventSignalPending();
 #endif
 
+    EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 }
 
 /*
