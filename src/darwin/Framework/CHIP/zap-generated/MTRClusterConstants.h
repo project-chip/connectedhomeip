@@ -1069,8 +1069,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterThermostatUserInterfaceConfigurationAttributeTemperatureDisplayModeID = 0x00000000,
     MTRClusterThermostatUserInterfaceConfigurationAttributeKeypadLockoutID = 0x00000001,
     MTRClusterThermostatUserInterfaceConfigurationAttributeScheduleProgrammingVisibilityID = 0x00000002,
-    MTRClusterThermostatUserInterfaceConfigurationAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
+    MTRClusterThermostatUserInterfaceConfigurationAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
     MTRClusterThermostatUserInterfaceConfigurationAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterThermostatUserInterfaceConfigurationAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterThermostatUserInterfaceConfigurationAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
@@ -1245,8 +1244,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterCarbonMonoxideConcentrationMeasurementAttributeToleranceID = 0x00000003,
     MTRClusterCarbonMonoxideConcentrationMeasurementAttributeGeneratedCommandListID
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterCarbonMonoxideConcentrationMeasurementAttributeAcceptedCommandListID
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
+    MTRClusterCarbonMonoxideConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterCarbonMonoxideConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterCarbonMonoxideConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterCarbonMonoxideConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
@@ -1258,8 +1256,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterCarbonDioxideConcentrationMeasurementAttributeToleranceID = 0x00000003,
     MTRClusterCarbonDioxideConcentrationMeasurementAttributeGeneratedCommandListID
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterCarbonDioxideConcentrationMeasurementAttributeAcceptedCommandListID
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
+    MTRClusterCarbonDioxideConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterCarbonDioxideConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterCarbonDioxideConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterCarbonDioxideConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
@@ -1282,8 +1279,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterEthyleneOxideConcentrationMeasurementAttributeToleranceID = 0x00000003,
     MTRClusterEthyleneOxideConcentrationMeasurementAttributeGeneratedCommandListID
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterEthyleneOxideConcentrationMeasurementAttributeAcceptedCommandListID
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
+    MTRClusterEthyleneOxideConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterEthyleneOxideConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterEthyleneOxideConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterEthyleneOxideConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
@@ -1317,8 +1313,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterNitricOxideConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
     MTRClusterNitricOxideConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
     MTRClusterNitricOxideConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterNitricOxideConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
+    MTRClusterNitricOxideConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
     MTRClusterNitricOxideConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterNitricOxideConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterNitricOxideConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
@@ -1366,8 +1361,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterSulfurDioxideConcentrationMeasurementAttributeToleranceID = 0x00000003,
     MTRClusterSulfurDioxideConcentrationMeasurementAttributeGeneratedCommandListID
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterSulfurDioxideConcentrationMeasurementAttributeAcceptedCommandListID
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
+    MTRClusterSulfurDioxideConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterSulfurDioxideConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterSulfurDioxideConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterSulfurDioxideConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
@@ -1401,8 +1395,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterChloraminesConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
     MTRClusterChloraminesConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
     MTRClusterChloraminesConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterChloraminesConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
+    MTRClusterChloraminesConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
     MTRClusterChloraminesConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterChloraminesConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterChloraminesConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
@@ -1430,8 +1423,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterFecalColiformAndEColiConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterFecalColiformAndEColiConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterFecalColiformAndEColiConcentrationMeasurementAttributeClusterRevisionID
-    = MTRClusterGlobalAttributeClusterRevisionID,
+    MTRClusterFecalColiformAndEColiConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster FluorideConcentrationMeasurement attributes
     MTRClusterFluorideConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
@@ -1481,8 +1473,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterTotalColiformBacteriaConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterTotalColiformBacteriaConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterTotalColiformBacteriaConcentrationMeasurementAttributeClusterRevisionID
-    = MTRClusterGlobalAttributeClusterRevisionID,
+    MTRClusterTotalColiformBacteriaConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster TurbidityConcentrationMeasurement attributes
     MTRClusterTurbidityConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,

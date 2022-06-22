@@ -975,7 +975,8 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     bool found = group.Find(mStorage, fabric, info.group_id);
     VerifyOrReturnError(!found || (group.index == index), CHIP_ERROR_DUPLICATE_KEY_ID);
 
-    group.group_id = info.group_id;
+    group.group_id       = info.group_id;
+    group.endpoint_count = 0;
     group.SetName(info.name);
 
     if (found)
@@ -1208,6 +1209,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
 
     GroupData group(fabric_index, fabric.first_group);
     size_t group_index = 0;
+    EndpointData endpoint;
 
     // Loop through all the groups
     while (group_index < fabric.group_count)
@@ -1216,39 +1218,12 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
         {
             break;
         }
-        EndpointData endpoint(fabric_index, group.group_id, group.first_endpoint);
-        EndpointData prev_endpoint;
-        size_t endpoint_index = 0;
-        while (endpoint_index < group.endpoint_count)
+        if (endpoint.Find(mStorage, fabric, group, endpoint_id))
         {
-            if (CHIP_NO_ERROR != endpoint.Load(mStorage))
-            {
-                break;
-            }
-            if (endpoint.endpoint_id == endpoint_id)
-            {
-                // Remove endpoint from curent group
-                if (0 == endpoint_index)
-                {
-                    // Remove first
-                    group.first_endpoint = endpoint.next;
-                }
-                else
-                {
-                    prev_endpoint.next = endpoint.next;
-                    ReturnErrorOnFailure(prev_endpoint.Save(mStorage));
-                }
-                endpoint.Delete(mStorage);
-                if (group.endpoint_count > 0)
-                {
-                    group.endpoint_count--;
-                }
-                ReturnErrorOnFailure(group.Save(mStorage));
-            }
-            prev_endpoint        = endpoint;
-            endpoint.endpoint_id = endpoint.next;
-            endpoint_index++;
+            // Endpoint found in group
+            ReturnErrorOnFailure(RemoveEndpoint(fabric_index, group.group_id, endpoint_id));
         }
+
         group.group_id = group.next;
         group_index++;
     }

@@ -28,9 +28,12 @@ class PtrResponder : public RecordResponder
 public:
     PtrResponder(const FullQName & qname, const FullQName & target) : RecordResponder(QType::PTR, qname), mTarget(target) {}
 
-    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override
+    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
+                         const ResponseConfiguration & configuration) override
     {
-        delegate->AddResponse(PtrResourceRecord(GetQName(), mTarget));
+        PtrResourceRecord record(GetQName(), mTarget);
+        configuration.Adjust(record);
+        delegate->AddResponse(record);
     }
 
 private:

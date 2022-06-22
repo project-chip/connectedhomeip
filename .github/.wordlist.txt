@@ -537,6 +537,7 @@ FW
 gbl
 gcloud
 GDB
+gdbserver
 GeneralCommissioning
 GeneralDiagnostics
 GenericConfigurationManagerImpl
@@ -739,6 +740,7 @@ libwebkitgtk
 lifecycle
 lightbulb
 lightin
+LightingApp
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
@@ -1125,6 +1127,7 @@ scm
 sco
 scp
 ScriptBinding
+SDB
 SDC
 SDHC
 SDK

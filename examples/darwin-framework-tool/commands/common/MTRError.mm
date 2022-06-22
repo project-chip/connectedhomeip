@@ -24,6 +24,11 @@
 #import <inet/InetError.h>
 #import <lib/support/TypeTraits.h>
 
+// Stolen for now from the framework, need to export this properly.
+@interface MTRErrorHolder : NSObject
+@property (nonatomic, readonly) CHIP_ERROR error;
+@end
+
 CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
 {
     if (error == nil) {
@@ -44,7 +49,7 @@ CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
 
     if (error.userInfo != nil) {
         id underlyingError = error.userInfo[@"underlyingError"];
-        if (underlyingError != nil && [underlyingError isKindOfClass:[MTRErrorHolder class]]) {
+        if (underlyingError != nil && [underlyingError isKindOfClass: [MTRErrorHolder class]]) {
             return ((MTRErrorHolder *) underlyingError).error;
         }
     }

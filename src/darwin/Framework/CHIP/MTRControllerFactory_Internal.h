@@ -31,6 +31,7 @@ class MTRPersistentStorageDelegateBridge;
 namespace chip {
 namespace Credentials {
     class GroupDataProvider;
+    class DeviceAttestationVerifier;
 } // namespace Credentials
 } // namespace chip
 
@@ -44,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) MTRPersistentStorageDelegateBridge * storageDelegateBridge;
 @property (readonly) chip::Credentials::GroupDataProvider * groupData;
-
+@property (readonly) chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier;
 @end
 
 NS_ASSUME_NONNULL_END

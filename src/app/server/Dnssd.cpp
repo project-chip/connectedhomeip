@@ -29,9 +29,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <protocols/secure_channel/PASESession.h>
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-#include <platform/DeviceInstanceInfoProvider.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 #include <credentials/FabricTable.h>
@@ -298,7 +298,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
     uint16_t value;
     uint32_t val32;
-    if (DeviceLayer::ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
+    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(value) != CHIP_NO_ERROR)
     {
         ChipLogDetail(Discovery, "Vendor ID not known");
     }
@@ -307,7 +307,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         advertiseParameters.SetVendorId(chip::Optional<uint16_t>::Value(value));
     }
 
-    if (DeviceLayer::ConfigurationMgr().GetProductId(value) != CHIP_NO_ERROR)
+    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(value) != CHIP_NO_ERROR)
     {
         ChipLogDetail(Discovery, "Product ID not known");
     }

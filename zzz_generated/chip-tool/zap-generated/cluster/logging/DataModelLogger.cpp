@@ -259,6 +259,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("MaxCumulativeFailsafeSeconds", indent + 1, value.maxCumulativeFailsafeSeconds);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxCumulativeFailsafeSeconds'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -9850,7 +9858,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("CurrentPositionTiltPercentage", 1, value);
         }
         case WindowCovering::Attributes::OperationalStatus::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalStatus", 1, value);
         }
@@ -9905,7 +9913,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Mode", 1, value);
         }
         case WindowCovering::Attributes::SafetyStatus::Id: {
-            uint16_t value;
+            chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SafetyStatus", 1, value);
         }

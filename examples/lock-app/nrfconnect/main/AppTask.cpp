@@ -107,10 +107,8 @@ CHIP_ERROR AppTask::Init()
 
 #ifdef CONFIG_OPENTHREAD_MTD_SED
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#elif CONFIG_OPENTHREAD_MTD
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #else
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #endif
     if (err != CHIP_NO_ERROR)
     {
@@ -167,6 +165,9 @@ CHIP_ERROR AppTask::Init()
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads.
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+
+    // Disable auto-relock time feature.
+    DoorLockServer::Instance().SetAutoRelockTime(kLockEndpointId, 0);
 
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
@@ -533,27 +534,38 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState(BoltLockManager::State state, BoltLockManager::OperationSource source)
 {
-    DlLockState lockState;
+    DlLockState newLockState;
 
     switch (state)
     {
     case BoltLockManager::State::kLockingCompleted:
-        lockState = DlLockState::kLocked;
+        newLockState = DlLockState::kLocked;
         break;
     case BoltLockManager::State::kUnlockingCompleted:
-        lockState = DlLockState::kUnlocked;
+        newLockState = DlLockState::kUnlocked;
         break;
     default:
-        lockState = DlLockState::kNotFullyLocked;
+        newLockState = DlLockState::kNotFullyLocked;
         break;
     }
 
-    SystemLayer().ScheduleLambda([lockState, source] {
-        LOG_INF("Updating LockState attribute");
+    SystemLayer().ScheduleLambda([newLockState, source] {
+        chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> currentLockState;
+        chip::app::Clusters::DoorLock::Attributes::LockState::Get(kLockEndpointId, currentLockState);
 
-        if (!DoorLockServer::Instance().SetLockState(kLockEndpointId, lockState, source))
+        if (currentLockState.IsNull())
         {
-            LOG_ERR("Failed to update LockState attribute");
+            // Initialize lock state with start value, but not invoke lock/unlock.
+            chip::app::Clusters::DoorLock::Attributes::LockState::Set(kLockEndpointId, newLockState);
+        }
+        else
+        {
+            LOG_INF("Updating LockState attribute");
+
+            if (!DoorLockServer::Instance().SetLockState(kLockEndpointId, newLockState, source))
+            {
+                LOG_ERR("Failed to update LockState attribute");
+            }
         }
     });
 }

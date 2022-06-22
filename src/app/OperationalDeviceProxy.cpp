@@ -317,12 +317,21 @@ void OperationalDeviceProxy::OnSessionEstablished(const SessionHandle & session)
 CHIP_ERROR OperationalDeviceProxy::Disconnect()
 {
     ReturnErrorCodeIf(mState != State::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
+
     if (mSecureSession)
     {
-        mInitParams.sessionManager->ExpirePairing(mSecureSession.Get().Value());
+        //
+        // Mark the session as defunct to signal that we no longer want to use this
+        // session anymore for further interactions to this peer. However, if we receive
+        // messages back from that peer on the defunct session, it will bring it back into an active
+        // state again.
+        //
+        mSecureSession.Get().Value()->AsSecureSession()->MarkAsDefunct();
     }
-    MoveToState(State::HasAddress);
 
+    mSecureSession.Release();
+
+    MoveToState(State::HasAddress);
     return CHIP_NO_ERROR;
 }
 

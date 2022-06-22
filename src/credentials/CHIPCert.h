@@ -740,12 +740,6 @@ CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKey
  * Extract Not Before Time from a chip certificate in ByteSpan TLV-encoded form.
  * Output format is seconds referenced from the CHIP epoch.
  *
- * Special value 0 corresponds to the X.509/RFC5280 defined special time value
- * 99991231235959Z meaning 'no well-defined expiration date'.  However, as a
- * NotBefore time, this does not require special handling when comparing to
- * a CHIP epoch time source, as 0 (the epoch) is also the earliest representable
- * uint32 time.
-
  * This does not perform any sort of validation on the certificate structure
  * other than parsing it.
  *

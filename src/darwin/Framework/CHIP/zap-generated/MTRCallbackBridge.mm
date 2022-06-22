@@ -4569,6 +4569,7 @@ void MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge:
     MTRGeneralCommissioningClusterBasicCommissioningInfo * _Nonnull objCValue;
     objCValue = [MTRGeneralCommissioningClusterBasicCommissioningInfo new];
     objCValue.failSafeExpiryLengthSeconds = [NSNumber numberWithUnsignedShort:value.failSafeExpiryLengthSeconds];
+    objCValue.maxCumulativeFailsafeSeconds = [NSNumber numberWithUnsignedShort:value.maxCumulativeFailsafeSeconds];
     DispatchSuccess(context, objCValue);
 };
 
@@ -11257,6 +11258,30 @@ void MTRWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
+void MTRWindowCoveringOperationalStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<MTRWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void MTRWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value)
 {
@@ -11268,6 +11293,30 @@ void MTRWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(
 void MTRWindowCoveringModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<MTRWindowCoveringModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void MTRWindowCoveringSafetyStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<MTRWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

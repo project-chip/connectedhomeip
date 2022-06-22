@@ -45,6 +45,7 @@
     /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     49, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -75,6 +76,7 @@
     /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     1, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -105,6 +107,7 @@
     /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -134,6 +137,7 @@
     257, /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
     257, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     6, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
@@ -155,6 +159,7 @@
     43, /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: manage */ \
     48, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
     49, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
+    51, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     16387, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
@@ -176,6 +181,7 @@
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \

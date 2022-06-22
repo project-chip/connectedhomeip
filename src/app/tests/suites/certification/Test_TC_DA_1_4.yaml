@@ -1,0 +1,80 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    17.1.4. [TC-DA-1.4] Device Attestation Request Validation-Error Scenario
+    [DUT-Commissioner]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Start the commissioning process of TH1 on DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "DUT generates 32-byte AttestationNonce"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "DUT sends AttestationRequest Command with AttestationNonce as field
+          to the TH1."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 responds to the DUT with an invalid AttestationResponse Command
+          by setting the following error condition: Commissionee is not yet
+          certified"
+      verification: |
+          Verify that DUT notifies a warning stating that Commissionee is not a fully trusted device.
+          Verify that the warning contains the information about the reason for error condition.
+          If the warning message indicates that Commissioning is allowed then confirm that CSRRequest Command is sent from DUT to TH1
+      disabled: true
+
+    - label: "Factory Reset TH1 so that it is commissionable again"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Repeat step 1 to step 7 and for step 5 set different error condition
+          as below: Commissionees PAA is not in the Commissioners trusted set.
+          Commissionee provides an invalid DAC and PAI chain as validated by TH
+          against the RFC5280 certificate Basic path validation algorithm
+          Commissionee provides DAC with validity period that is not in range of
+          PAA/PAI"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Repeat step 1 to step 7 and for step 5 set different error condition:
+          Certification Declaration has only one of the following fields
+          dac_origin_vendor_id dac_origin_product_id vendor_id field in the
+          Certification Declaration does not match with the VendorID attribute
+          found in the Basic Information cluster The Vendor ID in the DAC does
+          not match the vendor_id field in the Certification Declaration. The
+          Product ID (PID) the DAC is not present in the product_id_array field
+          in the Certification Declaration"
+      verification: |
+
+      disabled: true

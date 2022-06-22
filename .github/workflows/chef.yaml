@@ -29,7 +29,7 @@ jobs:
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
         container:
-            image: connectedhomeip/chip-build:0.5.77
+            image: connectedhomeip/chip-build:0.5.79
             options: --user root
         steps:
             - uses: Wandalen/wretry.action@v1.0.15
@@ -53,7 +53,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.77
+            image: connectedhomeip/chip-build:0.5.79
             options: --user root
 
         steps:
@@ -77,7 +77,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.5.77
+            image: connectedhomeip/chip-build-esp32:0.5.79
             options: --user root
 
         steps:
@@ -101,7 +101,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.5.77
+            image: connectedhomeip/chip-build-nrf-platform:0.5.79
             options: --user root
 
         steps:

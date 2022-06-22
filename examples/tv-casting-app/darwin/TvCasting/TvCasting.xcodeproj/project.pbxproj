@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		3C75075C284B080900D7DB3A /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C75075B284B07E800D7DB3A /* libmbedtls.a */; settings = {ATTRIBUTES = (Required, ); }; };
+		3C7507A72851188500D7DB3A /* DiscoveredNodeData.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C7507A62851188500D7DB3A /* DiscoveredNodeData.mm */; };
+		3C7507AD285299DF00D7DB3A /* CommissionerDiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7507AC285299DF00D7DB3A /* CommissionerDiscoveryView.swift */; };
+		3C7507AF28529A5F00D7DB3A /* CommissioningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7507AE28529A5F00D7DB3A /* CommissioningView.swift */; };
+		3C7507B72853A3AD00D7DB3A /* CommissionerDiscoveryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7507B62853A3AD00D7DB3A /* CommissionerDiscoveryViewModel.swift */; };
+		3C7507B92853EFF000D7DB3A /* CommissioningViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7507B82853EFF000D7DB3A /* CommissioningViewModel.swift */; };
+		3C7507BC2857A6EE00D7DB3A /* DiscoveredNodeDataConverter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C7507BB2857A6EE00D7DB3A /* DiscoveredNodeDataConverter.mm */; };
 		3C9ACC05284ABF4000718B2D /* libTvCastingCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C9ACC04284ABF2F00718B2D /* libTvCastingCommon.a */; };
 		3CC0E8FA2841DD3400EC6A18 /* TvCastingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC0E8F92841DD3400EC6A18 /* TvCastingApp.swift */; };
 		3CC0E8FC2841DD3400EC6A18 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC0E8FB2841DD3400EC6A18 /* ContentView.swift */; };
@@ -19,6 +25,14 @@
 /* Begin PBXFileReference section */
 		3C75075B284B07E800D7DB3A /* libmbedtls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedtls.a; path = lib/libmbedtls.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3C75075E284C1DF800D7DB3A /* TvCasting.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TvCasting.entitlements; sourceTree = "<group>"; };
+		3C7507A52851187500D7DB3A /* DiscoveredNodeData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DiscoveredNodeData.h; sourceTree = "<group>"; };
+		3C7507A62851188500D7DB3A /* DiscoveredNodeData.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DiscoveredNodeData.mm; sourceTree = "<group>"; };
+		3C7507AC285299DF00D7DB3A /* CommissionerDiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommissionerDiscoveryView.swift; sourceTree = "<group>"; };
+		3C7507AE28529A5F00D7DB3A /* CommissioningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommissioningView.swift; sourceTree = "<group>"; };
+		3C7507B62853A3AD00D7DB3A /* CommissionerDiscoveryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommissionerDiscoveryViewModel.swift; sourceTree = "<group>"; };
+		3C7507B82853EFF000D7DB3A /* CommissioningViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommissioningViewModel.swift; sourceTree = "<group>"; };
+		3C7507BB2857A6EE00D7DB3A /* DiscoveredNodeDataConverter.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DiscoveredNodeDataConverter.mm; sourceTree = "<group>"; };
+		3C7507BD2857A72A00D7DB3A /* DiscoveredNodeDataConverter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DiscoveredNodeDataConverter.hpp; sourceTree = "<group>"; };
 		3C9ACC04284ABF2F00718B2D /* libTvCastingCommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTvCastingCommon.a; path = lib/libTvCastingCommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CC0E8F62841DD3400EC6A18 /* TvCasting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TvCasting.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CC0E8F92841DD3400EC6A18 /* TvCastingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TvCastingApp.swift; sourceTree = "<group>"; };
@@ -80,6 +94,10 @@
 				3CC0E8FB2841DD3400EC6A18 /* ContentView.swift */,
 				3CC0E8FD2841DD3500EC6A18 /* Assets.xcassets */,
 				3CC0E8FF2841DD3500EC6A18 /* Preview Content */,
+				3C7507AC285299DF00D7DB3A /* CommissionerDiscoveryView.swift */,
+				3C7507B62853A3AD00D7DB3A /* CommissionerDiscoveryViewModel.swift */,
+				3C7507AE28529A5F00D7DB3A /* CommissioningView.swift */,
+				3C7507B82853EFF000D7DB3A /* CommissioningViewModel.swift */,
 			);
 			path = TvCasting;
 			sourceTree = "<group>";
@@ -95,9 +113,13 @@
 		3CC0E9072841DD4B00EC6A18 /* MatterBridge */ = {
 			isa = PBXGroup;
 			children = (
-				3CC0E9092841DD7000EC6A18 /* CastingServerBridge.mm */,
 				3CC0E9082841DD6F00EC6A18 /* TvCasting-Bridging-Header.h */,
 				3CC0E90B2841DD8500EC6A18 /* CastingServerBridge.h */,
+				3CC0E9092841DD7000EC6A18 /* CastingServerBridge.mm */,
+				3C7507A52851187500D7DB3A /* DiscoveredNodeData.h */,
+				3C7507A62851188500D7DB3A /* DiscoveredNodeData.mm */,
+				3C7507BB2857A6EE00D7DB3A /* DiscoveredNodeDataConverter.mm */,
+				3C7507BD2857A72A00D7DB3A /* DiscoveredNodeDataConverter.hpp */,
 			);
 			path = MatterBridge;
 			sourceTree = "<group>";
@@ -206,9 +228,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3C7507AF28529A5F00D7DB3A /* CommissioningView.swift in Sources */,
 				3CC0E90A2841DD7000EC6A18 /* CastingServerBridge.mm in Sources */,
+				3C7507B72853A3AD00D7DB3A /* CommissionerDiscoveryViewModel.swift in Sources */,
 				3CC0E8FC2841DD3400EC6A18 /* ContentView.swift in Sources */,
+				3C7507AD285299DF00D7DB3A /* CommissionerDiscoveryView.swift in Sources */,
 				3CC0E8FA2841DD3400EC6A18 /* TvCastingApp.swift in Sources */,
+				3C7507B92853EFF000D7DB3A /* CommissioningViewModel.swift in Sources */,
+				3C7507BC2857A6EE00D7DB3A /* DiscoveredNodeDataConverter.mm in Sources */,
+				3C7507A72851188500D7DB3A /* DiscoveredNodeData.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

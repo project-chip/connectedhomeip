@@ -19,8 +19,9 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        Text("Hello tv-casting-common C++, from Objective-C, from Swift! Sum: " + String(CastingServerBridge.getSharedInstance().add(5, secondNum: 6)))
-            .padding()
+        NavigationView {
+                CommissionerDiscoveryView()
+        }
     }
 }
 

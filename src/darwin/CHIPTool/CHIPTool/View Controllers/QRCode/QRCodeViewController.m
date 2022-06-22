@@ -406,7 +406,7 @@
     [super viewDidLoad];
     [self setupUI];
 
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = InitializeCHIP();
     [self.chipController setPairingDelegate:self queue:callbackQueue];
 
@@ -776,7 +776,7 @@
 - (void)_restartMatterStack
 {
     self.chipController = CHIPRestartController(self.chipController);
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
     [self.chipController setPairingDelegate:self queue:callbackQueue];
 }
 

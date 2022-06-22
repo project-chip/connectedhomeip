@@ -1,4 +1,5 @@
-chip.rpc.DeviceInfo.serial_number max_size:32  // length defined in chip spec 8.2.3.1
+chip.rpc.DeviceInfo.serial_number max_size:32  // length defined in chip spec 11.1.6.1
+chip.rpc.DeviceInfo.software_version_string max_size:64  // length defined in chip spec 11.1.6.1
 chip.rpc.DeviceState.fabric_info max_count:2
 chip.rpc.PairingInfo.qr_code max_size:256
 chip.rpc.PairingInfo.qr_code_url max_size:256

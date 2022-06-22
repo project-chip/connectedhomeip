@@ -6815,6 +6815,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             MTRGeneralCommissioningClusterBasicCommissioningInfo * _Nonnull value;
             value = [MTRGeneralCommissioningClusterBasicCommissioningInfo new];
             value.failSafeExpiryLengthSeconds = [NSNumber numberWithUnsignedShort:cppValue.failSafeExpiryLengthSeconds];
+            value.maxCumulativeFailsafeSeconds = [NSNumber numberWithUnsignedShort:cppValue.maxCumulativeFailsafeSeconds];
             return value;
         }
         case Attributes::RegulatoryConfig::Id: {
@@ -16947,7 +16948,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
             return value;
         }
         case Attributes::TargetPositionLiftPercent100ths::Id: {
@@ -17084,7 +17085,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {

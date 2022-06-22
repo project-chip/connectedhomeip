@@ -310,8 +310,17 @@ template <typename T>
 class TypedComplexArgument : public ComplexArgument
 {
 public:
+    TypedComplexArgument() {}
     TypedComplexArgument(T * request) : mRequest(request) {}
-    ~TypedComplexArgument() { ComplexArgumentParser::Finalize(*mRequest); }
+    ~TypedComplexArgument()
+    {
+        if (mRequest != nullptr)
+        {
+            ComplexArgumentParser::Finalize(*mRequest);
+        }
+    }
+
+    void SetArgument(T * request) { mRequest = request; };
 
     CHIP_ERROR Parse(const char * label, const char * json)
     {

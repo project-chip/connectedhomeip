@@ -2805,8 +2805,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace CurrentPositionTiltPercentage
 
 namespace OperationalStatus {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> * value); // OperationalStatus
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value);
 } // namespace OperationalStatus
 
 namespace TargetPositionLiftPercent100ths {
@@ -2868,8 +2869,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
 } // namespace Mode
 
 namespace SafetyStatus {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> * value); // SafetyStatus
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> value);
 } // namespace SafetyStatus
 
 namespace FeatureMap {

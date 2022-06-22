@@ -1120,7 +1120,11 @@ typedef void (*WiFiNetworkDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*WindowCoveringConfigStatusAttributeCallback)(void *,
                                                             chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus>);
+typedef void (*WindowCoveringOperationalStatusAttributeCallback)(
+    void *, chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus>);
 typedef void (*WindowCoveringModeAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::WindowCovering::Mode>);
+typedef void (*WindowCoveringSafetyStatusAttributeCallback)(void *,
+                                                            chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus>);
 typedef void (*WindowCoveringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*WindowCoveringAcceptedCommandListListAttributeCallback)(
@@ -9153,6 +9157,34 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class MTRWindowCoveringOperationalStatusAttributeCallbackBridge
+    : public MTRCallbackBridge<WindowCoveringOperationalStatusAttributeCallback>
+{
+public:
+    MTRWindowCoveringOperationalStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<WindowCoveringOperationalStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value);
+};
+
+class MTRWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge
+    : public MTRWindowCoveringOperationalStatusAttributeCallbackBridge
+{
+public:
+    MTRWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        MTRWindowCoveringOperationalStatusAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class MTRWindowCoveringModeAttributeCallbackBridge : public MTRCallbackBridge<WindowCoveringModeAttributeCallback>
 {
 public:
@@ -9169,6 +9201,32 @@ public:
     MTRWindowCoveringModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                              SubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringModeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRWindowCoveringSafetyStatusAttributeCallbackBridge : public MTRCallbackBridge<WindowCoveringSafetyStatusAttributeCallback>
+{
+public:
+    MTRWindowCoveringSafetyStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+                                                         bool keepAlive = false) :
+        MTRCallbackBridge<WindowCoveringSafetyStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> value);
+};
+
+class MTRWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge : public MTRWindowCoveringSafetyStatusAttributeCallbackBridge
+{
+public:
+    MTRWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action,
+                                                                     SubscriptionEstablishedHandler establishedHandler) :
+        MTRWindowCoveringSafetyStatusAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

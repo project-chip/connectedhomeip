@@ -36,13 +36,21 @@ tests:
           constraints:
               type: uint16
 
+    - label: "Read FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
+
     # Issue 17464
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && A_TEMPERATURE_TOLERANCE
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 2]
+          value: [0, 1, 2, 3, 65528, 65529, 65530, 65531, 65532, 65533]
           constraints:
               type: list
 

@@ -9306,9 +9306,11 @@ class GeneralCommissioning(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="failSafeExpiryLengthSeconds", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="maxCumulativeFailsafeSeconds", Tag=1, Type=uint),
                     ])
 
             failSafeExpiryLengthSeconds: 'uint' = 0
+            maxCumulativeFailsafeSeconds: 'uint' = 0
 
 
 

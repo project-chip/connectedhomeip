@@ -24,6 +24,7 @@ message DeviceInfo {
   uint32 software_version = 3;
   string serial_number = 4;
   PairingInfo pairing_info = 5;
+  string software_version_string = 6;
 }
 
 message FabricInfo {

@@ -74,8 +74,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
     if (mSystemState != nullptr)
     {
         params.systemLayer        = mSystemState->SystemLayer();
-        params.tcpEndPointManager = mSystemState->TCPEndPointManager();
         params.udpEndPointManager = mSystemState->UDPEndPointManager();
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        params.tcpEndPointManager = mSystemState->TCPEndPointManager();
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
         params.bleLayer = mSystemState->BleLayer();
 #endif
@@ -109,8 +111,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
     stateParams.systemLayer        = &DeviceLayer::SystemLayer();
-    stateParams.tcpEndPointManager = DeviceLayer::TCPEndPointManager();
     stateParams.udpEndPointManager = DeviceLayer::UDPEndPointManager();
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    stateParams.tcpEndPointManager = DeviceLayer::TCPEndPointManager();
+#endif
 #else
     stateParams.systemLayer        = params.systemLayer;
     stateParams.tcpEndPointManager = params.tcpEndPointManager;
@@ -154,6 +158,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     SimpleSessionResumptionStorage * sessionResumptionStorage = chip::Platform::New<SimpleSessionResumptionStorage>();
     stateParams.sessionResumptionStorage                      = sessionResumptionStorage;
     stateParams.certificateValidityPolicy                     = params.certificateValidityPolicy;
+    stateParams.unsolicitedStatusHandler                      = Platform::New<Protocols::SecureChannel::UnsolicitedStatusHandler>();
     stateParams.exchangeMgr                                   = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager                         = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider                             = params.groupDataProvider;
@@ -179,6 +184,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                       stateParams.fabricTable));
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
+    ReturnErrorOnFailure(stateParams.unsolicitedStatusHandler->Init(stateParams.exchangeMgr));
 
     InitDataModelHandler(stateParams.exchangeMgr);
 
@@ -325,7 +331,13 @@ void DeviceControllerFactory::Shutdown()
 
 CHIP_ERROR DeviceControllerSystemState::Shutdown()
 {
-    VerifyOrReturnError(mRefCount == 1, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mRefCount <= 1, CHIP_ERROR_INCORRECT_STATE);
+    if (mHaveShutDown)
+    {
+        // Nothing else to do here.
+        return CHIP_NO_ERROR;
+    }
+    mHaveShutDown = true;
 
     ChipLogDetail(Controller, "Shutting down the System State, this will teardown the CHIP Stack");
 
@@ -406,8 +418,10 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     }
 
     mSystemLayer        = nullptr;
-    mTCPEndPointManager = nullptr;
     mUDPEndPointManager = nullptr;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    mTCPEndPointManager = nullptr;
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
     mBleLayer = nullptr;
 #endif // CONFIG_NETWORK_LAYER_BLE
@@ -422,6 +436,12 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     {
         chip::Platform::Delete(mExchangeMgr);
         mExchangeMgr = nullptr;
+    }
+
+    if (mUnsolicitedStatusHandler != nullptr)
+    {
+        Platform::Delete(mUnsolicitedStatusHandler);
+        mUnsolicitedStatusHandler = nullptr;
     }
 
     if (mSessionMgr != nullptr)

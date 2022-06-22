@@ -50,13 +50,17 @@ tests:
               - name: "LiftPercentageValue"
                 value: 90
 
+    #
+    # TODO: For some reason, the window-covering server impl arms a 5s timer before it actually
+    #       processes the GoToLiftPercentage command's effect on the current tile value.
+    #
     - label: "1b: TH Waits for 100ms-1s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 500
+                value: 5000
 
     - label: "1c: TH sends StopMotion command to DUT"
       command: "StopMotion"
@@ -83,13 +87,17 @@ tests:
               - name: "TiltPercentageValue"
                 value: 90
 
+    #
+    # TODO: For some reason, the window-covering server impl arms a 5s timer before it actually
+    #       processes the GoToTiltPercentage command's effect on the current tile value.
+    #
     - label: "2b: TH Waits for 100ms-1s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 500
+                value: 5000
 
     - label: "2c: TH sends StopMotion command to DUT"
       command: "StopMotion"

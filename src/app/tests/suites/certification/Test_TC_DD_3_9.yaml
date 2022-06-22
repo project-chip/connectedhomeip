@@ -13,7 +13,8 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 7.3.9. [TC-DD-3.9] Commissioning Flow - Custom Flow
+name:
+    3.3.9. [TC-DD-3.9] Commissioning Flow - Custom Flow = 2 [DUT - Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -24,17 +25,17 @@ tests:
     - label: "TH receives Onboarding Payload from the DUT"
       verification: |
           1. Parse the DUT's QR Code using the TH commissioner: chip-tool
-          16-MacBook-Pro:connectedhomeip liam$ ./examples/chip-tool/out/debug/chip-tool payload parse-setup-payload MT:YNJV7NMF00KA0648G00
-          [1641844121253] [18592:788760] CHIP: [SPL] Parsing base38Representation: MT:YNJV7NMF00KA0648G00
-          [1641844121254] [18592:788760] CHIP: [SPL] CommissioningFlow: 2
-          [1641844121254] [18592:788760] CHIP: [SPL] VendorID: 9050
-          [1641844121254] [18592:788760] CHIP: [SPL] Version: 0
-          [1641844121254] [18592:788760] CHIP: [SPL] ProductID: 65279
-          [1641844121254] [18592:788760] CHIP: [SPL] Discriminator: 3840
-          [1641844121254] [18592:788760] CHIP: [SPL] SetUpPINCode: 20202021
-          [1641844121254] [18592:788760] CHIP: [SPL] RendezvousInformation: 2
+          $ ./out/chip-tool/chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
+          [1651077458589] [91233:65331701] CHIP: [SPL] Parsing base38Representation: MT:-24J029Q00KA0648G00
+          [1651077458590] [91233:65331701] CHIP: [SPL] CommissioningFlow: 2
+          [1651077458590] [91233:65331701] CHIP: [SPL] VendorID: 65521
+          [1651077458590] [91233:65331701] CHIP: [SPL] Version: 0
+          [1651077458590] [91233:65331701] CHIP: [SPL] ProductID: 32769
+          [1651077458590] [91233:65331701] CHIP: [SPL] Discriminator: 3840
+          [1651077458590] [91233:65331701] CHIP: [SPL] SetUpPINCode: 20202021
+          [1651077458590] [91233:65331701] CHIP: [SPL] RendezvousInformation: 4
 
-          2. Verify that the Commissioning Flow is set to 2 (Custom Flow)
+          2. Verify that the CommissioningFlow is set to 2 (Custom Flow)
       disabled: true
 
     - label:
@@ -42,7 +43,10 @@ tests:
           (DCL)"
       verification: |
           1. TH fetches the DCL from DUT's DCL
-          2. Verify that DCL contains criteria
+          2. Verify that DCL contains the criteria:
+          - CommissioningCustomFlow field = 2
+          - CommissioningModeInitialStepsHint bit 0 (Power Cycle) = 0 and bit 1 (Device Manufacturer URL) = 1
+          - CommissioningCustomFlowURL populated with a URL that uses https schema
       disabled: true
 
     - label:

@@ -22094,6 +22094,14 @@ typedef NS_OPTIONS(uint8_t, MTRWindowCoveringConfigStatus) {
     MTRWindowCoveringConfigStatusTiltEncoderControlled = 0x40,
 };
 
+typedef NS_OPTIONS(uint32_t, MTRWindowCoveringFeature) {
+    MTRWindowCoveringFeatureLift = 0x1,
+    MTRWindowCoveringFeatureTilt = 0x2,
+    MTRWindowCoveringFeaturePositionAwareLift = 0x4,
+    MTRWindowCoveringFeatureAbsolutePosition = 0x8,
+    MTRWindowCoveringFeaturePositionAwareTilt = 0x10,
+};
+
 typedef NS_OPTIONS(uint8_t, MTRWindowCoveringMode) {
     MTRWindowCoveringModeMotorDirectionReversed = 0x1,
     MTRWindowCoveringModeCalibrationMode = 0x2,
@@ -22101,33 +22109,25 @@ typedef NS_OPTIONS(uint8_t, MTRWindowCoveringMode) {
     MTRWindowCoveringModeLedFeedback = 0x8,
 };
 
-typedef NS_OPTIONS(uint32_t, MTRWindowCoveringWcFeature) {
-    MTRWindowCoveringWcFeatureLift = 0x1,
-    MTRWindowCoveringWcFeatureTilt = 0x2,
-    MTRWindowCoveringWcFeaturePositionAwareLift = 0x4,
-    MTRWindowCoveringWcFeatureAbsolutePosition = 0x8,
-    MTRWindowCoveringWcFeaturePositionAwareTilt = 0x10,
+typedef NS_OPTIONS(uint8_t, MTRWindowCoveringOperationalStatus) {
+    MTRWindowCoveringOperationalStatusGlobal = 0x3,
+    MTRWindowCoveringOperationalStatusLift = 0xC,
+    MTRWindowCoveringOperationalStatusTilt = 0x30,
 };
 
-typedef NS_OPTIONS(uint8_t, MTRWindowCoveringWcOperationalStatus) {
-    MTRWindowCoveringWcOperationalStatusGlobal = 0x3,
-    MTRWindowCoveringWcOperationalStatusLift = 0xC,
-    MTRWindowCoveringWcOperationalStatusTilt = 0x30,
-};
-
-typedef NS_OPTIONS(uint16_t, MTRWindowCoveringWcSafetyStatus) {
-    MTRWindowCoveringWcSafetyStatusRemoteLockout = 0x1,
-    MTRWindowCoveringWcSafetyStatusTamperDetection = 0x2,
-    MTRWindowCoveringWcSafetyStatusFailedCommunication = 0x4,
-    MTRWindowCoveringWcSafetyStatusPositionFailure = 0x8,
-    MTRWindowCoveringWcSafetyStatusThermalProtection = 0x10,
-    MTRWindowCoveringWcSafetyStatusObstacleDetected = 0x20,
-    MTRWindowCoveringWcSafetyStatusPower = 0x40,
-    MTRWindowCoveringWcSafetyStatusStopInput = 0x80,
-    MTRWindowCoveringWcSafetyStatusMotorJammed = 0x100,
-    MTRWindowCoveringWcSafetyStatusHardwareFailure = 0x200,
-    MTRWindowCoveringWcSafetyStatusManualOperation = 0x400,
-    MTRWindowCoveringWcSafetyStatusProtection = 0x800,
+typedef NS_OPTIONS(uint16_t, MTRWindowCoveringSafetyStatus) {
+    MTRWindowCoveringSafetyStatusRemoteLockout = 0x1,
+    MTRWindowCoveringSafetyStatusTamperDetection = 0x2,
+    MTRWindowCoveringSafetyStatusFailedCommunication = 0x4,
+    MTRWindowCoveringSafetyStatusPositionFailure = 0x8,
+    MTRWindowCoveringSafetyStatusThermalProtection = 0x10,
+    MTRWindowCoveringSafetyStatusObstacleDetected = 0x20,
+    MTRWindowCoveringSafetyStatusPower = 0x40,
+    MTRWindowCoveringSafetyStatusStopInput = 0x80,
+    MTRWindowCoveringSafetyStatusMotorJammed = 0x100,
+    MTRWindowCoveringSafetyStatusHardwareFailure = 0x200,
+    MTRWindowCoveringSafetyStatusManualOperation = 0x400,
+    MTRWindowCoveringSafetyStatusProtection = 0x800,
 };
 
 typedef NS_ENUM(uint8_t, MTRPumpConfigurationAndControlPumpControlMode) {

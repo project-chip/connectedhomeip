@@ -296,6 +296,7 @@ void WindowApp::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::At
     Cover * cover = GetCover(endpoint);
     chip::BitMask<Mode> mode;
     chip::BitMask<ConfigStatus> configStatus;
+    chip::BitMask<OperationalStatus> opStatus;
 
     if (nullptr == cover)
     {
@@ -316,7 +317,8 @@ void WindowApp::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::At
     /* RO OperationalStatus */
     case Attributes::OperationalStatus::Id:
         chip::DeviceLayer::PlatformMgr().LockChipStack();
-        emberAfWindowCoveringClusterPrint("Global OpState: %02X\n", (unsigned int) OperationalStatusGet(endpoint).global);
+        opStatus = OperationalStatusGet(endpoint);
+        OperationalStatusPrint(opStatus);
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         break;
     /* RW Mode */
@@ -432,8 +434,6 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     configStatus.Set(ConfigStatus::kOnlineReserved);
     ConfigStatusSet(endpoint, configStatus);
 
-    OperationalStatusSetWithGlobalUpdated(endpoint, mOperationalStatus);
-
     // Attribute: Id 13 EndProductType
     EndProductTypeSet(endpoint, EndProductType::kInteriorBlind);
 
@@ -448,8 +448,7 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     ModeSet(endpoint, mode);
 
     // Attribute: Id 27 SafetyStatus (Optional)
-    SafetyStatus safetyStatus = { 0x00 }; // 0 is no issues;
-    SafetyStatusSet(endpoint, safetyStatus);
+    chip::BitFlags<SafetyStatus> safetyStatus(0x00); // 0 is no issues;
 }
 
 void WindowApp::Cover::Finish()
@@ -489,8 +488,7 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
     Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, target);
     Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
 
-    OperationalStatus opStatus = OperationalStatusGet(mEndpoint);
-    OperationalState opState   = ComputeOperationalState(target, current);
+    OperationalState opState = ComputeOperationalState(target, current);
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
@@ -514,9 +512,8 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
 
         mLiftOpState = OperationalState::Stall;
     }
-    opStatus.lift = mLiftOpState;
 
-    ScheduleOperationalStatusSetWithGlobalUpdate(opStatus);
+    LiftScheduleOperationalStateSet(mLiftOpState);
 
     if ((OperationalState::Stall != mLiftOpState) && mLiftTimer)
     {
@@ -555,8 +552,7 @@ void WindowApp::Cover::TiltUpdate(bool newTarget)
     Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, target);
     Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
 
-    OperationalStatus opStatus = OperationalStatusGet(mEndpoint);
-    OperationalState opState   = ComputeOperationalState(target, current);
+    OperationalState opState = ComputeOperationalState(target, current);
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
@@ -580,9 +576,8 @@ void WindowApp::Cover::TiltUpdate(bool newTarget)
 
         mTiltOpState = OperationalState::Stall;
     }
-    opStatus.tilt = mTiltOpState;
 
-    ScheduleOperationalStatusSetWithGlobalUpdate(opStatus);
+    TiltScheduleOperationalStateSet(mTiltOpState);
 
     if ((OperationalState::Stall != mTiltOpState) && mTiltTimer)
     {
@@ -676,21 +671,23 @@ void WindowApp::Cover::CallbackPositionSet(intptr_t arg)
     chip::Platform::Delete(data);
 }
 
-void WindowApp::Cover::ScheduleOperationalStatusSetWithGlobalUpdate(OperationalStatus opStatus)
+void WindowApp::Cover::ScheduleOperationalStateSet(OperationalState opState, bool isTilt)
 {
     CoverWorkData * data = chip::Platform::New<CoverWorkData>();
     VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::OperationalStatusSet - Out of Memory for WorkData"));
 
     data->mEndpointId = mEndpoint;
-    data->opStatus    = opStatus;
+    data->opState     = opState;
+    data->isTilt      = isTilt;
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(CallbackOperationalStatusSetWithGlobalUpdate, reinterpret_cast<intptr_t>(data));
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(CallbackOperationalStateSet, reinterpret_cast<intptr_t>(data));
 }
 
-void WindowApp::Cover::CallbackOperationalStatusSetWithGlobalUpdate(intptr_t arg)
+void WindowApp::Cover::CallbackOperationalStateSet(intptr_t arg)
 {
     WindowApp::Cover::CoverWorkData * data = reinterpret_cast<WindowApp::Cover::CoverWorkData *>(arg);
-    OperationalStatusSetWithGlobalUpdated(data->mEndpointId, data->opStatus);
+
+    OperationalStateSet(data->mEndpointId, data->isTilt ? OperationalStatus::kTilt : OperationalStatus::kLift, data->opState);
 
     chip::Platform::Delete(data);
 }

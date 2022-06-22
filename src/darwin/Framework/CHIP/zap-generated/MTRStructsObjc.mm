@@ -677,14 +677,17 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _failSafeExpiryLengthSeconds = @(0);
+
+        _maxCumulativeFailsafeSeconds = @(0);
     }
     return self;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: failSafeExpiryLengthSeconds:%@; >", NSStringFromClass([self class]), _failSafeExpiryLengthSeconds];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: failSafeExpiryLengthSeconds:%@; maxCumulativeFailsafeSeconds:%@; >",
+                  NSStringFromClass([self class]), _failSafeExpiryLengthSeconds, _maxCumulativeFailsafeSeconds];
     return descriptionString;
 }
 

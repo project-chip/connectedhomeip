@@ -137,7 +137,8 @@ void QueryResponderBase::MarkAdditionalRepliesFor(QueryResponderIterator it)
     }
 }
 
-void QueryResponderBase::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate)
+void QueryResponderBase::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
+                                         const ResponseConfiguration & configuration)
 {
     // reply to dns-sd service list request
     for (size_t i = 0; i < mResponderInfoSize; i++)
@@ -152,7 +153,9 @@ void QueryResponderBase::AddAllResponses(const chip::Inet::IPPacketInfo * source
             continue;
         }
 
-        delegate->AddResponse(PtrResourceRecord(GetQName(), mResponderInfos[i].responder->GetQName()));
+        PtrResourceRecord record(GetQName(), mResponderInfos[i].responder->GetQName());
+        configuration.Adjust(record);
+        delegate->AddResponse(record);
     }
 }
 
