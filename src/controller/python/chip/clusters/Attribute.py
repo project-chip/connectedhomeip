@@ -466,6 +466,7 @@ class AttributeCache:
 
 class SubscriptionTransaction:
     def __init__(self, transaction: 'AsyncReadTransaction', subscriptionId, devCtrl):
+        self._onResubscriptionAttemptedCb = DefaultResubscriptionAttemptedCallback
         self._onAttributeChangeCb = DefaultAttributeChangeCallback
         self._onEventChangeCb = DefaultEventChangeCallback
         self._onErrorCb = DefaultErrorCallback
@@ -491,6 +492,15 @@ class SubscriptionTransaction:
 
     def GetEvents(self):
         return self._readTransaction.GetAllEventValues()
+
+    def SetResubscriptionAttemptedCallback(self, callback: Callable[[SubscriptionTransaction, int, int], None]):
+        '''
+        Sets the callback function that gets invoked anytime a re-subscription is attempted. The callback is expected
+        to have the following signature:
+            def Callback(transaction: SubscriptionTransaction, errorEncountered: int, nextResubscribeIntervalMsec: int)
+        '''
+        if callback is not None:
+            self._onResubscriptionAttemptedCb = callback
 
     def SetAttributeUpdateCallback(self, callback: Callable[[TypedAttributePath, SubscriptionTransaction], None]):
         '''
@@ -538,6 +548,10 @@ class SubscriptionTransaction:
 
     def __repr__(self):
         return f'<Subscription (Id={self._subscriptionId})>'
+
+
+def DefaultResubscriptionAttemptedCallback(transaction: SubscriptionTransaction, terminationError, nextResubscribeIntervalMsec):
+    print(f"Previous subscription failed with Error: {terminationError} - re-subscribing in {nextResubscribeIntervalMsec}ms...")
 
 
 def DefaultAttributeChangeCallback(path: TypedAttributePath, transaction: SubscriptionTransaction):
@@ -682,8 +696,9 @@ class AsyncReadTransaction:
         self._event_loop.call_soon_threadsafe(
             self._handleSubscriptionEstablished, subscriptionId)
 
-    def handleResubscriptionAttempted(self, terminationCause, nextResubscribeIntervalMsec):
-        print("would resubscribe with error " + str(terminationCause) + " in " + str(nextResubscribeIntervalMsec))
+    def handleResubscriptionAttempted(self, terminationCause: int, nextResubscribeIntervalMsec: int):
+        self._event_loop.call_soon_threadsafe(
+            self._subscription_handler._onResubscriptionAttemptedCb, self._subscription_handler, terminationCause, nextResubscribeIntervalMsec)
 
     def _handleReportBegin(self):
         pass
@@ -810,7 +825,7 @@ def _OnSubscriptionEstablishedCallback(closure, subscriptionId):
 
 
 @_OnResubscriptionAttemptedCallbackFunct
-def _OnResubscriptionAttemptedCallback(closure, terminationCause, nextResubscribeIntervalMsec):
+def _OnResubscriptionAttemptedCallback(closure, terminationCause: int, nextResubscribeIntervalMsec: int):
     closure.handleResubscriptionAttempted(terminationCause, nextResubscribeIntervalMsec)
 
 
