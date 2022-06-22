@@ -306,7 +306,6 @@ ctrl
 ctypes
 CurrentHue
 CurrentLevel
-CurrentPosition
 CurrentSaturation
 customAcl
 customizations
@@ -538,7 +537,6 @@ FW
 gbl
 gcloud
 GDB
-gdbserver
 GeneralCommissioning
 GeneralDiagnostics
 GenericConfigurationManagerImpl
@@ -628,6 +626,7 @@ IlluminanceMeasurement
 IM
 imager
 imagetool
+ImageURI
 imageUri
 img
 Impl
@@ -741,7 +740,6 @@ libwebkitgtk
 lifecycle
 lightbulb
 lightin
-LightingApp
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
@@ -842,7 +840,6 @@ MoveToSaturation
 MoveWithOnOff
 MPSL
 MRP
-MSR
 MTD
 MTU
 Multiband
@@ -1129,7 +1126,6 @@ scm
 sco
 scp
 ScriptBinding
-SDB
 SDC
 SDHC
 SDK
@@ -1282,7 +1278,6 @@ timedInteractionTimeoutMs
 TimeFormatLocalization
 timeoutMs
 TimeSynchronization
-tinycrypt
 Tizen
 TKIP
 tlsr

@@ -89,7 +89,7 @@ that the devices can interact with each other. This functionality is on endpoint
 ## Generic Switch
 
 The Generic Switch on endpoint 2 offers the Switch server cluster. It implements
-the features Momentary Switch (MS) and Momentary Switch Release (MSR), thus it
+the features Momentary Switch (`MS`) and Momentary Switch Release (`MSR`), thus it
 will send event notifications `InitialPress` and `ShortRelease` if button 3 of
 the DK is pressed and released.
 
@@ -300,7 +300,7 @@ platform image.
 
 **Button 3** can be used for the following purposes:
 
--   _Pressed once_ &mdash; Changes the value of the attribute CurrentPosition
+-   _Pressed once_ &mdash; Changes the value of the attribute `CurrentPosition`
     and (if subscribed) will send the event notifications to the controller.
 
 **Button 4** can be used to start the NFC tag emulation and enable Bluetooth LE
