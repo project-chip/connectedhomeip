@@ -29,7 +29,7 @@ concurrency:
 jobs:
     test_suites_chip_tool_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 135
+        timeout-minutes: 150
 
         strategy:
             matrix:
@@ -82,7 +82,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build Apps
-              timeout-minutes: 45
+              timeout-minutes: 60
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \

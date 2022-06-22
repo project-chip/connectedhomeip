@@ -46,10 +46,11 @@ tests:
               type: map32
 
     - label: "Read the global attribute: AttributeList"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          contains: [0, 1, 8, 65528, 65529, 65531, 65533]
+          value: [0, 1, 8, 65528, 65529, 65531, 65533]
           constraints:
               type: list
 

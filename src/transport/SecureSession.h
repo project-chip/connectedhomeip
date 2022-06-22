@@ -101,31 +101,8 @@ public:
      *   discovered during session establishment.
      */
     void Activate(const ScopedNodeId & localNode, const ScopedNodeId & peerNode, CATValues peerCATs, uint16_t peerSessionId,
-                  const ReliableMessageProtocolConfig & config)
-    {
-        VerifyOrDie(mState == State::kEstablishing);
-        VerifyOrDie(peerNode.GetFabricIndex() == localNode.GetFabricIndex());
+                  const ReliableMessageProtocolConfig & config);
 
-        // PASE sessions must always start unassociated with a Fabric!
-        VerifyOrDie(!((mSecureSessionType == Type::kPASE) && (peerNode.GetFabricIndex() != kUndefinedFabricIndex)));
-        // CASE sessions must always start "associated" a given Fabric!
-        VerifyOrDie(!((mSecureSessionType == Type::kCASE) && (peerNode.GetFabricIndex() == kUndefinedFabricIndex)));
-        // CASE sessions can only be activated against operational node IDs!
-        VerifyOrDie(!((mSecureSessionType == Type::kCASE) &&
-                      (!IsOperationalNodeId(peerNode.GetNodeId()) || !IsOperationalNodeId(localNode.GetNodeId()))));
-
-        mPeerNodeId    = peerNode.GetNodeId();
-        mLocalNodeId   = localNode.GetNodeId();
-        mPeerCATs      = peerCATs;
-        mPeerSessionId = peerSessionId;
-        mMRPConfig     = config;
-        SetFabricIndex(peerNode.GetFabricIndex());
-
-        Retain(); // This ref is released inside MarkForEviction
-        MoveToState(State::kActive);
-        ChipLogDetail(Inet, "SecureSession[%p]: Activated - Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
-                      mLocalSessionId);
-    }
     ~SecureSession() override
     {
         ChipLogDetail(Inet, "SecureSession[%p]: Released - Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
@@ -213,7 +190,7 @@ public:
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     NodeId GetLocalNodeId() const { return mLocalNodeId; }
 
-    CATValues GetPeerCATs() const { return mPeerCATs; }
+    const CATValues & GetPeerCATs() const { return mPeerCATs; }
 
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
@@ -261,6 +238,11 @@ public:
     const CryptoContext & GetCryptoContext() const { return mCryptoContext; }
 
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
+
+    // This should be a private API, only meant to be called by SecureSessionTable
+    // Session holders to this session may shift to the target session regarding SessionDelegate::GetNewSessionHandlingPolicy.
+    // It requires that the target sessoin is also a CASE session, having the same peer and CATs as this session.
+    void NewerSessionAvailable(const SessionHandle & session);
 
 private:
     enum class State : uint8_t

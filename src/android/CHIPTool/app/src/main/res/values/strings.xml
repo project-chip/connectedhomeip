@@ -39,6 +39,7 @@
     <string name="enter_pincode_label_text">Pincode</string>
     <string name="commission_btn_text">Commission</string>
     <string name="dns_discover_btn_text">Discover</string>
+    <string name="wifi_scan_btn_text">Wi-Fi Scan</string>
 
     <string name="send_command_on_btn_text">On</string>
     <string name="send_command_off_btn_text">Off</string>
@@ -163,4 +164,5 @@
     <string name="select_a_command">Select a command</string>
     <string name="select_a_cluster">Select a cluster</string>
     <string name="endpoint_name">Endpoint: </string>
+    <string name="wifi_connect_btn_text">Connect</string>
 </resources>

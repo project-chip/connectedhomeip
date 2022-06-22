@@ -59,32 +59,235 @@ PICS:
       id: MANUAL_FAULT
 
       # Color Control cluster
+    - label: "Does the device implement the CurrentHue attribute?"
+      id: CC.S.A0000
+
+    - label: "Does the device implement the CurrentSaturation attribute?"
+      id: CC.S.A0001
+
+    - label: "Does the device implement the REMAININGTime attribute?"
+      id: CC.S.A0002
+
+    - label: "Does the device implement the CurrentX attribute?"
+      id: CC.S.A0003
+
+    - label: "Does the device implement the CurrentY attribute?"
+      id: CC.S.A0004
+
+    - label: "Does the device implement the DriftCompensation attribute?"
+      id: CC.S.A0005
+
+    - label: "Does the device implement the CompensationText attribute?"
+      id: CC.S.A0006
+
+    - label: "Does the device implement the ColorTemperatureMireds attribute?"
+      id: CC.S.A0007
+
+    - label: "Does the device implement the ColorMode attribute?"
+      id: CC.S.A0008
+
+    - label: "Does the device implement the Options attribute?"
+      id: CC.S.A000f
+
+    - label: "Does the device implement the EnhancedCurrentHue attribute?"
+      id: CC.S.A4000
+
+    - label: "Does the device implement the EnhancedColorMode attribute?"
+      id: CC.S.A4001
+
+    - label: "Does the device implement the ColorLoopActive attribute?"
+      id: CC.S.A4002
+
+    - label: "Does the device implement the ColorLoopDirection attribute?"
+      id: CC.S.A4003
+
+    - label: "Does the device implement the ColorLoopTime attribute?"
+      id: CC.S.A4004
+
+    - label:
+          "Does the device implement the ColorLoopStartEnhancedHue attribute?"
+      id: CC.S.A4005
+
+    - label:
+          "Does the device implement the ColorLoopStoredEnhancedHue attribute?"
+      id: CC.S.A4006
+
+    - label: "Does the device implement the ColorCapabilities attribute?"
+      id: CC.S.A400a
+
+    - label:
+          "Does the device implement the ColorTempPhysicalMinMireds attribute?"
+      id: CC.S.A400b
+
+    - label:
+          "Does the device implement the ColorTempPhysicalMaxMireds attribute?"
+      id: CC.S.A400c
+
+    - label:
+          "Does the device implement the CoupleColorTempToLevelMinMireds
+          attribute?"
+      id: CC.S.A400d
+
+    - label:
+          "Does the device implement the StartUPColorTemperatureMireds
+          attribute?"
+      id: CC.S.A4010
+
+    - label: "Does the device implement the NumberOfPrimaries attribute?"
+      id: CC.S.A0010
+
+    - label: "Does the device implement the Primary1X attribute?"
+      id: CC.S.A0011
+
+    - label: "Does the device implement the Primary1Y attribute?"
+      id: CC.S.A0012
+
+    - label: "Does the device implement the Primary1Intensity attribute?"
+      id: CC.S.A0013
+
+    - label: "Does the device implement the Primary2X attribute?"
+      id: CC.S.A0015
+
+    - label: "Does the device implement the Primary2Y attribute?"
+      id: CC.S.A0016
+
+    - label: "Does the device implement the Primary2Intensity attribute?"
+      id: CC.S.A0017
+
+    - label: "Does the device implement the Primary3X attribute?"
+      id: CC.S.A0019
+
+    - label: "Does the device implement the Primary3Y attribute?"
+      id: CC.S.A001a
+
+    - label: "Does the device implement the Primary3Intensity attribute?"
+      id: CC.S.A001b
+
+    - label: "Does the device implement the Primary4X attribute?"
+      id: CC.S.A0020
+
+    - label: "Does the device implement the Primary4Y attribute?"
+      id: CC.S.A0021
+
+    - label: "Does the device implement the PRIMAR41Intensity attribute?"
+      id: CC.S.A0022
+
+    - label: "Does the device implement the Primary5X attribute?"
+      id: CC.S.A0024
+
+    - label: "Does the device implement the Primary5Y attribute?"
+      id: CC.S.A0025
+
+    - label: "Does the device implement the Primary5Intensity attribute?"
+      id: CC.S.A0026
+
+    - label: "Does the device implement the Primary6X attribute?"
+      id: CC.S.A0028
+
+    - label: "Does the device implement the Primary6Y attribute?"
+      id: CC.S.A0029
+
+    - label: "Does the device implement the Primary6Intensity attribute?"
+      id: CC.S.A002a
+
+    - label: "Does the device implement the WhitePointX attribute?"
+      id: CC.S.A0030
+
+    - label: "Does the device implement the WhitePointY attribute?"
+      id: CC.S.A0031
+
+    - label: "Does the device implement the ColorPointRX attribute?"
+      id: CC.S.A0032
+
+    - label: "Does the device implement the ColorPointRY attribute?"
+      id: CC.S.A0033
+
+    - label: "Does the device implement the ColorPointRIntensity attribute?"
+      id: CC.S.A0034
+
+    - label: "Does the device implement the ColorPointGX attribute?"
+      id: CC.S.A0036
+
+    - label: "Does the device implement the ColorPointGY attribute?"
+      id: CC.S.A0037
+
+    - label: "Does the device implement the ColorPointGIntensity attribute?"
+      id: CC.S.A0038
+
+    - label: "Does the device implement the ColorPointBX attribute?"
+      id: CC.S.A003a
+
+    - label: "Does the device implement the ColorPointBY attribute?"
+      id: CC.S.A003b
+
+    - label: "Does the device implement the ColorPointBIntensity attribute?"
+      id: CC.S.A003c
+
+    - label: "Does the device implement receiving the MoveToHue command?"
+      id: CC.S.C00.Rsp
+
+    - label: "Does the device implement receiving the MoveHue command?"
+      id: CC.S.C01.Rsp
+
+    - label: "Does the device implement receiving the MoveToHue command?"
+      id: CC.S.C02.Rsp
+
+    - label: "Does the device implement receiving the MoveToSaturation command?"
+      id: CC.S.C03.Rsp
+
+    - label: "Does the device implement receiving the MoveSaturation command?"
+      id: CC.S.C04.Rsp
+
+    - label: "Does the device implement receiving the StepSaturation command?"
+      id: CC.S.C05.Rsp
+
+    - label:
+          "Does the device implement receiving the MoveToHueAndSaturation
+          command?"
+      id: CC.S.C06.Rsp
+
+    - label: "Does the device implement receiving the MoveToColor command?"
+      id: CC.S.C07.Rsp
+
+    - label: "Does the device implement receiving the MoveColor command?"
+      id: CC.S.C08.Rsp
+
+    - label: "Does the device implement receiving the StopMoveStep command?"
+      id: CC.S.C47.Rsp
+
+    - label: "Does the device implement receiving the StepColor command?"
+      id: CC.S.C09.Rsp
+
+    - label:
+          "Does the device implement receiving the MoveToColorTemperature
+          command?"
+      id: CC.S.C0A.Rsp
+
+    - label:
+          "Does the device implement receiving the MoveColorTemperature command?"
+      id: CC.S.C4B.Rsp
+
+    - label:
+          "Does the device implement receiving the StepColorTemperature command?"
+      id: CC.S.C4C.Rsp
+
+    - label:
+          "Does the device implement receiving the EnhancedMoveToHue command?"
+      id: CC.S.C40.Rsp
+
+    - label: "Does the device implement receiving the EnhancedMoveHue command?"
+      id: CC.S.C41.Rsp
+
+    - label: "Does the device implement receiving the EnhancedStepHue command?"
+      id: CC.S.C42.Rsp
+
+    - label:
+          "Does the device implement receiving the
+          EnhancedMoveToHueAndSaturation command?"
+      id: CC.S.C43.Rsp
+
     - label: "Does the device implement receiving the ColorLoopSet command?"
-      id: CR_COLORLOOPSET
-
-    - label: "Does the device implement the COLORLOOPACTIVE attribute?"
-      id: A_COLORLOOPACTIVE
-
-    - label: "Does the device implement the COLORLOOPDIRECTION attribute?"
-      id: A_COLORLOOPDIRECTION
-
-    - label: "Does the device implement the COLORLOOPTIME attribute?"
-      id: A_COLORLOOPTIME
-
-    - label:
-          "Does the device implement the COLORLOOPSTARTENHANCEDHUE attribute?"
-      id: A_COLORLOOPSTARTENHANCEDHUE
-
-    - label:
-          "Does the device implement the COLORLOOPSTOREDENHANCEDHUE attribute?"
-      id: A_COLORLOOPSTOREDENHANCEDHUE
-
-    - label: "Does the device implement the ENHANCEDCURRENTHUE attribute?"
-      id: A_ENHANCEDCURRENTHUE
-
-    - label:
-          "Does the device implement receiving the EnhancedMovetoHue command?"
-      id: CR_ENHANCEDMOVETOHUE
+      id: CC.S.C44.Rsp
 
       # Relative Humidity cluster
     - label: "Does the device implement the MeasuredValue attribute?"
@@ -126,19 +329,22 @@ PICS:
 
       # Software Diagnostics cluster
     - label: "Does the device implement the SoftwareFault event?"
-      id: E_SOFTWAREFAULT
+      id: DGSW.S.E00
 
     - label: "Does the device implement the ThreadMetrics attribute"
-      id: A_THREADMETRICS
+      id: DGSW.S.A0001
+
+    - label: "Does the device implement the CurrentHeapFree attribute"
+      id: DGSW.S.A0002
 
     - label: "Does the device implement the CurrentHeapUsed attribute"
-      id: A_CURRENTHEAPUSED
+      id: DGSW.S.A0003
 
     - label: "Does the device implement the CurrentHeapHighWaterMark attribute"
-      id: A_CURRENTHEAPHIGHWATERMARK
+      id: DGSW.S.A0004
 
     - label: "Does the device implement the ResetWaterMarks command?"
-      id: CR_RESETWATERMARKS
+      id: DGSW.S.C00
 
       # Pump Configuration and Control cluster
     - label: "Does the device implement the attribute OperationMode"

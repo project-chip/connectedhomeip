@@ -349,7 +349,7 @@ async function asTypedLiteral(value, type, cookie)
     // If the number looks like an integer, append ".0" to the end;
     // otherwise adding an "f" suffix makes compilers complain.
     value = value.toString();
-    if (value.match(/^[0-9]+$/)) {
+    if (value.match(/^-?[0-9]+$/)) {
       value = value + ".0";
     }
     return value + 'f';

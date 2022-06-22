@@ -48,9 +48,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
-    /* Initialize LwIP. */
-    lwip_init();
-
     /* Create the thread object. */
     mThread = wiced_rtos_create_thread();
     VerifyOrExit(mThread != nullptr, err = CHIP_ERROR_NO_MEMORY);
