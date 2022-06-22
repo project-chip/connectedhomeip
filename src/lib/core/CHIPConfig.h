@@ -797,11 +797,9 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  * The default value comes from 3sub per fabric * max number of fabrics.
  *
- * TODO: (#17085) Should be changed to (CHIP_CONFIG_MAX_FABRICS * 3) after we can hold more read handlers on more concise
- * devices.
  */
 #ifndef CHIP_IM_MAX_NUM_SUBSCRIPTIONS
-#define CHIP_IM_MAX_NUM_SUBSCRIPTIONS (CHIP_CONFIG_MAX_FABRICS * 2)
+#define CHIP_IM_MAX_NUM_SUBSCRIPTIONS (CHIP_CONFIG_MAX_FABRICS * 3)
 #endif
 
 /**

@@ -31,6 +31,10 @@
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+#include <platform/ESP32/ESP32FactoryDataProvider.h>
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
@@ -38,6 +42,12 @@ using namespace ::chip::DeviceLayer;
 static const char * TAG = "light-app";
 
 static AppDeviceCallbacks EchoCallbacks;
+
+namespace {
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+ESP32FactoryDataProvider sFactoryDataProvider;
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+} // namespace
 
 static void InitServer(intptr_t context)
 {
@@ -68,7 +78,6 @@ extern "C" void app_main()
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
 #endif
-
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);

@@ -42,6 +42,7 @@ tests:
           value: 1
 
     - label: "Reads EnhancedCurrentHue attribute from DUT"
+      PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -51,6 +52,7 @@ tests:
               maxValue: 65535
 
     - label: "Enhanced move to hue and saturation command"
+      PICS: CC.S.C43.Rsp
       command: "EnhancedMoveToHueAndSaturation"
       arguments:
           values:
@@ -76,6 +78,7 @@ tests:
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
+      PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:

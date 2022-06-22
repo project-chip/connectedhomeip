@@ -1959,10 +1959,12 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotificatio
                                                                                   const otSrpClientService * aRemovedServices,
                                                                                   void * aContext)
 {
+    const char * errorStr = nullptr;
+
     switch (aError)
     {
     case OT_ERROR_NONE: {
-        ChipLogDetail(DeviceLayer, "OnSrpClientNotification: Last requested operation completed successfully");
+        ChipLogDetail(DeviceLayer, "SRP update succeeded");
 
         if (aHostInfo)
         {
@@ -1995,35 +1997,40 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotificatio
         break;
     }
     case OT_ERROR_PARSE:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Parsing operaton failed");
+        errorStr = "parsing operation failed";
         break;
     case OT_ERROR_NOT_FOUND:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Domain name or RRset does not exist");
+        errorStr = "domain name or RRset does not exist";
         break;
     case OT_ERROR_NOT_IMPLEMENTED:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Server does not support query type");
+        errorStr = "server does not support query type";
         break;
     case OT_ERROR_SECURITY:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Operation refused for security reasons");
+        errorStr = "operation refused for security reasons";
         break;
     case OT_ERROR_DUPLICATED:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Domain name or RRset is duplicated");
+        errorStr = "domain name or RRset is duplicated";
         break;
     case OT_ERROR_RESPONSE_TIMEOUT:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Timed out waiting on server response");
+        errorStr = "timed out waiting on server response";
         break;
     case OT_ERROR_INVALID_ARGS:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Invalid service structure detected");
+        errorStr = "invalid service structure detected";
         break;
     case OT_ERROR_NO_BUFS:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Insufficient buffer to handle message");
+        errorStr = "insufficient buffer to handle message";
         break;
     case OT_ERROR_FAILED:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Internal server error occurred");
+        errorStr = "internal server error";
         break;
     default:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Unknown error occurred");
+        errorStr = "unknown error";
         break;
+    }
+
+    if (errorStr != nullptr)
+    {
+        ChipLogError(DeviceLayer, "SRP update error: %s", errorStr);
     }
 }
 
@@ -2057,10 +2064,46 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientStateChange
 }
 
 template <class ImplClass>
-bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::SrpClient::Service::Matches(const char * aInstanceName,
-                                                                                      const char * aName) const
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::SrpClient::Service::Matches(const char * instanceName,
+                                                                                      const char * name) const
 {
-    return IsUsed() && (strcmp(mService.mInstanceName, aInstanceName) == 0) && (strcmp(mService.mName, aName) == 0);
+    return IsUsed() && (strcmp(mService.mInstanceName, instanceName) == 0) && (strcmp(mService.mName, name) == 0);
+}
+
+template <class ImplClass>
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::SrpClient::Service::Matches(
+    const char * instanceName, const char * name, uint16_t port, const Span<const char * const> & subTypes,
+    const Span<const Dnssd::TextEntry> & txtEntries) const
+{
+    size_t myNumSubTypes = 0;
+
+    for (const char * const * mySubType = mService.mSubTypeLabels; (mySubType != nullptr) && (*mySubType != nullptr); ++mySubType)
+    {
+        myNumSubTypes++;
+    }
+
+    VerifyOrReturnError(Matches(instanceName, name) && mService.mPort == port, false);
+    VerifyOrReturnError(myNumSubTypes == subTypes.size() && mService.mNumTxtEntries == txtEntries.size(), false);
+
+    const char * const * mySubType = mService.mSubTypeLabels;
+
+    for (const char * subType : subTypes)
+    {
+        VerifyOrReturnError(strcmp(*mySubType, subType) == 0, false);
+        ++mySubType;
+    }
+
+    const otDnsTxtEntry * myTxtEntry = mService.mTxtEntries;
+
+    for (const Dnssd::TextEntry & txtEntry : txtEntries)
+    {
+        VerifyOrReturnError(strcmp(myTxtEntry->mKey, txtEntry.mKey) == 0, false);
+        VerifyOrReturnError(
+            ByteSpan(myTxtEntry->mValue, myTxtEntry->mValueLength).data_equal(ByteSpan(txtEntry.mData, txtEntry.mDataSize)), false);
+        ++myTxtEntry;
+    }
+
+    return true;
 }
 
 template <class ImplClass>
@@ -2085,9 +2128,16 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     // remove the possible existing entry from anywhere in the list
     for (typename SrpClient::Service & service : mSrpClient.mServices)
     {
-        // Remove possible existing entry
+        if (service.Matches(aInstanceName, aName, aPort, aSubTypes, aTxtEntries))
+        {
+            // Re-adding existing service without any changes
+            service.mIsInvalid = false;
+            ExitNow();
+        }
+
         if (service.Matches(aInstanceName, aName))
         {
+            // Updating existing service
             SuccessOrExit(error = MapOpenThreadError(otSrpClientClearService(mOTInst, &service.mService)));
             // Clear memory immediately, as OnSrpClientNotification will not be called.
             memset(&service, 0, sizeof(service));

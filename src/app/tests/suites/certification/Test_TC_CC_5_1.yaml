@@ -40,6 +40,7 @@ tests:
           value: 1
 
     - label: "Check current x attribute value matched before any change"
+      PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -49,6 +50,7 @@ tests:
               maxValue: 65279
 
     - label: "Check current y attribute value matched before any change"
+      PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:
@@ -58,6 +60,7 @@ tests:
               maxValue: 65279
 
     - label: "Move to Color command"
+      PICS: CC.S.C07.Rsp
       command: "MoveToColor"
       arguments:
           values:
@@ -83,6 +86,7 @@ tests:
     - label:
           "Check current x attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -94,6 +98,7 @@ tests:
     - label:
           "Check current y attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:

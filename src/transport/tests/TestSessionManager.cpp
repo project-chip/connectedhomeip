@@ -848,6 +848,77 @@ void SessionCounterExhaustedTest(nlTestSuite * inSuite, void * inContext)
     sessionManager.Shutdown();
 }
 
+static void SessionShiftingTest(nlTestSuite * inSuite, void * inContext)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    NodeId aliceNodeId           = 0x11223344ull;
+    NodeId bobNodeId             = 0x12344321ull;
+    FabricIndex aliceFabricIndex = 1;
+    FabricIndex bobFabricIndex   = 1;
+
+    SessionManager sessionManager;
+    secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    SessionHolder aliceToBobSession;
+    CHIP_ERROR err = sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex,
+                                                                 peer, CryptoContext::SessionRole::kInitiator);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    class StickySessionDelegate : public SessionDelegate
+    {
+    public:
+        NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }
+        void OnSessionReleased() override {}
+    } delegate;
+
+    SessionHolderWithDelegate stickyAliceToBobSession(aliceToBobSession.Get().Value(), delegate);
+    NL_TEST_ASSERT(inSuite, aliceToBobSession.Contains(stickyAliceToBobSession.Get().Value()));
+
+    SessionHolder bobToAliceSession;
+    err = sessionManager.InjectCaseSessionWithTestKey(bobToAliceSession, 1, 2, bobNodeId, aliceNodeId, bobFabricIndex, peer,
+                                                      CryptoContext::SessionRole::kResponder);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SessionHolder newAliceToBobSession;
+    err = sessionManager.InjectCaseSessionWithTestKey(newAliceToBobSession, 3, 4, aliceNodeId, bobNodeId, aliceFabricIndex, peer,
+                                                      CryptoContext::SessionRole::kInitiator);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Here we got 3 sessions, and 4 holders:
+    // 1. alice -> bob: aliceToBobSession, stickyAliceToBobSession
+    // 2. alice <- bob: bobToAliceSession
+    // 3. alice -> bob: newAliceToBobSession
+
+    SecureSession * session1 = aliceToBobSession->AsSecureSession();
+    SecureSession * session2 = bobToAliceSession->AsSecureSession();
+    SecureSession * session3 = newAliceToBobSession->AsSecureSession();
+
+    NL_TEST_ASSERT(inSuite, session1 != session3);
+    NL_TEST_ASSERT(inSuite, stickyAliceToBobSession->AsSecureSession() == session1);
+
+    // Now shift the 1st session to the 3rd one, after shifting, holders should be:
+    // 1. alice -> bob: stickyAliceToBobSession
+    // 2. alice <- bob: bobToAliceSession
+    // 3. alice -> bob: aliceToBobSession, newAliceToBobSession
+    sessionManager.GetSecureSessions().NewerSessionAvailable(newAliceToBobSession.Get().Value()->AsSecureSession());
+
+    NL_TEST_ASSERT(inSuite, aliceToBobSession);
+    NL_TEST_ASSERT(inSuite, stickyAliceToBobSession);
+    NL_TEST_ASSERT(inSuite, newAliceToBobSession);
+
+    NL_TEST_ASSERT(inSuite, stickyAliceToBobSession->AsSecureSession() == session1);
+    NL_TEST_ASSERT(inSuite, bobToAliceSession->AsSecureSession() == session2);
+    NL_TEST_ASSERT(inSuite, aliceToBobSession->AsSecureSession() == session3);
+    NL_TEST_ASSERT(inSuite, newAliceToBobSession->AsSecureSession() == session3);
+
+    sessionManager.Shutdown();
+}
+
 // Test Suite
 
 /**
@@ -864,6 +935,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Too-old counter Test",           SendPacketWithTooOldCounterTest),
     NL_TEST_DEF("Session Allocation Test",        SessionAllocationTest),
     NL_TEST_DEF("Session Counter Exhausted Test", SessionCounterExhaustedTest),
+    NL_TEST_DEF("SessionShiftingTest",            SessionShiftingTest),
 
     NL_TEST_SENTINEL()
 };

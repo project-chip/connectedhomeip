@@ -120,6 +120,10 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     export PATH=$PATH:path/to/connectedhomeip/out/host
     ```
 
+-   To erase flash of the chip.
+
+        $ idf.py -p /dev/tty.SLAB_USBtoUART erase-flash
+
     Below mentioned command generates the nvs image with test DAC with
     VID:0xFFF2 and PID:8001
 
@@ -170,6 +174,9 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 -   If desired, the monitor can be run again like so:
 
         $ idf.py -p /dev/tty.SLAB_USBtoUART monitor
+
+-   Commissioning over ble after flashing script, change the passcode, replace
+    `20202021` with `99663300`.
 
 ## Commissioning over BLE using chip-tool
 
