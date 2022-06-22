@@ -35,7 +35,7 @@ using namespace chip::app::Clusters;
 void LightSwitch::Init(chip::EndpointId aLightDimmerSwitchEndpoint, chip::EndpointId aLightGenericSwitchEndpointId)
 {
     BindingHandler::GetInstance().Init();
-    mLightSwitchEndpoint = aLightDimmerSwitchEndpoint;
+    mLightSwitchEndpoint          = aLightDimmerSwitchEndpoint;
     mLightGenericSwitchEndpointId = aLightGenericSwitchEndpointId;
 }
 
@@ -87,14 +87,16 @@ void LightSwitch::DimmerChangeBrightness()
     }
 }
 
-void LightSwitch::GenericSwitchInitialPress() {
-    uint8_t newPosition      = 1;
+void LightSwitch::GenericSwitchInitialPress()
+{
+    uint8_t newPosition = 1;
 
     Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, newPosition);
     Clusters::SwitchServer::Instance().OnInitialPress(mLightGenericSwitchEndpointId, newPosition);
 }
 
-void LightSwitch::GenericSwitchReleasePress() {
+void LightSwitch::GenericSwitchReleasePress()
+{
     uint8_t previousPosition = 0;
 
     Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, previousPosition);
