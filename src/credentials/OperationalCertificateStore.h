@@ -64,19 +64,19 @@ public:
     virtual bool HasCertificateForFabric(FabricIndex fabricIndex, CertChainElement element) const = 0;
 
     /**
-     * @brief Add and temporarily activate a new Trusted Root Certificate to storage for the given fabric
+     * @brief Add and temporarily activate a new Trusted Root Certificate for the given fabric
      *
      * The certificate is temporary until committed or reverted.
-     * The certificate is committed to storage on `CommitOpCertsForFabric`.
+     * The certificate is committed to storage only on `CommitOpCertsForFabric`.
      * The certificate is destroyed if `RevertPendingOpCerts` is called before `CommitOpCertsForFabric`.
      *
      * Only one pending trusted root certificate is supported at a time and it is illegal
      * to call this method if there is already a persisted root certificate for the given
      * fabric.
      *
-     * Uniqueness constraints for roots (see AddTrustedRootCertificate command in spec) is not
+     * Uniqueness constraints for roots (see AddTrustedRootCertificate command in spec) are not
      * enforced by this method and must be done as a more holistic check elsewhere. Cryptographic
-     * signature verification or path validation is not enforced by this method.
+     * signature verification or path validation are not enforced by this method.
      *
      * If `UpdateOpCertsForFabric` had been called before this method, this method will return
      * CHIP_ERROR_INCORRECT_STATE since it is illegal to update trusted roots when updating an
@@ -106,11 +106,11 @@ public:
      * to call this method if there is already a persisted certificate chain for the given
      * fabric.
      *
-     * Cryptographic signature verification or path validation is not enforced by this method.
+     * Cryptographic signature verification or path validation are not enforced by this method.
      *
      * If `UpdateOpCertsForFabric` had been called before this method, this method will return
      * CHIP_ERROR_INCORRECT_STATE since it is illegal to add a certificate chain after
-     * updating an existing NOC updating prior to a commit.
+     * updating an existing NOC and before committing or reverting the update.
      *
      * If `AddNewTrustedRootCertForFabric` had not been called before this method, this method will
      * return CHIP_ERROR_INCORRECT_STATE since it is illegal in this implementation to store an
@@ -129,7 +129,7 @@ public:
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_NO_MEMORY if there is insufficient memory to maintain the temporary `noc` and `icac` cert copies
      * @retval CHIP_ERROR_INVALID_ARGUMENT if either the noc or icac are invalid sizes
-     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if `fabricIndex` mismatches the one from previous successful
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if `fabricIndex` mismatches the one from a previous successful
      *                                         `AddNewTrustedRootCertForFabric`.
      * @retval CHIP_ERROR_INCORRECT_STATE if the certificate store is not properly initialized, if this method
      *                                    is called after `UpdateOpCertsForFabric`, or if there was
@@ -151,33 +151,34 @@ public:
      * to call this method if there was not already a persisted certificate chain for the given
      * fabric.
      *
-     * Cryptographic signature verification or path validation is not enforced by this method.
+     * Cryptographic signature verification or path validation are not enforced by this method.
      *
      * If `AddNewOpCertsForFabric` had been called before this method, this method will return
      * CHIP_ERROR_INCORRECT_STATE since it is illegal to update a certificate chain after
-     * adding an existing NOC updating prior to a commit.
+     * adding an existing NOC and before committing or reverting the addition.
      *
-     * If there is no existing persisted trusted root certificate for the given fabricIndex, this
-     * method will method will eturn CHIP_ERROR_INCORRECT_STATE since it is illegal in this
-     * implementation to store an NOC chain without associated root.
+     * If there is no existing persisted trusted root certificate and NOC chain for the given
+     * fabricIndex, this method will return CHIP_ERROR_INCORRECT_STATE since it is
+     * illegal in this implementation to store an NOC chain without associated root, and it is illegal
+     * to update an opcert for a fabric not already configured.
      *
-     * @param fabricIndex - FabricIndex for which to add a new operational certificate chain
-     * @param noc - Buffer containing the NOC certificate to update
-     * @param icac - Buffer containing the ICAC certificate to update. If no ICAC is needed, `icac.empty()` must be true.
+     * @param fabricIndex - FabricIndex for which to update the operational certificate chain
+     * @param noc - Buffer containing the new NOC certificate to use
+     * @param icac - Buffer containing the ICAC certificate to use. If no ICAC is needed, `icac.empty()` must be true.
      *
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_NO_MEMORY if there is insufficient memory to maintain the temporary `noc` and `icac` cert copies
      * @retval CHIP_ERROR_INVALID_ARGUMENT if either the noc or icac are invalid sizes
      * @retval CHIP_ERROR_INCORRECT_STATE if the certificate store is not properly initialized, if this method
      *                                    is called after `AddNewOpCertsForFabric`, or if there was
-     *                                    already a pending cert chain for the given `fabricIndex`,
-     *                                    or if there is no associated persisted root for for the given `fabricIndex`.
+     *                                    already a pending cert chain for the given `fabricIndex`, or if there are
+     *                                    no associated persisted root and NOC chain for for the given `fabricIndex`.
      * @retval other CHIP_ERROR value on internal errors
      */
     virtual CHIP_ERROR UpdateOpCertsForFabric(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac) = 0;
 
     /**
-     * @brief Permanently commit the certificate chain last setup via successful calls to
+     * @brief Permanently commit the certificate chain last configured via successful calls to
      *        legal combinations of `AddNewTrustedRootCertForFabric`, `AddNewOpCertsForFabric` or
      *        `UpdateOpCertsForFabric`, replacing previously committed data, if any.
      *
@@ -187,8 +188,8 @@ public:
      *
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_INCORRECT_STATE if the certificate store is not properly initialized,
-     *                                    or if not valid pending state is available.
-     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if there are no pending certificate chain for `fabricIndex`
+     *                                    or if no valid pending state is available.
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if there is no pending certificate chain for `fabricIndex`
      * @retval other CHIP_ERROR value on internal storage errors
      */
     virtual CHIP_ERROR CommitOpCertsForFabric(FabricIndex fabricIndex) = 0;
@@ -196,15 +197,14 @@ public:
     /**
      * @brief Permanently remove the certificate chain associated with a fabric.
      *
-     * This is to be used for fail-safe handling and RemoveFabric.  Removes both the
-     * pending operational cert chain elements for the fabricIndex (if any) and the committed
-     * ones (if any).
+     * This is to be used for RemoveFabric. Removes both the pending operational cert chain
+     * elements for the fabricIndex (if any) and the committed ones (if any).
      *
      * @param fabricIndex - FabricIndex for which to remove the operational cert chain
      *
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_INCORRECT_STATE if the certificate store is not properly initialized.
-     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if there was not operational certificate data at all for `fabricIndex`
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if there was no operational certificate data at all for `fabricIndex`
      * @retval other CHIP_ERROR value on internal storage errors
      */
     virtual CHIP_ERROR RemoveOpCertsForFabric(FabricIndex fabricIndex) = 0;
@@ -234,7 +234,7 @@ public:
      * @param outCertificate - buffer to contain the certificate obtained from persistent or temporary storage
      *
      * @retval CHIP_NO_ERROR on success.
-     * @retval CHIP_ERROR_BUFFER_TOO_SMALL if `outCertificate` does not fit the certificate.
+     * @retval CHIP_ERROR_BUFFER_TOO_SMALL if `outCertificate` is too small to fit the certificate found.
      * @retval CHIP_ERROR_INCORRECT_STATE if the certificate store is not properly initialized.
      * @retval CHIP_ERROR_NOT_FOUND if the element cannot be found.
      * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if the fabricIndex is invalid.
