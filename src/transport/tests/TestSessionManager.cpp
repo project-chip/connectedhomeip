@@ -1015,7 +1015,7 @@ int Finalize(void * aContext)
  */
 int TestSessionManager()
 {
-    TestContext sContext;
+    static TestContext sContext;
 
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);

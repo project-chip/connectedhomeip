@@ -502,7 +502,7 @@ static int Finalize(void * aContext)
 
 int TestTCP()
 {
-    TestContext sContext;
+    static TestContext sContext;
 
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
