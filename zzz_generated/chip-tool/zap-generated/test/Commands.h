@@ -76478,7 +76478,7 @@ private:
 class Test_TC_MC_6_4Suite : public TestCommand
 {
 public:
-    Test_TC_MC_6_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_4", 22, credsIssuerConfig)
+    Test_TC_MC_6_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_4", 24, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -76610,26 +76610,42 @@ private:
         case 15:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
+                float value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("playbackSpeed", value, -1.0f));
             }
             break;
         case 16:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 17:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
             }
             break;
-        case 18:
+        case 17:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
+        case 18:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                float value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("playbackSpeed", value, -2.0f));
+            }
+            break;
         case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 20:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 21:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 float value;
@@ -76637,10 +76653,10 @@ private:
                 VerifyOrReturn(CheckValue("playbackSpeed", value, 1.0f));
             }
             break;
-        case 20:
+        case 22:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 4));
             break;
-        case 21:
+        case 23:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 4));
             break;
         default:
@@ -76769,7 +76785,12 @@ private:
                                  true, chip::NullOptional);
         }
         case 15: {
-            LogStep(15, "Sends a Rewind command to the DUT");
+            LogStep(15, "Reads the PlaybackSpeed attribute from the DUT");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::PlaybackSpeed::Id,
+                                 true, chip::NullOptional);
+        }
+        case 16: {
+            LogStep(16, "Sends a Rewind command to the DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Rewind::Type value;
@@ -76778,16 +76799,21 @@ private:
 
             );
         }
-        case 16: {
-            LogStep(16, "log a command");
+        case 17: {
+            LogStep(17, "log a command");
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Verify that the media play has reversed directiongarbage: not in length on purpose", 49);
             return UserPrompt(kIdentityAlpha, value);
         }
-        case 17: {
-            LogStep(17, "Sends a Play command");
+        case 18: {
+            LogStep(18, "Reads the PlaybackSpeed attribute from the DUT");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::PlaybackSpeed::Id,
+                                 true, chip::NullOptional);
+        }
+        case 19: {
+            LogStep(19, "Sends a Play command");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Play::Type value;
@@ -76796,22 +76822,22 @@ private:
 
             );
         }
-        case 18: {
-            LogStep(18, "log a command");
+        case 20: {
+            LogStep(20, "log a command");
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Verify that the media is has resumed playing forward at the default speedgarbage: not in length on purpose", 73);
             return UserPrompt(kIdentityAlpha, value);
         }
-        case 19: {
-            LogStep(19, "Reads the PlaybackSpeed attribute from the DUT");
+        case 21: {
+            LogStep(21, "Reads the PlaybackSpeed attribute from the DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::PlaybackSpeed::Id,
                                  true, chip::NullOptional);
         }
-        case 20: {
-            LogStep(20, "Sends consecutive FastForward commands");
+        case 22: {
+            LogStep(22, "Sends consecutive FastForward commands");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::FastForward::Type value;
@@ -76820,8 +76846,8 @@ private:
 
             );
         }
-        case 21: {
-            LogStep(21, "Sends consecutive Rewind commands");
+        case 23: {
+            LogStep(23, "Sends consecutive Rewind commands");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Rewind::Type value;
