@@ -40,6 +40,7 @@ tests:
           value: 1
 
     - label: "Move hue up command"
+      PICS: CC.S.C01.Rsp
       command: "MoveHue"
       arguments:
           values:
@@ -53,6 +54,7 @@ tests:
                 value: 0
 
     - label: "Reads CurrentHue attribute from DUT"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -62,6 +64,7 @@ tests:
               maxValue: 254
 
     - label: "Stop Move Step command"
+      PICS: CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
           values:
@@ -71,6 +74,7 @@ tests:
                 value: 0
 
     - label: "Reads CurrentHue attribute from DUT"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -90,6 +94,7 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           attribute"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -99,6 +104,7 @@ tests:
               maxValue: 254
 
     - label: "Move saturation up command"
+      PICS: CC.S.C04.Rsp
       command: "MoveSaturation"
       arguments:
           values:
@@ -114,6 +120,7 @@ tests:
     - label:
           "Check Saturation attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -123,6 +130,7 @@ tests:
               maxValue: 254
 
     - label: "Stop Move Step command"
+      PICS: CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
           values:
@@ -133,6 +141,7 @@ tests:
 
     - label: "Reads CurrentSaturation attribute from DUT."
       command: "readAttribute"
+      PICS: CC.S.A0001
       attribute: "CurrentSaturation"
       response:
           constraints:
@@ -151,6 +160,7 @@ tests:
     - label:
           "Check Saturation attribute value matched the value sent by the last
           attribute"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -160,6 +170,7 @@ tests:
               maxValue: 254
 
     - label: "Move Color command"
+      PICS: CC.S.C08.Rsp
       command: "MoveColor"
       arguments:
           values:
@@ -173,6 +184,7 @@ tests:
                 value: 0
 
     - label: "Reads CurrentX attribute from DUT"
+      PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -182,6 +194,7 @@ tests:
               maxValue: 65279
 
     - label: "Reads CurrentY attribute from DUT"
+      PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:
@@ -191,6 +204,7 @@ tests:
               maxValue: 65279
 
     - label: "Stop Move Step command"
+      PICS: CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
           values:
@@ -200,6 +214,7 @@ tests:
                 value: 0
 
     - label: "Reads CurrentX attribute from DUT"
+      PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -209,6 +224,7 @@ tests:
               maxValue: 65279
 
     - label: "Reads CurrentY attribute from DUT"
+      PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:
@@ -228,6 +244,7 @@ tests:
     - label:
           "Check current x attribute value matched the value sent by the last
           attribute"
+      PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -239,6 +256,7 @@ tests:
     - label:
           "Check current y attribute value matched the value sent by the last
           attribute"
+      PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:
@@ -248,6 +266,7 @@ tests:
               maxValue: 65279
 
     - label: "Move up color temperature command"
+      PICS: CC.S.C4B.Rsp
       command: "MoveColorTemperature"
       arguments:
           values:
@@ -265,6 +284,7 @@ tests:
                 value: 0
 
     - label: "Reads current color temprature from DUT"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -274,6 +294,7 @@ tests:
               maxValue: 65279
 
     - label: "Stop Move Step command"
+      PICS: CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
           values:
@@ -283,6 +304,7 @@ tests:
                 value: 0
 
     - label: "Reads current color temprature from DUT"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -302,6 +324,7 @@ tests:
     - label:
           "Reads current color attribute value matched the value sent by the
           last attribute"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -311,6 +334,7 @@ tests:
               maxValue: 65279
 
     - label: "Enhanced Move Hue Up command"
+      PICS: CC.S.C41.Rsp
       command: "EnhancedMoveHue"
       arguments:
           values:
@@ -324,6 +348,7 @@ tests:
                 value: 0
 
     - label: "Reads EnhancedCurrentHue attribute value from DUT"
+      PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -333,6 +358,7 @@ tests:
               maxValue: 65535
 
     - label: "Stop Move Step command"
+      PICS: CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
           values:
@@ -342,6 +368,7 @@ tests:
                 value: 0
 
     - label: "Reads EnhancedCurrentHue attribute value from DUT"
+      PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -361,6 +388,7 @@ tests:
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last attribute"
+      PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:

@@ -490,10 +490,6 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.do_build:
-        branch = shell.run_cmd(
-            "git branch | awk -v FS=' ' '/\*/{print $NF}' | sed 's|[()]||g'", return_cmd_output=True).replace("\n", "")
-        commit_id = shell.run_cmd("git rev-parse HEAD", return_cmd_output=True).replace("\n", "")
-
         if options.use_zzz:
             flush_print("Using pre-generated ZAP output")
             zzz_dir = os.path.join(_CHEF_SCRIPT_PATH,
@@ -579,7 +575,7 @@ def main(argv: Sequence[str]) -> None:
                         chip_shell_cmd_server = false
                         chip_build_libshell = true
                         chip_config_network_layer_ble = false
-                        target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.do_rpc else '0'}", "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\\"{branch}:{commit_id}\\""]
+                        target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.do_rpc else '0'}"]
                         """))
             with open(f"{_CHEF_SCRIPT_PATH}/linux/sample.gni", "w") as f:
                 f.write(textwrap.dedent(f"""\

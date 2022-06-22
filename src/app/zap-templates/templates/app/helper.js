@@ -322,7 +322,7 @@ async function asTypedExpression(value, type)
   return `static_cast<${resultType}>(${value})`;
 }
 
-async function asTypedLiteral(value, type)
+async function asTypedLiteral(value, type, cookie)
 {
   const valueIsANumber = !isNaN(value);
   if (!valueIsANumber) {
@@ -335,6 +335,7 @@ async function asTypedLiteral(value, type)
     return value + 'L';
   case 'int64_t':
     return value + 'LL';
+  case 'uint8_t':
   case 'uint16_t':
     return value + 'U';
   case 'uint32_t':
@@ -348,7 +349,7 @@ async function asTypedLiteral(value, type)
     // If the number looks like an integer, append ".0" to the end;
     // otherwise adding an "f" suffix makes compilers complain.
     value = value.toString();
-    if (value.match(/^[0-9]+$/)) {
+    if (value.match(/^-?[0-9]+$/)) {
       value = value + ".0";
     }
     return value + 'f';

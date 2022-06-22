@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,37 +18,23 @@
 
 #pragma once
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+#include <app/TestEventTriggerDelegate.h>
 
-struct AppEvent
+namespace chip {
+
+class OTATestEventTriggerDelegate : public TestEventTriggerDelegate
 {
-    enum AppEventTypes
-    {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_Light,
-        kEventType_Install,
-    };
+public:
+    static constexpr uint64_t kOtaQueryTrigger         = 0x0100'0000'0000'0100;
+    static constexpr uint64_t kOtaQueryFabricIndexMask = 0xff;
 
-    uint16_t Type;
+    explicit OTATestEventTriggerDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey) {}
 
-    union
-    {
-        struct
-        {
-            uint8_t Action;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } LightEvent;
-    };
+    bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
 
-    EventHandler Handler;
+private:
+    ByteSpan mEnableKey;
 };
+
+} // namespace chip

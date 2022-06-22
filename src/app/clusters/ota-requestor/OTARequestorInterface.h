@@ -145,14 +145,6 @@ public:
     using OTAUpdateStateEnum   = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
     using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
 
-    // Return value for various trigger-type APIs
-    enum OTATriggerResult
-    {
-        kTriggerSuccessful = 0,
-        kNoProviderKnown   = 1,
-        kWrongState        = 2
-    };
-
     // Reset any relevant states
     virtual void Reset(void) = 0;
 
@@ -167,8 +159,9 @@ public:
     // Destructor
     virtual ~OTARequestorInterface() = default;
 
-    // Application API to send the QueryImage command and start the image update process with the next available Provider
-    virtual OTATriggerResult TriggerImmediateQuery() = 0;
+    // Application API to send the QueryImage command and start the image update process.
+    // The `fabricIndex` optional argument can be used to explicitly select the OTA provider.
+    virtual CHIP_ERROR TriggerImmediateQuery(FabricIndex fabricIndex = kUndefinedFabricIndex) = 0;
 
     // Internal API meant for use by OTARequestorDriver to send the QueryImage command and start the image update process
     // with the preset provider

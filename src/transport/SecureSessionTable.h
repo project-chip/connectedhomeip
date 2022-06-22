@@ -94,6 +94,32 @@ public:
     CHECK_RETURN_VALUE
     Optional<SessionHandle> FindSecureSessionByLocalKey(uint16_t localSessionId);
 
+    // Select SessionHolders which are pointing to a session with the same peer as the given session. Shift them to the given
+    // session.
+    // This is an internal API, using raw pointer to a session is allowed here.
+    void NewerSessionAvailable(SecureSession * session)
+    {
+        VerifyOrDie(session->GetSecureSessionType() == SecureSession::Type::kCASE);
+        mEntries.ForEachActiveObject([&](SecureSession * oldSession) {
+            if (session == oldSession)
+                return Loop::Continue;
+
+            SessionHandle ref(*oldSession);
+
+            // This will give all SessionHolders pointing to oldSession a chance to switch to the provided session
+            //
+            // See documentation for SessionDelegate::GetNewSessionHandlingPolicy about how session auto-shifting works, and how
+            // to disable it for a specific SessionHolder in a specific scenario.
+            if (oldSession->GetSecureSessionType() == SecureSession::Type::kCASE && oldSession->GetPeer() == session->GetPeer() &&
+                oldSession->GetPeerCATs() == session->GetPeerCATs())
+            {
+                oldSession->NewerSessionAvailable(SessionHandle(*session));
+            }
+
+            return Loop::Continue;
+        });
+    }
+
 private:
     friend class TestSecureSessionTable;
 

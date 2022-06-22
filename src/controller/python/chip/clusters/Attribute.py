@@ -468,6 +468,7 @@ class SubscriptionTransaction:
     def __init__(self, transaction: 'AsyncReadTransaction', subscriptionId, devCtrl):
         self._onAttributeChangeCb = DefaultAttributeChangeCallback
         self._onEventChangeCb = DefaultEventChangeCallback
+        self._onErrorCb = DefaultErrorCallback
         self._readTransaction = transaction
         self._subscriptionId = subscriptionId
         self._devCtrl = devCtrl
@@ -502,6 +503,13 @@ class SubscriptionTransaction:
         if callback is not None:
             self._onEventChangeCb = callback
 
+    def SetErrorCallback(self, callback: Callable[[int, SubscriptionTransaction], None]):
+        '''
+        Sets the callback function in case a subscription error occured, accepts a Callable accepts an error code and the cached data.
+        '''
+        if callback is not None:
+            self._onErrorCb = callback
+
     @property
     def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
         return self._onAttributeChangeCb
@@ -509,6 +517,10 @@ class SubscriptionTransaction:
     @property
     def OnEventChangeCb(self) -> Callable[[EventReadResult, SubscriptionTransaction], None]:
         return self._onEventChangeCb
+
+    @property
+    def OnErrorCb(self) -> Callable[[int, SubscriptionTransaction], None]:
+        return self._onErrorCb
 
     def Shutdown(self):
         if (self._isDone):
@@ -543,6 +555,10 @@ def DefaultAttributeChangeCallback(path: TypedAttributePath, transaction: Subscr
 def DefaultEventChangeCallback(data: EventReadResult, transaction: SubscriptionTransaction):
     print("Received Event:")
     pprint(data, expand_all=True)
+
+
+def DefaultErrorCallback(chipError: int, transaction: SubscriptionTransaction):
+    print("Error during Subscription: Chip Stack Error %d".format(chipError))
 
 
 def _BuildEventIndex():
@@ -659,8 +675,10 @@ class AsyncReadTransaction:
         self._handleEventData(header, path, data, status)
 
     def _handleError(self, chipError: int):
-        self._future.set_exception(
-            chip.exceptions.ChipStackError(chipError))
+        if not self._future.done():
+            self._future.set_exception(
+                chip.exceptions.ChipStackError(chipError))
+        self._subscription_handler.OnErrorCb(chipError, self._subscription_handler)
 
     def handleError(self, chipError: int):
         self._event_loop.call_soon_threadsafe(
