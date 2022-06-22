@@ -1,4 +1,4 @@
-# Matter CC32XXSF Lock Example Application
+# Matter `CC32XXSF` Lock Example Application
 
 An example application showing the use of [Matter][matter] on the Texas
 Instruments CC32XX family of Wireless MCUs.
@@ -167,8 +167,8 @@ BLE provisioning is not supported currently.
 ### CHIP tool changes needed for Wi-Fi example
 
 The timeout for the CHIP tool needs to be increased from 10 to 15 seconds. This
-can be done in chip::System::Clock::Timeout GetWaitDuration in
-connectedhomeip/examples/chip-tool/commands/clusters/ModelCommand.h
+can be done in `chip::System::Clock::Timeout GetWaitDuration` in
+`connectedhomeip/examples/chip-tool/commands/clusters/ModelCommand.h`
 
 ## TI Support
 

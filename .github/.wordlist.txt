@@ -554,7 +554,6 @@ GetIP
 getManualTests
 getstarted
 getTests
-GetWaitDuration
 GH
 ghp
 githubusercontent
@@ -832,7 +831,6 @@ MLD
 mmevk
 moal
 ModeSelect
-ModelCommand
 modprobe
 Modustoolbox
 moveMode
@@ -1441,7 +1439,6 @@ xfffff
 xFFFFFFEFFFFFFFFF
 xtensa
 xwayland
-XXSF
 xyz
 xz
 xzvf
