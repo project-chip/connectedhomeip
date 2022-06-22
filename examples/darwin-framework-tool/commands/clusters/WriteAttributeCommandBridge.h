@@ -22,6 +22,9 @@
 
 #include "ModelCommandBridge.h"
 
+#import <Matter/Matter.h>
+#import "MTRError_Utils.h"
+
 class WriteAttribute : public ModelCommand {
 public:
     WriteAttribute()

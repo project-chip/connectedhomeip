@@ -18,8 +18,10 @@
 
 #pragma once
 
+
 #import <Matter/Matter.h>
-#import <Matter/MTRDevice_Internal.h> // For NSObjectFromCHIPTLV
+#import "MTRError_Utils.h"
+
 #include <lib/support/UnitTestUtils.h>
 
 #include "ModelCommandBridge.h"

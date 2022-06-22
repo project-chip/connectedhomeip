@@ -28,11 +28,12 @@
 #include <lib/support/UnitTestUtils.h>
 #include <map>
 #include <string>
-#include <zap-generated/cluster/CHIPTestClustersObjc.h>
+#include <zap-generated/cluster/MTRTestClustersObjc.h>
 
 #import <Matter/Matter.h>
 
-#include "MTRError_Internal.h"
+#import "MTRError_Utils.h"
+#import "MTRDevice_Externs.h"
 
 class TestCommandBridge;
 
@@ -43,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property chip::NodeId deviceId;
 @property BOOL active; // Whether to pass on notifications to the commandBridge
 
-- (void)onStatusUpdate:(CHIPPairingStatus)status;
+- (void)onStatusUpdate:(MTRPairingStatus)status;
 - (void)onPairingComplete:(NSError * _Nullable)error;
 - (void)onPairingDeleted:(NSError * _Nullable)error;
 - (void)onCommissioningComplete:(NSError * _Nullable)error;
@@ -194,7 +195,7 @@ public:
     void PairingComplete(chip::NodeId nodeId)
     {
         MTRDeviceController * commissioner = CurrentCommissioner();
-        VerifyOrReturn(controller != nil, Exit("No current commissioner"));
+        VerifyOrReturn(commissioner != nil, Exit("No current commissioner"));
 
         NSError * commissionError = nil;
         [commissioner commissionDevice:nodeId commissioningParams:[[MTRCommissioningParameters alloc] init] error:&commissionError];
@@ -469,12 +470,12 @@ private:
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation TestPairingDelegate
-- (void)onStatusUpdate:(CHIPPairingStatus)status
+- (void)onStatusUpdate:(MTRPairingStatus)status
 {
     if (_active) {
-        if (status == kSecurePairingSuccess) {
+        if (status == MTRPairingStatusSuccess) {
             NSLog(@"Secure pairing success");
-        } else if (status == kSecurePairingFailed) {
+        } else if (status == MTRPairingStatusFailed) {
             _active = NO;
             NSLog(@"Secure pairing failed");
             _commandBridge->OnStatusUpdate(chip::app::StatusIB(chip::Protocols::InteractionModel::Status::Failure));

@@ -24,7 +24,7 @@
 #include <core/CHIPBuildConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 
-#include "MTRError_Internal.h"
+#include "MTRError_Utils.h"
 
 const uint16_t kListenPort = 5541;
 static CHIPToolPersistentStorageDelegate * storage = nil;

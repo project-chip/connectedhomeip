@@ -20,10 +20,16 @@
 
 #import <Matter/Matter.h>
 
-#import <Matter/MTRCallbackBridge_internal.h> // For MTRDefaultSuccessCallbackBridge, etc
-#import <Matter/MTRCluster_internal.h> // For self.callbackQueue
-
 #import "zap-generated/cluster/MTRTestClustersObjc.h"
+#import "MTRCallbackBridge_internal.h"
+
+#include <access/AccessControl.h>
+#include <access/Privilege.h>
+#include <access/RequestPath.h>
+#include <access/SubjectDescriptor.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/InteractionModelEngine.h>
+#include <lib/core/CHIPError.h>
 
 #include <lib/support/CHIPListUtils.h>
 #include <type_traits>

@@ -27,14 +27,14 @@
 {
     NSLog(@"Pairing Status Update: %lu", status);
     switch (status) {
-    case MTRSecurePairingSuccess:
+    case MTRPairingStatusSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");
         ChipLogProgress(chipTool, "CASE establishment successful");
         break;
-    case MTRSecurePairingFailed:
+    case MTRPairingStatusFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
         break;
-    case MTRUnknownStatus:
+    case MTRPairingStatusUnknown:
         ChipLogError(chipTool, "Uknown Pairing Status");
         break;
     }

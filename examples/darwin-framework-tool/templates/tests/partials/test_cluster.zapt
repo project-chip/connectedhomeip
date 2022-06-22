@@ -187,7 +187,7 @@ class {{filename}}: public TestCommandBridge
             NSLog(@"{{label}} Error: %@", err);
 
             {{#if optional}}
-            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+            if (err.code == MTRInteractionErrorCodeUnsupportedAttribute) {
                 NextTest();
                 return;
             }

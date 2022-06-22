@@ -23,7 +23,7 @@
 #include "PairingDelegateBridge.h"
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "MTRError_Internal.h"
+#import "MTRError_Utils.h"
 
 using namespace ::chip;
 using namespace ::chip::Controller;

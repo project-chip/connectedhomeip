@@ -16,6 +16,8 @@
  *
  */
 
+#import <Matter/Matter.h>
+
 #include "commands/common/Commands.h"
 #include "commands/interactive/Commands.h"
 #include "commands/pairing/Commands.h"

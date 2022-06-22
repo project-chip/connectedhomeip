@@ -23,6 +23,8 @@ assert(chip_build_tools)
 config("config") {
   include_dirs = [
     ".",
+    "${chip_root}/src/darwin/Framework/CHIP/zap-generated",
+    "${chip_root}/src/darwin/Framework/CHIP",
     "${chip_root}/examples/darwin-framework-tool/commands/common",
     "${chip_root}/zzz_generated/darwin-framework-tool",
     "${chip_root}/zzz_generated/controller-clusters",
@@ -63,7 +65,8 @@ executable("darwin-framework-tool") {
     "commands/clusters/WriteAttributeCommandBridge.h",
     "commands/common/CHIPCommandBridge.mm",
     "commands/common/CHIPCommandStorageDelegate.mm",
-    "commands/common/MTRError_Internal.h",
+    "commands/common/MTRLogging.h",
+    "commands/common/MTRError_Utils.h",
     "commands/common/MTRError.mm",
     "commands/common/CHIPToolKeypair.mm",
     "commands/pairing/Commands.h",
