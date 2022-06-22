@@ -89,9 +89,9 @@ that the devices can interact with each other. This functionality is on endpoint
 ## Generic Switch
 
 The Generic Switch on endpoint 2 offers the Switch server cluster. It implements
-the features Momentary Switch (`MS`) and Momentary Switch Release (`MSR`), thus it
-will send event notifications `InitialPress` and `ShortRelease` if button 3 of
-the DK is pressed and released.
+the features Momentary Switch (`MS`) and Momentary Switch Release (`MSR`), thus
+it will send event notifications `InitialPress` and `ShortRelease` if button 3
+of the DK is pressed and released.
 
 ## Common settings
 
