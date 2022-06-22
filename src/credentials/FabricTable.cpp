@@ -1034,8 +1034,6 @@ CHIP_ERROR FabricTable::Init(const FabricTable::InitParams & initParams)
 
 void FabricTable::Forget(FabricIndex fabricIndex)
 {
-    VerifyOrReturn(IsValidFabricIndex(fabricIndex));
-
     ChipLogProgress(FabricProvisioning, "Forgetting fabric 0x%x", static_cast<unsigned>(fabricIndex));
 
     auto * fabricInfo = FindFabricWithIndex(fabricIndex);

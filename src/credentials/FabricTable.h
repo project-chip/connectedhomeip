@@ -163,7 +163,7 @@ protected:
                                 CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(IsOperationalNodeId(nodeId), CHIP_ERROR_INVALID_ARGUMENT);
             // We don't check the root public key validity or the compressed fabric ID, since in the
-            // very small usage that exists in private use, the rest shoulkd be OK.
+            // very small usage that exists in private use, the rest should be OK.
             return CHIP_NO_ERROR;
         }
     };
