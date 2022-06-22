@@ -46,10 +46,6 @@ const char * SecureSession::StateToString(State state) const
         return "kPendingEviction";
         break;
 
-    case State::kInactive:
-        return "kInactive";
-        break;
-
     default:
         return "???";
         break;
@@ -91,14 +87,6 @@ void SecureSession::MarkAsDefunct()
         //
         return;
 
-    case State::kInactive:
-        //
-        // Once a session is marked Inactive, we CANNOT bring it back to either
-        // being active or defunct.  But consumers may not really know this
-        // session is already inactive.  Just ignore the call and stay in
-        // kInactive state.
-        //
-        return;
     case State::kPendingEviction:
         //
         // Once a session is headed for eviction, we CANNOT bring it back to either being active or defunct.
@@ -125,8 +113,6 @@ void SecureSession::MarkForEviction()
     case State::kDefunct:
         FALLTHROUGH;
     case State::kActive:
-        FALLTHROUGH;
-    case State::kInactive:
         Release(); // Decrease the ref which is retained at Activate
         MoveToState(State::kPendingEviction);
         NotifySessionReleased();
@@ -134,35 +120,6 @@ void SecureSession::MarkForEviction()
 
     case State::kPendingEviction:
         // Do nothing
-        return;
-    }
-}
-
-void SecureSession::MarkInactive(SessionHolder & deferred)
-{
-    ChipLogDetail(Inet, "SecureSession[%p]: MarkInactive Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
-                  mLocalSessionId);
-    ReferenceCountedHandle<Transport::Session> ref(*this);
-    switch (mState)
-    {
-    case State::kEstablishing:
-        VerifyOrDie(false);
-        return;
-    case State::kDefunct:
-        FALLTHROUGH;
-    case State::kActive:
-        // Make sure we don't notify "deferred" that we're being removed.  This
-        // ensures that "deferred" is in fact in our holder list.
-        RemoveHolder(deferred);
-        // By setting this state, IsActiveSession() will return false, which prevents creating new exchanges.
-        MoveToState(State::kInactive);
-        NotifySessionReleased();
-        // Add the holder back.
-        AddHolder(deferred);
-        return;
-    case State::kInactive:
-    case State::kPendingEviction:
-        VerifyOrDie(false);
         return;
     }
 }

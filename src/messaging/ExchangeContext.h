@@ -196,14 +196,21 @@ public:
     void AbortAllOtherCommunicationOnFabric();
 
 private:
+    class ExchangeSessionHolder : public SessionHolderWithDelegate
+    {
+    public:
+        ExchangeSessionHolder(ExchangeContext & exchange) : SessionHolderWithDelegate(exchange) {}
+        void GrabExpiredSession(const SessionHandle & session);
+    };
+
     Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
 
     ExchangeMessageDispatch & mDispatch;
 
-    SessionHolderWithDelegate mSession; // The connection state
-    uint16_t mExchangeId;               // Assigned exchange ID.
+    ExchangeSessionHolder mSession; // The connection state
+    uint16_t mExchangeId;           // Assigned exchange ID.
 
     /**
      *  Determine whether a response is currently expected for a message that was sent over
@@ -288,18 +295,18 @@ private:
 
     // If SetAutoReleaseSession() is called, this exchange must be using a SecureSession, and should
     // evict it when the exchange is done with all its work (including any MRP traffic).
-    inline void SetAutoReleaseSession();
-    inline bool ReleaseSessionOnDestruction();
+    inline void SetIgnoreSessionRelease(bool ignore);
+    inline bool ShouldIgnoreSessionRelease();
 };
 
-inline void ExchangeContext::SetAutoReleaseSession()
+inline void ExchangeContext::SetIgnoreSessionRelease(bool ignore)
 {
-    mFlags.Set(Flags::kFlagAutoReleaseSession, true);
+    mFlags.Set(Flags::kFlagIgnoreSessionRelease, ignore);
 }
 
-inline bool ExchangeContext::ReleaseSessionOnDestruction()
+inline bool ExchangeContext::ShouldIgnoreSessionRelease()
 {
-    return mFlags.Has(Flags::kFlagAutoReleaseSession);
+    return mFlags.Has(Flags::kFlagIgnoreSessionRelease);
 }
 
 } // namespace Messaging

@@ -144,7 +144,6 @@ public:
     bool IsEstablishing() const { return mState == State::kEstablishing; }
     bool IsPendingEviction() const { return mState == State::kPendingEviction; }
     bool IsDefunct() const { return mState == State::kDefunct; }
-    bool IsInactive() const { return mState == State::kInactive; }
     const char * GetStateStr() const { return StateToString(mState); }
 
     /*
@@ -170,13 +169,6 @@ public:
      *
      */
     void MarkAsDefunct();
-
-    // Used to make the session look like it's being released, while allowing
-    // the passed-in holder (which must be holding this session) to continue
-    // holding it for now until it completes the work it's doing.  This API also
-    // puts the session into a state in which no new exchanges can be created on
-    // this session.
-    void MarkInactive(SessionHolder & deferred);
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kSecure; }
 #if CHIP_PROGRESS_LOGGING
@@ -312,13 +304,6 @@ private:
         // When all SessionHandles go out of scope, the session will be released automatically.
         //
         kPendingEviction = 4,
-
-        //
-        // The session is still functional but it can't yield any new outbound or inbound exchanges.
-        // This is meant to be used in conjunction with ExchangeManager::AbortExchangesForFabricExceptOne, with the one
-        // exceptional exchange handling out of this state when it finishes whatever it needs the session for.
-        //
-        kInactive = 5,
     };
 
     const char * StateToString(State state) const;
