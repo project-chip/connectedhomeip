@@ -211,7 +211,7 @@ private:
     static void AddInvokeRequestData(nlTestSuite * apSuite, void * apContext, CommandSender * apCommandSender,
                                      CommandId aCommandId = kTestCommandId);
     static void AddInvalidInvokeRequestData(nlTestSuite * apSuite, void * apContext, CommandSender * apCommandSender,
-                                                             CommandId aCommandId = kTestCommandId);
+                                            CommandId aCommandId = kTestCommandId);
     static void AddInvokeResponseData(nlTestSuite * apSuite, void * apContext, CommandHandler * apCommandHandler,
                                       bool aNeedStatusCode, CommandId aCommandId = kTestCommandId);
     static void ValidateCommandHandlerWithSendCommand(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode);
@@ -366,7 +366,7 @@ void TestCommandInteraction::AddInvokeRequestData(nlTestSuite * apSuite, void * 
 }
 
 void TestCommandInteraction::AddInvalidInvokeRequestData(nlTestSuite * apSuite, void * apContext, CommandSender * apCommandSender,
-                                                  CommandId aCommandId)
+                                                         CommandId aCommandId)
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     auto commandPathParams = MakeTestCommandPath(aCommandId);
@@ -694,7 +694,7 @@ void TestCommandInteraction::TestCommandInvalidMessage3(nlTestSuite * apSuite, v
     app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
 
     AddInvalidInvokeRequestData(apSuite, apContext, &commandSender);
-    err          = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
+    err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     ctx.DrainAndServiceIO();

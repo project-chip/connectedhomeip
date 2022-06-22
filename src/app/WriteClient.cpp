@@ -490,14 +490,15 @@ exit:
 }
 
 CHIP_ERROR WriteClient::NotifyResult(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
-                                       bool aSuppressErrorStatusResponse)
+                                     bool aSuppressErrorStatusResponse)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (aError != CHIP_NO_ERROR)
     {
         if (!aSuppressErrorStatusResponse)
         {
-            err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+            err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext,
+                                       false /*aExpectResponse*/);
         }
 
         if (mpCallback != nullptr)

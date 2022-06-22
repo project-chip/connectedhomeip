@@ -553,7 +553,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     engine->Shutdown();
 }
 
-//Write Client sends the write request, and process the unknown message error and invoke NotifyResult to close the client.
+// Write Client sends the write request, and process the unknown message error and invoke NotifyResult to close the client.
 void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -590,7 +590,8 @@ void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void 
     engine->Shutdown();
 }
 
-//Write Client sends the malformed write request, and server generates invalid action status report to client, and further the client is closed
+// Write Client sends the malformed write request, and server generates invalid action status report to client, and further the
+// client is closed
 void TestWriteInteraction::TestWriteInvalidMessage2(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
