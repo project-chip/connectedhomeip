@@ -396,7 +396,7 @@ private:
         void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
-            CommonOnFabricChange(fabricIndex);
+            ClearCASEResumptionStateOnFabricChange(fabricIndex);
 
             Credentials::GroupDataProvider * groupDataProvider = mServer->GetGroupDataProvider();
             if (groupDataProvider != nullptr)
@@ -430,19 +430,16 @@ private:
         }
 
     private:
-        void CommonOnFabricChange(chip::FabricIndex fabricIndex)
+        void ClearCASEResumptionStateOnFabricChange(chip::FabricIndex fabricIndex)
         {
-            // Remove all CASE session resumption state
             auto * sessionResumptionStorage = mServer->GetSessionResumptionStorage();
-            if (sessionResumptionStorage != nullptr)
+            VerifyOrReturn(sessionResumptionStorage != nullptr);
+            CHIP_ERROR err = sessionResumptionStorage->DeleteAll(fabricIndex);
+            if (err != CHIP_NO_ERROR)
             {
-                CHIP_ERROR err = sessionResumptionStorage->DeleteAll(fabricIndex);
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(AppServer,
-                                 "Warning, failed to delete session resumption state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
-                                 static_cast<unsigned>(fabricIndex), err.Format());
-                }
+                ChipLogError(AppServer,
+                             "Warning, failed to delete session resumption state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                             static_cast<unsigned>(fabricIndex), err.Format());
             }
         }
 
