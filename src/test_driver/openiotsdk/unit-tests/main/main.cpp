@@ -16,6 +16,12 @@
  *    limitations under the License.
  */
 
+extern "C" {
+#include "hal/serial_api.h"
+#include "mps3_uart.h"
+}
+
+#include <platform/openiotsdk/Logging.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -23,12 +29,30 @@
 
 using namespace ::chip;
 
+mdh_serial_t * serial_ptr = NULL;
+
+extern mdh_serial_t * get_serial()
+{
+    if (serial_ptr == NULL)
+    {
+        mps3_uart_t * uart;
+        mps3_uart_init(&uart, &UART0_CMSDK_DEV_NS);
+        serial_ptr = &(uart->serial);
+        mdh_serial_set_baud(serial_ptr, 115200);
+        return serial_ptr;
+    }
+    else
+    {
+        return serial_ptr;
+    }
+}
+
 int main()
 {
-    printf("Open IoT SDK unit-tests run...\r\n");
+    chip::Logging::Platform::openiotsdk_logging_init();
     int status = RunRegisteredUnitTests();
-    printf("Test status: %d\r\n", status);
-    printf("Open IoT SDK unit-tests completed\r\n");
+    ChipLogProgress(NotSpecified, "Test status: %d", status);
+    ChipLogProgress(NotSpecified, "Open IoT SDK unit-tests completed");
 
     return status;
 }

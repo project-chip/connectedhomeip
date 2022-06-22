@@ -22,6 +22,11 @@
  *          for Open IOT SDK platform.
  */
 
+extern "C" {
+#include "hal/serial_api.h"
+#include "mps3_uart.h"
+}
+
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -30,6 +35,11 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#define DEFAULT_TRACE_FILTER_LENGTH 24
+
+extern mdh_serial_t * get_serial();
+mdh_serial_t * serial = NULL;
 
 namespace chip {
 namespace DeviceLayer {
@@ -47,6 +57,11 @@ void __attribute__((weak)) OnLogOutput() {}
 namespace Logging {
 namespace Platform {
 
+mdh_serial_t * __attribute__((weak)) get_serial()
+{
+    return NULL;
+}
+
 /**
  * Logging static buffer
  */
@@ -59,13 +74,22 @@ char logMsgBuffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
  */
 void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-    size_t prefixLen = 0;
+    size_t msglen = 0;
     snprintf(logMsgBuffer, sizeof(logMsgBuffer), "[%s]", module);
     logMsgBuffer[sizeof(logMsgBuffer) - 2] = 0; // -2 to allow at least one char for the vsnprintf
-    prefixLen                              = strlen(logMsgBuffer);
-    vsnprintf(logMsgBuffer + prefixLen, sizeof(logMsgBuffer) - prefixLen, msg, v);
+    msglen                                 = strlen(logMsgBuffer);
+    vsnprintf(logMsgBuffer + msglen, sizeof(logMsgBuffer) - msglen, msg, v);
+    msglen = strlen(logMsgBuffer);
+    strncat(logMsgBuffer, "\r\n", sizeof(logMsgBuffer) - msglen);
 
-    // TODO
+    if (serial != NULL)
+    {
+        char * data = &logMsgBuffer[0];
+        while (*data != '\0')
+        {
+            mdh_serial_put_data(serial, *data++);
+        }
+    }
 
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();
@@ -73,7 +97,11 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
 
 void openiotsdk_logging_init()
 {
-    // TODO
+    serial = get_serial();
+    if (serial != NULL)
+    {
+        chip::Logging::SetLogFilter(chip::Logging::LogCategory::kLogCategory_None);
+    }
 }
 
 } // namespace Platform
