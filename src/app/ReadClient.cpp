@@ -429,7 +429,7 @@ exit:
 }
 
 CHIP_ERROR ReadClient::NotifyResult(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
-                                     bool aSuppressErrorStatusResponse)
+                                    bool aSuppressErrorStatusResponse)
 {
     CHIP_ERROR err = aError;
     if (aError != CHIP_NO_ERROR)

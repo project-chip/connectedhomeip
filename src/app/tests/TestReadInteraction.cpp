@@ -2729,8 +2729,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
     ctx.CreateSessionBobToAlice();
 }
 
-// Read Client sends the read request, and read handler process read request, then invoke unknown message handler, and send status report back, client and
-// server would be closed.
+// Read Client sends the read request, and read handler process read request, then invoke unknown message handler, and send status
+// report back, client and server would be closed.
 void TestReadInteraction::TestReadInvalidMessage1(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -2783,7 +2783,8 @@ void TestReadInteraction::TestReadInvalidMessage1(nlTestSuite * apSuite, void * 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-//Read Client sends the malformed read request, server fails to parse the request and generated the status report to client, and client would also be closed.
+// Read Client sends the malformed read request, server fails to parse the request and generated the status report to client, and
+// client would also be closed.
 void TestReadInteraction::TestReadInvalidMessage2(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -2813,7 +2814,8 @@ void TestReadInteraction::TestReadInvalidMessage2(nlTestSuite * apSuite, void * 
         chip::app::InitWriterWithSpaceReserved(writer, 0);
         err = request.Init(&writer);
         err = writer.Finalize(&msgBuf);
-        readClient.mpExchangeCtx = readClient.mpExchangeMgr->NewContext(readPrepareParams.mSessionHolder.Get().Value(), &readClient);
+        readClient.mpExchangeCtx =
+            readClient.mpExchangeMgr->NewContext(readPrepareParams.mSessionHolder.Get().Value(), &readClient);
         readClient.MoveToState(app::ReadClient::ClientState::AwaitingInitialReport);
         err = readClient.mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
@@ -2876,7 +2878,8 @@ void TestReadInteraction::TestReadInvalidMessage3(nlTestSuite * apSuite, void * 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-//Read Client creates the subscription with server, then trigger unknown message handler and send status report in server, client and server would be closed
+// Read Client creates the subscription with server, then trigger unknown message handler and send status report in server, client
+// and server would be closed
 void TestReadInteraction::TestSubscribeInvalidMessage1(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -2931,7 +2934,8 @@ void TestReadInteraction::TestSubscribeInvalidMessage1(nlTestSuite * apSuite, vo
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-//Read Client sends the malformed subscribe request, server fails to parse the request and generated the status report to client, and client would also be closed.
+// Read Client sends the malformed subscribe request, server fails to parse the request and generated the status report to client,
+// and client would also be closed.
 void TestReadInteraction::TestSubscribeInvalidMessage2(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -2961,10 +2965,11 @@ void TestReadInteraction::TestSubscribeInvalidMessage2(nlTestSuite * apSuite, vo
         chip::app::InitWriterWithSpaceReserved(writer, 0);
         err = request.Init(&writer);
         err = writer.Finalize(&msgBuf);
-        readClient.mpExchangeCtx = readClient.mpExchangeMgr->NewContext(readPrepareParams.mSessionHolder.Get().Value(), &readClient);
+        readClient.mpExchangeCtx =
+            readClient.mpExchangeMgr->NewContext(readPrepareParams.mSessionHolder.Get().Value(), &readClient);
         readClient.MoveToState(app::ReadClient::ClientState::AwaitingInitialReport);
         err = readClient.mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
-                                                        Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+                                                    Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.StepDrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, delegate.mError != CHIP_NO_ERROR);
