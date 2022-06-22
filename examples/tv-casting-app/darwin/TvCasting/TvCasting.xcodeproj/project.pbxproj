@@ -15,6 +15,8 @@
 		3C7507B92853EFF000D7DB3A /* CommissioningViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7507B82853EFF000D7DB3A /* CommissioningViewModel.swift */; };
 		3C7507BC2857A6EE00D7DB3A /* DiscoveredNodeDataConverter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C7507BB2857A6EE00D7DB3A /* DiscoveredNodeDataConverter.mm */; };
 		3C9ACC05284ABF4000718B2D /* libTvCastingCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C9ACC04284ABF2F00718B2D /* libTvCastingCommon.a */; };
+		3CA19435285BA780004768D5 /* ContentLauncherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA19434285BA780004768D5 /* ContentLauncherView.swift */; };
+		3CA19437285BA877004768D5 /* ContentLauncherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA19436285BA877004768D5 /* ContentLauncherViewModel.swift */; };
 		3CC0E8FA2841DD3400EC6A18 /* TvCastingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC0E8F92841DD3400EC6A18 /* TvCastingApp.swift */; };
 		3CC0E8FC2841DD3400EC6A18 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC0E8FB2841DD3400EC6A18 /* ContentView.swift */; };
 		3CC0E8FE2841DD3500EC6A18 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3CC0E8FD2841DD3500EC6A18 /* Assets.xcassets */; };
@@ -34,6 +36,8 @@
 		3C7507BB2857A6EE00D7DB3A /* DiscoveredNodeDataConverter.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DiscoveredNodeDataConverter.mm; sourceTree = "<group>"; };
 		3C7507BD2857A72A00D7DB3A /* DiscoveredNodeDataConverter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DiscoveredNodeDataConverter.hpp; sourceTree = "<group>"; };
 		3C9ACC04284ABF2F00718B2D /* libTvCastingCommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTvCastingCommon.a; path = lib/libTvCastingCommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		3CA19434285BA780004768D5 /* ContentLauncherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentLauncherView.swift; sourceTree = "<group>"; };
+		3CA19436285BA877004768D5 /* ContentLauncherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentLauncherViewModel.swift; sourceTree = "<group>"; };
 		3CC0E8F62841DD3400EC6A18 /* TvCasting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TvCasting.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CC0E8F92841DD3400EC6A18 /* TvCastingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TvCastingApp.swift; sourceTree = "<group>"; };
 		3CC0E8FB2841DD3400EC6A18 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -98,6 +102,8 @@
 				3C7507B62853A3AD00D7DB3A /* CommissionerDiscoveryViewModel.swift */,
 				3C7507AE28529A5F00D7DB3A /* CommissioningView.swift */,
 				3C7507B82853EFF000D7DB3A /* CommissioningViewModel.swift */,
+				3CA19434285BA780004768D5 /* ContentLauncherView.swift */,
+				3CA19436285BA877004768D5 /* ContentLauncherViewModel.swift */,
 			);
 			path = TvCasting;
 			sourceTree = "<group>";
@@ -237,6 +243,8 @@
 				3C7507B92853EFF000D7DB3A /* CommissioningViewModel.swift in Sources */,
 				3C7507BC2857A6EE00D7DB3A /* DiscoveredNodeDataConverter.mm in Sources */,
 				3C7507A72851188500D7DB3A /* DiscoveredNodeData.mm in Sources */,
+				3CA19437285BA877004768D5 /* ContentLauncherViewModel.swift in Sources */,
+				3CA19435285BA780004768D5 /* ContentLauncherView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,6 +288,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -296,7 +305,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -352,7 +361,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
