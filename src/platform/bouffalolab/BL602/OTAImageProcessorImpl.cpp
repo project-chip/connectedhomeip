@@ -206,8 +206,6 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
     hal_reboot();
-    // HandleApply is called after delayed action time seconds are elapsed, so it would be safe to schedule the restart
-    // chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(2 * 1000), HandleRestart, nullptr);
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
