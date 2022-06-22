@@ -26,6 +26,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "sl_component_catalog.h"
+
 #include <platform/internal/BLEManager.h>
 
 #include "FreeRTOS.h"
@@ -88,17 +90,6 @@ namespace {
 
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 
-/* Bluetooth stack configuration parameters (see "UG136: Silicon Labs Bluetooth C Application Developer's Guide" for
- * details on each parameter) */
-static sl_bt_configuration_t config;
-
-/** @brief Table of used BGAPI classes */
-static const struct sli_bgapi_class * const bt_class_table[] = { SL_BT_BGAPI_CLASS(system),      SL_BT_BGAPI_CLASS(advertiser),
-                                                                 SL_BT_BGAPI_CLASS(gap),         SL_BT_BGAPI_CLASS(scanner),
-                                                                 SL_BT_BGAPI_CLASS(connection),  SL_BT_BGAPI_CLASS(gatt),
-                                                                 SL_BT_BGAPI_CLASS(gatt_server), SL_BT_BGAPI_CLASS(nvm),
-                                                                 SL_BT_BGAPI_CLASS(sm),          NULL };
-
 StackType_t bluetoothEventStack[CHIP_DEVICE_CONFIG_BLE_APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t bluetoothEventTaskStruct;
 static TaskHandle_t BluetoothEventTaskHandle;
@@ -131,36 +122,10 @@ extern "C" sl_status_t initialize_bluetooth()
     NVIC_ClearPendingIRQ(PendSV_IRQn);
     NVIC_EnableIRQ(PendSV_IRQn);
 #endif
-    sl_status_t ret = sl_bt_init_stack(&config);
-    sl_bt_init_classes(bt_class_table);
-    sl_bt_init_multiprotocol();
-    return ret;
-}
+    sl_status_t err = sl_bt_stack_init();
+    EFM_ASSERT(err == SL_STATUS_OK);
 
-static void initBleConfig(void)
-{
-    memset(&config, 0, sizeof(sl_bt_configuration_t));
-    config.config_flags                = SL_BT_CONFIG_FLAG_RTOS;      /* Check flag options from UG136 */
-    config.bluetooth.max_connections   = BLE_LAYER_NUM_BLE_ENDPOINTS; /* Maximum number of simultaneous connections */
-    config.bluetooth.max_advertisers   = BLE_MAX_ADVERTISERS;
-    config.bluetooth.max_periodic_sync = BLE_CONFIG_MAX_PERIODIC_ADVERTISING_SYNC;
-    config.bluetooth.max_buffer_memory = BLE_MAX_BUFFER_SIZE;
-    config.gattdb                      = &gattdb; /* Pointer to GATT database */
-    config.scheduler_callback          = BluetoothLLCallback;
-    config.stack_schedule_callback     = BluetoothUpdate;
-    config.max_timers                  = BLE_CONFIG_MAX_SOFTWARE_TIMERS;
-    config.rf.tx_gain                  = BLE_CONFIG_RF_PATH_GAIN_TX;
-    config.rf.rx_gain                  = BLE_CONFIG_RF_PATH_GAIN_RX;
-    config.rf.tx_min_power             = BLE_CONFIG_MIN_TX_POWER;
-    config.rf.tx_max_power             = BLE_CONFIG_MAX_TX_POWER;
-#if (HAL_PA_ENABLE)
-    config.pa.config_enable = 1; /* Set this to be a valid PA config */
-#if defined(FEATURE_PA_INPUT_FROM_VBAT)
-    config.pa.input = SL_BT_RADIO_PA_INPUT_VBAT; /* Configure PA input to VBAT */
-#else
-    config.pa.input = SL_BT_RADIO_PA_INPUT_DCDC; /* Configure PA input to DCDC */
-#endif // defined(FEATURE_PA_INPUT_FROM_VBAT)
-#endif // (HAL_PA_ENABLE)
+    return err;
 }
 
 CHIP_ERROR BLEManagerImpl::_Init()
@@ -176,13 +141,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
     memset(mIndConfId, kUnusedIndex, sizeof(mIndConfId));
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
-    initBleConfig();
-
     // Start Bluetooth Link Layer and stack tasks
     ret =
         bluetooth_start(CHIP_DEVICE_CONFIG_BLE_LL_TASK_PRIORITY, CHIP_DEVICE_CONFIG_BLE_STACK_TASK_PRIORITY, initialize_bluetooth);
 
-    VerifyOrExit(ret == bg_err_success, err = MapBLEError(ret));
+    VerifyOrExit(ret == SL_STATUS_OK, err = MapBLEError(ret));
 
     // Create the Bluetooth Application task
     BluetoothEventTaskHandle =
@@ -523,7 +486,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     VerifyOrExit(timerHandle != kMaxConnections, err = CHIP_ERROR_NO_MEMORY);
 
     // start timer for light notification confirmation. Long delay for spake2 indication
-    sl_bt_system_set_soft_timer(TIMER_S_2_TIMERTICK(6), timerHandle, true);
+    sl_bt_system_set_lazy_soft_timer(TIMER_S_2_TIMERTICK(6), 0, timerHandle, true);
 
     ret = sl_bt_gatt_server_send_notification(conId, cId, (data->DataLength()), data->Start());
     err = MapBLEError(ret);
@@ -868,13 +831,13 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt)
 
         switch (conn_evt->reason)
         {
-        case bg_err_bt_remote_user_terminated:
-        case bg_err_bt_remote_device_terminated_connection_due_to_low_resources:
-        case bg_err_bt_remote_powering_off:
+        case SL_STATUS_BT_CTRL_REMOTE_USER_TERMINATED:
+        case SL_STATUS_BT_CTRL_REMOTE_DEVICE_TERMINATED_CONNECTION_DUE_TO_LOW_RESOURCES:
+        case SL_STATUS_BT_CTRL_REMOTE_POWERING_OFF:
             event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
             break;
 
-        case bg_err_bt_connection_terminated_by_local_host:
+        case SL_STATUS_BT_CTRL_CONNECTION_TERMINATED_BY_LOCAL_HOST:
             event.CHIPoBLEConnectionError.Reason = BLE_ERROR_APP_CLOSED_CONNECTION;
             break;
 
@@ -995,7 +958,7 @@ void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
     if (timerHandle < kMaxConnections)
     {
         ChipLogProgress(DeviceLayer, " stop soft timer");
-        sl_bt_system_set_soft_timer(0, timerHandle, false);
+        sl_bt_system_set_lazy_soft_timer(0, 0, timerHandle, false);
     }
 
     event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;

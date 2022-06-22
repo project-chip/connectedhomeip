@@ -63,11 +63,6 @@
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 	branch  = V10.3.1-kernel-only
 	platforms = ameba,cc13x2_26x2,bl602,efr32,esp32,k32w0,p6,qpg
-[submodule "efr32_sdk"]
-	path = third_party/efr32_sdk/repo
-	url = https://github.com/SiliconLabs/sdk_support.git
-	branch  = master
-	platforms = efr32
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
@@ -237,10 +232,6 @@
 	url = https://github.com/TexasInstruments/cc13xx_cc26xx_sdk.git
 	branch = main
 	platforms = cc13x2_26x2
-[submodule "third_party/efr32_sdk/wiseconnect-wifi-bt-sdk"]
-	path = third_party/efr32_sdk/wiseconnect-wifi-bt-sdk
-	url = https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk
-	platforms = efr32
 [submodule "third_party/bouffalolab/bl602"]
 	path = third_party/bouffalolab/bl602_sdk/repo
 	url = https://github.com/bouffalolab/bl_iot_sdk_matter.git
@@ -251,3 +242,18 @@
 	url = https://github.com/NXPmicro/mbedtls.git
 	branch = tinycrypt-mbedtls-2.28
 	platforms = k32w0
+[submodule "third_party/silabs/matter_support"]
+	path = third_party/silabs/matter_support
+	url = https://github.com/SiliconLabs/sdk_support.git
+	branch = main
+	platforms = efr32
+[submodule "third_party/silabs/gecko_sdk"]
+	path = third_party/silabs/gecko_sdk
+	url = https://github.com/SiliconLabs/gecko_sdk.git
+	branch = gsdk_4.1
+	platforms = efr32
+[submodule "third_party/silabs/wiseconnect-wifi-bt-sdk"]
+	path = third_party/silabs/wiseconnect-wifi-bt-sdk
+	url = https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git
+	branch = master
+	platforms = efr32
