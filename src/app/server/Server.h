@@ -426,7 +426,7 @@ private:
         void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
         {
             (void) fabricTable;
-            CommonOnFabricChange(fabricIndex);
+            ClearCASEResumptionStateOnFabricChange(fabricIndex);
         }
 
     private:
