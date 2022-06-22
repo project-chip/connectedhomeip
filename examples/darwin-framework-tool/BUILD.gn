@@ -59,6 +59,7 @@ executable("darwin-framework-tool") {
     # privilege-storage.cpp.
     "${chip_root}/src/app/util/privilege-storage.cpp",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
+    "${chip_root}/zzz_generated/controller-clusters/zap-generated/CHIPClusters.h",
     "commands/clusters/ClusterCommandBridge.h",
     "commands/clusters/ModelCommandBridge.mm",
     "commands/clusters/ReportCommandBridge.h",

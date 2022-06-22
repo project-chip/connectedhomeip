@@ -22,6 +22,9 @@
 
 #import "zap-generated/cluster/MTRTestClustersObjc.h"
 #import "MTRCallbackBridge_internal.h"
+#import "MTRDevice_Externs.h"
+#import "MTRCluster_Externs.h"
+#import "zap-generated/CHIPClusters.h"
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
@@ -30,13 +33,13 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPError.h>
-
 #include <lib/support/CHIPListUtils.h>
 #include <type_traits>
 
 using chip::Callback::Callback;
 using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
+
 
 @interface MTRTestAccessControl ()
 @property (readonly) chip::Controller::AccessControlCluster cppCluster;
