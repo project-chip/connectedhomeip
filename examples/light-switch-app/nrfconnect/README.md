@@ -64,16 +64,16 @@ to read more about the platform structure and dependencies.
 
 In matter there are 2 types of light switch device types:
 
-- On/Off Light Switch, Dimmer Switch, Color Dimmer Switch, Control Bridge
-- Generic Switch
+-   On/Off Light Switch, Dimmer Switch, Color Dimmer Switch, Control Bridge
+-   Generic Switch
 
 The first type uses Client application clusters (e.g. Level Control) and
 Bindings to send commands to the server clusters. This type of switch is on
 endpoint 1 of this example.
 
 With the second type controllers can use event subscriptions to be informed
-about changes on the Switch server cluster. This type of switch is on
-endpoint 2 of this example.
+about changes on the Switch server cluster. This type of switch is on endpoint 2
+of this example.
 
 ## On/Off Light Switch, Dimmer Switch, Color Dimmer Switch, Control Bridge
 
