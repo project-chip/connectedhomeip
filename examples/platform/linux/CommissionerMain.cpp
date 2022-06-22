@@ -172,7 +172,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     ReturnErrorOnFailure(factory.SetupCommissioner(params, gCommissioner));
 
     FabricIndex fabricIndex = gCommissioner.GetFabricIndex();
-    VerifyOrReturnError(fabricInfo != kUndefinedFabricIndex, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(fabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INTERNAL);
 
     uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
     MutableByteSpan compressedFabricIdSpan(compressedFabricId);
@@ -193,8 +193,8 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     // advertise operational since we are an admin
     app::DnssdServer::Instance().AdvertiseOperational();
 
-    ChipLogProgress(Support, "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
-                    ChipLogValueX64(gCommissioner.GetNodeId()), fabricIndex);
+    ChipLogProgress(Support, "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabricIndex=0x%u",
+                    ChipLogValueX64(gCommissioner.GetNodeId()), static_cast<unsigned>(fabricIndex));
 
     return CHIP_NO_ERROR;
 }
