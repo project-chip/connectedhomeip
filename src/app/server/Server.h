@@ -432,9 +432,6 @@ private:
     private:
         void CommonOnFabricChange(chip::FabricIndex fabricIndex)
         {
-            auto & sessionManager = mServer->GetSecureSessionManager();
-            sessionManager.FabricRemoved(fabricIndex);
-
             // Remove all CASE session resumption state
             auto * sessionResumptionStorage = mServer->GetSessionResumptionStorage();
             if (sessionResumptionStorage != nullptr)
