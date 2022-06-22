@@ -49,9 +49,9 @@ using namespace ::chip::DeviceLayer;
 
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 namespace {
-constexpr EndpointId kLightDimmerSwitchEndpointId    = 1;
-constexpr EndpointId kLightGenericSwitchEndpointId   = 2;
-constexpr EndpointId kLightEndpointId          = 1;
+constexpr EndpointId kLightDimmerSwitchEndpointId  = 1;
+constexpr EndpointId kLightGenericSwitchEndpointId = 2;
+constexpr EndpointId kLightEndpointId              = 1;
 
 constexpr uint32_t kFactoryResetTriggerTimeout = 3000;
 constexpr uint32_t kFactoryResetCancelWindow   = 3000;
