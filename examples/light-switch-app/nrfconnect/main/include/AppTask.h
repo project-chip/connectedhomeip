@@ -53,7 +53,9 @@ private:
     {
         NoneSelected = 0,
         SoftwareUpdate,
-        FactoryReset
+        FactoryReset,
+        GenericSwitchInitialPress,
+        GenericSwitchReleasePress
     };
     TimerFunction mFunction = TimerFunction::NoneSelected;
 
