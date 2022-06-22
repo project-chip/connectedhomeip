@@ -2994,7 +2994,7 @@ private:
 class Test_TC_CC_2_1Suite : public TestCommand
 {
 public:
-    Test_TC_CC_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_2_1", 60, credsIssuerConfig)
+    Test_TC_CC_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_2_1", 61, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -3014,6 +3014,8 @@ private:
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
+
+    uint32_t FeatureMapValue;
 
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
 
@@ -3196,12 +3198,21 @@ private:
         case 19:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                uint32_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorCapabilities", value, 0U));
+
+                FeatureMapValue = value;
             }
             break;
         case 20:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("colorCapabilities", value, FeatureMapValue));
+            }
+            break;
+        case 21:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -3211,7 +3222,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 31U));
             }
             break;
-        case 21:
+        case 22:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -3219,7 +3230,7 @@ private:
                 VerifyOrReturn(CheckValue("colorTempPhysicalMinMireds", value, 0U));
             }
             break;
-        case 22:
+        case 23:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -3227,14 +3238,6 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
-            }
-            break;
-        case 23:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorTempPhysicalMaxMireds", value, 65279U));
             }
             break;
         case 24:
@@ -3242,16 +3245,10 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
+                VerifyOrReturn(CheckValue("colorTempPhysicalMaxMireds", value, 65279U));
             }
             break;
         case 25:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -3284,11 +3281,25 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
+            }
+            break;
+        case 28:
+            if (IsUnsupported(status.mStatus))
+            {
+                return;
+            }
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("remainingTime", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
             break;
-        case 28:
+        case 29:
             if (IsUnsupported(status.mStatus))
             {
                 return;
@@ -3302,7 +3313,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 4U));
             }
             break;
-        case 29:
+        case 30:
             if (IsUnsupported(status.mStatus))
             {
                 return;
@@ -3315,7 +3326,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxLength("value", value.size(), 254));
             }
             break;
-        case 30:
+        case 31:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -3323,16 +3334,6 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 6U));
-            }
-            break;
-        case 31:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
             }
             break;
         case 32:
@@ -3348,19 +3349,19 @@ private:
         case 33:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<uint8_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-            }
-            break;
-        case 34:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
+            }
+            break;
+        case 34:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
         case 35:
@@ -3376,19 +3377,19 @@ private:
         case 36:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<uint8_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-            }
-            break;
-        case 37:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
+            }
+            break;
+        case 37:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
         case 38:
@@ -3404,19 +3405,19 @@ private:
         case 39:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<uint8_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-            }
-            break;
-        case 40:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
+            }
+            break;
+        case 40:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
         case 41:
@@ -3432,19 +3433,19 @@ private:
         case 42:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<uint8_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-            }
-            break;
-        case 43:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
+            }
+            break;
+        case 43:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
         case 44:
@@ -3460,19 +3461,19 @@ private:
         case 45:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<uint8_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-            }
-            break;
-        case 46:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
+            }
+            break;
+        case 46:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
         case 47:
@@ -3488,23 +3489,19 @@ private:
         case 48:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<uint8_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-            }
-            break;
-        case 49:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
+            }
+            break;
+        case 49:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
         case 50:
@@ -3556,9 +3553,11 @@ private:
             }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<uint8_t> value;
+                uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
             }
             break;
         case 54:
@@ -3568,11 +3567,9 @@ private:
             }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
         case 55:
@@ -3596,9 +3593,11 @@ private:
             }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::Nullable<uint8_t> value;
+                uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
             }
             break;
         case 57:
@@ -3608,11 +3607,9 @@ private:
             }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
         case 58:
@@ -3630,6 +3627,20 @@ private:
             }
             break;
         case 59:
+            if (IsUnsupported(status.mStatus))
+            {
+                return;
+            }
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65279U));
+            }
+            break;
+        case 60:
             if (IsUnsupported(status.mStatus))
             {
                 return;
@@ -3772,247 +3783,252 @@ private:
                                  ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, true, chip::NullOptional);
         }
         case 19: {
-            LogStep(19, "Reads ColorCapabilities attribute from DUT");
-            VerifyOrDo(!ShouldSkip("CC.S.A400a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorCapabilities::Id,
-                                 true, chip::NullOptional);
+            LogStep(19, "read the optional global attribute: FeatureMap");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::FeatureMap::Id, true,
+                                 chip::NullOptional);
         }
         case 20: {
-            LogStep(20, "Validate constraints of attribute: ColorCapabilities");
+            LogStep(20, "Reads ColorCapabilities attribute from DUT");
             VerifyOrDo(!ShouldSkip("CC.S.A400a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorCapabilities::Id,
                                  true, chip::NullOptional);
         }
         case 21: {
-            LogStep(21, "Reads ColorTempPhysicalMinMireds attribute from DUT");
-            VerifyOrDo(!ShouldSkip("CC.S.A400b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
-                                 ColorControl::Attributes::ColorTempPhysicalMinMireds::Id, true, chip::NullOptional);
+            LogStep(21, "Validate constraints of attribute: ColorCapabilities");
+            VerifyOrDo(!ShouldSkip("CC.S.A400a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorCapabilities::Id,
+                                 true, chip::NullOptional);
         }
         case 22: {
-            LogStep(22, "Validate constraints of attribute: ColorTempPhysicalMinMireds");
+            LogStep(22, "Reads ColorTempPhysicalMinMireds attribute from DUT");
             VerifyOrDo(!ShouldSkip("CC.S.A400b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorTempPhysicalMinMireds::Id, true, chip::NullOptional);
         }
         case 23: {
-            LogStep(23, "Read ColorTempPhysicalMaxMireds attribute from DUT");
-            VerifyOrDo(!ShouldSkip("CC.S.A400c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(23, "Validate constraints of attribute: ColorTempPhysicalMinMireds");
+            VerifyOrDo(!ShouldSkip("CC.S.A400b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
-                                 ColorControl::Attributes::ColorTempPhysicalMaxMireds::Id, true, chip::NullOptional);
+                                 ColorControl::Attributes::ColorTempPhysicalMinMireds::Id, true, chip::NullOptional);
         }
         case 24: {
-            LogStep(24, "Validate constraints of attribute: ColorTempPhysicalMaxMireds");
+            LogStep(24, "Read ColorTempPhysicalMaxMireds attribute from DUT");
             VerifyOrDo(!ShouldSkip("CC.S.A400c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorTempPhysicalMaxMireds::Id, true, chip::NullOptional);
         }
         case 25: {
-            LogStep(25, "Read the optional attribute: CoupleColorTempToLevelMinMireds");
+            LogStep(25, "Validate constraints of attribute: ColorTempPhysicalMaxMireds");
+            VerifyOrDo(!ShouldSkip("CC.S.A400c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
+                                 ColorControl::Attributes::ColorTempPhysicalMaxMireds::Id, true, chip::NullOptional);
+        }
+        case 26: {
+            LogStep(26, "Read the optional attribute: CoupleColorTempToLevelMinMireds");
             VerifyOrDo(!ShouldSkip("CC.S.A400d"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::CoupleColorTempToLevelMinMireds::Id, true, chip::NullOptional);
         }
-        case 26: {
-            LogStep(26, "Read the optional attribute: StartUpColorTemperatureMireds");
+        case 27: {
+            LogStep(27, "Read the optional attribute: StartUpColorTemperatureMireds");
             VerifyOrDo(!ShouldSkip("CC.S.A4010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::StartUpColorTemperatureMireds::Id, true, chip::NullOptional);
         }
-        case 27: {
-            LogStep(27, "Validate constraints of attribute: RemainingTime");
+        case 28: {
+            LogStep(28, "Validate constraints of attribute: RemainingTime");
             VerifyOrDo(!ShouldSkip("CC.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::RemainingTime::Id,
                                  true, chip::NullOptional);
         }
-        case 28: {
-            LogStep(28, "Read the optional attribute: DriftCompensation");
+        case 29: {
+            LogStep(29, "Read the optional attribute: DriftCompensation");
             VerifyOrDo(!ShouldSkip("CC.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::DriftCompensation::Id,
                                  true, chip::NullOptional);
         }
-        case 29: {
-            LogStep(29, "Read the optional attribute: CompensationText");
+        case 30: {
+            LogStep(30, "Read the optional attribute: CompensationText");
             VerifyOrDo(!ShouldSkip("CC.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CompensationText::Id,
                                  true, chip::NullOptional);
         }
-        case 30: {
-            LogStep(30, "Read the mandatory attribute: NumberOfPrimaries");
+        case 31: {
+            LogStep(31, "Read the mandatory attribute: NumberOfPrimaries");
             VerifyOrDo(!ShouldSkip("CC.S.A0010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::NumberOfPrimaries::Id,
                                  true, chip::NullOptional);
         }
-        case 31: {
-            LogStep(31, "Read the mandatory attribute: Primary1X");
+        case 32: {
+            LogStep(32, "Read the mandatory attribute: Primary1X");
             VerifyOrDo(!ShouldSkip("CC.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary1X::Id, true,
                                  chip::NullOptional);
         }
-        case 32: {
-            LogStep(32, "Read the mandatory attribute: Primary1Y");
+        case 33: {
+            LogStep(33, "Read the mandatory attribute: Primary1Y");
             VerifyOrDo(!ShouldSkip("CC.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary1Y::Id, true,
                                  chip::NullOptional);
         }
-        case 33: {
-            LogStep(33, "Read the mandatory attribute: Primary1Intensity");
+        case 34: {
+            LogStep(34, "Read the mandatory attribute: Primary1Intensity");
             VerifyOrDo(!ShouldSkip("CC.S.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary1Intensity::Id,
                                  true, chip::NullOptional);
         }
-        case 34: {
-            LogStep(34, "Read the mandatory attribute: Primary2X");
+        case 35: {
+            LogStep(35, "Read the mandatory attribute: Primary2X");
             VerifyOrDo(!ShouldSkip("CC.S.A0015"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary2X::Id, true,
                                  chip::NullOptional);
         }
-        case 35: {
-            LogStep(35, "Read the mandatory attribute: Primary2Y");
+        case 36: {
+            LogStep(36, "Read the mandatory attribute: Primary2Y");
             VerifyOrDo(!ShouldSkip("CC.S.A0016"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary2Y::Id, true,
                                  chip::NullOptional);
         }
-        case 36: {
-            LogStep(36, "Validate constraints of attribute: Primary2Intensity");
+        case 37: {
+            LogStep(37, "Validate constraints of attribute: Primary2Intensity");
             VerifyOrDo(!ShouldSkip("CC.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary2Intensity::Id,
                                  true, chip::NullOptional);
         }
-        case 37: {
-            LogStep(37, "Read the mandatory attribute: Primary3X");
+        case 38: {
+            LogStep(38, "Read the mandatory attribute: Primary3X");
             VerifyOrDo(!ShouldSkip("CC.S.A0019"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary3X::Id, true,
                                  chip::NullOptional);
         }
-        case 38: {
-            LogStep(38, "Read the mandatory attribute: Primary3Y");
+        case 39: {
+            LogStep(39, "Read the mandatory attribute: Primary3Y");
             VerifyOrDo(!ShouldSkip("CC.S.A001a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary3Y::Id, true,
                                  chip::NullOptional);
         }
-        case 39: {
-            LogStep(39, "Read the mandatory attribute: Primary3Intensity");
+        case 40: {
+            LogStep(40, "Read the mandatory attribute: Primary3Intensity");
             VerifyOrDo(!ShouldSkip("CC.S.A001b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary3Intensity::Id,
                                  true, chip::NullOptional);
         }
-        case 40: {
-            LogStep(40, "Read the mandatory attribute: Primary4X");
+        case 41: {
+            LogStep(41, "Read the mandatory attribute: Primary4X");
             VerifyOrDo(!ShouldSkip("CC.S.A0020"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary4X::Id, true,
                                  chip::NullOptional);
         }
-        case 41: {
-            LogStep(41, "Read the mandatory attribute: Primary4Y");
+        case 42: {
+            LogStep(42, "Read the mandatory attribute: Primary4Y");
             VerifyOrDo(!ShouldSkip("CC.S.A0021"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary4Y::Id, true,
                                  chip::NullOptional);
         }
-        case 42: {
-            LogStep(42, "Read the mandatory attribute: Primary4Intensity");
+        case 43: {
+            LogStep(43, "Read the mandatory attribute: Primary4Intensity");
             VerifyOrDo(!ShouldSkip("CC.S.A0022"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary4Intensity::Id,
                                  true, chip::NullOptional);
         }
-        case 43: {
-            LogStep(43, "Read the mandatory attribute: Primary5X");
+        case 44: {
+            LogStep(44, "Read the mandatory attribute: Primary5X");
             VerifyOrDo(!ShouldSkip("CC.S.A0024"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary5X::Id, true,
                                  chip::NullOptional);
         }
-        case 44: {
-            LogStep(44, "Read the mandatory attribute: Primary5Y");
+        case 45: {
+            LogStep(45, "Read the mandatory attribute: Primary5Y");
             VerifyOrDo(!ShouldSkip("CC.S.A0025"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary5Y::Id, true,
                                  chip::NullOptional);
         }
-        case 45: {
-            LogStep(45, "Read the mandatory attribute: Primary5Intensity");
+        case 46: {
+            LogStep(46, "Read the mandatory attribute: Primary5Intensity");
             VerifyOrDo(!ShouldSkip("CC.S.A0026"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary5Intensity::Id,
                                  true, chip::NullOptional);
         }
-        case 46: {
-            LogStep(46, "Read the mandatory attribute: Primary6X");
+        case 47: {
+            LogStep(47, "Read the mandatory attribute: Primary6X");
             VerifyOrDo(!ShouldSkip("CC.S.A0028"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary6X::Id, true,
                                  chip::NullOptional);
         }
-        case 47: {
-            LogStep(47, "Read the mandatory attribute: Primary6Y");
+        case 48: {
+            LogStep(48, "Read the mandatory attribute: Primary6Y");
             VerifyOrDo(!ShouldSkip("CC.S.A0029"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary6Y::Id, true,
                                  chip::NullOptional);
         }
-        case 48: {
-            LogStep(48, "Read the mandatory attribute: Primary6Intensity");
+        case 49: {
+            LogStep(49, "Read the mandatory attribute: Primary6Intensity");
             VerifyOrDo(!ShouldSkip("CC.S.A002a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary6Intensity::Id,
                                  true, chip::NullOptional);
         }
-        case 49: {
-            LogStep(49, "Read the optional attribute: WhitePointX");
+        case 50: {
+            LogStep(50, "Read the optional attribute: WhitePointX");
             VerifyOrDo(!ShouldSkip("CC.S.A0030"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::WhitePointX::Id, true,
                                  chip::NullOptional);
         }
-        case 50: {
-            LogStep(50, "Read the optional attribute: WhitePointY");
+        case 51: {
+            LogStep(51, "Read the optional attribute: WhitePointY");
             VerifyOrDo(!ShouldSkip("CC.S.A0031"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::WhitePointY::Id, true,
                                  chip::NullOptional);
         }
-        case 51: {
-            LogStep(51, "Read the optional attribute: ColorPointRX");
+        case 52: {
+            LogStep(52, "Read the optional attribute: ColorPointRX");
             VerifyOrDo(!ShouldSkip("CC.S.A0032"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointRX::Id, true,
                                  chip::NullOptional);
         }
-        case 52: {
-            LogStep(52, "Read the optional attribute: ColorPointRY");
+        case 53: {
+            LogStep(53, "Read the optional attribute: ColorPointRY");
             VerifyOrDo(!ShouldSkip("CC.S.A0033"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointRY::Id, true,
                                  chip::NullOptional);
         }
-        case 53: {
-            LogStep(53, "Read the optional attribute: ColorPointRIntensity");
+        case 54: {
+            LogStep(54, "Read the optional attribute: ColorPointRIntensity");
             VerifyOrDo(!ShouldSkip("CC.S.A0034"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorPointRIntensity::Id, true, chip::NullOptional);
         }
-        case 54: {
-            LogStep(54, "Read the optional attribute: ColorPointGX");
+        case 55: {
+            LogStep(55, "Read the optional attribute: ColorPointGX");
             VerifyOrDo(!ShouldSkip("CC.S.A0036"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointGX::Id, true,
                                  chip::NullOptional);
         }
-        case 55: {
-            LogStep(55, "Read the optional attribute: ColorPointGY");
+        case 56: {
+            LogStep(56, "Read the optional attribute: ColorPointGY");
             VerifyOrDo(!ShouldSkip("CC.S.A0037"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointGY::Id, true,
                                  chip::NullOptional);
         }
-        case 56: {
-            LogStep(56, "Read the optional attribute: ColorPointGIntensity");
+        case 57: {
+            LogStep(57, "Read the optional attribute: ColorPointGIntensity");
             VerifyOrDo(!ShouldSkip("CC.S.A0038"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorPointGIntensity::Id, true, chip::NullOptional);
         }
-        case 57: {
-            LogStep(57, "Read the optional attribute: ColorPointBX");
+        case 58: {
+            LogStep(58, "Read the optional attribute: ColorPointBX");
             VerifyOrDo(!ShouldSkip("CC.S.A003a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointBX::Id, true,
                                  chip::NullOptional);
         }
-        case 58: {
-            LogStep(58, "Read the optional attribute: ColorPointBY");
+        case 59: {
+            LogStep(59, "Read the optional attribute: ColorPointBY");
             VerifyOrDo(!ShouldSkip("CC.S.A003b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointBY::Id, true,
                                  chip::NullOptional);
         }
-        case 59: {
-            LogStep(59, "Read the optional attribute: ColorPointBIntensity");
+        case 60: {
+            LogStep(60, "Read the optional attribute: ColorPointBIntensity");
             VerifyOrDo(!ShouldSkip("CC.S.A003c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::ColorPointBIntensity::Id, true, chip::NullOptional);
