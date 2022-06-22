@@ -24,7 +24,7 @@
 #include <core/CHIPBuildConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 
-#include "../common/MTRError_Internal.h"
+#include "MTRError_Internal.h"
 
 const uint16_t kListenPort = 5541;
 static CHIPToolPersistentStorageDelegate * storage = nil;
@@ -172,13 +172,13 @@ void CHIPCommandBridge::SetCommandExitStatus(NSError * error, const char * logSt
     if (logString != nullptr) {
         LogNSError(logString, error);
     }
-    CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
+    CHIP_ERROR err = MTRErrorToCHIPErrorCode(error);
     SetCommandExitStatus(err);
 }
 
 void CHIPCommandBridge::LogNSError(const char * logString, NSError * error)
 {
-    CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
+    CHIP_ERROR err = MTRErrorToCHIPErrorCode(error);
     if (err == CHIP_NO_ERROR) {
         ChipLogProgress(chipTool, "%s: %s", logString, chip::ErrorStr(err));
     } else {

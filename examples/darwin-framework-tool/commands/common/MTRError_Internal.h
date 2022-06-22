@@ -22,12 +22,4 @@
 
 #include <Matter/Matter.h>
 
-NS_ASSUME_NONNULL_BEGIN
-
-@interface MTRError (TestExtensions)
-+ (nullable NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode;
-+ (nullable NSError *)errorForIMStatus:(const chip::app::StatusIB &)status;
-+ (CHIP_ERROR)errorToCHIPErrorCode:(NSError * _Nullable)error;
-@end
-
-NS_ASSUME_NONNULL_END
+CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error);

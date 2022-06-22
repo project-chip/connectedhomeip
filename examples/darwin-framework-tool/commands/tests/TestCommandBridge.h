@@ -32,7 +32,7 @@
 
 #import <Matter/Matter.h>
 
-#include "../common/MTRError_Internal.h"
+#include "MTRError_Internal.h"
 
 class TestCommandBridge;
 
@@ -165,7 +165,7 @@ public:
             return CHIP_NO_ERROR;
         }
 
-        return [MTRError errorToCHIPErrorCode:err];
+        return MTRErrorToCHIPErrorCode(err);
     }
 
     /////////// SystemCommands Interface /////////
@@ -193,12 +193,12 @@ public:
 
     void PairingComplete(chip::NodeId nodeId)
     {
-        MTRDeviceController * controller = CurrentCommissioner();
+        MTRDeviceController * commissioner = CurrentCommissioner();
         VerifyOrReturn(controller != nil, Exit("No current commissioner"));
 
         NSError * commissionError = nil;
-        [controller commissionDevice:nodeId commissioningParams:[[MTRCommissioningParameters alloc] init] error:&commissionError];
-        CHIP_ERROR err = [MTRError errorToCHIPErrorCode:commissionError];
+        [commissioner commissionDevice:nodeId commissioningParams:[[MTRCommissioningParameters alloc] init] error:&commissionError];
+        CHIP_ERROR err = MTRErrorToCHIPErrorCode(commissionError);
         if (err != CHIP_NO_ERROR) {
             Exit("Failed to kick off commissioning", err);
             return;
@@ -331,7 +331,7 @@ protected:
 
     template <typename T> bool CheckConstraintNotValue(const char * _Nonnull itemName, NSError * _Nullable current, T expected)
     {
-        NSNumber * currentValue = @([MTRError errorToCHIPErrorCode:current].AsInteger());
+        NSNumber * currentValue = @(MTRErrorToCHIPErrorCode(current).AsInteger());
         return CheckConstraintNotValue(itemName, currentValue, @(expected));
     }
 
@@ -488,7 +488,7 @@ NS_ASSUME_NONNULL_BEGIN
         if (error != nil) {
             _active = NO;
             NSLog(@"Pairing complete with error");
-            CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
+            CHIP_ERROR err = MTRErrorToCHIPErrorCode(error);
             _commandBridge->OnStatusUpdate([self convertToStatusIB:err]);
         } else {
             _commandBridge->PairingComplete(_deviceId);
@@ -507,7 +507,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (_active) {
         _active = NO;
-        CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
+        CHIP_ERROR err = MTRErrorToCHIPErrorCode(error);
         _commandBridge->OnStatusUpdate([self convertToStatusIB:err]);
     }
 }
