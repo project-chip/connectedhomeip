@@ -22,6 +22,12 @@ config("app-main-config") {
   include_dirs = [ "." ]
 }
 
+source_set("ota-test-event-trigger") {
+  sources = [
+    "${chip_root}/src/app/clusters/ota-requestor/OTATestEventTriggerDelegate.h",
+  ]
+}
+
 source_set("app-main") {
   defines = []
   sources = [
@@ -55,6 +61,7 @@ source_set("app-main") {
   }
 
   public_deps = [
+    ":ota-test-event-trigger",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/credentials:default_attestation_verifier",

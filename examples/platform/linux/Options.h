@@ -59,6 +59,7 @@ struct LinuxDeviceOptions
     chip::Optional<std::string> traceStreamFilename;
     chip::Credentials::DeviceAttestationCredentialsProvider * dacProvider = nullptr;
     chip::CSRResponseOptions mCSRResponseOptions;
+    uint8_t testEventTriggerEnableKey[16] = { 0 };
 
     static LinuxDeviceOptions & GetInstance();
 };
