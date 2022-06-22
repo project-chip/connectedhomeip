@@ -25,6 +25,7 @@ import textwrap
 from typing import Any, Dict, Sequence
 
 import yaml
+import re
 
 import constants
 import stateful_shell
@@ -241,6 +242,8 @@ def main(argv: Sequence[str]) -> None:
                       metavar="TARGET",
                       default="esp32")
     parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c", action="store_true", dest="do_rpc")
+    parser.add_option("-a", "--automated_test_stamp", help="provide the additional stamp \"branch:commit_id\" as the software version string for automated tests.",
+                      action="store_true", dest="do_automated_test_stamp")
     parser.add_option("-v", "--vid", dest="vid", type=int,
                       help="specifies the Vendor ID. Default is 0xFFF1", metavar="VID", default=0xFFF1)
     parser.add_option("-p", "--pid", dest="pid", type=int,
@@ -490,6 +493,22 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.do_build:
+        if options.do_automated_test_stamp:
+            branch = ""
+            for branch_text in shell.run_cmd("git branch", return_cmd_output=True).split("\n"):
+                match_texts = re.findall("\* (.*)", branch_text)
+                if match_texts:
+                    branch = match_texts[0]
+                    break
+            commit_id = shell.run_cmd("git rev-parse HEAD", return_cmd_output=True).replace("\n", "")
+            sw_ver_string = f"""{branch}:{commit_id}"""
+            # 64 bytes space could only contain 63 bytes string + 1 byte EOS.
+            if len(sw_ver_string) >= 64:
+                truncated_sw_ver_string = f"""{branch[:22]}:{commit_id}"""
+                flush_print(
+                    f"""Truncate the software version string from \"{sw_ver_string}\" to \"{truncated_sw_ver_string}\" due to 64 bytes limitation""")
+                sw_ver_string = truncated_sw_ver_string
+
         if options.use_zzz:
             flush_print("Using pre-generated ZAP output")
             zzz_dir = os.path.join(_CHEF_SCRIPT_PATH,
@@ -569,6 +588,7 @@ def main(argv: Sequence[str]) -> None:
         elif options.build_target == "linux":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/linux")
             with open(f"{_CHEF_SCRIPT_PATH}/linux/args.gni", "w") as f:
+                sw_ver_string_config_text = f"chip_device_config_device_software_version_string = \"{sw_ver_string}\"" if options.do_automated_test_stamp else ""
                 f.write(textwrap.dedent(f"""\
                         import("//build_overrides/chip.gni")
                         import("${{chip_root}}/config/standalone/args.gni")
@@ -576,6 +596,7 @@ def main(argv: Sequence[str]) -> None:
                         chip_build_libshell = true
                         chip_config_network_layer_ble = false
                         target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.do_rpc else '0'}"]
+                        {sw_ver_string_config_text}
                         """))
             with open(f"{_CHEF_SCRIPT_PATH}/linux/sample.gni", "w") as f:
                 f.write(textwrap.dedent(f"""\
