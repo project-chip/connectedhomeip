@@ -850,15 +850,21 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
             CHIPSoftwareDiagnosticsClusterSoftwareFaultEvent * value = [CHIPSoftwareDiagnosticsClusterSoftwareFaultEvent new];
 
             do {
-                CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct * _Nonnull memberValue;
-                memberValue = [CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct new];
-                memberValue.id = [NSNumber numberWithUnsignedLongLong:cppValue.softwareFault.id];
-                memberValue.name = [[NSString alloc] initWithBytes:cppValue.softwareFault.name.data()
-                                                            length:cppValue.softwareFault.name.size()
-                                                          encoding:NSUTF8StringEncoding];
-                memberValue.faultRecording = [NSData dataWithBytes:cppValue.softwareFault.faultRecording.data()
-                                                            length:cppValue.softwareFault.faultRecording.size()];
-                value.softwareFault = memberValue;
+                NSNumber * _Nonnull memberValue;
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.id];
+                value.id = memberValue;
+            } while (0);
+            do {
+                NSString * _Nonnull memberValue;
+                memberValue = [[NSString alloc] initWithBytes:cppValue.name.data()
+                                                       length:cppValue.name.size()
+                                                     encoding:NSUTF8StringEncoding];
+                value.name = memberValue;
+            } while (0);
+            do {
+                NSData * _Nonnull memberValue;
+                memberValue = [NSData dataWithBytes:cppValue.faultRecording.data() length:cppValue.faultRecording.size()];
+                value.faultRecording = memberValue;
             } while (0);
 
             return value;
