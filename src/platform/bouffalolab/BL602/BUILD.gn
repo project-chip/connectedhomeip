@@ -36,19 +36,19 @@ static_library("BL602") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "DeviceInfoProviderImpl.cpp",
+    "DeviceInfoProviderImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
-    "DeviceInfoProviderImpl.cpp",
-    "DeviceInfoProviderImpl.h",
     "InetPlatformConfig.h",
     "Logging.cpp",
     "NetworkCommissioningDriver.cpp",
+    "OTAImageProcessorImpl.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
-    "OTAImageProcessorImpl.cpp",
   ]
 
   deps = [
