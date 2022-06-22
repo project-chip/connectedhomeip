@@ -58,7 +58,7 @@ typedef struct mdns
 } mdns_t;
 
 #define MDNS_TXT_MAX_LEN 128
-static mdns_t mdns      = { NULL, 0, 0, 0, 0};
+static mdns_t mdns      = { NULL, 0, 0, 0, 0 };
 mdns_txt_item_t * items = nullptr;
 uint8_t packet[MDNS_TXT_MAX_LEN];
 
@@ -181,7 +181,8 @@ int mdns_responder_ops(struct netif * netif)
         return -1;
     }
 
-    if (!(mdns.netif)) {
+    if (!(mdns.netif))
+    {
         mdns.netif = netif;
 
         ret = mdns_resp_add_netif(netif, glservice->mHostName, 10);
@@ -193,7 +194,7 @@ int mdns_responder_ops(struct netif * netif)
         }
     }
 
-    items = static_cast<mdns_txt_item_t *>(chip::Platform::MemoryCalloc(glservice->mTextEntrySize, sizeof(mdns_txt_item_t)));
+    items        = static_cast<mdns_txt_item_t *>(chip::Platform::MemoryCalloc(glservice->mTextEntrySize, sizeof(mdns_txt_item_t)));
     mdns.txt_cnt = glservice->mTextEntrySize;
     for (size_t i = 0; i < glservice->mTextEntrySize; i++)
     {
@@ -274,7 +275,7 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
         return CHIP_ERROR_INTERNAL;
     }
 
-    //mdns_responder_ops(netif);
+    // mdns_responder_ops(netif);
 
     slot = netifapi_netif_common(netif, NULL, mdns_responder_start_netifapi_errt_fn);
     if (slot < 0)
@@ -298,7 +299,8 @@ CHIP_ERROR ChipDnssdRemoveServices()
         return CHIP_ERROR_INTERNAL;
     }
 
-    for (i = 0; i < mdns.slot_idx; i++) {
+    for (i = 0; i < mdns.slot_idx; i++)
+    {
         mdns_resp_del_service(netif, mdns.slot[i]);
     }
 

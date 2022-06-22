@@ -109,8 +109,6 @@
 #define CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS 4
 #endif // CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS
 
-
-
 // ==================== Security Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_DEBUG_CERT_VALIDATION

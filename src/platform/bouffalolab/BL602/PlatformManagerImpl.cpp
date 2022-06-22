@@ -26,8 +26,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/PlatformManager.h>
-#include <platform/bouffalolab/BL602/DiagnosticDataProviderImpl.h>
 #include <platform/bouffalolab/BL602/DeviceInfoProviderImpl.h>
+#include <platform/bouffalolab/BL602/DiagnosticDataProviderImpl.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
@@ -85,12 +85,8 @@ void event_cb_wifi_event(input_event_t * event, void * private_data)
         NetworkCommissioning::BLWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
     }
     break;
-    case CODE_WIFI_ON_DISCONNECT:
-    {
-        printf("[APP] [EVT] disconnect %lld, Reason: %s\r\n",
-            aos_now_ms(),
-            wifi_mgmr_status_code_str(event->value)
-        );
+    case CODE_WIFI_ON_DISCONNECT: {
+        printf("[APP] [EVT] disconnect %lld, Reason: %s\r\n", aos_now_ms(), wifi_mgmr_status_code_str(event->value));
     }
     break;
     case CODE_WIFI_ON_CONNECTING: {

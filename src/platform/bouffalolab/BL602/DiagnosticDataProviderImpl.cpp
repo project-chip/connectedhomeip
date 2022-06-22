@@ -23,8 +23,8 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <crypto/CHIPCryptoPAL.h>
 #include <DiagnosticDataProviderImpl.h>
+#include <crypto/CHIPCryptoPAL.h>
 
 #include <lwip/tcpip.h>
 

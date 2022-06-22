@@ -25,6 +25,10 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/af-enums.h>
@@ -34,12 +38,8 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <platform/bouffalolab/BL602/OTAImageProcessorImpl.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <bl_sys_ota.h>
 #include <lib/support/ErrorStr.h>
@@ -541,7 +541,6 @@ void AppTask::UpdateClusterState(void)
     {
         log_error("ERR: updating on/off %x\r\n", status);
     }
-
 }
 
 void AppTask::OtaTask(void)

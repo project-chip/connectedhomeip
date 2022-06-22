@@ -20,8 +20,8 @@
 
 #include "OTAImageProcessorImpl.h"
 #include "lib/core/CHIPError.h"
-#include <hosal_ota.h>
 #include <hal_sys.h>
+#include <hosal_ota.h>
 
 #define TAG "OTAImageProcessor"
 using namespace chip::System;
@@ -132,7 +132,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
-    int err = 0;
+    int err               = 0;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
@@ -188,7 +188,8 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     }
 
     err = hosal_ota_update(imageProcessor->offset, block.data(), block.size());
-    if (err != 0) {
+    if (err != 0)
+    {
         log_info("Update ota failed.\r\n");
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
         return;
@@ -206,7 +207,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     hal_reboot();
     // HandleApply is called after delayed action time seconds are elapsed, so it would be safe to schedule the restart
-    //chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(2 * 1000), HandleRestart, nullptr);
+    // chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(2 * 1000), HandleRestart, nullptr);
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
