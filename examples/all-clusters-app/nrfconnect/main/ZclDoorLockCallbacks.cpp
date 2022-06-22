@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
