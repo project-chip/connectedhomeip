@@ -2,28 +2,19 @@ package chip.devicecontroller;
 
 import androidx.annotation.Nullable;
 
-/**
- * Parameters representing initialization arguments for {@link ChipDeviceController}.
- */
+/** Parameters representing initialization arguments for {@link ChipDeviceController}. */
 public final class ControllerParams {
 
   private final int udpListenPort;
-  @Nullable
-  private final KeypairDelegate keypairDelegate;
-  @Nullable
-  private final byte[] rootCertificate;
-  @Nullable
-  private final byte[] intermediateCertificate;
-  @Nullable
-  private final byte[] operationalCertificate;
-  @Nullable
-  private final byte[] ipk;
+  @Nullable private final KeypairDelegate keypairDelegate;
+  @Nullable private final byte[] rootCertificate;
+  @Nullable private final byte[] intermediateCertificate;
+  @Nullable private final byte[] operationalCertificate;
+  @Nullable private final byte[] ipk;
 
   private static final int LEGACY_GLOBAL_CHIP_PORT = 5540;
 
-  /**
-   * @param udpListenPort the UDP listening port, or 0 to pick any available port.
-   */
+  /** @param udpListenPort the UDP listening port, or 0 to pick any available port. */
   private ControllerParams(Builder builder) {
     this.udpListenPort = builder.udpListenPort;
     this.keypairDelegate = builder.keypairDelegate;
@@ -33,9 +24,7 @@ public final class ControllerParams {
     this.ipk = builder.ipk;
   }
 
-  /**
-   * Gets the UDP listening port; 0 indicates "any available port"
-   */
+  /** Gets the UDP listening port; 0 indicates "any available port" */
   public int getUdpListenPort() {
     return udpListenPort;
   }
@@ -60,9 +49,7 @@ public final class ControllerParams {
     return ipk;
   }
 
-  /**
-   * Returns parameters with ephemerally generated operational credentials
-   */
+  /** Returns parameters with ephemerally generated operational credentials */
   public static Builder newBuilder() {
     return new Builder();
   }
@@ -83,19 +70,13 @@ public final class ControllerParams {
   /** Builder for {@link ControllerParams}. */
   public static class Builder {
     private int udpListenPort = LEGACY_GLOBAL_CHIP_PORT + 1;
-    @Nullable
-    private KeypairDelegate keypairDelegate = null;
-    @Nullable
-    private byte[] rootCertificate = null;
-    @Nullable
-    private byte[] intermediateCertificate = null;
-    @Nullable
-    private byte[] operationalCertificate = null;
-    @Nullable
-    private byte[] ipk = null;
+    @Nullable private KeypairDelegate keypairDelegate = null;
+    @Nullable private byte[] rootCertificate = null;
+    @Nullable private byte[] intermediateCertificate = null;
+    @Nullable private byte[] operationalCertificate = null;
+    @Nullable private byte[] ipk = null;
 
-    private Builder() {
-    }
+    private Builder() {}
 
     public Builder setUdpListenPort(int udpListenPort) {
       if (udpListenPort < 0) {

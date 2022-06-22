@@ -39,16 +39,12 @@ public class ChipDeviceController {
     return;
   }
 
-  /**
-   * Returns a new {@link ChipDeviceController} with default parameters.
-   */
+  /** Returns a new {@link ChipDeviceController} with default parameters. */
   public ChipDeviceController() {
     this(ControllerParams.newBuilder().build());
   }
 
-  /**
-   * Returns a new {@link ChipDeviceController} with the specified parameters.
-   */
+  /** Returns a new {@link ChipDeviceController} with the specified parameters. */
   public ChipDeviceController(ControllerParams params) {
     deviceControllerPtr = newDeviceController(params);
   }
