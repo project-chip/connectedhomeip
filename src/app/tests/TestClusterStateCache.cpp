@@ -636,7 +636,7 @@ nlTestSuite theSuite =
 
 int TestClusterStateCache()
 {
-    TestContext gContext;
+    static TestContext gContext;
     gSuite = &theSuite;
     nlTestRunner(&theSuite, &gContext);
     return (nlTestRunnerStats(&theSuite));

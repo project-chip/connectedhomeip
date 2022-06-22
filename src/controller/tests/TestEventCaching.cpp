@@ -463,7 +463,7 @@ nlTestSuite sSuite =
 
 int TestEventCaching()
 {
-    TestContext gContext;
+    static TestContext gContext;
     gSuite = &sSuite;
     nlTestRunner(&sSuite, &gContext);
     return (nlTestRunnerStats(&sSuite));

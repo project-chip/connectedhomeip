@@ -933,7 +933,7 @@ nlTestSuite sSuite =
 
 int TestCommandInteraction()
 {
-    TestContext gContext;
+    static TestContext gContext;
     nlTestRunner(&sSuite, &gContext);
     return (nlTestRunnerStats(&sSuite));
 }

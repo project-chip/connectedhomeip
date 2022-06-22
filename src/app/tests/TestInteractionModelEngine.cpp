@@ -250,7 +250,7 @@ nlTestSuite sSuite =
 
 int TestInteractionModelEngine()
 {
-    TestContext gContext;
+    static TestContext gContext;
     nlTestRunner(&sSuite, &gContext);
     return (nlTestRunnerStats(&sSuite));
 }
