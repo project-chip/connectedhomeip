@@ -147,9 +147,6 @@ public:
      */
     void MarkAsDefunct();
 
-    // Used to prevent any new exchange created on the session while the existing exchanges finish their work.
-    void MarkInactive();
-
     Session::SessionType GetSessionType() const override { return Session::SessionType::kSecure; }
 #if CHIP_PROGRESS_LOGGING
     const char * GetSessionTypeString() const override { return "secure"; };
@@ -289,13 +286,6 @@ private:
         // When all SessionHandles go out of scope, the session will be released automatically.
         //
         kPendingEviction = 4,
-
-        //
-        // The session is still functional but it can't yield any new outbound or inbound exchanges.
-        // This is meant to be used in conjunction with ExchangeManager::AbortExchangesForFabricExceptOne, with the one
-        // exceptional exchange handling out of this state when it finishes whatever it needs the session for.
-        //
-        kInactive = 5,
     };
 
     const char * StateToString(State state) const;
