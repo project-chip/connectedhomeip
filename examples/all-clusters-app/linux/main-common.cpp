@@ -67,7 +67,7 @@ void HandleSoftwareFaultEvent(intptr_t arg)
     if (!IsClusterPresentOnAnyEndpoint(Clusters::SoftwareDiagnostics::Id))
         return;
 
-    Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type softwareFault;
+    Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type softwareFault;
     char threadName[kMaxThreadNameLength + 1];
 
     softwareFault.id = static_cast<uint64_t>(getpid());
