@@ -651,7 +651,6 @@ function getTests() {
     'Test_TC_MC_2_1',
     'Test_TC_MC_3_2',
     'Test_TC_MC_3_3',
-    'Test_TC_MC_3_4',
     'Test_TC_MC_3_5',
     'Test_TC_MC_3_6',
     'Test_TC_MC_3_7',
