@@ -123,10 +123,11 @@
                                  clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                        udcRequestSentHandler:(nullable void (^)(bool))udcRequestSentHandler
 {
-    ChipLogProgress(
-        AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() called with port %d", commissionerPort);
+    ChipLogProgress(AppServer,
+        "CastingServerBridge().sendUserDirectedCommissioningRequest() called with IP %s port %d platformInterface %d",
+        [commissionerIpAddress UTF8String], commissionerPort, platformInterface);
 
-    dispatch_async(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+    dispatch_async(_chipWorkQueue, ^{
         bool udcRequestStatus;
         chip::Inet::IPAddress commissionerAddrInet;
         if (chip::Inet::IPAddress::FromString([commissionerIpAddress UTF8String], commissionerAddrInet) == false) {
@@ -153,4 +154,39 @@
         });
     });
 }
+
+- (void)openBasicCommissioningWindow:(nullable void (^)(bool))commissioningCompleteCallback
+                            clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    commissioningWindowRequestedHandler:(nullable void (^)(bool))commissioningWindowRequestedHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().openBasicCommissioningWindow() called");
+
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->OpenBasicCommissioningWindow(
+            [&commissioningCompleteCallback](CHIP_ERROR err) { commissioningCompleteCallback(CHIP_NO_ERROR == err); });
+
+        dispatch_async(clientQueue, ^{
+            commissioningWindowRequestedHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)contentLauncherLaunchUrl:(NSString * _Nonnull)contentUrl
+               contentDisplayStr:(NSString * _Nonnull)contentDisplayStr
+       launchUrlResponseCallback:(nullable void (^)(bool))launchUrlResponseCallback
+                     clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+     launchUrlRequestSentHandler:(nullable void (^)(bool))launchUrlRequestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().contentLauncherLaunchUrl() called");
+
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err
+            = CastingServer::GetInstance()->ContentLauncherLaunchURL([contentUrl UTF8String], [contentDisplayStr UTF8String],
+                [&launchUrlResponseCallback](CHIP_ERROR err) { launchUrlResponseCallback(CHIP_NO_ERROR == err); });
+        dispatch_async(clientQueue, ^{
+            launchUrlRequestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
 @end
