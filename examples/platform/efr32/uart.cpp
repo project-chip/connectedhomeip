@@ -44,10 +44,21 @@ extern "C" {
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #endif
 
+
+#ifdef EFR32MG24
+#define HELPER1(x) EUSART##x##_RX_IRQn
+#else
 #define HELPER1(x) USART##x##_RX_IRQn
+#endif 
+
 #define HELPER2(x) HELPER1(x)
 
+#ifdef EFR32MG24
+#define HELPER3(x) EUSART##x##_RX_IRQHandler
+#else
 #define HELPER3(x) USART##x##_RX_IRQHandler
+#endif
+
 #define HELPER4(x) HELPER3(x)
 
 // On MG24 boards VCOM runs on the EUSART device, MG12 uses the UART device
@@ -208,19 +219,60 @@ void uartConsoleInit(void)
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
 
+#ifdef EFR32MG24
+
+    NVIC_ClearPendingIRQ(EUSART0_RX_IRQn /*USART_IRQ*/);
+    NVIC_EnableIRQ(EUSART0_RX_IRQn /*USART_IRQ*/);
+
+#else // not EFR32MG24
     // Enable USART0 interrupt to wake OT task when data arrives
-    NVIC_ClearPendingIRQ(USART_IRQ);
-    NVIC_EnableIRQ(USART_IRQ);
+     NVIC_ClearPendingIRQ(USART_IRQ);
+     NVIC_EnableIRQ(USART_IRQ);
+#endif // EFR32MG24
+
 
 #ifdef EFR32MG24
-    EUSART_IntEnable(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, USART_IF_RXDATAV);
+ // Clear previous RX interrupts
+    EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
+
+  // Enable RX interrupts
+    EUSART_IntEnable(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
+
+  // Finally enable it
+    EUSART_Enable(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, eusartEnable);
+
+
+  // Original call 
+  //   EUSART_IntEnable(EUSART0/*SL_UARTDRV_EUSART_VCOM_PERIPHERAL*/, USART_IF_RXDATAV);
 #else
     USART_IntEnable(SL_UARTDRV_USART_VCOM_PERIPHERAL, USART_IF_RXDATAV);
 #endif // EFR32MG24
 }
 
+int liss_counter = 0;
+
 void USART_IRQHandler(void)
 {
+
+#if 0 // LISS
+    if(liss_counter >= 3) {
+
+        do {
+            int a,b = 0;
+
+            a = liss_counter + 100;
+            b = a + 6;
+            a = b +7;
+
+
+        } while(1);
+    }
+
+#endif // LISS
+
+liss_counter++;
+
+
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcessFromISR();
 #endif
@@ -229,6 +281,8 @@ void USART_IRQHandler(void)
 #elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif
+
+    EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 }
 
 /*
