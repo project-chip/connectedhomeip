@@ -93,7 +93,7 @@ public:
      *
      * @param[in] key Key to be deleted
      *
-     * @return CHIP_NO_ERROR on success, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND the key is not found in storage,
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if the key is not found in storage,
      *         or another CHIP_ERROR value from implementation on failure.
      */
     virtual CHIP_ERROR SyncDeleteKeyValue(const char * key) = 0;

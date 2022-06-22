@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 45.1.4. [TC-SWDIAG-3.1] Command received functionality with server as DUT
+name: 43.2.1. [TC-DGSW-2.1] Attributes with server as DUT
 
 config:
     nodeId: 0x12344321
@@ -28,34 +28,37 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Sends ResetWatermarks to DUT"
-      command: "ResetWatermarks"
-      PICS: CR_RESETWATERMARKS
-
-    - label: "Reads a list of ThreadMetrics struct attribute from DUT."
+    #issue 873
+    - label:
+          "Reads a list of ThreadMetrics struct non-global attribute from DUT."
       command: "readAttribute"
       attribute: "ThreadMetrics"
-      PICS: A_THREADMETRICS
+      PICS: DGSW.S.A0001
       response:
           constraints:
               type: list
 
-    #issue #830
-    - label: "Reads CurrentHeapUsed attribute value from DUT"
-      optional: true
+    - label: "Reads CurrentHeapFree non-global attribute value from DUT"
       command: "readAttribute"
-      attribute: "CurrentHeapUsed"
-      PICS: A_CURRENTHEAPUSED
+      attribute: "CurrentHeapFree"
+      PICS: DGSW.S.A0002
       response:
           constraints:
               type: uint64
 
-    #issue #830
-    - label: "Reads CurrentHeapHighWaterMark attribute value from DUT"
-      optional: true
+    - label: "Reads CurrentHeapUsed non-global attribute value from DUT"
+      command: "readAttribute"
+      attribute: "CurrentHeapUsed"
+      PICS: DGSW.S.A0003
+      response:
+          constraints:
+              type: uint64
+
+    - label:
+          "Reads CurrentHeapHighWaterMark non-global attribute value from DUT"
       command: "readAttribute"
       attribute: "CurrentHeapHighWatermark"
-      PICS: A_CURRENTHEAPHIGHWATERMARK
+      PICS: DGSW.S.A0004
       response:
           constraints:
               type: uint64

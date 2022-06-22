@@ -81,7 +81,7 @@ bool SessionHolder::GrabPairingSession(const SessionHandle & session)
     if (!session->IsSecureSession())
         return false;
 
-    if (!session->AsSecureSession()->IsPairing())
+    if (!session->AsSecureSession()->IsEstablishing())
         return false;
 
     mSession.Emplace(session.mSession);

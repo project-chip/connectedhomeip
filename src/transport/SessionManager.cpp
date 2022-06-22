@@ -333,31 +333,12 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
-void SessionManager::ExpirePairing(const SessionHandle & sessionHandle)
-{
-    sessionHandle->AsSecureSession()->MarkForRemoval();
-}
-
 void SessionManager::ExpireAllPairings(const ScopedNodeId & node)
 {
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetPeer() == node)
         {
-            session->MarkForRemoval();
-        }
-        return Loop::Continue;
-    });
-}
-
-void SessionManager::ExpireAllPairingsForPeerExceptPending(const ScopedNodeId & node)
-{
-    mSecureSessions.ForEachSession([&](auto session) {
-        if ((session->GetPeer() == node) && session->IsActiveSession() &&
-            (session->GetSecureSessionType() == SecureSession::Type::kCASE))
-        {
-            ChipLogDetail(Inet, "Expired/released previous local session ID %u for peer " ChipLogFormatScopedNodeId,
-                          static_cast<unsigned>(session->GetLocalSessionId()), ChipLogValueScopedNodeId(session->GetPeer()));
-            session->MarkForRemoval();
+            session->MarkForEviction();
         }
         return Loop::Continue;
     });
@@ -369,7 +350,7 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetFabricIndex() == fabric)
         {
-            session->MarkForRemoval();
+            session->MarkForEviction();
         }
         return Loop::Continue;
     });
@@ -381,7 +362,7 @@ void SessionManager::ExpireAllPASEPairings()
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetSecureSessionType() == Transport::SecureSession::Type::kPASE)
         {
-            session->MarkForRemoval();
+            session->MarkForEviction();
         }
         return Loop::Continue;
     });
@@ -398,7 +379,7 @@ void SessionManager::ReleaseSessionsForFabricExceptOne(FabricIndex fabricIndex, 
             if (session == deferredSecureSession)
                 session->MarkInactive();
             else
-                session->MarkForRemoval();
+                session->MarkForEviction();
         }
         return Loop::Continue;
     });
@@ -407,12 +388,7 @@ void SessionManager::ReleaseSessionsForFabricExceptOne(FabricIndex fabricIndex, 
 Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,
                                                         const ScopedNodeId & sessionEvictionHint)
 {
-    //
-    // This is currently not being utilized yet but will be once session eviction logic is added.
-    //
-    (void) sessionEvictionHint;
-
-    return mSecureSessions.CreateNewSecureSession(secureSessionType);
+    return mSecureSessions.CreateNewSecureSession(secureSessionType, sessionEvictionHint);
 }
 
 CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
@@ -423,6 +399,27 @@ CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionH
     Optional<SessionHandle> session =
         mSecureSessions.CreateNewSecureSessionForTest(chip::Transport::SecureSession::Type::kPASE, localSessionId, localNodeId,
                                                       peerNodeId, CATValues{}, peerSessionId, fabric, GetLocalMRPConfig());
+    VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
+    SecureSession * secureSession = session.Value()->AsSecureSession();
+    secureSession->SetPeerAddress(peerAddress);
+
+    size_t secretLen = strlen(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE);
+    ByteSpan secret(reinterpret_cast<const uint8_t *>(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE), secretLen);
+    ReturnErrorOnFailure(secureSession->GetCryptoContext().InitFromSecret(
+        secret, ByteSpan(nullptr, 0), CryptoContext::SessionInfoType::kSessionEstablishment, role));
+    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(Transport::PeerMessageCounter::kInitialSyncValue);
+    sessionHolder.Grab(session.Value());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SessionManager::InjectCaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId,
+                                                        uint16_t peerSessionId, NodeId localNodeId, NodeId peerNodeId,
+                                                        FabricIndex fabric, const Transport::PeerAddress & peerAddress,
+                                                        CryptoContext::SessionRole role, const CATValues & cats)
+{
+    Optional<SessionHandle> session =
+        mSecureSessions.CreateNewSecureSessionForTest(chip::Transport::SecureSession::Type::kCASE, localSessionId, localNodeId,
+                                                      peerNodeId, cats, peerSessionId, fabric, GetLocalMRPConfig());
     VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
     SecureSession * secureSession = session.Value()->AsSecureSession();
     secureSession->SetPeerAddress(peerAddress);
@@ -555,6 +552,14 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
     }
 
     Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
+
+    if (!secureSession->IsDefunct() && !secureSession->IsActiveSession())
+    {
+        ChipLogError(Inet, "Secure transport received message on a session in an invalid state (state = '%s')",
+                     secureSession->GetStateStr());
+        return;
+    }
+
     // Decrypt and verify the message before message counter verification or any further processing.
     CryptoContext::NonceStorage nonce;
     // PASE Sessions use the undefined node ID of all zeroes, since there is no node ID to use
@@ -751,13 +756,20 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
                                                                  const Optional<Transport::SecureSession::Type> & type)
 {
     SecureSession * found = nullptr;
+
     mSecureSessions.ForEachSession([&peerNodeId, &type, &found](auto session) {
         if (session->IsActiveSession() && session->GetPeer() == peerNodeId &&
             (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
         {
-            found = session;
-            return Loop::Break;
+            //
+            // Select the active session with the most recent activity to return back to the caller.
+            //
+            if ((found && (found->GetLastActivityTime() > session->GetLastActivityTime())) || !found)
+            {
+                found = session;
+            }
         }
+
         return Loop::Continue;
     });
 

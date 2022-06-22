@@ -28,19 +28,23 @@ namespace chip {
  *    released when the underlying session is released. One must verify it is available before use. The object can be
  *    created using SessionHandle.Grab()
  */
-class SessionHolder : public SessionDelegate, public IntrusiveListNodeBase<>
+class SessionHolder : public IntrusiveListNodeBase<>
 {
 public:
     SessionHolder() {}
-    ~SessionHolder() override;
+    virtual ~SessionHolder();
 
     SessionHolder(const SessionHolder &);
     SessionHolder(SessionHolder && that);
     SessionHolder & operator=(const SessionHolder &);
     SessionHolder & operator=(SessionHolder && that);
 
-    // Implement SessionDelegate
-    void OnSessionReleased() override { Release(); }
+    virtual void SessionReleased() { Release(); }
+    virtual void ShiftToSession(const SessionHandle & session)
+    {
+        Release();
+        Grab(session);
+    }
 
     bool Contains(const SessionHandle & session) const
     {
@@ -51,7 +55,7 @@ public:
     bool Grab(const SessionHandle & session);
     void Release();
 
-    operator bool() const { return mSession.HasValue(); }
+    explicit operator bool() const { return mSession.HasValue(); }
     Optional<SessionHandle> Get() const
     {
         //
@@ -81,12 +85,18 @@ public:
     SessionHolderWithDelegate(const SessionHandle & handle, SessionDelegate & delegate) : mDelegate(delegate) { Grab(handle); }
     operator bool() const { return SessionHolder::operator bool(); }
 
-    void OnSessionReleased() override
+    void SessionReleased() override
     {
         Release();
 
         // Note, the session is already cleared during mDelegate.OnSessionReleased
         mDelegate.OnSessionReleased();
+    }
+
+    void ShiftToSession(const SessionHandle & session) override
+    {
+        if (mDelegate.GetNewSessionHandlingPolicy() == SessionDelegate::NewSessionHandlingPolicy::kShiftToNewSession)
+            SessionHolder::ShiftToSession(session);
     }
 
     void DispatchSessionEvent(SessionDelegate::Event event) override { (mDelegate.*event)(); }

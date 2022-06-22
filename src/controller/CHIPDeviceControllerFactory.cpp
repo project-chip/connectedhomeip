@@ -74,8 +74,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
     if (mSystemState != nullptr)
     {
         params.systemLayer        = mSystemState->SystemLayer();
-        params.tcpEndPointManager = mSystemState->TCPEndPointManager();
         params.udpEndPointManager = mSystemState->UDPEndPointManager();
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        params.tcpEndPointManager = mSystemState->TCPEndPointManager();
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
         params.bleLayer = mSystemState->BleLayer();
 #endif
@@ -109,8 +111,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
     stateParams.systemLayer        = &DeviceLayer::SystemLayer();
-    stateParams.tcpEndPointManager = DeviceLayer::TCPEndPointManager();
     stateParams.udpEndPointManager = DeviceLayer::UDPEndPointManager();
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    stateParams.tcpEndPointManager = DeviceLayer::TCPEndPointManager();
+#endif
 #else
     stateParams.systemLayer        = params.systemLayer;
     stateParams.tcpEndPointManager = params.tcpEndPointManager;
@@ -327,7 +331,13 @@ void DeviceControllerFactory::Shutdown()
 
 CHIP_ERROR DeviceControllerSystemState::Shutdown()
 {
-    VerifyOrReturnError(mRefCount == 1, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mRefCount <= 1, CHIP_ERROR_INCORRECT_STATE);
+    if (mHaveShutDown)
+    {
+        // Nothing else to do here.
+        return CHIP_NO_ERROR;
+    }
+    mHaveShutDown = true;
 
     ChipLogDetail(Controller, "Shutting down the System State, this will teardown the CHIP Stack");
 
@@ -408,8 +418,10 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     }
 
     mSystemLayer        = nullptr;
-    mTCPEndPointManager = nullptr;
     mUDPEndPointManager = nullptr;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    mTCPEndPointManager = nullptr;
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
     mBleLayer = nullptr;
 #endif // CONFIG_NETWORK_LAYER_BLE

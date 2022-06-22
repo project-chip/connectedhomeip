@@ -31,38 +31,6 @@ typedef void (*CHIPDefaultSuccessCallbackType)(void *);
 typedef void (*VendorIdAttributeCallback)(void *, chip::VendorId);
 typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::VendorId> &);
 
-typedef void (*CHIPAccountLoginClusterGetSetupPINResponseCallbackType)(
-    void *, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &);
-typedef void (*CHIPApplicationLauncherClusterLauncherResponseCallbackType)(
-    void *, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType &);
-typedef void (*CHIPChannelClusterChangeChannelResponseCallbackType)(
-    void *, const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType &);
-typedef void (*CHIPContentLauncherClusterLaunchResponseCallbackType)(
-    void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType &);
-typedef void (*CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
-    void *, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetUserResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterSetCredentialResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetCredentialStatusResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &);
-typedef void (*CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackType)(
-    void *, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType &);
-typedef void (*CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType)(
-    void *, const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType &);
-typedef void (*CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackType)(
-    void *, const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType &);
-typedef void (*CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType)(
-    void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &);
-typedef void (*CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType)(
-    void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &);
 typedef void (*CHIPGroupsClusterAddGroupResponseCallbackType)(
     void *, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType &);
 typedef void (*CHIPGroupsClusterViewGroupResponseCallbackType)(
@@ -71,28 +39,6 @@ typedef void (*CHIPGroupsClusterGetGroupMembershipResponseCallbackType)(
     void *, const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType &);
 typedef void (*CHIPGroupsClusterRemoveGroupResponseCallbackType)(
     void *, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType &);
-typedef void (*CHIPKeypadInputClusterSendKeyResponseCallbackType)(
-    void *, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType &);
-typedef void (*CHIPMediaPlaybackClusterPlaybackResponseCallbackType)(
-    void *, const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterScanNetworksResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType &);
-typedef void (*CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType)(
-    void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType &);
-typedef void (*CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType)(
-    void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType &);
-typedef void (*CHIPOperationalCredentialsClusterAttestationResponseCallbackType)(
-    void *, const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType &);
-typedef void (*CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType)(
-    void *, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType &);
-typedef void (*CHIPOperationalCredentialsClusterCSRResponseCallbackType)(
-    void *, const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType &);
-typedef void (*CHIPOperationalCredentialsClusterNOCResponseCallbackType)(
-    void *, const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType &);
 typedef void (*CHIPScenesClusterAddSceneResponseCallbackType)(
     void *, const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType &);
 typedef void (*CHIPScenesClusterViewSceneResponseCallbackType)(
@@ -111,8 +57,64 @@ typedef void (*CHIPScenesClusterEnhancedViewSceneResponseCallbackType)(
     void *, const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType &);
 typedef void (*CHIPScenesClusterCopySceneResponseCallbackType)(
     void *, const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType &);
+typedef void (*CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType)(
+    void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType &);
+typedef void (*CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType)(
+    void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType &);
+typedef void (*CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackType)(
+    void *, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType &);
+typedef void (*CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType)(
+    void *, const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType &);
+typedef void (*CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackType)(
+    void *, const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterScanNetworksResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType &);
+typedef void (*CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
+    void *, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &);
+typedef void (*CHIPOperationalCredentialsClusterAttestationResponseCallbackType)(
+    void *, const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType &);
+typedef void (*CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType)(
+    void *, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType &);
+typedef void (*CHIPOperationalCredentialsClusterCSRResponseCallbackType)(
+    void *, const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType &);
+typedef void (*CHIPOperationalCredentialsClusterNOCResponseCallbackType)(
+    void *, const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType &);
+typedef void (*CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType)(
+    void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &);
+typedef void (*CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType)(
+    void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetUserResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterSetCredentialResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetCredentialStatusResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &);
+typedef void (*CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &);
+typedef void (*CHIPChannelClusterChangeChannelResponseCallbackType)(
+    void *, const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType &);
 typedef void (*CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType)(
     void *, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType &);
+typedef void (*CHIPMediaPlaybackClusterPlaybackResponseCallbackType)(
+    void *, const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType &);
+typedef void (*CHIPKeypadInputClusterSendKeyResponseCallbackType)(
+    void *, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType &);
+typedef void (*CHIPContentLauncherClusterLaunchResponseCallbackType)(
+    void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType &);
+typedef void (*CHIPApplicationLauncherClusterLauncherResponseCallbackType)(
+    void *, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType &);
+typedef void (*CHIPAccountLoginClusterGetSetupPINResponseCallbackType)(
+    void *, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestSpecificResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestAddArgumentsResponseCallbackType)(
@@ -137,8 +139,6 @@ typedef void (*CHIPTestClusterClusterTestEmitTestEventResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &);
-typedef void (*CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &);
 
 typedef void (*IdentifyClusterIdentifyEffectIdentifierAttributeCallback)(void *,
                                                                          chip::app::Clusters::Identify::IdentifyEffectIdentifier);
@@ -560,141 +560,47 @@ typedef void (*TestClusterClusterSimpleEnumAttributeCallback)(void *, chip::app:
 typedef void (*NullableTestClusterClusterSimpleEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> &);
 
-typedef void (*AccessControlAclListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
-        data);
-typedef void (*AccessControlExtensionListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & data);
-typedef void (*AccessControlGeneratedCommandListListAttributeCallback)(
+typedef void (*IdentifyGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*AccessControlAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*AccessControlAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*AccountLoginGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*AccountLoginAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*AccountLoginAttributeListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*AdministratorCommissioningGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*AdministratorCommissioningAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*AdministratorCommissioningAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ApplicationBasicApplicationStructAttributeCallback)(
-    void *, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType &);
-typedef void (*ApplicationBasicAllowedVendorListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & data);
-typedef void (*ApplicationBasicGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ApplicationBasicAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ApplicationBasicAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ApplicationLauncherCatalogListListAttributeCallback)(void * context,
-                                                                    const chip::app::DataModel::DecodableList<uint16_t> & data);
-typedef void (*ApplicationLauncherCurrentAppStructAttributeCallback)(
-    void *,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &);
-typedef void (*ApplicationLauncherGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ApplicationLauncherAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ApplicationLauncherAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*AudioOutputOutputListListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & data);
-typedef void (*AudioOutputGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*AudioOutputAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*AudioOutputAttributeListListAttributeCallback)(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BarrierControlGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BarrierControlAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BarrierControlAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BasicCapabilityMinimaStructAttributeCallback)(
-    void *, const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType &);
-typedef void (*BasicGeneratedCommandListListAttributeCallback)(void * context,
+typedef void (*IdentifyAcceptedCommandListListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*IdentifyAttributeListListAttributeCallback)(void * context,
+                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*GroupsGeneratedCommandListListAttributeCallback)(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*GroupsAcceptedCommandListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BasicAcceptedCommandListListAttributeCallback)(void * context,
+typedef void (*GroupsAttributeListListAttributeCallback)(void * context,
+                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ScenesGeneratedCommandListListAttributeCallback)(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ScenesAcceptedCommandListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ScenesAttributeListListAttributeCallback)(void * context,
+                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*OnOffGeneratedCommandListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OnOffAcceptedCommandListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BasicAttributeListListAttributeCallback)(void * context,
+typedef void (*OnOffAttributeListListAttributeCallback)(void * context,
                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OnOffSwitchConfigurationAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*LevelControlGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*LevelControlAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*LevelControlAttributeListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*BinaryInputBasicGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BinaryInputBasicAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BinaryInputBasicAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BindingBindingListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & data);
-typedef void (*BindingGeneratedCommandListListAttributeCallback)(void * context,
-                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BindingAcceptedCommandListListAttributeCallback)(void * context,
-                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BindingAttributeListListAttributeCallback)(void * context,
-                                                          const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BooleanStateGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BooleanStateAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BooleanStateAttributeListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BridgedActionsActionListListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & data);
-typedef void (*BridgedActionsEndpointListListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
-        data);
-typedef void (*BridgedActionsGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BridgedActionsAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BridgedActionsAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BridgedDeviceBasicGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BridgedDeviceBasicAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BridgedDeviceBasicAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ChannelChannelListListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & data);
-typedef void (*ChannelLineupStructAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> &);
-typedef void (*ChannelCurrentChannelStructAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> &);
-typedef void (*ChannelGeneratedCommandListListAttributeCallback)(void * context,
-                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ChannelAcceptedCommandListListAttributeCallback)(void * context,
-                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ChannelAttributeListListAttributeCallback)(void * context,
-                                                          const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ColorControlGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ColorControlAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ColorControlAttributeListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ContentLauncherAcceptHeaderListAttributeCallback)(void * context,
-                                                                 const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
-typedef void (*ContentLauncherGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ContentLauncherAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ContentLauncherAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*DescriptorDeviceListListAttributeCallback)(
     void * context,
@@ -711,59 +617,107 @@ typedef void (*DescriptorAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DescriptorAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*DiagnosticLogsGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*DiagnosticLogsAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*DiagnosticLogsAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*DoorLockCredentialRulesSupportAttributeCallback)(void *,
-                                                                chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask>);
-typedef void (*DoorLockSupportedOperatingModesAttributeCallback)(
-    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>);
-typedef void (*DoorLockDefaultConfigurationRegisterAttributeCallback)(
-    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>);
-typedef void (*DoorLockLocalProgrammingFeaturesAttributeCallback)(
-    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>);
-typedef void (*DoorLockGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*DoorLockAcceptedCommandListListAttributeCallback)(void * context,
-                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*DoorLockAttributeListListAttributeCallback)(void * context,
-                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ElectricalMeasurementGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ElectricalMeasurementAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ElectricalMeasurementAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*EthernetNetworkDiagnosticsAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*FanControlGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*FanControlAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*FanControlAttributeListListAttributeCallback)(void * context,
-                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*FixedLabelLabelListListAttributeCallback)(
+typedef void (*BindingBindingListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & data);
-typedef void (*FixedLabelGeneratedCommandListListAttributeCallback)(
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & data);
+typedef void (*BindingGeneratedCommandListListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BindingAcceptedCommandListListAttributeCallback)(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BindingAttributeListListAttributeCallback)(void * context,
+                                                          const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*AccessControlAclListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+        data);
+typedef void (*AccessControlExtensionListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & data);
+typedef void (*AccessControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*FixedLabelAcceptedCommandListListAttributeCallback)(
+typedef void (*AccessControlAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*FixedLabelAttributeListListAttributeCallback)(void * context,
-                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*FlowMeasurementGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*FlowMeasurementAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*FlowMeasurementAttributeListListAttributeCallback)(
+typedef void (*AccessControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BridgedActionsActionListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & data);
+typedef void (*BridgedActionsEndpointListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
+        data);
+typedef void (*BridgedActionsGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BridgedActionsAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BridgedActionsAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BasicCapabilityMinimaStructAttributeCallback)(
+    void *, const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType &);
+typedef void (*BasicGeneratedCommandListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BasicAcceptedCommandListListAttributeCallback)(void * context,
+                                                              const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BasicAttributeListListAttributeCallback)(void * context,
+                                                        const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*OtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OtaSoftwareUpdateProviderAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & data);
+typedef void (*OtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OtaSoftwareUpdateRequestorAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*LocalizationConfigurationSupportedLocalesListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
+typedef void (*LocalizationConfigurationGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*LocalizationConfigurationAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*LocalizationConfigurationAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & data);
+typedef void (*TimeFormatLocalizationGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TimeFormatLocalizationAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TimeFormatLocalizationAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*UnitLocalizationGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*UnitLocalizationAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*UnitLocalizationAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*PowerSourceConfigurationSourcesListAttributeCallback)(void * context,
+                                                                     const chip::app::DataModel::DecodableList<uint8_t> & data);
+typedef void (*PowerSourceConfigurationGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*PowerSourceConfigurationAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*PowerSourceConfigurationAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*PowerSourceActiveWiredFaultsListAttributeCallback)(void * context,
+                                                                  const chip::app::DataModel::DecodableList<uint8_t> & data);
+typedef void (*PowerSourceActiveBatteryFaultsListAttributeCallback)(void * context,
+                                                                    const chip::app::DataModel::DecodableList<uint8_t> & data);
+typedef void (*PowerSourceActiveBatteryChargeFaultsListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & data);
+typedef void (*PowerSourceGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*PowerSourceAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*PowerSourceAttributeListListAttributeCallback)(void * context,
+                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*GeneralCommissioningBasicCommissioningInfoStructAttributeCallback)(
     void *, const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType &);
 typedef void (*GeneralCommissioningGeneratedCommandListListAttributeCallback)(
@@ -771,6 +725,22 @@ typedef void (*GeneralCommissioningGeneratedCommandListListAttributeCallback)(
 typedef void (*GeneralCommissioningAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*GeneralCommissioningAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*NetworkCommissioningNetworksListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+        data);
+typedef void (*NetworkCommissioningGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*NetworkCommissioningAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*NetworkCommissioningAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*DiagnosticLogsGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*DiagnosticLogsAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*DiagnosticLogsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*GeneralDiagnosticsNetworkInterfacesListAttributeCallback)(
     void * context,
@@ -788,133 +758,68 @@ typedef void (*GeneralDiagnosticsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*GeneralDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*GroupKeyManagementGroupKeyMapListAttributeCallback)(
+typedef void (*SoftwareDiagnosticsThreadMetricsListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
         data);
-typedef void (*GroupKeyManagementGroupTableListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &
-        data);
-typedef void (*GroupKeyManagementGeneratedCommandListListAttributeCallback)(
+typedef void (*SoftwareDiagnosticsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*GroupKeyManagementAcceptedCommandListListAttributeCallback)(
+typedef void (*SoftwareDiagnosticsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*GroupKeyManagementAttributeListListAttributeCallback)(
+typedef void (*SoftwareDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*GroupsGeneratedCommandListListAttributeCallback)(void * context,
-                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*GroupsAcceptedCommandListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*GroupsAttributeListListAttributeCallback)(void * context,
-                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*IdentifyGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*IdentifyAcceptedCommandListListAttributeCallback)(void * context,
-                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*IdentifyAttributeListListAttributeCallback)(void * context,
-                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*IlluminanceMeasurementGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*IlluminanceMeasurementAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*IlluminanceMeasurementAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*KeypadInputGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*KeypadInputAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*KeypadInputAttributeListListAttributeCallback)(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*LevelControlGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*LevelControlAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*LevelControlAttributeListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*LocalizationConfigurationSupportedLocalesListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
-typedef void (*LocalizationConfigurationGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*LocalizationConfigurationAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*LocalizationConfigurationAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*LowPowerGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*LowPowerAcceptedCommandListListAttributeCallback)(void * context,
-                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*LowPowerAttributeListListAttributeCallback)(void * context,
-                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*MediaInputInputListListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & data);
-typedef void (*MediaInputGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*MediaInputAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*MediaInputAttributeListListAttributeCallback)(void * context,
-                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*MediaPlaybackSampledPositionStructAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &);
-typedef void (*MediaPlaybackGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*MediaPlaybackAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*MediaPlaybackAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ModeSelectSupportedModesListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & data);
-typedef void (*ModeSelectGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ModeSelectAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ModeSelectAttributeListListAttributeCallback)(void * context,
-                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*NetworkCommissioningNetworksListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
-        data);
-typedef void (*NetworkCommissioningGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*NetworkCommissioningAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*NetworkCommissioningAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*OtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*OtaSoftwareUpdateProviderAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback)(
+typedef void (*ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & data);
-typedef void (*OtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallback)(
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & data);
+typedef void (*ThreadNetworkDiagnosticsRouteTableListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
+        data);
+typedef void (*ThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallback)(
+    void *,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> &);
+typedef void (*ThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallback)(
+    void *,
+    const chip::app::DataModel::Nullable<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> &);
+typedef void (*ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & data);
+typedef void (*ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*OtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallback)(
+typedef void (*ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*OtaSoftwareUpdateRequestorAttributeListListAttributeCallback)(
+typedef void (*ThreadNetworkDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OccupancySensingGeneratedCommandListListAttributeCallback)(
+typedef void (*WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*OccupancySensingAcceptedCommandListListAttributeCallback)(
+typedef void (*WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*OccupancySensingAttributeListListAttributeCallback)(
+typedef void (*WiFiNetworkDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OnOffGeneratedCommandListListAttributeCallback)(void * context,
+typedef void (*EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*EthernetNetworkDiagnosticsAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BridgedDeviceBasicGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BridgedDeviceBasicAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BridgedDeviceBasicAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*SwitchGeneratedCommandListListAttributeCallback)(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*SwitchAcceptedCommandListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*OnOffAcceptedCommandListListAttributeCallback)(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*OnOffAttributeListListAttributeCallback)(void * context,
-                                                        const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback)(
+typedef void (*SwitchAttributeListListAttributeCallback)(void * context,
+                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*AdministratorCommissioningGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback)(
+typedef void (*AdministratorCommissioningAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*OnOffSwitchConfigurationAttributeListListAttributeCallback)(
+typedef void (*AdministratorCommissioningAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*OperationalCredentialsNOCsListAttributeCallback)(
     void * context,
@@ -932,31 +837,85 @@ typedef void (*OperationalCredentialsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OperationalCredentialsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*PowerSourceActiveWiredFaultsListAttributeCallback)(void * context,
-                                                                  const chip::app::DataModel::DecodableList<uint8_t> & data);
-typedef void (*PowerSourceActiveBatteryFaultsListAttributeCallback)(void * context,
-                                                                    const chip::app::DataModel::DecodableList<uint8_t> & data);
-typedef void (*PowerSourceActiveBatteryChargeFaultsListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & data);
-typedef void (*PowerSourceGeneratedCommandListListAttributeCallback)(
+typedef void (*GroupKeyManagementGroupKeyMapListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
+        data);
+typedef void (*GroupKeyManagementGroupTableListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &
+        data);
+typedef void (*GroupKeyManagementGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*PowerSourceAcceptedCommandListListAttributeCallback)(
+typedef void (*GroupKeyManagementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*PowerSourceAttributeListListAttributeCallback)(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*PowerSourceConfigurationSourcesListAttributeCallback)(void * context,
-                                                                     const chip::app::DataModel::DecodableList<uint8_t> & data);
-typedef void (*PowerSourceConfigurationGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*PowerSourceConfigurationAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*PowerSourceConfigurationAttributeListListAttributeCallback)(
+typedef void (*GroupKeyManagementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*PressureMeasurementGeneratedCommandListListAttributeCallback)(
+typedef void (*FixedLabelLabelListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & data);
+typedef void (*FixedLabelGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*PressureMeasurementAcceptedCommandListListAttributeCallback)(
+typedef void (*FixedLabelAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*PressureMeasurementAttributeListListAttributeCallback)(
+typedef void (*FixedLabelAttributeListListAttributeCallback)(void * context,
+                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*UserLabelLabelListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & data);
+typedef void (*UserLabelGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*UserLabelAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*UserLabelAttributeListListAttributeCallback)(void * context,
+                                                            const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BooleanStateGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BooleanStateAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BooleanStateAttributeListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ModeSelectSupportedModesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & data);
+typedef void (*ModeSelectGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ModeSelectAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ModeSelectAttributeListListAttributeCallback)(void * context,
+                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*DoorLockCredentialRulesSupportAttributeCallback)(void *,
+                                                                chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask>);
+typedef void (*DoorLockSupportedOperatingModesAttributeCallback)(
+    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>);
+typedef void (*DoorLockDefaultConfigurationRegisterAttributeCallback)(
+    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>);
+typedef void (*DoorLockLocalProgrammingFeaturesAttributeCallback)(
+    void *, chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>);
+typedef void (*DoorLockGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*DoorLockAcceptedCommandListListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*DoorLockAttributeListListAttributeCallback)(void * context,
+                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*WindowCoveringConfigStatusAttributeCallback)(void *,
+                                                            chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus>);
+typedef void (*WindowCoveringOperationalStatusAttributeCallback)(
+    void *, chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus>);
+typedef void (*WindowCoveringModeAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::WindowCovering::Mode>);
+typedef void (*WindowCoveringSafetyStatusAttributeCallback)(void *,
+                                                            chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus>);
+typedef void (*WindowCoveringGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*WindowCoveringAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*WindowCoveringAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BarrierControlGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BarrierControlAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BarrierControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*PumpConfigurationAndControlPumpStatusAttributeCallback)(
     void *, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>);
@@ -966,34 +925,85 @@ typedef void (*PumpConfigurationAndControlAcceptedCommandListListAttributeCallba
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PumpConfigurationAndControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ThermostatGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ThermostatAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ThermostatAttributeListListAttributeCallback)(void * context,
+                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*FanControlGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*FanControlAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*FanControlAttributeListListAttributeCallback)(void * context,
+                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ThermostatUserInterfaceConfigurationAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ColorControlGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ColorControlAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ColorControlAttributeListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*IlluminanceMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*IlluminanceMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*IlluminanceMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*TemperatureMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TemperatureMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TemperatureMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*PressureMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*PressureMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*PressureMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*FlowMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*FlowMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*FlowMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*RelativeHumidityMeasurementGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*RelativeHumidityMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*RelativeHumidityMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ScenesGeneratedCommandListListAttributeCallback)(void * context,
-                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ScenesAcceptedCommandListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ScenesAttributeListListAttributeCallback)(void * context,
-                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*SoftwareDiagnosticsThreadMetricsListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
-        data);
-typedef void (*SoftwareDiagnosticsGeneratedCommandListListAttributeCallback)(
+typedef void (*OccupancySensingGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*SoftwareDiagnosticsAcceptedCommandListListAttributeCallback)(
+typedef void (*OccupancySensingAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*SoftwareDiagnosticsAttributeListListAttributeCallback)(
+typedef void (*OccupancySensingAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*SwitchGeneratedCommandListListAttributeCallback)(void * context,
+typedef void (*WakeOnLanGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*WakeOnLanAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*WakeOnLanAttributeListListAttributeCallback)(void * context,
+                                                            const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ChannelChannelListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & data);
+typedef void (*ChannelLineupStructAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> &);
+typedef void (*ChannelCurrentChannelStructAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> &);
+typedef void (*ChannelGeneratedCommandListListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ChannelAcceptedCommandListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*SwitchAcceptedCommandListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*SwitchAttributeListListAttributeCallback)(void * context,
-                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ChannelAttributeListListAttributeCallback)(void * context,
+                                                          const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*TargetNavigatorTargetListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & data);
@@ -1003,11 +1013,84 @@ typedef void (*TargetNavigatorAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TargetNavigatorAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*TemperatureMeasurementGeneratedCommandListListAttributeCallback)(
+typedef void (*MediaPlaybackSampledPositionStructAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &);
+typedef void (*MediaPlaybackGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*TemperatureMeasurementAcceptedCommandListListAttributeCallback)(
+typedef void (*MediaPlaybackAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*TemperatureMeasurementAttributeListListAttributeCallback)(
+typedef void (*MediaPlaybackAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*MediaInputInputListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & data);
+typedef void (*MediaInputGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*MediaInputAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*MediaInputAttributeListListAttributeCallback)(void * context,
+                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*LowPowerGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*LowPowerAcceptedCommandListListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*LowPowerAttributeListListAttributeCallback)(void * context,
+                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*KeypadInputGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*KeypadInputAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*KeypadInputAttributeListListAttributeCallback)(void * context,
+                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ContentLauncherAcceptHeaderListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
+typedef void (*ContentLauncherGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ContentLauncherAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ContentLauncherAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*AudioOutputOutputListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & data);
+typedef void (*AudioOutputGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*AudioOutputAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*AudioOutputAttributeListListAttributeCallback)(void * context,
+                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ApplicationLauncherCatalogListListAttributeCallback)(void * context,
+                                                                    const chip::app::DataModel::DecodableList<uint16_t> & data);
+typedef void (*ApplicationLauncherCurrentAppStructAttributeCallback)(
+    void *,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &);
+typedef void (*ApplicationLauncherGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ApplicationLauncherAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ApplicationLauncherAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ApplicationBasicApplicationStructAttributeCallback)(
+    void *, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType &);
+typedef void (*ApplicationBasicAllowedVendorListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & data);
+typedef void (*ApplicationBasicGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ApplicationBasicAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ApplicationBasicAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*AccountLoginGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*AccountLoginAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*AccountLoginAttributeListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ElectricalMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ElectricalMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ElectricalMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*TestClusterBitmap8AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>);
 typedef void (*TestClusterBitmap16AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>);
@@ -1048,89 +1131,6 @@ typedef void (*TestClusterAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TestClusterAttributeListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ThermostatGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ThermostatAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ThermostatAttributeListListAttributeCallback)(void * context,
-                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ThermostatUserInterfaceConfigurationAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & data);
-typedef void (*ThreadNetworkDiagnosticsRouteTableListListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
-        data);
-typedef void (*ThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallback)(
-    void *,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> &);
-typedef void (*ThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallback)(
-    void *,
-    const chip::app::DataModel::Nullable<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> &);
-typedef void (*ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & data);
-typedef void (*ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ThreadNetworkDiagnosticsAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & data);
-typedef void (*TimeFormatLocalizationGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*TimeFormatLocalizationAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*TimeFormatLocalizationAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*UnitLocalizationGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*UnitLocalizationAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*UnitLocalizationAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*UserLabelLabelListListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & data);
-typedef void (*UserLabelGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*UserLabelAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*UserLabelAttributeListListAttributeCallback)(void * context,
-                                                            const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*WakeOnLanGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*WakeOnLanAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*WakeOnLanAttributeListListAttributeCallback)(void * context,
-                                                            const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*WiFiNetworkDiagnosticsAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*WindowCoveringConfigStatusAttributeCallback)(void *,
-                                                            chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus>);
-typedef void (*WindowCoveringOperationalStatusAttributeCallback)(
-    void *, chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus>);
-typedef void (*WindowCoveringModeAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::WindowCovering::Mode>);
-typedef void (*WindowCoveringSafetyStatusAttributeCallback)(void *,
-                                                            chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus>);
-typedef void (*WindowCoveringGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*WindowCoveringAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*WindowCoveringAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 
 class CHIPDefaultSuccessCallbackBridge : public CHIPCallbackBridge<DefaultSuccessCallback>
 {
@@ -1854,85 +1854,25 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPAccessControlAclListAttributeCallbackBridge : public CHIPCallbackBridge<AccessControlAclListAttributeCallback>
+class CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<IdentifyGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPAccessControlAclListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<AccessControlAclListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
-            value);
-};
-
-class CHIPAccessControlAclListAttributeCallbackSubscriptionBridge : public CHIPAccessControlAclListAttributeCallbackBridge
-{
-public:
-    CHIPAccessControlAclListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action,
-                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAccessControlAclListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAccessControlExtensionListAttributeCallbackBridge : public CHIPCallbackBridge<AccessControlExtensionListAttributeCallback>
-{
-public:
-    CHIPAccessControlExtensionListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<AccessControlExtensionListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> &
-            value);
-};
-
-class CHIPAccessControlExtensionListAttributeCallbackSubscriptionBridge
-    : public CHIPAccessControlExtensionListAttributeCallbackBridge
-{
-public:
-    CHIPAccessControlExtensionListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAccessControlExtensionListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAccessControlGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<AccessControlGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPAccessControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AccessControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
+    CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<IdentifyGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class CHIPAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPAccessControlGeneratedCommandListListAttributeCallbackBridge
+class CHIPIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAccessControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -1942,712 +1882,25 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPAccessControlAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<AccessControlAcceptedCommandListListAttributeCallback>
+class CHIPIdentifyAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<IdentifyAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPAccessControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AccessControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPAccessControlAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAccessControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAccessControlAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<AccessControlAttributeListListAttributeCallback>
-{
-public:
-    CHIPAccessControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AccessControlAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPAccessControlAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPAccessControlAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPAccessControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAccessControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<AccountLoginGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AccountLoginGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAccountLoginAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<AccountLoginAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPAccountLoginAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AccountLoginAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPAccountLoginAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAccountLoginAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAccountLoginAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<AccountLoginAttributeListListAttributeCallback>
-{
-public:
-    CHIPAccountLoginAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AccountLoginAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPAccountLoginAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPAccountLoginAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPAccountLoginAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAccountLoginAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<AdministratorCommissioningGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AdministratorCommissioningGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                                keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<AdministratorCommissioningAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AdministratorCommissioningAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                               keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<AdministratorCommissioningAttributeListListAttributeCallback>
-{
-public:
-    CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AdministratorCommissioningAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPApplicationBasicApplicationStructAttributeCallbackBridge
-    : public CHIPCallbackBridge<ApplicationBasicApplicationStructAttributeCallback>
-{
-public:
-    CHIPApplicationBasicApplicationStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationBasicApplicationStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value);
-};
-
-class CHIPApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge
-    : public CHIPApplicationBasicApplicationStructAttributeCallbackBridge
-{
-public:
-    CHIPApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPApplicationBasicApplicationStructAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ApplicationBasicAllowedVendorListListAttributeCallback>
-{
-public:
-    CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationBasicAllowedVendorListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & value);
-};
-
-class CHIPApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge
-    : public CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge
-{
-public:
-    CHIPApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPApplicationBasicGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ApplicationBasicGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPApplicationBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationBasicGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPApplicationBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPApplicationBasicGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPApplicationBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPApplicationBasicGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPApplicationBasicAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ApplicationBasicAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPApplicationBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationBasicAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPApplicationBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPApplicationBasicAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPApplicationBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPApplicationBasicAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPApplicationBasicAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ApplicationBasicAttributeListListAttributeCallback>
-{
-public:
-    CHIPApplicationBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationBasicAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPApplicationBasicAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPApplicationBasicAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPApplicationLauncherCatalogListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ApplicationLauncherCatalogListListAttributeCallback>
-{
-public:
-    CHIPApplicationLauncherCatalogListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationLauncherCatalogListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value);
-};
-
-class CHIPApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge
-    : public CHIPApplicationLauncherCatalogListListAttributeCallbackBridge
-{
-public:
-    CHIPApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPApplicationLauncherCatalogListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPApplicationLauncherCurrentAppStructAttributeCallbackBridge
-    : public CHIPCallbackBridge<ApplicationLauncherCurrentAppStructAttributeCallback>
-{
-public:
-    CHIPApplicationLauncherCurrentAppStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationLauncherCurrentAppStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &
-            value);
-};
-
-class CHIPApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge
-    : public CHIPApplicationLauncherCurrentAppStructAttributeCallbackBridge
-{
-public:
-    CHIPApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPApplicationLauncherCurrentAppStructAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ApplicationLauncherGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationLauncherGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ApplicationLauncherAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationLauncherAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPApplicationLauncherAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ApplicationLauncherAttributeListListAttributeCallback>
-{
-public:
-    CHIPApplicationLauncherAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationLauncherAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPApplicationLauncherAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPApplicationLauncherAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAudioOutputOutputListListAttributeCallbackBridge : public CHIPCallbackBridge<AudioOutputOutputListListAttributeCallback>
-{
-public:
-    CHIPAudioOutputOutputListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<AudioOutputOutputListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & value);
-};
-
-class CHIPAudioOutputOutputListListAttributeCallbackSubscriptionBridge : public CHIPAudioOutputOutputListListAttributeCallbackBridge
-{
-public:
-    CHIPAudioOutputOutputListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAudioOutputOutputListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAudioOutputGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<AudioOutputGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPAudioOutputGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AudioOutputGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPAudioOutputGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAudioOutputGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAudioOutputAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<AudioOutputAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPAudioOutputAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AudioOutputAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPAudioOutputAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAudioOutputAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAudioOutputAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<AudioOutputAttributeListListAttributeCallback>
-{
-public:
-    CHIPAudioOutputAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<AudioOutputAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPAudioOutputAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPAudioOutputAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPAudioOutputAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAudioOutputAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBarrierControlGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BarrierControlGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPBarrierControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BarrierControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPBarrierControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPBarrierControlGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPBarrierControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBarrierControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBarrierControlAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BarrierControlAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPBarrierControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BarrierControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPBarrierControlAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBarrierControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBarrierControlAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BarrierControlAttributeListListAttributeCallback>
-{
-public:
-    CHIPBarrierControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPIdentifyAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BarrierControlAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<IdentifyAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class CHIPBarrierControlAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPBarrierControlAttributeListListAttributeCallbackBridge
+class CHIPIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPIdentifyAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPBarrierControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                            CHIPActionBlock action,
                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBarrierControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPIdentifyAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -2657,108 +1910,440 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPBasicCapabilityMinimaStructAttributeCallbackBridge
-    : public CHIPCallbackBridge<BasicCapabilityMinimaStructAttributeCallback>
+class CHIPIdentifyAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<IdentifyAttributeListListAttributeCallback>
 {
 public:
-    CHIPBasicCapabilityMinimaStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<BasicCapabilityMinimaStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType & value);
-};
-
-class CHIPBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge
-    : public CHIPBasicCapabilityMinimaStructAttributeCallbackBridge
-{
-public:
-    CHIPBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBasicCapabilityMinimaStructAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBasicGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BasicGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BasicGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPBasicGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBasicGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBasicAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BasicAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<BasicAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPBasicAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBasicAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBasicAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<BasicAttributeListListAttributeCallback>
-{
-public:
-    CHIPBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<BasicAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPIdentifyAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                         bool keepAlive = false) :
+        CHIPCallbackBridge<IdentifyAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class CHIPBasicAttributeListListAttributeCallbackSubscriptionBridge : public CHIPBasicAttributeListListAttributeCallbackBridge
+class CHIPIdentifyAttributeListListAttributeCallbackSubscriptionBridge : public CHIPIdentifyAttributeListListAttributeCallbackBridge
 {
 public:
-    CHIPBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPIdentifyAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action,
+                                                                     SubscriptionEstablishedHandler establishedHandler) :
+        CHIPIdentifyAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGroupsGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GroupsGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPGroupsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GroupsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPGroupsGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGroupsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGroupsAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GroupsAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPGroupsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GroupsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPGroupsAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGroupsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGroupsAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<GroupsAttributeListListAttributeCallback>
+{
+public:
+    CHIPGroupsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                       bool keepAlive = false) :
+        CHIPCallbackBridge<GroupsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPGroupsAttributeListListAttributeCallbackSubscriptionBridge : public CHIPGroupsAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPGroupsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action,
+                                                                   SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGroupsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPScenesGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ScenesGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPScenesGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ScenesGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPScenesGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        CHIPScenesGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPScenesAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ScenesAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPScenesAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ScenesAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPScenesAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
+        CHIPScenesAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPScenesAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<ScenesAttributeListListAttributeCallback>
+{
+public:
+    CHIPScenesAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                       bool keepAlive = false) :
+        CHIPCallbackBridge<ScenesAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPScenesAttributeListListAttributeCallbackSubscriptionBridge : public CHIPScenesAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPScenesAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action,
+                                                                   SubscriptionEstablishedHandler establishedHandler) :
+        CHIPScenesAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPOnOffGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OnOffGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPOnOffGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OnOffGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPOnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPOnOffGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPOnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
+        CHIPOnOffGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPOnOffAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OnOffAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPOnOffAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                            bool keepAlive = false) :
+        CHIPCallbackBridge<OnOffAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPOnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPOnOffAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPOnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action,
+                                                                        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPOnOffAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPOnOffAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<OnOffAttributeListListAttributeCallback>
+{
+public:
+    CHIPOnOffAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                      bool keepAlive = false) :
+        CHIPCallbackBridge<OnOffAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPOnOffAttributeListListAttributeCallbackSubscriptionBridge : public CHIPOnOffAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPOnOffAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                   CHIPActionBlock action,
                                                                   SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBasicAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPOnOffAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OnOffSwitchConfigurationAttributeListListAttributeCallback>
+{
+public:
+    CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OnOffSwitchConfigurationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<LevelControlGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LevelControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPLevelControlAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<LevelControlAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPLevelControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LevelControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPLevelControlAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPLevelControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPLevelControlAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<LevelControlAttributeListListAttributeCallback>
+{
+public:
+    CHIPLevelControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LevelControlAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPLevelControlAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPLevelControlAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPLevelControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
+        CHIPLevelControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -2845,800 +2430,6 @@ public:
                                                                              CHIPActionBlock action,
                                                                              SubscriptionEstablishedHandler establishedHandler) :
         CHIPBinaryInputBasicAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBindingBindingListAttributeCallbackBridge : public CHIPCallbackBridge<BindingBindingListAttributeCallback>
-{
-public:
-    CHIPBindingBindingListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                  bool keepAlive = false) :
-        CHIPCallbackBridge<BindingBindingListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & value);
-};
-
-class CHIPBindingBindingListAttributeCallbackSubscriptionBridge : public CHIPBindingBindingListAttributeCallbackBridge
-{
-public:
-    CHIPBindingBindingListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBindingBindingListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBindingGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BindingGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPBindingGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BindingGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPBindingGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBindingGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBindingAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BindingAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPBindingAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BindingAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPBindingAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBindingAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBindingAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<BindingAttributeListListAttributeCallback>
-{
-public:
-    CHIPBindingAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<BindingAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPBindingAttributeListListAttributeCallbackSubscriptionBridge : public CHIPBindingAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPBindingAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBindingAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BooleanStateGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BooleanStateGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBooleanStateAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BooleanStateAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPBooleanStateAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BooleanStateAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPBooleanStateAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBooleanStateAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBooleanStateAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BooleanStateAttributeListListAttributeCallback>
-{
-public:
-    CHIPBooleanStateAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BooleanStateAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPBooleanStateAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPBooleanStateAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPBooleanStateAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBooleanStateAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBridgedActionsActionListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BridgedActionsActionListListAttributeCallback>
-{
-public:
-    CHIPBridgedActionsActionListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<BridgedActionsActionListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> &
-            value);
-};
-
-class CHIPBridgedActionsActionListListAttributeCallbackSubscriptionBridge
-    : public CHIPBridgedActionsActionListListAttributeCallbackBridge
-{
-public:
-    CHIPBridgedActionsActionListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBridgedActionsActionListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBridgedActionsEndpointListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BridgedActionsEndpointListListAttributeCallback>
-{
-public:
-    CHIPBridgedActionsEndpointListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BridgedActionsEndpointListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
-            value);
-};
-
-class CHIPBridgedActionsEndpointListListAttributeCallbackSubscriptionBridge
-    : public CHIPBridgedActionsEndpointListListAttributeCallbackBridge
-{
-public:
-    CHIPBridgedActionsEndpointListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBridgedActionsEndpointListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBridgedActionsGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BridgedActionsGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPBridgedActionsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BridgedActionsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPBridgedActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPBridgedActionsGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPBridgedActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBridgedActionsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBridgedActionsAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BridgedActionsAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPBridgedActionsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BridgedActionsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPBridgedActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPBridgedActionsAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPBridgedActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBridgedActionsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBridgedActionsAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BridgedActionsAttributeListListAttributeCallback>
-{
-public:
-    CHIPBridgedActionsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BridgedActionsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPBridgedActionsAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPBridgedActionsAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPBridgedActionsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBridgedActionsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BridgedDeviceBasicAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BridgedDeviceBasicAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBridgedDeviceBasicAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<BridgedDeviceBasicAttributeListListAttributeCallback>
-{
-public:
-    CHIPBridgedDeviceBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BridgedDeviceBasicAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPBridgedDeviceBasicAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBridgedDeviceBasicAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPChannelChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<ChannelChannelListListAttributeCallback>
-{
-public:
-    CHIPChannelChannelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<ChannelChannelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value);
-};
-
-class CHIPChannelChannelListListAttributeCallbackSubscriptionBridge : public CHIPChannelChannelListListAttributeCallbackBridge
-{
-public:
-    CHIPChannelChannelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
-        CHIPChannelChannelListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPChannelLineupStructAttributeCallbackBridge : public CHIPCallbackBridge<ChannelLineupStructAttributeCallback>
-{
-public:
-    CHIPChannelLineupStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                   bool keepAlive = false) :
-        CHIPCallbackBridge<ChannelLineupStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> & value);
-};
-
-class CHIPChannelLineupStructAttributeCallbackSubscriptionBridge : public CHIPChannelLineupStructAttributeCallbackBridge
-{
-public:
-    CHIPChannelLineupStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action,
-                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPChannelLineupStructAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPChannelCurrentChannelStructAttributeCallbackBridge
-    : public CHIPCallbackBridge<ChannelCurrentChannelStructAttributeCallback>
-{
-public:
-    CHIPChannelCurrentChannelStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<ChannelCurrentChannelStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value);
-};
-
-class CHIPChannelCurrentChannelStructAttributeCallbackSubscriptionBridge
-    : public CHIPChannelCurrentChannelStructAttributeCallbackBridge
-{
-public:
-    CHIPChannelCurrentChannelStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
-        CHIPChannelCurrentChannelStructAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPChannelGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ChannelGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPChannelGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ChannelGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPChannelGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPChannelGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPChannelAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ChannelAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPChannelAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ChannelAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPChannelAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        CHIPChannelAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPChannelAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<ChannelAttributeListListAttributeCallback>
-{
-public:
-    CHIPChannelAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<ChannelAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPChannelAttributeListListAttributeCallbackSubscriptionBridge : public CHIPChannelAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPChannelAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
-        CHIPChannelAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPColorControlGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ColorControlGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPColorControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ColorControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPColorControlGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPColorControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPColorControlAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ColorControlAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPColorControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ColorControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPColorControlAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPColorControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPColorControlAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ColorControlAttributeListListAttributeCallback>
-{
-public:
-    CHIPColorControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ColorControlAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPColorControlAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPColorControlAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPColorControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPColorControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPContentLauncherAcceptHeaderListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherAcceptHeaderListAttributeCallback>
-{
-public:
-    CHIPContentLauncherAcceptHeaderListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherAcceptHeaderListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value);
-};
-
-class CHIPContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge
-    : public CHIPContentLauncherAcceptHeaderListAttributeCallbackBridge
-{
-public:
-    CHIPContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPContentLauncherAcceptHeaderListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPContentLauncherGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPContentLauncherGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPContentLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPContentLauncherGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPContentLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPContentLauncherGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPContentLauncherAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPContentLauncherAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPContentLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPContentLauncherAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPContentLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPContentLauncherAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPContentLauncherAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherAttributeListListAttributeCallback>
-{
-public:
-    CHIPContentLauncherAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPContentLauncherAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPContentLauncherAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPContentLauncherAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPContentLauncherAttributeListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -3838,26 +2629,25 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<DiagnosticLogsGeneratedCommandListListAttributeCallback>
+class CHIPBindingBindingListAttributeCallbackBridge : public CHIPCallbackBridge<BindingBindingListAttributeCallback>
 {
 public:
-    CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DiagnosticLogsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
+    CHIPBindingBindingListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                  bool keepAlive = false) :
+        CHIPCallbackBridge<BindingBindingListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & value);
 };
 
-class CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge
+class CHIPBindingBindingListAttributeCallbackSubscriptionBridge : public CHIPBindingBindingListAttributeCallbackBridge
 {
 public:
-    CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPBindingBindingListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action,
+                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBindingBindingListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -3867,54 +2657,25 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<DiagnosticLogsAcceptedCommandListListAttributeCallback>
+class CHIPBindingGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BindingGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DiagnosticLogsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDiagnosticLogsAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<DiagnosticLogsAttributeListListAttributeCallback>
-{
-public:
-    CHIPDiagnosticLogsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPBindingGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DiagnosticLogsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<BindingGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class CHIPDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPDiagnosticLogsAttributeListListAttributeCallbackBridge
+class CHIPBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPBindingGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                            CHIPActionBlock action,
                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDiagnosticLogsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPBindingGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -3924,25 +2685,25 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPDoorLockCredentialRulesSupportAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockCredentialRulesSupportAttributeCallback>
+class CHIPBindingAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BindingAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPDoorLockCredentialRulesSupportAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPBindingAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockCredentialRulesSupportAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<BindingAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class CHIPDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockCredentialRulesSupportAttributeCallbackBridge
+class CHIPBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPBindingAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                           CHIPActionBlock action,
                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockCredentialRulesSupportAttributeCallbackBridge(queue, handler, action, true),
+        CHIPBindingAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -3952,163 +2713,23 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockSupportedOperatingModesAttributeCallback>
+class CHIPBindingAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<BindingAttributeListListAttributeCallback>
 {
 public:
-    CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockSupportedOperatingModesAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value);
-};
-
-class CHIPDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockDefaultConfigurationRegisterAttributeCallback>
-{
-public:
-    CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockDefaultConfigurationRegisterAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value);
-};
-
-class CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockLocalProgrammingFeaturesAttributeCallback>
-{
-public:
-    CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockLocalProgrammingFeaturesAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value);
-};
-
-class CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPDoorLockGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<DoorLockAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPDoorLockAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPDoorLockAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDoorLockAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<DoorLockAttributeListListAttributeCallback>
-{
-public:
-    CHIPDoorLockAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPBindingAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                        bool keepAlive = false) :
+        CHIPCallbackBridge<BindingAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class CHIPDoorLockAttributeListListAttributeCallbackSubscriptionBridge : public CHIPDoorLockAttributeListListAttributeCallbackBridge
+class CHIPBindingAttributeListListAttributeCallbackSubscriptionBridge : public CHIPBindingAttributeListListAttributeCallbackBridge
 {
 public:
-    CHIPDoorLockAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPBindingAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action,
+                                                                    SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBindingAttributeListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -4118,1796 +2739,26 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ElectricalMeasurementGeneratedCommandListListAttributeCallback>
+class CHIPAccessControlAclListAttributeCallbackBridge : public CHIPCallbackBridge<AccessControlAclListAttributeCallback>
 {
 public:
-    CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ElectricalMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ElectricalMeasurementAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ElectricalMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPElectricalMeasurementAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ElectricalMeasurementAttributeListListAttributeCallback>
-{
-public:
-    CHIPElectricalMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ElectricalMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPElectricalMeasurementAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPElectricalMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                                keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                               keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<EthernetNetworkDiagnosticsAttributeListListAttributeCallback>
-{
-public:
-    CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<EthernetNetworkDiagnosticsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFanControlGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<FanControlGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPFanControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<FanControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPFanControlGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFanControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFanControlAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<FanControlAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPFanControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<FanControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPFanControlAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFanControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFanControlAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<FanControlAttributeListListAttributeCallback>
-{
-public:
-    CHIPFanControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<FanControlAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPFanControlAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPFanControlAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPFanControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFanControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFixedLabelLabelListListAttributeCallbackBridge : public CHIPCallbackBridge<FixedLabelLabelListListAttributeCallback>
-{
-public:
-    CHIPFixedLabelLabelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                       bool keepAlive = false) :
-        CHIPCallbackBridge<FixedLabelLabelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPAccessControlAclListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                    bool keepAlive = false) :
+        CHIPCallbackBridge<AccessControlAclListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value);
-};
-
-class CHIPFixedLabelLabelListListAttributeCallbackSubscriptionBridge : public CHIPFixedLabelLabelListListAttributeCallbackBridge
-{
-public:
-    CHIPFixedLabelLabelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFixedLabelLabelListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFixedLabelGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<FixedLabelGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPFixedLabelGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<FixedLabelGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPFixedLabelGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFixedLabelGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFixedLabelAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<FixedLabelAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPFixedLabelAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<FixedLabelAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPFixedLabelAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFixedLabelAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFixedLabelAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<FixedLabelAttributeListListAttributeCallback>
-{
-public:
-    CHIPFixedLabelAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<FixedLabelAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPFixedLabelAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPFixedLabelAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPFixedLabelAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFixedLabelAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<FlowMeasurementGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<FlowMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<FlowMeasurementAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<FlowMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFlowMeasurementAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<FlowMeasurementAttributeListListAttributeCallback>
-{
-public:
-    CHIPFlowMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<FlowMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPFlowMeasurementAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFlowMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralCommissioningBasicCommissioningInfoStructAttributeCallback>
-{
-public:
-    CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralCommissioningBasicCommissioningInfoStructAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType & value);
-};
-
-class CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge
-{
-public:
-    CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralCommissioningGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralCommissioningGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralCommissioningAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralCommissioningAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGeneralCommissioningAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralCommissioningAttributeListListAttributeCallback>
-{
-public:
-    CHIPGeneralCommissioningAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralCommissioningAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralCommissioningAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralCommissioningAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>
-{
-public:
-    CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & value);
-};
-
-class CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge
-{
-public:
-    CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>
-{
-public:
-    CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
-};
-
-class CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge
-{
-public:
-    CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>
-{
-public:
-    CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
-};
-
-class CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge
-{
-public:
-    CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>
-{
-public:
-    CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
-};
-
-class CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge
-{
-public:
-    CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralDiagnosticsGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralDiagnosticsAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGeneralDiagnosticsAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralDiagnosticsAttributeListListAttributeCallback>
-{
-public:
-    CHIPGeneralDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralDiagnosticsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralDiagnosticsAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralDiagnosticsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GroupKeyManagementGroupKeyMapListAttributeCallback>
-{
-public:
-    CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GroupKeyManagementGroupKeyMapListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> & value);
-};
-
-class CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge
-    : public CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge
-{
-public:
-    CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GroupKeyManagementGroupTableListAttributeCallback>
-{
-public:
-    CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GroupKeyManagementGroupTableListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> & value);
-};
-
-class CHIPGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge
-    : public CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge
-{
-public:
-    CHIPGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GroupKeyManagementGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GroupKeyManagementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GroupKeyManagementAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GroupKeyManagementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGroupKeyManagementAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GroupKeyManagementAttributeListListAttributeCallback>
-{
-public:
-    CHIPGroupKeyManagementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GroupKeyManagementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPGroupKeyManagementAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGroupKeyManagementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGroupsGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GroupsGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPGroupsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GroupsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPGroupsGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGroupsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGroupsAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GroupsAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPGroupsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GroupsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPGroupsAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGroupsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGroupsAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<GroupsAttributeListListAttributeCallback>
-{
-public:
-    CHIPGroupsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                       bool keepAlive = false) :
-        CHIPCallbackBridge<GroupsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPGroupsAttributeListListAttributeCallbackSubscriptionBridge : public CHIPGroupsAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPGroupsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGroupsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<IdentifyGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<IdentifyGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPIdentifyAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<IdentifyAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPIdentifyAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<IdentifyAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPIdentifyAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPIdentifyAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPIdentifyAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<IdentifyAttributeListListAttributeCallback>
-{
-public:
-    CHIPIdentifyAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<IdentifyAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPIdentifyAttributeListListAttributeCallbackSubscriptionBridge : public CHIPIdentifyAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPIdentifyAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
-        CHIPIdentifyAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<IlluminanceMeasurementGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<IlluminanceMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                            keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<IlluminanceMeasurementAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<IlluminanceMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPIlluminanceMeasurementAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<IlluminanceMeasurementAttributeListListAttributeCallback>
-{
-public:
-    CHIPIlluminanceMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<IlluminanceMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPIlluminanceMeasurementAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPIlluminanceMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<KeypadInputGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<KeypadInputGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPKeypadInputAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<KeypadInputAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPKeypadInputAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<KeypadInputAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPKeypadInputAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPKeypadInputAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPKeypadInputAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<KeypadInputAttributeListListAttributeCallback>
-{
-public:
-    CHIPKeypadInputAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<KeypadInputAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPKeypadInputAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPKeypadInputAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPKeypadInputAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPKeypadInputAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<LevelControlGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<LevelControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPLevelControlAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<LevelControlAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPLevelControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<LevelControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPLevelControlAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPLevelControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPLevelControlAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<LevelControlAttributeListListAttributeCallback>
-{
-public:
-    CHIPLevelControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<LevelControlAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPLevelControlAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPLevelControlAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPLevelControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPLevelControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge
-    : public CHIPCallbackBridge<LocalizationConfigurationSupportedLocalesListAttributeCallback>
-{
-public:
-    CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<LocalizationConfigurationSupportedLocalesListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value);
-};
-
-class CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge
-    : public CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge
-{
-public:
-    CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<LocalizationConfigurationGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<LocalizationConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                               keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<LocalizationConfigurationAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<LocalizationConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPLocalizationConfigurationAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<LocalizationConfigurationAttributeListListAttributeCallback>
-{
-public:
-    CHIPLocalizationConfigurationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<LocalizationConfigurationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPLocalizationConfigurationAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPLocalizationConfigurationAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPLocalizationConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPLocalizationConfigurationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<LowPowerGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<LowPowerGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPLowPowerAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<LowPowerAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPLowPowerAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<LowPowerAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPLowPowerAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPLowPowerAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPLowPowerAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<LowPowerAttributeListListAttributeCallback>
-{
-public:
-    CHIPLowPowerAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<LowPowerAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPLowPowerAttributeListListAttributeCallbackSubscriptionBridge : public CHIPLowPowerAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPLowPowerAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
-        CHIPLowPowerAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPMediaInputInputListListAttributeCallbackBridge : public CHIPCallbackBridge<MediaInputInputListListAttributeCallback>
-{
-public:
-    CHIPMediaInputInputListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                       bool keepAlive = false) :
-        CHIPCallbackBridge<MediaInputInputListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & value);
-};
-
-class CHIPMediaInputInputListListAttributeCallbackSubscriptionBridge : public CHIPMediaInputInputListListAttributeCallbackBridge
-{
-public:
-    CHIPMediaInputInputListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
-        CHIPMediaInputInputListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPMediaInputGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<MediaInputGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPMediaInputGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaInputGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPMediaInputGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPMediaInputGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPMediaInputAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<MediaInputAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPMediaInputAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaInputAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPMediaInputAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPMediaInputAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPMediaInputAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<MediaInputAttributeListListAttributeCallback>
-{
-public:
-    CHIPMediaInputAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<MediaInputAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPMediaInputAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPMediaInputAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPMediaInputAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
-        CHIPMediaInputAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPMediaPlaybackSampledPositionStructAttributeCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackSampledPositionStructAttributeCallback>
-{
-public:
-    CHIPMediaPlaybackSampledPositionStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackSampledPositionStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> & value);
-};
-
-class CHIPMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge
-    : public CHIPMediaPlaybackSampledPositionStructAttributeCallbackBridge
-{
-public:
-    CHIPMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPMediaPlaybackSampledPositionStructAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPMediaPlaybackAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackAttributeListListAttributeCallback>
-{
-public:
-    CHIPMediaPlaybackAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPMediaPlaybackAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        CHIPMediaPlaybackAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPModeSelectSupportedModesListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ModeSelectSupportedModesListAttributeCallback>
-{
-public:
-    CHIPModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<ModeSelectSupportedModesListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
             value);
 };
 
-class CHIPModeSelectSupportedModesListAttributeCallbackSubscriptionBridge
-    : public CHIPModeSelectSupportedModesListAttributeCallbackBridge
+class CHIPAccessControlAclListAttributeCallbackSubscriptionBridge : public CHIPAccessControlAclListAttributeCallbackBridge
 {
 public:
-    CHIPModeSelectSupportedModesListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPModeSelectSupportedModesListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPAccessControlAclListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action,
+                                                                SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAccessControlAclListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -5917,112 +2768,27 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPModeSelectGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ModeSelectGeneratedCommandListListAttributeCallback>
+class CHIPAccessControlExtensionListAttributeCallbackBridge : public CHIPCallbackBridge<AccessControlExtensionListAttributeCallback>
 {
 public:
-    CHIPModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ModeSelectGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPModeSelectGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPModeSelectGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPModeSelectAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ModeSelectAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ModeSelectAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPModeSelectAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPModeSelectAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPModeSelectAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ModeSelectAttributeListListAttributeCallback>
-{
-public:
-    CHIPModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<ModeSelectAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPModeSelectAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPModeSelectAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPModeSelectAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
-        CHIPModeSelectAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPNetworkCommissioningNetworksListAttributeCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningNetworksListAttributeCallback>
-{
-public:
-    CHIPNetworkCommissioningNetworksListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningNetworksListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPAccessControlExtensionListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<AccessControlExtensionListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> &
             value);
 };
 
-class CHIPNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge
-    : public CHIPNetworkCommissioningNetworksListAttributeCallbackBridge
+class CHIPAccessControlExtensionListAttributeCallbackSubscriptionBridge
+    : public CHIPAccessControlExtensionListAttributeCallbackBridge
 {
 public:
-    CHIPNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNetworkCommissioningNetworksListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPAccessControlExtensionListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action,
+                                                                      SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAccessControlExtensionListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -6032,84 +2798,341 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningGeneratedCommandListListAttributeCallback>
+class CHIPAccessControlGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<AccessControlGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningAttributeListListAttributeCallback>
-{
-public:
-    CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPAccessControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+        CHIPCallbackBridge<AccessControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPAccessControlGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAccessControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPAccessControlAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<AccessControlAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPAccessControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AccessControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPAccessControlAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAccessControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPAccessControlAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<AccessControlAttributeListListAttributeCallback>
+{
+public:
+    CHIPAccessControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AccessControlAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class CHIPNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge
+class CHIPAccessControlAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPAccessControlAttributeListListAttributeCallbackBridge
 {
 public:
-    CHIPNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge(
+    CHIPAccessControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAccessControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBridgedActionsActionListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BridgedActionsActionListListAttributeCallback>
+{
+public:
+    CHIPBridgedActionsActionListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                            bool keepAlive = false) :
+        CHIPCallbackBridge<BridgedActionsActionListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> &
+            value);
+};
+
+class CHIPBridgedActionsActionListListAttributeCallbackSubscriptionBridge
+    : public CHIPBridgedActionsActionListListAttributeCallbackBridge
+{
+public:
+    CHIPBridgedActionsActionListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action,
+                                                                        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBridgedActionsActionListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBridgedActionsEndpointListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BridgedActionsEndpointListListAttributeCallback>
+{
+public:
+    CHIPBridgedActionsEndpointListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BridgedActionsEndpointListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
+            value);
+};
+
+class CHIPBridgedActionsEndpointListListAttributeCallbackSubscriptionBridge
+    : public CHIPBridgedActionsEndpointListListAttributeCallbackBridge
+{
+public:
+    CHIPBridgedActionsEndpointListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBridgedActionsEndpointListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBridgedActionsGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BridgedActionsGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPBridgedActionsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BridgedActionsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPBridgedActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPBridgedActionsGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPBridgedActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPBridgedActionsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBridgedActionsAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BridgedActionsAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPBridgedActionsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BridgedActionsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPBridgedActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPBridgedActionsAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPBridgedActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBridgedActionsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBridgedActionsAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BridgedActionsAttributeListListAttributeCallback>
+{
+public:
+    CHIPBridgedActionsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BridgedActionsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPBridgedActionsAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPBridgedActionsAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPBridgedActionsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBridgedActionsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBasicCapabilityMinimaStructAttributeCallbackBridge
+    : public CHIPCallbackBridge<BasicCapabilityMinimaStructAttributeCallback>
+{
+public:
+    CHIPBasicCapabilityMinimaStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<BasicCapabilityMinimaStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType & value);
+};
+
+class CHIPBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge
+    : public CHIPBasicCapabilityMinimaStructAttributeCallbackBridge
+{
+public:
+    CHIPBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBasicCapabilityMinimaStructAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBasicGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BasicGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BasicGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPBasicGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBasicGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBasicAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BasicAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                            bool keepAlive = false) :
+        CHIPCallbackBridge<BasicAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPBasicAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action,
+                                                                        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBasicAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBasicAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<BasicAttributeListListAttributeCallback>
+{
+public:
+    CHIPBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                      bool keepAlive = false) :
+        CHIPCallbackBridge<BasicAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPBasicAttributeListListAttributeCallbackSubscriptionBridge : public CHIPBasicAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action,
+                                                                  SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBasicAttributeListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -6324,26 +3347,26 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPOccupancySensingGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<OccupancySensingGeneratedCommandListListAttributeCallback>
+class CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<LocalizationConfigurationSupportedLocalesListAttributeCallback>
 {
 public:
-    CHIPOccupancySensingGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OccupancySensingGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+    CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LocalizationConfigurationSupportedLocalesListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value);
 };
 
-class CHIPOccupancySensingGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPOccupancySensingGeneratedCommandListListAttributeCallbackBridge
+class CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge
+    : public CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge
 {
 public:
-    CHIPOccupancySensingGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+    CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOccupancySensingGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -6353,26 +3376,26 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPOccupancySensingAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<OccupancySensingAcceptedCommandListListAttributeCallback>
+class CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<LocalizationConfigurationGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPOccupancySensingAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OccupancySensingAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
+    CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LocalizationConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class CHIPOccupancySensingAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPOccupancySensingAcceptedCommandListListAttributeCallbackBridge
+class CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPOccupancySensingAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+    CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOccupancySensingAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -6382,136 +3405,26 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPOccupancySensingAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<OccupancySensingAttributeListListAttributeCallback>
+class CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<LocalizationConfigurationAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPOccupancySensingAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OccupancySensingAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPOccupancySensingAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPOccupancySensingAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPOccupancySensingAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOccupancySensingAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPOnOffGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<OnOffGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPOnOffGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OnOffGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPOnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPOnOffGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPOnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOnOffGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPOnOffAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<OnOffAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPOnOffAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<OnOffAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPOnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPOnOffAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPOnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOnOffAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPOnOffAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<OnOffAttributeListListAttributeCallback>
-{
-public:
-    CHIPOnOffAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<OnOffAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPOnOffAttributeListListAttributeCallbackSubscriptionBridge : public CHIPOnOffAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPOnOffAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOnOffAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+        CHIPCallbackBridge<LocalizationConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                               keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge
+class CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+    CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -6521,26 +3434,316 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback>
+class CHIPLocalizationConfigurationAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<LocalizationConfigurationAttributeListListAttributeCallback>
 {
 public:
-    CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPLocalizationConfigurationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LocalizationConfigurationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPLocalizationConfigurationAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPLocalizationConfigurationAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPLocalizationConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPLocalizationConfigurationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback>
+{
+public:
+    CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value);
+};
+
+class CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge
+    : public CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge
+{
+public:
+    CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TimeFormatLocalizationGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TimeFormatLocalizationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                            keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TimeFormatLocalizationAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TimeFormatLocalizationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPTimeFormatLocalizationAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TimeFormatLocalizationAttributeListListAttributeCallback>
+{
+public:
+    CHIPTimeFormatLocalizationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TimeFormatLocalizationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPTimeFormatLocalizationAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPTimeFormatLocalizationAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPTimeFormatLocalizationAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTimeFormatLocalizationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPUnitLocalizationGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<UnitLocalizationGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPUnitLocalizationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<UnitLocalizationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPUnitLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPUnitLocalizationGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPUnitLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPUnitLocalizationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPUnitLocalizationAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<UnitLocalizationAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPUnitLocalizationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<UnitLocalizationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPUnitLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPUnitLocalizationAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPUnitLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPUnitLocalizationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPUnitLocalizationAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<UnitLocalizationAttributeListListAttributeCallback>
+{
+public:
+    CHIPUnitLocalizationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<UnitLocalizationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPUnitLocalizationAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPUnitLocalizationAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPUnitLocalizationAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPUnitLocalizationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceConfigurationSourcesListAttributeCallback>
+{
+public:
+    CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceConfigurationSourcesListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
+};
+
+class CHIPPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceConfigurationGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceConfigurationAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+        CHIPCallbackBridge<PowerSourceConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                              keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge
+class CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+    CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -6550,26 +3753,1512 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<OnOffSwitchConfigurationAttributeListListAttributeCallback>
+class CHIPPowerSourceConfigurationAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceConfigurationAttributeListListAttributeCallback>
 {
 public:
-    CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPPowerSourceConfigurationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OnOffSwitchConfigurationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+        CHIPCallbackBridge<PowerSourceConfigurationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                        keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackBridge
+class CHIPPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceConfigurationAttributeListListAttributeCallbackBridge
 {
 public:
-    CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
+    CHIPPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPPowerSourceConfigurationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceActiveWiredFaultsListAttributeCallback>
+{
+public:
+    CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceActiveWiredFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
+};
+
+class CHIPPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>
+{
+public:
+    CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
+};
+
+class CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceActiveBatteryChargeFaultsListAttributeCallback>
+{
+public:
+    CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceActiveBatteryChargeFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
+};
+
+class CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPPowerSourceGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPPowerSourceAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPowerSourceAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceAttributeListListAttributeCallback>
+{
+public:
+    CHIPPowerSourceAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                            bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPPowerSourceAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPPowerSourceAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPPowerSourceAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action,
+                                                                        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPowerSourceAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralCommissioningBasicCommissioningInfoStructAttributeCallback>
+{
+public:
+    CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralCommissioningBasicCommissioningInfoStructAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType & value);
+};
+
+class CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscriptionBridge
+    : public CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge
+{
+public:
+    CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralCommissioningGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralCommissioningGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                          keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralCommissioningAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralCommissioningAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGeneralCommissioningAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralCommissioningAttributeListListAttributeCallback>
+{
+public:
+    CHIPGeneralCommissioningAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralCommissioningAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPGeneralCommissioningAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGeneralCommissioningAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNetworkCommissioningNetworksListAttributeCallbackBridge
+    : public CHIPCallbackBridge<NetworkCommissioningNetworksListAttributeCallback>
+{
+public:
+    CHIPNetworkCommissioningNetworksListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NetworkCommissioningNetworksListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+            value);
+};
+
+class CHIPNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge
+    : public CHIPNetworkCommissioningNetworksListAttributeCallbackBridge
+{
+public:
+    CHIPNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNetworkCommissioningNetworksListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<NetworkCommissioningGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NetworkCommissioningGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                          keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<NetworkCommissioningAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NetworkCommissioningAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<NetworkCommissioningAttributeListListAttributeCallback>
+{
+public:
+    CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NetworkCommissioningAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<DiagnosticLogsGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DiagnosticLogsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<DiagnosticLogsAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DiagnosticLogsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPDiagnosticLogsAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<DiagnosticLogsAttributeListListAttributeCallback>
+{
+public:
+    CHIPDiagnosticLogsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DiagnosticLogsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPDiagnosticLogsAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPDiagnosticLogsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & value);
+};
+
+class CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBridge
+    : public CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge
+{
+public:
+    CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
+};
+
+class CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionBridge
+    : public CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge
+{
+public:
+    CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
+};
+
+class CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBridge
+    : public CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge
+{
+public:
+    CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
+};
+
+class CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBridge
+    : public CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge
+{
+public:
+    CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralDiagnosticsGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralDiagnosticsAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGeneralDiagnosticsAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralDiagnosticsAttributeListListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralDiagnosticsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPGeneralDiagnosticsAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGeneralDiagnosticsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<SoftwareDiagnosticsThreadMetricsListAttributeCallback>
+{
+public:
+    CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<SoftwareDiagnosticsThreadMetricsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+            value);
+};
+
+class CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge
+    : public CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge
+{
+public:
+    CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<SoftwareDiagnosticsGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<SoftwareDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<SoftwareDiagnosticsAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<SoftwareDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<SoftwareDiagnosticsAttributeListListAttributeCallback>
+{
+public:
+    CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<SoftwareDiagnosticsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>
+{
+public:
+    CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value);
+};
+
+class CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge
+    : public CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge
+{
+public:
+    CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>
+{
+public:
+    CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> & value);
+};
+
+class CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge
+    : public CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge
+{
+public:
+    CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallback>
+{
+public:
+    CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                          keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<
+                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value);
+};
+
+class CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge
+    : public CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge
+{
+public:
+    CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallback>
+{
+public:
+    CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler,
+                                                                                          CHIPActionBlock action,
+                                                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<ThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallback>(queue, handler, action,
+                                                                                                        OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<
+                    chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value);
+};
+
+class CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge
+    : public CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge
+{
+public:
+    CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>
+{
+public:
+    CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value);
+};
+
+class CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge
+    : public CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge
+{
+public:
+    CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsAttributeListListAttributeCallback>
+{
+public:
+    CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThreadNetworkDiagnosticsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                            keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<WiFiNetworkDiagnosticsAttributeListListAttributeCallback>
+{
+public:
+    CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WiFiNetworkDiagnosticsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                                keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPEthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPEthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<EthernetNetworkDiagnosticsAttributeListListAttributeCallback>
+{
+public:
+    CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<EthernetNetworkDiagnosticsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BridgedDeviceBasicAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BridgedDeviceBasicAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBridgedDeviceBasicAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BridgedDeviceBasicAttributeListListAttributeCallback>
+{
+public:
+    CHIPBridgedDeviceBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BridgedDeviceBasicAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPBridgedDeviceBasicAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBridgedDeviceBasicAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPSwitchGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<SwitchGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPSwitchGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<SwitchGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPSwitchGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        CHIPSwitchGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPSwitchAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<SwitchAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPSwitchAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<SwitchAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPSwitchAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
+        CHIPSwitchAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPSwitchAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<SwitchAttributeListListAttributeCallback>
+{
+public:
+    CHIPSwitchAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                       bool keepAlive = false) :
+        CHIPCallbackBridge<SwitchAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge : public CHIPSwitchAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action,
+                                                                   SubscriptionEstablishedHandler establishedHandler) :
+        CHIPSwitchAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<AdministratorCommissioningGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AdministratorCommissioningGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                                keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<AdministratorCommissioningAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AdministratorCommissioningAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<AdministratorCommissioningAttributeListListAttributeCallback>
+{
+public:
+    CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AdministratorCommissioningAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -6756,25 +5445,57 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge
-    : public CHIPCallbackBridge<PowerSourceActiveWiredFaultsListAttributeCallback>
+class CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GroupKeyManagementGroupKeyMapListAttributeCallback>
 {
 public:
-    CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceActiveWiredFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GroupKeyManagementGroupKeyMapListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> & value);
 };
 
-class CHIPPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge
-    : public CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge
+class CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge
+    : public CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge
 {
 public:
-    CHIPPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GroupKeyManagementGroupTableListAttributeCallback>
+{
+public:
+    CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GroupKeyManagementGroupTableListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> & value);
+};
+
+class CHIPGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge
+    : public CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge
+{
+public:
+    CHIPGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                             CHIPActionBlock action,
                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -6784,311 +5505,26 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge
-    : public CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>
+class CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GroupKeyManagementGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
-};
-
-class CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackSubscriptionBridge
-    : public CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge
-{
-public:
-    CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge
-    : public CHIPCallbackBridge<PowerSourceActiveBatteryChargeFaultsListAttributeCallback>
-{
-public:
-    CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceActiveBatteryChargeFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
-};
-
-class CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackSubscriptionBridge
-    : public CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge
-{
-public:
-    CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPPowerSourceGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<PowerSourceGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPPowerSourceGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPPowerSourceGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPowerSourceGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPPowerSourceAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<PowerSourceAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPPowerSourceAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPPowerSourceAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPowerSourceAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPPowerSourceAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<PowerSourceAttributeListListAttributeCallback>
-{
-public:
-    CHIPPowerSourceAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPPowerSourceAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPPowerSourceAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPPowerSourceAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPowerSourceAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge
-    : public CHIPCallbackBridge<PowerSourceConfigurationSourcesListAttributeCallback>
-{
-public:
-    CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceConfigurationSourcesListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
-};
-
-class CHIPPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge
-    : public CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge
-{
-public:
-    CHIPPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<PowerSourceConfigurationGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<PowerSourceConfigurationAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                             keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPPowerSourceConfigurationAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<PowerSourceConfigurationAttributeListListAttributeCallback>
-{
-public:
-    CHIPPowerSourceConfigurationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceConfigurationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPPowerSourceConfigurationAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPowerSourceConfigurationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPPressureMeasurementGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<PressureMeasurementGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPPressureMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PressureMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPPressureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPPressureMeasurementGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPPressureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPressureMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPPressureMeasurementAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<PressureMeasurementAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPPressureMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                           CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PressureMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+        CHIPCallbackBridge<GroupKeyManagementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class CHIPPressureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPPressureMeasurementAcceptedCommandListListAttributeCallbackBridge
+class CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPPressureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+    CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPressureMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7098,25 +5534,950 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPPressureMeasurementAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<PressureMeasurementAttributeListListAttributeCallback>
+class CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GroupKeyManagementAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPPressureMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PressureMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GroupKeyManagementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPGroupKeyManagementAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GroupKeyManagementAttributeListListAttributeCallback>
+{
+public:
+    CHIPGroupKeyManagementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GroupKeyManagementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class CHIPPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPPressureMeasurementAttributeListListAttributeCallbackBridge
+class CHIPGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPGroupKeyManagementAttributeListListAttributeCallbackBridge
 {
 public:
-    CHIPPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGroupKeyManagementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPFixedLabelLabelListListAttributeCallbackBridge : public CHIPCallbackBridge<FixedLabelLabelListListAttributeCallback>
+{
+public:
+    CHIPFixedLabelLabelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                       bool keepAlive = false) :
+        CHIPCallbackBridge<FixedLabelLabelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value);
+};
+
+class CHIPFixedLabelLabelListListAttributeCallbackSubscriptionBridge : public CHIPFixedLabelLabelListListAttributeCallbackBridge
+{
+public:
+    CHIPFixedLabelLabelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action,
+                                                                   SubscriptionEstablishedHandler establishedHandler) :
+        CHIPFixedLabelLabelListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPFixedLabelGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<FixedLabelGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPFixedLabelGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<FixedLabelGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPFixedLabelGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPFixedLabelGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPFixedLabelAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<FixedLabelAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPFixedLabelAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<FixedLabelAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPFixedLabelAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPFixedLabelAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPFixedLabelAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<FixedLabelAttributeListListAttributeCallback>
+{
+public:
+    CHIPFixedLabelAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<FixedLabelAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPFixedLabelAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPFixedLabelAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPFixedLabelAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        CHIPFixedLabelAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPUserLabelLabelListListAttributeCallbackBridge : public CHIPCallbackBridge<UserLabelLabelListListAttributeCallback>
+{
+public:
+    CHIPUserLabelLabelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                      bool keepAlive = false) :
+        CHIPCallbackBridge<UserLabelLabelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & value);
+};
+
+class CHIPUserLabelLabelListListAttributeCallbackSubscriptionBridge : public CHIPUserLabelLabelListListAttributeCallbackBridge
+{
+public:
+    CHIPUserLabelLabelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action,
+                                                                  SubscriptionEstablishedHandler establishedHandler) :
+        CHIPUserLabelLabelListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPUserLabelGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<UserLabelGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPUserLabelGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<UserLabelGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPUserLabelGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPUserLabelGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPUserLabelAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<UserLabelAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPUserLabelAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<UserLabelAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPUserLabelAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPUserLabelAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPUserLabelAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<UserLabelAttributeListListAttributeCallback>
+{
+public:
+    CHIPUserLabelAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<UserLabelAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPUserLabelAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPUserLabelAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPUserLabelAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action,
+                                                                      SubscriptionEstablishedHandler establishedHandler) :
+        CHIPUserLabelAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BooleanStateGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BooleanStateGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                                 CHIPActionBlock action,
                                                                                 SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPressureMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBooleanStateAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BooleanStateAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPBooleanStateAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BooleanStateAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPBooleanStateAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBooleanStateAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBooleanStateAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BooleanStateAttributeListListAttributeCallback>
+{
+public:
+    CHIPBooleanStateAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BooleanStateAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPBooleanStateAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPBooleanStateAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPBooleanStateAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBooleanStateAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPModeSelectSupportedModesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ModeSelectSupportedModesListAttributeCallback>
+{
+public:
+    CHIPModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                            bool keepAlive = false) :
+        CHIPCallbackBridge<ModeSelectSupportedModesListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
+            value);
+};
+
+class CHIPModeSelectSupportedModesListAttributeCallbackSubscriptionBridge
+    : public CHIPModeSelectSupportedModesListAttributeCallbackBridge
+{
+public:
+    CHIPModeSelectSupportedModesListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action,
+                                                                        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPModeSelectSupportedModesListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPModeSelectGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ModeSelectGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ModeSelectGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPModeSelectGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPModeSelectGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPModeSelectAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ModeSelectAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ModeSelectAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPModeSelectAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPModeSelectAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPModeSelectAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ModeSelectAttributeListListAttributeCallback>
+{
+public:
+    CHIPModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<ModeSelectAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPModeSelectAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPModeSelectAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPModeSelectAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        CHIPModeSelectAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPDoorLockCredentialRulesSupportAttributeCallbackBridge
+    : public CHIPCallbackBridge<DoorLockCredentialRulesSupportAttributeCallback>
+{
+public:
+    CHIPDoorLockCredentialRulesSupportAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DoorLockCredentialRulesSupportAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value);
+};
+
+class CHIPDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge
+    : public CHIPDoorLockCredentialRulesSupportAttributeCallbackBridge
+{
+public:
+    CHIPDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        CHIPDoorLockCredentialRulesSupportAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge
+    : public CHIPCallbackBridge<DoorLockSupportedOperatingModesAttributeCallback>
+{
+public:
+    CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DoorLockSupportedOperatingModesAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value);
+};
+
+class CHIPDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge
+    : public CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge
+{
+public:
+    CHIPDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackBridge
+    : public CHIPCallbackBridge<DoorLockDefaultConfigurationRegisterAttributeCallback>
+{
+public:
+    CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DoorLockDefaultConfigurationRegisterAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value);
+};
+
+class CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge
+    : public CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackBridge
+{
+public:
+    CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        CHIPDoorLockDefaultConfigurationRegisterAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackBridge
+    : public CHIPCallbackBridge<DoorLockLocalProgrammingFeaturesAttributeCallback>
+{
+public:
+    CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DoorLockLocalProgrammingFeaturesAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value);
+};
+
+class CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge
+    : public CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackBridge
+{
+public:
+    CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPDoorLockLocalProgrammingFeaturesAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPDoorLockGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<DoorLockGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPDoorLockGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DoorLockGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPDoorLockGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPDoorLockGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPDoorLockAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<DoorLockAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPDoorLockAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DoorLockAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPDoorLockAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPDoorLockAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPDoorLockAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<DoorLockAttributeListListAttributeCallback>
+{
+public:
+    CHIPDoorLockAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                         bool keepAlive = false) :
+        CHIPCallbackBridge<DoorLockAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPDoorLockAttributeListListAttributeCallbackSubscriptionBridge : public CHIPDoorLockAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPDoorLockAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action,
+                                                                     SubscriptionEstablishedHandler establishedHandler) :
+        CHIPDoorLockAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWindowCoveringConfigStatusAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringConfigStatusAttributeCallback>
+{
+public:
+    CHIPWindowCoveringConfigStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<WindowCoveringConfigStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value);
+};
+
+class CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge
+    : public CHIPWindowCoveringConfigStatusAttributeCallbackBridge
+{
+public:
+    CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action,
+                                                                      SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWindowCoveringConfigStatusAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWindowCoveringOperationalStatusAttributeCallbackBridge
+    : public CHIPCallbackBridge<WindowCoveringOperationalStatusAttributeCallback>
+{
+public:
+    CHIPWindowCoveringOperationalStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WindowCoveringOperationalStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value);
+};
+
+class CHIPWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge
+    : public CHIPWindowCoveringOperationalStatusAttributeCallbackBridge
+{
+public:
+    CHIPWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWindowCoveringOperationalStatusAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWindowCoveringModeAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringModeAttributeCallback>
+{
+public:
+    CHIPWindowCoveringModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                  bool keepAlive = false) :
+        CHIPCallbackBridge<WindowCoveringModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value);
+};
+
+class CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge : public CHIPWindowCoveringModeAttributeCallbackBridge
+{
+public:
+    CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action,
+                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWindowCoveringModeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWindowCoveringSafetyStatusAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringSafetyStatusAttributeCallback>
+{
+public:
+    CHIPWindowCoveringSafetyStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<WindowCoveringSafetyStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> value);
+};
+
+class CHIPWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge
+    : public CHIPWindowCoveringSafetyStatusAttributeCallbackBridge
+{
+public:
+    CHIPWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action,
+                                                                      SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWindowCoveringSafetyStatusAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<WindowCoveringGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WindowCoveringGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPWindowCoveringGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPWindowCoveringGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWindowCoveringAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<WindowCoveringAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPWindowCoveringAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WindowCoveringAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPWindowCoveringAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWindowCoveringAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWindowCoveringAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<WindowCoveringAttributeListListAttributeCallback>
+{
+public:
+    CHIPWindowCoveringAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WindowCoveringAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPWindowCoveringAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWindowCoveringAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBarrierControlGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BarrierControlGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPBarrierControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BarrierControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPBarrierControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPBarrierControlGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPBarrierControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBarrierControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBarrierControlAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BarrierControlAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPBarrierControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BarrierControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPBarrierControlAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBarrierControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPBarrierControlAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<BarrierControlAttributeListListAttributeCallback>
+{
+public:
+    CHIPBarrierControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<BarrierControlAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPBarrierControlAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPBarrierControlAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPBarrierControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBarrierControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7242,6 +6603,697 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class CHIPThermostatGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThermostatGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPThermostatGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThermostatGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPThermostatGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPThermostatGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPThermostatGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThermostatGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThermostatAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThermostatAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPThermostatAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThermostatAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPThermostatAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPThermostatAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPThermostatAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThermostatAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThermostatAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThermostatAttributeListListAttributeCallback>
+{
+public:
+    CHIPThermostatAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<ThermostatAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPThermostatAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPThermostatAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPThermostatAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThermostatAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPFanControlGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<FanControlGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPFanControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<FanControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPFanControlGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPFanControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPFanControlAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<FanControlAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPFanControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<FanControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPFanControlAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPFanControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPFanControlAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<FanControlAttributeListListAttributeCallback>
+{
+public:
+    CHIPFanControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<FanControlAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPFanControlAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPFanControlAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPFanControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        CHIPFanControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler,
+                                                                                            CHIPActionBlock action,
+                                                                                            bool keepAlive = false) :
+        CHIPCallbackBridge<ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                          OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler,
+                                                                                           CHIPActionBlock action,
+                                                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThermostatUserInterfaceConfigurationAttributeListListAttributeCallback>
+{
+public:
+    CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     CHIPActionBlock action,
+                                                                                     bool keepAlive = false) :
+        CHIPCallbackBridge<ThermostatUserInterfaceConfigurationAttributeListListAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPColorControlGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ColorControlGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPColorControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ColorControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPColorControlGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        CHIPColorControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPColorControlAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ColorControlAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPColorControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ColorControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPColorControlAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPColorControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPColorControlAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ColorControlAttributeListListAttributeCallback>
+{
+public:
+    CHIPColorControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ColorControlAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPColorControlAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPColorControlAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPColorControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
+        CHIPColorControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<IlluminanceMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<IlluminanceMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                            keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<IlluminanceMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<IlluminanceMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPIlluminanceMeasurementAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<IlluminanceMeasurementAttributeListListAttributeCallback>
+{
+public:
+    CHIPIlluminanceMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<IlluminanceMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPIlluminanceMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPIlluminanceMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TemperatureMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TemperatureMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                            keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TemperatureMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TemperatureMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPTemperatureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPTemperatureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPTemperatureMeasurementAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TemperatureMeasurementAttributeListListAttributeCallback>
+{
+public:
+    CHIPTemperatureMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TemperatureMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPTemperatureMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTemperatureMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPressureMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PressureMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPPressureMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PressureMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPPressureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPPressureMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPPressureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPressureMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPressureMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PressureMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPPressureMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PressureMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPPressureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPPressureMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPPressureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPressureMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPPressureMeasurementAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PressureMeasurementAttributeListListAttributeCallback>
+{
+public:
+    CHIPPressureMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PressureMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPPressureMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        CHIPPressureMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<FlowMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<FlowMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<FlowMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<FlowMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPFlowMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPFlowMeasurementAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<FlowMeasurementAttributeListListAttributeCallback>
+{
+public:
+    CHIPFlowMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<FlowMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPFlowMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPFlowMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class CHIPRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<RelativeHumidityMeasurementGeneratedCommandListListAttributeCallback>
 {
@@ -7329,25 +7381,26 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPScenesGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ScenesGeneratedCommandListListAttributeCallback>
+class CHIPOccupancySensingGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OccupancySensingGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPScenesGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ScenesGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPOccupancySensingGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OccupancySensingGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class CHIPScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPScenesGeneratedCommandListListAttributeCallbackBridge
+class CHIPOccupancySensingGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPOccupancySensingGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        CHIPScenesGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPOccupancySensingGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPOccupancySensingGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7357,25 +7410,26 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPScenesAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ScenesAcceptedCommandListListAttributeCallback>
+class CHIPOccupancySensingAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OccupancySensingAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPScenesAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ScenesAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPOccupancySensingAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OccupancySensingAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class CHIPScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPScenesAcceptedCommandListListAttributeCallbackBridge
+class CHIPOccupancySensingAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPOccupancySensingAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPScenesAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPOccupancySensingAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPOccupancySensingAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7385,23 +7439,25 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPScenesAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<ScenesAttributeListListAttributeCallback>
+class CHIPOccupancySensingAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OccupancySensingAttributeListListAttributeCallback>
 {
 public:
-    CHIPScenesAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                       bool keepAlive = false) :
-        CHIPCallbackBridge<ScenesAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPOccupancySensingAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OccupancySensingAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class CHIPScenesAttributeListListAttributeCallbackSubscriptionBridge : public CHIPScenesAttributeListListAttributeCallbackBridge
+class CHIPOccupancySensingAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPOccupancySensingAttributeListListAttributeCallbackBridge
 {
 public:
-    CHIPScenesAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
-        CHIPScenesAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPOccupancySensingAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPOccupancySensingAttributeListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7411,28 +7467,108 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge
-    : public CHIPCallbackBridge<SoftwareDiagnosticsThreadMetricsListAttributeCallback>
+class CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<WakeOnLanGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<SoftwareDiagnosticsThreadMetricsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WakeOnLanGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWakeOnLanAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<WakeOnLanAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPWakeOnLanAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<WakeOnLanAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPWakeOnLanAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWakeOnLanAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPWakeOnLanAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<WakeOnLanAttributeListListAttributeCallback>
+{
+public:
+    CHIPWakeOnLanAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<WakeOnLanAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPWakeOnLanAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action,
+                                                                      SubscriptionEstablishedHandler establishedHandler) :
+        CHIPWakeOnLanAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPChannelChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<ChannelChannelListListAttributeCallback>
+{
+public:
+    CHIPChannelChannelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                      bool keepAlive = false) :
+        CHIPCallbackBridge<ChannelChannelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
-            value);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value);
 };
 
-class CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge
-    : public CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge
+class CHIPChannelChannelListListAttributeCallbackSubscriptionBridge : public CHIPChannelChannelListListAttributeCallbackBridge
 {
 public:
-    CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPChannelChannelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action,
+                                                                  SubscriptionEstablishedHandler establishedHandler) :
+        CHIPChannelChannelListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7442,26 +7578,83 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<SoftwareDiagnosticsGeneratedCommandListListAttributeCallback>
+class CHIPChannelLineupStructAttributeCallbackBridge : public CHIPCallbackBridge<ChannelLineupStructAttributeCallback>
 {
 public:
-    CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<SoftwareDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
+    CHIPChannelLineupStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                   bool keepAlive = false) :
+        CHIPCallbackBridge<ChannelLineupStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> & value);
+};
+
+class CHIPChannelLineupStructAttributeCallbackSubscriptionBridge : public CHIPChannelLineupStructAttributeCallbackBridge
+{
+public:
+    CHIPChannelLineupStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action,
+                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPChannelLineupStructAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPChannelCurrentChannelStructAttributeCallbackBridge
+    : public CHIPCallbackBridge<ChannelCurrentChannelStructAttributeCallback>
+{
+public:
+    CHIPChannelCurrentChannelStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<ChannelCurrentChannelStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value);
+};
+
+class CHIPChannelCurrentChannelStructAttributeCallbackSubscriptionBridge
+    : public CHIPChannelCurrentChannelStructAttributeCallbackBridge
+{
+public:
+    CHIPChannelCurrentChannelStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        CHIPChannelCurrentChannelStructAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPChannelGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ChannelGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPChannelGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ChannelGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge
+class CHIPChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPChannelGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPChannelGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7471,82 +7664,25 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<SoftwareDiagnosticsAcceptedCommandListListAttributeCallback>
+class CHIPChannelAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ChannelAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<SoftwareDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<SoftwareDiagnosticsAttributeListListAttributeCallback>
-{
-public:
-    CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<SoftwareDiagnosticsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPSwitchGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<SwitchGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPSwitchGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPChannelAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<SwitchGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<ChannelAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class CHIPSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPSwitchGeneratedCommandListListAttributeCallbackBridge
+class CHIPChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPChannelAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                           CHIPActionBlock action,
                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPSwitchGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPChannelAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7556,51 +7692,23 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPSwitchAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<SwitchAcceptedCommandListListAttributeCallback>
+class CHIPChannelAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<ChannelAttributeListListAttributeCallback>
 {
 public:
-    CHIPSwitchAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<SwitchAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPSwitchAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPSwitchAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPSwitchAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<SwitchAttributeListListAttributeCallback>
-{
-public:
-    CHIPSwitchAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                       bool keepAlive = false) :
-        CHIPCallbackBridge<SwitchAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPChannelAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                        bool keepAlive = false) :
+        CHIPCallbackBridge<ChannelAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge : public CHIPSwitchAttributeListListAttributeCallbackBridge
+class CHIPChannelAttributeListListAttributeCallbackSubscriptionBridge : public CHIPChannelAttributeListListAttributeCallbackBridge
 {
 public:
-    CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
-        CHIPSwitchAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPChannelAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action,
+                                                                    SubscriptionEstablishedHandler establishedHandler) :
+        CHIPChannelAttributeListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7727,26 +7835,27 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<TemperatureMeasurementGeneratedCommandListListAttributeCallback>
+class CHIPMediaPlaybackSampledPositionStructAttributeCallbackBridge
+    : public CHIPCallbackBridge<MediaPlaybackSampledPositionStructAttributeCallback>
 {
 public:
-    CHIPTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TemperatureMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                            keepAlive){};
+    CHIPMediaPlaybackSampledPositionStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<MediaPlaybackSampledPositionStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> & value);
 };
 
-class CHIPTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge
+class CHIPMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge
+    : public CHIPMediaPlaybackSampledPositionStructAttributeCallbackBridge
 {
 public:
-    CHIPTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPMediaPlaybackSampledPositionStructAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7756,26 +7865,989 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<TemperatureMeasurementAcceptedCommandListListAttributeCallback>
+class CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<MediaPlaybackGeneratedCommandListListAttributeCallback>
 {
 public:
-    CHIPTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<MediaPlaybackGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPMediaPlaybackGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<MediaPlaybackAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<MediaPlaybackAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        CHIPMediaPlaybackAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPMediaPlaybackAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<MediaPlaybackAttributeListListAttributeCallback>
+{
+public:
+    CHIPMediaPlaybackAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<MediaPlaybackAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPMediaPlaybackAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        CHIPMediaPlaybackAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPMediaInputInputListListAttributeCallbackBridge : public CHIPCallbackBridge<MediaInputInputListListAttributeCallback>
+{
+public:
+    CHIPMediaInputInputListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                       bool keepAlive = false) :
+        CHIPCallbackBridge<MediaInputInputListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & value);
+};
+
+class CHIPMediaInputInputListListAttributeCallbackSubscriptionBridge : public CHIPMediaInputInputListListAttributeCallbackBridge
+{
+public:
+    CHIPMediaInputInputListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action,
+                                                                   SubscriptionEstablishedHandler establishedHandler) :
+        CHIPMediaInputInputListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPMediaInputGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<MediaInputGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPMediaInputGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<MediaInputGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPMediaInputGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPMediaInputGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPMediaInputAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<MediaInputAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPMediaInputAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<MediaInputAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPMediaInputAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPMediaInputAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPMediaInputAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<MediaInputAttributeListListAttributeCallback>
+{
+public:
+    CHIPMediaInputAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<MediaInputAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPMediaInputAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPMediaInputAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPMediaInputAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        CHIPMediaInputAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<LowPowerGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LowPowerGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPLowPowerAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<LowPowerAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPLowPowerAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LowPowerAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPLowPowerAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPLowPowerAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPLowPowerAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<LowPowerAttributeListListAttributeCallback>
+{
+public:
+    CHIPLowPowerAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                         bool keepAlive = false) :
+        CHIPCallbackBridge<LowPowerAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPLowPowerAttributeListListAttributeCallbackSubscriptionBridge : public CHIPLowPowerAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPLowPowerAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action,
+                                                                     SubscriptionEstablishedHandler establishedHandler) :
+        CHIPLowPowerAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<KeypadInputGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<KeypadInputGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPKeypadInputAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<KeypadInputAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPKeypadInputAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<KeypadInputAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPKeypadInputAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPKeypadInputAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPKeypadInputAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<KeypadInputAttributeListListAttributeCallback>
+{
+public:
+    CHIPKeypadInputAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                            bool keepAlive = false) :
+        CHIPCallbackBridge<KeypadInputAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPKeypadInputAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPKeypadInputAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPKeypadInputAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action,
+                                                                        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPKeypadInputAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPContentLauncherAcceptHeaderListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ContentLauncherAcceptHeaderListAttributeCallback>
+{
+public:
+    CHIPContentLauncherAcceptHeaderListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ContentLauncherAcceptHeaderListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value);
+};
+
+class CHIPContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge
+    : public CHIPContentLauncherAcceptHeaderListAttributeCallbackBridge
+{
+public:
+    CHIPContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPContentLauncherAcceptHeaderListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPContentLauncherGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ContentLauncherGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPContentLauncherGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ContentLauncherGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPContentLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPContentLauncherGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPContentLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPContentLauncherGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPContentLauncherAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ContentLauncherAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPContentLauncherAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ContentLauncherAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPContentLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPContentLauncherAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPContentLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPContentLauncherAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPContentLauncherAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ContentLauncherAttributeListListAttributeCallback>
+{
+public:
+    CHIPContentLauncherAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ContentLauncherAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPContentLauncherAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPContentLauncherAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPContentLauncherAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPContentLauncherAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPAudioOutputOutputListListAttributeCallbackBridge : public CHIPCallbackBridge<AudioOutputOutputListListAttributeCallback>
+{
+public:
+    CHIPAudioOutputOutputListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                         bool keepAlive = false) :
+        CHIPCallbackBridge<AudioOutputOutputListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & value);
+};
+
+class CHIPAudioOutputOutputListListAttributeCallbackSubscriptionBridge : public CHIPAudioOutputOutputListListAttributeCallbackBridge
+{
+public:
+    CHIPAudioOutputOutputListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action,
+                                                                     SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAudioOutputOutputListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPAudioOutputGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<AudioOutputGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPAudioOutputGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AudioOutputGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPAudioOutputGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAudioOutputGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPAudioOutputAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<AudioOutputAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPAudioOutputAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AudioOutputAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPAudioOutputAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAudioOutputAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPAudioOutputAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<AudioOutputAttributeListListAttributeCallback>
+{
+public:
+    CHIPAudioOutputAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                            bool keepAlive = false) :
+        CHIPCallbackBridge<AudioOutputAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPAudioOutputAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPAudioOutputAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPAudioOutputAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action,
+                                                                        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAudioOutputAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPApplicationLauncherCatalogListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ApplicationLauncherCatalogListListAttributeCallback>
+{
+public:
+    CHIPApplicationLauncherCatalogListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ApplicationLauncherCatalogListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value);
+};
+
+class CHIPApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge
+    : public CHIPApplicationLauncherCatalogListListAttributeCallbackBridge
+{
+public:
+    CHIPApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPApplicationLauncherCatalogListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPApplicationLauncherCurrentAppStructAttributeCallbackBridge
+    : public CHIPCallbackBridge<ApplicationLauncherCurrentAppStructAttributeCallback>
+{
+public:
+    CHIPApplicationLauncherCurrentAppStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ApplicationLauncherCurrentAppStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &
+            value);
+};
+
+class CHIPApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge
+    : public CHIPApplicationLauncherCurrentAppStructAttributeCallbackBridge
+{
+public:
+    CHIPApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPApplicationLauncherCurrentAppStructAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ApplicationLauncherGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ApplicationLauncherGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPApplicationLauncherGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ApplicationLauncherAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ApplicationLauncherAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPApplicationLauncherAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPApplicationLauncherAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ApplicationLauncherAttributeListListAttributeCallback>
+{
+public:
+    CHIPApplicationLauncherAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ApplicationLauncherAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPApplicationLauncherAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        CHIPApplicationLauncherAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPApplicationBasicApplicationStructAttributeCallbackBridge
+    : public CHIPCallbackBridge<ApplicationBasicApplicationStructAttributeCallback>
+{
+public:
+    CHIPApplicationBasicApplicationStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ApplicationBasicApplicationStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value);
+};
+
+class CHIPApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge
+    : public CHIPApplicationBasicApplicationStructAttributeCallbackBridge
+{
+public:
+    CHIPApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPApplicationBasicApplicationStructAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ApplicationBasicAllowedVendorListListAttributeCallback>
+{
+public:
+    CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ApplicationBasicAllowedVendorListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & value);
+};
+
+class CHIPApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge
+    : public CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge
+{
+public:
+    CHIPApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPApplicationBasicGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ApplicationBasicGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPApplicationBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ApplicationBasicGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPApplicationBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPApplicationBasicGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPApplicationBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPApplicationBasicGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPApplicationBasicAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ApplicationBasicAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPApplicationBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ApplicationBasicAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPApplicationBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPApplicationBasicAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPApplicationBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPApplicationBasicAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPApplicationBasicAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ApplicationBasicAttributeListListAttributeCallback>
+{
+public:
+    CHIPApplicationBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ApplicationBasicAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPApplicationBasicAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPApplicationBasicAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<AccountLoginGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AccountLoginGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                CHIPActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPAccountLoginAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<AccountLoginAcceptedCommandListListAttributeCallback>
+{
+public:
+    CHIPAccountLoginAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AccountLoginAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPAccountLoginAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAccountLoginAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPAccountLoginAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<AccountLoginAttributeListListAttributeCallback>
+{
+public:
+    CHIPAccountLoginAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AccountLoginAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPAccountLoginAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPAccountLoginAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPAccountLoginAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action,
+                                                                         SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAccountLoginAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ElectricalMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TemperatureMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+        CHIPCallbackBridge<ElectricalMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                            keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class CHIPTemperatureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge
+class CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    CHIPTemperatureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+    CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7785,26 +8857,55 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPTemperatureMeasurementAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<TemperatureMeasurementAttributeListListAttributeCallback>
+class CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ElectricalMeasurementAcceptedCommandListListAttributeCallback>
 {
 public:
-    CHIPTemperatureMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TemperatureMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
+    CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ElectricalMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                          keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPElectricalMeasurementAttributeListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ElectricalMeasurementAttributeListListAttributeCallback>
+{
+public:
+    CHIPElectricalMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ElectricalMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class CHIPTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPTemperatureMeasurementAttributeListListAttributeCallbackBridge
+class CHIPElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public CHIPElectricalMeasurementAttributeListListAttributeCallbackBridge
 {
 public:
-    CHIPTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+    CHIPElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTemperatureMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        CHIPElectricalMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -8354,1312 +9455,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPThermostatGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThermostatGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPThermostatGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPThermostatGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPThermostatGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPThermostatGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThermostatAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThermostatAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPThermostatAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPThermostatAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPThermostatAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPThermostatAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThermostatAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThermostatAttributeListListAttributeCallback>
-{
-public:
-    CHIPThermostatAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPThermostatAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPThermostatAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPThermostatAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                            ResponseHandler handler,
-                                                                                            CHIPActionBlock action,
-                                                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                          OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                           ResponseHandler handler,
-                                                                                           CHIPActionBlock action,
-                                                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action,
-                                                                                                         OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThermostatUserInterfaceConfigurationAttributeListListAttributeCallback>
-{
-public:
-    CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                     ResponseHandler handler,
-                                                                                     CHIPActionBlock action,
-                                                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatUserInterfaceConfigurationAttributeListListAttributeCallback>(queue, handler, action,
-                                                                                                   OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>
-{
-public:
-    CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value);
-};
-
-class CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge
-    : public CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge
-{
-public:
-    CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>
-{
-public:
-    CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> & value);
-};
-
-class CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge
-    : public CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge
-{
-public:
-    CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallback>
-{
-public:
-    CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<
-                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value);
-};
-
-class CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge
-    : public CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge
-{
-public:
-    CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallback>
-{
-public:
-    CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                          ResponseHandler handler,
-                                                                                          CHIPActionBlock action,
-                                                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<ThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallback>(queue, handler, action,
-                                                                                                        OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<
-                    chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value);
-};
-
-class CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge
-    : public CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge
-{
-public:
-    CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>
-{
-public:
-    CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>(queue, handler, action,
-                                                                                                 OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value);
-};
-
-class CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge
-    : public CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge
-{
-public:
-    CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                             keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsAttributeListListAttributeCallback>
-{
-public:
-    CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThreadNetworkDiagnosticsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge
-    : public CHIPCallbackBridge<TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback>
-{
-public:
-    CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value);
-};
-
-class CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge
-    : public CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge
-{
-public:
-    CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<TimeFormatLocalizationGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TimeFormatLocalizationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                            keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<TimeFormatLocalizationAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TimeFormatLocalizationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPTimeFormatLocalizationAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<TimeFormatLocalizationAttributeListListAttributeCallback>
-{
-public:
-    CHIPTimeFormatLocalizationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TimeFormatLocalizationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPTimeFormatLocalizationAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPTimeFormatLocalizationAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPTimeFormatLocalizationAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTimeFormatLocalizationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPUnitLocalizationGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<UnitLocalizationGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPUnitLocalizationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<UnitLocalizationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPUnitLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPUnitLocalizationGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPUnitLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPUnitLocalizationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPUnitLocalizationAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<UnitLocalizationAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPUnitLocalizationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<UnitLocalizationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPUnitLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPUnitLocalizationAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPUnitLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPUnitLocalizationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPUnitLocalizationAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<UnitLocalizationAttributeListListAttributeCallback>
-{
-public:
-    CHIPUnitLocalizationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<UnitLocalizationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPUnitLocalizationAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPUnitLocalizationAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPUnitLocalizationAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPUnitLocalizationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPUserLabelLabelListListAttributeCallbackBridge : public CHIPCallbackBridge<UserLabelLabelListListAttributeCallback>
-{
-public:
-    CHIPUserLabelLabelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<UserLabelLabelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & value);
-};
-
-class CHIPUserLabelLabelListListAttributeCallbackSubscriptionBridge : public CHIPUserLabelLabelListListAttributeCallbackBridge
-{
-public:
-    CHIPUserLabelLabelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
-        CHIPUserLabelLabelListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPUserLabelGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<UserLabelGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPUserLabelGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<UserLabelGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPUserLabelGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPUserLabelGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPUserLabelAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<UserLabelAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPUserLabelAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<UserLabelAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPUserLabelAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPUserLabelAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPUserLabelAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<UserLabelAttributeListListAttributeCallback>
-{
-public:
-    CHIPUserLabelAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<UserLabelAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPUserLabelAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPUserLabelAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPUserLabelAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
-        CHIPUserLabelAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<WakeOnLanGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<WakeOnLanGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWakeOnLanAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<WakeOnLanAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPWakeOnLanAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<WakeOnLanAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPWakeOnLanAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWakeOnLanAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWakeOnLanAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<WakeOnLanAttributeListListAttributeCallback>
-{
-public:
-    CHIPWakeOnLanAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<WakeOnLanAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPWakeOnLanAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWakeOnLanAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                            keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<WiFiNetworkDiagnosticsAttributeListListAttributeCallback>
-{
-public:
-    CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<WiFiNetworkDiagnosticsAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWindowCoveringConfigStatusAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringConfigStatusAttributeCallback>
-{
-public:
-    CHIPWindowCoveringConfigStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<WindowCoveringConfigStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value);
-};
-
-class CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge
-    : public CHIPWindowCoveringConfigStatusAttributeCallbackBridge
-{
-public:
-    CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWindowCoveringConfigStatusAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWindowCoveringOperationalStatusAttributeCallbackBridge
-    : public CHIPCallbackBridge<WindowCoveringOperationalStatusAttributeCallback>
-{
-public:
-    CHIPWindowCoveringOperationalStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<WindowCoveringOperationalStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value);
-};
-
-class CHIPWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge
-    : public CHIPWindowCoveringOperationalStatusAttributeCallbackBridge
-{
-public:
-    CHIPWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWindowCoveringOperationalStatusAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWindowCoveringModeAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringModeAttributeCallback>
-{
-public:
-    CHIPWindowCoveringModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                  bool keepAlive = false) :
-        CHIPCallbackBridge<WindowCoveringModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value);
-};
-
-class CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge : public CHIPWindowCoveringModeAttributeCallbackBridge
-{
-public:
-    CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWindowCoveringModeAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWindowCoveringSafetyStatusAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringSafetyStatusAttributeCallback>
-{
-public:
-    CHIPWindowCoveringSafetyStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<WindowCoveringSafetyStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> value);
-};
-
-class CHIPWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge
-    : public CHIPWindowCoveringSafetyStatusAttributeCallbackBridge
-{
-public:
-    CHIPWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWindowCoveringSafetyStatusAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<WindowCoveringGeneratedCommandListListAttributeCallback>
-{
-public:
-    CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<WindowCoveringGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPWindowCoveringGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPWindowCoveringGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWindowCoveringGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWindowCoveringAcceptedCommandListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<WindowCoveringAcceptedCommandListListAttributeCallback>
-{
-public:
-    CHIPWindowCoveringAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<WindowCoveringAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class CHIPWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public CHIPWindowCoveringAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    CHIPWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWindowCoveringAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWindowCoveringAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<WindowCoveringAttributeListListAttributeCallback>
-{
-public:
-    CHIPWindowCoveringAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<WindowCoveringAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPWindowCoveringAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWindowCoveringAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPAccountLoginClusterGetSetupPINResponseCallbackType>
-{
-public:
-    CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPAccountLoginClusterGetSetupPINResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data);
-};
-
-class CHIPApplicationLauncherClusterLauncherResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPApplicationLauncherClusterLauncherResponseCallbackType>
-{
-public:
-    CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPApplicationLauncherClusterLauncherResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & data);
-};
-
-class CHIPChannelClusterChangeChannelResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPChannelClusterChangeChannelResponseCallbackType>
-{
-public:
-    CHIPChannelClusterChangeChannelResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPChannelClusterChangeChannelResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data);
-};
-
-class CHIPContentLauncherClusterLaunchResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPContentLauncherClusterLaunchResponseCallbackType>
-{
-public:
-    CHIPContentLauncherClusterLaunchResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPContentLauncherClusterLaunchResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & data);
-};
-
-class CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType>
-{
-public:
-    CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data);
-};
-
-class CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data);
-};
-
-class CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data);
-};
-
-class CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data);
-};
-
-class CHIPDoorLockClusterGetUserResponseCallbackBridge : public CHIPCallbackBridge<CHIPDoorLockClusterGetUserResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetUserResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetUserResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data);
-};
-
-class CHIPDoorLockClusterSetCredentialResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterSetCredentialResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterSetCredentialResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterSetCredentialResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data);
-};
-
-class CHIPDoorLockClusterGetCredentialStatusResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetCredentialStatusResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetCredentialStatusResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetCredentialStatusResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data);
-};
-
-class CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackType>
-{
-public:
-    CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
-};
-
-class CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>
-{
-public:
-    CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>(queue, handler, action,
-                                                                                                   OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
-};
-
-class CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackType>
-{
-public:
-    CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackType>(queue, handler, action,
-                                                                                                     OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
-};
-
-class CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>
-{
-public:
-    CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data);
-};
-
-class CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>
-{
-public:
-    CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>(queue, handler, action,
-                                                                                                  OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data);
-};
-
 class CHIPGroupsClusterAddGroupResponseCallbackBridge : public CHIPCallbackBridge<CHIPGroupsClusterAddGroupResponseCallbackType>
 {
 public:
@@ -9702,151 +9497,6 @@ public:
         CHIPCallbackBridge<CHIPGroupsClusterRemoveGroupResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & data);
-};
-
-class CHIPKeypadInputClusterSendKeyResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPKeypadInputClusterSendKeyResponseCallbackType>
-{
-public:
-    CHIPKeypadInputClusterSendKeyResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPKeypadInputClusterSendKeyResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & data);
-};
-
-class CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>
-{
-public:
-    CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & data);
-};
-
-class CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterScanNetworksResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPNetworkCommissioningClusterScanNetworksResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                            keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data);
-};
-
-class CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                             keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
-};
-
-class CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
-};
-
-class CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>
-{
-public:
-    CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                               keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & data);
-};
-
-class CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>
-{
-public:
-    CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                                keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & data);
-};
-
-class CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPOperationalCredentialsClusterAttestationResponseCallbackType>
-{
-public:
-    CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPOperationalCredentialsClusterAttestationResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                             keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & data);
-};
-
-class CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType>
-{
-public:
-    CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType>(queue, handler, action,
-                                                                                                  OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & data);
-};
-
-class CHIPOperationalCredentialsClusterCSRResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPOperationalCredentialsClusterCSRResponseCallbackType>
-{
-public:
-    CHIPOperationalCredentialsClusterCSRResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPOperationalCredentialsClusterCSRResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data);
-};
-
-class CHIPOperationalCredentialsClusterNOCResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPOperationalCredentialsClusterNOCResponseCallbackType>
-{
-public:
-    CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPOperationalCredentialsClusterNOCResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
 };
 
 class CHIPScenesClusterAddSceneResponseCallbackBridge : public CHIPCallbackBridge<CHIPScenesClusterAddSceneResponseCallbackType>
@@ -9950,6 +9600,307 @@ public:
     static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType & data);
 };
 
+class CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>
+{
+public:
+    CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & data);
+};
+
+class CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>
+{
+public:
+    CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                                keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & data);
+};
+
+class CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackType>
+{
+public:
+    CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+};
+
+class CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>
+{
+public:
+    CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>(queue, handler, action,
+                                                                                                   OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
+};
+
+class CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackType>
+{
+public:
+    CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackType>(queue, handler, action,
+                                                                                                     OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
+};
+
+class CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterScanNetworksResponseCallbackType>
+{
+public:
+    CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPNetworkCommissioningClusterScanNetworksResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                            keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data);
+};
+
+class CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>
+{
+public:
+    CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
+};
+
+class CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType>
+{
+public:
+    CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
+};
+
+class CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType>
+{
+public:
+    CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data);
+};
+
+class CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPOperationalCredentialsClusterAttestationResponseCallbackType>
+{
+public:
+    CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPOperationalCredentialsClusterAttestationResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & data);
+};
+
+class CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType>
+{
+public:
+    CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType>(queue, handler, action,
+                                                                                                  OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & data);
+};
+
+class CHIPOperationalCredentialsClusterCSRResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPOperationalCredentialsClusterCSRResponseCallbackType>
+{
+public:
+    CHIPOperationalCredentialsClusterCSRResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPOperationalCredentialsClusterCSRResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data);
+};
+
+class CHIPOperationalCredentialsClusterNOCResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPOperationalCredentialsClusterNOCResponseCallbackType>
+{
+public:
+    CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPOperationalCredentialsClusterNOCResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
+};
+
+class CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>
+{
+public:
+    CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data);
+};
+
+class CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>
+{
+public:
+    CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>(queue, handler, action,
+                                                                                                  OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data);
+};
+
+class CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data);
+};
+
+class CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data);
+};
+
+class CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data);
+};
+
+class CHIPDoorLockClusterGetUserResponseCallbackBridge : public CHIPCallbackBridge<CHIPDoorLockClusterGetUserResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterGetUserResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                     bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterGetUserResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data);
+};
+
+class CHIPDoorLockClusterSetCredentialResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterSetCredentialResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterSetCredentialResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterSetCredentialResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data);
+};
+
+class CHIPDoorLockClusterGetCredentialStatusResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetCredentialStatusResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterGetCredentialStatusResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterGetCredentialStatusResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data);
+};
+
+class CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>
+{
+public:
+    CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data);
+};
+
+class CHIPChannelClusterChangeChannelResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPChannelClusterChangeChannelResponseCallbackType>
+{
+public:
+    CHIPChannelClusterChangeChannelResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPChannelClusterChangeChannelResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data);
+};
+
 class CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge
     : public CHIPCallbackBridge<CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType>
 {
@@ -9961,6 +9912,68 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType & data);
+};
+
+class CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>
+{
+public:
+    CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & data);
+};
+
+class CHIPKeypadInputClusterSendKeyResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPKeypadInputClusterSendKeyResponseCallbackType>
+{
+public:
+    CHIPKeypadInputClusterSendKeyResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                        bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPKeypadInputClusterSendKeyResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & data);
+};
+
+class CHIPContentLauncherClusterLaunchResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPContentLauncherClusterLaunchResponseCallbackType>
+{
+public:
+    CHIPContentLauncherClusterLaunchResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPContentLauncherClusterLaunchResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & data);
+};
+
+class CHIPApplicationLauncherClusterLauncherResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPApplicationLauncherClusterLauncherResponseCallbackType>
+{
+public:
+    CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPApplicationLauncherClusterLauncherResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & data);
+};
+
+class CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPAccountLoginClusterGetSetupPINResponseCallbackType>
+{
+public:
+    CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPAccountLoginClusterGetSetupPINResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data);
 };
 
 class CHIPTestClusterClusterTestSpecificResponseCallbackBridge
@@ -10118,19 +10131,6 @@ public:
     static void
     OnSuccessFn(void * context,
                 const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data);
-};
-
-class CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>
-{
-public:
-    CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data);
 };
 
 class CHIPIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge

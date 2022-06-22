@@ -650,10 +650,15 @@
  * secure sessions. This controls the maximum number of concurrent
  * established secure sessions across all supported transports.
  *
- * This is sized to cover the sum of the following:
+ * This is sized by default to cover the sum of the following:
  *  - At least 3 CASE sessions / fabric (Spec Ref: 4.13.2.8)
  *  - 1 reserved slot for CASEServer as a responder.
  *  - 1 reserved slot for PASE.
+ *
+ *  NOTE: On heap-based platforms, there is no pre-allocation of the pool.
+ *  Due to the use of an LRU-scheme to manage sessions, the actual active
+ *  size of the pool will grow up to the value of this define,
+ *  after which, it will remain at or around this size indefinitely.
  *
  */
 #ifndef CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
@@ -792,11 +797,9 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  * The default value comes from 3sub per fabric * max number of fabrics.
  *
- * TODO: (#17085) Should be changed to (CHIP_CONFIG_MAX_FABRICS * 3) after we can hold more read handlers on more concise
- * devices.
  */
 #ifndef CHIP_IM_MAX_NUM_SUBSCRIPTIONS
-#define CHIP_IM_MAX_NUM_SUBSCRIPTIONS (CHIP_CONFIG_MAX_FABRICS * 2)
+#define CHIP_IM_MAX_NUM_SUBSCRIPTIONS (CHIP_CONFIG_MAX_FABRICS * 3)
 #endif
 
 /**

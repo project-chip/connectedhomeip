@@ -114,14 +114,15 @@ protected:
         SessionHandle session(*this);
         while (!mHolders.Empty())
         {
-            mHolders.begin()->OnSessionReleased(); // OnSessionReleased must remove the item from the linked list
+            mHolders.begin()->SessionReleased(); // SessionReleased must remove the item from the linked list
         }
     }
 
     void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
 
-private:
     IntrusiveList<SessionHolder> mHolders;
+
+private:
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 };
 

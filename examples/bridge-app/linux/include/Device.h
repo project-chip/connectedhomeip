@@ -26,9 +26,6 @@
 #include <functional>
 #include <vector>
 
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::BridgedActions;
-
 class Device
 {
 public:
@@ -185,36 +182,38 @@ private:
 class EndpointListInfo
 {
 public:
-    EndpointListInfo(uint16_t endpointListId, std::string name, EndpointListTypeEnum type);
-    EndpointListInfo(uint16_t endpointListId, std::string name, EndpointListTypeEnum type, chip::EndpointId endpointId);
+    EndpointListInfo(uint16_t endpointListId, std::string name, chip::app::Clusters::BridgedActions::EndpointListTypeEnum type);
+    EndpointListInfo(uint16_t endpointListId, std::string name, chip::app::Clusters::BridgedActions::EndpointListTypeEnum type,
+                     chip::EndpointId endpointId);
     void AddEndpointId(chip::EndpointId endpointId);
     inline uint16_t GetEndpointListId() { return mEndpointListId; };
     std::string GetName() { return mName; };
-    inline EndpointListTypeEnum GetType() { return mType; };
+    inline chip::app::Clusters::BridgedActions::EndpointListTypeEnum GetType() { return mType; };
     inline chip::EndpointId * GetEndpointListData() { return mEndpoints.data(); };
     inline size_t GetEndpointListSize() { return mEndpoints.size(); };
 
 private:
     uint16_t mEndpointListId = static_cast<uint16_t>(0);
     std::string mName;
-    EndpointListTypeEnum mType = static_cast<EndpointListTypeEnum>(0);
+    chip::app::Clusters::BridgedActions::EndpointListTypeEnum mType =
+        static_cast<chip::app::Clusters::BridgedActions::EndpointListTypeEnum>(0);
     std::vector<chip::EndpointId> mEndpoints;
 };
 
 class Room
 {
 public:
-    Room(std::string name, uint16_t endpointListId, EndpointListTypeEnum type, bool isVisible);
+    Room(std::string name, uint16_t endpointListId, chip::app::Clusters::BridgedActions::EndpointListTypeEnum type, bool isVisible);
     inline void setIsVisible(bool isVisible) { mIsVisible = isVisible; };
     inline bool getIsVisible() { return mIsVisible; };
     inline void setName(std::string name) { mName = name; };
     inline std::string getName() { return mName; };
-    inline EndpointListTypeEnum getType() { return mType; };
+    inline chip::app::Clusters::BridgedActions::EndpointListTypeEnum getType() { return mType; };
     inline uint16_t getEndpointListId() { return mEndpointListId; };
 
 private:
     bool mIsVisible;
     std::string mName;
     uint16_t mEndpointListId;
-    EndpointListTypeEnum mType;
+    chip::app::Clusters::BridgedActions::EndpointListTypeEnum mType;
 };

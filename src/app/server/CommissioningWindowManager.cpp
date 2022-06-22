@@ -66,7 +66,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         ChipLogError(AppServer, "Failsafe timer expired");
         if (mPASESession)
         {
-            mPASESession->AsSecureSession()->MarkForRemoval();
+            mPASESession->AsSecureSession()->MarkForEviction();
         }
         HandleFailedAttempt(CHIP_ERROR_TIMEOUT);
     }
@@ -177,7 +177,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
         {
             ChipLogError(AppServer, "Error arming failsafe on PASE session establishment completion");
             // Don't allow a PASE session to hang around without a fail-safe.
-            session->AsSecureSession()->MarkForRemoval();
+            session->AsSecureSession()->MarkForEviction();
             HandleFailedAttempt(err);
         }
     }

@@ -133,6 +133,8 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/DefaultOTARequestorUserConsent.h",
           "${_app_root}/clusters/${cluster}/ExtendedOTARequestorDriver.cpp",
           "${_app_root}/clusters/${cluster}/OTARequestorStorage.h",
+          "${_app_root}/clusters/${cluster}/OTATestEventTriggerDelegate.cpp",
+          "${_app_root}/clusters/${cluster}/OTATestEventTriggerDelegate.h",
         ]
       } else if (cluster == "bindings") {
         sources += [

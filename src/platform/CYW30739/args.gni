@@ -34,12 +34,11 @@ chip_enable_openthread = true
 lwip_platform = "cyw30739"
 
 chip_inet_config_enable_ipv4 = false
-chip_inet_config_enable_dns_resolver = false
 chip_inet_config_enable_tcp_endpoint = false
-chip_inet_config_enable_raw_endpoint = false
+chip_system_config_use_open_thread_inet_endpoints = true
+chip_with_lwip = false
 
 chip_system_config_locking = "none"
-chip_system_config_use_lwip = true
 chip_system_config_use_sockets = false
 
 optimize_debug_level = "s"

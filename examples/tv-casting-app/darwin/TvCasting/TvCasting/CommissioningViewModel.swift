@@ -17,14 +17,34 @@
 
 
 import Foundation
+import os.log
 
 class CommissioningViewModel: ObservableObject {
+    let Log = Logger(subsystem: "com.matter.casting",
+                     category: "CommissioningViewModel")
+    
     @Published var udcRequestSent: Bool?;
     
     @Published var commisisoningWindowOpened: Bool?;
-    
+
+    @Published var commisisoningComplete: Bool?;
+
     func prepareForCommissioning(selectedCommissioner: DiscoveredNodeData?) {
-        // TBD: Call openBasicCommissioningWindow() and get Onboarding payload
+        if let castingServerBridge = CastingServerBridge.getSharedInstance()
+        {
+            castingServerBridge.openBasicCommissioningWindow(
+                { (result: Bool) -> () in
+                    // commissioning complete handler code
+                    self.Log.info("Commissioning status: \(result)")
+                    self.commisisoningComplete = result
+                },
+                clientQueue: DispatchQueue.main,
+                commissioningWindowRequestedHandler: { (result: Bool) -> () in
+                    self.commisisoningWindowOpened = result
+                })
+        }
+        
+        // TBD: Get Onboarding payload
         
         // Send User directed commissioning request if a commissioner with a known IP addr was selected
         if(selectedCommissioner != nil && selectedCommissioner!.numIPs > 0)

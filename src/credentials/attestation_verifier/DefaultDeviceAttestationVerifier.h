@@ -21,6 +21,32 @@
 namespace chip {
 namespace Credentials {
 
+class DefaultDACVerifier : public DeviceAttestationVerifier
+{
+public:
+    DefaultDACVerifier(const AttestationTrustStore * paaRootStore) : mAttestationTrustStore(paaRootStore) {}
+
+    void VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
+                                      Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
+
+    AttestationVerificationResult ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
+                                                                            ByteSpan & certDeclBuffer) override;
+
+    AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
+                                                                        const ByteSpan & firmwareInfo,
+                                                                        const DeviceInfoForAttestation & deviceInfo) override;
+
+    CHIP_ERROR VerifyNodeOperationalCSRInformation(const ByteSpan & nocsrElementsBuffer,
+                                                   const ByteSpan & attestationChallengeBuffer,
+                                                   const ByteSpan & attestationSignatureBuffer,
+                                                   const Crypto::P256PublicKey & dacPublicKey, const ByteSpan & csrNonce) override;
+
+protected:
+    DefaultDACVerifier() {}
+
+    const AttestationTrustStore * mAttestationTrustStore;
+};
+
 /**
  * @brief Get implementation of a PAA root store containing a basic set of static PAA roots
  *        sufficient for *testing* only.
@@ -35,7 +61,7 @@ namespace Credentials {
 const AttestationTrustStore * GetTestAttestationTrustStore();
 
 /**
- * @brief Get implementation of a sample DAC verifier to validate device
+ * @brief Get a singleton implementation of a sample DAC verifier to validate device
  *        attestation procedure.
  *
  * @param[in] paaRootStore Pointer to the AttestationTrustStore instance to be used by implementation
@@ -43,6 +69,9 @@ const AttestationTrustStore * GetTestAttestationTrustStore();
  *                         always available while the DeviceAttestationVerifier could be used.
  *
  * @returns a singleton DeviceAttestationVerifier that satisfies basic device attestation procedure requirements.
+ *          This has process lifetime, so the paaRootStore must also have
+ *          process lifetime.  In particular, after the first call it's not
+ *          possible to change which AttestationTrustStore is used by this verifier.
  */
 DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore);
 

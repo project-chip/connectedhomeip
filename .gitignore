@@ -61,3 +61,6 @@ compile_commands.json
 
 # backup files, usually created by the ZAP tool
 *~
+
+# log files
+*.log

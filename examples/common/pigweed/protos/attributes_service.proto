@@ -206,6 +206,7 @@ message AttributeData {
     int32 data_int16 = 7;
     int32 data_int32 = 8;
   };
+  optional bytes tlv_data = 9;
 }
 
 message AttributeWrite {
