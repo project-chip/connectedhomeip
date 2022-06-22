@@ -14032,7 +14032,7 @@ private:
 class Test_TC_CGEN_2_1Suite : public TestCommand
 {
 public:
-    Test_TC_CGEN_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CGEN_2_1", 7, credsIssuerConfig)
+    Test_TC_CGEN_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CGEN_2_1", 9, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -14074,7 +14074,7 @@ private:
             {
                 uint64_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("breadcrumb", value, 0ULL));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
             }
             break;
         case 2:
@@ -14111,10 +14111,18 @@ private:
             {
                 chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(
-                    CheckValue("basicCommissioningInfo.failSafeExpiryLengthSeconds", value.failSafeExpiryLengthSeconds, 60U));
-                VerifyOrReturn(
-                    CheckValue("basicCommissioningInfo.maxCumulativeFailsafeSeconds", value.maxCumulativeFailsafeSeconds, 900U));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "bool"));
             }
             break;
         default:
@@ -14168,9 +14176,26 @@ private:
                                  GeneralCommissioning::Attributes::LocationCapability::Id, true, chip::NullOptional);
         }
         case 6: {
-            LogStep(6, "TH1 reads BasicCommissioningInfo attribute from DUT");
+            LogStep(6,
+                    "TH1 reads BasicCommissioningInfo attribute from DUT and Verify that the BasicCommissioningInfo attribute has "
+                    "the following field: FailSafeExpiryLengthSeconds field value is within a duration range of 0 to 65535");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                  GeneralCommissioning::Attributes::BasicCommissioningInfo::Id, true, chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Step 6 TC-CGEN-2.1");
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Step 6 is implicitly validating the attribute(BasicCommissioningInfo) constraints, as long "
+                                       "as the payload is being parsed successfullygarbage: not in length on purpose",
+                                       134);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 8: {
+            LogStep(8, "TH1 reads SupportsConcurrentConnection attribute from the DUT");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
+                                 GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id, true, chip::NullOptional);
         }
         }
         return CHIP_NO_ERROR;
