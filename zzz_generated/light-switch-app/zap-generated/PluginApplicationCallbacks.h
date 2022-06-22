@@ -28,6 +28,7 @@
     MatterScenesPluginClientInitCallback();                                                                                        \
     MatterOnOffPluginClientInitCallback();                                                                                         \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
+    MatterBindingPluginClientInitCallback();                                                                                       \
     MatterBindingPluginServerInitCallback();                                                                                       \
     MatterAccessControlPluginServerInitCallback();                                                                                 \
     MatterBasicPluginServerInitCallback();                                                                                         \

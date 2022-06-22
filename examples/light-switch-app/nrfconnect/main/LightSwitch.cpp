@@ -24,13 +24,19 @@
 #include <app/util/binding-table.h>
 #include <controller/InvokeInteraction.h>
 
+#include <app/clusters/switch-server/switch-server.h>
+
+#include <app-common/zap-generated/attributes/Accessors.h>
+
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
-void LightSwitch::Init(chip::EndpointId aLightSwitchEndpoint)
+void LightSwitch::Init(chip::EndpointId aLightDimmerSwitchEndpoint, chip::EndpointId aLightGenericSwitchEndpointId)
 {
     BindingHandler::GetInstance().Init();
-    mLightSwitchEndpoint = aLightSwitchEndpoint;
+    mLightSwitchEndpoint = aLightDimmerSwitchEndpoint;
+    mLightGenericSwitchEndpointId = aLightGenericSwitchEndpointId;
 }
 
 void LightSwitch::InitiateActionSwitch(Action mAction)
@@ -79,4 +85,18 @@ void LightSwitch::DimmerChangeBrightness()
         data->IsGroup = BindingHandler::GetInstance().IsGroupBound();
         DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data));
     }
+}
+
+void LightSwitch::GenericSwitchInitialPress() {
+    uint8_t newPosition      = 1;
+
+    Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, newPosition);
+    Clusters::SwitchServer::Instance().OnInitialPress(mLightGenericSwitchEndpointId, newPosition);
+}
+
+void LightSwitch::GenericSwitchReleasePress() {
+    uint8_t previousPosition = 0;
+
+    Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, previousPosition);
+    Clusters::SwitchServer::Instance().OnShortRelease(mLightGenericSwitchEndpointId, previousPosition);
 }

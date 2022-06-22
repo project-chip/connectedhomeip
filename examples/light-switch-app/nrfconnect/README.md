@@ -62,13 +62,38 @@ and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
 [nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
 to read more about the platform structure and dependencies.
 
+In matter there are 2 types of light switch device types:
+
+- On/Off Light Switch, Dimmer Switch, Color Dimmer Switch, Control Bridge
+- Generic Switch
+
+The first type uses Client application clusters (e.g. Level Control) and
+Bindings to send commands to the server clusters. This type of switch is on
+endpoint 1 of this example.
+
+With the second type controllers can use event subscriptions to be informed
+about changes on the Switch server cluster. This type of switch is on
+endpoint 2 of this example.
+
+## On/Off Light Switch, Dimmer Switch, Color Dimmer Switch, Control Bridge
+
 A light switch device is a simple embedded controller, which has the ability to
 control lighting devices, such as light bulbs or LEDs. After commissioning into
 a Matter network, the light switch device does not know what it can control. In
 other words, it has no information about another device being connected to the
 same network. You must provide this information to the light switch through the
 process called binding, which links clusters and endpoints on both devices, so
-that the devices can interact with each other.
+that the devices can interact with each other. This functionality is on endpoint
+1 and triggered by button 2.
+
+## Generic Switch
+
+The Generic Switch on endpoint 2 offers the Switch server cluster. It implements
+the features Momentary Switch (MS) and Momentary Switch Release (MSR), thus it
+will send event notifications `InitialPress` and `ShortRelease` if button 3 of
+the DK is pressed and released.
+
+## Common settings
 
 The Matter device that runs the light switch application is controlled by the
 Matter controller device over the Thread protocol. By default, the Matter device
@@ -272,6 +297,11 @@ platform image.
     example) (dimmer functionality). The brightness is changing from 0% to 100%
     with 1% increments every 300 milliseconds as long as **Button 2** is
     pressed.
+
+**Button 3** can be used for the following purposes:
+
+-   _Pressed once_ &mdash; Changes the value of the attribute CurrentPosition
+    and (if subscribed) will send the event notifications to the controller.
 
 **Button 4** can be used to start the NFC tag emulation and enable Bluetooth LE
 advertising for the predefined period of time (15 minutes by default).
@@ -707,6 +737,20 @@ To test the communication between the light switch device and the bound devices,
 use [light switch buttons](#buttons) or
 [Matter CLI commands](#matter-cli-commands), as described in the
 [Device UI](#device-ui) section.
+
+### Testing the Generic Switch
+
+Use the interactive mode of chip-tool:
+
+        chip-tool interactive start
+
+Subscribe to the initial-press and short-release
+
+        >>> switch subscribe-event initial-press 1 20 <node_id> 2 --is-urgent true
+        >>> switch subscribe-event initial-press 1 20 <node_id> 2 --is-urgent true
+
+When pressing and releasing button 3, both events should be sent to the
+controller.
 
 ### Testing Device Firmware Upgrade
 
