@@ -29,7 +29,7 @@ using namespace ::chip::app::Clusters::DoorLock;
 
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 
-// Provided some empty callbacks and replaced feature map 
+// Provided some empty callbacks and replaced feature map
 // to simulate DoorLock endpoint for All-Clusters-App example
 // without using kUsersManagement|kAccessSchedules|kRFIDCredentials|kPINCredentials
 
