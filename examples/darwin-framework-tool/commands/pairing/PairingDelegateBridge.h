@@ -18,6 +18,8 @@
 #pragma once
 #include "PairingCommandBridge.h"
 
+#import <Matter/Matter.h>
+
 @interface CHIPToolPairingDelegate : NSObject <MTRDevicePairingDelegate>
 @property PairingCommandBridge * commandBridge;
 @property chip::NodeId deviceID;

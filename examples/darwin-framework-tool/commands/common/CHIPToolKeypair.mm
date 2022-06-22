@@ -1,5 +1,5 @@
 #import "CHIPToolKeypair.h"
-#include <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>

@@ -1,5 +1,7 @@
 #include "CHIPCommandStorageDelegate.h"
 
+#import <Matter/Matter.h>
+
 NSString * const kCHIPToolDefaultsDomain = @"com.apple.chiptool";
 
 id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
