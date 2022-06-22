@@ -1,0 +1,96 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    11.4.19. [TC-CNET-4.19] [Ethernet] Verification for attributes check
+    [DUT-Client]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "DUT reads the MaxNetworks attribute from the TH"
+      verification: |
+          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read max-networks 1 0
+
+          [1646226441.815782][2475:2480] CHIP:DMG:        SuppressResponse = true,
+          [1646226441.815849][2475:2480] CHIP:DMG:        InteractionModelRevision = 1
+          [1646226441.815889][2475:2480] CHIP:DMG: }
+          [1646226441.816092][2475:2480] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0000DataVersion: 3622667250
+          [1646226441.816191][2475:2480] CHIP:TOO:   MaxNetworks: 1
+          [1646226441.816288][2475:2480] CHIP:EM: Sending Standalone Ack for MessageCounter:14864333 on exchange 39473i
+      disabled: true
+
+    - label: "DUT reads the Networks attribute from the TH"
+      verification: |
+          ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 1 0
+
+          [1653483289.382372][28210:28215] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3189790698
+          [1653483289.382458][28210:28215] CHIP:TOO:   Networks: 1 entries
+          [1653483289.382507][28210:28215] CHIP:TOO:     [1]: {
+          [1653483289.382537][28210:28215] CHIP:TOO:       NetworkID: 65746830
+          [1653483289.382561][28210:28215] CHIP:TOO:       Connected: TRUE
+          [1653483289.382584][28210:28215] CHIP:TOO:      }
+          [1653483289.382684][28210:28215] CHIP:EM: Sending Standalone Ack for MessageCounter:13711908 on exchange 32535i
+      disabled: true
+
+    - label: "DUT reads InterfaceEnabled attribute from the TH"
+      verification: |
+          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read interface-enabled 1 0
+
+          [1646226615.428003][2502:2507] CHIP:DMG:
+          [1646226615.428035][2502:2507] CHIP:DMG:        SuppressResponse = true,
+          [1646226615.428064][2502:2507] CHIP:DMG:        InteractionModelRevision = 1
+          [1646226615.428094][2502:2507] CHIP:DMG: }
+          [1646226615.428270][2502:2507] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0004DataVersion: 3622667250
+          [1646226615.428331][2502:2507] CHIP:TOO:   InterfaceEnabled: TRUE
+          [1646226615.428415][2502:2507] CHIP:EM: Sending Standalone Ack for MessageCounter:3894401 on exchange 55691i
+      disabled: true
+
+    - label: "DUT reads LastNetworkingStatus attribute from the TH"
+      verification: |
+          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-networking-status 1 0
+
+          [1646227167.614060][2533:2538] CHIP:DMG:        SuppressResponse = true,
+          [1646227167.614095][2533:2538] CHIP:DMG:        InteractionModelRevision = 1
+          [1646227167.614126][2533:2538] CHIP:DMG: }
+          [1646227167.614299][2533:2538] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005DataVersion: 3622667250
+          [1646227167.614385][2533:2538] CHIP:TOO:   LastNetworkingStatus: 0
+          [1646227167.614468][2533:2538] CHIP:EM: Sending Standalone Ack for MessageCounter:8947540 on exchange 12532i
+      disabled: true
+
+    - label: "DUT reads LastNetworkID attribute from the TH"
+      verification: |
+          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-network-id 1 0
+
+          [1646227218.543427][2545:2550] CHIP:DMG:
+          [1646227218.543462][2545:2550] CHIP:DMG:        SuppressResponse = true,
+          [1646227218.543506][2545:2550] CHIP:DMG:        InteractionModelRevision = 1
+          [1646227218.543538][2545:2550] CHIP:DMG: }
+          [1646227218.543748][2545:2550] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006DataVersion: 3622667250
+          [1646227218.543836][2545:2550] CHIP:TOO:   LastNetworkID:
+          [1646227218.543924][2545:2550] CHIP:EM: Sending Standalone Ack for MessageCounter:9758721 on exchange 15256i
+      disabled: true
+
+    - label: "DUT reads LastConnectErrorValue attribute from the TH"
+      verification: |
+          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-connect-error-value 1 0
+
+          [1653483224.839873][28189:28194] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0007 DataVersion: 3189790698
+          [1653483224.839927][28189:28194] CHIP:TOO:   LastConnectErrorValue: null
+          [1653483224.840028][28189:28194] CHIP:EM: Sending Standalone Ack for MessageCounter:289132 on exchange 60682i
+      disabled: true

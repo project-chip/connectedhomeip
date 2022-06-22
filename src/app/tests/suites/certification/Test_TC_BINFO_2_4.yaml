@@ -1,0 +1,121 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 11.2.4. [TC-BINFO-2.4] Events [DUT-Client]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Simulate a reboot on the TH"
+      verification: |
+          ./chip-tool basic read-event start-up 1 0
+
+
+          [1651229405.704017][2825:2825] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:11744980 on exchange 35983r
+          [1651229405.704064][2825:2825] CHIP:EM: Handling via exchange: 35983r, Delegate: 0xaaaae659a088
+          [1651229405.704208][2825:2825] CHIP:IM: Received Read request
+          [1651229405.704271][2825:2825] CHIP:DMG: ReadRequestMessage =
+          [1651229405.704303][2825:2825] CHIP:DMG: {
+          [1651229405.704329][2825:2825] CHIP:DMG:        EventPathIBs =
+          [1651229405.704362][2825:2825] CHIP:DMG:        [
+          [1651229405.704392][2825:2825] CHIP:DMG:                EventPath =
+          [1651229405.704428][2825:2825] CHIP:DMG:                {
+          [1651229405.704463][2825:2825] CHIP:DMG:                        Endpoint = 0x0,
+          [1651229405.704501][2825:2825] CHIP:DMG:                        Cluster = 0x28,
+          [1651229405.704539][2825:2825] CHIP:DMG:                        Event = 0x0,
+          [1651229405.704575][2825:2825] CHIP:DMG:                },
+          [1651229405.704613][2825:2825] CHIP:DMG:
+          [1651229405.704641][2825:2825] CHIP:DMG:        ],
+          [1651229405.704676][2825:2825] CHIP:DMG:
+          [1651229405.704707][2825:2825] CHIP:DMG:        isFabricFiltered = true,
+          [1651229405.704737][2825:2825] CHIP:DMG:        InteractionModelRevision = 1
+          [1651229405.704766][2825:2825] CHIP:DMG: },
+      disabled: true
+
+    - label: "Simulate a Shut down on the TH"
+      verification: |
+          1. Launch chip-tool into interactive mode with the command ./chip-tool interactive start
+
+          2. Turn down the DUT and run below command in interactive mode shell
+          basic subscribe-event shut-down 1 3 1 0
+
+          CHIP:ZCL: Emitting ShutDown event
+          [1653392378.033015][19010:19010] CHIP:EVL: LogEvent event number: 0x0000000000000005 priority: 2, endpoint id:  0x0 cluster id: 0x0000_0028 event id: 0x1 Sys timestamp: 0x0000000006AD1297
+      disabled: true
+
+    - label: "Simulate a reboot on the TH"
+      verification: |
+          ./chip-tool basic read-event start-up 1 0
+
+
+          [1651229405.704017][2825:2825] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:11744980 on exchange 35983r
+          [1651229405.704064][2825:2825] CHIP:EM: Handling via exchange: 35983r, Delegate: 0xaaaae659a088
+          [1651229405.704208][2825:2825] CHIP:IM: Received Read request
+          [1651229405.704271][2825:2825] CHIP:DMG: ReadRequestMessage =
+          [1651229405.704303][2825:2825] CHIP:DMG: {
+          [1651229405.704329][2825:2825] CHIP:DMG:        EventPathIBs =
+          [1651229405.704362][2825:2825] CHIP:DMG:        [
+          [1651229405.704392][2825:2825] CHIP:DMG:                EventPath =
+          [1651229405.704428][2825:2825] CHIP:DMG:                {
+          [1651229405.704463][2825:2825] CHIP:DMG:                        Endpoint = 0x0,
+          [1651229405.704501][2825:2825] CHIP:DMG:                        Cluster = 0x28,
+          [1651229405.704539][2825:2825] CHIP:DMG:                        Event = 0x0,
+          [1651229405.704575][2825:2825] CHIP:DMG:                },
+          [1651229405.704613][2825:2825] CHIP:DMG:
+          [1651229405.704641][2825:2825] CHIP:DMG:        ],
+          [1651229405.704676][2825:2825] CHIP:DMG:
+          [1651229405.704707][2825:2825] CHIP:DMG:        isFabricFiltered = true,
+          [1651229405.704737][2825:2825] CHIP:DMG:        InteractionModelRevision = 1
+          [1651229405.704766][2825:2825] CHIP:DMG: },
+      disabled: true
+
+    - label: "Simulate a Factory Reset the TH"
+      verification: |
+          ./chip-tool basic read-event  leave 1 0
+      disabled: true
+
+    - label: "Simulate a reboot on the TH"
+      verification: |
+          ./chip-tool basic read-event start-up 1 0
+
+
+          [1651229405.704017][2825:2825] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:11744980 on exchange 35983r
+          [1651229405.704064][2825:2825] CHIP:EM: Handling via exchange: 35983r, Delegate: 0xaaaae659a088
+          [1651229405.704208][2825:2825] CHIP:IM: Received Read request
+          [1651229405.704271][2825:2825] CHIP:DMG: ReadRequestMessage =
+          [1651229405.704303][2825:2825] CHIP:DMG: {
+          [1651229405.704329][2825:2825] CHIP:DMG:        EventPathIBs =
+          [1651229405.704362][2825:2825] CHIP:DMG:        [
+          [1651229405.704392][2825:2825] CHIP:DMG:                EventPath =
+          [1651229405.704428][2825:2825] CHIP:DMG:                {
+          [1651229405.704463][2825:2825] CHIP:DMG:                        Endpoint = 0x0,
+          [1651229405.704501][2825:2825] CHIP:DMG:                        Cluster = 0x28,
+          [1651229405.704539][2825:2825] CHIP:DMG:                        Event = 0x0,
+          [1651229405.704575][2825:2825] CHIP:DMG:                },
+          [1651229405.704613][2825:2825] CHIP:DMG:
+          [1651229405.704641][2825:2825] CHIP:DMG:        ],
+          [1651229405.704676][2825:2825] CHIP:DMG:
+          [1651229405.704707][2825:2825] CHIP:DMG:        isFabricFiltered = true,
+          [1651229405.704737][2825:2825] CHIP:DMG:        InteractionModelRevision = 1
+          [1651229405.704766][2825:2825] CHIP:DMG: },
+      disabled: true
+
+    - label: "Simulate a Reachable attribute change on the TH"
+      verification: |
+          ./chip-tool basic read-event reachable-changed 1 0
+      disabled: true
