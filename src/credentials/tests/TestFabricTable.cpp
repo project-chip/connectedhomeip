@@ -163,7 +163,25 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, lastKnownGoodTime == buildTime);
 
-            // Load a test fabric
+            // Load a test fabric, but do not commit.
+            NL_TEST_ASSERT(inSuite, LoadTestFabric(inSuite, fabricTable, /* doCommit = */ false) == CHIP_NO_ERROR);
+
+            // Read Last Known Good Time and verify that it hasn't moved forward.
+            // This test case was written after the test certs' NotBefore time and we
+            // are using a configuration manager that should reflect a real build time.
+            // Therefore, we expect that build time is after NotBefore and so Last
+            // Known Good Time will be set to the later of these, build time, even
+            // after installing the new fabric.
+            NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, lastKnownGoodTime == buildTime);
+
+            // Verify that calling the fail-safe roll back interface does change
+            // last known good time, as it hadn't been updated in the first place.
+            fabricTable.RevertPendingFabricData();
+            NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, lastKnownGoodTime == buildTime);
+
+            // Now reload the test fabric and commit this time.
             NL_TEST_ASSERT(inSuite, LoadTestFabric(inSuite, fabricTable, /* doCommit = */ true) == CHIP_NO_ERROR);
 
             // Read Last Known Good Time and verify that it hasn't moved forward.
@@ -174,6 +192,12 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
             // after installing the new fabric.
             NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, lastKnownGoodTime == buildTime);
+
+            // Call revert again.  Since we've committed, this is a no-op.
+            // Last known good time should again be unchanged.
+            fabricTable.RevertPendingFabricData();
+            NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, lastKnownGoodTime == buildTime);
         }
         {
             // Test reloading last known good time from persistence.
@@ -182,24 +206,6 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
             FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
 
             // Verify that last known good time was retained.
-            System::Clock::Seconds32 lastKnownGoodTime;
-            NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, lastKnownGoodTime == buildTime);
-
-            // Verify that we can call the fail-safe roll back interface.
-            // Because we didn't advance Last Known Good Time, this should be a
-            // no-op.
-            NL_TEST_ASSERT(inSuite, fabricTable.RevertLastKnownGoodChipEpochTime() == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, lastKnownGoodTime == buildTime);
-        }
-        {
-            // Reload again from persistence to verify the fail-safe rollback
-            // left the time intact.
-            ScopedFabricTable fabricTableHolder;
-            NL_TEST_ASSERT(inSuite, fabricTableHolder.Init(&testStorage) == CHIP_NO_ERROR);
-            FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
-
             System::Clock::Seconds32 lastKnownGoodTime;
             NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, lastKnownGoodTime == buildTime);
@@ -211,8 +217,8 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
                                                              System::Clock::Seconds32(testCertNotBeforeTime.count() - 1000),
                                                              System::Clock::Seconds32(testCertNotBeforeTime.count() - 1000000) };
     // Test that certificate NotBefore times that are at or after the Firmware
-    // build time do result in Last Known Good Times set to these.  Then test
-    // that we can do a fail-safe roll back.
+    // build time do result in Last Known Good Times set to these.
+    // Verify behavior both for fail-safe roll back and commit scenarios.
     for (auto buildTime : beforeNotBeforeBuildTimes)
     {
         // Set build time to the desired value.
@@ -224,62 +230,37 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, fabricTableHolder.Init(&testStorage) == CHIP_NO_ERROR);
             FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
 
-            // Load a test fabric
-            NL_TEST_ASSERT(inSuite, LoadTestFabric(inSuite, fabricTable, /* doCommit = */ true) == CHIP_NO_ERROR);
+            // Load a test fabric, but do not commit.
+            NL_TEST_ASSERT(inSuite, LoadTestFabric(inSuite, fabricTable, /* doCommit = */ false) == CHIP_NO_ERROR);
 
             // Read Last Known Good Time and verify that it is now set to the certificate
             // NotBefore time, as this should be at or after firmware build time.
             System::Clock::Seconds32 lastKnownGoodTime;
             NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, lastKnownGoodTime == testCertNotBeforeTime);
+
+            // Now test revert.  Last known good time should change back to the
+            // previous value.
+            fabricTable.RevertPendingFabricData();
+            NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, lastKnownGoodTime == buildTime);
         }
-// TODO: Fix the fail-safe handling of LKGT
-#if 0
         {
             // Test reloading last known good time from persistence.
             ScopedFabricTable fabricTableHolder;
             NL_TEST_ASSERT(inSuite, fabricTableHolder.Init(&testStorage) == CHIP_NO_ERROR);
             FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
 
-            // Verify that last known good time was retained.
+            // Verify that the original last known good time was retained, since
+            // we reverted before.
             System::Clock::Seconds32 lastKnownGoodTime;
             NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, lastKnownGoodTime == testCertNotBeforeTime);
-
-            // Verify that we can do a fail-safe roll back.
-            NL_TEST_ASSERT(inSuite, fabricTable.RevertLastKnownGoodChipEpochTime() == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, lastKnownGoodTime == buildTime);
         }
         {
-            // Reload again from persistence to verify the fail-safe rollback
-            // persisted the reverted time.
+            // Now test loading a fabric and committing.
             ScopedFabricTable fabricTableHolder;
             NL_TEST_ASSERT(inSuite, fabricTableHolder.Init(&testStorage) == CHIP_NO_ERROR);
             FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
-
-            System::Clock::Seconds32 lastKnownGoodTime;
-            NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, lastKnownGoodTime == buildTime);
-        }
-#endif
-    }
-    // Test that certificate NotBefore times that are at or after the Firmware
-    // build time do result in Last Known Good Times set to these.  Then test
-    // that we can commit these to storage.  Attempted fail-safe roll back after
-    // commit will be a no-op.
-    for (auto buildTime : beforeNotBeforeBuildTimes)
-    {
-        // Set build time to the desired value.
-        NL_TEST_ASSERT(inSuite, DeviceLayer::ConfigurationMgr().SetFirmwareBuildChipEpochTime(buildTime) == CHIP_NO_ERROR);
-        chip::TestPersistentStorageDelegate testStorage;
-        {
-            // Initialize a fabric table.
-            ScopedFabricTable fabricTableHolder;
-            NL_TEST_ASSERT(inSuite, fabricTableHolder.Init(&testStorage) == CHIP_NO_ERROR);
-            FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
-
-            // Load a test fabric
             NL_TEST_ASSERT(inSuite, LoadTestFabric(inSuite, fabricTable, /* doCommit = */ true) == CHIP_NO_ERROR);
 
             // Read Last Known Good Time and verify that it is now set to the certificate
@@ -288,13 +269,9 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, lastKnownGoodTime == testCertNotBeforeTime);
 
-            // Commit to storage.
-            NL_TEST_ASSERT(inSuite, fabricTable.CommitLastKnownGoodChipEpochTime() == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, lastKnownGoodTime == testCertNotBeforeTime);
-
-            // Verify that we can do a no-op fail-safe roll back.
-            NL_TEST_ASSERT(inSuite, fabricTable.RevertLastKnownGoodChipEpochTime() == CHIP_NO_ERROR);
+            // Now test revert, which will be a no-op because we already
+            // committed.  Verify that Last Known Good time is retained.
+            fabricTable.RevertPendingFabricData();
             NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, lastKnownGoodTime == testCertNotBeforeTime);
         }
@@ -304,7 +281,8 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, fabricTableHolder.Init(&testStorage) == CHIP_NO_ERROR);
             FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
 
-            // Verify that last known good time was retained.
+            // Verify that the new last known good time was retained, since
+            // we committed.
             System::Clock::Seconds32 lastKnownGoodTime;
             NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, lastKnownGoodTime == testCertNotBeforeTime);

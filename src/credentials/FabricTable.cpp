@@ -852,7 +852,18 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, Crypto::P256Keypair * exi
                         static_cast<unsigned>(fabricEntry->GetFabricIndex()), ChipLogValueX64(fabricEntry->GetNodeId()));
     }
 
-    mPendingLastKnownGoodTime = notBeforeCollector.mLatestNotBefore;
+    // Failure to update pending Last Known Good Time is non-fatal.  If Last
+    // Known Good Time is incorrect and this causes the commissioner's
+    // certificates to appear invalid, the certificate validity policy will
+    // determine what to do.  And if the validity policy considers this fatal
+    // this will prevent CASE and cause the pending fabric and Last Known Good
+    // Time to be reverted.
+    CHIP_ERROR lkgtErr = mLastKnownGoodTime.UpdatePendingLastKnownGoodChipEpochTime(notBeforeCollector.mLatestNotBefore);
+    if (lkgtErr != CHIP_NO_ERROR)
+    {
+        // Log but this is not sticky...
+        ChipLogError(FabricProvisioning, "Failed to update pending Last Known Good Time: %" CHIP_ERROR_FORMAT, lkgtErr.Format());
+    }
 
     *outputIndex = fabricIndex;
 
@@ -1786,13 +1797,11 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
         }
         stickyError = (stickyError != CHIP_NO_ERROR) ? stickyError : opCertErr;
 
-        // Update failure of Last Known Good Time is non-fatal.  If Last
-        // Known Good Time is unknown during incoming certificate validation
-        // for CASE and current time is also unknown, the certificate
-        // validity policy will see this condition and can act appropriately.
-        mLastKnownGoodTime.UpdateLastKnownGoodChipEpochTime(mPendingLastKnownGoodTime);
-
-        CHIP_ERROR lkgtErr = CommitLastKnownGoodChipEpochTime();
+        // Failure to commit Last Known Good Time is non-fatal.  If Last Known
+        // Good Time is incorrect and this causes incoming certificates to
+        // appear invalid, the certificate validity policy will see this
+        // condition and can act appropriately.
+        CHIP_ERROR lkgtErr = mLastKnownGoodTime.CommitPendingLastKnownGoodChipEpochTime();
         if (lkgtErr != CHIP_NO_ERROR)
         {
             // Log but this is not sticky...
@@ -1852,6 +1861,8 @@ void FabricTable::RevertPendingFabricData()
     {
         mOpCertStore->RevertPendingOpCerts();
     }
+
+    mLastKnownGoodTime.RevertPendingLastKnownGoodChipEpochTime();
 
     mStateFlags.ClearAll();
     mFabricIndexWithPendingState = kUndefinedFabricIndex;
