@@ -41,6 +41,7 @@ tests:
 
     - label: "Check current x attribute value  matched before any change"
       command: "readAttribute"
+      PICS: CC.S.A0003
       attribute: "CurrentX"
       response:
           constraints:
@@ -50,6 +51,7 @@ tests:
 
     - label: "Check current y attribute  value  matched before any change"
       command: "readAttribute"
+      PICS: CC.S.A0004
       attribute: "CurrentY"
       response:
           constraints:
@@ -59,6 +61,7 @@ tests:
 
     - label: "Step Color command"
       command: "StepColor"
+      PICS: CC.S.C09.Rsp
       arguments:
           values:
               - name: "stepX"
@@ -83,6 +86,7 @@ tests:
     - label:
           "Check current x attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -94,6 +98,7 @@ tests:
     - label:
           "Check current y attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:

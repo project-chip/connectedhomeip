@@ -194,7 +194,9 @@ private:
             otDnsTxtEntry mTxtEntries[kTxtMaxNumber];
 
             bool IsUsed() const { return mService.mInstanceName != nullptr; }
-            bool Matches(const char * aInstanceName, const char * aName) const;
+            bool Matches(const char * instanceName, const char * name) const;
+            bool Matches(const char * instanceName, const char * name, uint16_t port, const Span<const char * const> & subTypes,
+                         const Span<const Dnssd::TextEntry> & txtEntries) const;
         };
 
         char mHostName[Dnssd::kHostNameMaxLength + 1];

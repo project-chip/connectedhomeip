@@ -66,6 +66,21 @@ void TestBytesToHexNotNullTerminated(nlTestSuite * inSuite, void * inContext)
         // Nothing should have been touched.
         NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
     }
+
+    // Trivial: Zero size input with null buffer
+    {
+        char dest[2]     = { '!', '@' };
+        char expected[2] = { '!', '@' };
+        NL_TEST_ASSERT(inSuite, BytesToHex(nullptr, 0, &dest[0], sizeof(dest), HexFlags::kNone) == CHIP_NO_ERROR);
+        // Nothing should have been touched.
+        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+
+        NL_TEST_ASSERT(inSuite, BytesToHex(nullptr, 0, nullptr, 0, HexFlags::kNone) == CHIP_NO_ERROR);
+        // Nothing should have been touched.
+        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+
+        NL_TEST_ASSERT(inSuite, BytesToHex(nullptr, 0, nullptr, 1, HexFlags::kNone) == CHIP_ERROR_INVALID_ARGUMENT);
+    }
 }
 
 void TestBytesToHexNullTerminated(nlTestSuite * inSuite, void * inContext)
@@ -115,21 +130,27 @@ void TestBytesToHexNullTerminated(nlTestSuite * inSuite, void * inContext)
         // Expect nul termination
         NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
     }
+
+    // Trivial: Zero size input with null buffer
+    {
+        char dest[2]     = { '!', '@' };
+        char expected[2] = { '\0', '@' };
+        NL_TEST_ASSERT(inSuite, BytesToHex(nullptr, 0, &dest[0], sizeof(dest), HexFlags::kNullTerminate) == CHIP_NO_ERROR);
+        // Nothing should have been touched.
+        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+
+        NL_TEST_ASSERT(inSuite, BytesToHex(nullptr, 0, nullptr, 0, HexFlags::kNullTerminate) == CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        NL_TEST_ASSERT(inSuite, BytesToHex(nullptr, 0, &dest[0], 1, HexFlags::kNullTerminate) == CHIP_NO_ERROR);
+        // Nothing should have been touched.
+        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+
+        NL_TEST_ASSERT(inSuite, BytesToHex(nullptr, 0, nullptr, 1, HexFlags::kNullTerminate) == CHIP_ERROR_INVALID_ARGUMENT);
+    }
 }
 
 void TestBytesToHexErrors(nlTestSuite * inSuite, void * inContext)
 {
-    // NULL source
-    {
-        const uint8_t * src = nullptr;
-        char dest[18]       = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
-        char expected[18]   = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
-        NL_TEST_ASSERT(inSuite, BytesToHex(&src[0], 0, &dest[0], sizeof(dest), HexFlags::kNone) == CHIP_ERROR_INVALID_ARGUMENT);
-
-        // Buffers should not have been touched
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
-    }
-
     // NULL destination
     {
         uint8_t src[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF };

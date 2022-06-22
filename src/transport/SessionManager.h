@@ -154,6 +154,10 @@ public:
     CHIP_ERROR InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
                                             uint16_t peerSessionId, FabricIndex fabricIndex,
                                             const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role);
+    CHIP_ERROR InjectCaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, uint16_t peerSessionId,
+                                            NodeId localNodeId, NodeId peerNodeId, FabricIndex fabric,
+                                            const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role,
+                                            const CATValues & cats = CATValues{});
 
     /**
      * @brief
@@ -210,6 +214,7 @@ public:
     void FabricRemoved(FabricIndex fabricIndex);
 
     TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
+    Transport::SecureSessionTable & GetSecureSessions() { return mSecureSessions; }
 
     /**
      * @brief

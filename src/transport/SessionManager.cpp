@@ -412,6 +412,27 @@ CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionH
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR SessionManager::InjectCaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId,
+                                                        uint16_t peerSessionId, NodeId localNodeId, NodeId peerNodeId,
+                                                        FabricIndex fabric, const Transport::PeerAddress & peerAddress,
+                                                        CryptoContext::SessionRole role, const CATValues & cats)
+{
+    Optional<SessionHandle> session =
+        mSecureSessions.CreateNewSecureSessionForTest(chip::Transport::SecureSession::Type::kCASE, localSessionId, localNodeId,
+                                                      peerNodeId, cats, peerSessionId, fabric, GetLocalMRPConfig());
+    VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
+    SecureSession * secureSession = session.Value()->AsSecureSession();
+    secureSession->SetPeerAddress(peerAddress);
+
+    size_t secretLen = strlen(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE);
+    ByteSpan secret(reinterpret_cast<const uint8_t *>(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE), secretLen);
+    ReturnErrorOnFailure(secureSession->GetCryptoContext().InitFromSecret(
+        secret, ByteSpan(nullptr, 0), CryptoContext::SessionInfoType::kSessionEstablishment, role));
+    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(Transport::PeerMessageCounter::kInitialSyncValue);
+    sessionHolder.Grab(session.Value());
+    return CHIP_NO_ERROR;
+}
+
 void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
     CHIP_TRACE_PREPARED_MESSAGE_RECEIVED(&peerAddress, &msg);

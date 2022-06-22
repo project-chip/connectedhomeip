@@ -315,7 +315,9 @@ function getManualTests() {
   ];
 
   const SoftwareDiagnostics = [
-    'Test_TC_SWDIAG_1_2',
+    'Test_TC_DGSW_1_1',
+    'Test_TC_DGSW_3_1',
+    'Test_TC_DGSW_3_2',
   ];
 
   const WiFiNetworkDiagnostics = [
@@ -821,9 +823,9 @@ function getTests() {
   ];
 
   const SoftwareDiagnostics = [
-    'Test_TC_SWDIAG_1_1',
-    'Test_TC_SWDIAG_2_1',
-    'Test_TC_SWDIAG_3_1',
+    'Test_TC_DGSW_2_1',
+    'Test_TC_DGSW_2_2',
+    'Test_TC_DGSW_2_3',
   ];
 
   const Subscriptions = [

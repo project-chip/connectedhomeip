@@ -47,7 +47,7 @@ public:
         item.ssidLen  = mpScanResults[mIternum].SSID.len;
         item.channel  = mpScanResults[mIternum].channel;
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        // item.rssi     = mpScanResults[mIternum].rssi;
+        item.rssi     = mpScanResults[mIternum].signal_strength;
         memcpy(item.ssid, mpScanResults[mIternum].SSID.val, item.ssidLen);
         memcpy(item.bssid, mpScanResults[mIternum].BSSID.octet, 6);
 

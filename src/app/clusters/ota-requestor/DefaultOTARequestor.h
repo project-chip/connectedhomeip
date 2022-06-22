@@ -47,7 +47,7 @@ public:
         const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
 
     // Application API to send the QueryImage command and start the image update process with the next available Provider
-    OTATriggerResult TriggerImmediateQuery() override;
+    CHIP_ERROR TriggerImmediateQuery(FabricIndex fabricIndex) override;
 
     // Internal API meant for use by OTARequestorDriver to send the QueryImage command and start the image update process
     // with the Provider currently set

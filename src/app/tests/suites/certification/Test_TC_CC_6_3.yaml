@@ -41,6 +41,7 @@ tests:
           value: 1
 
     - label: "Read current color temprature"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -50,6 +51,7 @@ tests:
               maxValue: 65279
 
     - label: "Step up color temperature command"
+      PICS: CC.S.C4C.Rsp
       command: "StepColorTemperature"
       arguments:
           values:
@@ -77,6 +79,7 @@ tests:
                 value: 40
 
     - label: "Read current color temprature"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -94,6 +97,7 @@ tests:
                 value: 45
 
     - label: "Read current color temprature"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -111,6 +115,7 @@ tests:
                 value: 50
 
     - label: "Read current color temprature"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -120,6 +125,7 @@ tests:
               maxValue: 65279
 
     - label: "Step down color temperature command"
+      PICS: CC.S.C4C.Rsp
       command: "StepColorTemperature"
       arguments:
           values:
@@ -147,6 +153,7 @@ tests:
                 value: 40
 
     - label: "Read current color temprature"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -164,6 +171,7 @@ tests:
                 value: 45
 
     - label: "Read current color temprature"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -181,6 +189,7 @@ tests:
                 value: 50
 
     - label: "Read current color temprature"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:

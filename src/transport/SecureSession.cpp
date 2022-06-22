@@ -26,6 +26,36 @@ void SecureSessionDeleter::Release(SecureSession * entry)
     entry->mTable.ReleaseSession(entry);
 }
 
+void SecureSession::Activate(const ScopedNodeId & localNode, const ScopedNodeId & peerNode, CATValues peerCATs,
+                             uint16_t peerSessionId, const ReliableMessageProtocolConfig & config)
+{
+    VerifyOrDie(mState == State::kEstablishing);
+    VerifyOrDie(peerNode.GetFabricIndex() == localNode.GetFabricIndex());
+
+    // PASE sessions must always start unassociated with a Fabric!
+    VerifyOrDie(!((mSecureSessionType == Type::kPASE) && (peerNode.GetFabricIndex() != kUndefinedFabricIndex)));
+    // CASE sessions must always start "associated" a given Fabric!
+    VerifyOrDie(!((mSecureSessionType == Type::kCASE) && (peerNode.GetFabricIndex() == kUndefinedFabricIndex)));
+    // CASE sessions can only be activated against operational node IDs!
+    VerifyOrDie(!((mSecureSessionType == Type::kCASE) &&
+                  (!IsOperationalNodeId(peerNode.GetNodeId()) || !IsOperationalNodeId(localNode.GetNodeId()))));
+
+    mPeerNodeId    = peerNode.GetNodeId();
+    mLocalNodeId   = localNode.GetNodeId();
+    mPeerCATs      = peerCATs;
+    mPeerSessionId = peerSessionId;
+    mMRPConfig     = config;
+    SetFabricIndex(peerNode.GetFabricIndex());
+
+    Retain(); // This ref is released inside MarkForEviction
+    MoveToState(State::kActive);
+
+    if (mSecureSessionType == Type::kCASE)
+        mTable.NewerSessionAvailable(this);
+
+    ChipLogDetail(Inet, "SecureSession[%p]: Activated - Type:%d LSID:%d", this, to_underlying(mSecureSessionType), mLocalSessionId);
+}
+
 const char * SecureSession::StateToString(State state) const
 {
     switch (state)
@@ -198,6 +228,23 @@ void SecureSession::Release()
 #endif
 
     ReferenceCounted<SecureSession, SecureSessionDeleter, 0, uint16_t>::Release();
+}
+
+void SecureSession::NewerSessionAvailable(const SessionHandle & session)
+{
+    // Shift to the new session, checks are performed by the the caller SecureSessionTable::NewerSessionAvailable.
+    IntrusiveList<SessionHolder>::Iterator iter = mHolders.begin();
+    while (iter != mHolders.end())
+    {
+        // The iterator can be invalid once the session holder is migrated to another session. So we store its next value before
+        // notifying the holder.
+        IntrusiveList<SessionHolder>::Iterator next = iter;
+        ++next;
+
+        iter->ShiftToSession(session);
+
+        iter = next;
+    }
 }
 
 } // namespace Transport

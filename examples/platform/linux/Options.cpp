@@ -27,6 +27,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
+#include <lib/support/BytesToHex.h>
 
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
@@ -70,6 +71,7 @@ enum
     kOptionCSRResponseAttestationSignatureIncorrectType = 0x101c,
     kOptionCSRResponseAttestationSignatureInvalid       = 0x101d,
     kOptionCSRResponseCSRExistingKeyPair                = 0x101e,
+    kDeviceOption_TestEventTriggerEnableKey             = 0x101f,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -114,6 +116,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "cert_error_nocsrelements_too_long", kNoArgument, kOptionCSRResponseNOCSRElementsTooLong },
     { "cert_error_attestation_signature_incorrect_type", kNoArgument, kOptionCSRResponseAttestationSignatureIncorrectType },
     { "cert_error_attestation_signature_invalid", kNoArgument, kOptionCSRResponseAttestationSignatureInvalid },
+    { "enable-key", kArgumentRequired, kDeviceOption_TestEventTriggerEnableKey },
     {}
 };
 
@@ -215,6 +218,8 @@ const char * sDeviceOptionHelp =
     "       Configure the CSRResponse to be build with an invalid AttestationSignature type.\n"
     "  --cert_error_attestation_signature_invalid\n"
     "       Configure the CSRResponse to be build with an AttestationSignature that does not match what is expected.\n"
+    "  --enable-key <key>\n"
+    "       A 16-byte, hex-encoded key, used to validate TestEventTrigger command of Generial Diagnostics cluster\n"
     "\n";
 
 bool Base64ArgToVector(const char * arg, size_t maxSize, std::vector<uint8_t> & outVector)
@@ -442,6 +447,19 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kOptionCSRResponseAttestationSignatureInvalid:
         LinuxDeviceOptions::GetInstance().mCSRResponseOptions.attestationSignatureInvalid = true;
         break;
+    case kDeviceOption_TestEventTriggerEnableKey: {
+        constexpr size_t kEnableKeyLength = sizeof(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey);
+
+        if (Encoding::HexToBytes(aValue, strlen(aValue), LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey,
+                                 kEnableKeyLength) != kEnableKeyLength)
+        {
+
+            PrintArgError("%s: ERROR: invalid value specified for %s\n", aProgram, aName);
+            retval = false;
+        }
+
+        break;
+    }
 
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
