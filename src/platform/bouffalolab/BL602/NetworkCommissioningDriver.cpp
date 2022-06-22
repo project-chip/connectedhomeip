@@ -333,7 +333,7 @@ void BLWiFiDriver::OnNetworkStatusChange()
         ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
         return;
     }
-    
+
     if (ConnectivityManagerImpl::mWiFiStationState == ConnectivityManager::kWiFiStationState_Connected)
     {
         staConnected = true;
