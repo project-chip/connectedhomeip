@@ -44,10 +44,20 @@ extern "C" {
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #endif
 
+#ifdef EFR32MG24
+#define HELPER1(x) EUSART##x##_RX_IRQn
+#else
 #define HELPER1(x) USART##x##_RX_IRQn
+#endif
+
 #define HELPER2(x) HELPER1(x)
 
+#ifdef EFR32MG24
+#define HELPER3(x) EUSART##x##_RX_IRQHandler
+#else
 #define HELPER3(x) USART##x##_RX_IRQHandler
+#endif
+
 #define HELPER4(x) HELPER3(x)
 
 // On MG24 boards VCOM runs on the EUSART device, MG12 uses the UART device
@@ -55,7 +65,6 @@ extern "C" {
 #define USART_IRQ HELPER2(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
 #define USART_IRQHandler HELPER4(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
 #define vcom_handle sl_uartdrv_eusart_vcom_handle
-
 #else
 #define USART_IRQ HELPER2(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
 #define USART_IRQHandler HELPER4(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
@@ -208,12 +217,19 @@ void uartConsoleInit(void)
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
 
-    // Enable USART0 interrupt to wake OT task when data arrives
+    // Enable USART0/EUSART0 interrupt to wake OT task when data arrives
     NVIC_ClearPendingIRQ(USART_IRQ);
     NVIC_EnableIRQ(USART_IRQ);
 
 #ifdef EFR32MG24
-    EUSART_IntEnable(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, USART_IF_RXDATAV);
+    // Clear previous RX interrupts
+    EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
+
+    // Enable RX interrupts
+    EUSART_IntEnable(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
+
+    // Enable EUSART
+    EUSART_Enable(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, eusartEnable);
 #else
     USART_IntEnable(SL_UARTDRV_USART_VCOM_PERIPHERAL, USART_IF_RXDATAV);
 #endif // EFR32MG24
@@ -228,6 +244,10 @@ void USART_IRQHandler(void)
     /* TODO */
 #elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
+#endif
+
+#ifdef EFR32MG24
+    EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 #endif
 }
 
