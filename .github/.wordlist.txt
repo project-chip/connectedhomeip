@@ -306,6 +306,7 @@ ctrl
 ctypes
 CurrentHue
 CurrentLevel
+CurrentPosition
 CurrentSaturation
 customAcl
 customizations
@@ -841,6 +842,7 @@ MoveToSaturation
 MoveWithOnOff
 MPSL
 MRP
+MSR
 MTD
 MTU
 Multiband
