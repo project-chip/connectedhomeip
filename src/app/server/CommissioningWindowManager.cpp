@@ -103,8 +103,6 @@ void CommissioningWindowManager::ResetState()
 void CommissioningWindowManager::Cleanup()
 {
     StopAdvertisement(/* aShuttingDown = */ false);
-    ExpireFailSafeIfArmed();
-
     ResetState();
 }
 
