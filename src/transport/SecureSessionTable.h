@@ -142,9 +142,13 @@ private:
         }
 
         const Transport::SecureSession * operator->() const { return mSession; }
+        auto GetNumMatchingOnFabric() { return mNumMatchingOnFabric; }
+        auto GetNumMatchingOnPeer() { return mNumMatchingOnPeer; }
 
     private:
         SecureSession * mSession;
+        uint16_t mNumMatchingOnFabric;
+        uint16_t mNumMatchingOnPeer;
         friend class SecureSessionTable;
     };
 
@@ -192,14 +196,32 @@ private:
 
     /**
      *
-     * This implements the following eviction policy:
+     * This implements an eviction policy by sorting sessions using the following sorting keys and selecting
+     * the session that is most ahead as the best candidate for eviction:
      *
-     *  - Sessions are sorted with their state as the primary sort key and activity time as the secondary
-     *    sort key.
-     *  - The primary sort key places defunct sessions ahead of active ones, ahead of anything else.
-     *  - The secondary sort key places older sessions ahead of newer sessions. This ensures
-     *    we're prioritizing reaping less active sessions over more recently active sessions (activity
-     *    in either TX or RX).
+     *  - Key1:  Sessions on fabrics that have more sessions in the table are placed ahead of sessions on fabrics
+     *           with lesser sessions. We conclusively know that if a particular fabric has more sessions in the table
+     *           than another, that that fabric is definitely over minimas (assuming a minimially sized session table
+     *           conformant to spec minimas).
+     *
+     *    Key2:  Sessions that match the eviction hint's fabric are placed ahead of those that don't. This ensures that
+     *           if Key1 is even (i.e two fabrics are tied in count), that you attempt to select sessions that match
+     *           the eviction hint's fabric to ensure we evict sessions within the fabric that a new session might be about
+     *           to be created within. This is essential to preventing cross-fabric denial of service possibilities.
+     *
+     *    Key3:  Sessions with a higher mNumMatchingOnPeer are placed ahead of those with less. This ensures
+     *           we pick sessions that have a higher number of duplicated sessions to a peer over those with less since
+     *           evicting a duplicated session will have less of an impact to that peer.
+     *
+     *    Key4:  Sessions whose target peer's ScopedNodeId matches the eviction hint are placed ahead of those who don't. This
+     * ensures that all things equal, a session that already exists to the peer is refreshed ahead of another to another peer.
+     *
+     *    Key5:  Sessions that are in defunct state are placed ahead of those in the active state, ahead of any other state.
+     *           This ensures that we prioritize evicting defunct sessions (since they have been deemed non-functional anyways)
+     *           over active, healthy ones, over those are currently in the process of establishment.
+     *
+     *    Key6:  Sessions that have a less recent activity time are placed ahead of those with a more recent activity time. This
+     *           is the canonical sorting criteria for basic LRU.
      *
      */
     void DefaultEvictionPolicy(EvictionPolicyContext & evictionContext);
@@ -230,6 +252,12 @@ private:
 
     bool mRunningEvictionLogic = false;
     ObjectPool<SecureSession, CHIP_CONFIG_SECURE_SESSION_POOL_SIZE> mEntries;
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    uint32_t mMaxSessionTableSize = CHIP_CONFIG_SECURE_SESSION_POOL_SIZE;
+    void SetMaxSessionTableSize(uint32_t size) { mMaxSessionTableSize = size; }
+#endif
+
     uint16_t mNextSessionId = 0;
 };
 

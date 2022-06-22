@@ -76,6 +76,11 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
                                      nodeid=device_nodeid),
               "Failed to finish key exchange")
 
+    ok = asyncio.run(test.TestMultiFabric(ip=address,
+                                          setuppin=20202021,
+                                          nodeid=1))
+    FailIfNot(ok, "Failed to commission multi-fabric")
+
     #
     # Run this before the MultiFabric test, since it will result in the resultant CASE session
     # on fabric2 to be evicted (due to the stressful nature of that test) on the target.
@@ -88,11 +93,6 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
     #
     logger.info("Testing CASE Eviction")
     FailIfNot(asyncio.run(test.TestCaseEviction(device_nodeid)), "Failed TestCaseEviction")
-
-    ok = asyncio.run(test.TestMultiFabric(ip=address,
-                                          setuppin=20202021,
-                                          nodeid=1))
-    FailIfNot(ok, "Failed to commission multi-fabric")
 
     logger.info("Testing closing sessions")
     FailIfNot(test.TestCloseSession(nodeid=device_nodeid), "Failed to close sessions")
