@@ -49,7 +49,7 @@ extern "C" {
 #define HELPER1(x) EUSART##x##_RX_IRQn
 #else
 #define HELPER1(x) USART##x##_RX_IRQn
-#endif 
+#endif
 
 #define HELPER2(x) HELPER1(x)
 
@@ -66,7 +66,6 @@ extern "C" {
 #define USART_IRQ HELPER2(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
 #define USART_IRQHandler HELPER4(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
 #define vcom_handle sl_uartdrv_eusart_vcom_handle
-
 #else
 #define USART_IRQ HELPER2(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
 #define USART_IRQHandler HELPER4(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
@@ -219,60 +218,26 @@ void uartConsoleInit(void)
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
 
-#ifdef EFR32MG24
-
-    NVIC_ClearPendingIRQ(EUSART0_RX_IRQn /*USART_IRQ*/);
-    NVIC_EnableIRQ(EUSART0_RX_IRQn /*USART_IRQ*/);
-
-#else // not EFR32MG24
-    // Enable USART0 interrupt to wake OT task when data arrives
-     NVIC_ClearPendingIRQ(USART_IRQ);
-     NVIC_EnableIRQ(USART_IRQ);
-#endif // EFR32MG24
-
+    // Enable USART0/EUSART0 interrupt to wake OT task when data arrives
+    NVIC_ClearPendingIRQ(USART_IRQ);
+    NVIC_EnableIRQ(USART_IRQ);
 
 #ifdef EFR32MG24
- // Clear previous RX interrupts
+    // Clear previous RX interrupts
     EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 
-  // Enable RX interrupts
+    // Enable RX interrupts
     EUSART_IntEnable(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 
-  // Finally enable it
+    // Enable EUSART
     EUSART_Enable(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, eusartEnable);
-
-
-  // Original call 
-  //   EUSART_IntEnable(EUSART0/*SL_UARTDRV_EUSART_VCOM_PERIPHERAL*/, USART_IF_RXDATAV);
 #else
     USART_IntEnable(SL_UARTDRV_USART_VCOM_PERIPHERAL, USART_IF_RXDATAV);
 #endif // EFR32MG24
 }
 
-int liss_counter = 0;
-
 void USART_IRQHandler(void)
 {
-
-#if 0 // LISS
-    if(liss_counter >= 3) {
-
-        do {
-            int a,b = 0;
-
-            a = liss_counter + 100;
-            b = a + 6;
-            a = b +7;
-
-
-        } while(1);
-    }
-
-#endif // LISS
-
-liss_counter++;
-
-
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcessFromISR();
 #endif
@@ -282,7 +247,9 @@ liss_counter++;
     otSysEventSignalPending();
 #endif
 
+#ifdef EFR32MG24
     EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
+#endif
 }
 
 /*
