@@ -158,7 +158,7 @@ public:
      * adding an existing NOC and before committing or reverting the addition.
      *
      * If there is no existing persisted trusted root certificate and NOC chain for the given
-     * fabricIndex, this method will method will return CHIP_ERROR_INCORRECT_STATE since it is
+     * fabricIndex, this method will return CHIP_ERROR_INCORRECT_STATE since it is
      * illegal in this implementation to store an NOC chain without associated root, and it is illegal
      * to update an opcert for a fabric not already configured.
      *
