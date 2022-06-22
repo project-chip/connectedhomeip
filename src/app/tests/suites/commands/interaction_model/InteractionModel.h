@@ -29,6 +29,22 @@
 
 constexpr uint8_t kMaxAllowedPaths = 10;
 
+class InteractionModelConfig
+{
+public:
+    struct AttributePathsConfig
+    {
+        size_t count = 0;
+        chip::app::AttributePathParams attributePathParams[kMaxAllowedPaths];
+        chip::app::DataVersionFilter dataVersionFilter[kMaxAllowedPaths];
+    };
+
+    static CHIP_ERROR GetAttributePaths(std::vector<chip::EndpointId> endpointIds, std::vector<chip::ClusterId> clusterIds,
+                                        std::vector<chip::AttributeId> attributeIds,
+                                        const chip::Optional<std::vector<chip::DataVersion>> & dataVersions,
+                                        AttributePathsConfig & pathsConfig);
+};
+
 class InteractionModelReports
 {
 public:
@@ -172,38 +188,37 @@ public:
 
 protected:
     template <class T>
-    CHIP_ERROR WriteAttribute(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                              chip::AttributeId attributeId, const T & value,
-                              const chip::Optional<uint16_t> & timedInteractionTimeoutMs = chip::NullOptional,
-                              const chip::Optional<bool> & suppressResponse              = chip::NullOptional,
-                              const chip::Optional<chip::DataVersion> & dataVersion      = chip::NullOptional,
-                              const chip::Optional<uint16_t> & repeatCount               = chip::NullOptional,
-                              const chip::Optional<uint16_t> & repeatDelayInMs           = chip::NullOptional)
+    CHIP_ERROR WriteAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
+                              std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
+                              const std::vector<T> & values,
+                              const chip::Optional<uint16_t> & timedInteractionTimeoutMs          = chip::NullOptional,
+                              const chip::Optional<bool> & suppressResponse                       = chip::NullOptional,
+                              const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional,
+                              const chip::Optional<uint16_t> & repeatCount                        = chip::NullOptional,
+                              const chip::Optional<uint16_t> & repeatDelayInMs                    = chip::NullOptional)
     {
+        InteractionModelConfig::AttributePathsConfig pathsConfig;
+        ReturnErrorOnFailure(
+            InteractionModelConfig::GetAttributePaths(endpointIds, clusterIds, attributeIds, dataVersions, pathsConfig));
+
+        VerifyOrReturnError(pathsConfig.count == values.size() || values.size() == 1, CHIP_ERROR_INVALID_ARGUMENT);
+
         uint16_t repeat = repeatCount.ValueOr(1);
         while (repeat--)
         {
-            chip::app::AttributePathParams attributePathParams;
-            if (endpointId != chip::kInvalidEndpointId)
-            {
-                attributePathParams.mEndpointId = endpointId;
-            }
-
-            if (clusterId != chip::kInvalidClusterId)
-            {
-                attributePathParams.mClusterId = clusterId;
-            }
-
-            if (attributeId != chip::kInvalidAttributeId)
-            {
-                attributePathParams.mAttributeId = attributeId;
-            }
 
             mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), &mChunkedWriteCallback,
                                                                     timedInteractionTimeoutMs, suppressResponse.ValueOr(false));
             VerifyOrReturnError(mWriteClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
-            ReturnErrorOnFailure(mWriteClient->EncodeAttribute(attributePathParams, value, dataVersion));
+            for (uint8_t i = 0; i < pathsConfig.count; i++)
+            {
+                auto & path        = pathsConfig.attributePathParams[i];
+                auto & dataVersion = pathsConfig.dataVersionFilter[i].mDataVersion;
+                const T & value    = i >= values.size() ? values.at(0) : values.at(i);
+                ReturnErrorOnFailure(EncodeAttribute<T>(path, dataVersion, value));
+            }
+
             ReturnErrorOnFailure(mWriteClient->SendWriteRequest(device->GetSecureSession().Value()));
 
             if (repeatDelayInMs.HasValue())
@@ -213,6 +228,28 @@ protected:
         }
 
         return CHIP_NO_ERROR;
+    }
+
+    template <class T>
+    CHIP_ERROR WriteAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
+                              std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds, const T & value,
+                              const chip::Optional<uint16_t> & timedInteractionTimeoutMs          = chip::NullOptional,
+                              const chip::Optional<bool> & suppressResponse                       = chip::NullOptional,
+                              const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional,
+                              const chip::Optional<uint16_t> & repeatCount                        = chip::NullOptional,
+                              const chip::Optional<uint16_t> & repeatDelayInMs                    = chip::NullOptional)
+    {
+        std::vector<T> values = { value };
+        return WriteAttribute(device, endpointIds, clusterIds, attributeIds, values, timedInteractionTimeoutMs, suppressResponse,
+                              dataVersions, repeatCount, repeatDelayInMs);
+    }
+
+    template <class T>
+    CHIP_ERROR WriteGroupAttribute(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::ClusterId clusterId,
+                                   chip::AttributeId attributeId, const std::vector<T> & value,
+                                   const chip::Optional<chip::DataVersion> & dataVersion = chip::NullOptional)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     template <class T>
@@ -246,6 +283,21 @@ protected:
 
     std::unique_ptr<chip::app::WriteClient> mWriteClient;
     chip::app::ChunkedWriteCallback mChunkedWriteCallback;
+
+private:
+    template <typename T>
+    CHIP_ERROR EncodeAttribute(const chip::app::AttributePathParams & path, const chip::Optional<chip::DataVersion> & dataVersion,
+                               T value, typename std::enable_if<!std::is_pointer<T>::value>::type * = 0)
+    {
+        return mWriteClient->EncodeAttribute(path, value, dataVersion);
+    }
+
+    template <typename T>
+    CHIP_ERROR EncodeAttribute(const chip::app::AttributePathParams & path, const chip::Optional<chip::DataVersion> & dataVersion,
+                               T value, typename std::enable_if<std::is_pointer<T>::value>::type * = 0)
+    {
+        return mWriteClient->EncodeAttribute(path, *value, dataVersion);
+    }
 };
 
 class InteractionModel : public InteractionModelReports,
@@ -293,7 +345,19 @@ public:
         chip::DeviceProxy * device = GetDevice(identity);
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        return InteractionModelWriter::WriteAttribute(device, endpointId, clusterId, attributeId, value, timedInteractionTimeoutMs);
+        std::vector<chip::EndpointId> endpointIds   = { endpointId };
+        std::vector<chip::ClusterId> clusterIds     = { clusterId };
+        std::vector<chip::AttributeId> attributeIds = { attributeId };
+
+        chip::Optional<std::vector<chip::DataVersion>> optionalDataVersions;
+        if (dataVersion.HasValue())
+        {
+            std::vector<chip::DataVersion> dataVersions = { dataVersion.Value() };
+            optionalDataVersions.SetValue(dataVersions);
+        }
+
+        return InteractionModelWriter::WriteAttribute(device, endpointIds, clusterIds, attributeIds, value,
+                                                      timedInteractionTimeoutMs, suppressResponse, optionalDataVersions);
     }
 
     template <class T>

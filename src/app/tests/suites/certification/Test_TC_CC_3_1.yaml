@@ -40,6 +40,7 @@ tests:
           value: 1
 
     - label: "Reads CurrentHue attribute from DUT"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -49,6 +50,7 @@ tests:
               maxValue: 254
 
     - label: "Move to hue shortest distance command"
+      PICS: CC.S.C00.Rsp
       command: "MoveToHue"
       arguments:
           values:
@@ -74,6 +76,7 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -93,6 +96,7 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -112,6 +116,7 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -122,6 +127,7 @@ tests:
 
     - label: "Move to hue longest distance command"
       command: "MoveToHue"
+      PICS: CC.S.C00.Rsp
       arguments:
           values:
               - name: "hue"
@@ -146,6 +152,7 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -165,6 +172,7 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -184,6 +192,7 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -194,6 +203,7 @@ tests:
 
     - label: "Move to hue up command"
       command: "MoveToHue"
+      PICS: CC.S.C00.Rsp
       arguments:
           values:
               - name: "hue"
@@ -218,6 +228,7 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -237,6 +248,7 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -256,6 +268,7 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -266,6 +279,7 @@ tests:
 
     - label: "Move to hue down command"
       command: "MoveToHue"
+      PICS: CC.S.C00.Rsp
       arguments:
           values:
               - name: "hue"
@@ -290,6 +304,7 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -309,6 +324,7 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -328,6 +344,7 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:

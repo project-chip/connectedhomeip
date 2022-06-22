@@ -210,6 +210,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPGeneralCommissioningClusterBasicCommissioningInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull failSafeExpiryLengthSeconds;
+@property (strong, nonatomic) NSNumber * _Nonnull maxCumulativeFailsafeSeconds;
 - (instancetype)init;
 @end
 
@@ -578,12 +579,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
 @property (strong, nonatomic) NSNumber * _Nullable heatSetpoint;
 @property (strong, nonatomic) NSNumber * _Nullable coolSetpoint;
-- (instancetype)init;
-@end
-
-@interface CHIPIasAceClusterIasAceZoneStatusResult : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull zoneId;
-@property (strong, nonatomic) NSNumber * _Nonnull zoneStatus;
 - (instancetype)init;
 @end
 

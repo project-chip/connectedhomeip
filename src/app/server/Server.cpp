@@ -202,6 +202,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mMessageCounterManager.Init(&mExchangeMgr);
     SuccessOrExit(err);
 
+    err = mUnsolicitedStatusHandler.Init(&mExchangeMgr);
+    SuccessOrExit(err);
+
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable());
     SuccessOrExit(err);
 
@@ -267,6 +270,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             .fabricTable       = &mFabrics,
             .clientPool        = &mCASEClientPool,
             .groupDataProvider = mGroupsProvider,
+            .mrpLocalConfig    = Optional<ReliableMessageProtocolConfig>(GetLocalMRPConfig()),
         },
         .devicePool        = &mDevicePool,
     };

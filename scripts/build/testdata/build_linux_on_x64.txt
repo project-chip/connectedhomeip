@@ -46,6 +46,16 @@ bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-light-ipv6only'
 
+# Generating linux-arm64-light-rpc
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=import("//with_pw_rpc.gni") target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-light-rpc'
+
+# Generating linux-arm64-light-rpc-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=import("//with_pw_rpc.gni") chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-light-rpc-ipv6only'
+
 # Generating linux-arm64-lock
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
@@ -173,6 +183,12 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating linux-x64-light-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-light-ipv6only
 
+# Generating linux-x64-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=import("//with_pw_rpc.gni")' {out}/linux-x64-light-rpc
+
+# Generating linux-x64-light-rpc-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=import("//with_pw_rpc.gni") chip_inet_config_enable_ipv4=false' {out}/linux-x64-light-rpc-ipv6only
+
 # Generating linux-x64-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/linux {out}/linux-x64-lock
 
@@ -259,6 +275,12 @@ ninja -C {out}/linux-arm64-light
 
 # Building linux-arm64-light-ipv6only
 ninja -C {out}/linux-arm64-light-ipv6only
+
+# Building linux-arm64-light-rpc
+ninja -C {out}/linux-arm64-light-rpc
+
+# Building linux-arm64-light-rpc-ipv6only
+ninja -C {out}/linux-arm64-light-rpc-ipv6only
 
 # Building linux-arm64-lock
 ninja -C {out}/linux-arm64-lock
@@ -352,6 +374,12 @@ ninja -C {out}/linux-x64-light
 
 # Building linux-x64-light-ipv6only
 ninja -C {out}/linux-x64-light-ipv6only
+
+# Building linux-x64-light-rpc
+ninja -C {out}/linux-x64-light-rpc
+
+# Building linux-x64-light-rpc-ipv6only
+ninja -C {out}/linux-x64-light-rpc-ipv6only
 
 # Building linux-x64-lock
 ninja -C {out}/linux-x64-lock

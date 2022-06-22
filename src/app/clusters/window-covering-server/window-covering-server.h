@@ -50,30 +50,6 @@ enum class OperationalState : uint8_t
 };
 static_assert(sizeof(OperationalState) == sizeof(uint8_t), "OperationalState Size is not correct");
 
-// Decoded components of the OperationalStatus attribute
-struct OperationalStatus
-{
-    OperationalState global; // bit 0-1 M
-    OperationalState lift;   // bit 2-3 LF
-    OperationalState tilt;   // bit 4-5 TL
-};
-
-struct SafetyStatus
-{
-    uint8_t remoteLockout : 1;       // bit 0
-    uint8_t tamperDetection : 1;     // bit 1
-    uint8_t failedCommunication : 1; // bit 2
-    uint8_t positionFailure : 1;     // bit 3
-    uint8_t thermalProtection : 1;   // bit 4
-    uint8_t obstacleDetected : 1;    // bit 5
-    uint8_t powerIssue : 1;          // bit 6
-    uint8_t stopInput : 1;           // bit 7
-    uint8_t motorJammed : 1;         // bit 8
-    uint8_t hardwareFailure : 1;     // bit 9
-    uint8_t manualOperation : 1;     // bit 10
-};
-static_assert(sizeof(SafetyStatus) == sizeof(uint16_t), "SafetyStatus Size is not correct");
-
 // Declare Position Limit Status
 enum class LimitStatus : uint8_t
 {
@@ -92,7 +68,7 @@ struct AbsoluteLimits
     uint16_t closed;
 };
 
-bool HasFeature(chip::EndpointId endpoint, WcFeature feature);
+bool HasFeature(chip::EndpointId endpoint, Feature feature);
 bool HasFeaturePaLift(chip::EndpointId endpoint);
 bool HasFeaturePaTilt(chip::EndpointId endpoint);
 
@@ -104,9 +80,11 @@ void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitMask<ConfigStatus
 chip::BitMask<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint);
 void ConfigStatusUpdateFeatures(chip::EndpointId endpoint);
 
-void OperationalStatusSet(chip::EndpointId endpoint, const OperationalStatus & status);
-void OperationalStatusSetWithGlobalUpdated(chip::EndpointId endpoint, OperationalStatus & status);
-const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint);
+void OperationalStatusPrint(const chip::BitMask<OperationalStatus> & opStatus);
+void OperationalStatusSet(chip::EndpointId endpoint, chip::BitMask<OperationalStatus> newStatus);
+chip::BitMask<OperationalStatus> OperationalStatusGet(chip::EndpointId endpoint);
+void OperationalStateSet(chip::EndpointId endpoint, const chip::BitMask<OperationalStatus> field, OperationalState state);
+OperationalState OperationalStateGet(chip::EndpointId endpoint, const chip::BitMask<OperationalStatus> field);
 
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current);
 OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths current);
@@ -119,8 +97,8 @@ void ModePrint(const chip::BitMask<Mode> & mode);
 void ModeSet(chip::EndpointId endpoint, chip::BitMask<Mode> & mode);
 chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint);
 
-void SafetyStatusSet(chip::EndpointId endpoint, SafetyStatus & status);
-const SafetyStatus SafetyStatusGet(chip::EndpointId endpoint);
+void SafetyStatusSet(chip::EndpointId endpoint, const chip::BitMask<SafetyStatus> & status);
+chip::BitMask<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint);
 
 LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits);
 

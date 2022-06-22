@@ -71,7 +71,7 @@ will then join the network.
 *   Additionally a pre-compiled bootloader must be flashed to the board. This
     can be found at:
 
-          $ ./examples/ota-requestor-app/p6/matter-psoc6-mcuboot-bootloader.hex
+          $ ./third_party/p6/p6_sdk/ota/matter-psoc6-mcuboot-bootloader.hex
 
 <a name="flashing-the-application"></a>
 

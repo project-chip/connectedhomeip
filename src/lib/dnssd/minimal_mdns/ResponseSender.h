@@ -112,7 +112,8 @@ public:
     bool HasQueryResponders() const;
 
     /// Send back the response to a particular query
-    CHIP_ERROR Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource);
+    CHIP_ERROR Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource,
+                       const ResponseConfiguration & configuration);
 
     // Implementation of ResponderDelegate
     void AddResponse(const ResourceRecord & record) override;

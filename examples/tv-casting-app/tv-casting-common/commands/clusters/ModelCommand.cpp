@@ -16,7 +16,7 @@
  *
  */
 
-#include "ModelCommand.h"
+#include <commands/clusters/ModelCommand.h>
 
 #include <CastingServer.h>
 #include <app/InteractionModelEngine.h>
@@ -28,23 +28,23 @@ CHIP_ERROR ModelCommand::RunCommand()
 {
     FabricIndex fabricIndex = CastingServer::GetInstance()->CurrentFabricIndex();
 
-    if (mNodeId == 0)
+    if (mDestinationId == 0)
     {
         ChipLogProgress(chipTool, "nodeId set to 0, using default for fabric %d", fabricIndex);
-        mNodeId = CastingServer::GetInstance()->GetVideoPlayerNodeForFabricIndex(fabricIndex);
+        mDestinationId = CastingServer::GetInstance()->GetVideoPlayerNodeForFabricIndex(fabricIndex);
     }
     else
     {
         // potentially change fabric index if this is not the right one for the given nodeId
-        fabricIndex = CastingServer::GetInstance()->GetVideoPlayerFabricIndexForNode(mNodeId);
+        fabricIndex = CastingServer::GetInstance()->GetVideoPlayerFabricIndexForNode(mDestinationId);
     }
-    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
+    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mDestinationId);
 
-    if (IsGroupId(mNodeId))
+    if (IsGroupId(mDestinationId))
     {
-        ChipLogProgress(chipTool, "Sending command to group 0x%x", GroupIdFromNodeId(mNodeId));
+        ChipLogProgress(chipTool, "Sending command to group 0x%x", GroupIdFromNodeId(mDestinationId));
 
-        return SendGroupCommand(GroupIdFromNodeId(mNodeId), fabricIndex);
+        return SendGroupCommand(GroupIdFromNodeId(mDestinationId), fabricIndex);
     }
 
     Server * server           = &(chip::Server::GetInstance());
@@ -55,7 +55,7 @@ CHIP_ERROR ModelCommand::RunCommand()
         return CHIP_ERROR_INVALID_FABRIC_INDEX;
     }
 
-    PeerId peerID = fabric->GetPeerIdForNode(mNodeId);
+    PeerId peerID = fabric->GetPeerIdForNode(mDestinationId);
     server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnDeviceConnectedCallback,
                                                             &mOnDeviceConnectionFailureCallback);
     return CHIP_NO_ERROR;

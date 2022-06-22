@@ -42,6 +42,7 @@
 #include <messaging/EphemeralExchangeDispatch.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
+#include <platform/LockTracker.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 
@@ -132,6 +133,10 @@ void ExchangeContext::UpdateSEDIntervalMode(bool activeMode)
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
                                         const SendFlags & sendFlags)
 {
+    // This is the first point all outgoing messages funnel through.  Ensure
+    // that our message sends are all synchronized correctly.
+    assertChipStackLockedByCurrentThread();
+
     bool isStandaloneAck =
         (protocolId == Protocols::SecureChannel::Id) && msgType == to_underlying(Protocols::SecureChannel::MsgType::StandaloneAck);
     if (!isStandaloneAck)
@@ -319,6 +324,9 @@ ExchangeContext::~ExchangeContext()
 {
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
     VerifyOrDie(!IsAckPending());
+
+    if (ReleaseSessionOnDestruction() && mSession)
+        mSession->AsSecureSession()->MarkForEviction();
 
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
     // Make sure that the exchange withdraws the request for Sleepy End Device active mode.

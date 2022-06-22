@@ -42,6 +42,17 @@ tests:
           [1651103874.314412][26507:26507] CHIP:DL:   Manufacturing Date: (not set)
           [1651103874.314434][26507:26507] CHIP:DL:   Device Type: 65535 (0xFFFF)
           [1651103874.314502][26507:26507] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
+
+          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload MT:-24J0YXE00KA0648G00
+          [1653997840.457937][2875:2875] CHIP:SPL: Parsing base38Representation: MT:-24J0YXE00KA0648G00
+          [1653997840.458108][2875:2875] CHIP:SPL: Version:       0
+          [1653997840.458134][2875:2875] CHIP:SPL: VendorID:      65521
+          [1653997840.458155][2875:2875] CHIP:SPL: ProductID:     32769
+          [1653997840.458175][2875:2875] CHIP:SPL: Custom flow:   2    (CUSTOM)
+          [1653997840.458197][2875:2875] CHIP:SPL: Capabilities:  0x02 (BLE)
+          [1653997840.458218][2875:2875] CHIP:SPL: Discriminator: 3840
+          [1653997840.458237][2875:2875] CHIP:SPL: Passcode:      20202021
+          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$
       disabled: true
 
     - label:
@@ -98,6 +109,19 @@ tests:
           [1651103447.175998][8940:8940] CHIP:DL:   Device Type: 65535 (0xFFFF)
           [1651103447.176023][8940:8940] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
           [1651103447.176084][8940:8940] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
+
+
+          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
+          [1653998683.950764][2924:2924] CHIP:SPL: Parsing base38Representation: MT:-24J029Q00KA0648G00
+          [1653998683.951071][2924:2924] CHIP:SPL: Version:       0
+          [1653998683.951203][2924:2924] CHIP:SPL: VendorID:      65521
+          [1653998683.951256][2924:2924] CHIP:SPL: ProductID:     32769
+          [1653998683.951305][2924:2924] CHIP:SPL: Custom flow:   2    (CUSTOM)
+          [1653998683.951357][2924:2924] CHIP:SPL: Capabilities:  0x04 (On IP network)
+          [1653998683.951451][2924:2924] CHIP:SPL: Discriminator: 3840
+          [1653998683.951498][2924:2924] CHIP:SPL: Passcode:      20202021
+          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$
+          "
       disabled: true
 
     - label:

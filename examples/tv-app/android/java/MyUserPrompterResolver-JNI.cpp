@@ -26,7 +26,7 @@
 using namespace chip;
 
 #define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
-    extern "C" JNIEXPORT RETURN JNICALL Java_com_tcl_chip_tvapp_UserPrompterResolver_##METHOD_NAME
+    extern "C" JNIEXPORT RETURN JNICALL Java_com_matter_tv_server_tvapp_UserPrompterResolver_##METHOD_NAME
 
 JNI_METHOD(void, OnPinCodeEntered)(JNIEnv *, jobject, jint jPinCode)
 {

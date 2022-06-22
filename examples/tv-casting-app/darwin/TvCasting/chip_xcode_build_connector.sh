@@ -107,7 +107,7 @@ declare -a args=(
 [[ $PLATFORM_FAMILY_NAME != macOS ]] && {
     args+=(
         'target_os="ios"'
-        'import("//config/ios/args.gni")'
+        'import("//examples/tv-casting-app/darwin/args.gni")'
     )
 }
 

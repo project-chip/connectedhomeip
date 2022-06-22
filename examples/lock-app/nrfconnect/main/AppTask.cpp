@@ -28,6 +28,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -59,6 +60,11 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 constexpr EndpointId kLockEndpointId = 1;
+
+// NOTE! This key is for test/certification only and should not be available in production devices.
+// Ideally, it should be a part of the factory data set.
+constexpr uint8_t kTestEventTriggerEnableKey[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                     0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
@@ -107,10 +113,8 @@ CHIP_ERROR AppTask::Init()
 
 #ifdef CONFIG_OPENTHREAD_MTD_SED
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#elif CONFIG_OPENTHREAD_MTD
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #else
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #endif
     if (err != CHIP_NO_ERROR)
     {
@@ -153,9 +157,11 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
+    static CommonCaseDeviceServerInitParams initParams;
+    static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(kTestEventTriggerEnableKey) };
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
@@ -167,6 +173,9 @@ CHIP_ERROR AppTask::Init()
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads.
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+
+    // Disable auto-relock time feature.
+    DoorLockServer::Instance().SetAutoRelockTime(kLockEndpointId, 0);
 
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
@@ -533,27 +542,38 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState(BoltLockManager::State state, BoltLockManager::OperationSource source)
 {
-    DlLockState lockState;
+    DlLockState newLockState;
 
     switch (state)
     {
     case BoltLockManager::State::kLockingCompleted:
-        lockState = DlLockState::kLocked;
+        newLockState = DlLockState::kLocked;
         break;
     case BoltLockManager::State::kUnlockingCompleted:
-        lockState = DlLockState::kUnlocked;
+        newLockState = DlLockState::kUnlocked;
         break;
     default:
-        lockState = DlLockState::kNotFullyLocked;
+        newLockState = DlLockState::kNotFullyLocked;
         break;
     }
 
-    SystemLayer().ScheduleLambda([lockState, source] {
-        LOG_INF("Updating LockState attribute");
+    SystemLayer().ScheduleLambda([newLockState, source] {
+        chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> currentLockState;
+        chip::app::Clusters::DoorLock::Attributes::LockState::Get(kLockEndpointId, currentLockState);
 
-        if (!DoorLockServer::Instance().SetLockState(kLockEndpointId, lockState, source))
+        if (currentLockState.IsNull())
         {
-            LOG_ERR("Failed to update LockState attribute");
+            // Initialize lock state with start value, but not invoke lock/unlock.
+            chip::app::Clusters::DoorLock::Attributes::LockState::Set(kLockEndpointId, newLockState);
+        }
+        else
+        {
+            LOG_INF("Updating LockState attribute");
+
+            if (!DoorLockServer::Instance().SetLockState(kLockEndpointId, newLockState, source))
+            {
+                LOG_ERR("Failed to update LockState attribute");
+            }
         }
     });
 }

@@ -677,14 +677,17 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _failSafeExpiryLengthSeconds = @(0);
+
+        _maxCumulativeFailsafeSeconds = @(0);
     }
     return self;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: failSafeExpiryLengthSeconds:%@; >", NSStringFromClass([self class]), _failSafeExpiryLengthSeconds];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: failSafeExpiryLengthSeconds:%@; maxCumulativeFailsafeSeconds:%@; >",
+                  NSStringFromClass([self class]), _failSafeExpiryLengthSeconds, _maxCumulativeFailsafeSeconds];
     return descriptionString;
 }
 
@@ -2098,27 +2101,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: transitionTime:%@; heatSetpoint:%@; coolSetpoint:%@; >",
                                              NSStringFromClass([self class]), _transitionTime, _heatSetpoint, _coolSetpoint];
-    return descriptionString;
-}
-
-@end
-
-@implementation CHIPIasAceClusterIasAceZoneStatusResult
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _zoneId = @(0);
-
-        _zoneStatus = @(0);
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: zoneId:%@; zoneStatus:%@; >", NSStringFromClass([self class]), _zoneId, _zoneStatus];
     return descriptionString;
 }
 

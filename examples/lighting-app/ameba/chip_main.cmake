@@ -37,6 +37,8 @@ list(
     ${chip_dir}/examples/lighting-app/ameba/main/Globals.cpp
     ${chip_dir}/examples/lighting-app/ameba/main/LEDWidget.cpp
     ${chip_dir}/examples/lighting-app/ameba/main/DsoHack.cpp
+
+    ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )
 
 add_library(
@@ -61,6 +63,7 @@ target_include_directories(
     ${chip_dir}/examples/lighting-app/lighting-common/include
     ${chip_dir}/examples/lighting-app/ameba/main/include
     ${chip_dir}/examples/platform/ameba
+    ${chip_dir}/examples/providers
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/
     ${chip_dir}/src/lib/

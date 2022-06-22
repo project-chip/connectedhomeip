@@ -17,4 +17,7 @@ public class MatterIntentConstants {
 
   public static final String EXTRA_DIRECTIVE_RESPONSE_PENDING_INTENT =
       "EXTRA_DIRECTIVE_RESPONSE_PENDING_INTENT";
+
+  public static final String EXTRA_COMMAND_ID = "EXTRA_COMMAND_ID";
+  public static final String EXTRA_CLUSTER_ID = "EXTRA_CLUSTER_ID";
 }

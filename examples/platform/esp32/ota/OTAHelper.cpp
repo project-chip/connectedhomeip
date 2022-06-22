@@ -19,21 +19,42 @@
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #include <platform/ESP32/OTAImageProcessorImpl.h>
 #include <system/SystemEvent.h>
+
+#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
+#include <lib/shell/Commands.h>
+#include <lib/shell/Engine.h>
+#include <lib/shell/commands/Help.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::DeviceLayer;
 using namespace chip;
 
+class CustomOTARequestorDriver : public DeviceLayer::ExtendedOTARequestorDriver
+{
+public:
+    bool CanConsent() override;
+};
+
 namespace {
 DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
-DefaultOTARequestorDriver gRequestorUser;
+CustomOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
+chip::Optional<bool> gRequestorCanConsent;
+static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
+chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
+
 } // namespace
+
+bool CustomOTARequestorDriver::CanConsent()
+{
+    return gRequestorCanConsent.ValueOr(DeviceLayer::ExtendedOTARequestorDriver::CanConsent());
+}
 
 static void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 {
@@ -43,6 +64,12 @@ static void InitOTARequestorHandler(System::Layer * systemLayer, void * appState
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
+    if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
+    {
+        gUserConsentProvider.SetUserConsentState(gUserConsentState);
+        gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
+    }
 }
 
 void OTAHelpers::InitOTARequestor()
@@ -50,3 +77,86 @@ void OTAHelpers::InitOTARequestor()
     chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec), InitOTARequestorHandler,
                                                 nullptr);
 }
+
+namespace chip {
+namespace Shell {
+namespace {
+
+Shell::Engine sSubShell;
+
+CHIP_ERROR UserConsentStateHandler(int argc, char ** argv)
+{
+    VerifyOrReturnError(argc == 1, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (strcmp(argv[0], "granted") == 0)
+    {
+        gUserConsentState = chip::ota::UserConsentState::kGranted;
+    }
+    else if (strcmp(argv[0], "denied") == 0)
+    {
+        gUserConsentState = chip::ota::UserConsentState::kDenied;
+    }
+    else if (strcmp(argv[0], "deferred") == 0)
+    {
+        gUserConsentState = chip::ota::UserConsentState::kObtaining;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR RequestorCanConsentHandler(int argc, char ** argv)
+{
+    VerifyOrReturnError(argc == 1, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (strcmp(argv[0], "true") == 0)
+    {
+        gRequestorCanConsent.SetValue(true);
+    }
+    else if (strcmp(argv[0], "false") == 0)
+    {
+        gRequestorCanConsent.SetValue(false);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTARequestorHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        sSubShell.ForEachCommand(PrintCommandHelp, nullptr);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR error = sSubShell.ExecCommand(argc, argv);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        streamer_printf(streamer_get(), "Error: %" CHIP_ERROR_FORMAT "\r\n", error.Format());
+    }
+
+    return error;
+}
+} // namespace
+
+void OTARequestorCommands::Register()
+{
+    // Register subcommands of the `OTARequestor` commands.
+    static const shell_command_t subCommands[] = {
+        { &UserConsentStateHandler, "userConsentState",
+          "Set UserConsentState for QueryImageCommand\n"
+          "Usage: OTARequestor userConsentState <granted/denied/deferred>" },
+        { &RequestorCanConsentHandler, "requestorCanConsent",
+          "Set requestorCanConsent for QueryImageCommand\n"
+          "Usage: OTARequestor requestorCanConsent <true/false>" },
+
+    };
+
+    sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));
+
+    // Register the root `OTA Requestor` command in the top-level shell.
+    static const shell_command_t otaRequestorCommand = { &OTARequestorHandler, "OTARequestor", "OTA Requestor commands" };
+
+    Engine::Root().RegisterCommands(&otaRequestorCommand, 1);
+}
+
+} // namespace Shell
+} // namespace chip

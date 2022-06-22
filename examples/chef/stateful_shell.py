@@ -26,6 +26,7 @@ _ENV_FILENAME = ".shell_env"
 _OUTPUT_FILENAME = ".shell_output"
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _TEE_WAIT_TIMEOUT = 3
+_ENV_EXCLUDE_SET = {"PS1"}
 
 TermColors = constants.TermColors
 
@@ -108,12 +109,18 @@ class StatefulShell:
             command_with_state = (
                 f"OLDPWD={self.env.get('OLDPWD', '')}; {cmd} {redirect}; RETCODE=$?; "
                 f"{save_env_cmd}; exit $RETCODE")
-            with subprocess.Popen(
-                [command_with_state],
-                env=self.env, cwd=self.cwd,
-                shell=True, executable=self.shell_app
-            ) as proc:
-                returncode = proc.wait()
+            try:
+                with subprocess.Popen(
+                    [command_with_state],
+                    env=self.env, cwd=self.cwd,
+                    shell=True, executable=self.shell_app
+                ) as proc:
+                    returncode = proc.wait()
+            except Exception:
+                print("Error.")
+                print(f"Cmd:\n{command_with_state}")
+                print(f"Envs:\n{self.env}")
+                raise
 
             # Load env state from envfile.
             with open(envfile_path, encoding="latin1") as f:
@@ -121,6 +128,8 @@ class StatefulShell:
                 env_entries = f.read().split("\n")
                 for entry in env_entries:
                     parts = entry.split("=")
+                    if parts[0] in _ENV_EXCLUDE_SET:
+                        continue
                     # Handle case where an env variable contains text with '='.
                     env_dict[parts[0]] = "=".join(parts[1:])
                 self.env = env_dict

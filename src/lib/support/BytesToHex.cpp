@@ -98,10 +98,16 @@ size_t HexToBytes(const char * src_hex, const size_t src_size, uint8_t * dest_by
 
 CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags)
 {
-    if ((src_bytes == nullptr) || (dest_hex == nullptr))
+    if ((src_bytes == nullptr) && (src_size != 0))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    if ((dest_hex == nullptr) && (dest_size_max != 0))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     if (src_size > ((SIZE_MAX - 1) / 2u))
     {
         // Output would overflow a size_t, let's bail out to avoid computation wraparounds below.

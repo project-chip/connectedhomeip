@@ -246,3 +246,8 @@
 	url = https://github.com/bouffalolab/bl_iot_sdk_matter.git
 	branch = bl602_release
 	platforms = bl602
+[submodule "third_party/nxp/libs/mbedtls/repo"]
+	path = third_party/nxp/libs/mbedtls/repo
+	url = https://github.com/NXPmicro/mbedtls.git
+	branch = tinycrypt-mbedtls-2.28
+	platforms = k32w0

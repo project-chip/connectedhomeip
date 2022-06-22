@@ -42,6 +42,9 @@ namespace Credentials {
 
 namespace {
 
+// As per specifications section 11.22.5.1. Constant RESP_MAX
+constexpr size_t kMaxResponseLength = 900;
+
 static const ByteSpan kTestPaaRoots[] = {
     TestCerts::sTestCert_PAA_FFF1_Cert,
     TestCerts::sTestCert_PAA_NoVID_Cert,
@@ -142,31 +145,7 @@ CHIP_ERROR GetCertificationDeclarationCertificate(const ByteSpan & skid, Mutable
     return CopySpanToMutableSpan(ByteSpan{ sCertChainLookupTable[certChainLookupTableIdx].mCertificate }, outCertificate);
 }
 
-class DefaultDACVerifier : public DeviceAttestationVerifier
-{
-public:
-    DefaultDACVerifier(const AttestationTrustStore * paaRootStore) : mAttestationTrustStore(paaRootStore) {}
-
-    void VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
-                                      Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
-
-    AttestationVerificationResult ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
-                                                                            ByteSpan & certDeclBuffer) override;
-
-    AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
-                                                                        const ByteSpan & firmwareInfo,
-                                                                        const DeviceInfoForAttestation & deviceInfo) override;
-
-    CHIP_ERROR VerifyNodeOperationalCSRInformation(const ByteSpan & nocsrElementsBuffer,
-                                                   const ByteSpan & attestationChallengeBuffer,
-                                                   const ByteSpan & attestationSignatureBuffer, const P256PublicKey & dacPublicKey,
-                                                   const ByteSpan & csrNonce) override;
-
-protected:
-    DefaultDACVerifier() {}
-
-    const AttestationTrustStore * mAttestationTrustStore;
-};
+} // namespace
 
 void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion)
@@ -182,6 +161,9 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
     VerifyOrExit(!info.attestationElementsBuffer.empty() && !info.attestationChallengeBuffer.empty() &&
                      !info.attestationSignatureBuffer.empty() && !info.paiDerBuffer.empty() && !info.dacDerBuffer.empty() &&
                      !info.attestationNonceBuffer.empty() && onCompletion != nullptr,
+                 attestationError = AttestationVerificationResult::kInvalidArgument);
+
+    VerifyOrExit(info.attestationElementsBuffer.size() <= kMaxResponseLength,
                  attestationError = AttestationVerificationResult::kInvalidArgument);
 
     // match DAC and PAI VIDs
@@ -410,6 +392,7 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
                             !attestationSignatureBuffer.empty() && !csrNonce.empty(),
                         CHIP_ERROR_INVALID_ARGUMENT);
 
+    VerifyOrReturnError(nocsrElementsBuffer.size() <= kMaxResponseLength, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(csrNonce.size() == Controller::kCSRNonceLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     ByteSpan csrSpan;
@@ -419,6 +402,8 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
     ByteSpan vendorReserved3Span;
     ReturnErrorOnFailure(DeconstructNOCSRElements(nocsrElementsBuffer, csrSpan, csrNonceSpan, vendorReserved1Span,
                                                   vendorReserved2Span, vendorReserved3Span));
+
+    VerifyOrReturnError(csrNonceSpan.size() == Controller::kCSRNonceLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Verify that Nonce matches with what we sent
     VerifyOrReturnError(csrNonceSpan.data_equal(csrNonce), CHIP_ERROR_INVALID_ARGUMENT);
@@ -433,8 +418,6 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
 
     return CHIP_NO_ERROR;
 }
-
-} // namespace
 
 const AttestationTrustStore * GetTestAttestationTrustStore()
 {

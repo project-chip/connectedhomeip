@@ -67,8 +67,11 @@ tests:
 
     #Issue 17997
     - label: "TH1 reads BasicCommissioningInfo attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "BasicCommissioningInfo"
       response:
-          value: { FailSafeExpiryLengthSeconds: 60 }
+          value:
+              {
+                  FailSafeExpiryLengthSeconds: 60,
+                  MaxCumulativeFailsafeSeconds: 900,
+              }

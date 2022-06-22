@@ -310,15 +310,6 @@ static constexpr ClusterId Id = 0x00000428;
 namespace SodiumConcentrationMeasurement {
 static constexpr ClusterId Id = 0x00000429;
 } // namespace SodiumConcentrationMeasurement
-namespace IasZone {
-static constexpr ClusterId Id = 0x00000500;
-} // namespace IasZone
-namespace IasAce {
-static constexpr ClusterId Id = 0x00000501;
-} // namespace IasAce
-namespace IasWd {
-static constexpr ClusterId Id = 0x00000502;
-} // namespace IasWd
 namespace WakeOnLan {
 static constexpr ClusterId Id = 0x00000503;
 } // namespace WakeOnLan
