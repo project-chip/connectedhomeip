@@ -139,6 +139,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         }
     }
 }
+
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
@@ -236,7 +237,7 @@ void ConnectivityManagerImpl::DriveStationState()
         // Ensure that the WFX is started.
         if ((serr = wfx_wifi_start()) != SL_STATUS_OK)
         {
-            ChipLogError(DeviceLayer, "WFX_wifi_start: FAIL: %s", chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "wfx_wifi_start() failed: %s", chip::ErrorStr(err));
             return;
         }
         // Ensure that station mode is enabled in the WFX WiFi layer.
@@ -314,7 +315,7 @@ void ConnectivityManagerImpl::DriveStationState()
                     ChipLogProgress(DeviceLayer, "Attempting to connect WiFi");
                     if ((serr = wfx_connect_to_ap()) != SL_STATUS_OK)
                     {
-                        ChipLogError(DeviceLayer, "wfx_connect_to_ap failed");
+                        ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
                     }
                     SuccessOrExit(serr);
 
@@ -368,6 +369,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
 
     UpdateInternetConnectivityState();
 }
+
 void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, void * aAppState)
 {
     sInstance.DriveStationState();
@@ -394,60 +396,10 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     // If the WiFi station is currently in the connected state...
     if (mWiFiStationState == kWiFiStationState_Connected)
     {
-#if 1 //! defined (SL_WF200) || (SL_WF200 == 0)
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
         haveIPv4Conn = wfx_have_ipv4_addr(SL_WFX_STA_INTERFACE);
-#if (CHIP_DEVICE_CONFIG_ENABLE_IPV6)
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
         haveIPv6Conn = wfx_have_ipv6_addr(SL_WFX_STA_INTERFACE);
-#endif
-        /* TODO  - haveIPv6Conn */
-#else  /* Old code that needed LWIP and its internals */
-        // Get the LwIP netif for the WiFi station interface.
-        struct netif * netif = Internal::WFXUtils::GetStationNetif();
-
-        // If the WiFi station interface is up...
-        if (netif != NULL && netif_is_up(netif) && netif_is_link_up(netif))
-        {
-            // // Check if a DNS server is currently configured.  If so...
-            // TODO
-            // ip_addr_t dnsServerAddr = *dns_getserver(0);
-            // if (!ip_addr_isany_val(dnsServerAddr))
-            if (1)
-            {
-                // If the station interface has been assigned an IPv4 address, and has
-                // an IPv4 gateway, then presume that the device has IPv4 Internet
-                // connectivity.
-                if (!ip4_addr_isany_val(*netif_ip4_addr(netif)) && !ip4_addr_isany_val(*netif_ip4_gw(netif)))
-                {
-                    haveIPv4Conn = true;
-                    char addrStr[INET_ADDRSTRLEN];
-                    // TODO: change the code to using IPv6 address
-                    sprintf(addrStr, "%d.%d.%d.%d", (int) (netif->ip_addr.u_addr.ip4.addr & 0xff),
-                            (int) ((netif->ip_addr.u_addr.ip4.addr >> 8) & 0xff),
-                            (int) ((netif->ip_addr.u_addr.ip4.addr >> 16) & 0xff),
-                            (int) ((netif->ip_addr.u_addr.ip4.addr >> 24) & 0xff));
-                    IPAddress::FromString(addrStr, addr);
-                }
-
-                // TODO
-                // Search among the IPv6 addresses assigned to the interface for a Global Unicast
-                // address (2000::/3) that is in the valid state.  If such an address is found...
-                // for (uint8_t i = 0; i < LWIP_IPV6_NUM_ADDRESSES; i++)
-                // {
-                //     if (ip6_addr_isglobal(netif_ip6_addr(netif, i)) && ip6_addr_isvalid(netif_ip6_addr_state(netif, i)))
-                //     {
-                //         // Determine if there is a default IPv6 router that is currently reachable
-                //         // via the station interface.  If so, presume for now that the device has
-                //         // IPv6 connectivity.
-                //         struct netif * found_if = nd6_find_route(IP6_ADDR_ANY6);
-                //         if (found_if && netif->num == found_if->num)
-                //         {
-                //             haveIPv6Conn = true;
-                //         }
-                //     }
-                // }
-            }
-        }
-#endif /* OLD-Code */
     }
 
     // If the internet connectivity state has changed...
