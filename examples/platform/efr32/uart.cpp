@@ -44,7 +44,6 @@ extern "C" {
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #endif
 
-
 #ifdef EFR32MG24
 #define HELPER1(x) EUSART##x##_RX_IRQn
 #else
