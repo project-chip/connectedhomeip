@@ -52,6 +52,7 @@ shared_library("ChipDeviceCtrl") {
       "ChipDeviceController-ScriptDevicePairingDelegate.h",
       "ChipDeviceController-StorageDelegate.cpp",
       "ChipDeviceController-StorageDelegate.h",
+      "ChipDeviceController-IssueNocChain.cpp",
       "OpCredsBinding.cpp",
       "chip/clusters/attribute.cpp",
       "chip/clusters/command.cpp",

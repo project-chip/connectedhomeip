@@ -66,6 +66,11 @@ public:
                                         const ByteSpan & DAC, const ByteSpan & PAI,
                                         Callback::Callback<OnNOCChainGeneration> * onCompletion) = 0;
 
+    virtual CHIP_ERROR GenerateChipNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
+                                            const ByteSpan & attestationSignature, const ByteSpan & attestationChallenge,
+                                            const ByteSpan & DAC, const ByteSpan & PAI,
+                                            Callback::Callback<OnNOCChainGeneration> * onCompletion) = 0;
+
     /**
      *   This function sets the node ID for which the next NOC Chain would be requested. The node ID is
      *   provided as a hint, and the delegate implementation may chose to ignore it and pick node ID of
