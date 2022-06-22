@@ -34,8 +34,8 @@
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/internal/BLEManager.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/internal/BLEManager.h>
 
 #include "esp_bt.h"
 #include "esp_bt_main.h"
