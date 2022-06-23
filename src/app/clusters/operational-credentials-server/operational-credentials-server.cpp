@@ -572,10 +572,11 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
     err = fabricTable.SetFabricLabel(ourFabricIndex, label);
     VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
 
+    finalStatus = Status::Success
+
     // Succeeded at updating the label, mark Fabrics table changed.
     MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
                                            OperationalCredentials::Attributes::Fabrics::Id);
-
 exit:
     if (finalStatus == Status::Success)
     {
