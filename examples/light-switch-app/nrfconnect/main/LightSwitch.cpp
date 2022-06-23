@@ -104,7 +104,7 @@ void LightSwitch::GenericSwitchReleasePress()
     DeviceLayer::SystemLayer().ScheduleLambda([this] {
         // Release moves Position from 1 (press) to 0 (idle)
         uint8_t previousPosition = 1;
-        uint8_t newPosition = 0;
+        uint8_t newPosition      = 0;
 
         Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, newPosition);
         // ShortRelease event takes previousPosition as event data
