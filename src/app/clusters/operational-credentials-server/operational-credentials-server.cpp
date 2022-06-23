@@ -127,7 +127,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadNOCs(EndpointId endpoint, Attri
 
     return aEncoder.EncodeList([accessingFabricIndex](const auto & encoder) -> CHIP_ERROR {
         const auto & fabricTable = Server::GetInstance().GetFabricTable();
-        for (auto & fabricInfo : fabricTable)
+        for (const auto & fabricInfo : fabricTable)
         {
             Clusters::OperationalCredentials::Structs::NOCStruct::Type noc;
             uint8_t nocBuf[kMaxCHIPCertLength];
@@ -175,7 +175,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         const auto & fabricTable = Server::GetInstance().GetFabricTable();
 
-        for (auto & fabricInfo : fabricTable)
+        for (const auto & fabricInfo : fabricTable)
         {
             Clusters::OperationalCredentials::Structs::FabricDescriptor::Type fabricDescriptor;
             FabricIndex fabricIndex = fabricInfo.GetFabricIndex();
@@ -204,7 +204,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId end
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         const auto & fabricTable = Server::GetInstance().GetFabricTable();
 
-        for (auto & fabricInfo : fabricTable)
+        for (const auto & fabricInfo : fabricTable)
         {
             uint8_t certBuf[kMaxCHIPCertLength];
             MutableByteSpan cert{ certBuf };

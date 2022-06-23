@@ -135,11 +135,6 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
         const chip::Controller::DeviceCommissioner * controller = it->second.get();
 
         chip::FabricIndex fabricIndex = controller->GetFabricIndex();
-        if (fabricIndex == chip::kUndefinedFabricIndex)
-        {
-            continue;
-        }
-
         uint8_t compressed_fabric_id[sizeof(uint64_t)];
         chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
         ReturnLogErrorOnFailure(controller->GetCompressedFabricIdBytes(compressed_fabric_id_span));

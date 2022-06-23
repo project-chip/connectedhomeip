@@ -413,6 +413,8 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
 
+    size_t numFabricsIterated = 0;
+
     size_t numStorageKeysAtStart = storage.GetNumKeys();
 
     // Sequence 1: Add node ID 55 on fabric 11, using externally owned key and no ICAC --> Yield fabricIndex 1
@@ -425,6 +427,24 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
                                    .GetStatus());
         ByteSpan rcac = fabric11CertAuthority.GetRcac();
         ByteSpan noc  = fabric11CertAuthority.GetNoc();
+
+        // Validate iterator sees nothing yet
+        {
+            numFabricsIterated = 0;
+            bool saw1 = false;
+            for (const auto & iterFabricInfo : fabricTable)
+            {
+                ++numFabricsIterated;
+                if (iterFabricInfo.GetFabricIndex() == 1)
+                {
+                    saw1 = true;
+                }
+            }
+
+            NL_TEST_ASSERT(inSuite, numFabricsIterated == 0);
+            NL_TEST_ASSERT(inSuite, saw1 == false);
+        }
+
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac));
         FabricIndex newFabricIndex = kUndefinedFabricIndex;
         bool keyIsExternallyOwned  = true;
@@ -438,6 +458,25 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
 
         // No storage yet
         NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == numStorageKeysAtStart);
+
+        // Validate iterator sees pending
+        {
+            numFabricsIterated = 0;
+            bool saw1 = false;
+            for (const auto & iterFabricInfo : fabricTable)
+            {
+                ++numFabricsIterated;
+                if (iterFabricInfo.GetFabricIndex() == 1)
+                {
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetNodeId() == nodeId);
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetFabricId() == fabricId);
+                    saw1 = true;
+                }
+            }
+
+            NL_TEST_ASSERT(inSuite, numFabricsIterated == 1);
+            NL_TEST_ASSERT(inSuite, saw1 == true);
+        }
 
         // Commit, now storage should have keys
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.CommitPendingFabricData());
@@ -472,6 +511,25 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(newFabricIndex, ByteSpan{ message }, sig));
         NL_TEST_ASSERT_SUCCESS(inSuite,
                                fabric11Node55Keypair.Pubkey().ECDSA_validate_msg_signature(&message[0], sizeof(message), sig));
+
+        // Validate iterator sees committed
+        {
+            numFabricsIterated = 0;
+            bool saw1 = false;
+            for (const auto & iterFabricInfo : fabricTable)
+            {
+                ++numFabricsIterated;
+                if (iterFabricInfo.GetFabricIndex() == 1)
+                {
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetNodeId() == nodeId);
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetFabricId() == fabricId);
+                    saw1 = true;
+                }
+            }
+
+            NL_TEST_ASSERT(inSuite, numFabricsIterated == 1);
+            NL_TEST_ASSERT(inSuite, saw1 == true);
+        }
     }
 
     size_t numStorageAfterFirstAdd = storage.GetNumKeys();
@@ -543,6 +601,33 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(newFabricIndex, ByteSpan{ message }, sig));
             NL_TEST_ASSERT_SUCCESS(inSuite, nocPubKey.ECDSA_validate_msg_signature(&message[0], sizeof(message), sig));
         }
+
+        // Verify we can now see 2 fabrics with the iterator
+        {
+            numFabricsIterated = 0;
+            bool saw1 = false;
+            bool saw2 = false;
+            for (const auto & iterFabricInfo : fabricTable)
+            {
+                ++numFabricsIterated;
+                if (iterFabricInfo.GetFabricIndex() == 1)
+                {
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetNodeId() == 55);
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetFabricId() == 11);
+                    saw1 = true;
+                }
+                if (iterFabricInfo.GetFabricIndex() == 2)
+                {
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetNodeId() == 999);
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetFabricId() == 44);
+                    saw2 = true;
+                }
+            }
+
+            NL_TEST_ASSERT(inSuite, numFabricsIterated == 2);
+            NL_TEST_ASSERT(inSuite, saw1 == true);
+            NL_TEST_ASSERT(inSuite, saw2 == true);
+        }
     }
 
     size_t numStorageAfterSecondAdd = storage.GetNumKeys();
@@ -571,6 +656,33 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
 
         // No storage yet
         NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == numStorageAfterSecondAdd);
+
+        // Validate iterator sees the pending data
+        {
+            numFabricsIterated = 0;
+            bool saw1 = false;
+            bool saw2 = false;
+            for (const auto & iterFabricInfo : fabricTable)
+            {
+                ++numFabricsIterated;
+                if (iterFabricInfo.GetFabricIndex() == 1)
+                {
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetNodeId() == 55);
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetFabricId() == 11);
+                    saw1 = true;
+                }
+                if (iterFabricInfo.GetFabricIndex() == 2)
+                {
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetNodeId() == 1000);
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetFabricId() == 44);
+                    saw2 = true;
+                }
+            }
+
+            NL_TEST_ASSERT(inSuite, numFabricsIterated == 2);
+            NL_TEST_ASSERT(inSuite, saw1 == true);
+            NL_TEST_ASSERT(inSuite, saw2 == true);
+        }
 
         // Commit, now storage should have keys
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.CommitPendingFabricData());
@@ -610,6 +722,33 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
 
             NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(fabricIndex, ByteSpan{ message }, sig));
             NL_TEST_ASSERT_SUCCESS(inSuite, nocPubKey.ECDSA_validate_msg_signature(&message[0], sizeof(message), sig));
+        }
+
+        // Validate iterator sees the committed update
+        {
+            numFabricsIterated = 0;
+            bool saw1 = false;
+            bool saw2 = false;
+            for (const auto & iterFabricInfo : fabricTable)
+            {
+                ++numFabricsIterated;
+                if (iterFabricInfo.GetFabricIndex() == 1)
+                {
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetNodeId() == 55);
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetFabricId() == 11);
+                    saw1 = true;
+                }
+                if (iterFabricInfo.GetFabricIndex() == 2)
+                {
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetNodeId() == 1000);
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetFabricId() == 44);
+                    saw2 = true;
+                }
+            }
+
+            NL_TEST_ASSERT(inSuite, numFabricsIterated == 2);
+            NL_TEST_ASSERT(inSuite, saw1 == true);
+            NL_TEST_ASSERT(inSuite, saw2 == true);
         }
     }
 
@@ -682,9 +821,32 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(2, ByteSpan{ message }, sig));
             NL_TEST_ASSERT_SUCCESS(inSuite, nocPubKey.ECDSA_validate_msg_signature(&message[0], sizeof(message), sig));
         }
-    }
 
-    // TODO: Validate iterator
+        // Validate iterator only sees the remaining fabric
+        {
+            numFabricsIterated = 0;
+            bool saw1 = false;
+            bool saw2 = false;
+            for (const auto & iterFabricInfo : fabricTable)
+            {
+                ++numFabricsIterated;
+                if (iterFabricInfo.GetFabricIndex() == 1)
+                {
+                    saw1 = true;
+                }
+                if (iterFabricInfo.GetFabricIndex() == 2)
+                {
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetNodeId() == 1000);
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetFabricId() == 44);
+                    saw2 = true;
+                }
+            }
+
+            NL_TEST_ASSERT(inSuite, numFabricsIterated == 1);
+            NL_TEST_ASSERT(inSuite, saw1 == false);
+            NL_TEST_ASSERT(inSuite, saw2 == true);
+        }
+    }
 }
 
 void TestAddMultipleSameRootDifferentFabricId(nlTestSuite * inSuite, void * inContext)
