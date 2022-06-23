@@ -66,7 +66,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     ReturnErrorOnFailure(mStorage.ReadValueBin(key, buf.Get(), read_size, read_size));
 
     size_t total_size_to_read = read_size - offset_bytes;
-    size_t copy_size = std::min(value_size, total_size_to_read);
+    size_t copy_size          = std::min(value_size, total_size_to_read);
     if (read_bytes_size != nullptr)
     {
         *read_bytes_size = copy_size;
