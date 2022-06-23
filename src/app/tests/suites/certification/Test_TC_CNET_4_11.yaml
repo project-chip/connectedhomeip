@@ -1,0 +1,105 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    11.4.11. [TC-CNET-4.11] [Wi-Fi] Verification for ConnectNetwork Command
+    [DUT-Server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH sends ArmFailSafe command to the DUT"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
+
+          [1653480530.006012][27845:27850] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1653480530.006109][27845:27850] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1653480530.006209][27845:27850] CHIP:TOO:   ArmFailSafeResponse: {
+          [1653480530.006278][27845:27850] CHIP:TOO:     errorCode: 0
+          [1653480530.006328][27845:27850] CHIP:TOO:     debugText:
+          [1653480530.006374][27845:27850] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "TH1 sends AddOrUpdateWiFiNetwork command to the DUT with SSID
+          argument value as 'Userwifi_ssid', Credentials argument value as
+          'Userwifi_Credentials' and Breadcrumb argument value as 1"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
+
+          Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1653480530.517643][27851:27856] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [165
+          3480530.517748][27851:27856] CHIP:TOO:   NetworkConfigResponse: {
+          [1653480530.517808][27851:27856] CHIP:TOO:     networkingStatus: 0
+          [1653480530.517854][27851:27856] CHIP:TOO:     networkIndex: 0
+          [1653480530.517894][27851:27856] CHIP:TOO:    }
+      disabled: true
+
+    - label: "TH1 reads Networks attribute from the DUT"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 1 0
+
+          [1653480531.027668][27857:27863] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3424382863
+          [1653480531.027835][27857:27863] CHIP:TOO:   Networks: 1 entries
+          [1653480531.027946][27857:27863] CHIP:TOO:     [1]: {
+          [1653480531.028015][27857:27863] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1653480531.028073][27857:27863] CHIP:TOO:       Connected: TRUE
+          [1653480531.028128][27857:27863] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "TH saves record current wall clock time with seconds resolution as
+          CT1"
+      verification: |
+          TH1 saves the timestamp as CT1
+      disabled: true
+
+    - label:
+          "TH sends ConnectNetwork command to the DUT with NetworkID argument
+          value as 'Userwifi_ssid1' and Breadcrumb argument value as 1"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
+
+          Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
+          [1653480537.209041][27864:27869] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
+          [1653480537.209113][27864:27869] CHIP:TOO:   ConnectNetworkResponse: {
+          [1653480537.209154][27864:27869] CHIP:TOO:     networkingStatus: 0
+          [1653480537.209179][27864:27869] CHIP:TOO:     errorValue: null
+          [1653480537.209201][27864:27869] CHIP:TOO:    }
+          [1653480537.209240][27864:27869] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "TH saves record current wall clock time with seconds resolution as
+          CT2"
+      verification: |
+          TH1 saves the timestamp as CT2
+      disabled: true
+
+    - label: "TH reads Networks attribute from the DUT"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 1 0
+
+          [1653481261.622658][27982:27987] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3424382863
+          [1653481261.622821][27982:27987] CHIP:TOO:   Networks: 1 entries
+          [1653481261.622927][27982:27987] CHIP:TOO:     [1]: {
+          [1653481261.622996][27982:27987] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1653481261.623056][27982:27987] CHIP:TOO:       Connected: TRUE
+          [1653481261.623112][27982:27987] CHIP:TOO:      }
+      disabled: true

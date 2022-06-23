@@ -482,7 +482,7 @@ CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom)
+CHIP_ERROR CASESession::FindLocalNodeFromDestinationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom)
 {
     VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -604,13 +604,13 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     }
 
     // Attempt to match the initiator's desired destination based on local fabric table.
-    err = FindLocalNodeFromDestionationId(destinationIdentifier, initiatorRandom);
+    err = FindLocalNodeFromDestinationId(destinationIdentifier, initiatorRandom);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(SecureChannel, "CASE matched destination ID: fabricIndex %u, NodeID 0x" ChipLogFormatX64,
                         static_cast<unsigned>(mFabricIndex), ChipLogValueX64(mLocalNodeId));
 
-        // Side-effect of FindLocalNodeFromDestionationId success was that mFabricIndex/mLocalNodeId are now
+        // Side-effect of FindLocalNodeFromDestinationId success was that mFabricIndex/mLocalNodeId are now
         // set to the local fabric and associated NodeId that was targeted by the initiator.
     }
     else

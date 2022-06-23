@@ -29,6 +29,7 @@ import re
 
 import constants
 import stateful_shell
+from sample_app_util import zap_file_parser
 
 TermColors = constants.TermColors
 
@@ -38,11 +39,8 @@ _CHEF_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 _REPO_BASE_PATH = os.path.join(_CHEF_SCRIPT_PATH, "../../")
 _DEVICE_FOLDER = os.path.join(_CHEF_SCRIPT_PATH, "devices")
 _DEVICE_LIST = [file[:-4] for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap")]
-_CHEF_ZZZ_ROOT = os.path.join(_CHEF_SCRIPT_PATH, "zzz_generated")
-_CI_DEVICE_MANIFEST_NAME = "INPUTMD5.txt"
-_CI_ZAP_MANIFEST_NAME = "ZAPSHA.txt"
-_CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_meta.json")
-_CI_ALLOW_LIST = ["rootnode_dimmablelight_gY80DaqEUL"]
+_CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
+_CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 
 gen_dir = ""  # Filled in after sample app type is read from args.
 
@@ -98,64 +96,9 @@ def check_python_version() -> None:
         exit(1)
 
 
-def check_zap() -> str:
-    """Produces SHA of ZAP submodule for current HEAD.
-
-    Returns:
-      SHA of zap submodule.
-    """
-    shell.run_cmd(f"cd {_REPO_BASE_PATH}")
-    branch = shell.run_cmd("git rev-parse --abbrev-ref HEAD",
-                           return_cmd_output=True)
-    branch = branch.replace("\n", "")
-    command = f"git ls-tree {branch} third_party/zap/repo"
-    zap_commit = shell.run_cmd(command, return_cmd_output=True)
-    zap_commit = zap_commit.split(" ")[2]
-    zap_commit = zap_commit[:zap_commit.index("\t")]
-    flush_print(f"Found zap commit: {zap_commit}")
-    return zap_commit
-
-
-def generate_device_manifest(
-        write_manifest_file: bool = False) -> Dict[str, Any]:
-    """Produces dictionary containing md5 of device dir zap files.
-
-    Args:
-        write_manifest_file: Serialize manifest in tree.
-    Returns:
-        Dict containing MD5 of device dir zap files.
-    """
-    ci_manifest = {"devices": {}}
-    devices_manifest = ci_manifest["devices"]
-    zap_sha = check_zap()
-    ci_manifest["zap_commit"] = zap_sha
-    for device_name in _DEVICE_LIST:
-        device_file_path = os.path.join(_DEVICE_FOLDER, device_name + ".zap")
-        with open(device_file_path, "rb") as device_file:
-            device_file_data = device_file.read()
-        device_file_md5 = hashlib.md5(device_file_data).hexdigest()
-        devices_manifest[device_name] = device_file_md5
-        flush_print(f"Current digest for {device_name} : {device_file_md5}")
-        if write_manifest_file:
-            device_zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device_name)
-            device_zzz_md5_file = os.path.join(device_zzz_dir, _CI_DEVICE_MANIFEST_NAME)
-            with open(device_zzz_md5_file, "w+") as md5_file:
-                md5_file.write(device_file_md5)
-            device_zzz_zap_sha_file = os.path.join(device_zzz_dir, _CI_ZAP_MANIFEST_NAME)
-            with open(device_zzz_zap_sha_file, "w+") as zap_sha_file:
-                zap_sha_file.write(zap_sha)
-    return ci_manifest
-
-
 def load_cicd_config() -> Dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
         config = json.loads(config_file.read())
-    for platform_name, platform_config in config.items():
-        has_build_dir = "build_dir" in platform_config
-        has_plat_label = "platform_label" in platform_config
-        if not has_build_dir or not has_plat_label:
-            flush_print(f"{platform_name} CICD config missing build_dir or platform_label")
-            exit(1)
     return config
 
 
@@ -169,9 +112,132 @@ def flush_print(
         with_border: Add boarder above and below to_print.
     """
     if with_border:
-        border = ('-' * 64) + '\n'
+        border = ('-' * len(to_print)) + '\n'
         to_print = f"{border}{to_print}\n{border}"
     print(to_print, flush=True)
+
+
+def unwrap_cmd(cmd: str) -> str:
+    """Dedent and replace new line with space."""
+    return textwrap.dedent(cmd).replace("\n", " ")
+
+
+def bundle(platform: str, device_name: str) -> None:
+    """Filters files from the build output folder for CD.
+    Clears _CD_STAGING_DIR.
+    Calls bundle_{platform}(device_name).
+    exit(1) for missing bundle_{platform}.
+    Adds .matter files into _CD_STAGING_DIR.
+    Generates metadata for device in _CD_STAGING_DIR.
+
+    Args:
+        platform: The platform to bundle.
+        device_name: The example to bundle.
+    """
+    matter_file = f"{device_name}.matter"
+    zap_file = os.path.join(_DEVICE_FOLDER, f"{device_name}.zap")
+    flush_print(f"Bundling {platform}", with_border=True)
+    flush_print(f"Cleaning {_CD_STAGING_DIR}")
+    shutil.rmtree(_CD_STAGING_DIR, ignore_errors=True)
+    os.mkdir(_CD_STAGING_DIR)
+    if platform == "linux":
+        bundle_linux(device_name)
+    elif platform == "nrfconnect":
+        bundle_nrfconnect(device_name)
+    elif platform == "esp32":
+        bundle_esp32(device_name)
+    else:
+        flush_print(f"No bundle function for {platform}!")
+        exit(1)
+    flush_print(f"Copying {matter_file}")
+    src_item = os.path.join(_REPO_BASE_PATH,
+                            "zzz_generated",
+                            "chef-"+device_name,
+                            "zap-generated",
+                            matter_file)
+    dest_item = os.path.join(_CD_STAGING_DIR, matter_file)
+    shutil.copy(src_item, dest_item)
+    flush_print(f"Generating metadata for {device_name}")
+    metadata_file = zap_file_parser.generate_hash_metadata_file(zap_file)
+    metadata_dest = os.path.join(_CD_STAGING_DIR,
+                                 os.path.basename(metadata_file))
+    shutil.copy(metadata_file, metadata_dest)
+
+
+#
+# Per-platform bundle functions
+#
+
+
+def bundle_linux(device_name: str) -> None:
+    linux_root = os.path.join(_CHEF_SCRIPT_PATH,
+                              "linux",
+                              "out")
+    map_file_name = f"{device_name}.map"
+    src_item = os.path.join(linux_root, device_name)
+    dest_item = os.path.join(_CD_STAGING_DIR, device_name)
+    shutil.copy(src_item, dest_item)
+    src_item = os.path.join(linux_root, map_file_name)
+    dest_item = os.path.join(_CD_STAGING_DIR, map_file_name)
+    shutil.copy(src_item, dest_item)
+
+
+def bundle_nrfconnect(device_name: str) -> None:
+    zephyr_exts = ["elf", "map", "hex"]
+    script_files = ["firmware_utils.py",
+                    "nrfconnect_firmware_utils.py"]
+    nrf_root = os.path.join(_CHEF_SCRIPT_PATH,
+                            "nrfconnect",
+                            "build",
+                            "zephyr")
+    scripts_root = os.path.join(_REPO_BASE_PATH,
+                                "scripts",
+                                "flashing")
+    gen_script_path = os.path.join(scripts_root,
+                                   "gen_flashing_script.py")
+    sub_dir = os.path.join(_CD_STAGING_DIR, device_name)
+    os.mkdir(sub_dir)
+    for zephyr_ext in zephyr_exts:
+        input_base = f"zephyr.{zephyr_ext}"
+        output_base = f"{device_name}.{zephyr_ext}"
+        src_item = os.path.join(nrf_root, input_base)
+        if zephyr_ext == "hex":
+            dest_item = os.path.join(sub_dir, output_base)
+        else:
+            dest_item = os.path.join(_CD_STAGING_DIR, output_base)
+        shutil.copy(src_item, dest_item)
+    for script_file in script_files:
+        src_item = os.path.join(scripts_root, script_file)
+        dest_item = os.path.join(sub_dir, script_file)
+        shutil.copy(src_item, dest_item)
+    shell.run_cmd(f"cd {sub_dir}")
+    command = f"""\
+    python3 {gen_script_path} nrfconnect
+    --output {device_name}.flash.py
+    --application {device_name}.hex"""
+    shell.run_cmd(unwrap_cmd(command))
+
+
+def bundle_esp32(device_name: str) -> None:
+    """Reference example for bundle_{platform}
+    functions, which should copy/move files from a build
+    output dir into _CD_STAGING_DIR to be archived.
+
+    Args:
+        device_name: The device to bundle.
+    """
+    esp_root = os.path.join(_CHEF_SCRIPT_PATH,
+                            "esp32",
+                            "build")
+    manifest_file = os.path.join(esp_root,
+                                 "chip-shell.flashbundle.txt")
+    with open(manifest_file) as manifest:
+        for item in manifest:
+            item = item.strip()
+            src_item = os.path.join(esp_root, item)
+            dest_item = os.path.join(_CD_STAGING_DIR, item)
+            os.makedirs(os.path.dirname(dest_item), exist_ok=True)
+            shutil.copy(src_item, dest_item)
 
 
 def main(argv: Sequence[str]) -> None:
@@ -252,66 +318,16 @@ def main(argv: Sequence[str]) -> None:
                       action="store_true", dest="do_rpc_console")
     parser.add_option("-y", "--tty", help="Enumerated USB tty/serial interface enumerated for your physical device. E.g.: /dev/ACM0",
                       dest="tty", metavar="TTY", default=None)
-    parser.add_option("", "--generate_zzz", help="Populates zzz_generated/chef/<DEVICE_TYPE>/zap-generated with output of ZAP tool for every device in examples/chef/devices. If this flag is set, all other arguments are ignored except for --bootstrap_zap and --validate_zzz.",
-                      dest="generate_zzz", action="store_true")
-    parser.add_option("", "--validate_zzz", help="Checks if cached ZAP output needs to be regenrated, for use in CI. If this flag is set, all other arguments are ignored.",
-                      dest="validate_zzz", action="store_true")
     parser.add_option("", "--use_zzz", help="Use pre generated output from the ZAP tool found in the zzz_generated folder. Used to decrease execution time of CI/CD jobs",
                       dest="use_zzz", action="store_true")
     parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Uses --use_zzz. Chef exits after completion.",
                       dest="build_all", action="store_true")
     parser.add_option(
-        "", "--ci", help="Builds Chef examples defined in _CI_ALLOW_LIST. Uses --use_zzz. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
+        "", "--ci", help="Builds Chef examples defined in cicd_config. Uses --use_zzz. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
 
     options, _ = parser.parse_args(argv)
 
     splash()
-
-    #
-    # Validate zzz_generated
-    #
-
-    if options.validate_zzz:
-        flush_print(f"Validating\n{_CHEF_ZZZ_ROOT}\n",
-                    with_border=True)
-        fix_instructions = textwrap.dedent("""\
-        Cached files out of date!
-        Please:
-          ./scripts/bootstrap.sh
-          source ./scripts/activate.sh
-          cd ./third_party/zap/repo
-          npm install
-          cd ../../..
-          ./examples/chef/chef.py --generate_zzz
-          git add examples/chef/zzz_generated
-        Ensure you are running with the latest version of ZAP from master!""")
-        ci_manifest = generate_device_manifest()
-        current_zap = ci_manifest["zap_commit"]
-        for device, device_md5 in ci_manifest["devices"].items():
-            zzz_dir = os.path.join(_CHEF_ZZZ_ROOT, device)
-            device_zap_sha_file = os.path.join(zzz_dir, _CI_ZAP_MANIFEST_NAME)
-            device_md5_file = os.path.join(zzz_dir, _CI_DEVICE_MANIFEST_NAME)
-            help_msg = f"{device}: {fix_instructions}"
-            if not os.path.exists(device_zap_sha_file):
-                flush_print(f"ZAP VERSION MISSING {help_msg}")
-                exit(1)
-            else:
-                with open(device_zap_sha_file) as zap_file:
-                    output_cached_zap_sha = zap_file.read()
-                if output_cached_zap_sha != current_zap:
-                    flush_print(f"ZAP VERSION MISMATCH {help_msg}")
-                    exit(1)
-            if not os.path.exists(device_md5_file):
-                flush_print(f"INPUT MD5 MISSING {help_msg}")
-                exit(1)
-            else:
-                with open(device_md5_file) as md5_file:
-                    output_cached_md5 = md5_file.read()
-                if output_cached_md5 != device_md5:
-                    flush_print(f"INPUT MD5 MISMATCH {help_msg}")
-                    exit(1)
-        flush_print("Cached ZAP output is up to date!")
-        exit(0)
 
     #
     # ZAP bootstrapping
@@ -320,12 +336,11 @@ def main(argv: Sequence[str]) -> None:
     if options.do_bootstrap_zap:
         if sys.platform == "linux" or sys.platform == "linux2":
             flush_print("Installing ZAP OS package dependencies")
-            install_deps_cmd = textwrap.dedent("""\
+            install_deps_cmd = """\
             sudo apt-get install node node-yargs npm
             libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp
-            libjpeg9-dev libgif-dev node-typescript""")
-            install_deps_cmd = install_deps_cmd.replace("\n", " ")
-            shell.run_cmd(install_deps_cmd)
+            libjpeg9-dev libgif-dev node-typescript"""
+            shell.run_cmd(unwrap_cmd(install_deps_cmd))
         if sys.platform == "darwin":
             flush_print("Installation of ZAP OS packages not supported on MacOS")
         if sys.platform == "win32":
@@ -337,49 +352,22 @@ def main(argv: Sequence[str]) -> None:
             f"cd {_REPO_BASE_PATH}/third_party/zap/repo/ && npm install")
 
     #
-    # Populate zzz_generated
-    #
-
-    if options.generate_zzz:
-        flush_print(f"Cleaning {_CHEF_ZZZ_ROOT}")
-        if not os.path.exists(_CHEF_ZZZ_ROOT):
-            flush_print(f"{_CHEF_ZZZ_ROOT} doesn't exist; creating")
-            os.mkdir(_CHEF_ZZZ_ROOT)
-        else:
-            flush_print(f"Deleting and recreating existing {_CHEF_ZZZ_ROOT}")
-            shutil.rmtree(_CHEF_ZZZ_ROOT)
-            os.mkdir(_CHEF_ZZZ_ROOT)
-        flush_print(f"Generating files in {_CHEF_ZZZ_ROOT} for all devices")
-        for device_name in _DEVICE_LIST:
-            flush_print(f"Generating files for {device_name}")
-            device_out_dir = os.path.join(_CHEF_ZZZ_ROOT,
-                                          device_name,
-                                          "zap-generated")
-            os.makedirs(device_out_dir)
-            shell.run_cmd(textwrap.dedent(f"""\
-            {_REPO_BASE_PATH}/scripts/tools/zap/generate.py \
-            {_CHEF_SCRIPT_PATH}/devices/{device_name}.zap -o {device_out_dir}"""))
-            shell.run_cmd(f"touch {device_out_dir}/af-gen-event.h")
-        generate_device_manifest(write_manifest_file=True)
-        exit(0)
-
-    #
     # CI
     #
 
     if options.ci:
-        for device_name in [d for d in _DEVICE_LIST if d in _CI_ALLOW_LIST]:
+        for device_name in [d for d in _DEVICE_LIST if d in cicd_config["ci_allow_list"]]:
             if options.build_target == "nrfconnect":
                 shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
             command = f"./chef.py -cbr --use_zzz -d {device_name} -t {options.build_target}"
             flush_print(f"Building {command}", with_border=True)
             shell.run_cmd(command)
-            # TODO call per-platform bundle function for extra validation
+            bundle(options.build_target, device_name)
         exit(0)
 
     #
-    # Build all
+    # CD
     #
 
     if options.build_all:
@@ -387,22 +375,42 @@ def main(argv: Sequence[str]) -> None:
         archive_prefix = "/workspace/artifacts/"
         archive_suffix = ".tar.gz"
         os.makedirs(archive_prefix, exist_ok=True)
+        failed_builds = []
         for device_name in _DEVICE_LIST:
-            for platform, platform_meta in cicd_config.items():
-                directory = platform_meta['build_dir']
-                label = platform_meta['platform_label']
-                output_dir = os.path.join(_CHEF_SCRIPT_PATH, directory)
+            for platform, label in cicd_config["cd_platforms"].items():
                 command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform}"
                 flush_print(f"Building {command}", with_border=True)
                 shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
                 shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
-                shell.run_cmd(command)
-                # TODO Needs to call per-platform bundle function
+                try:
+                    shell.run_cmd(command)
+                except RuntimeError as build_fail_error:
+                    failed_builds.append((device_name, platform, "build"))
+                    flush_print(str(build_fail_error))
+                    break
+                try:
+                    bundle(platform, device_name)
+                except FileNotFoundError as bundle_fail_error:
+                    failed_builds.append((device_name, platform, "bundle"))
+                    flush_print(str(bundle_fail_error))
+                    break
                 archive_name = f"{label}-{device_name}"
                 archive_full_name = archive_prefix + archive_name + archive_suffix
                 flush_print(f"Adding build output to archive {archive_full_name}")
+                if os.path.exists(archive_full_name):
+                    os.remove(archive_full_name)
                 with tarfile.open(archive_full_name, "w:gz") as tar:
-                    tar.add(output_dir, arcname=".")
+                    tar.add(_CD_STAGING_DIR, arcname=".")
+        if len(failed_builds) == 0:
+            flush_print("No build failures", with_border=True)
+        else:
+            flush_print("Logging build failures", with_border=True)
+            for failed_build in failed_builds:
+                fail_log = f"""\
+                Device: {failed_build[0]},
+                Platform: {failed_build[1]},
+                Phase: {failed_build[2]}"""
+                flush_print(unwrap_cmd(fail_log))
         exit(0)
 
     #
@@ -511,19 +519,15 @@ def main(argv: Sequence[str]) -> None:
 
         if options.use_zzz:
             flush_print("Using pre-generated ZAP output")
-            zzz_dir = os.path.join(_CHEF_SCRIPT_PATH,
+            zzz_dir = os.path.join(_REPO_BASE_PATH,
                                    "zzz_generated",
-                                   options.sample_device_type_name,
+                                   "chef-"+options.sample_device_type_name,
                                    "zap-generated")
             if not os.path.exists(zzz_dir):
                 flush_print(textwrap.dedent(f"""\
                 You have specified --use_zzz
                 for device {options.sample_device_type_name}
                 which does not exist in the cached ZAP output.
-                To cache ZAP output for this device:
-                ensure {options.sample_device_type_name}.zap
-                is placed in {_DEVICE_FOLDER}
-                run chef with the option --generate_zzz
                 """))
                 exit(1)
             shutil.rmtree(gen_dir, ignore_errors=True)
