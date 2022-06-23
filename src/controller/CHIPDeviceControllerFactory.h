@@ -177,11 +177,6 @@ public:
         void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
-
-            if (mSessionManager != nullptr)
-            {
-                mSessionManager->FabricRemoved(fabricIndex);
-            }
             if (mGroupDataProvider != nullptr)
             {
                 mGroupDataProvider->RemoveFabric(fabricIndex);
