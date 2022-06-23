@@ -25,5 +25,4 @@ public class MatterIntentConstants {
   public static final String EXTRA_COMMAND_ID = "EXTRA_COMMAND_ID";
   public static final String EXTRA_CLUSTER_ID = "EXTRA_CLUSTER_ID";
   public static final String EXTRA_ATTRIBUTE_ID = "EXTRA_ATTRIBUTE_ID";
-
 }

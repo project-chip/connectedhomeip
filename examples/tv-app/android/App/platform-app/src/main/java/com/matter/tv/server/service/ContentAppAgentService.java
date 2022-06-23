@@ -81,10 +81,11 @@ public class ContentAppAgentService extends Service {
   }
 
   public static String sendAttributeReadRequest(
-          Context context, String packageName, int clusterId, int attributeId) {
+      Context context, String packageName, int clusterId, int attributeId) {
     Intent in = new Intent(MatterIntentConstants.ACTION_MATTER_COMMAND);
     Bundle extras = new Bundle();
-    extras.putString(MatterIntentConstants.EXTRA_ATTRIBUTE_ACTION, MatterIntentConstants.ATTRIBUTE_ACTION_READ);
+    extras.putString(
+        MatterIntentConstants.EXTRA_ATTRIBUTE_ACTION, MatterIntentConstants.ATTRIBUTE_ACTION_READ);
     extras.putInt(MatterIntentConstants.EXTRA_ATTRIBUTE_ID, attributeId);
     extras.putInt(MatterIntentConstants.EXTRA_CLUSTER_ID, clusterId);
     in.putExtras(extras);
@@ -94,8 +95,8 @@ public class ContentAppAgentService extends Service {
     in.setFlags(flags);
     int messageId = responseRegistry.getNextMessageCounter();
     in.putExtra(
-            MatterIntentConstants.EXTRA_DIRECTIVE_RESPONSE_PENDING_INTENT,
-            getPendingIntentForResponse(context, packageName, messageId));
+        MatterIntentConstants.EXTRA_DIRECTIVE_RESPONSE_PENDING_INTENT,
+        getPendingIntentForResponse(context, packageName, messageId));
     context.sendBroadcast(in);
     responseRegistry.waitForMessage(messageId, 10, TimeUnit.SECONDS);
     String response = responseRegistry.readAndRemoveResponse(messageId);
