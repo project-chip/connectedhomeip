@@ -167,6 +167,12 @@ inline void Delete(T * p)
 template <typename T>
 struct Deleter
 {
+    constexpr Deleter() = default;
+
+    template <typename U>
+    Deleter(const Deleter<U>&,
+            typename std::enable_if<std::is_convertible<U*, T*>::value>::type* = 0) {}
+
     void operator()(T * p) { Delete(p); }
 };
 
