@@ -100,9 +100,9 @@ class TestOnlyLocalCertificateAuthority
     CHIP_ERROR GetStatus() { return mCurrentStatus; }
     bool IsSuccess() { return mCurrentStatus == CHIP_NO_ERROR; }
 
-    ByteSpan GetNoc() const { return ByteSpan{mLastNoc.Get(), mLastNoc.BufferByteSize()}; }
-    ByteSpan GetIcac() const { return mIncludeIcac ? ByteSpan{mLastIcac.Get(), mLastIcac.BufferByteSize()} : ByteSpan{nullptr, 0}; }
-    ByteSpan GetRcac() const { return ByteSpan{mLastRcac.Get(), mLastRcac.BufferByteSize()}; }
+    ByteSpan GetNoc() const { return ByteSpan{mLastNoc.Get(), mLastNoc.AllocatedSize()}; }
+    ByteSpan GetIcac() const { return mIncludeIcac ? ByteSpan{mLastIcac.Get(), mLastIcac.AllocatedSize()} : ByteSpan{nullptr, 0}; }
+    ByteSpan GetRcac() const { return ByteSpan{mLastRcac.Get(), mLastRcac.AllocatedSize()}; }
 
     TestOnlyLocalCertificateAuthority & GenerateNocChain(FabricId fabricId, NodeId nodeId, const Crypto::P256PublicKey & nocPublicKey)
     {
@@ -148,7 +148,7 @@ class TestOnlyLocalCertificateAuthority
         ChipDN noc_dn;
 
         // Get subject DN of RCAC as our issuer field for ICAC and/or NOC depending on if ICAC is present
-        ReturnErrorOnFailure(ExtractSubjectDNFromChipCert(ByteSpan{mLastRcac.Get(), mLastRcac.BufferByteSize()}, rcac_dn));
+        ReturnErrorOnFailure(ExtractSubjectDNFromChipCert(ByteSpan{mLastRcac.Get(), mLastRcac.AllocatedSize()}, rcac_dn));
 
         Crypto::P256Keypair icacKeypair;
         ReturnErrorOnFailure(icacKeypair.Initialize()); // Maybe we won't use it, but it's OK
@@ -169,10 +169,10 @@ class TestOnlyLocalCertificateAuthority
 
             X509CertRequestParams icac_request = { 0, mNow, mNow + mValidity, icac_dn, rcac_dn };
 
-            MutableByteSpan icacDerSpan{icacDerBuf.Get(), icacDerBuf.BufferByteSize()};
+            MutableByteSpan icacDerSpan{icacDerBuf.Get(), icacDerBuf.AllocatedSize()};
             ReturnErrorOnFailure(Credentials::NewICAX509Cert(icac_request, icacKeypair.Pubkey(), *mRootKeypair.get(), icacDerSpan));
 
-            MutableByteSpan icacChipSpan{icacChipBuf.Get(), icacChipBuf.BufferByteSize()};
+            MutableByteSpan icacChipSpan{icacChipBuf.Get(), icacChipBuf.AllocatedSize()};
             ReturnErrorOnFailure(Credentials::ConvertX509CertToChipCert(icacDerSpan, icacChipSpan));
 
             ReturnErrorCodeIf(!mLastIcac.Alloc(icacChipSpan.size()), CHIP_ERROR_NO_MEMORY);
@@ -195,10 +195,10 @@ class TestOnlyLocalCertificateAuthority
 
             X509CertRequestParams noc_request = { 0, mNow, mNow + mValidity, noc_dn, *issuer_dn };
 
-            MutableByteSpan nocDerSpan{nocDerBuf.Get(), nocDerBuf.BufferByteSize()};
+            MutableByteSpan nocDerSpan{nocDerBuf.Get(), nocDerBuf.AllocatedSize()};
             ReturnErrorOnFailure(Credentials::NewNodeOperationalX509Cert(noc_request, nocPublicKey, *nocIssuerKeypair, nocDerSpan));
 
-            MutableByteSpan nocChipSpan{nocChipBuf.Get(), nocChipBuf.BufferByteSize()};
+            MutableByteSpan nocChipSpan{nocChipBuf.Get(), nocChipBuf.AllocatedSize()};
             ReturnErrorOnFailure(Credentials::ConvertX509CertToChipCert(nocDerSpan, nocChipSpan));
 
             ReturnErrorCodeIf(!mLastNoc.Alloc(nocChipSpan.size()), CHIP_ERROR_NO_MEMORY);
@@ -223,10 +223,10 @@ class TestOnlyLocalCertificateAuthority
 
         X509CertRequestParams rcac_request = { 0, mNow, mNow + mValidity, rcac_dn, rcac_dn };
 
-        MutableByteSpan rcacDerSpan{rcacDerBuf.Get(), rcacDerBuf.BufferByteSize()};
+        MutableByteSpan rcacDerSpan{rcacDerBuf.Get(), rcacDerBuf.AllocatedSize()};
         ReturnErrorOnFailure(Credentials::NewRootX509Cert(rcac_request, rootKeyPair, rcacDerSpan));
 
-        MutableByteSpan rcacChipSpan{rcacChipBuf.Get(), rcacChipBuf.BufferByteSize()};
+        MutableByteSpan rcacChipSpan{rcacChipBuf.Get(), rcacChipBuf.AllocatedSize()};
         ReturnErrorOnFailure(Credentials::ConvertX509CertToChipCert(rcacDerSpan, rcacChipSpan));
 
         VerifyOrReturnError(mLastRcac.Alloc(rcacChipSpan.size()), CHIP_ERROR_NO_MEMORY);
