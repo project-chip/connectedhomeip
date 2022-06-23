@@ -46,16 +46,13 @@ tests:
               minValue: 0
               maxValue: 10000
 
-    # Issue 18794
     - label:
           "1b 1c: If (PA_LF & LF) TH reads CurrentPositionLiftPercentage from
           DUT + assert CurrentPositionLiftPercent100ths/100 equals
           CurrentPositionLiftPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS:
-          PICS_SKIP_SAMPLE_APP && WNCV_LF && WNCV_PA_LF &&
-          A_CURRENTPOSITIONLIFTPERCENTAGE
+      PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
       response:
           value: attrCurrentPositionLiftPercent100ths / 100
           constraints:

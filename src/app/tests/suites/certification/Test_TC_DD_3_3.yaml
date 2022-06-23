@@ -59,7 +59,7 @@ tests:
           CHIP:DL:   Device Type: 35 (0x23)
           CHIP:SVR: SetupQRCode: [MT:YNJV7VSC00KA0648G00]
           CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00KA0648G00
+          CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00KA0648G00
           CHIP:SVR: Manual pairing code: [34970112332]
           CHIP:ZCL: Using ZAP configuration...
           ] CHIP:ZCL: OpCreds: Initiating OpCreds cluster by writing fabrics list from fabric table.
@@ -435,7 +435,7 @@ tests:
           CHIP:DL:   Device Type: 35 (0x23)
           CHIP:SVR: SetupQRCode: [MT:YNJV7VSC00KA0648G00]
           CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00KA0648G00
+          CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00KA0648G00
           CHIP:SVR: Manual pairing code: [34970112332]
           CHIP:SVR: Retrieved value from server storage.
           CHIP:SVR: Retrieved value from server storage.

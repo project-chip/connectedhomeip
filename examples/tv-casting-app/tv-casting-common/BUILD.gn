@@ -74,7 +74,10 @@ chip_data_model("tv-casting-common") {
 }
 
 static_library("tvCastingCommon") {
-  public_deps = [ "${chip_root}/examples/tv-casting-app/tv-casting-common" ]
+  public_deps = [
+    "${chip_root}/examples/tv-casting-app/tv-casting-common",
+    "${chip_root}/src/credentials:default_attestation_verifier",
+  ]
 
   cflags = [ "-Wconversion" ]
 

@@ -84,6 +84,10 @@ void event_cb_wifi_event(input_event_t * event, void * private_data)
         NetworkCommissioning::BLWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
     }
     break;
+    case CODE_WIFI_ON_DISCONNECT: {
+        printf("[APP] [EVT] disconnect %lld, Reason: %s\r\n", aos_now_ms(), wifi_mgmr_status_code_str(event->value));
+    }
+    break;
     case CODE_WIFI_ON_CONNECTING: {
         log_info("[APP] [EVT] Connecting %lld\r\n", aos_now_ms());
         ConnectivityManagerImpl::mWiFiStationState = ConnectivityManager::kWiFiStationState_Connecting;

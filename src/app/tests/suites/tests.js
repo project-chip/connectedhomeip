@@ -112,36 +112,36 @@ function getManualTests() {
   ];
 
   const DeviceManagement = [
-    'Test_TC_DM_1_1',
-    'Test_TC_DM_1_2',
-    'Test_TC_DM_1_3',
-    'Test_TC_DM_2_2',
-    'Test_TC_DM_2_4',
-    'Test_TC_DM_3_1',
-    'Test_TC_DM_3_2',
-    'Test_TC_DM_3_3',
-    'Test_TC_DM_3_4',
-    'Test_TC_DM_4_1',
-    'Test_TC_DM_4_2',
-    'Test_TC_DM_4_3',
-    'Test_TC_DM_4_4',
-    'Test_TC_DM_4_5',
-    'Test_TC_DM_4_6',
-    'Test_TC_DM_4_7',
-    'Test_TC_DM_4_8',
-    'Test_TC_DM_4_9',
-    'Test_TC_DM_4_10',
-    'Test_TC_DM_4_11',
-    'Test_TC_DM_4_12',
-    'Test_TC_DM_4_13',
-    'Test_TC_DM_4_14',
-    'Test_TC_DM_4_15',
-    'Test_TC_DM_4_16',
-    'Test_TC_DM_4_17',
-    'Test_TC_DM_4_18',
-    'Test_TC_DM_4_19',
-    'Test_TC_DM_4_20',
-    'Test_TC_DM_4_21',
+    'Test_TC_BINFO_1_1',
+    'Test_TC_OPCREDS_1_2',
+    'Test_TC_CNET_1_3',
+    'Test_TC_BINFO_2_2',
+    'Test_TC_BINFO_2_4',
+    'Test_TC_OPCREDS_3_1',
+    'Test_TC_OPCREDS_3_2',
+    'Test_TC_OPCREDS_3_3',
+    'Test_TC_OPCREDS_3_4',
+    'Test_TC_CNET_4_1',
+    'Test_TC_CNET_4_2',
+    'Test_TC_CNET_4_3',
+    'Test_TC_CNET_4_4',
+    'Test_TC_CNET_4_5',
+    'Test_TC_CNET_4_6',
+    'Test_TC_CNET_4_7',
+    'Test_TC_CNET_4_8',
+    'Test_TC_CNET_4_9',
+    'Test_TC_CNET_4_10',
+    'Test_TC_CNET_4_11',
+    'Test_TC_CNET_4_12',
+    'Test_TC_CNET_4_13',
+    'Test_TC_CNET_4_14',
+    'Test_TC_CNET_4_15',
+    'Test_TC_CNET_4_16',
+    'Test_TC_CNET_4_17',
+    'Test_TC_CNET_4_18',
+    'Test_TC_CNET_4_19',
+    'Test_TC_CNET_4_20',
+    'Test_TC_CNET_4_21',
   ];
 
   const DiagnosticsLogs = [
@@ -215,10 +215,6 @@ function getManualTests() {
     'Test_TC_MC_5_4',
     'Test_TC_MC_5_5',
     'Test_TC_MC_5_6',
-    'Test_TC_MC_6_1',
-    'Test_TC_MC_6_2',
-    'Test_TC_MC_6_3',
-    'Test_TC_MC_6_4',
     'Test_TC_MC_6_5',
     'Test_TC_MC_6_7',
     'Test_TC_MC_7_3',
@@ -372,11 +368,11 @@ function getManualTests() {
   ];
 
   const DoorLock = [
-    'Test_TC_DL_1_1',
-    'Test_TC_DL_2_1',
-    'Test_TC_DL_2_6',
-    'Test_TC_DL_2_8',
-    'Test_TC_DL_2_10',
+    'Test_TC_DLRK_1_1',
+    'Test_TC_DLRK_2_1',
+    'Test_TC_DLRK_2_6',
+    'Test_TC_DLRK_2_8',
+    'Test_TC_DLRK_2_10',
   ];
 
   const LocalizationConfiguration = [
@@ -568,7 +564,7 @@ function getTests() {
   ];
 
   const DeviceManagement = [
-    'Test_TC_DM_2_1',
+    'Test_TC_BINFO_2_1',
   ];
 
   const Descriptor = [
@@ -651,7 +647,6 @@ function getTests() {
     'Test_TC_MC_2_1',
     'Test_TC_MC_3_2',
     'Test_TC_MC_3_3',
-    'Test_TC_MC_3_4',
     'Test_TC_MC_3_5',
     'Test_TC_MC_3_6',
     'Test_TC_MC_3_7',
@@ -664,6 +659,10 @@ function getTests() {
     'Test_TC_MC_5_1',
     'Test_TC_MC_5_2',
     'Test_TC_MC_5_3',
+    'Test_TC_MC_6_1',
+    'Test_TC_MC_6_2',
+    'Test_TC_MC_6_3',
+    'Test_TC_MC_6_4',
     'Test_TC_MC_7_1',
     'Test_TC_MC_7_2',
     'Test_TC_MC_8_1',
@@ -836,12 +835,12 @@ function getTests() {
     'DL_UsersAndCredentials',
     'DL_LockUnlock',
     'DL_Schedules',
-    'Test_TC_DL_2_2',
-    'Test_TC_DL_2_3',
-    'Test_TC_DL_2_4',
-    'Test_TC_DL_2_5',
-    'Test_TC_DL_2_7',
-    'Test_TC_DL_2_9',
+    'Test_TC_DLRK_2_2',
+    'Test_TC_DLRK_2_3',
+    'Test_TC_DLRK_2_4',
+    'Test_TC_DLRK_2_5',
+    'Test_TC_DLRK_2_7',
+    'Test_TC_DLRK_2_9',
   ];
 
   const Groups = [

@@ -20,6 +20,10 @@
 
 #import "DiscoveredNodeDataConverter.hpp"
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
 
@@ -55,6 +59,16 @@
         if (err != CHIP_NO_ERROR) {
             ChipLogError(AppServer, "InitChipStack failed: %s", ErrorStr(err));
             return nil;
+        }
+
+        // Initialize device attestation config
+        SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+
+        // Initialize device attestation verifier from a constant version
+        {
+            // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+            const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+            SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
         }
 
         // init app Server
@@ -161,9 +175,10 @@
 {
     ChipLogProgress(AppServer, "CastingServerBridge().openBasicCommissioningWindow() called");
 
+    _commissioningCompleteCallback = commissioningCompleteCallback;
     dispatch_async(_chipWorkQueue, ^{
         CHIP_ERROR err = CastingServer::GetInstance()->OpenBasicCommissioningWindow(
-            [&commissioningCompleteCallback](CHIP_ERROR err) { commissioningCompleteCallback(CHIP_NO_ERROR == err); });
+            [](CHIP_ERROR err) { [CastingServerBridge getSharedInstance].commissioningCompleteCallback(CHIP_NO_ERROR == err); });
 
         dispatch_async(clientQueue, ^{
             commissioningWindowRequestedHandler(CHIP_NO_ERROR == err);
@@ -179,10 +194,11 @@
 {
     ChipLogProgress(AppServer, "CastingServerBridge().contentLauncherLaunchUrl() called");
 
+    _launchUrlResponseCallback = launchUrlResponseCallback;
     dispatch_async(_chipWorkQueue, ^{
         CHIP_ERROR err
             = CastingServer::GetInstance()->ContentLauncherLaunchURL([contentUrl UTF8String], [contentDisplayStr UTF8String],
-                [&launchUrlResponseCallback](CHIP_ERROR err) { launchUrlResponseCallback(CHIP_NO_ERROR == err); });
+                [](CHIP_ERROR err) { [CastingServerBridge getSharedInstance].launchUrlResponseCallback(CHIP_NO_ERROR == err); });
         dispatch_async(clientQueue, ^{
             launchUrlRequestSentHandler(CHIP_NO_ERROR == err);
         });

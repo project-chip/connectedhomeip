@@ -51,6 +51,17 @@ pw_proto_library(button_service
     pw_protobuf.common_proto
 )
 
+pw_proto_library(descriptor_service
+  SOURCES
+    ${chip_dir}/examples/common/pigweed/protos/descriptor_service.proto
+  PREFIX
+    descriptor_service
+  STRIP_PREFIX
+    ${chip_dir}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_proto
+)
+
 pw_proto_library(device_service
   SOURCES
     ${chip_dir}/examples/common/pigweed/protos/device_service.proto
@@ -202,6 +213,7 @@ if (matter_enable_rpc)
 target_link_libraries(${chip_main} PUBLIC
     attributes_service.nanopb_rpc
     button_service.nanopb_rpc
+    descriptor_service.nanopb_rpc
     device_service.nanopb_rpc
     lighting_service.nanopb_rpc
     locking_service.nanopb_rpc
@@ -240,6 +252,7 @@ list(
 
     -DPW_RPC_ATTRIBUTE_SERVICE=1
     -DPW_RPC_BUTTON_SERVICE=1
+    -DPW_RPC_DESCRIPTOR_SERVICE=1
     -DPW_RPC_DEVICE_SERVICE=1
     -DPW_RPC_LIGHTING_SERVICE=1
     -DPW_RPC_LOCKING_SERVICE=1
