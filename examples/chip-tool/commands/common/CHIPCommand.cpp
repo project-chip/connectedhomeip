@@ -128,26 +128,31 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     // Initialize Group Data, including IPK
     for (auto it = mCommissioners.begin(); it != mCommissioners.end(); it++)
     {
+        if (0 == it->first.compare(kIdentityNull))
+        {
+            continue;
+        }
         const chip::Controller::DeviceCommissioner * controller = it->second.get();
 
         chip::FabricIndex fabricIndex = controller->GetFabricIndex();
+        if (fabricIndex == chip::kUndefinedFabricIndex)
+        {
+            continue;
+        }
 
         uint8_t compressed_fabric_id[sizeof(uint64_t)];
         chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
-        CHIP_ERROR err = controller->GetCompressedFabricIdBytes(compressed_fabric_id_span);
+        ReturnLogErrorOnFailure(controller->GetCompressedFabricIdBytes(compressed_fabric_id_span));
 
-        if ((err == CHIP_NO_ERROR) && (0 != it->first.compare(kIdentityNull)))
-        {
-            ReturnLogErrorOnFailure(chip::GroupTesting::InitData(&mGroupDataProvider, fabricIndex, compressed_fabric_id_span));
+        ReturnLogErrorOnFailure(chip::GroupTesting::InitData(&mGroupDataProvider, fabricIndex, compressed_fabric_id_span));
 
-            // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
-            // key is the same, but the derived keys will be different for each fabric.
-            // This has to be done here after we know the Compressed Fabric ID of all
-            // chip-tool-managed fabrics
-            chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-            ReturnLogErrorOnFailure(
-                chip::Credentials::SetSingleIpkEpochKey(&mGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
-        }
+        // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
+        // key is the same, but the derived keys will be different for each fabric.
+        // This has to be done here after we know the Compressed Fabric ID of all
+        // chip-tool-managed fabrics
+        chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+        ReturnLogErrorOnFailure(
+            chip::Credentials::SetSingleIpkEpochKey(&mGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
     }
 
     return CHIP_NO_ERROR;

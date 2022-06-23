@@ -261,20 +261,21 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
                 }
             }
         }
-
-        // Commit after setup, error-out on failure.
-        if (err == CHIP_NO_ERROR)
-        {
-            // No need to revert on error: CommitPendingFabricData reverts internally on *any* error.
-            err = fabricTable->CommitPendingFabricData();
-        }
-        else
-        {
-            fabricTable->RevertPendingFabricData();
-        }
-
-        ReturnErrorOnFailure(err);
     }
+
+    // Commit after setup, error-out on failure.
+    if (err == CHIP_NO_ERROR)
+    {
+        // No need to revert on error: CommitPendingFabricData reverts internally on *any* error.
+        err = fabricTable->CommitPendingFabricData();
+    }
+    else
+    {
+        fabricTable->RevertPendingFabricData();
+    }
+
+    ReturnErrorOnFailure(err);
+    VerifyOrReturnError(fabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INTERNAL);
 
     mFabricIndex = fabricIndex;
 
