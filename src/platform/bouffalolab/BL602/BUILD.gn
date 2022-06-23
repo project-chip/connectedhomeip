@@ -36,20 +36,25 @@ static_library("BL602") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "DeviceInfoProviderImpl.cpp",
+    "DeviceInfoProviderImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
-    "DnssdImpl.cpp",
     "InetPlatformConfig.h",
     "Logging.cpp",
     "NetworkCommissioningDriver.cpp",
+    "OTAImageProcessorImpl.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
   ]
 
-  deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
+  deps = [
+    "${chip_root}/src/lib/dnssd:platform_header",
+    "${chip_root}/src/setup_payload",
+  ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 

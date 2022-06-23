@@ -23,7 +23,6 @@ riscv_platform_config = "${bl602_sdk_build_root}/bl602_riscv.gni"
 mbedtls_target = "${bl602_sdk_build_root}:bl602_sdk"
 
 chip_device_platform = "bl602"
-chip_mdns = "platform"
 
 lwip_platform = "bl602"
 
