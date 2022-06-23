@@ -193,7 +193,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     // advertise operational since we are an admin
     app::DnssdServer::Instance().AdvertiseOperational();
 
-    ChipLogProgress(Support, "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabricIndex=0x%u",
+    ChipLogProgress(Support, "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabricIndex=0x%x",
                     ChipLogValueX64(gCommissioner.GetNodeId()), static_cast<unsigned>(fabricIndex));
 
     return CHIP_NO_ERROR;

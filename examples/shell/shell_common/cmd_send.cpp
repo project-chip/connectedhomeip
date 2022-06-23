@@ -18,5 +18,7 @@
 // This used to be a test command, but it did not track at all with the rest of the
 // spec and could not work. It was removed from init, but because of dependencies,
 // this empty body below still exists.
+//
+// See https://github.com/project-chip/connectedhomeip/issues/19889
 
 void cmd_send_init() {}
