@@ -125,9 +125,8 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/",
       "${efr32_sdk_root}/util/third_party/freertos/cmsis/Include",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/include",
-      "${sdk_support_root}/matter/efr32",
-      "${sdk_support_root}/matter/efr32/${efr32_family}/",
-      "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}",
+      "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/config",
+      "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/autogen",
     ]
 
     defines = [
@@ -362,6 +361,8 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay_armv6m_gcc.S",
       "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_mbedtls_context.c",
       "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_stack_init.c",
+      "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_advertiser_config.c",
+      "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_connection_config.c",
       "${efr32_sdk_root}/util/silicon_labs/silabs_core/memory_manager/sl_malloc.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/aes.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/aesni.c",
@@ -474,13 +475,11 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/timers.c",
-      "${sdk_support_root}/matter/efr32/sl_board_default_init.c",
-      "${sdk_support_root}/matter/efr32/sl_device_init_clocks.c",
-      "${sdk_support_root}/matter/efr32/sl_event_handler.c",
-      "${sdk_support_root}/matter/efr32/sl_simple_button_instances.c",
-      "${sdk_support_root}/matter/efr32/sl_simple_led_instances.c",
-      "${sdk_support_root}/matter/efr32/sli_bt_advertiser_config.c",
-      "${sdk_support_root}/matter/efr32/sli_bt_connection_config.c",
+      "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/autogen/sl_board_default_init.c",
+      "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/autogen/sl_device_init_clocks.c",
+      "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/autogen/sl_event_handler.c",
+      "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/autogen/sl_simple_button_instances.c",
+      "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/autogen/sl_simple_led_instances.c",
     ]
 
     if (defined(invoker.enable_sleepy_device)) {
@@ -505,7 +504,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emlib/src/em_eusart.c",
         "${efr32_sdk_root}/platform/emlib/src/em_leuart.c",
         "${efr32_sdk_root}/platform/emlib/src/em_usart.c",
-        "${sdk_support_root}/matter/efr32/${efr32_family}/sl_uartdrv_init.c",
+        "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/autogen/sl_uartdrv_init.c",
       ]
 
       if (efr32_family == "efr32mg12") {

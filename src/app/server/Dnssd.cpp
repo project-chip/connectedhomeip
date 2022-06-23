@@ -258,7 +258,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                                              .SetMac(mac)
                                              .SetPort(GetSecuredPort())
                                              .SetInterfaceId(GetInterfaceId())
-                                             .SetMRPConfig(GetLocalMRPConfig())
+                                             .SetLocalMRPConfig(GetLocalMRPConfig())
                                              .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
                                              .EnableIpV4(true);
 
@@ -351,7 +351,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     advertiseParameters.SetRotatingDeviceId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
 #endif
 
-    advertiseParameters.SetMRPConfig(GetLocalMRPConfig()).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
+    advertiseParameters.SetLocalMRPConfig(GetLocalMRPConfig()).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
 
     if (!HaveOperationalCredentials())
     {

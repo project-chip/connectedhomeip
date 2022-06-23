@@ -56,9 +56,9 @@ struct CommonResolutionData
 
     bool IsValid() const { return !IsHost("") && (numIPs > 0) && (ipAddress[0] != chip::Inet::IPAddress::Any); }
 
-    ReliableMessageProtocolConfig GetMRPConfig() const
+    ReliableMessageProtocolConfig GetRemoteMRPConfig() const
     {
-        const ReliableMessageProtocolConfig defaultConfig = GetLocalMRPConfig();
+        const ReliableMessageProtocolConfig defaultConfig = GetDefaultMRPConfig();
         return ReliableMessageProtocolConfig(GetMrpRetryIntervalIdle().ValueOr(defaultConfig.mIdleRetransTimeout),
                                              GetMrpRetryIntervalActive().ValueOr(defaultConfig.mActiveRetransTimeout));
     }

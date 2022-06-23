@@ -706,14 +706,10 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         ChipLogDetail(DeviceLayer, "Start BLE advertissement");
     }
 
-#ifndef EFR32MG24
-    // set_random_address causes issues in BLE driver later on with MG24 family.
-    // To be remove when updateing to GSDK4.0
     const uint8_t kResolvableRandomAddrType = 2; // Private resolvable random address type
     bd_addr unusedBdAddr;                        // We can ignore this field when setting random address.
     sl_bt_advertiser_set_random_address(advertising_set_handle, kResolvableRandomAddrType, unusedBdAddr, &unusedBdAddr);
     (void) unusedBdAddr;
-#endif
 
     err = ConfigureAdvertisingData();
     SuccessOrExit(err);

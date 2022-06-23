@@ -1,1 +1,1 @@
-0.5.81 Version bump reason: [Ameba] Update Ameba SDK to use BLE random address and add uxTaskGetFreeStackSize and uxTaskGetStackSize
+0.5.82 Version bump reason: Since [EFR32] Update gsdk to 4.1 was merged - We need git-lfs

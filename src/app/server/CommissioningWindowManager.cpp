@@ -219,9 +219,8 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
     if (mUseECM)
     {
         ReturnErrorOnFailure(SetTemporaryDiscriminator(mECMDiscriminator));
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(
-            mServer->GetSecureSessionManager(), mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength),
-            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(mServer->GetSecureSessionManager(), mECMPASEVerifier, mECMIterations,
+                                                            ByteSpan(mECMSalt, mECMSaltLength), GetLocalMRPConfig(), this));
     }
     else
     {
@@ -243,8 +242,7 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
         ReturnErrorOnFailure(verifier.Deserialize(ByteSpan(serializedVerifier)));
 
         ReturnErrorOnFailure(mPairingSession.WaitForPairing(mServer->GetSecureSessionManager(), verifier, iterationCount, saltSpan,
-                                                            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
-                                                            this));
+                                                            GetLocalMRPConfig(), this));
     }
 
     ReturnErrorOnFailure(StartAdvertisement());
