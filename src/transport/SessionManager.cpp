@@ -72,7 +72,10 @@ uint32_t EncryptedPacketBufferHandle::GetMessageCounter() const
 
 SessionManager::SessionManager() : mState(State::kNotReady) {}
 
-SessionManager::~SessionManager() {}
+SessionManager::~SessionManager()
+{
+    this->Shutdown();
+}
 
 CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
                                 Transport::MessageCounterManagerInterface * messageCounterManager,
@@ -103,7 +106,10 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
 
 void SessionManager::Shutdown()
 {
-    mFabricTable->RemoveFabricDelegate(this);
+    if (mFabricTable != nullptr)
+    {
+        mFabricTable->RemoveFabricDelegate(this);
+    }
     mMessageCounterManager = nullptr;
 
     mState        = State::kNotReady;
