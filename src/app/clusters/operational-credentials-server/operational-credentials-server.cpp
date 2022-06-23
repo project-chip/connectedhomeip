@@ -371,7 +371,7 @@ constexpr size_t kMaxRspLen = 900;
 // logic.
 class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
 {
-
+  public:
     // Gets called when a fabric is deleted from KVS store
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
@@ -399,16 +399,12 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync();
         EventManagement::GetInstance().FabricRemoved(fabricIndex);
 
-        // Remove access control entries in reverse order (it could be any order, but reverse order
-        // will cause less churn in persistent storage).
-        size_t aclCount = 0;
-        if (Access::GetAccessControl().GetEntryCount(fabricIndex, aclCount) == CHIP_NO_ERROR)
-        {
-            while (aclCount)
-            {
-                (void) Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, --aclCount);
-            }
-        }
+        NotifyFabricTableChanged();
+    }
+
+    void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        NotifyFabricTableChanged();
     }
 
     // Gets called when a fabric in FabricTable is persisted to storage
@@ -423,6 +419,18 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
                         ", FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
                         static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
                         ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
+
+        NotifyFabricTableChanged();
+    }
+
+  private:
+    void NotifyFabricTableChanged()
+    {
+        // Opcreds cluster is always on Endpoint 0
+        MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id,
+                                               OperationalCredentials::Attributes::CommissionedFabrics::Id);
+        MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id,
+                                               OperationalCredentials::Attributes::Fabrics::Id);
     }
 };
 
@@ -479,11 +487,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
     CHIP_ERROR err = DeleteFabricFromTable(fabricBeingRemoved);
     SuccessOrExit(err);
 
-    // On success, notify that fabric table has changed.
-    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-                                           OperationalCredentials::Attributes::Fabrics::Id);
-    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-                                           OperationalCredentials::Attributes::CommissionedFabrics::Id);
+    // Notification was already done by FabricTable delegate
 
 exit:
     // Not using ConvertToNOCResponseStatus here because it's pretty
@@ -564,15 +568,18 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
     if (fabric == nullptr)
     {
         SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kInsufficientPrivilege, ourFabricIndex,
-                        CharSpan("Current fabric not found"));
+                        CharSpan::fromCharString("Current fabric not found"));
         return true;
     }
 
     // Set Label on fabric. Any error on this is basically an internal error...
+    // NOTE: if an UpdateNOC had caused a pending fabric, that pending fabric is
+    //       the one updated thereafter. Otherwise, the data is committed to storage
+    //       as soon as the update is done.
     err = fabricTable.SetFabricLabel(ourFabricIndex, label);
     VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
 
-    finalStatus = Status::Success
+    finalStatus = Status::Success;
 
     // Succeeded at updating the label, mark Fabrics table changed.
     MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
@@ -684,8 +691,8 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
     MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
 
-    bool isForUpdateNoc = false;
-    bool hasPendingKey  = fabricTable.HasPendingOperationalKey(isForUpdateNoc);
+    bool csrWasForUpdateNoc = false; //< Output param of HasPendingOperationalKey
+    bool hasPendingKey      = fabricTable.HasPendingOperationalKey(csrWasForUpdateNoc);
 
     ChipLogProgress(Zcl, "OpCreds: Received an AddNOC command");
 
@@ -702,7 +709,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     // Must have had a previous CSR request, not tagged for UpdateNOC
     VerifyOrExit(hasPendingKey, nocResponse = OperationalCertStatus::kMissingCsr);
-    VerifyOrExit(!isForUpdateNoc, nonDefaultStatus = Status::ConstraintError);
+    VerifyOrExit(!csrWasForUpdateNoc, nonDefaultStatus = Status::ConstraintError);
 
     // Internal error that would prevent IPK from being added
     VerifyOrExit(groupDataProvider != nullptr, nonDefaultStatus = Status::Failure);
@@ -786,6 +793,22 @@ exit:
     if (needRevert)
     {
         fabricTable.RevertPendingOpCertsExceptRoot();
+
+        // Revert IPK and ACL entries added, ignoring errors, since some steps may have been skipped
+        // and error handling does not assist.
+        if (groupDataProvider != nullptr)
+        {
+            (void)groupDataProvider->RemoveFabric(newFabricIndex);
+        }
+
+        // TODO(#19898): All ACL work done within AddNOC does not trigger ACL cluster updates
+
+        (void)Access::GetAccessControl().DeleteAllEntriesForFabric(newFabricIndex);
+
+        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                               OperationalCredentials::Attributes::CommissionedFabrics::Id);
+        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                               OperationalCredentials::Attributes::Fabrics::Id);
     }
 
     // We have an NOC response
@@ -836,8 +859,8 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
     FabricInfo * fabricInfo           = RetrieveCurrentFabric(commandObj);
 
-    bool isForUpdateNoc = false;
-    bool hasPendingKey  = fabricTable.HasPendingOperationalKey(isForUpdateNoc);
+    bool csrWasForUpdateNoc = false; //< Output param of HasPendingOperationalKey
+    bool hasPendingKey  = fabricTable.HasPendingOperationalKey(csrWasForUpdateNoc);
 
     VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, nonDefaultStatus = Status::InvalidCommand);
     VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
@@ -849,7 +872,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     // Must have had a previous CSR request, tagged for UpdateNOC
     VerifyOrExit(hasPendingKey, nocResponse = OperationalCertStatus::kMissingCsr);
-    VerifyOrExit(isForUpdateNoc, nonDefaultStatus = Status::ConstraintError);
+    VerifyOrExit(csrWasForUpdateNoc, nonDefaultStatus = Status::ConstraintError);
 
     // If current fabric is not available, command was invoked over PASE which is not legal
     VerifyOrExit(fabricInfo != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INSUFFICIENT_PRIVILEGE));
@@ -873,12 +896,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     // So we need to StartServer() here.
     app::DnssdServer::Instance().StartServer();
 
-    // Notify the attributes containing NOCs and fabric metadata can be read with new data
-    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-                                           OperationalCredentials::Attributes::NOCs::Id);
-    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-                                           OperationalCredentials::Attributes::Fabrics::Id);
-
+    // Attribute notification was already done by fabric table
 exit:
     if (needRevert)
     {

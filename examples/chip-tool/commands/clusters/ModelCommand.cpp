@@ -28,8 +28,7 @@ CHIP_ERROR ModelCommand::RunCommand()
 
     if (IsGroupId(mDestinationId))
     {
-        FabricIndex fabricIndex;
-        ReturnErrorOnFailure(CurrentCommissioner().GetFabricIndex(&fabricIndex));
+        FabricIndex fabricIndex = CurrentCommissioner().GetFabricIndex();
         ChipLogProgress(chipTool, "Sending command to group 0x%x", GroupIdFromNodeId(mDestinationId));
 
         return SendGroupCommand(GroupIdFromNodeId(mDestinationId), fabricIndex);

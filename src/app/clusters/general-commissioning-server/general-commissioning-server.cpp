@@ -249,6 +249,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
                 CHIP_ERROR err = fabricTable.CommitPendingFabricData();
                 if (err != CHIP_NO_ERROR)
                 {
+                    // No need to revert on error: CommitPendingFabricData always reverts if not fully successful.
                     ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit pending fabric data: %" CHIP_ERROR_FORMAT,
                                  err.Format());
                 }

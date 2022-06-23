@@ -287,11 +287,7 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
             return;
         }
 
-        chip::FabricIndex fabricIdx = 0;
-        errorCode = _cppCommissioner->GetFabricIndex(&fabricIdx);
-        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
-            return;
-        }
+        chip::FabricIndex fabricIdx = _cppCommissioner->GetFabricIndex();
 
         uint8_t compressedIdBuffer[sizeof(uint64_t)];
         chip::MutableByteSpan compressedId(compressedIdBuffer);
@@ -723,13 +719,7 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
         return chip::kUndefinedFabricIndex;
     }
 
-    chip::FabricIndex fabricIdx;
-    CHIP_ERROR err = _cppCommissioner->GetFabricIndex(&fabricIdx);
-    if (err != CHIP_NO_ERROR) {
-        return chip::kUndefinedFabricIndex;
-    }
-
-    return fabricIdx;
+    return _cppCommissioner->GetFabricIndex();
 }
 
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable

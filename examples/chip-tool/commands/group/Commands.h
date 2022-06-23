@@ -54,8 +54,7 @@ public:
         fprintf(stderr, "  | Available Groups :                                                                  |\n");
         fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
         fprintf(stderr, "  | Group Id   |  KeySet Id     |   Group Name                                          |\n");
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        chip::FabricIndex fabricIndex = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
         auto it                                                  = groupDataProvider->IterateGroupInfo(fabricIndex);
         chip::Credentials::GroupDataProvider::GroupInfo group;
@@ -98,8 +97,7 @@ public:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        chip::FabricIndex fabricIndex = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
         chip::Credentials::GroupDataProvider::GroupInfo group;
 
@@ -133,8 +131,7 @@ public:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        chip::FabricIndex fabricIndex = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
         ReturnErrorOnFailure(groupDataProvider->RemoveGroupInfo(fabricIndex, groupId));
         SetCommandExitStatus(CHIP_NO_ERROR);
@@ -153,8 +150,7 @@ public:
 
     CHIP_ERROR RunCommand() override
     {
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        chip::FabricIndex fabricIndex = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
         chip::Credentials::GroupDataProvider::KeySet keySet;
 
@@ -194,8 +190,7 @@ public:
     CHIP_ERROR RunCommand() override
     {
         size_t current_count = 0;
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        chip::FabricIndex fabricIndex = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
 
         auto iter     = groupDataProvider->IterateGroupKeys(fabricIndex);
@@ -227,8 +222,7 @@ public:
     CHIP_ERROR RunCommand() override
     {
         size_t index = 0;
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        chip::FabricIndex fabricIndex = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
         auto iter                                                = groupDataProvider->IterateGroupKeys(fabricIndex);
         size_t maxCount                                          = iter->Count();
@@ -272,8 +266,7 @@ public:
 
     CHIP_ERROR RunCommand() override
     {
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        chip::FabricIndex fabricIndex = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
         uint8_t compressed_fabric_id[sizeof(uint64_t)];
         chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
@@ -317,8 +310,7 @@ public:
     CHIP_ERROR RunCommand() override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        chip::FabricIndex fabricIndex = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
 
         // Unbind all group

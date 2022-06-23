@@ -33,9 +33,7 @@ CHIP_ERROR TestCommand::RunCommand()
 CHIP_ERROR TestCommand::WaitForCommissionee(const char * identity,
                                             const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value)
 {
-    chip::FabricIndex fabricIndex;
-
-    ReturnErrorOnFailure(GetCommissioner(identity).GetFabricIndex(&fabricIndex));
+    chip::FabricIndex fabricIndex = GetCommissioner(identity).GetFabricIndex();
 
     //
     // There's a chance the commissionee may have rebooted before this call here as part of a test flow

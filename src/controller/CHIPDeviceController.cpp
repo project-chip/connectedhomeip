@@ -219,18 +219,6 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
         {
             err = fabricTable->UpdatePendingFabricWithProvidedOpKey(fabricIndex, nocSpan, icacSpan, externalOperationalKeypair,
                                                                     hasExternallyOwnedKeypair);
-            if (err == CHIP_NO_ERROR)
-            {
-                err = fabricTable->CommitPendingFabricData();
-            }
-            if (err != CHIP_NO_ERROR)
-            {
-                fabricTable->RevertPendingFabricData();
-                return err;
-            }
-
-            fabricInfo = fabricTable->FindFabricWithIndex(fabricIndex);
-            ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
         }
         else
         // CASE 2: New fabric with injected key
@@ -241,19 +229,6 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
                 err = fabricTable->AddNewPendingFabricWithProvidedOpKey(
                     nocSpan, icacSpan, newFabricVendorId, externalOperationalKeypair, hasExternallyOwnedKeypair, &fabricIndex);
             }
-            if (err == CHIP_NO_ERROR)
-            {
-                err = fabricTable->CommitPendingFabricData();
-            }
-
-            if (err != CHIP_NO_ERROR)
-            {
-                fabricTable->RevertPendingFabricData();
-                return err;
-            }
-
-            fabricInfo = fabricTable->FindFabricWithIndex(fabricIndex);
-            ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
         }
     }
     else
@@ -266,43 +241,29 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
             VerifyOrReturnError(fabricTable->HasOperationalKeyForFabric(fabricIndex), CHIP_ERROR_KEY_NOT_FOUND);
 
             err = fabricTable->UpdatePendingFabricWithOperationalKeystore(fabricIndex, nocSpan, icacSpan);
-            if (err == CHIP_NO_ERROR)
-            {
-                err = fabricTable->CommitPendingFabricData();
-            }
-            if (err != CHIP_NO_ERROR)
-            {
-                fabricTable->RevertPendingFabricData();
-                return err;
-            }
-
-            fabricInfo = fabricTable->FindFabricWithIndex(fabricIndex);
-            ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
         }
         else
         // CASE 4: New fabric with operational keystore
         {
-            VerifyOrReturnError(fabricTable->HasOperationalKeyForFabric(fabricIndex), CHIP_ERROR_KEY_NOT_FOUND);
-
             err = fabricTable->AddNewPendingTrustedRootCert(rcacSpan);
             if (err == CHIP_NO_ERROR)
             {
                 err = fabricTable->AddNewPendingFabricWithOperationalKeystore(nocSpan, icacSpan, newFabricVendorId, &fabricIndex);
             }
-            if (err == CHIP_NO_ERROR)
-            {
-                err = fabricTable->CommitPendingFabricData();
-            }
-
-            if (err != CHIP_NO_ERROR)
-            {
-                fabricTable->RevertPendingFabricData();
-                return err;
-            }
-
-            fabricInfo = fabricTable->FindFabricWithIndex(fabricIndex);
-            ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
         }
+
+        // Commit after setup, error-out on failure.
+        if (err == CHIP_NO_ERROR)
+        {
+            // No need to revert on error: CommitPendingFabricData reverts internally on *any* error.
+            err = fabricTable->CommitPendingFabricData();
+        }
+        else
+        {
+            fabricTable->RevertPendingFabricData();
+        }
+
+        ReturnErrorOnFailure(err);
     }
 
     mFabricIndex = fabricIndex;

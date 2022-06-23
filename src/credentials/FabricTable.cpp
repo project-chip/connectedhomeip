@@ -1906,7 +1906,7 @@ CHIP_ERROR FabricTable::SetFabricLabel(FabricIndex fabricIndex, const CharSpan &
     bool fabricIsInitialized = (fabricInfo != nullptr) && fabricInfo->IsInitialized();
     VerifyOrReturnError(fabricIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    // Update fabric tabel in-memory entry, whether pending or not
+    // Update fabric table current in-memory entry, whether pending or not
     ReturnErrorOnFailure(fabricInfo->SetFabricLabel(fabricLabel));
 
     if (!mStateFlags.HasAny(StateFlags::kIsAddPending, StateFlags::kIsUpdatePending) && (fabricInfo != &mPendingFabric))

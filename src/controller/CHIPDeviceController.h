@@ -278,14 +278,6 @@ public:
      */
     CHIP_ERROR GetRootPublicKey(Crypto::P256PublicKey & outRootPublicKey) const;
 
-    CHIP_ERROR GetFabricIndex(FabricIndex * value)
-    {
-        const auto * fabricInfo = GetFabricInfo();
-        VerifyOrReturnError(mState == State::Initialized && fabricInfo != nullptr && value != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        *value = fabricInfo->GetFabricIndex();
-        return CHIP_NO_ERROR;
-    }
-
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     const FabricTable * GetFabricTable() const
