@@ -171,7 +171,7 @@ log ([UART terminal](#viewing-logging-output)). It will look like the following:
 ```
 SetupQRCode:  [MT:.81TM -00 0C9SS0]
 Copy/paste the below URL in a browser to see the QR Code:
-https://dhrishi.github.io/connectedhomeip/qrcode.html?data=CH%3A.81TM%20-00%200C9SS0
+https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3A.81TM%20-00%200C9SS0
 ```
 
 You can directly navigate to the webpage URL displayed (which has QR payload
@@ -203,4 +203,4 @@ Additionally, we welcome any feedback.
     https://www.ti.com/wireless-connectivity/thread/design-development.html
 [ot_border_router_setup]:
     https://openthread.io/guides/border-router/beaglebone-black
-[qr_code_generator]: https://dhrishi.github.io/connectedhomeip/qrcode.html
+[qr_code_generator]: https://project-chip.github.io/connectedhomeip/qrcode.html

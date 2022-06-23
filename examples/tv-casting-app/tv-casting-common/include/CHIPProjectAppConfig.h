@@ -29,7 +29,9 @@
 
 // include the CHIPProjectConfig from config/standalone
 
+#ifndef CHIP_CONFIG_KVS_PATH
 #define CHIP_CONFIG_KVS_PATH "/tmp/chip_casting_kvs"
+#endif
 
 #include <CHIPProjectConfig.h>
 
@@ -48,3 +50,6 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test TV casting app"
 
 #define CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART 0
+
+// Enable some test-only interaction model APIs.
+#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1

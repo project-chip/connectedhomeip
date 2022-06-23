@@ -29,7 +29,7 @@ concurrency:
 jobs:
     test_suites_chip_tool_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 135
+        timeout-minutes: 150
 
         strategy:
             matrix:
@@ -103,7 +103,7 @@ jobs:
                 mv /Users/runner/work/connectedhomeip/connectedhomeip/src/darwin/Framework/build/Release/Matter.framework /tmp/macos_framework_output
                 ls -la /tmp/macos_framework_output
             - name: Build Apps
-              timeout-minutes: 45
+              timeout-minutes: 60
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \

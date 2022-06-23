@@ -20,10 +20,10 @@ config:
     endpoint: 1
     majornumber:
         type: INT16U
-        defaultValue: 1
+        defaultValue: 9
     minornumber:
         type: INT16U
-        defaultValue: 2
+        defaultValue: 1
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -41,37 +41,34 @@ tests:
           constraints:
               type: list
 
-    #Issue 18094
     - label: "Reads the CurrentChannel attribute from the DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
-          saveAs: currentChannelvalue
           value: [majorNumber: majornumber, minorNumber: minornumber]
 
-    #Issue 13084 and 18098
     - label: "Sends a SkipChannel command to the DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "SkipChannel"
       arguments:
           values:
               - name: "Count"
                 value: 1
 
-    - label: "log a command"
+    - label: "Verify that the channel has changed on the device"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "verify that the channel has changed on the device"
+                value: "Please enter 'y' if channel has changed on the device"
+              - name: "expectedValue"
+                value: "y"
 
-    #Issue 18094 and 13029
     - label: "Reads the CurrentChannel attribute from the DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
+          value: [majorNumber: majornumber, minorNumber: minornumber + 1]
           constraints:
               type: list

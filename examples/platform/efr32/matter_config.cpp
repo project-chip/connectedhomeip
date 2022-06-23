@@ -27,7 +27,7 @@
 
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
-#endif /* RS911X_WIFI */
+#endif /* SL_WIFI */
 
 #if PW_RPC_ENABLED
 #include "Rpc.h"
@@ -135,7 +135,7 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
     //==============================================
     EFR32_LOG("Init CHIP Stack");
     // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
+    ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);

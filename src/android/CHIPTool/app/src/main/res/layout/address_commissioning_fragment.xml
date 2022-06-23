@@ -85,6 +85,24 @@
       app:layout_constraintTop_toBottomOf="@id/address_commissioning_fragment_flow">
 
     <Button
+        android:id="@+id/wifiScanBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/wifi_scan_btn_text"/>
+
+    <Spinner
+        android:id="@+id/wifiScanListSpinner"
+        android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/wifiConnectBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/wifi_connect_btn_text"/>
+
+    <Button
         android:id="@+id/discoverBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

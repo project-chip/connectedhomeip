@@ -20,6 +20,10 @@
 
 #import "DiscoveredNodeDataConverter.hpp"
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
 
@@ -55,6 +59,16 @@
         if (err != CHIP_NO_ERROR) {
             ChipLogError(AppServer, "InitChipStack failed: %s", ErrorStr(err));
             return nil;
+        }
+
+        // Initialize device attestation config
+        SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+
+        // Initialize device attestation verifier from a constant version
+        {
+            // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+            const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+            SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
         }
 
         // init app Server
@@ -123,10 +137,11 @@
                                  clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                        udcRequestSentHandler:(nullable void (^)(bool))udcRequestSentHandler
 {
-    ChipLogProgress(
-        AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() called with port %d", commissionerPort);
+    ChipLogProgress(AppServer,
+        "CastingServerBridge().sendUserDirectedCommissioningRequest() called with IP %s port %d platformInterface %d",
+        [commissionerIpAddress UTF8String], commissionerPort, platformInterface);
 
-    dispatch_async(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+    dispatch_async(_chipWorkQueue, ^{
         bool udcRequestStatus;
         chip::Inet::IPAddress commissionerAddrInet;
         if (chip::Inet::IPAddress::FromString([commissionerIpAddress UTF8String], commissionerAddrInet) == false) {
@@ -153,4 +168,41 @@
         });
     });
 }
+
+- (void)openBasicCommissioningWindow:(nullable void (^)(bool))commissioningCompleteCallback
+                            clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    commissioningWindowRequestedHandler:(nullable void (^)(bool))commissioningWindowRequestedHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().openBasicCommissioningWindow() called");
+
+    _commissioningCompleteCallback = commissioningCompleteCallback;
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->OpenBasicCommissioningWindow(
+            [](CHIP_ERROR err) { [CastingServerBridge getSharedInstance].commissioningCompleteCallback(CHIP_NO_ERROR == err); });
+
+        dispatch_async(clientQueue, ^{
+            commissioningWindowRequestedHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)contentLauncherLaunchUrl:(NSString * _Nonnull)contentUrl
+               contentDisplayStr:(NSString * _Nonnull)contentDisplayStr
+       launchUrlResponseCallback:(nullable void (^)(bool))launchUrlResponseCallback
+                     clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+     launchUrlRequestSentHandler:(nullable void (^)(bool))launchUrlRequestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().contentLauncherLaunchUrl() called");
+
+    _launchUrlResponseCallback = launchUrlResponseCallback;
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err
+            = CastingServer::GetInstance()->ContentLauncherLaunchURL([contentUrl UTF8String], [contentDisplayStr UTF8String],
+                [](CHIP_ERROR err) { [CastingServerBridge getSharedInstance].launchUrlResponseCallback(CHIP_NO_ERROR == err); });
+        dispatch_async(clientQueue, ^{
+            launchUrlRequestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
 @end

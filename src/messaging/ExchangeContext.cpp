@@ -325,9 +325,6 @@ ExchangeContext::~ExchangeContext()
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
     VerifyOrDie(!IsAckPending());
 
-    if (ReleaseSessionOnDestruction() && mSession)
-        mSession->AsSecureSession()->MarkForEviction();
-
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
     // Make sure that the exchange withdraws the request for Sleepy End Device active mode.
     UpdateSEDIntervalMode(false);
@@ -371,6 +368,11 @@ bool ExchangeContext::MatchExchange(const SessionHandle & session, const PacketH
 
 void ExchangeContext::OnSessionReleased()
 {
+    if (ShouldIgnoreSessionRelease())
+    {
+        return;
+    }
+
     if (mFlags.Has(Flags::kFlagClosed))
     {
         // Exchange is already being closed. It may occur when closing an exchange after sending
@@ -571,6 +573,32 @@ ExchangeMessageDispatch & ExchangeContext::GetMessageDispatch(bool isEphemeralEx
         return delegate->GetMessageDispatch();
 
     return ApplicationExchangeDispatch::Instance();
+}
+
+void ExchangeContext::AbortAllOtherCommunicationOnFabric()
+{
+    if (!mSession || !mSession->IsSecureSession())
+    {
+        ChipLogError(ExchangeManager, "AbortAllOtherCommunicationOnFabric called when we don't have a PASE/CASE session");
+        return;
+    }
+
+    // Save our session so it does not actually go away.
+    Optional<SessionHandle> session = mSession.Get();
+
+    SetIgnoreSessionRelease(true);
+
+    GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(mSession->GetFabricIndex());
+
+    mSession.GrabExpiredSession(session.Value());
+
+    SetIgnoreSessionRelease(false);
+}
+
+void ExchangeContext::ExchangeSessionHolder::GrabExpiredSession(const SessionHandle & session)
+{
+    VerifyOrDie(session->AsSecureSession()->IsPendingEviction());
+    GrabUnchecked(session);
 }
 
 } // namespace Messaging

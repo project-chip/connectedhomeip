@@ -28,46 +28,38 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #issue #12884 Media cluster commands and precondition not supported
-    - label: "Precondition: Connect media content available for playback"
-      disabled: true
-
     - label:
           "Precondition: Media content in a paused state at the beginning of the
           content"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "Pause"
-
-    - label: "log a command"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
+      response:
           values:
-              - name: "message"
-                value: "Verify that media is paused"
+              - name: "status"
+                value: 0
 
-    - label: "Precondition: At least 2 media items are queued"
-      disabled: true
-
-    #Issue 18109
     - label: "Reads the CurrentState attribute from the DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
     - label: "Sends a Play command to the DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "Play"
+      response:
+          values:
+              - name: "status"
+                value: 0
 
-    - label: "log a command"
+    - label: "Verify that the media state is playing"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Physically verify that the media is playing"
+                value: "Please enter 'y' if media state is playing"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads the CurrentState attribute"
       command: "readAttribute"
@@ -76,85 +68,115 @@ tests:
           value: 0
 
     - label: "Sends a StartOver command to the DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "StartOver"
+      response:
+          values:
+              - name: "status"
+                value: 0
 
-    - label: "log a command"
+    - label: "Verify that the media is started over"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Physically verify that the media is started over"
+                value: "Please enter 'y' if media is started over"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Sends a Next command to the DUT"
       command: "Next"
+      response:
+          values:
+              - name: "status"
+                value: 0
 
-    - label: "log a command"
+    - label: "Verify that the next media item in the queue has been loaded"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
                 value:
-                    "Verify that the next media item in the queue has been
-                    loaded"
+                    "Please enter 'y' if media item in the queue has been loaded"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Sends a Previous command to the DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "Previous"
+      response:
+          values:
+              - name: "status"
+                value: 0
 
-    - label: "log a command"
+    - label: "Verify that the previous media item in the queue has been loaded"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
                 value:
-                    "Verify that the previous media item in the queue has been
-                    loaded"
+                    "Please enter 'y' if previous media item in the queue has
+                    been loaded"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Sends a SkipForward command to the DUT "
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "SkipForward"
       arguments:
           values:
               - name: "DeltaPositionMilliseconds"
                 value: 10000
+      response:
+          values:
+              - name: "status"
+                value: 0
 
-    - label: "log a command"
+    - label: "Verify that the media has skipped forward 10 seconds"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Verify that the media has skipped forward 10 seconds"
+                value:
+                    "Please enter 'y' if media has skipped forward 10 seconds"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads the SampledPosition attribute from the DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
           value: 10000
 
     - label: "Sends a SkipBackward command to the DUT "
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "SkipBackward"
       arguments:
           values:
               - name: "DeltaPositionMilliseconds"
                 value: 10000
+      response:
+          values:
+              - name: "status"
+                value: 0
 
-    - label: "log a command"
+    - label: "Verify that the media has skipped backward 10 seconds"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Verify that the media has skipped backward 10 seconds"
+                value:
+                    "Please enter 'y' if media has skipped backward 10 seconds"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads the SampledPosition attribute from the DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "SampledPosition"
       response:

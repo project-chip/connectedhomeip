@@ -30,6 +30,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -57,15 +58,17 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-constexpr int kFactoryResetTriggerTimeout      = 3000;
-constexpr int kFactoryResetCancelWindowTimeout = 3000;
-constexpr int kAppEventQueueSize               = 10;
-constexpr uint8_t kButtonPushEvent             = 1;
-constexpr uint8_t kButtonReleaseEvent          = 0;
-constexpr EndpointId kLightEndpointId          = 1;
-constexpr uint32_t kIdentifyBlinkRateMs        = 500;
-constexpr uint8_t kDefaultMinLevel             = 0;
-constexpr uint8_t kDefaultMaxLevel             = 254;
+constexpr int kFactoryResetTriggerTimeout        = 3000;
+constexpr int kFactoryResetCancelWindowTimeout   = 3000;
+constexpr int kAppEventQueueSize                 = 10;
+constexpr uint8_t kButtonPushEvent               = 1;
+constexpr uint8_t kButtonReleaseEvent            = 0;
+constexpr EndpointId kLightEndpointId            = 1;
+constexpr uint32_t kIdentifyBlinkRateMs          = 500;
+constexpr uint8_t kDefaultMinLevel               = 0;
+constexpr uint8_t kDefaultMaxLevel               = 254;
+constexpr uint8_t kTestEventTriggerEnableKey[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                     0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 k_timer sFunctionTimer;
@@ -167,8 +170,10 @@ CHIP_ERROR AppTask::Init()
     // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
-    static chip::CommonCaseDeviceServerInitParams initParams;
+    static CommonCaseDeviceServerInitParams initParams;
+    static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(kTestEventTriggerEnableKey) };
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());

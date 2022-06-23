@@ -3634,7 +3634,7 @@ endpoint 1 {
     ram      attribute options;
     ram      attribute numberOfPrimaries;
     ram      attribute enhancedColorMode default = 0x01;
-    ram      attribute colorCapabilities;
+    ram      attribute colorCapabilities default = 0x1F;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 5;
   }
