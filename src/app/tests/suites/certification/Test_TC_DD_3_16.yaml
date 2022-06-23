@@ -41,7 +41,7 @@ tests:
           [1651180718.960671][13218:13218] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
           [1651180718.960729][13218:13218] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
           [1651180718.960760][13218:13218] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1651180718.960781][13218:13218] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0AFN00KA0648G00
+          [1651180718.960781][13218:13218] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0AFN00KA0648G00
           [1651180718.960814][13218:13218] CHIP:SVR: Manual pairing code: [34970112332]
       disabled: true
 

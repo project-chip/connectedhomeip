@@ -73,7 +73,10 @@ public:
     // There is not delegate, nothing to do here
     virtual void DispatchSessionEvent(SessionDelegate::Event event) {}
 
-private:
+protected:
+    // Helper for use by the Grab methods.
+    void GrabUnchecked(const SessionHandle & session);
+
     Optional<ReferenceCountedHandle<Transport::Session>> mSession;
 };
 

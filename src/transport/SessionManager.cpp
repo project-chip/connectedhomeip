@@ -368,23 +368,6 @@ void SessionManager::ExpireAllPASEPairings()
     });
 }
 
-void SessionManager::ReleaseSessionsForFabricExceptOne(FabricIndex fabricIndex, const SessionHandle & deferred)
-{
-    VerifyOrDie(deferred->IsSecureSession());
-    SecureSession * deferredSecureSession = deferred->AsSecureSession();
-
-    mSecureSessions.ForEachSession([&](auto session) {
-        if (session->GetPeer().GetFabricIndex() == fabricIndex)
-        {
-            if (session == deferredSecureSession)
-                session->MarkInactive();
-            else
-                session->MarkForEviction();
-        }
-        return Loop::Continue;
-    });
-}
-
 Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,
                                                         const ScopedNodeId & sessionEvictionHint)
 {
@@ -553,7 +536,13 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
 
     Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
 
-    if (!secureSession->IsDefunct() && !secureSession->IsActiveSession())
+    // We need to allow through messages even on sessions that are pending
+    // evictions, because for some cases (UpdateNOC, RemoveFabric, etc) there
+    // can be a single exchange alive on the session waiting for a MRP ack, and
+    // we need to make sure to send the ack through.  The exchange manager is
+    // responsible for ensuring that such messages do not lead to new exchange
+    // creation.
+    if (!secureSession->IsDefunct() && !secureSession->IsActiveSession() && !secureSession->IsPendingEviction())
     {
         ChipLogError(Inet, "Secure transport received message on a session in an invalid state (state = '%s')",
                      secureSession->GetStateStr());

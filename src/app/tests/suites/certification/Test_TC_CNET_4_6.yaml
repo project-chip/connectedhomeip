@@ -1,0 +1,62 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    11.4.6. [TC-CNET-4.6] [Thread] UNSUPPORTED_ACCESS message Validation
+    [DUT-Server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "TH sends the AddOrUpdateThreadNetwork command to the DUT with the
+          following argument: OperationalDataset argument value as 'Userth_op'
+          Breadcrumb argument value as 1"
+      verification: |
+          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning add-or-update-thread-network 1232034768527434274  51 0
+
+          [1650363857.368796][6969:6974] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0x7e
+          [1650363857.368875][6969:6974] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1650363857.368983][6969:6974] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650363857.369099][6969:6974] CHIP:EM: Sending Standalone Ack for MessageCounter:11755505 on exchange 55845i
+      disabled: true
+
+    - label:
+          "TH sends RemoveNetwork command to the DUT with NetworkID argument
+          value as 'Userth_op' and Breadcrumb argument value as 1"
+      verification: |
+          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning remove-network 1232034768527434274 51 0
+
+          [1650363867.634242][6975:6980] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0004 Status=0x7e
+          [1650363867.634324][6975:6980] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1650363867.634414][6975:6980] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650363867.634538][6975:6980] CHIP:EM: Sending Standalone Ack for MessageCounter:10492212 on exchange 58096i
+      disabled: true
+
+    - label:
+          "TH sends ConnectNetwork command to the DUT with NetworkID argument
+          value as 'Userth_op' and Breadcrumb argument value as 1"
+      verification: |
+          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning connect-network 1232034768527434274 51 0
+
+
+          [1650363877.624299][6983:6988] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0006 Status=0x7e
+          [1650363877.624379][6983:6988] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1650363877.624465][6983:6988] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650363877.624582][6983:6988] CHIP:EM: Sending Standalone Ack for MessageCounter:841274 on exchange 6415i
+      disabled: true

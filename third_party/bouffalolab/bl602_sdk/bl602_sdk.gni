@@ -267,6 +267,7 @@ template("bl602_sdk") {
 
     cflags_cc = [ "-fpermissive" ]
     cflags_cc += [ "-std=c++17" ]
+    cflags_cc += [ "-D _GNU_SOURCE" ]
 
     foreach(include_dir, _include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]

@@ -59,6 +59,14 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Wait for 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
       PICS: CC.S.C44.Rsp
@@ -134,11 +142,10 @@ tests:
       response:
           value: 1
 
-    #Issue 18848
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
-      PICS: PICS_SKIP_SAMPLE_APP && CC.S.A4006
+      PICS: CC.S.A4006
       response:
           value: 16384
 

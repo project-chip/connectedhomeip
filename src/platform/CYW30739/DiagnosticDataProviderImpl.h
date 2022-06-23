@@ -48,16 +48,6 @@ public:
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
-
-private:
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    struct ThreadNetworkInterface : public NetworkInterface
-    {
-        ~ThreadNetworkInterface() = delete;
-
-        uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    };
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 };
 
 } // namespace DeviceLayer

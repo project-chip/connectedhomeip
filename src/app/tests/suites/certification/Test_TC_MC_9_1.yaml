@@ -19,7 +19,6 @@ name:
 config:
     nodeId: 0x12344321
     cluster: "Application Basic"
-    # Default endpoint is 3, since that's where tv-app has this cluster.
     endpoint: 3
 
 tests:
@@ -30,14 +29,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    - label: "Precondition"
-      cluster: "LogCommands"
-      command: "Log"
-      arguments:
-          values:
-              - name: "message"
-                value: "DUT has one or more Content Apps available"
 
     - label: "Reads the VendorName attribute"
       command: "readAttribute"
