@@ -37,7 +37,7 @@ tests:
           [1641836544619] [16162:695667] CHIP: [DL]   Device Type: 257 (0x101)
           [1641836544619] [16162:695667] CHIP: [SVR] SetupQRCode: [MT:YNJV7VSC00KA0648G00]
           [1641836544619] [16162:695667] CHIP: [SVR] Copy/paste the below URL in a browser to see the QR Code:
-          [1641836544619] [16162:695667] CHIP: [SVR] https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00KA0648G00
+          [1641836544619] [16162:695667] CHIP: [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00KA0648G00
           [1641836544619] [16162:695667] CHIP: [SVR] Manual pairing code: [34970112332]
 
 
@@ -86,7 +86,7 @@ tests:
           [1641836544690] [16162:695667] CHIP: [DL]   Device Type: 257 (0x101)
           [1641836544690] [16162:695667] CHIP: [SVR] SetupQRCode: [MT:YNJV7VSC00KA0648G00]
           [1641836544690] [16162:695667] CHIP: [SVR] Copy/paste the below URL in a browser to see the QR Code:
-          [1641836544690] [16162:695667] CHIP: [SVR] https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00KA0648G00
+          [1641836544690] [16162:695667] CHIP: [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00KA0648G00
           [1641836544690] [16162:695667] CHIP: [SVR] Manual pairing code: [34970112332]
           [1641836544690] [16162:695684] CHIP: [DL] _OnPlatformEvent
           [1641836544690] [16162:695684] CHIP: [DIS] DNS-SD StartServer mode=0

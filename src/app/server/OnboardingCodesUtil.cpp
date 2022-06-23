@@ -30,7 +30,7 @@
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
-constexpr char kQrCodeBaseUrl[]                   = "https://dhrishi.github.io/connectedhomeip/qrcode.html";
+constexpr char kQrCodeBaseUrl[]                   = "https://project-chip.github.io/connectedhomeip/qrcode.html";
 constexpr char kUrlDataAssignmentPhrase[]         = "?data=";
 constexpr char kSpecialCharsUnreservedInRfc3986[] = "-._~";
 
