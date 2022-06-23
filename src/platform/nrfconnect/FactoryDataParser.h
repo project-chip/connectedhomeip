@@ -33,6 +33,7 @@ struct FactoryDataString
 
 struct FactoryData
 {
+    uint16_t version;
     struct FactoryDataString sn;
     uint16_t date_year;
     uint8_t date_month;

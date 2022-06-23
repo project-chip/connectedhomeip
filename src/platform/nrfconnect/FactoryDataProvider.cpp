@@ -16,6 +16,7 @@
  */
 
 #include "FactoryDataProvider.h"
+#include "CHIPDevicePlatformConfig.h"
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <logging/log.h>
@@ -53,6 +54,14 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
     {
         ChipLogError(DeviceLayer, "Failed to parse factory data");
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
+
+    // Check if factory data version is correct
+    if (mFactoryData.version != CONFIG_CHIP_FACTORY_DATA_VERSION)
+    {
+        ChipLogError(DeviceLayer, "Factory data version mismatch. Flash version: %d vs code version: %d", mFactoryData.version,
+                     CONFIG_CHIP_FACTORY_DATA_VERSION);
+        return CHIP_ERROR_VERSION_MISMATCH;
     }
 
     return CHIP_NO_ERROR;
