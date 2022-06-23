@@ -15,44 +15,12 @@
  *    limitations under the License.
  */
 #include <lib/dnssd/minimal_mdns/Logging.h>
+#include <lib/dnssd/minimal_mdns/core/QNameString.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace mdns {
 namespace Minimal {
 namespace Logging {
-
-QNameString::QNameString(const mdns::Minimal::FullQName & name)
-{
-    for (unsigned i = 0; i < name.nameCount; i++)
-    {
-        if (i != 0)
-        {
-            mBuffer.Add(".");
-        }
-        mBuffer.Add(name.names[i]);
-    }
-}
-
-QNameString::QNameString(mdns::Minimal::SerializedQNameIterator name)
-{
-    bool first = true;
-    while (name.Next())
-    {
-        if (first)
-        {
-            first = false;
-        }
-        else
-        {
-            mBuffer.Add(".");
-        }
-        mBuffer.Add(name.Value());
-    }
-    if (!name.IsValid())
-    {
-        mBuffer.Add("(!INVALID!)");
-    }
-}
 
 namespace {
 

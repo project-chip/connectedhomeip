@@ -29,23 +29,6 @@ namespace Minimal {
 /// MinMdns.
 namespace Logging {
 
-// Allows for a FullQName to be represented as a user-readable logging string
-class QNameString
-{
-public:
-    QNameString(const mdns::Minimal::FullQName & name);
-
-    QNameString(mdns::Minimal::SerializedQNameIterator name);
-
-    inline const char * c_str() const { return mBuffer.c_str(); }
-
-    inline bool Fit() const { return mBuffer.Fit(); }
-
-private:
-    static constexpr size_t kMaxQNameLength = 128;
-    chip::StringBuilder<kMaxQNameLength> mBuffer;
-};
-
 #if CHIP_MINMDNS_HIGH_VERBOSITY
 
 void LogSendingQuery(const mdns::Minimal::Query & query);
