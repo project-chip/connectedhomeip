@@ -36,8 +36,8 @@
 #include <lib/core/CHIPConfig.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
-#include <protocols/secure_channel/UnsolicitedStatusHandler.h>
 #include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
+#include <protocols/secure_channel/UnsolicitedStatusHandler.h>
 
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
