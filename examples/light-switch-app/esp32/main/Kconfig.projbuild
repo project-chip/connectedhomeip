@@ -71,5 +71,12 @@ menu "Demo"
        default 2 if RENDEZVOUS_MODE_BLE
        default 4 if RENDEZVOUS_MODE_THREAD
        default 8 if RENDEZVOUS_MODE_ETHERNET
-
+    
+    config EXAMPLE_BOARD_BUTTON_GPIO
+        int "Boot Button GPIO"
+        default 0 if !IDF_TARGET_ESP32C3
+        default 9 if IDF_TARGET_ESP32C3
+        help
+            GPIO number on which the "Boot" button is connected. This is generally used
+            by the application for custom operations like toggling states.
 endmenu
