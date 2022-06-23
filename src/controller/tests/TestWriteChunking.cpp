@@ -737,7 +737,7 @@ nlTestSuite sSuite =
 
 int TestWriteChunkingTests()
 {
-    static TestContext gContext;
+    TestContext gContext;
     gSuite = &sSuite;
     nlTestRunner(&sSuite, &gContext);
     return (nlTestRunnerStats(&sSuite));

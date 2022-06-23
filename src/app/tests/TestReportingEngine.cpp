@@ -349,7 +349,7 @@ nlTestSuite sSuite =
 
 int TestReportingEngine()
 {
-    static TestContext gContext;
+    TestContext gContext;
     nlTestRunner(&sSuite, &gContext);
     return (nlTestRunnerStats(&sSuite));
 }

@@ -618,7 +618,7 @@ nlTestSuite theSuite =
 
 int TestBufferedReadCallback()
 {
-    static TestContext gContext;
+    TestContext gContext;
     gSuite = &theSuite;
     nlTestRunner(&theSuite, &gContext);
     return (nlTestRunnerStats(&theSuite));

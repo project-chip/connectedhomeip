@@ -294,7 +294,7 @@ nlTestSuite sSuite =
 
 int TestFabricScopedEventLogging()
 {
-    static TestContext gContext;
+    TestContext gContext;
     nlTestRunner(&sSuite, &gContext);
     return (nlTestRunnerStats(&sSuite));
 }

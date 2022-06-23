@@ -185,7 +185,7 @@ nlTestSuite sSuite =
 
 int TestEventOverflow()
 {
-    static TestContext gContext;
+    TestContext gContext;
     nlTestRunner(&sSuite, &gContext);
     return (nlTestRunnerStats(&sSuite));
 }

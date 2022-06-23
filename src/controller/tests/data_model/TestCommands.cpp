@@ -459,7 +459,7 @@ nlTestSuite sSuite =
 
 int TestCommandInteractionTest()
 {
-    static TestContext gContext;
+    TestContext gContext;
     nlTestRunner(&sSuite, &gContext);
     return (nlTestRunnerStats(&sSuite));
 }
