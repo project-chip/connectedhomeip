@@ -64,6 +64,7 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
     "${nlunit_test_root}:nlunit-test",

@@ -30,6 +30,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
+#include <lib/support/UnitTestContext.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <setup_payload/AdditionalDataPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
@@ -317,17 +318,11 @@ int TestAdditionalDataPayload()
         TestAdditionalDataPayload_Teardown
     };
     // clang-format on
-    TestContext context;
-
-    context.mSuite = &theSuite;
 
     // Generate machine-readable, comma-separated value (CSV) output.
     nl_test_set_output_style(OUTPUT_CSV);
 
-    // Run Test suit against one context
-    nlTestRunner(&theSuite, &context);
-
-    return nlTestRunnerStats(&theSuite);
+    return chip::ExecuteTestsWithContext<TestContext>(&theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestAdditionalDataPayload);
