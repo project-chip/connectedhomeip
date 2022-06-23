@@ -21,6 +21,8 @@
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 
+using namespace chip::ArgParser;
+
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
 using chip::ArgParser::PrintArgError;
@@ -55,8 +57,8 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
 OptionSet * AppOptions::GetOptions()
 {
     static OptionDef optionsDef[] = {
-        { "dac_provider", chip::ArgParser::kArgumentRequired, kOptionDacProviderFilePath },
-        { "min_commissioning_timeout", chip::ArgParser::kArgumentRequired, kOptionMinCommissioningTimeout },
+        { "dac_provider", kArgumentRequired, kOptionDacProviderFilePath },
+        { "min_commissioning_timeout", kArgumentRequired, kOptionMinCommissioningTimeout },
         {},
     };
 

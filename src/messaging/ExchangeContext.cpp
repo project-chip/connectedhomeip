@@ -42,6 +42,7 @@
 #include <messaging/EphemeralExchangeDispatch.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
+#include <platform/LockTracker.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 
@@ -132,6 +133,10 @@ void ExchangeContext::UpdateSEDIntervalMode(bool activeMode)
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
                                         const SendFlags & sendFlags)
 {
+    // This is the first point all outgoing messages funnel through.  Ensure
+    // that our message sends are all synchronized correctly.
+    assertChipStackLockedByCurrentThread();
+
     bool isStandaloneAck =
         (protocolId == Protocols::SecureChannel::Id) && msgType == to_underlying(Protocols::SecureChannel::MsgType::StandaloneAck);
     if (!isStandaloneAck)
@@ -363,6 +368,11 @@ bool ExchangeContext::MatchExchange(const SessionHandle & session, const PacketH
 
 void ExchangeContext::OnSessionReleased()
 {
+    if (ShouldIgnoreSessionRelease())
+    {
+        return;
+    }
+
     if (mFlags.Has(Flags::kFlagClosed))
     {
         // Exchange is already being closed. It may occur when closing an exchange after sending
@@ -563,6 +573,32 @@ ExchangeMessageDispatch & ExchangeContext::GetMessageDispatch(bool isEphemeralEx
         return delegate->GetMessageDispatch();
 
     return ApplicationExchangeDispatch::Instance();
+}
+
+void ExchangeContext::AbortAllOtherCommunicationOnFabric()
+{
+    if (!mSession || !mSession->IsSecureSession())
+    {
+        ChipLogError(ExchangeManager, "AbortAllOtherCommunicationOnFabric called when we don't have a PASE/CASE session");
+        return;
+    }
+
+    // Save our session so it does not actually go away.
+    Optional<SessionHandle> session = mSession.Get();
+
+    SetIgnoreSessionRelease(true);
+
+    GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(mSession->GetFabricIndex());
+
+    mSession.GrabExpiredSession(session.Value());
+
+    SetIgnoreSessionRelease(false);
+}
+
+void ExchangeContext::ExchangeSessionHolder::GrabExpiredSession(const SessionHandle & session)
+{
+    VerifyOrDie(session->AsSecureSession()->IsPendingEviction());
+    GrabUnchecked(session);
 }
 
 } // namespace Messaging

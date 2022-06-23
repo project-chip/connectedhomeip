@@ -55,7 +55,7 @@ limitations under the License.
     <!-- Conformance feature [TL & PA_TL] - for now optional -->
     <attribute side="server" writable="false" code="0x0009" define="WC_CURRENT_POSITION_TILT_PERCENTAGE"          type="Percent"  min="0"      max="100"    isNullable="true" optional="true" reportable="true" >CurrentPositionTiltPercentage</attribute>
     <!-- Conformance feature M -->
-    <attribute side="server" writable="false" code="0x000A" define="WC_OPERATIONAL_STATUS"                        type="BITMAP8"  min="0x00"   max="0x7F"   default="0x00"   optional="false" reportable="true" >OperationalStatus</attribute>
+    <attribute side="server" writable="false" code="0x000A" define="WC_OPERATIONAL_STATUS"                        type="OperationalStatus" min="0x00"   max="0x7F"   default="0x00"   optional="false" reportable="true" >OperationalStatus</attribute>
     <!-- Conformance feature LF & PA_LF - for now optional -->
     <attribute side="server" writable="false" code="0x000B" define="WC_TARGET_POSITION_LIFT_PERCENT100THS"        type="Percent100ths" min="0" max="10000"  isNullable="true" optional="true" reportable="true" >TargetPositionLiftPercent100ths</attribute>
     <!-- Conformance feature TL & PA_TL - for now optional -->
@@ -88,7 +88,7 @@ limitations under the License.
     <!-- attribute side="server" writable="true"  code="0x0018" define="WC_INTERMEDIATE_SETPOINTS_LIFT"           type="OCTET_STRING" length="254" default="1,0x0000"        optional="true" >IntermediateSetpointsLift</attribute> -->
     <!-- attribute side="server" writable="true"  code="0x0019" define="WC_INTERMEDIATE_SETPOINTS_TILT"           type="OCTET_STRING" length="254" default="1,0x0000"        optional="true" >IntermediateSetpointsTilt</attribute> -->
     <!-- Conformance feature Optional -->
-    <attribute side="server" writable="false" code="0x001A" define="WC_SAFETY_STATUS"                             type="BITMAP16" min="0x0000" max="0xFFFF" default="0x0000" optional="true" reportable="true" >SafetyStatus</attribute>
+    <attribute side="server" writable="false" code="0x001A" define="WC_SAFETY_STATUS"                             type="SafetyStatus" min="0x0000" max="0xFFFF" default="0x0000" optional="true" reportable="true" >SafetyStatus</attribute>
 
     <!-- Window Covering Command Set -->
     <!-- Conformance feature M -->
@@ -177,7 +177,7 @@ limitations under the License.
     <field mask="0x08" name="LedFeedback"/>
   </bitmap>
 
-  <bitmap name="WcOperationalStatus" type="BITMAP8">
+  <bitmap name="OperationalStatus" type="BITMAP8">
     <cluster code="0x0102"/>
     <field mask="0x03" name="Global"/>
     <field mask="0x0C" name="Lift"/>
@@ -195,7 +195,7 @@ limitations under the License.
     <field mask="0x40" name="TiltEncoderControlled"/>
   </bitmap>
 
-  <bitmap name="WcSafetyStatus" type="BITMAP16">
+  <bitmap name="SafetyStatus" type="BITMAP16">
     <cluster code="0x0102"/>
     <field mask="0x0001" name="RemoteLockout"/>
     <field mask="0x0002" name="TamperDetection"/>
@@ -211,13 +211,12 @@ limitations under the License.
     <field mask="0x0800" name="Protection"/>
   </bitmap>
 
-  <bitmap name="WcFeature" type="BITMAP32">
+  <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x0102"/>
-    <field name="Lift" mask="0x1"/>
-    <field name="Tilt" mask="0x2"/>
-    <field name="PositionAwareLift" mask="0x4"/>
-    <field name="AbsolutePosition" mask="0x8"/>
-    <field name="PositionAwareTilt" mask="0x10"/>
+    <field mask="0x01" name="Lift" />
+    <field mask="0x02" name="Tilt" />
+    <field mask="0x04" name="PositionAwareLift"/>
+    <field mask="0x08" name="AbsolutePosition"/>
+    <field mask="0x10" name="PositionAwareTilt"/>
   </bitmap>
-
 </configurator>

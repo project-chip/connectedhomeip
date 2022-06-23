@@ -207,24 +207,6 @@ tests:
               minValue: 0
               maxValue: 2047
 
-    - label: "3a.2: write a value into the RO mandatory attribute: SafetyStatus"
-      command: "writeAttribute"
-      attribute: "SafetyStatus"
-      PICS: A_SAFETYSTATUS
-      arguments:
-          value: 4096
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3a.3: reads back the RO mandatory attribute: SafetyStatus"
-      command: "readAttribute"
-      attribute: "SafetyStatus"
-      PICS: A_SAFETYSTATUS
-      response:
-          constraints:
-              type: map16
-              notValue: 4096
-
     ### Attribute[  1]: PhysicalClosedLimitLift  ====================
     - label:
           "3b: read the RO optional attribute default: PhysicalClosedLimitLift"

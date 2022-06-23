@@ -290,17 +290,20 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, 
     JniUtfString jnihostName(env, hostName);
     JniUtfString jniAddress(env, address);
     Inet::IPAddress ipAddress;
+    Inet::InterfaceId iface;
 
     VerifyOrReturn(strlen(jniInstanceName.c_str()) <= Operational::kInstanceNameMaxLength, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
     VerifyOrReturn(strlen(jniServiceType.c_str()) <= kDnssdTypeAndProtocolMaxSize, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
     VerifyOrReturn(CanCastTo<uint16_t>(port), dispatch(CHIP_ERROR_INVALID_ARGUMENT));
-    VerifyOrReturn(Inet::IPAddress::FromString(jniAddress.c_str(), ipAddress), dispatch(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturn(Inet::IPAddress::FromString(const_cast<char *>(jniAddress.c_str()), ipAddress, iface),
+                   dispatch(CHIP_ERROR_INVALID_ARGUMENT));
 
     DnssdService service = {};
     CopyString(service.mName, jniInstanceName.c_str());
     CopyString(service.mHostName, jnihostName.c_str());
     CopyString(service.mType, jniServiceType.c_str());
     service.mPort          = static_cast<uint16_t>(port);
+    service.mInterface     = iface;
     service.mTextEntrySize = 0;
     service.mTextEntries   = nullptr;
 

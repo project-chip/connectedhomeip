@@ -40,9 +40,6 @@ public:
     CHIP_ERROR StoreVendorId(uint16_t vendorId);
     CHIP_ERROR StoreProductId(uint16_t productId);
 
-    CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
-    CHIP_ERROR GetProductId(uint16_t & productId) override;
-
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
 

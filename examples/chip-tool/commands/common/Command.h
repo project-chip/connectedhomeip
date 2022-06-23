@@ -73,6 +73,7 @@ enum ArgumentType
     VectorBool,
     Vector16,
     Vector32,
+    VectorCustom,
 };
 
 struct Argument
@@ -179,6 +180,7 @@ public:
 
     size_t AddArgument(const char * name, int64_t min, uint64_t max, std::vector<uint16_t> * value, const char * desc = "");
     size_t AddArgument(const char * name, int64_t min, uint64_t max, std::vector<uint32_t> * value, const char * desc = "");
+    size_t AddArgument(const char * name, std::vector<CustomArgument *> * value, const char * desc = "");
     size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<std::vector<bool>> * value,
                        const char * desc = "");
     size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<std::vector<uint32_t>> * value,

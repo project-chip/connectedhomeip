@@ -9,16 +9,17 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.OpenCommissioningCallback
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import kotlinx.android.synthetic.main.multi_admin_client_fragment.discriminatorEd
+import kotlinx.android.synthetic.main.multi_admin_client_fragment.timeoutEd
 import kotlinx.android.synthetic.main.multi_admin_client_fragment.multiAdminClusterCommandStatus
 import kotlinx.android.synthetic.main.multi_admin_client_fragment.setupPinCodeEd
 import kotlinx.android.synthetic.main.multi_admin_client_fragment.view.basicCommissioningMethodBtn
 import kotlinx.android.synthetic.main.multi_admin_client_fragment.view.enhancedCommissioningMethodBtn
 import kotlinx.android.synthetic.main.multi_admin_client_fragment.view.revokeBtn
-import kotlinx.android.synthetic.main.on_off_client_fragment.*
 import kotlinx.coroutines.*
 
 class MultiAdminClientFragment : Fragment() {
@@ -53,8 +54,10 @@ class MultiAdminClientFragment : Fragment() {
     // TODO: use the discriminator and setupPinCode that was used to commission the device
     val testDiscriminator = "3840"
     val testSetupPinCode = 20202021L
+    val testDuration = 180
     discriminatorEd.setText(testDiscriminator)
     setupPinCodeEd.setText(testSetupPinCode.toString())
+    timeoutEd.setText(testDuration.toString())
   }
 
   inner class ChipControllerCallback : GenericChipDeviceListener() {
@@ -78,23 +81,41 @@ class MultiAdminClientFragment : Fragment() {
   }
 
   private suspend fun sendBasicCommissioningCommandClick() {
-    val testDuration = 100
-    deviceController.openPairingWindow(
+    val testDuration = timeoutEd.text.toString().toInt()
+    deviceController.openPairingWindowCallback(
       ChipClient.getConnectedDevicePointer(
         requireContext(),
         addressUpdateFragment.deviceId
-      ), testDuration
+      ), testDuration,
+      object:OpenCommissioningCallback {
+        override fun onError(status: Int, deviceId: Long) {
+          showMessage("OpenBasicCommissioning Fail! \nDevice ID : $deviceId\nErrorCode : $status")
+        }
+
+        override fun onSuccess(deviceId: Long, manualPairingCode: String?, qrCode: String?) {
+          showMessage("OpenBasicCommissioning Success! \n Node ID: $deviceId")
+        }
+      }
     )
   }
 
   private suspend fun sendEnhancedCommissioningCommandClick() {
-    val testDuration = 100
+    val testDuration = timeoutEd.text.toString().toInt()
     val testIteration = 1000
     val devicePointer =
       ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-    deviceController.openPairingWindowWithPIN(
+    deviceController.openPairingWindowWithPINCallback(
       devicePointer, testDuration, testIteration.toLong(),
-      discriminatorEd.text.toString().toInt(), setupPinCodeEd.text.toString().toULong().toLong()
+      discriminatorEd.text.toString().toInt(), setupPinCodeEd.text.toString().toULong().toLong(),
+      object:OpenCommissioningCallback {
+        override fun onError(status: Int, deviceId: Long) {
+          showMessage("OpenCommissioning Fail! \nDevice ID : $deviceId\nErrorCode : $status")
+        }
+
+        override fun onSuccess(deviceId: Long, manualPairingCode: String?, qrCode: String?) {
+          showMessage("OpenCommissioning Success! \n Node ID: $deviceId\n\tManual : $manualPairingCode\n\tQRCode : $qrCode")
+        }
+      }
     )
   }
 

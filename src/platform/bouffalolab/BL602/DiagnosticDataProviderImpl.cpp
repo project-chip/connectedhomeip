@@ -23,9 +23,8 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <DiagnosticDataProviderImpl.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <platform/DiagnosticDataProvider.h>
-#include <platform/nxp/k32w/k32w0/DiagnosticDataProviderImpl.h>
 
 #include <lwip/tcpip.h>
 

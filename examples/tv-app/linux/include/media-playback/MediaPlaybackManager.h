@@ -61,4 +61,7 @@ protected:
     uint64_t mStartTime                    = 0;
     // Magic number for testing.
     uint64_t mDuration = 80000;
+
+    static const int kPlaybackMaxForwardSpeed = 10;
+    static const int kPlaybackMaxRewindSpeed  = -10;
 };

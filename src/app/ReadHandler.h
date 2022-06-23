@@ -315,7 +315,7 @@ private:
     Transport::SecureSession * GetSession() const;
     SubjectDescriptor GetSubjectDescriptor() const { return GetSession()->GetSubjectDescriptor(); }
 
-    auto GetSubscriptionStartGeneration() const { return mSubscriptionStartGeneration; }
+    auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
 
     void UnblockUrgentEventDelivery()
     {
@@ -431,7 +431,7 @@ private:
 
     // When we don't have enough resources for a new subscription, the oldest subscription might be evicted by interaction model
     // engine, the "oldest" subscription is the subscription with the smallest generation.
-    uint64_t mSubscriptionStartGeneration = 0;
+    uint64_t mTransactionStartGeneration = 0;
 
     SubscriptionId mSubscriptionId    = 0;
     uint16_t mMinIntervalFloorSeconds = 0;

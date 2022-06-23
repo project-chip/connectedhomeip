@@ -54,8 +54,8 @@ public:
 
         ChipLogProgress(Discovery, "Resolve completed: %s", addr_string);
         ChipLogProgress(Discovery, "   Supports TCP:                  %s", result.supportsTcp ? "YES" : "NO");
-        ChipLogProgress(Discovery, "   MRP IDLE retransmit timeout:   %u ms", result.mrpConfig.mIdleRetransTimeout.count());
-        ChipLogProgress(Discovery, "   MRP ACTIVE retransmit timeout: %u ms", result.mrpConfig.mActiveRetransTimeout.count());
+        ChipLogProgress(Discovery, "   MRP IDLE retransmit timeout:   %u ms", result.mrpRemoteConfig.mIdleRetransTimeout.count());
+        ChipLogProgress(Discovery, "   MRP ACTIVE retransmit timeout: %u ms", result.mrpRemoteConfig.mActiveRetransTimeout.count());
         NotifyDone();
     }
 

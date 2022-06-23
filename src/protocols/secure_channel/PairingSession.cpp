@@ -34,14 +34,10 @@ CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager
 
 CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & peerAddress)
 {
-    // TODO(17568): Replace with proper expiry logic. This current method makes sure there
-    // are not multiple sessions established, until eventual exhaustion of the resources
-    // for CASE sessions. Current method is quick fix for #17698, cannot remain.
-    mSessionManager->ExpireAllPairingsForPeerExceptPending(GetPeer());
-
     // Prepare SecureSession fields, including key derivation, first, before activation
     Transport::SecureSession * secureSession = mSecureSessionHolder->AsSecureSession();
     ReturnErrorOnFailure(DeriveSecureSession(secureSession->GetCryptoContext()));
+
     uint16_t peerSessionId = GetPeerSessionId();
     secureSession->SetPeerAddress(peerAddress);
     secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(Transport::PeerMessageCounter::kInitialSyncValue);
@@ -50,7 +46,7 @@ CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & 
     // a partially valid session.
     secureSession->Activate(GetLocalScopedNodeId(), GetPeer(), GetPeerCATs(), peerSessionId, mRemoteMRPConfig);
 
-    ChipLogDetail(Inet, "New secure session created for device " ChipLogFormatScopedNodeId ", LSID:%d PSID:%d!",
+    ChipLogDetail(Inet, "New secure session activated for device " ChipLogFormatScopedNodeId ", LSID:%d PSID:%d!",
                   ChipLogValueScopedNodeId(GetPeer()), secureSession->GetLocalSessionId(), peerSessionId);
 
     return CHIP_NO_ERROR;
@@ -88,13 +84,13 @@ void PairingSession::DiscardExchange()
     }
 }
 
-CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpConfig,
+CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpLocalConfig,
                                                TLV::TLVWriter & tlvWriter)
 {
     TLV::TLVType mrpParamsContainer;
     ReturnErrorOnFailure(tlvWriter.StartContainer(tag, TLV::kTLVType_Structure, mrpParamsContainer));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mrpConfig.mIdleRetransTimeout.count()));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), mrpConfig.mActiveRetransTimeout.count()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mrpLocalConfig.mIdleRetransTimeout.count()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), mrpLocalConfig.mActiveRetransTimeout.count()));
     return tlvWriter.EndContainer(mrpParamsContainer);
 }
 
@@ -136,6 +132,17 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     mRemoteMRPConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(tlvElementValue);
 
     return tlvReader.ExitContainer(containerType);
+}
+
+bool PairingSession::IsSessionEstablishmentInProgress()
+{
+    if (!mSecureSessionHolder)
+    {
+        return false;
+    }
+
+    Transport::SecureSession * secureSession = mSecureSessionHolder->AsSecureSession();
+    return secureSession->IsEstablishing();
 }
 
 void PairingSession::Clear()

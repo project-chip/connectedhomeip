@@ -9,5 +9,6 @@
         "gn_targets": [":python_packages.install"]
     },
     "required_submodules": ["third_party/pigweed/repo"],
+    "rosetta": "never",
     "gni_file": "build_overrides/pigweed_environment.gni"
 }

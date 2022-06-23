@@ -18,6 +18,12 @@ config:
     nodeId: 0x12344321
     cluster: "Application Launcher"
     endpoint: 1
+    catalogVendorId:
+        type: INT16U
+        defaultValue: 123
+    applicationId:
+        type: CHAR_STRING
+        defaultValue: "exampleid"
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -28,27 +34,26 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue 17969
     - label: "Launch an app with the provided a application ID"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "LaunchApp"
       arguments:
           values:
               - name: "Data"
                 value: "Hello World"
               - name: "application"
-                value: { catalogVendorId: 1234, applicationId: "HelloWorldApp" }
+                value:
+                    {
+                        catalogVendorId: catalogVendorId,
+                        applicationId: applicationId,
+                    }
       response:
           values:
-              - name: "Status"
-                value: 1
-              - name: "Data"
-                value: "Hello World"
+              - name: "status"
+                value: 0
 
     - label:
           "TH sends a LaunchApp command to DUT to launch an app which is not
           available"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "LaunchApp"
       arguments:
           values:
@@ -56,27 +61,11 @@ tests:
                 value: "Hello World"
               - name: "application"
                 value:
-                    { catalogVendorId: 1234, applicationId: "NonAvailableApp" }
+                    {
+                        catalogVendorId: catalogVendorId,
+                        applicationId: "NonAvailableApp",
+                    }
       response:
           values:
-              - name: "Status"
+              - name: "status"
                 value: 1
-              - name: "Data"
-                value: "Hello World"
-
-    - label: "Launch an app with the provided a application ID"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "LaunchApp"
-      arguments:
-          values:
-              - name: "data"
-                value: "Hello World"
-              - name: "application"
-                value:
-                    { catalogVendorId: 1234, applicationId: "HelloWorldApp2" }
-      response:
-          values:
-              - name: "Status"
-                value: 2
-              - name: "Data"
-                value: "Hello World"

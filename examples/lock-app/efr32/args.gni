@@ -22,5 +22,5 @@ chip_enable_ota_requestor = true
 
 chip_enable_openthread = true
 pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
-pw_assert_BACKEND = "$dir_pw_assert_log"
+pw_assert_BACKEND = "$dir_pw_assert_log:check_backend"
 pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"

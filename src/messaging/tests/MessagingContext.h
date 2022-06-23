@@ -99,10 +99,10 @@ public:
         return addr;
     }
 
-    static const uint16_t kBobKeyId   = 1;
-    static const uint16_t kAliceKeyId = 2;
-    NodeId GetBobNodeId() const;
-    NodeId GetAliceNodeId() const;
+    static const uint16_t kBobKeyId     = 1;
+    static const uint16_t kAliceKeyId   = 2;
+    static const uint16_t kCharlieKeyId = 3;
+    static const uint16_t kDavidKeyId   = 4;
     GroupId GetFriendsGroupId() const { return mFriendsGroupId; }
 
     SessionManager & GetSecureSessionManager() { return mSessionManager; }
@@ -118,6 +118,8 @@ public:
     CHIP_ERROR CreateSessionBobToAlice();
     CHIP_ERROR CreateSessionAliceToBob();
     CHIP_ERROR CreateSessionBobToFriends();
+    CHIP_ERROR CreatePASESessionCharlieToDavid();
+    CHIP_ERROR CreatePASESessionDavidToCharlie();
 
     void ExpireSessionBobToAlice();
     void ExpireSessionAliceToBob();
@@ -125,6 +127,8 @@ public:
 
     SessionHandle GetSessionBobToAlice();
     SessionHandle GetSessionAliceToBob();
+    SessionHandle GetSessionCharlieToDavid();
+    SessionHandle GetSessionDavidToCharlie();
     SessionHandle GetSessionBobToFriends();
 
     const Transport::PeerAddress & GetAliceAddress() { return mAliceAddress; }
@@ -154,8 +158,12 @@ private:
     GroupId mFriendsGroupId       = 0x0101;
     Transport::PeerAddress mAliceAddress;
     Transport::PeerAddress mBobAddress;
+    Transport::PeerAddress mCharlieAddress;
+    Transport::PeerAddress mDavidAddress;
     SessionHolder mSessionAliceToBob;
     SessionHolder mSessionBobToAlice;
+    SessionHolder mSessionCharlieToDavid;
+    SessionHolder mSessionDavidToCharlie;
     Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
 };
 

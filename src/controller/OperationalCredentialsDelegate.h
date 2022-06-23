@@ -67,6 +67,34 @@ public:
                                         Callback::Callback<OnNOCChainGeneration> * onCompletion) = 0;
 
     /**
+     * @brief
+     *   This function generates an operational certificate chain for a remote device that is being commissioned.
+     *   The API generates the certificate in CHIP cert form.
+     *
+     *   The delegate is expected to use the certificate authority whose certificate
+     *   is returned in `GetRootCACertificate()` API call.
+     *
+     *   The delegate will call `onCompletion` when the NOC certificate chain is ready.
+     *
+     * @param[in] csrElements          CSR elements as per specifications section 11.18.5.6. NOCSR Elements.
+     * @param[in] csrNonce             CSR nonce as described in 6.4.6.1
+     * @param[in] attestationSignature Attestation signature as per specifications section 11.22.7.6. CSRResponse Command.
+     * @param[in] attestationChallenge Attestation challenge as per 11.18.5.7
+     * @param[in] DAC                  Device attestation certificate received from the device being commissioned
+     * @param[in] PAI                  Product Attestation Intermediate certificate
+     * @param[in] onCompletion         Callback handler to provide generated NOC chain to the caller of GenerateNOCChain()
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     */
+    virtual CHIP_ERROR GenerateChipNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
+                                            const ByteSpan & attestationSignature, const ByteSpan & attestationChallenge,
+                                            const ByteSpan & DAC, const ByteSpan & PAI,
+                                            Callback::Callback<OnNOCChainGeneration> * onCompletion)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
      *   This function sets the node ID for which the next NOC Chain would be requested. The node ID is
      *   provided as a hint, and the delegate implementation may chose to ignore it and pick node ID of
      *   their choice.

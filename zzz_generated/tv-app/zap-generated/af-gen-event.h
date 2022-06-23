@@ -41,41 +41,4 @@
 #ifndef __AF_GEN_EVENT__
 #define __AF_GEN_EVENT__
 
-// Code used to configure the cluster event mechanism
-#define EMBER_AF_GENERATED_EVENT_CODE                                                                                              \
-    EmberEventControl emberAfLevelControlClusterServerTickCallbackControl1;                                                        \
-    EmberEventControl emberAfLevelControlClusterServerTickCallbackControl2;                                                        \
-    static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, uint8_t endpoint)                    \
-    {                                                                                                                              \
-        /* emberAfPushEndpointNetworkIndex(endpoint); */                                                                           \
-        emberEventControlSetInactive(control);                                                                                     \
-        (*callback)(endpoint);                                                                                                     \
-        /* emberAfPopNetworkIndex(); */                                                                                            \
-    }                                                                                                                              \
-    void emberAfLevelControlClusterServerTickCallbackWrapperFunction1(void)                                                        \
-    {                                                                                                                              \
-        clusterTickWrapper(&emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallback,    \
-                           1);                                                                                                     \
-    }                                                                                                                              \
-    void emberAfLevelControlClusterServerTickCallbackWrapperFunction2(void)                                                        \
-    {                                                                                                                              \
-        clusterTickWrapper(&emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallback,    \
-                           2);                                                                                                     \
-    }
-
-// EmberEventData structs used to populate the EmberEventData table
-#define EMBER_AF_GENERATED_EVENTS                                                                                                  \
-    { &emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallbackWrapperFunction1 },       \
-        { &emberAfLevelControlClusterServerTickCallbackControl2, emberAfLevelControlClusterServerTickCallbackWrapperFunction2 },
-
-#define EMBER_AF_GENERATED_EVENT_STRINGS "Level Server EP 1", "Level Server EP 2",
-
-// The length of the event context table used to track and retrieve cluster events
-#define EMBER_AF_EVENT_CONTEXT_LENGTH 2
-
-// EmberAfEventContext structs used to populate the EmberAfEventContext table
-#define EMBER_AF_GENERATED_EVENT_CONTEXT                                                                                           \
-    { 0x1, 0x8, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfLevelControlClusterServerTickCallbackControl1 },          \
-        { 0x2, 0x8, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfLevelControlClusterServerTickCallbackControl2 },
-
 #endif // __AF_GEN_EVENT__

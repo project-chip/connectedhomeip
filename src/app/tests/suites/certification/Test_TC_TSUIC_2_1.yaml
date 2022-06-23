@@ -28,13 +28,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the mandatory attribute: TemperatureDisplayMode"
-      command: "readAttribute"
-      attribute: "temperature display mode"
-      response:
-          value: 0
-
-    - label: "read the mandatory attribute: TemperatureDisplayMode"
+    - label: "Read the mandatory attribute: TemperatureDisplayMode"
       command: "readAttribute"
       attribute: "temperature display mode"
       response:
@@ -43,13 +37,7 @@ tests:
               minValue: 0
               maxValue: 1
 
-    - label: "read the mandatory attribute: KeypadLockout"
-      command: "readAttribute"
-      attribute: "keypad lockout"
-      response:
-          value: 0
-
-    - label: "read the mandatory attribute: KeypadLockout"
+    - label: "Read the mandatory attribute: KeypadLockout"
       command: "readAttribute"
       attribute: "keypad lockout"
       response:
@@ -58,13 +46,7 @@ tests:
               minValue: 0
               maxValue: 5
 
-    - label: "read the optional attribute: ScheduleProgrammingVisibility"
-      command: "readAttribute"
-      attribute: "schedule programming visibility"
-      response:
-          value: 0
-
-    - label: "read the optional attribute: ScheduleProgrammingVisibility"
+    - label: "Read the optional attribute: ScheduleProgrammingVisibility"
       command: "readAttribute"
       attribute: "schedule programming visibility"
       response:

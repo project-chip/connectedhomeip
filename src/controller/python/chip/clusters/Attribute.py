@@ -466,8 +466,10 @@ class AttributeCache:
 
 class SubscriptionTransaction:
     def __init__(self, transaction: 'AsyncReadTransaction', subscriptionId, devCtrl):
+        self._onResubscriptionAttemptedCb = DefaultResubscriptionAttemptedCallback
         self._onAttributeChangeCb = DefaultAttributeChangeCallback
         self._onEventChangeCb = DefaultEventChangeCallback
+        self._onErrorCb = DefaultErrorCallback
         self._readTransaction = transaction
         self._subscriptionId = subscriptionId
         self._devCtrl = devCtrl
@@ -491,6 +493,15 @@ class SubscriptionTransaction:
     def GetEvents(self):
         return self._readTransaction.GetAllEventValues()
 
+    def SetResubscriptionAttemptedCallback(self, callback: Callable[[SubscriptionTransaction, int, int], None]):
+        '''
+        Sets the callback function that gets invoked anytime a re-subscription is attempted. The callback is expected
+        to have the following signature:
+            def Callback(transaction: SubscriptionTransaction, errorEncountered: int, nextResubscribeIntervalMsec: int)
+        '''
+        if callback is not None:
+            self._onResubscriptionAttemptedCb = callback
+
     def SetAttributeUpdateCallback(self, callback: Callable[[TypedAttributePath, SubscriptionTransaction], None]):
         '''
         Sets the callback function for the attribute value change event, accepts a Callable accepts an attribute path and the cached data.
@@ -502,6 +513,13 @@ class SubscriptionTransaction:
         if callback is not None:
             self._onEventChangeCb = callback
 
+    def SetErrorCallback(self, callback: Callable[[int, SubscriptionTransaction], None]):
+        '''
+        Sets the callback function in case a subscription error occured, accepts a Callable accepts an error code and the cached data.
+        '''
+        if callback is not None:
+            self._onErrorCb = callback
+
     @property
     def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
         return self._onAttributeChangeCb
@@ -510,14 +528,19 @@ class SubscriptionTransaction:
     def OnEventChangeCb(self) -> Callable[[EventReadResult, SubscriptionTransaction], None]:
         return self._onEventChangeCb
 
+    @property
+    def OnErrorCb(self) -> Callable[[int, SubscriptionTransaction], None]:
+        return self._onErrorCb
+
     def Shutdown(self):
         if (self._isDone):
             print("Subscription was already terminated previously!")
             return
 
         handle = chip.native.GetLibraryHandle()
-        handle.pychip_ReadClient_Abort(
-            self._readTransaction._pReadClient, self._readTransaction._pReadCallback)
+        builtins.chipStack.Call(
+            lambda: handle.pychip_ReadClient_Abort(
+                self._readTransaction._pReadClient, self._readTransaction._pReadCallback))
         self._isDone = True
 
     def __del__(self):
@@ -525,6 +548,10 @@ class SubscriptionTransaction:
 
     def __repr__(self):
         return f'<Subscription (Id={self._subscriptionId})>'
+
+
+def DefaultResubscriptionAttemptedCallback(transaction: SubscriptionTransaction, terminationError, nextResubscribeIntervalMsec):
+    print(f"Previous subscription failed with Error: {terminationError} - re-subscribing in {nextResubscribeIntervalMsec}ms...")
 
 
 def DefaultAttributeChangeCallback(path: TypedAttributePath, transaction: SubscriptionTransaction):
@@ -542,6 +569,10 @@ def DefaultAttributeChangeCallback(path: TypedAttributePath, transaction: Subscr
 def DefaultEventChangeCallback(data: EventReadResult, transaction: SubscriptionTransaction):
     print("Received Event:")
     pprint(data, expand_all=True)
+
+
+def DefaultErrorCallback(chipError: int, transaction: SubscriptionTransaction):
+    print("Error during Subscription: Chip Stack Error %d".format(chipError))
 
 
 def _BuildEventIndex():
@@ -583,6 +614,7 @@ class AsyncReadTransaction:
         self._changedPathSet = set()
         self._pReadClient = None
         self._pReadCallback = None
+        self._resultError = None
 
     def SetClientObjPointers(self, pReadClient, pReadCallback):
         self._pReadClient = pReadClient
@@ -591,7 +623,7 @@ class AsyncReadTransaction:
     def GetAllEventValues(self):
         return self._events
 
-    def _handleAttributeData(self, path: AttributePathWithListIndex, dataVersion: int, status: int, data: bytes):
+    def handleAttributeData(self, path: AttributePathWithListIndex, dataVersion: int, status: int, data: bytes):
         try:
             imStatus = status
             try:
@@ -612,10 +644,7 @@ class AsyncReadTransaction:
         except Exception as ex:
             logging.exception(ex)
 
-    def handleAttributeData(self, path: AttributePath, dataVersion: int, status: int, data: bytes):
-        self._handleAttributeData(path, dataVersion, status, data)
-
-    def _handleEventData(self, header: EventHeader, path: EventPath, data: bytes, status: int):
+    def handleEventData(self, header: EventHeader, path: EventPath, data: bytes, status: int):
         try:
             eventType = _EventIndex.get(str(path), None)
             eventValue = None
@@ -654,17 +683,8 @@ class AsyncReadTransaction:
         except Exception as ex:
             logging.exception(ex)
 
-    def handleEventData(self, header: EventHeader, path: EventPath, data: bytes, status: int):
-        self._handleEventData(header, path, data, status)
-
-    def _handleError(self, chipError: int):
-        self._future.set_exception(
-            chip.exceptions.ChipStackError(chipError))
-
     def handleError(self, chipError: int):
-        self._event_loop.call_soon_threadsafe(
-            self._handleError, chipError
-        )
+        self._resultError = chipError
 
     def _handleSubscriptionEstablished(self, subscriptionId):
         if not self._future.done():
@@ -676,8 +696,9 @@ class AsyncReadTransaction:
         self._event_loop.call_soon_threadsafe(
             self._handleSubscriptionEstablished, subscriptionId)
 
-    def handleResubscriptionAttempted(self, terminationCause, nextResubscribeIntervalMsec):
-        print("would resubscribe with error " + str(terminationCause) + " in " + str(nextResubscribeIntervalMsec))
+    def handleResubscriptionAttempted(self, terminationCause: int, nextResubscribeIntervalMsec: int):
+        self._event_loop.call_soon_threadsafe(
+            self._subscription_handler._onResubscriptionAttemptedCb, self._subscription_handler, terminationCause, nextResubscribeIntervalMsec)
 
     def _handleReportBegin(self):
         pass
@@ -694,9 +715,28 @@ class AsyncReadTransaction:
         self._changedPathSet = set()
 
     def _handleDone(self):
+        #
+        # We only set the exception/result on the future in this _handleDone call (if it hasn't
+        # already been set yet, which can be in the case of subscriptions) since doing so earlier
+        # would result in the callers awaiting the result to
+        # move on, possibly invalidating the provided _event_loop.
+        #
         if not self._future.done():
-            self._future.set_result(AsyncReadTransaction.ReadResponse(
-                attributes=self._cache.attributeCache, events=self._events))
+            if self._resultError:
+                if self._subscription_handler:
+                    self._subscription_handler.OnErrorCb(chipError, self._subscription_handler)
+                else:
+                    self._future.set_exception(chip.exceptions.ChipStackError(chipError))
+            else:
+                self._future.set_result(AsyncReadTransaction.ReadResponse(
+                    attributes=self._cache.attributeCache, events=self._events))
+
+        #
+        # Decrement the ref on ourselves to match the increment that happened at allocation.
+        # This happens synchronously as part of handling done to ensure the object remains valid
+        # right till the very end.
+        #
+        ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
     def handleDone(self):
         self._event_loop.call_soon_threadsafe(self._handleDone)
@@ -713,31 +753,36 @@ class AsyncWriteTransaction:
     def __init__(self, future: Future, eventLoop):
         self._event_loop = eventLoop
         self._future = future
-        self._res = []
-
-    def _handleResponse(self, path: AttributePath, status: int):
-        try:
-            imStatus = chip.interaction_model.Status(status)
-            self._res.append(AttributeWriteResult(Path=path, Status=imStatus))
-        except:
-            self._res.append(AttributeWriteResult(Path=path, Status=status))
+        self._resultData = []
+        self._resultError = None
 
     def handleResponse(self, path: AttributePath, status: int):
-        self._event_loop.call_soon_threadsafe(
-            self._handleResponse, path, status)
-
-    def _handleError(self, chipError: int):
-        self._future.set_exception(
-            chip.exceptions.ChipStackError(chipError))
+        try:
+            imStatus = chip.interaction_model.Status(status)
+            self._resultData.append(AttributeWriteResult(Path=path, Status=imStatus))
+        except:
+            self._resultData.append(AttributeWriteResult(Path=path, Status=status))
 
     def handleError(self, chipError: int):
-        self._event_loop.call_soon_threadsafe(
-            self._handleError, chipError
-        )
+        self._resultError = chipError
 
     def _handleDone(self):
-        if not self._future.done():
-            self._future.set_result(self._res)
+        #
+        # We only set the exception/result on the future in this _handleDone call,
+        # since doing so earlier would result in the callers awaiting the result to
+        # move on, possibly invalidating the provided _event_loop.
+        #
+        if self._resultError is not None:
+            self._future.set_exception(chip.exceptions.ChipStackError(self._resultError))
+        else:
+            self._future.set_result(self._resultData)
+
+        #
+        # Decrement the ref on ourselves to match the increment that happened at allocation.
+        # This happens synchronously as part of handling done to ensure the object remains valid
+        # right till the very end.
+        #
+        ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
     def handleDone(self):
         self._event_loop.call_soon_threadsafe(self._handleDone)
@@ -780,7 +825,7 @@ def _OnSubscriptionEstablishedCallback(closure, subscriptionId):
 
 
 @_OnResubscriptionAttemptedCallbackFunct
-def _OnResubscriptionAttemptedCallback(closure, terminationCause, nextResubscribeIntervalMsec):
+def _OnResubscriptionAttemptedCallback(closure, terminationCause: int, nextResubscribeIntervalMsec: int):
     closure.handleResubscriptionAttempted(terminationCause, nextResubscribeIntervalMsec)
 
 
@@ -802,7 +847,6 @@ def _OnReportEndCallback(closure):
 @_OnReadDoneCallbackFunct
 def _OnReadDoneCallback(closure):
     closure.handleDone()
-    ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
 
 
 _OnWriteResponseCallbackFunct = CFUNCTYPE(
@@ -827,7 +871,6 @@ def _OnWriteErrorCallback(closure, chiperror: int):
 @_OnWriteDoneCallbackFunct
 def _OnWriteDoneCallback(closure):
     closure.handleDone()
-    ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
 
 
 def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: int = None) -> int:
@@ -853,8 +896,9 @@ def WriteAttributes(future: Future, eventLoop, device, attributes: List[Attribut
 
     transaction = AsyncWriteTransaction(future, eventLoop)
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-    res = handle.pychip_WriteClient_WriteAttributes(
-        ctypes.py_object(transaction), device, ctypes.c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), ctypes.c_size_t(len(attributes)), *writeargs)
+    res = builtins.chipStack.Call(
+        lambda: handle.pychip_WriteClient_WriteAttributes(
+            ctypes.py_object(transaction), device, ctypes.c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), ctypes.c_size_t(len(attributes)), *writeargs))
     if res != 0:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res
@@ -954,17 +998,18 @@ def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributeP
     params.IsFabricFiltered = fabricFiltered
     params = _ReadParams.build(params)
 
-    res = handle.pychip_ReadClient_Read(
-        ctypes.py_object(transaction),
-        ctypes.byref(readClientObj),
-        ctypes.byref(readCallbackObj),
-        device,
-        ctypes.c_char_p(params),
-        ctypes.c_size_t(0 if attributes is None else len(attributes)),
-        ctypes.c_size_t(
-            0 if dataVersionFilters is None else len(dataVersionFilters)),
-        ctypes.c_size_t(0 if events is None else len(events)),
-        *readargs)
+    res = builtins.chipStack.Call(
+        lambda: handle.pychip_ReadClient_Read(
+            ctypes.py_object(transaction),
+            ctypes.byref(readClientObj),
+            ctypes.byref(readCallbackObj),
+            device,
+            ctypes.c_char_p(params),
+            ctypes.c_size_t(0 if attributes is None else len(attributes)),
+            ctypes.c_size_t(
+                0 if dataVersionFilters is None else len(dataVersionFilters)),
+            ctypes.c_size_t(0 if events is None else len(events)),
+            *readargs))
 
     transaction.SetClientObjPointers(readClientObj, readCallbackObj)
 

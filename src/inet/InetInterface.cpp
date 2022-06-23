@@ -34,6 +34,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/SafeInt.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 #include <lwip/netif.h>
@@ -435,6 +436,21 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
 
 CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & interface)
 {
+    // First attempt to parse as a numeric ID:
+    char * parseEnd;
+    unsigned long intfNum = strtoul(intfName, &parseEnd, 10);
+    if (*parseEnd == 0)
+    {
+        if (intfNum > 0 && intfNum < UINT8_MAX && CanCastTo<InterfaceId::PlatformType>(intfNum))
+        {
+            interface = InterfaceId(static_cast<InterfaceId::PlatformType>(intfNum));
+            return CHIP_NO_ERROR;
+        }
+
+        return INET_ERROR_UNKNOWN_INTERFACE;
+    }
+
+    // Falling back to name -> ID lookup otherwise (e.g. wlan0)
     unsigned int intfId = if_nametoindex(intfName);
     interface           = InterfaceId(intfId);
     if (intfId == 0)

@@ -63,6 +63,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 1
 
 // Enable some test-only interaction model APIs.
-#define CONFIG_IM_BUILD_FOR_UNIT_TEST 1
+#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
 
 #endif /* CHIPPROJECTCONFIG_H */

@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/CommandHandlerInterface.h>
 #include <jni.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/JniReferences.h>
@@ -29,10 +31,22 @@
 namespace chip {
 namespace AppPlatform {
 
-class ContentAppCommandDelegate
+using CommandHandlerInterface = chip::app::CommandHandlerInterface;
+
+class ContentAppCommandDelegate : public CommandHandlerInterface
 {
 public:
-    ContentAppCommandDelegate(jobject manager)
+    ContentAppCommandDelegate(jobject manager, ClusterId aClusterId) : CommandHandlerInterface(Optional<EndpointId>(), aClusterId)
+    {
+        if (manager == nullptr)
+        {
+            // To support the existing hardcoded sample apps.
+            return;
+        }
+        InitializeJNIObjects(manager);
+    };
+
+    ContentAppCommandDelegate(jobject manager) : CommandHandlerInterface(Optional<EndpointId>(), app::Clusters::ContentLauncher::Id)
     {
 
         if (manager == nullptr)
@@ -40,7 +54,16 @@ public:
             // To support the existing hardcoded sample apps.
             return;
         }
+        InitializeJNIObjects(manager);
+    };
 
+    void InvokeCommand(CommandHandlerInterface::HandlerContext & handlerContext) override;
+
+    const char * sendCommand(chip::EndpointId epID, std::string commandPayload);
+
+private:
+    void InitializeJNIObjects(jobject manager)
+    {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for ContentAppEndpointManager"));
 
@@ -53,17 +76,16 @@ public:
                        ChipLogError(Zcl, "Failed to get ContentAppEndpointManager Java class"));
 
         mSendCommandMethod =
-            env->GetMethodID(ContentAppEndpointManagerClass, "sendCommand", "(ILjava/lang/String;)Ljava/lang/String;");
+            env->GetMethodID(ContentAppEndpointManagerClass, "sendCommand", "(IIILjava/lang/String;)Ljava/lang/String;");
         if (mSendCommandMethod == nullptr)
         {
             ChipLogError(Zcl, "Failed to access ContentAppEndpointManager 'sendCommand' method");
             env->ExceptionClear();
         }
-    };
+    }
 
-    const char * sendCommand(chip::EndpointId epID, std::string commandPayload);
+    void FormatResponseData(CommandHandlerInterface::HandlerContext & handlerContext, const char * response);
 
-private:
     jobject mContentAppEndpointManager = nullptr;
     jmethodID mSendCommandMethod       = nullptr;
 };

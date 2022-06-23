@@ -22,6 +22,7 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "chip_porting.h"
+#include <DeviceInfoProviderImpl.h>
 #include <lwip_netconf.h>
 
 #include <app/clusters/identify-server/identify-server.h>
@@ -89,6 +90,7 @@ Identify gIdentify1 = {
 #endif
 
 static DeviceCallbacks EchoCallbacks;
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 static void InitServer(intptr_t context)
 {
@@ -96,6 +98,8 @@ static void InitServer(intptr_t context)
     static chip::CommonCaseDeviceServerInitParams initParams;
     initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

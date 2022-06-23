@@ -22,6 +22,7 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "Server.h"
+#include <DeviceInfoProviderImpl.h>
 
 #include "chip_porting.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -41,6 +42,10 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #include <lwip_netconf.h>
+
+#if CONFIG_ENABLE_PW_RPC
+#include "Rpc.h"
+#endif
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -74,6 +79,7 @@ void NetWorkCommissioningInstInit()
 #endif
 
 static DeviceCallbacks EchoCallbacks;
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 void OnIdentifyStart(Identify *)
 {
@@ -117,6 +123,8 @@ static void InitServer(intptr_t context)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -133,6 +141,10 @@ extern "C" void ChipTest(void)
 {
     ChipLogProgress(DeviceLayer, "Lighting App Demo!");
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if CONFIG_ENABLE_PW_RPC
+    chip::rpc::Init();
+#endif
 
     initPref();
 

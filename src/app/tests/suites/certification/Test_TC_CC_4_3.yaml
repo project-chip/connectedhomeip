@@ -40,6 +40,7 @@ tests:
           value: 1
 
     - label: "Reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -49,6 +50,7 @@ tests:
               maxValue: 254
 
     - label: "Step saturation up command"
+      PICS: CC.S.C05.Rsp
       command: "StepSaturation"
       arguments:
           values:
@@ -73,6 +75,7 @@ tests:
                 value: 10
 
     - label: "Over TransitionTime,Read CurrentSaturation attribute from DUT"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -82,6 +85,7 @@ tests:
               maxValue: 254
 
     - label: "Step saturation down command"
+      PICS: CC.S.C05.Rsp
       command: "StepSaturation"
       arguments:
           values:
@@ -105,6 +109,7 @@ tests:
                 value: 10
 
     - label: "Over TransitionTime,Reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:

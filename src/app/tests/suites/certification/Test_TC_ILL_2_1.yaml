@@ -28,6 +28,16 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "TH reads MeasuredValue attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 1
+              maxValue: 65534
+
     - label: "TH reads MinMeasuredValue attribute from DUT"
       command: "readAttribute"
       attribute: "MinMeasuredValue"
@@ -61,3 +71,5 @@ tests:
       response:
           constraints:
               type: enum8
+              minValue: 0
+              maxValue: 254

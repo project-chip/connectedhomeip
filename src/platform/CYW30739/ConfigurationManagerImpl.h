@@ -41,6 +41,8 @@ public:
     static ConfigurationManagerImpl & GetDefaultInstance();
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
+    CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
+    CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
