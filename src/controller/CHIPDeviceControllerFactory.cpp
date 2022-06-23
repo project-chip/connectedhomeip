@@ -167,12 +167,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.messageCounterManager     = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider         = params.groupDataProvider;
 
-    // This is constructed with a base class deleter so we can std::move it into
-    // stateParams without a manual conversion below.
-    auto sessionResumptionStorage =
-        std::unique_ptr<SimpleSessionResumptionStorage, Platform::Deleter<chip::SessionResumptionStorage>>(
-            Platform::New<SimpleSessionResumptionStorage>());
-
     // if no fabricTable was provided, create one and track it in stateParams for cleanup
     stateParams.fabricTable = params.fabricTable;
 
@@ -192,6 +186,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         tempFabricTable         = stateParams.fabricTable;
     }
 
+    auto sessionResumptionStorage = chip::Platform::MakeUnique<SimpleSessionResumptionStorage>();
     ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));
     stateParams.sessionResumptionStorage = std::move(sessionResumptionStorage);
 
