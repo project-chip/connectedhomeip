@@ -220,6 +220,13 @@ chip_gn_arg_bool  ("chip_detail_logging"                    CONFIG_MATTER_LOG_LE
 chip_gn_arg_bool  ("chip_automation_logging"                "false")
 chip_gn_arg_bool  ("chip_malloc_sys_heap"                   CONFIG_CHIP_MALLOC_SYS_HEAP)
 
+if (CONFIG_CHIP_FACTORY_DATA)
+    chip_gn_arg_bool  ("chip_use_transitional_commissionable_data_provider"  "false")
+    chip_gn_arg_bool  ("chip_enable_factory_data"                            "true")
+elseif (CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
+    chip_gn_arg_bool  ("chip_use_transitional_commissionable_data_provider"  "false")
+endif()
+
 if (CONFIG_CHIP_ROTATING_DEVICE_ID)
     chip_gn_arg_bool("chip_enable_rotating_device_id"          "true")
     chip_gn_arg_bool("chip_enable_additional_data_advertising" "true")

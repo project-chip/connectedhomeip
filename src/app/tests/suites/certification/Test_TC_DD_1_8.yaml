@@ -41,11 +41,11 @@ tests:
           CHIP:DL:   Device Type: 65535 (0xFFFF)
           CHIP:SVR: SetupQRCode: [MT:-24J0CEK01KA0648G00]
           CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0CEK01KA0648G00
+          CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0CEK01KA0648G00
           CHIP:SVR: Manual pairing code: [34970112332]
           CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
           CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
+          CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
 
           2. Parse the DUT's QR Code using the TH commissioner: chip-tool
           ubuntu@matter-7:~/Apr18_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload MT:-24J048N01KA0648G00

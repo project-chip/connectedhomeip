@@ -24,6 +24,10 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#if CONFIG_CHIP_FACTORY_DATA
+#include <platform/nrfconnect/FactoryDataProvider.h>
+#endif
+
 #ifdef CONFIG_CHIP_PW_RPC
 #include "Rpc.h"
 #endif
@@ -98,6 +102,10 @@ private:
     bool mFunctionTimerActive = false;
     PWMDevice mPWMDevice;
     static AppTask sAppTask;
+
+#if CONFIG_CHIP_FACTORY_DATA
+    chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
+#endif
 };
 
 inline AppTask & GetAppTask(void)
