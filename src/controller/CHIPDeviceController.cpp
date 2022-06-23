@@ -1191,8 +1191,7 @@ CHIP_ERROR DeviceCommissioner::IssueNOCChain(const ByteSpan & NOCSRElements, Nod
     MATTER_TRACE_EVENT_SCOPE("IssueNOCChain", "DeviceCommissioner");
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(Controller, "Getting certificate chain for the device on fabric idx %u",
-                    static_cast<unsigned>(mFabricIndex));
+    ChipLogProgress(Controller, "Getting certificate chain for the device on fabric idx %u", static_cast<unsigned>(mFabricIndex));
 
     mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(nodeId);
 
