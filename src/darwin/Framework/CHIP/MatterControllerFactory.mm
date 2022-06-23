@@ -405,7 +405,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
     FabricTable * fabricTable = &fabricTableInstance;
     dispatch_sync(_chipWorkQueue, ^{
         FabricInfo * fabric = nullptr;
-        BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:fabric];
+        BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
         if (!ok) {
             CHIP_LOG_ERROR("Can't start on new fabric: fabric matching failed");
             return;
@@ -416,7 +416,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
             return;
         }
 
-        params = [[CHIPDeviceControllerStartupParamsInternal alloc] initForNewFabric:&fabricTable
+        params = [[CHIPDeviceControllerStartupParamsInternal alloc] initForNewFabric:fabricTable
                                                                             keystore:_keystore
                                                                               params:startupParams];
     });
