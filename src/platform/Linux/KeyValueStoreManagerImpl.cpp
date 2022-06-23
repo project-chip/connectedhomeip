@@ -72,7 +72,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     }
     ::memcpy(value, buf.Get() + offset_bytes, copy_size);
 
-    return CHIP_NO_ERROR;
+    return (value_size < read_size - offset_bytes) ? CHIP_ERROR_BUFFER_TOO_SMALL : CHIP_NO_ERROR;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
