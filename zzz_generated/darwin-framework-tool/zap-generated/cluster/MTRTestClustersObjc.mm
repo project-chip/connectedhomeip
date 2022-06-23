@@ -40,6 +40,8 @@ using chip::Callback::Callback;
 using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
 
+void MTRDefaultSuccessCallbackBridge::OnSuccessFn(void * context) { DispatchSuccess(context, nil); };
+
 @interface MTRTestAccessControl ()
 @property (readonly) chip::Controller::AccessControlCluster cppCluster;
 @end
