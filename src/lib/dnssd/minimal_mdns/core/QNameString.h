@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <lib/support/StringBuilder.h>
 #include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/support/StringBuilder.h>
 
 namespace mdns {
 namespace Minimal {
