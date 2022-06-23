@@ -1,0 +1,112 @@
+body {
+	margin: 0;
+	padding: 0;
+}
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	height: 100vh;
+	background: #f2f2f2;
+	font-family: 'Roboto', sans-serif;
+}
+
+.wrapper div {
+	text-align: center;
+}
+
+.logo {
+	display: block;
+	margin: 0 auto 1rem;
+}
+
+#qrcode img {
+	margin: 2rem auto;
+}
+
+p {
+	margin-bottom: 0;
+	margin-top: 0;
+	line-height: 24px;
+}
+
+#payload {
+	font-weight: bold;
+}
+
+#qr {
+	margin-bottom: 3rem;
+}
+button {
+	margin-bottom: 0;
+	font-weight: 400;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	-ms-touch-action: manipulation;
+	touch-action: manipulation;
+	cursor: pointer;
+	background-image: none;
+	border: 1px solid transparent;
+	padding: 6px 12px;
+	font-size: 14px;
+	line-height: 1.42857143;
+	border-radius: 4px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	color: #fff;
+	background-color: #5cb85c;
+	border-color: #4cae4c;
+	margin-top: 1rem;
+}
+
+@media print {
+	form,
+	.footer,
+	.noprint {
+		display: none;
+	}
+}
+
+#error {
+	color: #dc3545;
+}
+
+.footer {
+	background: #eaeaea;
+	padding: 8px;
+}
+
+.footer a {
+	font-weight: bold;
+	color: #000000;
+}
+
+.footer:visited {
+	color: #000;
+}
+
+.input-box {
+	width: 400px;
+	padding: 0.345rem 0.75rem;
+	margin: 1rem auto;
+	font-size: 14px;
+	line-height: 1.5;
+	color: #495057;
+	background-color: #fff;
+	background-clip: padding-box;
+	border: 1px solid #ced4da;
+	border-radius: 0.25rem;
+	transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.qrcode-btn {
+	margin-top: 0;
+}
+
+#qrcode-container {
+	display: none;
+	margin: 1rem auto;
+}
