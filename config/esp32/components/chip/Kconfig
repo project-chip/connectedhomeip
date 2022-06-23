@@ -635,6 +635,16 @@ menu "CHIP Device Layer"
                 nvs partition. Factory partition can be configured using CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION_LABEL
                 option, default is "nvs".
 
+        config ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER
+            depends on ENABLE_ESP32_FACTORY_DATA_PROVIDER
+            bool "Use ESP32 Device Instance Info Provider"
+            default n
+            help
+                Use ESP32 Device Instance Info Provider to get device instance info from factory partition.
+                Details like Vendor Name, Vendor Id, Product Name, Product Id, Serial Number, Manufacturing Date,
+                Hardware Version, Hardware Version String, and Rotating Device Id UniqueId will be read from factory
+                partition.
+
     endmenu
 
 
