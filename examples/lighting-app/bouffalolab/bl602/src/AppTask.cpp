@@ -40,6 +40,7 @@
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
 #include <platform/bouffalolab/BL602/OTAImageProcessorImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <DeviceInfoProviderImpl.h>
 
 #include <bl_sys_ota.h>
 #include <lib/support/ErrorStr.h>
@@ -138,6 +139,7 @@ CHIP_ERROR AppTask::Init()
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
 
     ConfigurationMgr().LogDeviceConfig();
 
