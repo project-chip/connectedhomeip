@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "../../java/ContentAppCommandDelegate.h"
+#include "../../java/ContentAppAttributeDelegate.h"
 #include <app/clusters/content-launch-server/content-launch-server.h>
 
 using chip::CharSpan;
@@ -29,12 +29,12 @@ using ContentLauncherDelegate   = chip::app::Clusters::ContentLauncher::Delegate
 using LaunchResponseType        = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
 using ParameterType             = chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType;
 using BrandingInformationType   = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type;
-using ContentAppCommandDelegate = chip::AppPlatform::ContentAppCommandDelegate;
+using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
 class AppContentLauncherManager : public ContentLauncherDelegate
 {
 public:
-    AppContentLauncherManager(ContentAppCommandDelegate commandDelegate, std::list<std::string> acceptHeaderList,
+    AppContentLauncherManager(ContentAppAttributeDelegate * attributeDelegate, std::list<std::string> acceptHeaderList,
                               uint32_t supportedStreamingProtocols);
 
     void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
@@ -53,5 +53,5 @@ protected:
 
 private:
     EndpointId mEndpointId;
-    ContentAppCommandDelegate mCommandDelegate;
+    ContentAppAttributeDelegate * mAttributeDelegate;
 };

@@ -46,6 +46,8 @@ shared_library("jni") {
     "java/ClusterChangeAttribute.cpp",
     "java/ContentAppCommandDelegate.cpp",
     "java/ContentAppCommandDelegate.h",
+    "java/ContentAppAttributeDelegate.cpp",
+    "java/ContentAppAttributeDelegate.h",
     "java/ContentLauncherManager.cpp",
     "java/ContentLauncherManager.h",
     "java/DeviceCallbacks.cpp",
