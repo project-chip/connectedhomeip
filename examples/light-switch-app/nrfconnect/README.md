@@ -64,15 +64,17 @@ to read more about the platform structure and dependencies.
 
 In Matter, the following types of light switch devices are available:
 
--   Group 1: On/Off Light Switch, Dimmer Switch, Color Dimmer Switch, Control Bridge
+-   Group 1: On/Off Light Switch, Dimmer Switch, Color Dimmer Switch, Control
+    Bridge
 -   Group 2: Generic Switch
 
-The first type (here referred to as Group 1) uses client application clusters (for example, Level Control) and
-bindings to send commands to the server clusters. This type of switch is on the endpoint 1 of this example.
+The first type (here referred to as Group 1) uses client application clusters
+(for example, Level Control) and bindings to send commands to the server
+clusters. This type of switch is on the endpoint 1 of this example.
 
-With the second type (Group 2), controllers can use event subscriptions to be informed
-about changes on the switch server cluster. This type of switch is on the endpoint 2
-of this example.
+With the second type (Group 2), controllers can use event subscriptions to be
+informed about changes on the switch server cluster. This type of switch is on
+the endpoint 2 of this example.
 
 ### Group 1 light switch devices overview
 
@@ -82,15 +84,15 @@ a Matter network, the light switch device does not know what it can control. In
 other words, it has no information about another device being connected to the
 same network. You must provide this information to the light switch through the
 process called binding, which links clusters and endpoints on both devices, so
-that the devices can interact with each other. This functionality is on the endpoint
-1 and triggered by **Button 2**.
+that the devices can interact with each other. This functionality is on the
+endpoint 1 and triggered by **Button 2**.
 
 ### Generic Switch
 
-The Generic Switch on the endpoint 2 offers the switch server cluster. It implements
-the Momentary Switch (``MS``) and Momentary Switch Release (``MSR``) features.
-For this reason, it sends event notifications ``InitialPress`` and ``ShortRelease`` if **Button 3**
-of the DK is pressed and released.
+The Generic Switch on the endpoint 2 offers the switch server cluster. It
+implements the Momentary Switch (`MS`) and Momentary Switch Release (`MSR`)
+features. For this reason, it sends event notifications `InitialPress` and
+`ShortRelease` if **Button 3** of the DK is pressed and released.
 
 ### Common example settings
 
@@ -299,7 +301,7 @@ platform image.
 
 **Button 3** can be used for the following purposes:
 
--   _Pressed once_ &mdash; Changes the value of the attribute ``CurrentPosition``
+-   _Pressed once_ &mdash; Changes the value of the attribute `CurrentPosition`
     and (if subscribed) sends the event notifications to the controller.
 
 **Button 4** can be used to start the NFC tag emulation and enable Bluetooth LE
@@ -739,20 +741,19 @@ use [light switch buttons](#buttons) or
 
 ### Testing the Generic Switch
 
-
 To test the Generic Switch, complete the following steps:
 
-1. Enter the interactive mode of the CHIP Tool:
+1.  Enter the interactive mode of the CHIP Tool:
 
         chip-tool interactive start
 
-2. Subscribe to the ``InitialPress`` and ``ShortRelease`` event notifications:
+2.  Subscribe to the `InitialPress` and `ShortRelease` event notifications:
 
         >>> switch subscribe-event initial-press 1 20 <node_id> 2 --is-urgent true
         >>> switch subscribe-event initial-press 1 20 <node_id> 2 --is-urgent true
 
-3. Press **Button 3** to test the new configuration.
-    When pressing and releasing **Button 3**, both events should be sent to the controller.
+3.  Press **Button 3** to test the new configuration. When pressing and
+    releasing **Button 3**, both events should be sent to the controller.
 
 ### Testing Device Firmware Upgrade
 
