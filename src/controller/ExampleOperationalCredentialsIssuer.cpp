@@ -338,16 +338,16 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateChipNOCChain(const ByteS
     memcpy(&ipkValue[0], defaultIpkSpan.data(), defaultIpkSpan.size());
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipNoc;
-    ReturnErrorCodeIf(!chipNoc.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-    MutableByteSpan chipNocSpan(chipNoc.Get(), kMaxCHIPDERCertLength);
+    ReturnErrorCodeIf(!chipNoc.Alloc(Credentials::kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan chipNocSpan(chipNoc.Get(), Credentials::kMaxCHIPCertLength);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipIcac;
-    ReturnErrorCodeIf(!chipIcac.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-    MutableByteSpan chipIcacSpan(chipIcac.Get(), kMaxCHIPDERCertLength);
+    ReturnErrorCodeIf(!chipIcac.Alloc(Credentials::kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan chipIcacSpan(chipIcac.Get(), Credentials::kMaxCHIPCertLength);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipRcac;
-    ReturnErrorCodeIf(!chipRcac.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-    MutableByteSpan chipRcacSpan(chipRcac.Get(), kMaxCHIPDERCertLength);
+    ReturnErrorCodeIf(!chipRcac.Alloc(Credentials::kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan chipRcacSpan(chipRcac.Get(), Credentials::kMaxCHIPCertLength);
 
     ReturnErrorOnFailure(ConvertX509CertToChipCert(nocSpan, chipNocSpan));
     ReturnErrorOnFailure(ConvertX509CertToChipCert(icacSpan, chipIcacSpan));
