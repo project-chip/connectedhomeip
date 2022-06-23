@@ -41,7 +41,7 @@ tests:
           [1653087913.251732][8083:8083] CHIP:DL:   Device Type: 65535 (0xFFFF)
           [1653087913.252171][8083:8083] CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
           [1653087913.252710][8083:8083] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1653087913.253175][8083:8083] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
+          [1653087913.253175][8083:8083] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
           [1653087913.253681][8083:8083] CHIP:SVR: Manual pairing code: [749701123365521327694]
           [1653087913.254268][8083:8083] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to 29f72814
       disabled: true
@@ -179,7 +179,7 @@ tests:
           [1653087913.251732][8083:8083] CHIP:DL:   Device Type: 65535 (0xFFFF)
           [1653087913.252171][8083:8083] CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
           [1653087913.252710][8083:8083] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1653087913.253175][8083:8083] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
+          [1653087913.253175][8083:8083] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
           [1653087913.253681][8083:8083] CHIP:SVR: Manual pairing code: [749701123365521327694]
           [1653087913.254268][8083:8083] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to 29f72814
       disabled: true
