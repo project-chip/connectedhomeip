@@ -29,4 +29,24 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
     }
     return "Success";
   }
+
+  public String readAttribute(int endpointId, int clusterId, int attributeId) {
+    Log.d(
+        TAG,
+        "Received a attribute read request for endpointId "
+            + endpointId
+            + "clusterId"
+            + clusterId
+            + " attributeId "
+            + attributeId);
+    for (ContentApp app :
+        ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().values()) {
+      if (app.getEndpointId() == endpointId) {
+        Log.d(TAG, "Sending attribute read request for endpointId " + endpointId);
+        return ContentAppAgentService.sendAttributeReadRequest(
+            context, app.getAppName(), clusterId, attributeId);
+      }
+    }
+    return "";
+  }
 }

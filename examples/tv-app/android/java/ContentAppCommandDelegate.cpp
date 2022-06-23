@@ -79,8 +79,9 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
             return;
         }
 
-        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-        UtfString jsonString(env, JsonToString(json).c_str());
+        JNIEnv * env      = JniReferences::GetInstance().GetEnvForCurrentThread();
+        Json::Value value = json["value"];
+        UtfString jsonString(env, JsonToString(value).c_str());
 
         ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand send command being called with payload %s",
                         JsonToString(json).c_str());
@@ -110,9 +111,8 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
 void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::HandlerContext & handlerContext, const char * response)
 {
     Json::Reader reader;
-    Json::Value resJson;
-    reader.parse(response, resJson);
-    Json::Value value = resJson["value"];
+    Json::Value value;
+    reader.parse(response, value);
 
     switch (handlerContext.mRequestPath.mClusterId)
     {

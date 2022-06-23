@@ -44,6 +44,8 @@ shared_library("jni") {
     "java/ChannelManager.cpp",
     "java/ChannelManager.h",
     "java/ClusterChangeAttribute.cpp",
+    "java/ContentAppAttributeDelegate.cpp",
+    "java/ContentAppAttributeDelegate.h",
     "java/ContentAppCommandDelegate.cpp",
     "java/ContentAppCommandDelegate.h",
     "java/ContentLauncherManager.cpp",
