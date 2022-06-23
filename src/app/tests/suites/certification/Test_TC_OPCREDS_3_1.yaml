@@ -1,0 +1,368 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    11.3.1. [TC-OPCREDS-3.1] Attribute-NOCs, TrustedRootCertificates list
+    validation [DUT-Server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "Factory Reset DUT (to ensure NOC list is empty at the beginning of
+          the following steps)"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label: "Start the commissioning process DUT by TH1 on a first Fabric"
+      verification: |
+          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841
+
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
+      disabled: true
+
+    - label:
+          "TH sends CertificateChainRequest Command to DUT for both PAI and DAC"
+      verification: |
+          ./chip-tool operationalcredentials certificate-chain-request 1 1 0
+
+          [1651570197.289787][3689:3694] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
+          [1651570197.289857][3689:3694] CHIP:TOO:   CertificateChainResponse: {
+          [1651570197.289898][3689:3694] CHIP:TOO:     certificate: Elided value too large of size 491
+          [1651570197.289954][3689:3694] CHIP:TOO:    }
+      disabled: true
+
+    - label: "TH saves DAC and the PAI certificates."
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "TH completes the Device Attestation Procedures validation using the
+          DAC and PAI certificates"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label: "TH Sends CSRRequest command"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "TH validates the attestation response, obtains the NOC, the Root CA
+          Certificate and ICAC (optional) and also allocates the FabricID and
+          NodeID. Save RCAC certificate as Root_CA_Certificate_Original_TH1"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "TH sends AddTrustedRootCertificate command to DUT to install the Root
+          CA Certificate to the trust store"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "TH sends AddTrustedRootCertificate command to DUT for the
+          installation of the same Root_CA_Certificate_Original_TH1"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label: "Read the TrustedRootCertificates list from DUT"
+      verification: |
+          ./chip-tool operationalcredentials read trusted-root-certificates 1 0
+
+          [1651570587.562845][3714:3719] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2018783037
+          [1651570587.562960][3714:3719] CHIP:TOO:   TrustedRootCertificates: 2 entries
+          [1651570587.565701][3714:3719] CHIP:TOO:     [1]: Elided value too large of size 231
+          [1651570587.565758][3714:3719] CHIP:TOO:     [2]: Elided value too large of size 231
+      disabled: true
+
+    - label:
+          "TH sends AddTrustedRootCertificate command to DUT to install the Root
+          CA Certificate which differs from Root_CA_Certificate_Original_TH1 by
+          one byte in the Subject field"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label: "Read the TrustedRootCertificates list from DUT"
+      verification: |
+          ./chip-tool operationalcredentials read trusted-root-certificates 1 0
+
+          [1651570587.562845][3714:3719] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2018783037
+          [1651570587.562960][3714:3719] CHIP:TOO:   TrustedRootCertificates: 2 entries
+          [1651570587.565701][3714:3719] CHIP:TOO:     [1]: Elided value too large of size 231
+          [1651570587.565758][3714:3719] CHIP:TOO:     [2]: Elided value too large of size 231
+      disabled: true
+
+    - label:
+          "TH sends AddTrustedRootCertificate command to DUT to install a
+          malformed Root CA Certificate where the signature does not match the
+          public key"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label: "TH1 sends the AddNOC Command to DUT"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label: "Save the FabricIndex as FabricIndex_Test for future use"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label: "Read the NOCs (NOCStruct) list from DUT"
+      verification: |
+          ./chip-tool operationalcredentials read nocs 1 0
+
+          [1651570741.707935][3729:3734] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2018783037
+          [1651570741.708034][3729:3734] CHIP:TOO:   NOCs: 1 entries
+          [1651570741.708122][3729:3734] CHIP:TOO:     [1]: {
+          [1651570741.708163][3729:3734] CHIP:TOO:       Noc: Elided value too large of size 241
+          [1651570741.708202][3729:3734] CHIP:TOO:       Icac: Elided value too large of size 231
+          [1651570741.708238][3729:3734] CHIP:TOO:       FabricIndex: 1
+          [1651570741.708272][3729:3734] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Read the first NOCStruct element from the list"
+      verification: |
+          ./chip-tool operationalcredentials read nocs 1 0
+
+          [1651570741.707935][3729:3734] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2018783037
+          [1651570741.708034][3729:3734] CHIP:TOO:   NOCs: 1 entries
+          [1651570741.708122][3729:3734] CHIP:TOO:     [1]: {
+          [1651570741.708163][3729:3734] CHIP:TOO:       Noc: Elided value too large of size 241
+          [1651570741.708202][3729:3734] CHIP:TOO:       Icac: Elided value too large of size 231
+          [1651570741.708238][3729:3734] CHIP:TOO:       FabricIndex: 1
+          [1651570741.708272][3729:3734] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "TH sends UpdateFabricLabel command with 'Node Ope Credits 1' as Label
+          field to DUT"
+      verification: |
+          ./chip-tool operationalcredentials update-fabric-label NodeOpeCredits1 1 0
+
+          [1651571821.028022][3803:3808] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1651571821.028086][3803:3808] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1651571821.028181][3803:3808] CHIP:TOO:   NOCResponse: {
+          [1651571821.028226][3803:3808] CHIP:TOO:     statusCode: 0
+          [1651571821.028259][3803:3808] CHIP:TOO:     fabricIndex: 1
+          [1651571821.028292][3803:3808] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Read the Fabrics List from DUT and get the FabricDescriptorStruct for
+          which FabricIndex = fabric-id field from the operational certificate"
+      verification: |
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
+
+          [1651572032.170920][3815:3820] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2018783041
+          [1651572032.171031][3815:3820] CHIP:TOO:   Fabrics: 2 entries
+          [1651572032.171179][3815:3820] CHIP:TOO:     [1]: {
+          [1651572032.171223][3815:3820] CHIP:TOO:       RootPublicKey: 0412894491026CDACAC117D232D252EF827691D378BCCC9E8E717E6C70B3D36E4C5430FDF26B783EC579506D3E748BABFBC6D400302C72CD5BD40B152AA303724B
+          [1651572032.171262][3815:3820] CHIP:TOO:       VendorId: 65521
+          [1651572032.171296][3815:3820] CHIP:TOO:       FabricId: 1
+          [1651572032.171328][3815:3820] CHIP:TOO:       NodeId: 1
+          [1651572032.171360][3815:3820] CHIP:TOO:       Label: NodeOpeCredits1
+          [1651572032.171393][3815:3820] CHIP:TOO:       FabricIndex: 1
+          [1651572032.171427][3815:3820] CHIP:TOO:      }
+          [1651572032.171472][3815:3820] CHIP:TOO:     [2]: {
+          [1651572032.171511][3815:3820] CHIP:TOO:       RootPublicKey: 040983D9AC57DBF8DA04F818B1A15B2BD2821AD2BA1807099EAE1A52C62B404767972D4D7AB6B583395769881A666DCA8776EBC662EA1DE19B1DDDD9306A5DCB91
+          [1651572032.171547][3815:3820] CHIP:TOO:       VendorId: 65521
+          [1651572032.171579][3815:3820] CHIP:TOO:       FabricId: 1
+          [1651572032.171610][3815:3820] CHIP:TOO:       NodeId: 2
+          [1651572032.171641][3815:3820] CHIP:TOO:       Label:
+          [1651572032.171673][3815:3820] CHIP:TOO:       FabricIndex: 2
+          [1651572032.171705][3815:3820] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Read the TrustedRootCertificates list from DUT"
+      verification: |
+          "./chip-tool operationalcredentials read trusted-root-certificates 1 0
+
+          [1651570587.562845][3714:3719] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2018783037
+          [1651570587.562960][3714:3719] CHIP:TOO:   TrustedRootCertificates: 2 entries
+          [1651570587.565701][3714:3719] CHIP:TOO:     [1]: Elided value too large of size 231
+          [1651570587.565758][3714:3719] CHIP:TOO:     [2]: Elided value too large of size 231"
+      disabled: true
+
+    - label:
+          'TH sends UpdateFabricLabel command with "Node Ope Credits 1" as Label
+          field to DUT'
+      verification: |
+          ./chip-tool operationalcredentials update-fabric-label  2 1 0
+
+          [1650455515.088785][4397:4402] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1650455515.088888][4397:4402] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1650455515.089107][4397:4402] CHIP:TOO:   NOCResponse: {
+          [1650455515.089208][4397:4402] CHIP:TOO:     statusCode: 0
+          [1650455515.089268][4397:4402] CHIP:TOO:     fabricIndex: 1
+          [1650455515.089326][4397:4402] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Start the commissioning process DUT by TH2 on a second Fabric Repeat
+          steps 3 to 38 for TH2 For UpdateFabricLabel command set the label
+          value as 'Node Ope Credits 2' Save RCAC certificate as
+          Root_CA_Certificate_Original_TH2"
+      verification: |
+          ./chip-tool operationalcredentials update-fabric-label NodeOpeCredits2 2 0
+
+          [1651574223.789186][4176:4181] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1651574223.789322][4176:4181] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1651574223.789490][4176:4181] CHIP:TOO:   NOCResponse: {
+          [1651574223.789565][4176:4181] CHIP:TOO:     statusCode: 0
+          [1651574223.789622][4176:4181] CHIP:TOO:     fabricIndex: 2
+          [1651574223.789681][4176:4181] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Read the TrustedRootCertificates list from DUT"
+      verification: |
+          ./chip-tool operationalcredentials read trusted-root-certificates 2 0
+
+          [1651574260.271930][4183:4188] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2018783045
+          [1651574260.272108][4183:4188] CHIP:TOO:   TrustedRootCertificates: 2 entries
+          [1651574260.275506][4183:4188] CHIP:TOO:     [1]: Elided value too large of size 231
+          [1651574260.275672][4183:4188] CHIP:TOO:     [2]: Elided value too large of size 231
+      disabled: true
+
+    - label:
+          "TH2 sends UpdateFabricLabel command with 'Node Ope Credits 1' as
+          Label field to DUT"
+      verification: |
+          ./chip-tool operationalcredentials update-fabric-label NodeOpeCredits1 2 0
+
+          [1651574185.259939][4167:4172] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1651574185.260038][4167:4172] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1651574185.260186][4167:4172] CHIP:TOO:   NOCResponse: {
+          [1651574185.260394][4167:4172] CHIP:TOO:     statusCode: 10
+          [1651574185.260464][4167:4172] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Read the Fabrics List from DUT"
+      verification: |
+          ./chip-tool operationalcredentials read fabrics 1 0
+
+          [1651239584.030782][2559:2564] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 693340809
+          [1651239584.032687][2559:2564] CHIP:TOO:   Fabrics: 1 entries
+          [1651239584.033091][2559:2564] CHIP:TOO:     [1]: {
+          [1651239584.033165][2559:2564] CHIP:TOO:       RootPublicKey: 048661B0C0D119C7636D1ADC7EBE1D26A374FFA6C944F7457DF1DDD1163677D4D00AF9FF1A620E73066F326118124D7C2521CFF2B4EDE69E87AF364D1CAD1D2C0A
+          [1651239584.033207][2559:2564] CHIP:TOO:       VendorId: 65521
+          [1651239584.033240][2559:2564] CHIP:TOO:       FabricId: 1
+          [1651239584.033272][2559:2564] CHIP:TOO:       NodeId: 1
+          [1651239584.033304][2559:2564] CHIP:TOO:       Label:
+          [1651239584.033336][2559:2564] CHIP:TOO:       FabricIndex: 1
+          [1651239584.033370][2559:2564] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Read the Fabrics List from DUT and get the FabricDescriptorStruct for
+          which FabricIndex = fabric-id field from the operational certificate"
+      verification: |
+          ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0
+
+          [1651575635.120166][4259:4264] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2018783045
+          [1651575635.120365][4259:4264] CHIP:TOO:   Fabrics: 2 entries
+          [1651575635.120654][4259:4264] CHIP:TOO:     [1]: {
+          [1651575635.120726][4259:4264] CHIP:TOO:       RootPublicKey: 0412894491026CDACAC117D232D252EF827691D378BCCC9E8E717E6C70B3D36E4C5430FDF26B783EC579506D3E748BABFBC6D400302C72CD5BD40B152AA303724B
+          [1651575635.120789][4259:4264] CHIP:TOO:       VendorId: 65521
+          [1651575635.120844][4259:4264] CHIP:TOO:       FabricId: 1
+          [1651575635.120896][4259:4264] CHIP:TOO:       NodeId: 1
+          [1651575635.120948][4259:4264] CHIP:TOO:       Label: NodeOpeCredits1
+          [1651575635.121002][4259:4264] CHIP:TOO:       FabricIndex: 1
+          [1651575635.121057][4259:4264] CHIP:TOO:      }
+          [1651575635.121134][4259:4264] CHIP:TOO:     [2]: {
+          [1651575635.121224][4259:4264] CHIP:TOO:       RootPublicKey: 040983D9AC57DBF8DA04F818B1A15B2BD2821AD2BA1807099EAE1A52C62B404767972D4D7AB6B583395769881A666DCA8776EBC662EA1DE19B1DDDD9306A5DCB91
+          [1651575635.121287][4259:4264] CHIP:TOO:       VendorId: 65521
+          [1651575635.121341][4259:4264] CHIP:TOO:       FabricId: 1
+          [1651575635.121394][4259:4264] CHIP:TOO:       NodeId: 2
+          [1651575635.121446][4259:4264] CHIP:TOO:       Label: NodeOpeCredits2
+          [1651575635.121499][4259:4264] CHIP:TOO:       FabricIndex: 2
+          [1651575635.121552][4259:4264] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "From TH2 send RemoveFabric command with Fabric Index as
+          FabricIndex_Test + 5 (Invalid Fabric Index)to DUT"
+      verification: |
+          ./chip-tool operationalcredentials remove-fabric 25 1 0
+
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1646390608.860327][6336:6341] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1646390608.860465][6336:6341] CHIP:TOO:   NOCResponse: {
+          [1646390608.860548][6336:6341] CHIP:TOO:     statusCode: 11
+          [1646390608.860611][6336:6341] CHIP:TOO:    }
+          [1646390608.860695][6336:6341] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1646390608.860801][6336:6341] CHIP:EM: Sending Standalone Ack for MessageCounter:1477607 on exchange 51257i
+      disabled: true
+
+    - label:
+          "From TH2 sends RemoveFabric command with Fabric Index as
+          FabricIndex_Test (Valid Fabric Index)to DUT"
+      verification: |
+          ./chip-tool operationalcredentials remove-fabric 1 1 0
+
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          CHIP:TOO:   NOCResponse: {
+          CHIP:TOO:     statusCode: 0
+          CHIP:TOO:     fabricIndex: 2
+          CHIP:TOO:    }
+          CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "From TH2 send RemoveTrustedRootCertificate command with certificate
+          value as Root_CA_Certificate_Original_TH2 to DUT"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label: "From TH Read the TrustedRootCertificates list from DUT."
+      verification: |
+          ./chip-tool operationalcredentials read  trusted-root-certificates 2 0
+
+          [1651577039.219545][4506:4511] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2998576972
+          [1651577039.219645][4506:4511] CHIP:TOO:   TrustedRootCertificates: 2 entries
+          [1651577039.219727][4506:4511] CHIP:TOO:     [1]: Elided value too large of size 231
+          [1651577039.219771][4506:4511] CHIP:TOO:     [2]: Elided value too large of size 231
+      disabled: true
+
+    - label: "From TH Read the Fabrics list from DUT."
+      verification: |
+          ./chip-tool operationalcredentials read fabrics 2 0
+
+          [1651577163.247975][4519:4524] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2998576972
+          [1651577163.248161][4519:4524] CHIP:TOO:   Fabrics: 1 entries
+          [1651577163.248349][4519:4524] CHIP:TOO:     [1]: {
+          [1651577163.248425][4519:4524] CHIP:TOO:       RootPublicKey: 040983D9AC57DBF8DA04F818B1A15B2BD2821AD2BA1807099EAE1A52C62B404767972D4D7AB6B583395769881A666DCA8776EBC662EA1DE19B1DDDD9306A5DCB91
+          [1651577163.248489][4519:4524] CHIP:TOO:       VendorId: 65521
+          [1651577163.248545][4519:4524] CHIP:TOO:       FabricId: 1
+          [1651577163.248599][4519:4524] CHIP:TOO:       NodeId: 2
+          [1651577163.248653][4519:4524] CHIP:TOO:       Label:
+          [1651577163.248706][4519:4524] CHIP:TOO:       FabricIndex: 2
+          [1651577163.248763][4519:4524] CHIP:TOO:      }
+      disabled: true

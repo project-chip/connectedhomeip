@@ -1,0 +1,1270 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    111.3.3. [TC-DRLK-3.3] Verification for the Door Lock Events [DUT - Client]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 0"
+      verification: |
+          ./chip-tool doorlock read-event door-lock-alarm 2 1
+
+          [1653571709030] [98353:2847768] CHIP: [DMG] ReportDataMessage =
+          [1653571709030] [98353:2847768] CHIP: [DMG] {
+          [1653571709030] [98353:2847768] CHIP: [DMG]         SuppressResponse = true, 
+          [1653571709030] [98353:2847768] CHIP: [DMG]         InteractionModelRevision = 1
+          [1653571709030] [98353:2847768] CHIP: [DMG] }
+          [1653571709030] [98353:2847768] CHIP: [EM] Sending Standalone Ack for MessageCounter:4015518 on exchange 47229i
+      disabled: true
+
+    - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 1"
+      verification: |
+          ./chip-tool doorlock read-event door-lock-alarm 2 1
+
+          [1653571709030] [98353:2847768] CHIP: [DMG] ReportDataMessage =
+          [1653571709030] [98353:2847768] CHIP: [DMG] {
+          [1653571709030] [98353:2847768] CHIP: [DMG]         SuppressResponse = true, 
+          [1653571709030] [98353:2847768] CHIP: [DMG]         InteractionModelRevision = 1
+          [1653571709030] [98353:2847768] CHIP: [DMG] }
+          [1653571709030] [98353:2847768] CHIP: [EM] Sending Standalone Ack for MessageCounter:4015518 on exchange 47229i
+      disabled: true
+
+    - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 3"
+      verification: |
+          ./chip-tool doorlock read-event door-lock-alarm 2 1
+
+          [1653571709030] [98353:2847768] CHIP: [DMG] ReportDataMessage =
+          [1653571709030] [98353:2847768] CHIP: [DMG] {
+          [1653571709030] [98353:2847768] CHIP: [DMG]         SuppressResponse = true, 
+          [1653571709030] [98353:2847768] CHIP: [DMG]         InteractionModelRevision = 1
+          [1653571709030] [98353:2847768] CHIP: [DMG] }
+          [1653571709030] [98353:2847768] CHIP: [EM] Sending Standalone Ack for MessageCounter:4015518 on exchange 47229i
+      disabled: true
+
+    - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 4"
+      verification: |
+          ./chip-tool doorlock read-event door-lock-alarm 2 1
+
+          [1653571709030] [98353:2847768] CHIP: [DMG] ReportDataMessage =
+          [1653571709030] [98353:2847768] CHIP: [DMG] {
+          [1653571709030] [98353:2847768] CHIP: [DMG]         SuppressResponse = true, 
+          [1653571709030] [98353:2847768] CHIP: [DMG]         InteractionModelRevision = 1
+          [1653571709030] [98353:2847768] CHIP: [DMG] }
+          [1653571709030] [98353:2847768] CHIP: [EM] Sending Standalone Ack for MessageCounter:4015518 on exchange 47229i
+      disabled: true
+
+    - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 5"
+      verification: |
+          ./chip-tool doorlock read-event door-lock-alarm 2 1
+
+          [1653571709030] [98353:2847768] CHIP: [DMG] ReportDataMessage =
+          [1653571709030] [98353:2847768] CHIP: [DMG] {
+          [1653571709030] [98353:2847768] CHIP: [DMG]         SuppressResponse = true, 
+          [1653571709030] [98353:2847768] CHIP: [DMG]         InteractionModelRevision = 1
+          [1653571709030] [98353:2847768] CHIP: [DMG] }
+          [1653571709030] [98353:2847768] CHIP: [EM] Sending Standalone Ack for MessageCounter:4015518 on exchange 47229i
+      disabled: true
+
+    - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 6"
+      verification: |
+          ./chip-tool doorlock read-event door-lock-alarm 2 1
+
+          [1653571709030] [98353:2847768] CHIP: [DMG] ReportDataMessage =
+          [1653571709030] [98353:2847768] CHIP: [DMG] {
+          [1653571709030] [98353:2847768] CHIP: [DMG]         SuppressResponse = true, 
+          [1653571709030] [98353:2847768] CHIP: [DMG]         InteractionModelRevision = 1
+          [1653571709030] [98353:2847768] CHIP: [DMG] }
+          [1653571709030] [98353:2847768] CHIP: [EM] Sending Standalone Ack for MessageCounter:4015518 on exchange 47229i
+      disabled: true
+
+    - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 7"
+      verification: |
+          ./chip-tool doorlock read-event door-lock-alarm 2 1
+
+          [1653571709030] [98353:2847768] CHIP: [DMG] ReportDataMessage =
+          [1653571709030] [98353:2847768] CHIP: [DMG] {
+          [1653571709030] [98353:2847768] CHIP: [DMG]         SuppressResponse = true, 
+          [1653571709030] [98353:2847768] CHIP: [DMG]         InteractionModelRevision = 1
+          [1653571709030] [98353:2847768] CHIP: [DMG] }
+          [1653571709030] [98353:2847768] CHIP: [EM] Sending Standalone Ack for MessageCounter:4015518 on exchange 47229i
+      disabled: true
+
+    - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 8"
+      verification: |
+          ./chip-tool doorlock read-event door-lock-alarm 2 1
+
+          [1653571709030] [98353:2847768] CHIP: [DMG] ReportDataMessage =
+          [1653571709030] [98353:2847768] CHIP: [DMG] {
+          [1653571709030] [98353:2847768] CHIP: [DMG]         SuppressResponse = true, 
+          [1653571709030] [98353:2847768] CHIP: [DMG]         InteractionModelRevision = 1
+          [1653571709030] [98353:2847768] CHIP: [DMG] }
+          [1653571709030] [98353:2847768] CHIP: [EM] Sending Standalone Ack for MessageCounter:4015518 on exchange 47229i
+      disabled: true
+
+    - label: "Simulate a DoorStateChange event by setting the DoorState to 0"
+      verification: |
+          ./chip-tool doorlock read-event door-state-change 2 1
+
+          [1653571783958] [98363:2848274] CHIP: [DMG] ReportDataMessage =
+          [1653571783958] [98363:2848274] CHIP: [DMG] {
+          [1653571783958] [98363:2848274] CHIP: [DMG] 	SuppressResponse = true, 
+          [1653571783958] [98363:2848274] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653571783958] [98363:2848274] CHIP: [DMG] }
+          [1653571783958] [98363:2848274] CHIP: [EM] Sending Standalone Ack for MessageCounter:11677624 on exchange 14436i
+      disabled: true
+
+    - label: "Simulate a DoorStateChange event by setting the DoorState to 1"
+      verification: |
+          "./chip-tool doorlock read-event door-state-change 2 1
+
+          [1653571783958] [98363:2848274] CHIP: [DMG] ReportDataMessage =
+          [1653571783958] [98363:2848274] CHIP: [DMG] {
+          [1653571783958] [98363:2848274] CHIP: [DMG] 	SuppressResponse = true, 
+          [1653571783958] [98363:2848274] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653571783958] [98363:2848274] CHIP: [DMG] }
+          [1653571783958] [98363:2848274] CHIP: [EM] Sending Standalone Ack for MessageCounter:11677624 on exchange 14436i"
+      disabled: true
+
+    - label: "Simulate a DoorStateChange event by setting the DoorState to 2"
+      verification: |
+          "./chip-tool doorlock read-event door-state-change 2 1
+
+          [1653571783958] [98363:2848274] CHIP: [DMG] ReportDataMessage =
+          [1653571783958] [98363:2848274] CHIP: [DMG] {
+          [1653571783958] [98363:2848274] CHIP: [DMG] 	SuppressResponse = true, 
+          [1653571783958] [98363:2848274] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653571783958] [98363:2848274] CHIP: [DMG] }
+          [1653571783958] [98363:2848274] CHIP: [EM] Sending Standalone Ack for MessageCounter:11677624 on exchange 14436i"
+      disabled: true
+
+    - label: "Simulate a DoorStateChange event by setting the DoorState to 3"
+      verification: |
+          "./chip-tool doorlock read-event door-state-change 2 1
+
+          [1653571783958] [98363:2848274] CHIP: [DMG] ReportDataMessage =
+          [1653571783958] [98363:2848274] CHIP: [DMG] {
+          [1653571783958] [98363:2848274] CHIP: [DMG] 	SuppressResponse = true, 
+          [1653571783958] [98363:2848274] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653571783958] [98363:2848274] CHIP: [DMG] }
+          [1653571783958] [98363:2848274] CHIP: [EM] Sending Standalone Ack for MessageCounter:11677624 on exchange 14436i"
+      disabled: true
+
+    - label: "Simulate a DoorStateChange event by setting the DoorState to 4"
+      verification: |
+          "./chip-tool doorlock read-event door-state-change 2 1
+
+          [1653571783958] [98363:2848274] CHIP: [DMG] ReportDataMessage =
+          [1653571783958] [98363:2848274] CHIP: [DMG] {
+          [1653571783958] [98363:2848274] CHIP: [DMG] 	SuppressResponse = true, 
+          [1653571783958] [98363:2848274] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653571783958] [98363:2848274] CHIP: [DMG] }
+          [1653571783958] [98363:2848274] CHIP: [EM] Sending Standalone Ack for MessageCounter:11677624 on exchange 14436i"
+      disabled: true
+
+    - label: "Simulate a DoorStateChange event by setting the DoorState to 5"
+      verification: |
+          "./chip-tool doorlock read-event door-state-change 2 1
+
+          [1653571783958] [98363:2848274] CHIP: [DMG] ReportDataMessage =
+          [1653571783958] [98363:2848274] CHIP: [DMG] {
+          [1653571783958] [98363:2848274] CHIP: [DMG] 	SuppressResponse = true, 
+          [1653571783958] [98363:2848274] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653571783958] [98363:2848274] CHIP: [DMG] }
+          [1653571783958] [98363:2848274] CHIP: [EM] Sending Standalone Ack for MessageCounter:11677624 on exchange 14436i"
+      disabled: true
+
+    - label: "Simulate a LockOperation event by setting OperationSource to 0"
+      verification: |
+          ./chip-tool doorlock read-event lock-operation 2 1
+
+
+          [1653572803263] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Event number: 5
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Timestamp: 15352644
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803264] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Event number: 6
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Timestamp: 15451617
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15511623
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 8
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15818987
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 9
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 18179000
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 12
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19845592
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 13
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19905596
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "Simulate a LockOperation event by setting OperationSource to 1"
+      verification: |
+          ./chip-tool doorlock read-event lock-operation 2 1
+
+
+          [1653572803263] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Event number: 5
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Timestamp: 15352644
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803264] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Event number: 6
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Timestamp: 15451617
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15511623
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 8
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15818987
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 9
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 18179000
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 12
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19845592
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 13
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19905596
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "Simulate a LockOperation event by setting OperationSource to 2"
+      verification: |
+          ./chip-tool doorlock read-event lock-operation 2 1
+
+
+          [1653572803263] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Event number: 5
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Timestamp: 15352644
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803264] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Event number: 6
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Timestamp: 15451617
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15511623
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 8
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15818987
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 9
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 18179000
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 12
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19845592
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 13
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19905596
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "Simulate a LockOperation event by setting OperationSource to 3"
+      verification: |
+          ./chip-tool doorlock read-event lock-operation 2 1
+
+
+          [1653572803263] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Event number: 5
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Timestamp: 15352644
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803264] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Event number: 6
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Timestamp: 15451617
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15511623
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 8
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15818987
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 9
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 18179000
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 12
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19845592
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 13
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19905596
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "Simulate a LockOperation event by setting OperationSource to 4"
+      verification: |
+          "./chip-tool doorlock read-event lock-operation 2 1
+
+
+          [1653572803263] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Event number: 5
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Timestamp: 15352644
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803264] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Event number: 6
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Timestamp: 15451617
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15511623
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 8
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15818987
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 9
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 18179000
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 12
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19845592
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 13
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19905596
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "Simulate a LockOperation event by setting OperationSource to 5"
+      verification: |
+          ./chip-tool doorlock read-event lock-operation 2 1
+
+
+          [1653572803263] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Event number: 5
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Timestamp: 15352644
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803264] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Event number: 6
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Timestamp: 15451617
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15511623
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 8
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15818987
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 9
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 18179000
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 12
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19845592
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 13
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19905596
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "Simulate a LockOperation event by setting OperationSource to 6"
+      verification: |
+          ./chip-tool doorlock read-event lock-operation 2 1
+
+
+          [1653572803263] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Event number: 5
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Timestamp: 15352644
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803264] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Event number: 6
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Timestamp: 15451617
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15511623
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 8
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15818987
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 9
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 18179000
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 12
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19845592
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 13
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19905596
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "Simulate a LockOperation event by setting OperationSource to 7"
+      verification: |
+          ./chip-tool doorlock read-event lock-operation 2 1
+
+
+          [1653572803263] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Event number: 5
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Timestamp: 15352644
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803264] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Event number: 6
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Timestamp: 15451617
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15511623
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 8
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15818987
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 9
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 18179000
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 12
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19845592
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 13
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19905596
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "Simulate a LockOperation event by setting OperationSource to 8"
+      verification: |
+          ./chip-tool doorlock read-event lock-operation 2 1
+
+
+          [1653572803263] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Event number: 5
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Timestamp: 15352644
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803264] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Event number: 6
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Timestamp: 15451617
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15511623
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 8
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15818987
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 9
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 18179000
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 12
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19845592
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 13
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19905596
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "Simulate a LockOperation event by setting OperationSource to 9"
+      verification: |
+          ./chip-tool doorlock read-event lock-operation 2 1
+
+
+          [1653572803263] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Event number: 5
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803263] [98482:2853531] CHIP: [TOO]          Timestamp: 15352644
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803264] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Event number: 6
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803264] [98482:2853531] CHIP: [TOO]          Timestamp: 15451617
+          [1653572803264] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803264] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803264] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803264] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803264] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803264] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803264] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15511623
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 8
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 15818987
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 9
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 18179000
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 12
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19845592
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 7
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: 1
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: 112233
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+          [1653572803265] [98482:2853531] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0002
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Event number: 13
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Priority: Critical
+          [1653572803265] [98482:2853531] CHIP: [TOO]          Timestamp: 19905596
+          [1653572803265] [98482:2853531] CHIP: [TOO]   LockOperation: {
+          [1653572803265] [98482:2853531] CHIP: [TOO]     LockOperationType: 0
+          [1653572803265] [98482:2853531] CHIP: [TOO]     OperationSource: 4
+          [1653572803265] [98482:2853531] CHIP: [TOO]     UserIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     FabricIndex: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     SourceNode: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]     Credentials: null
+          [1653572803265] [98482:2853531] CHIP: [TOO]    }
+      disabled: true
+
+    - label:
+          "Simulate a LockOperationError Event by setting OperationError as 0"
+      verification: |
+          ./chip-tool doorlock read-event lock-operation-error 2 1
+
+
+          [1653572299057] [98420:2850836] CHIP: [DMG] ReportDataMessage =
+          [1653572299057] [98420:2850836] CHIP: [DMG] {
+          [1653572299057] [98420:2850836] CHIP: [DMG] 	SuppressResponse = true, 
+          [1653572299057] [98420:2850836] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653572299057] [98420:2850836] CHIP: [DMG] }
+          [1653572299057] [98420:2850836] CHIP: [EM] Sending Standalone Ack for MessageCounter:13024512 on exchange 29986i
+      disabled: true
+
+    - label:
+          "Simulate a LockOperationError Event by setting OperationError as 1"
+      verification: |
+          ./chip-tool doorlock read-event lock-operation-error 2 1
+
+
+          [1653572299057] [98420:2850836] CHIP: [DMG] ReportDataMessage =
+          [1653572299057] [98420:2850836] CHIP: [DMG] {
+          [1653572299057] [98420:2850836] CHIP: [DMG] 	SuppressResponse = true, 
+          [1653572299057] [98420:2850836] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653572299057] [98420:2850836] CHIP: [DMG] }
+          [1653572299057] [98420:2850836] CHIP: [EM] Sending Standalone Ack for MessageCounter:13024512 on exchange 29986i
+      disabled: true
+
+    - label:
+          "Simulate a LockOperationError Event by setting OperationError as 2"
+      verification: |
+          ./chip-tool doorlock read-event lock-operation-error 2 1
+
+
+          [1653572299057] [98420:2850836] CHIP: [DMG] ReportDataMessage =
+          [1653572299057] [98420:2850836] CHIP: [DMG] {
+          [1653572299057] [98420:2850836] CHIP: [DMG] 	SuppressResponse = true, 
+          [1653572299057] [98420:2850836] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653572299057] [98420:2850836] CHIP: [DMG] }
+          [1653572299057] [98420:2850836] CHIP: [EM] Sending Standalone Ack for MessageCounter:13024512 on exchange 29986i
+      disabled: true
+
+    - label:
+          "Simulate a LockOperationError Event by setting OperationError as 3"
+      verification: |
+          ./chip-tool doorlock read-event lock-operation-error 2 1
+
+
+          [1653572299057] [98420:2850836] CHIP: [DMG] ReportDataMessage =
+          [1653572299057] [98420:2850836] CHIP: [DMG] {
+          [1653572299057] [98420:2850836] CHIP: [DMG] 	SuppressResponse = true, 
+          [1653572299057] [98420:2850836] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653572299057] [98420:2850836] CHIP: [DMG] }
+          [1653572299057] [98420:2850836] CHIP: [EM] Sending Standalone Ack for MessageCounter:13024512 on exchange 29986i
+      disabled: true
+
+    - label:
+          "Simulate a LockOperationError Event by setting OperationError as 4"
+      verification: |
+          ./chip-tool doorlock read-event lock-operation-error 2 1
+
+
+          [1653572299057] [98420:2850836] CHIP: [DMG] ReportDataMessage =
+          [1653572299057] [98420:2850836] CHIP: [DMG] {
+          [1653572299057] [98420:2850836] CHIP: [DMG] 	SuppressResponse = true, 
+          [1653572299057] [98420:2850836] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653572299057] [98420:2850836] CHIP: [DMG] }
+          [1653572299057] [98420:2850836] CHIP: [EM] Sending Standalone Ack for MessageCounter:13024512 on exchange 29986i
+      disabled: true
+
+    - label: "Simulate a LockUserChange event by changing the Lock User"
+      verification: |
+          ./chip-tool doorlock read-event lock-user-change 2 1
+
+
+          [1653572384473] [98430:2851349] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
+          [1653572384473] [98430:2851349] CHIP: [TOO] 	 Event number: 10
+          [1653572384473] [98430:2851349] CHIP: [TOO] 	 Priority: Info
+          [1653572384473] [98430:2851349] CHIP: [TOO] 	 Timestamp: 19034354
+          [1653572384474] [98430:2851349] CHIP: [TOO]   LockUserChange: {
+          [1653572384474] [98430:2851349] CHIP: [TOO]     LockDataType: 2
+          [1653572384474] [98430:2851349] CHIP: [TOO]     DataOperationType: 0
+          [1653572384474] [98430:2851349] CHIP: [TOO]     OperationSource: 7
+          [1653572384474] [98430:2851349] CHIP: [TOO]     UserIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     FabricIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     SourceNode: 112233
+          [1653572384474] [98430:2851349] CHIP: [TOO]     DataIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]    }
+          [1653572384474] [98430:2851349] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
+          [1653572384474] [98430:2851349] CHIP: [TOO] 	 Event number: 11
+          [1653572384474] [98430:2851349] CHIP: [TOO] 	 Priority: Info
+          [1653572384474] [98430:2851349] CHIP: [TOO] 	 Timestamp: 19240944
+          [1653572384474] [98430:2851349] CHIP: [TOO]   LockUserChange: {
+          [1653572384474] [98430:2851349] CHIP: [TOO]     LockDataType: 2
+          [1653572384474] [98430:2851349] CHIP: [TOO]     DataOperationType: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     OperationSource: 7
+          [1653572384474] [98430:2851349] CHIP: [TOO]     UserIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     FabricIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     SourceNode: 112233
+          [1653572384474] [98430:2851349] CHIP: [TOO]     DataIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "Simulate a LockUserChange event by changing the Schedule"
+      verification: |
+          ./chip-tool doorlock read-event lock-user-change 2 1
+
+
+          [1653572384473] [98430:2851349] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
+          [1653572384473] [98430:2851349] CHIP: [TOO] 	 Event number: 10
+          [1653572384473] [98430:2851349] CHIP: [TOO] 	 Priority: Info
+          [1653572384473] [98430:2851349] CHIP: [TOO] 	 Timestamp: 19034354
+          [1653572384474] [98430:2851349] CHIP: [TOO]   LockUserChange: {
+          [1653572384474] [98430:2851349] CHIP: [TOO]     LockDataType: 2
+          [1653572384474] [98430:2851349] CHIP: [TOO]     DataOperationType: 0
+          [1653572384474] [98430:2851349] CHIP: [TOO]     OperationSource: 7
+          [1653572384474] [98430:2851349] CHIP: [TOO]     UserIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     FabricIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     SourceNode: 112233
+          [1653572384474] [98430:2851349] CHIP: [TOO]     DataIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]    }
+          [1653572384474] [98430:2851349] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
+          [1653572384474] [98430:2851349] CHIP: [TOO] 	 Event number: 11
+          [1653572384474] [98430:2851349] CHIP: [TOO] 	 Priority: Info
+          [1653572384474] [98430:2851349] CHIP: [TOO] 	 Timestamp: 19240944
+          [1653572384474] [98430:2851349] CHIP: [TOO]   LockUserChange: {
+          [1653572384474] [98430:2851349] CHIP: [TOO]     LockDataType: 2
+          [1653572384474] [98430:2851349] CHIP: [TOO]     DataOperationType: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     OperationSource: 7
+          [1653572384474] [98430:2851349] CHIP: [TOO]     UserIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     FabricIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     SourceNode: 112233
+          [1653572384474] [98430:2851349] CHIP: [TOO]     DataIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "Simulate a LockUserChange event by changing the Credential"
+      verification: |
+          ./chip-tool doorlock read-event lock-user-change 2 1
+
+
+          [1653572384473] [98430:2851349] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
+          [1653572384473] [98430:2851349] CHIP: [TOO] 	 Event number: 10
+          [1653572384473] [98430:2851349] CHIP: [TOO] 	 Priority: Info
+          [1653572384473] [98430:2851349] CHIP: [TOO] 	 Timestamp: 19034354
+          [1653572384474] [98430:2851349] CHIP: [TOO]   LockUserChange: {
+          [1653572384474] [98430:2851349] CHIP: [TOO]     LockDataType: 2
+          [1653572384474] [98430:2851349] CHIP: [TOO]     DataOperationType: 0
+          [1653572384474] [98430:2851349] CHIP: [TOO]     OperationSource: 7
+          [1653572384474] [98430:2851349] CHIP: [TOO]     UserIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     FabricIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     SourceNode: 112233
+          [1653572384474] [98430:2851349] CHIP: [TOO]     DataIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]    }
+          [1653572384474] [98430:2851349] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Event 0x0000_0004
+          [1653572384474] [98430:2851349] CHIP: [TOO] 	 Event number: 11
+          [1653572384474] [98430:2851349] CHIP: [TOO] 	 Priority: Info
+          [1653572384474] [98430:2851349] CHIP: [TOO] 	 Timestamp: 19240944
+          [1653572384474] [98430:2851349] CHIP: [TOO]   LockUserChange: {
+          [1653572384474] [98430:2851349] CHIP: [TOO]     LockDataType: 2
+          [1653572384474] [98430:2851349] CHIP: [TOO]     DataOperationType: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     OperationSource: 7
+          [1653572384474] [98430:2851349] CHIP: [TOO]     UserIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     FabricIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]     SourceNode: 112233
+          [1653572384474] [98430:2851349] CHIP: [TOO]     DataIndex: 1
+          [1653572384474] [98430:2851349] CHIP: [TOO]    }
+      disabled: true

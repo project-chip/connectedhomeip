@@ -33,21 +33,46 @@ tests:
       attribute: "ClusterRevision"
       response:
           value: 1
-
-    - label: "Read the global attribute constraints: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
           constraints:
               type: uint16
 
-    #Issue 10988
+    - label: "Read the optional global attribute: FeatureMap"
+      PICS: MC_CHANNEL.S.CL || MC_CHANNEL.S.LI
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: map32
+
+    #Issue 10988 and 19152
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS:
+          PICS_SKIP_SAMPLE_APP && MC_CHANNEL.S.A0000 && MC_CHANNEL.S.A0001 &&
+          MC_CHANNEL.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
+          value: [65528, 65529, 65531, 65532, 65533]
+          constraints:
+              type: list
+
+    #Issue 10988 and 19152
+    - label: "Read the global attribute: AcceptedCommandList"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: [0, 2, 3]
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: [1]
           constraints:
               type: list
 
@@ -57,50 +82,6 @@ tests:
           response provides a list of supported events."
       verification: |
           Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    #Issue 10988
-    - label: "Read the global attribute: AcceptedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          constraints:
-              type: list
-
-    #Issue 10988
-    - label: "Read the global attribute: GeneratedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          constraints:
-              type: list
-
-    #Issue 10988
-    - label:
-          "Read FeatureMap attribute from the DUT and Verify that the DUT
-          response values based on feature/PICS support Bit 0 - Set to 1 if the
-          DUT supports Channel Lists (PICS_CL_S is true) Bit 1 - Set to 1 if the
-          DUT supports Lineup Info (PICS_LI_S is true)"
-      verification: |
-          ./chip-tool channel read feature-map 1 1
-          [[1649662622709] [67419:752862] CHIP: [DMG]                                         Endpoint = 0x1,
-          [1649662622709] [67419:752862] CHIP: [DMG]                                         Cluster = 0x504,
-          [1649662622709] [67419:752862] CHIP: [DMG]                                         Attribute = 0x0000_FFFC,
-          [1649662622709] [67419:752862] CHIP: [DMG]                                 }
-          [1649662622709] [67419:752862] CHIP: [DMG]
-          [1649662622709] [67419:752862] CHIP: [DMG]                                 StatusIB =
-          [1649662622709] [67419:752862] CHIP: [DMG]                                 {
-          [1649662622709] [67419:752862] CHIP: [DMG]                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT

@@ -28,7 +28,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -36,12 +36,37 @@ tests:
           constraints:
               type: uint16
 
+    - label: "Read the optional global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 2
+          constraints:
+              type: map32
+
+    # if condition needed 10988
     - label: "Read the global attribute: AttributeList"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           value: [0, 1, 2, 14, 15, 16, 65528, 65529, 65531, 65532, 65533]
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
           constraints:
               type: list
 
@@ -60,25 +85,3 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
-    - label: "Read the global attribute: AcceptedCommandList"
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          value: []
-          constraints:
-              type: list
-
-    - label: "Read the global attribute: GeneratedCommandList"
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          value: []
-          constraints:
-              type: list
-
-    - label: "read the optional global attribute: FeatureMap"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 2

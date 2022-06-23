@@ -135,7 +135,7 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
     //==============================================
     EFR32_LOG("Init CHIP Stack");
     // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
+    ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);

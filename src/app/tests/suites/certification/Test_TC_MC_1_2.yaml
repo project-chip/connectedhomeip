@@ -34,38 +34,25 @@ tests:
       attribute: "ClusterRevision"
       response:
           value: 1
-
-    - label: "Read the global attribute constraints: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
           constraints:
               type: uint16
 
-    #Issue 17453
+    - label: "Read the optional global attribute: FeatureMap"
+      PICS: MC_KEYPADINPUT.S.NV || MC_KEYPADINPUT.S.LK || MC_KEYPADINPUT.S.NK
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: map32
+
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           value: [65528, 65529, 65531, 65532, 65533]
           constraints:
               type: list
-
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
@@ -75,9 +62,7 @@ tests:
           constraints:
               type: list
 
-    #Disabled due to issue 17453
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -85,12 +70,12 @@ tests:
           constraints:
               type: list
 
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label:
-          "Read FeatureMap attribute from the DUT and Verify that the DUT
-          response"
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
       verification: |
-          ./chip-tool lowpower read feature-map 1 1
-          [1645780669.465220][5069:5074] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86
+          Not implemented in chip-tool
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT

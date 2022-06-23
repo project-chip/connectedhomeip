@@ -220,7 +220,7 @@ CHIP_ERROR ClusterStateCache::Get(const ConcreteAttributePath & path, TLV::TLVRe
     }
 
     reader.Init(attributeState->Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().Get(),
-                attributeState->Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().BufferByteSize());
+                attributeState->Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().AllocatedSize());
     return reader.Next();
 }
 
@@ -423,7 +423,7 @@ void ClusterStateCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter
                 {
                     TLV::TLVReader bufReader;
                     bufReader.Init(attributeIter.second.Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().Get(),
-                                   attributeIter.second.Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().BufferByteSize());
+                                   attributeIter.second.Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().AllocatedSize());
                     ReturnOnFailure(bufReader.Next());
                     // Skip to the end of the element.
                     ReturnOnFailure(bufReader.Skip());
