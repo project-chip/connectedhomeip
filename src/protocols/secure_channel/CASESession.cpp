@@ -194,7 +194,7 @@ CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, Fab
                                             SessionResumptionStorage * sessionResumptionStorage,
                                             Credentials::CertificateValidityPolicy * policy,
                                             SessionEstablishmentDelegate * delegate, const ScopedNodeId & previouslyEstablishedPeer,
-                                            Optional<ReliableMessageProtocolConfig> mrpConfig)
+                                            Optional<ReliableMessageProtocolConfig> mrpLocalConfig)
 {
     // Below VerifyOrReturnError is not SuccessOrExit since we only want to goto `exit:` after
     // Init has been successfully called.
@@ -207,7 +207,7 @@ CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, Fab
     mFabricsTable             = fabricTable;
     mRole                     = CryptoContext::SessionRole::kResponder;
     mSessionResumptionStorage = sessionResumptionStorage;
-    mLocalMRPConfig           = mrpConfig;
+    mLocalMRPConfig           = mrpLocalConfig;
 
     ChipLogDetail(SecureChannel, "Allocated SecureSession (%p) - waiting for Sigma1 msg",
                   mSecureSessionHolder.Get().Value()->AsSecureSession());
@@ -223,7 +223,7 @@ exit:
 CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, FabricTable * fabricTable, ScopedNodeId peerScopedNodeId,
                                          ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
                                          Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
-                                         Optional<ReliableMessageProtocolConfig> mrpConfig)
+                                         Optional<ReliableMessageProtocolConfig> mrpLocalConfig)
 {
     MATTER_TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -255,7 +255,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     mFabricsTable             = fabricTable;
     mFabricIndex              = fabricInfo->GetFabricIndex();
     mSessionResumptionStorage = sessionResumptionStorage;
-    mLocalMRPConfig           = mrpConfig;
+    mLocalMRPConfig           = mrpLocalConfig;
 
     mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
     mPeerNodeId  = peerScopedNodeId.GetNodeId();

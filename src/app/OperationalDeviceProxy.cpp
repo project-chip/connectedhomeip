@@ -404,7 +404,7 @@ CHIP_ERROR OperationalDeviceProxy::LookupPeerAddress()
 
 void OperationalDeviceProxy::OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result)
 {
-    UpdateDeviceData(result.address, result.mrpConfig);
+    UpdateDeviceData(result.address, result.mrpRemoteConfig);
 }
 
 void OperationalDeviceProxy::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason)

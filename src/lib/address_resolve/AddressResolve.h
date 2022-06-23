@@ -32,10 +32,10 @@ namespace AddressResolve {
 struct ResolveResult
 {
     Transport::PeerAddress address;
-    ReliableMessageProtocolConfig mrpConfig;
+    ReliableMessageProtocolConfig mrpRemoteConfig;
     bool supportsTcp = false;
 
-    ResolveResult() : address(Transport::Type::kUdp), mrpConfig(GetLocalMRPConfig()) {}
+    ResolveResult() : address(Transport::Type::kUdp), mrpRemoteConfig(GetDefaultMRPConfig()) {}
 };
 
 /// Represents an object interested in callbacks for a resolve operation.

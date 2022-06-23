@@ -68,7 +68,7 @@ void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
 
     // First node, peer session id 1, local session id 2
     auto optionalSession = connections.CreateNewSecureSessionForTest(SecureSession::Type::kCASE, 2, kLocalNodeId, kCasePeer1NodeId,
-                                                                     kPeer1CATs, 1, kFabricIndex, GetLocalMRPConfig());
+                                                                     kPeer1CATs, 1, kFabricIndex, GetDefaultMRPConfig());
     NL_TEST_ASSERT(inSuite, optionalSession.HasValue());
     NL_TEST_ASSERT(inSuite, optionalSession.Value()->AsSecureSession()->GetSecureSessionType() == SecureSession::Type::kCASE);
     NL_TEST_ASSERT(inSuite, optionalSession.Value()->AsSecureSession()->GetPeerNodeId() == kCasePeer1NodeId);
@@ -80,7 +80,7 @@ void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
 
     // Second node, peer session id 3, local session id 4
     optionalSession = connections.CreateNewSecureSessionForTest(SecureSession::Type::kCASE, 4, kLocalNodeId, kCasePeer2NodeId,
-                                                                kPeer2CATs, 3, kFabricIndex, GetLocalMRPConfig());
+                                                                kPeer2CATs, 3, kFabricIndex, GetDefaultMRPConfig());
     NL_TEST_ASSERT(inSuite, optionalSession.HasValue());
     NL_TEST_ASSERT(inSuite, optionalSession.Value()->AsSecureSession()->GetSecureSessionType() == SecureSession::Type::kCASE);
     NL_TEST_ASSERT(inSuite, optionalSession.Value()->AsSecureSession()->GetPeerNodeId() == kCasePeer2NodeId);
@@ -96,9 +96,9 @@ void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
     //
     for (int i = 2; i < CHIP_CONFIG_SECURE_SESSION_POOL_SIZE; ++i)
     {
-        sessions[i] = connections.CreateNewSecureSessionForTest(SecureSession::Type::kCASE,
-                                                                static_cast<uint16_t>(static_cast<uint16_t>(i) + 6u), kLocalNodeId,
-                                                                kCasePeer2NodeId, kPeer2CATs, 3, kFabricIndex, GetLocalMRPConfig());
+        sessions[i] = connections.CreateNewSecureSessionForTest(
+            SecureSession::Type::kCASE, static_cast<uint16_t>(static_cast<uint16_t>(i) + 6u), kLocalNodeId, kCasePeer2NodeId,
+            kPeer2CATs, 3, kFabricIndex, GetDefaultMRPConfig());
         NL_TEST_ASSERT(inSuite, sessions[i].HasValue());
     }
 
@@ -115,7 +115,7 @@ void TestFindByKeyId(nlTestSuite * inSuite, void * inContext)
 
     // First node, peer session id 1, local session id 2
     auto optionalSession = connections.CreateNewSecureSessionForTest(SecureSession::Type::kCASE, 2, kLocalNodeId, kCasePeer1NodeId,
-                                                                     kPeer1CATs, 1, kFabricIndex, GetLocalMRPConfig());
+                                                                     kPeer1CATs, 1, kFabricIndex, GetDefaultMRPConfig());
     NL_TEST_ASSERT(inSuite, optionalSession.HasValue());
 
     NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(1).HasValue());
@@ -123,7 +123,7 @@ void TestFindByKeyId(nlTestSuite * inSuite, void * inContext)
 
     // Second node, peer session id 3, local session id 4
     optionalSession = connections.CreateNewSecureSessionForTest(SecureSession::Type::kCASE, 4, kLocalNodeId, kCasePeer2NodeId,
-                                                                kPeer2CATs, 3, kFabricIndex, GetLocalMRPConfig());
+                                                                kPeer2CATs, 3, kFabricIndex, GetDefaultMRPConfig());
     NL_TEST_ASSERT(inSuite, optionalSession.HasValue());
 
     NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(3).HasValue());
