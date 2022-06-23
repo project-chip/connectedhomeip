@@ -499,36 +499,6 @@ public:
     bool HasOperationalKeyForFabric(FabricIndex fabricIndex) const;
 
     // TODO: REVIEW DOCS
-    /**
-     * @brief Add and temporarily activate a new Trusted Root Certificate to storage for the given fabric
-     *
-     * The certificate is temporary until committed or reverted.
-     * The certificate is committed to storage on `CommitOpCertsForFabric`.
-     * The certificate is destroyed if `RevertPendingOpCerts` is called before `CommitOpCertsForFabric`.
-     *
-     * Only one pending trusted root certificate is supported at a time and it is illegal
-     * to call this method if there is already a persisted root certificate for the given
-     * fabric.
-     *
-     * Uniqueness constraints for roots (see AddTrustedRootCertificate command in spec) is not
-     * enforced by this method and must be done as a more holistic check elsewhere. Cryptographic
-     * signature verification or path validation is not enforced by this method.
-     *
-     * If `UpdateOpCertsForFabric` had been called before this method, this method will return
-     * CHIP_ERROR_INCORRECT_STATE since it is illegal to update trusted roots when updating an
-     * existing NOC chain.
-     *
-     * @param fabricIndex - FabricIndex for which a new trusted root certificate should be added
-     * @param rcac - Buffer containing the root certificate to add.
-     *
-     * @retval CHIP_NO_ERROR on success
-     * @retval CHIP_ERROR_NO_MEMORY if there is insufficient memory to maintain the temporary root cert
-     * @retval CHIP_ERROR_INVALID_ARGUMENT if the certificate is empty or too large
-     * @retval CHIP_ERROR_INCORRECT_STATE if the certificate store is not properly initialized, if this method
-     *                                    is called after `UpdateOpCertsForFabric`, or if there was
-     *                                    already a pending or persisted root certificate for the given `fabricIndex`.
-     * @retval other CHIP_ERROR value on internal errors
-     */
     CHIP_ERROR AddNewPendingTrustedRootCert(const ByteSpan & rcac);
 
     // TODO: REVIEW DOCS

@@ -250,6 +250,16 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
             {
                 err = fabricTable->AddNewPendingFabricWithOperationalKeystore(nocSpan, icacSpan, newFabricVendorId, &fabricIndex);
             }
+
+            if (err == CHIP_NO_ERROR)
+            {
+                // Now that we know our planned fabric index, verify that the
+                // keystore has a key for it.
+                if (!fabricTable->HasOperationalKeyForFabric(fabricIndex))
+                {
+                    err = CHIP_ERROR_KEY_NOT_FOUND;
+                }
+            }
         }
 
         // Commit after setup, error-out on failure.

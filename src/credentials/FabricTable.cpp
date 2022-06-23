@@ -826,7 +826,14 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, Crypto::P256Keypair * exi
     else if (mOperationalKeystore != nullptr)
     {
         // If a keystore exists, we activate the operational key now, which also validates if it was previously installed
-        ReturnErrorOnFailure(mOperationalKeystore->ActivateOpKeypairForFabric(fabricIndex, nocPubKey));
+        if (mOperationalKeystore->HasPendingOpKeypair())
+        {
+            ReturnErrorOnFailure(mOperationalKeystore->ActivateOpKeypairForFabric(fabricIndex, nocPubKey));
+        }
+        else
+        {
+            VerifyOrReturnError(mOperationalKeystore->HasOpKeypairForFabric(fabricIndex), CHIP_ERROR_KEY_NOT_FOUND);
+        }
     }
     else
     {
@@ -1416,10 +1423,12 @@ CHIP_ERROR FabricTable::ActivatePendingOperationalKey(const Crypto::P256PublicKe
     // We can only manage commissionable pending fail-safe state if we have a keystore
     VerifyOrReturnError(mOperationalKeystore != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrReturnError(!mStateFlags.Has(StateFlags::kIsOperationalKeyPending), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mStateFlags.Has(StateFlags::kIsOperationalKeyPending), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(mFabricIndexWithPendingState), CHIP_ERROR_INCORRECT_STATE);
 
-    return mOperationalKeystore->ActivateOpKeypairForFabric(mFabricIndexWithPendingState, nocSubjectPublicKey);
+    ReturnErrorOnFailure(mOperationalKeystore->ActivateOpKeypairForFabric(mFabricIndexWithPendingState, nocSubjectPublicKey));
+    mStateFlags.Clear(StateFlags::kIsOperationalKeyPending);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FabricTable::AddNewPendingTrustedRootCert(const ByteSpan & rcac)

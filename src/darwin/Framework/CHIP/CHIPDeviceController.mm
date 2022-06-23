@@ -66,8 +66,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 static NSString * const kErrorGenerateNOC = @"Generating operational certificate failed";
 static NSString * const kErrorKeyAllocation = @"Generating new operational key failed";
 static NSString * const kErrorCSRValidation = @"Extracting public key from CSR failed";
-static NSString * const kErrorActivateKey = @"Activating new operational key failed";
-static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data failed";
 
 @interface CHIPDeviceController ()
 
@@ -262,16 +260,6 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
                     [startupParams.nodeId unsignedLongLongValue], startupParams.fabricId, chip::kUndefinedCATs, pubKey, noc);
 
                 if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorGenerateNOC]) {
-                    return;
-                }
-
-                errorCode = startupParams.fabricTable->ActivatePendingOperationalKey(pubKey);
-                if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorActivateKey]) {
-                    return;
-                }
-
-                errorCode = startupParams.fabricTable->CommitPendingFabricData();
-                if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommitPendingFabricData]) {
                     return;
                 }
             }

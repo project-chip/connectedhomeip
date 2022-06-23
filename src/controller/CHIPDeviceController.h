@@ -168,7 +168,6 @@ public:
     CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**
-     * This function finds the device corresponding to peerNodeId, and establishes
      * @brief
      *   Looks up the PeerAddress for an established CASE session.
      *

@@ -1482,7 +1482,6 @@ CHIP_ERROR CASESession::ValidatePeerIdentity(const ByteSpan & peerNOC, const Byt
 
     ReturnErrorOnFailure(SetEffectiveTime());
 
-    PeerId peerId;
     CompressedFabricId unused;
     FabricId peerFabricId;
     ReturnErrorOnFailure(mFabricsTable->VerifyCredentials(mFabricIndex, peerNOC, peerICAC, mValidContext, unused, peerFabricId,
