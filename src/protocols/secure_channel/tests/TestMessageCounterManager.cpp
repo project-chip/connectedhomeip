@@ -168,7 +168,7 @@ int Finalize(void * aContext)
  */
 int TestMessageCounterManager()
 {
-    static TestContext sContext;
+    TestContext sContext;
 
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);

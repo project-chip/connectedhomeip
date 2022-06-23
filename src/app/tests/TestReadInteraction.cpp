@@ -2788,7 +2788,7 @@ nlTestSuite sSuite =
 
 int TestReadInteraction()
 {
-    static TestContext sContext;
+    TestContext sContext;
     nlTestRunner(&sSuite, &sContext);
     return (nlTestRunnerStats(&sSuite));
 }

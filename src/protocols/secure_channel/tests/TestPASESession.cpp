@@ -487,7 +487,7 @@ int TestSecurePairing_Teardown(void * inContext)
  */
 int TestPASESession()
 {
-    static TestContext sContext;
+    TestContext sContext;
 
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);

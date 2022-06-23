@@ -1687,7 +1687,7 @@ nlTestSuite sSuite =
  */
 int TestReliableMessageProtocol()
 {
-    static TestContext sContext;
+    TestContext sContext;
 
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
