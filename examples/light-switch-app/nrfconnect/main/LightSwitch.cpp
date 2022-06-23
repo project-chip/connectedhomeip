@@ -90,19 +90,24 @@ void LightSwitch::DimmerChangeBrightness()
 void LightSwitch::GenericSwitchInitialPress()
 {
     DeviceLayer::SystemLayer().ScheduleLambda([this] {
-        uint8_t pressedPosition = 1;
+        // Press moves Position from 0 (idle) to 1 (press)
+        uint8_t newPosition = 1;
 
-        Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, pressedPosition);
-        Clusters::SwitchServer::Instance().OnInitialPress(mLightGenericSwitchEndpointId, pressedPosition);
+        Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, newPosition);
+        // InitialPress event takes newPosition as event data
+        Clusters::SwitchServer::Instance().OnInitialPress(mLightGenericSwitchEndpointId, newPosition);
     });
 }
 
 void LightSwitch::GenericSwitchReleasePress()
 {
     DeviceLayer::SystemLayer().ScheduleLambda([this] {
-        uint8_t releasedPosition = 0;
+        // Release moves Position from 1 (press) to 0 (idle)
+        uint8_t previousPosition = 1;
+        uint8_t newPosition = 0;
 
-        Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, releasedPosition);
-        Clusters::SwitchServer::Instance().OnShortRelease(mLightGenericSwitchEndpointId, releasedPosition);
+        Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, newPosition);
+        // ShortRelease event takes previousPosition as event data
+        Clusters::SwitchServer::Instance().OnShortRelease(mLightGenericSwitchEndpointId, previousPosition);
     });
 }
