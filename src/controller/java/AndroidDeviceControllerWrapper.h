@@ -111,6 +111,7 @@ public:
      * @param[in] intermediateCertificate an X.509 DER-encoded intermediate certificate for this node
      * @param[in] nodeOperationalCertificate an X.509 DER-encoded operational certificate for this node
      * @param[in] ipkEpochKey the IPK epoch key to use for this node
+     * @param[in] listenPort the UDP port to listen on
      * @param[out] errInfoOnFailure a pointer to a CHIP_ERROR that will be populated if this method returns nullptr
      */
     static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
@@ -120,7 +121,7 @@ public:
                                                         AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
                                                         jobject keypairDelegate, jbyteArray rootCertificate,
                                                         jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate,
-                                                        jbyteArray ipkEpochKey, CHIP_ERROR * errInfoOnFailure);
+                                                        jbyteArray ipkEpochKey, uint16_t listenPort, CHIP_ERROR * errInfoOnFailure);
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;

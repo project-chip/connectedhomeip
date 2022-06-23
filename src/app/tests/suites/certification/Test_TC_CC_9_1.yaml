@@ -59,6 +59,14 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Wait for 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
       PICS: CC.S.C44.Rsp
@@ -194,11 +202,10 @@ tests:
       response:
           value: 1
 
-    #Issue 18848
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT"
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
-      PICS: PICS_SKIP_SAMPLE_APP && CC.S.A4006
+      PICS: CC.S.A4006
       response:
           value: 16384
 
@@ -344,11 +351,10 @@ tests:
       response:
           value: 1
 
-    #Issue 18848
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT"
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
-      PICS: PICS_SKIP_SAMPLE_APP && CC.S.A4006
+      PICS: CC.S.A4006
       response:
           value: 16384
 
@@ -446,7 +452,7 @@ tests:
       arguments:
           values:
               - name: "enhancedHue"
-                value: 40960
+                value: 16384
               - name: "direction"
                 value: 0
               - name: "transitionTime"
@@ -456,20 +462,20 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Wait 2000ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 2000
+                value: 1000
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       PICS: CC.S.A4000
       response:
-          value: 40960
+          value: 16384
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
@@ -525,11 +531,10 @@ tests:
       response:
           value: 1
 
-    #Issue 18848
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT"
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
-      PICS: PICS_SKIP_SAMPLE_APP && CC.S.A4006
+      PICS: CC.S.A4006
       response:
           value: 16384
 
@@ -675,11 +680,10 @@ tests:
       response:
           value: 1
 
-    #Issue 18848
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT"
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
-      PICS: PICS_SKIP_SAMPLE_APP && CC.S.A4006
+      PICS: CC.S.A4006
       response:
           value: 16384
 
