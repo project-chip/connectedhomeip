@@ -1,0 +1,161 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    11.3.2. [TC-OPCREDS-3.2] Attribute-CurrentFabricIndex validation
+    [DUT-Server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Factory Reset DUT"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commission DUT to TH1s Fabric When DUT sends NOC response save
+          fabricindex as fabindex1"
+      verification: |
+          ./chip-tool operationalcredentials read   current-fabric-index   1 0
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 2445178920
+          CHIP:TOO:   CurrentFabricIndex: 1
+          CHIP:EM: Sending Standalone Ack for MessageCounter:7141893 on exchange 26909i"
+      disabled: true
+
+    - label: "Save TH1s Fabric ID as FabricID1"
+      verification: |
+          Take the CurrentFabricIndex as fabindex1
+      disabled: true
+
+    - label:
+          "Commission DUT to TH2s Fabric When DUT sends NOC response save
+          fabricindex as fabindex2"
+      verification: |
+          ./chip-tool operationalcredentials read   current-fabric-index 2 0
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 2445178920
+          CHIP:TOO:   CurrentFabricIndex: 2
+          CHIP:EM: Sending Standalone Ack for MessageCounter:8900122 on exchange 26519i
+      disabled: true
+
+    - label: "Save TH2s Fabric ID as FabricID2"
+      verification: |
+          Take the CurrentFabricIndex as fabindex2
+      disabled: true
+
+    - label: "From TH1 read the CurrentFabricIndex"
+      verification: |
+          ./chip-tool operationalcredentials read   current-fabric-index   1 0
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 2445178920
+          CHIP:TOO:   CurrentFabricIndex: 1
+          CHIP:EM: Sending Standalone Ack for MessageCounter:7141893 on exchange 26909i
+      disabled: true
+
+    - label:
+          "From TH1 read the NOCs List attribute having entry index 0 and entry
+          index 1"
+      verification: |
+          ./chip-tool operationalcredentials read nocs 1 0
+
+          [1651577468.074462][4512:4517] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2998576972
+          [1651577468.074533][4512:4517] CHIP:TOO:   NOCs: 1 entries
+          [1651577468.074596][4512:4517] CHIP:TOO:     [1]: {
+          [1651577468.074626][4512:4517] CHIP:TOO:       Noc: Elided value too large of size 241
+          [1651577468.074652][4512:4517] CHIP:TOO:       Icac: Elided value too large of size 231
+          [1651577468.074676][4512:4517] CHIP:TOO:       FabricIndex: 1
+          [1651577468.074699][4512:4517] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Read NOCStruct values from entry at index 0"
+      verification: |
+          ./chip-tool operationalcredentials read nocs 1 0
+
+          [1651577468.074462][4512:4517] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2998576972
+          [1651577468.074533][4512:4517] CHIP:TOO:   NOCs: 1 entries
+          [1651577468.074596][4512:4517] CHIP:TOO:     [1]: {
+          [1651577468.074626][4512:4517] CHIP:TOO:       Noc: Elided value too large of size 241
+          [1651577468.074652][4512:4517] CHIP:TOO:       Icac: Elided value too large of size 231
+          [1651577468.074676][4512:4517] CHIP:TOO:       FabricIndex: 1
+          [1651577468.074699][4512:4517] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Read the FabricDescriptorStruct from Fabrics list for FabricID =
+          FabricID1 from DUT"
+      verification: |
+          ./chip-tool operationalcredentials read fabrics 1 0
+
+          [1651578337.008417][4553:4558] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2998576972
+          [1651578337.008501][4553:4558] CHIP:TOO:   Fabrics: 1 entries
+          [1651578337.008588][4553:4558] CHIP:TOO:     [1]: {
+          [1651578337.008787][4553:4558] CHIP:TOO:       RootPublicKey: 04807D3A8F50C29C29D10352FEC75DC2E9965E86A64FEBDCF4CF671C8A77A3EBA96AC62B4615BA857297AE9D22656BC1076457E2CC46C5E864F6D03B8AC811F938
+          [1651578337.008826][4553:4558] CHIP:TOO:       VendorId: 65521
+          [1651578337.008849][4553:4558] CHIP:TOO:       FabricId: 1
+          [1651578337.008873][4553:4558] CHIP:TOO:       NodeId: 1
+          [1651578337.008896][4553:4558] CHIP:TOO:       Label:
+          [1651578337.008918][4553:4558] CHIP:TOO:       FabricIndex: 1
+          [1651578337.008941][4553:4558] CHIP:TOO:      }
+      disabled: true
+
+    - label: "From TH2 read the CurrentFabricIndex"
+      verification: |
+          ./chip-tool operationalcredentials read   current-fabric-index 2 0
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 2445178920
+          CHIP:TOO:   CurrentFabricIndex: 2
+          CHIP:EM: Sending Standalone Ack for MessageCounter:8900122 on exchange 26519i
+      disabled: true
+
+    - label: "From TH2 read the NOCs List attribute having two entries"
+      verification: |
+          ./chip-tool operationalcredentials read nocs 2 0
+
+          [1651578024.197989][4573:4578] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2998576972
+          [1651578024.198153][4573:4578] CHIP:TOO:   NOCs: 1 entries
+          [1651578024.198294][4573:4578] CHIP:TOO:     [1]: {
+          [1651578024.198363][4573:4578] CHIP:TOO:       Noc: Elided value too large of size 241
+          [1651578024.198425][4573:4578] CHIP:TOO:       Icac: Elided value too large of size 231
+          [1651578024.198485][4573:4578] CHIP:TOO:       FabricIndex: 2
+          [1651578024.198542][4573:4578] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Read NOCStruct values from entry at index 1"
+      verification: |
+          ./chip-tool operationalcredentials read nocs 2 0
+
+          [1651578024.197989][4573:4578] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2998576972
+          [1651578024.198153][4573:4578] CHIP:TOO:   NOCs: 1 entries
+          [1651578024.198294][4573:4578] CHIP:TOO:     [1]: {
+          [1651578024.198363][4573:4578] CHIP:TOO:       Noc: Elided value too large of size 241
+          [1651578024.198425][4573:4578] CHIP:TOO:       Icac: Elided value too large of size 231
+          [1651578024.198485][4573:4578] CHIP:TOO:       FabricIndex: 2
+          [1651578024.198542][4573:4578] CHIP:TOO:      }
+      disabled: true
+
+    - label: "From TH2 Read the TrustedRootCertificates list from DUT"
+      verification: |
+          ./chip-tool operationalcredentials read trusted-root-certificates 2 0
+
+          [1651578083.266945][4581:4586] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2998576972
+          [1651578083.267107][4581:4586] CHIP:TOO:   TrustedRootCertificates: 2 entries
+          [1651578083.267238][4581:4586] CHIP:TOO:     [1]: Elided value too large of size 231
+          [1651578083.267311][4581:4586] CHIP:TOO:     [2]: Elided value too large of size 231
+      disabled: true
