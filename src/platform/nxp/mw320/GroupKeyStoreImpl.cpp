@@ -152,6 +152,7 @@ CHIP_ERROR GroupKeyStoreImpl::StoreGroupKey(const ChipGroupKey & key)
             ChipLogProgress(SecurityManager, "GroupKeyStore: storing key 0x%08" PRIX32 " (%s), len %" PRId8 "%s", key.KeyId,
                             ChipKeyId::DescribeKey(key.KeyId), key.KeyLen, extraKeyInfo);
 #endif
+#endif
         }
     }
 
