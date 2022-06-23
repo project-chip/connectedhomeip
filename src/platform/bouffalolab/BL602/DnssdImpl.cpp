@@ -42,6 +42,25 @@ namespace chip {
 namespace Dnssd {
 
 #define MDNS_MAX_PACKET_SIZE 64
+typedef struct
+{
+    const char * key;   /*!< item key name */
+    const char * value; /*!< item value string */
+    size_t value_len;
+} mdns_txt_item_t;
+
+typedef struct mdns
+{
+    struct netif * netif;
+    uint8_t slot[10];
+    uint8_t slot_idx;
+    int txt_cnt;
+} mdns_t;
+
+#define MDNS_TXT_MAX_LEN 128
+static mdns_t mdns      = { NULL, 0, 0, 0, 0 };
+mdns_txt_item_t * items = nullptr;
+uint8_t packet[MDNS_TXT_MAX_LEN];
 
 static const DnssdService * glservice;
 
@@ -50,6 +69,7 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     mdns_resp_init();
+    mdns.slot_idx = 0;
     initCallback(context, error);
 
     glservice = static_cast<DnssdService *>(chip::Platform::MemoryCalloc(1, sizeof(DnssdService)));
@@ -66,24 +86,6 @@ static const char * GetProtocolString(DnssdServiceProtocol protocol)
 {
     return protocol == DnssdServiceProtocol::kDnssdProtocolTcp ? "_tcp" : "_udp";
 }
-
-typedef struct
-{
-    const char * key;   /*!< item key name */
-    const char * value; /*!< item value string */
-    size_t value_len;
-} mdns_txt_item_t;
-
-typedef struct mdns
-{
-    struct netif * netif;
-    int slot;
-} mdns_t;
-
-#define MDNS_TXT_MAX_LEN 128
-static mdns_t mdns      = { NULL, -1 };
-mdns_txt_item_t * items = nullptr;
-uint8_t packet[MDNS_TXT_MAX_LEN];
 
 static inline uint8_t _mdns_append_u8(uint8_t * packet, uint16_t * index, uint8_t value)
 {
@@ -139,7 +141,7 @@ static void srv_txt(struct mdns_service * service, void * txt_userdata)
     int i, ret;
     int index = 0;
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < mdns.txt_cnt; i++)
     {
         ret = mdns_resp_add_service_txtitem(service, &(packet[index + 1]), packet[index]);
         if (ret)
@@ -179,18 +181,21 @@ int mdns_responder_ops(struct netif * netif)
         return -1;
     }
 
-    mdns.netif = netif;
-
-    ret = mdns_resp_add_netif(netif, glservice->mHostName, 10);
-    if (ret != 0)
+    if (!(mdns.netif))
     {
-        mdns_resp_deinit();
-        log_info("add netif failed:%d\r\n", ret);
-        return -1;
+        mdns.netif = netif;
+
+        ret = mdns_resp_add_netif(netif, glservice->mHostName, 10);
+        if (ret != 0)
+        {
+            mdns_resp_deinit();
+            log_info("add netif failed:%d\r\n", ret);
+            return -1;
+        }
     }
 
-    items = static_cast<mdns_txt_item_t *>(chip::Platform::MemoryCalloc(glservice->mTextEntrySize, sizeof(mdns_txt_item_t)));
-
+    items        = static_cast<mdns_txt_item_t *>(chip::Platform::MemoryCalloc(glservice->mTextEntrySize, sizeof(mdns_txt_item_t)));
+    mdns.txt_cnt = glservice->mTextEntrySize;
     for (size_t i = 0; i < glservice->mTextEntrySize; i++)
     {
         items[i].key       = glservice->mTextEntries[i].mKey;
@@ -199,8 +204,6 @@ int mdns_responder_ops(struct netif * netif)
         packet_len         = packet_len + strlen(items[i].key) + items[i].value_len + 1;
     }
 
-    // todo:use malloc?
-    // packet = static_cast<uint8_t*>(chip::Platform::MemoryCalloc(packet_len, sizeof(uint8_t)));
     if (MDNS_TXT_MAX_LEN < packet_len)
     {
         return -1;
@@ -220,6 +223,11 @@ int mdns_responder_ops(struct netif * netif)
         return -1;
     }
 
+    mdns.slot[mdns.slot_idx] = slot;
+    mdns.slot_idx++;
+    mdns_resp_announce(netif);
+
+#if 0
     // for ota
     slot =
         mdns_resp_add_service(netif, "MATTER OTA", "_ota", static_cast<uint8_t>(glservice->mProtocol), 3333, 1000, ota_txt, NULL);
@@ -229,14 +237,17 @@ int mdns_responder_ops(struct netif * netif)
         mdns_resp_deinit();
         log_info("ota mdns fail.\r\n");
     }
+#endif
 
     return slot;
 }
 
+#if 1
 static err_t mdns_responder_start_netifapi_errt_fn(struct netif * netif)
 {
     return mdns_responder_ops(netif);
 }
+#endif
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
@@ -244,6 +255,8 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
     struct netif * netif;
     int slot;
     bool mdns_flag;
+
+    log_info("============================== ChipDnssdPublishService.\r\n");
 
     if (!(chip::DeviceLayer::ConnectivityMgrImpl()._IsWiFiStationConnected()))
     {
@@ -262,6 +275,8 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
         return CHIP_ERROR_INTERNAL;
     }
 
+    // mdns_responder_ops(netif);
+
     slot = netifapi_netif_common(netif, NULL, mdns_responder_start_netifapi_errt_fn);
     if (slot < 0)
     {
@@ -274,7 +289,23 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
 
 CHIP_ERROR ChipDnssdRemoveServices()
 {
-    // netifapi_netif_common(mdns.netif, NULL, mdns_responder_stop_netifapi_errt_fn);
+    struct netif * netif;
+    int i = 0;
+
+    netif = wifi_mgmr_sta_netif_get();
+    if (netif == NULL)
+    {
+        log_info("find failed\r\n");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    for (i = 0; i < mdns.slot_idx; i++)
+    {
+        mdns_resp_del_service(netif, mdns.slot[i]);
+    }
+
+    mdns.slot_idx = 0;
+
     return CHIP_NO_ERROR;
 }
 
