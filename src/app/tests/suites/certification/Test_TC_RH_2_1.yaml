@@ -46,9 +46,7 @@ tests:
               minValue: 0
               maxValue: 9999
 
-    #Issue 14703
     - label: "Reads constraints of attribute: MaxMeasuredValue"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "max measured value"
       response:

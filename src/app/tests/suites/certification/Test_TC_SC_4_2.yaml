@@ -473,20 +473,27 @@ tests:
                     minValue: 1
 
     #Negative scenarios not implemented in CI
-    - label: "Log commands"
+    - label: "TH adds an unknown key/value pair in the advertised data"
       cluster: "LogCommands"
-      command: "Log"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
                 value:
-                    "TH adds an unknown key/value pair in the advertised data"
+                    "Please enter 'y' if TH adds an unknown key/value pair in
+                    the advertised data"
+              - name: "expectedValue"
+                value: "y"
 
     #Negative scenarios not implemented in CI
-    - label: "Log commands"
+    - label: "Scan for DNS-SD commissioner advertisements from TH"
       cluster: "LogCommands"
-      command: "Log"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Scan for DNS-SD commissioner advertisements from TH"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

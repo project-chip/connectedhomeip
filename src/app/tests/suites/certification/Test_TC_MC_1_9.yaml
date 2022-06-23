@@ -35,17 +35,19 @@ tests:
       attribute: "ClusterRevision"
       response:
           value: 1
-
-    - label: "Read the global attribute constraints: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
           constraints:
               type: uint16
 
-    ##Issue 10988
+    - label: "Read the optional global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
+
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: MC_TGTNAV.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -53,21 +55,14 @@ tests:
           constraints:
               type: list
 
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Read the global attribute: AttributeList"
+      PICS: "!MC_TGTNAV.S.A0001"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          value: [0, 65528, 65529, 65531, 65532, 65533]
+          constraints:
+              type: list
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
@@ -77,7 +72,6 @@ tests:
           constraints:
               type: list
 
-    # Issue 17458
     - label: "Read the global attribute: GeneratedCommandList"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
@@ -87,13 +81,12 @@ tests:
           constraints:
               type: list
 
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label:
-          "Read FeatureMap attribute from the DUT and verify response has the
-          value 0 or throws a general error if the attribute is not supported.."
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
       verification: |
-          ./chip-tool  targetnavigator read  feature-map 1 1
-          [1646117330.365338][8706:8711] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86
-          [1646117330.365410][8706:8711] CHIP:EM: Sending Standalone Ack for MessageCounter:10744435 on exchange 3932i
+          Not implemented in chip-tool
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT

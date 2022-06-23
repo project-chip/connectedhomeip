@@ -220,12 +220,11 @@ CHIP_ERROR PersistentStorageOpCertStore::AddNewTrustedRootCertForFabric(FabricIn
                       CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(StorageHasCertificate(mStorage, fabricIndex, CertChainElement::kRcac), CHIP_ERROR_INCORRECT_STATE);
 
-    Platform::ScopedMemoryBuffer<uint8_t> rcacBuf;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> rcacBuf;
     ReturnErrorCodeIf(!rcacBuf.Alloc(rcac.size()), CHIP_ERROR_NO_MEMORY);
     memcpy(rcacBuf.Get(), rcac.data(), rcac.size());
 
-    mPendingRcac     = std::move(rcacBuf);
-    mPendingRcacSize = static_cast<uint16_t>(rcac.size());
+    mPendingRcac = std::move(rcacBuf);
 
     mPendingFabricIndex = fabricIndex;
     mStateFlags.Set(StateFlags::kAddNewTrustedRootCalled);
@@ -255,24 +254,19 @@ CHIP_ERROR PersistentStorageOpCertStore::AddNewOpCertsForFabric(FabricIndex fabr
     ReturnErrorCodeIf(StorageHasCertificate(mStorage, fabricIndex, CertChainElement::kNoc), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(StorageHasCertificate(mStorage, fabricIndex, CertChainElement::kIcac), CHIP_ERROR_INCORRECT_STATE);
 
-    Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> nocBuf;
     ReturnErrorCodeIf(!nocBuf.Alloc(noc.size()), CHIP_ERROR_NO_MEMORY);
     memcpy(nocBuf.Get(), noc.data(), noc.size());
 
-    Platform::ScopedMemoryBuffer<uint8_t> icacBuf;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> icacBuf;
     if (icac.size() > 0)
     {
         ReturnErrorCodeIf(!icacBuf.Alloc(icac.size()), CHIP_ERROR_NO_MEMORY);
         memcpy(icacBuf.Get(), icac.data(), icac.size());
     }
 
-    mPendingNoc     = std::move(nocBuf);
-    mPendingNocSize = static_cast<uint16_t>(noc.size());
-
-    mPendingIcac     = std::move(icacBuf);
-    mPendingIcacSize = static_cast<uint16_t>(icac.size());
-
-    mPendingFabricIndex = fabricIndex;
+    mPendingNoc  = std::move(nocBuf);
+    mPendingIcac = std::move(icacBuf);
 
     mStateFlags.Set(StateFlags::kAddNewOpCertsCalled);
 
@@ -303,22 +297,19 @@ CHIP_ERROR PersistentStorageOpCertStore::UpdateOpCertsForFabric(FabricIndex fabr
     // Don't check for ICAC, we may not have had one before, but assume that if NOC is there, a
     // previous chain was at least partially there
 
-    Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> nocBuf;
     ReturnErrorCodeIf(!nocBuf.Alloc(noc.size()), CHIP_ERROR_NO_MEMORY);
     memcpy(nocBuf.Get(), noc.data(), noc.size());
 
-    Platform::ScopedMemoryBuffer<uint8_t> icacBuf;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> icacBuf;
     if (icac.size() > 0)
     {
         ReturnErrorCodeIf(!icacBuf.Alloc(icac.size()), CHIP_ERROR_NO_MEMORY);
         memcpy(icacBuf.Get(), icac.data(), icac.size());
     }
 
-    mPendingNoc     = std::move(nocBuf);
-    mPendingNocSize = static_cast<uint16_t>(noc.size());
-
-    mPendingIcac     = std::move(icacBuf);
-    mPendingIcacSize = static_cast<uint16_t>(icac.size());
+    mPendingNoc  = std::move(nocBuf);
+    mPendingIcac = std::move(icacBuf);
 
     // For NOC update, UpdateOpCertsForFabric is what determines the pending fabric index,
     // not a previous AddNewTrustedRootCertForFabric call.
@@ -346,17 +337,17 @@ CHIP_ERROR PersistentStorageOpCertStore::CommitOpCertsForFabric(FabricIndex fabr
     // TODO: Handle transaction marking to revert partial certs at next boot if we get interrupted by reboot.
 
     // Start committing NOC first so we don't have dangling roots if one was added.
-    ByteSpan pendingNocSpan{ mPendingNoc.Get(), mPendingNocSize };
+    ByteSpan pendingNocSpan{ mPendingNoc.Get(), mPendingNoc.AllocatedSize() };
     CHIP_ERROR nocErr = SaveCertToStorage(mStorage, mPendingFabricIndex, CertChainElement::kNoc, pendingNocSpan);
 
     // ICAC storage handles deleting on empty/missing
-    ByteSpan pendingIcacSpan{ mPendingIcac.Get(), mPendingIcacSize };
+    ByteSpan pendingIcacSpan{ mPendingIcac.Get(), mPendingIcac.AllocatedSize() };
     CHIP_ERROR icacErr = SaveCertToStorage(mStorage, mPendingFabricIndex, CertChainElement::kIcac, pendingIcacSpan);
 
     CHIP_ERROR rcacErr = CHIP_NO_ERROR;
     if (HasPendingRootCert())
     {
-        ByteSpan pendingRcacSpan{ mPendingRcac.Get(), mPendingRcacSize };
+        ByteSpan pendingRcacSpan{ mPendingRcac.Get(), mPendingRcac.AllocatedSize() };
         rcacErr = SaveCertToStorage(mStorage, mPendingFabricIndex, CertChainElement::kRcac, pendingRcacSpan);
     }
 
@@ -401,7 +392,6 @@ bool PersistentStorageOpCertStore::HasAnyCertificateForFabric(FabricIndex fabric
     bool nocMissing  = !StorageHasCertificate(mStorage, fabricIndex, CertChainElement::kNoc);
     bool anyPending  = (mPendingRcac.Get() != nullptr) || (mPendingIcac.Get() != nullptr) || (mPendingNoc.Get() != nullptr);
 
-    // If there was *no* state, pending or persisted, we have an error
     if (rcacMissing && icacMissing && nocMissing && !anyPending)
     {
         return false;
@@ -453,21 +443,21 @@ CHIP_ERROR PersistentStorageOpCertStore::GetPendingCertificate(FabricIndex fabri
     case CertChainElement::kRcac:
         if (mPendingRcac.Get() != nullptr)
         {
-            ByteSpan rcacSpan{ mPendingRcac.Get(), static_cast<size_t>(mPendingRcacSize) };
+            ByteSpan rcacSpan{ mPendingRcac.Get(), mPendingRcac.AllocatedSize() };
             return CopySpanToMutableSpan(rcacSpan, outCertificate);
         }
         break;
     case CertChainElement::kIcac:
         if (mPendingIcac.Get() != nullptr)
         {
-            ByteSpan icacSpan{ mPendingIcac.Get(), static_cast<size_t>(mPendingIcacSize) };
+            ByteSpan icacSpan{ mPendingIcac.Get(), mPendingIcac.AllocatedSize() };
             return CopySpanToMutableSpan(icacSpan, outCertificate);
         }
         break;
     case CertChainElement::kNoc:
         if (mPendingNoc.Get() != nullptr)
         {
-            ByteSpan nocSpan{ mPendingNoc.Get(), static_cast<size_t>(mPendingNocSize) };
+            ByteSpan nocSpan{ mPendingNoc.Get(), mPendingNoc.AllocatedSize() };
             return CopySpanToMutableSpan(nocSpan, outCertificate);
         }
         break;

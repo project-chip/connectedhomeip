@@ -731,6 +731,7 @@ CHIP_ERROR TLVReader::ReadElement()
         break;
     case kTLVFieldSize_8Byte:
         mElemLenOrVal = LittleEndian::Read64(p);
+        VerifyOrReturnError(!TLVTypeHasLength(elemType) || (mElemLenOrVal <= UINT32_MAX), CHIP_ERROR_NOT_IMPLEMENTED);
         break;
     }
 

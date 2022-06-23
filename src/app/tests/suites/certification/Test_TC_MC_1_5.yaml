@@ -29,7 +29,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the global attribute constraints: ClusterRevision"
+    - label: "read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -37,7 +37,7 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Read FeatureMap attribute from the DUT"
+    - label: "Read the optional global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -45,13 +45,29 @@ tests:
           constraints:
               type: map32
 
-    #Issue 10988
+    #Testplan issue 1416
     - label: "Read the global attribute: AttributeList"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 65528, 65529, 65531, 65532, 65533]
+          value: [65528, 65529, 65531, 65531, 65533]
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
           constraints:
               type: list
 
@@ -70,19 +86,3 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
-    - label: "Read the global attribute: AcceptedCommandList"
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          value: []
-          constraints:
-              type: list
-
-    - label: "Read the global attribute: GeneratedCommandList"
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          value: []
-          constraints:
-              type: list

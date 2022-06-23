@@ -36,7 +36,7 @@ _SyncSetKeyValueCbFunct = CFUNCTYPE(
     None, py_object, c_char_p, POINTER(c_char),  c_uint16)
 _SyncGetKeyValueCbFunct = CFUNCTYPE(
     None, py_object, c_char_p, POINTER(c_char), POINTER(c_uint16))
-_SyncDeleteKeyValueCbFunct = CFUNCTYPE(None, py_object, POINTER(c_char_p))
+_SyncDeleteKeyValueCbFunct = CFUNCTYPE(None, py_object, c_char_p)
 
 
 @_SyncSetKeyValueCbFunct

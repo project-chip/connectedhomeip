@@ -58,11 +58,6 @@ EOF
     PW_ROOT="$_CHIP_ROOT/third_party/pigweed/repo"
     export PW_ROOT
 
-    # Do not force use Rosetta in Pigweed because Matter is using host toolchain
-    if [ -z "$PW_BOOTSTRAP_USE_ROSETTA" ]; then
-        export PW_BOOTSTRAP_USE_ROSETTA=false
-    fi
-
     . "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh"
 
     _chip_bootstrap_banner() {

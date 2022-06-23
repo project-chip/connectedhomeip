@@ -38,43 +38,34 @@ tests:
           constraints:
               type: uint16
 
-    #Issue 10988
+    - label: "Read the optional global attribute: FeatureMap"
+      PICS: MC_MEDIAPLAYBACK.S.AS || MC_MEDIAPLAYBACK.S.VS
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: map32
+
+    #Issue 10988 and 19154
     - label: "Read the global attribute: AttributeList"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 2, 3, 4, 5, 6, 65528, 65529, 65531, 65532, 65533]
+          value: [0, 65528, 65529, 65531, 65532, 65533]
           constraints:
               type: list
 
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    ##Issue 10988
     - label: "Read the global attribute: AcceptedCommandList"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
-          value: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11]
+          value: [0, 1, 2]
           constraints:
               type: list
 
-    #Issue 17455
     - label: "Read the global attribute: GeneratedCommandList"
       PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
@@ -84,18 +75,12 @@ tests:
           constraints:
               type: list
 
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label:
-          "Read FeatureMap attribute from the DUT and Verify that the DUT values
-          based on feature/PICS support:Bit 0 - Set to 1 if the DUT supports
-          Advanced Seek (PICS_ADVANCEDSEEK is true) Bit 1 - Set to 1 if the DUT
-          supports Variable Speed (PICS_VARIABLESPEED is true)"
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
       verification: |
-          ./chip-tool mediaplayback read feature-map 1 3
-          [1646115004.682978][8139:8144] CHIP:DMG:         SuppressResponse = true,
-          [1646115004.682994][8139:8144] CHIP:DMG:         InteractionModelRevision = 1
-          [1646115004.683010][8139:8144] CHIP:DMG: }
-          [1646115004.683125][8139:8144] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86
-          [1646115004.683189][8139:8144] CHIP:EM: Sending Standalone Ack for MessageCounter:712796 on exchange 9659i
+          Not implemented in chip-tool
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT

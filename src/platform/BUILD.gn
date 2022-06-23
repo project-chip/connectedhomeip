@@ -65,6 +65,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     # Indication that the CHIP data model is included
     chip_enable_data_model = false
+
+    # The string of device software version was built.
+    chip_device_config_device_software_version_string = ""
   }
 
   if (chip_stack_lock_tracking == "auto") {
@@ -254,6 +257,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET=Zephyr",
       ]
     }
+
+    if (chip_device_config_device_software_version_string != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${chip_device_config_device_software_version_string}\"" ]
+    }
   }
 } else if (chip_device_platform == "none") {
   buildconfig_header("platform_buildconfig") {
@@ -325,8 +332,12 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericConnectivityManagerImpl_NoBLE.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_NoThread.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_TCP.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_TCP.ipp",
       "../include/platform/internal/GenericConnectivityManagerImpl_Thread.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_Thread.ipp",
+      "../include/platform/internal/GenericConnectivityManagerImpl_UDP.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_UDP.ipp",
       "../include/platform/internal/GenericConnectivityManagerImpl_WiFi.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_WiFi.ipp",
       "../include/platform/internal/GenericDeviceInstanceInfoProvider.h",

@@ -23,10 +23,17 @@
  *
  **/
 
+#include "AppTask.h"
+
 #include "DeviceCallbacks.h"
 #include "LEDWidget.h"
 
 #include <app/util/util.h>
+
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 static const char * TAG = "light-app-callbacks";
 
@@ -118,3 +125,23 @@ exit:
     return;
 }
 #endif // CONFIG_LED_TYPE_RMT
+
+/** @brief OnOff Cluster Init
+ *
+ * This function is called when a specific cluster is initialized. It gives the
+ * application an opportunity to take care of cluster initialization procedures.
+ * It is called exactly once for each endpoint where cluster is present.
+ *
+ * @param endpoint   Ver.: always
+ *
+ * emberAfOnOffClusterInitCallback happens before the stack initialize the cluster
+ * attributes to the default value.
+ * The logic here expects something similar to the deprecated Plugins callback
+ * emberAfPluginOnOffClusterServerPostInitCallback.
+ *
+ */
+void emberAfOnOffClusterInitCallback(EndpointId endpoint)
+{
+    ESP_LOGI(TAG, "emberAfOnOffClusterInitCallback");
+    GetAppTask().UpdateClusterState();
+}

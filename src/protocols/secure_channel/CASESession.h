@@ -87,7 +87,7 @@ public:
     CHIP_ERROR PrepareForSessionEstablishment(
         SessionManager & sessionManager, FabricTable * fabricTable, SessionResumptionStorage * sessionResumptionStorage,
         Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
-        ScopedNodeId previouslyEstablishedPeer,
+        const ScopedNodeId & previouslyEstablishedPeer,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -226,7 +226,7 @@ private:
     CHIP_ERROR RecoverInitiatorIpk();
     // On success, sets locally maching mFabricInfo in internal state to the entry matched by
     // destinationId/initiatorRandom from processing of Sigma1, and sets mIpk to the right IPK.
-    CHIP_ERROR FindLocalNodeFromDestionationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom);
+    CHIP_ERROR FindLocalNodeFromDestinationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom);
 
     CHIP_ERROR SendSigma1();
     CHIP_ERROR HandleSigma1_and_SendSigma2(System::PacketBufferHandle && msg);
@@ -272,9 +272,9 @@ private:
 
     void InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex);
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void SetStopSigmaHandshakeAt(Optional<State> state) { mStopHandshakeAtState = state; }
-#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     Crypto::Hash_SHA256_stream mCommissioningHash;
     Crypto::P256PublicKey mRemotePubKey;
@@ -305,9 +305,9 @@ private:
 
     State mState;
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     Optional<State> mStopHandshakeAtState = Optional<State>::Missing();
-#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 };
 
 } // namespace chip

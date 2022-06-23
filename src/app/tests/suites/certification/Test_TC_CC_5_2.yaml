@@ -41,6 +41,7 @@ tests:
 
     - label: "Check current x attribute value  matched before any change"
       command: "readAttribute"
+      PICS: CC.S.A0003
       attribute: "CurrentX"
       response:
           constraints:
@@ -50,6 +51,7 @@ tests:
 
     - label: "Check current y attribute value matched before any change"
       command: "readAttribute"
+      PICS: CC.S.A0004
       attribute: "CurrentY"
       response:
           constraints:
@@ -59,6 +61,7 @@ tests:
 
     - label: "Move Color command"
       command: "MoveColor"
+      PICS: CC.S.C08.Rsp
       arguments:
           values:
               - name: "rateX"
@@ -81,6 +84,7 @@ tests:
     - label:
           "Check current x attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -92,6 +96,7 @@ tests:
     - label:
           "Check current y attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:
@@ -101,6 +106,7 @@ tests:
               maxValue: 65279
 
     - label: "Stop Move Step command"
+      PICS: CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
           values:
@@ -112,6 +118,7 @@ tests:
     - label:
           "Check current x attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -123,6 +130,7 @@ tests:
     - label:
           "Check current y attribute value matched the value sent by the last
           command"
+      PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:

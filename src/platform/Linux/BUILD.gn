@@ -65,7 +65,6 @@ static_library("Linux") {
     "Logging.cpp",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningEthernetDriver.cpp",
-    "NetworkCommissioningThreadDriver.cpp",
     "NetworkCommissioningWiFiDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
@@ -83,6 +82,10 @@ static_library("Linux") {
     "bluez/MainLoop.h",
     "bluez/Types.h",
   ]
+
+  if (chip_enable_openthread) {
+    sources += [ "NetworkCommissioningThreadDriver.cpp" ]
+  }
 
   deps = [ "${chip_root}/src/setup_payload" ]
 
@@ -123,6 +126,8 @@ static_library("Linux") {
   }
 
   if (chip_enable_wifi) {
+    sources += [ "GlibTypeDeleter.h" ]
+
     public_deps += [ "dbus/wpa" ]
   }
 

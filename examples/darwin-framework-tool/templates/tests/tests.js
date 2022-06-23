@@ -66,6 +66,15 @@ function getTests() {
   // TODO: Test_TC_CC_9_3 does not work on Darwin for now.
   tests.disable('Test_TC_CC_9_3');
 
+  // TODO: Test_TC_MC_3_7 does not work on Darwin for now.
+  tests.disable('Test_TC_MC_3_7');
+
+  // TODO: Test_TC_MC_3_8 does not work on Darwin for now.
+  tests.disable('Test_TC_MC_3_8');
+
+  // TODO: Test_TC_MC_3_9 does not work on Darwin for now.
+  tests.disable('Test_TC_MC_3_9');
+
   return tests;
 }
 

@@ -187,7 +187,13 @@ public:
     ~ScopedMemoryBufferWithSize() { mSize = 0; }
 
     // return the size in bytes
-    inline size_t BufferByteSize() const { return mSize; }
+    inline size_t AllocatedSize() const { return mSize; }
+
+    void Free()
+    {
+        mSize = 0;
+        ScopedMemoryBuffer<T>::Free();
+    }
 
     T * Release()
     {

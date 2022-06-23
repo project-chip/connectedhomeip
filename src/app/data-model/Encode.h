@@ -160,14 +160,14 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const Nullable<X> & x)
     }
 
     // Allow sending invalid values for nullables when
-    // CONFIG_IM_BUILD_FOR_UNIT_TEST is true, so we can test how the other side
+    // CONFIG_BUILD_FOR_HOST_UNIT_TEST is true, so we can test how the other side
     // responds.
-#if !CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
     if (!x.HasValidValue())
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
-#endif // !CONFIG_IM_BUILD_FOR_UNIT_TEST
+#endif // !CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     // The -Wmaybe-uninitialized warning gets confused about the fact
     // that x.mValue is always initialized if x.IsNull() is not

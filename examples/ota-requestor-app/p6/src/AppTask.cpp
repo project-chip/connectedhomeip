@@ -441,8 +441,7 @@ void OnTriggerUpdateTimerHandler(Layer * systemLayer, void * appState)
 {
     P6_LOG("Triggering immediate OTA update query");
 
-    DefaultOTARequestor * req = static_cast<DefaultOTARequestor *>(GetRequestorInstance());
-    req->TriggerImmediateQuery();
+    GetRequestorInstance()->TriggerImmediateQuery();
 }
 
 void AppTask::InitOTARequestor()

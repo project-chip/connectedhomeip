@@ -1,0 +1,259 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 11.3.3. [TC-OPCREDS-3.3] Attribute-NOCs, Commands [DUT-Client]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "Factory Reset DUT (to ensure NOC list is empty at the beginning of
+          the following steps)"
+      verification: |
+
+      disabled: true
+
+    - label: "Start the commissioning process of TH1 with DUT"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH saves the following values as: NOCValue as nocvalue1 ICACValue as
+          icacvalue1 IpkValue as ipkvalue1 CaseAdminNode as caseadmin1
+          AdminVendorId as adminvendorid1"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label: "DUT reads the NOCs (NOCStruct) list from TH1"
+      verification: |
+          ./chip-tool operationalcredentials read nocs 1 0
+
+          [1651578833.213718][4404:4404] CHIP:IM: Received Read request
+          [1651578833.213786][4404:4404] CHIP:DMG: ReadRequestMessage =
+          [1651578833.213824][4404:4404] CHIP:DMG: {
+          [1651578833.213855][4404:4404] CHIP:DMG:        AttributePathIBs =
+          [1651578833.213893][4404:4404] CHIP:DMG:        [
+          [1651578833.213927][4404:4404] CHIP:DMG:                AttributePathIB =
+          [1651578833.213977][4404:4404] CHIP:DMG:                {
+          [1651578833.214018][4404:4404] CHIP:DMG:                        Endpoint = 0x0,
+          [1651578833.214064][4404:4404] CHIP:DMG:                        Cluster = 0x3e,
+          [1651578833.214110][4404:4404] CHIP:DMG:                        Attribute = 0x0000_0000,
+          [1651578833.214152][4404:4404] CHIP:DMG:                }
+          [1651578833.214196][4404:4404] CHIP:DMG:
+          [1651578833.214235][4404:4404] CHIP:DMG:        ],
+          [1651578833.214275][4404:4404] CHIP:DMG:
+          [1651578833.214313][4404:4404] CHIP:DMG:        isFabricFiltered = true,
+          [1651578833.214350][4404:4404] CHIP:DMG:        InteractionModelRevision = 1
+          [1651578833.214385][4404:4404] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "Extract the following FabricDescriptorStruct values from TH1
+          RootPublicKey VendorID FabricID NodeID Label"
+      verification: |
+          "./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
+
+          [1651572032.170920][3815:3820] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2018783041
+          [1651572032.171031][3815:3820] CHIP:TOO:   Fabrics: 2 entries
+          [1651572032.171179][3815:3820] CHIP:TOO:     [1]: {
+          [1651572032.171223][3815:3820] CHIP:TOO:       RootPublicKey: 0412894491026CDACAC117D232D252EF827691D378BCCC9E8E717E6C70B3D36E4C5430FDF26B783EC579506D3E748BABFBC6D400302C72CD5BD40B152AA303724B
+          [1651572032.171262][3815:3820] CHIP:TOO:       VendorId: 65521
+          [1651572032.171296][3815:3820] CHIP:TOO:       FabricId: 1
+          [1651572032.171328][3815:3820] CHIP:TOO:       NodeId: 1
+          [1651572032.171360][3815:3820] CHIP:TOO:       Label: NodeOpeCredits1
+          [1651572032.171393][3815:3820] CHIP:TOO:       FabricIndex: 1
+          [1651572032.171427][3815:3820] CHIP:TOO:      }
+          [1651572032.171472][3815:3820] CHIP:TOO:     [2]: {
+          [1651572032.171511][3815:3820] CHIP:TOO:       RootPublicKey: 040983D9AC57DBF8DA04F818B1A15B2BD2821AD2BA1807099EAE1A52C62B404767972D4D7AB6B583395769881A666DCA8776EBC662EA1DE19B1DDDD9306A5DCB91
+          [1651572032.171547][3815:3820] CHIP:TOO:       VendorId: 65521
+          [1651572032.171579][3815:3820] CHIP:TOO:       FabricId: 1
+          [1651572032.171610][3815:3820] CHIP:TOO:       NodeId: 2
+          [1651572032.171641][3815:3820] CHIP:TOO:       Label:
+          [1651572032.171673][3815:3820] CHIP:TOO:       FabricIndex: 2
+          [1651572032.171705][3815:3820] CHIP:TOO:      }"
+      disabled: true
+
+    - label: "DUT sends UpdateNOC to TH1"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label: "DUT sends UpdateFabricLabel to TH1"
+      verification: |
+          ./chip-tool operationalcredentials update-fabric-label node1 1 0
+
+          [1651579074.158732][4404:4404] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:2322191 on exchange 64215r
+          [1651579074.158787][4404:4404] CHIP:EM: Handling via exchange: 64215r, Delegate: 0xaaaaae69a088
+          [1651579074.158905][4404:4404] CHIP:DMG: InvokeRequestMessage =
+          [1651579074.158945][4404:4404] CHIP:DMG: {
+          [1651579074.158979][4404:4404] CHIP:DMG:        suppressResponse = false,
+          [1651579074.159019][4404:4404] CHIP:DMG:        timedRequest = false,
+          [1651579074.159055][4404:4404] CHIP:DMG:        InvokeRequests =
+          [1651579074.159100][4404:4404] CHIP:DMG:        [
+          [1651579074.159135][4404:4404] CHIP:DMG:                CommandDataIB =
+          [1651579074.159207][4404:4404] CHIP:DMG:                {
+          [1651579074.159249][4404:4404] CHIP:DMG:                        CommandPathIB =
+          [1651579074.159289][4404:4404] CHIP:DMG:                        {
+          [1651579074.159335][4404:4404] CHIP:DMG:                                EndpointId = 0x0,
+          [1651579074.159384][4404:4404] CHIP:DMG:                                ClusterId = 0x3e,
+          [1651579074.159433][4404:4404] CHIP:DMG:                                CommandId = 0x9,
+          [1651579074.159477][4404:4404] CHIP:DMG:                        },
+          [1651579074.159525][4404:4404] CHIP:DMG:
+          [1651579074.159563][4404:4404] CHIP:DMG:                        CommandData =
+          [1651579074.159608][4404:4404] CHIP:DMG:                        {
+          [1651579074.159656][4404:4404] CHIP:DMG:                                0x0 = "node1",
+          [1651579074.159707][4404:4404] CHIP:DMG:                        },
+          [1651579074.159748][4404:4404] CHIP:DMG:                },
+          [1651579074.159793][4404:4404] CHIP:DMG:
+          [1651579074.159829][4404:4404] CHIP:DMG:        ],
+          [1651579074.159872][4404:4404] CHIP:DMG:
+          [1651579074.159907][4404:4404] CHIP:DMG:        InteractionModelRevision = 1
+          [1651579074.159947][4404:4404] CHIP:DMG: },
+          [1651579074.160036][4404:4404] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003E e=0 p=a
+          [1651579074.160085][4404:4404] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label: "DUT reads SupportedFabrics from TH1"
+      verification: |
+          ./chip-tool operationalcredentials read supported-fabrics 1 0
+          [1651579155.243425][4404:4404] CHIP:IM: Received Read request
+          [1651579155.243484][4404:4404] CHIP:DMG: ReadRequestMessage =
+          [1651579155.243516][4404:4404] CHIP:DMG: {
+          [1651579155.243542][4404:4404] CHIP:DMG:        AttributePathIBs =
+          [1651579155.243575][4404:4404] CHIP:DMG:        [
+          [1651579155.243604][4404:4404] CHIP:DMG:                AttributePathIB =
+          [1651579155.243648][4404:4404] CHIP:DMG:                {
+          [1651579155.243683][4404:4404] CHIP:DMG:                        Endpoint = 0x0,
+          [1651579155.243724][4404:4404] CHIP:DMG:                        Cluster = 0x3e,
+          [1651579155.243762][4404:4404] CHIP:DMG:                        Attribute = 0x0000_0002,
+          [1651579155.243798][4404:4404] CHIP:DMG:                }
+          [1651579155.243834][4404:4404] CHIP:DMG:
+          [1651579155.243867][4404:4404] CHIP:DMG:        ],
+          [1651579155.243901][4404:4404] CHIP:DMG:
+          [1651579155.243933][4404:4404] CHIP:DMG:        isFabricFiltered = true,
+          [1651579155.243964][4404:4404] CHIP:DMG:        InteractionModelRevision = 1
+          [1651579155.243992][4404:4404] CHIP:DMG: },
+      disabled: true
+
+    - label: "DUT reads CommissionedFabrics attribute from TH1"
+      verification: |
+          ./chip-tool operationalcredentials read commissioned-fabrics 1 0
+          [1651579198.627299][4404:4404] CHIP:IM: Received Read request
+          [1651579198.627363][4404:4404] CHIP:DMG: ReadRequestMessage =
+          [1651579198.627398][4404:4404] CHIP:DMG: {
+          [1651579198.627427][4404:4404] CHIP:DMG:        AttributePathIBs =
+          [1651579198.627462][4404:4404] CHIP:DMG:        [
+          [1651579198.627494][4404:4404] CHIP:DMG:                AttributePathIB =
+          [1651579198.627535][4404:4404] CHIP:DMG:                {
+          [1651579198.627573][4404:4404] CHIP:DMG:                        Endpoint = 0x0,
+          [1651579198.627614][4404:4404] CHIP:DMG:                        Cluster = 0x3e,
+          [1651579198.627657][4404:4404] CHIP:DMG:                        Attribute = 0x0000_0003,
+          [1651579198.627696][4404:4404] CHIP:DMG:                }
+          [1651579198.627734][4404:4404] CHIP:DMG:
+          [1651579198.627769][4404:4404] CHIP:DMG:        ],
+          [1651579198.627807][4404:4404] CHIP:DMG:
+          [1651579198.627842][4404:4404] CHIP:DMG:        isFabricFiltered = true,
+          [1651579198.627875][4404:4404] CHIP:DMG:        InteractionModelRevision = 1
+          [1651579198.627906][4404:4404] CHIP:DMG: },
+      disabled: true
+
+    - label: "DUT reads TrustedRootCertificates attribute from TH1"
+      verification: |
+          ./chip-tool operationalcredentials read trusted-root-certificates 1 0
+          [1651579224.947817][4404:4404] CHIP:IM: Received Read request
+          [1651579224.947879][4404:4404] CHIP:DMG: ReadRequestMessage =
+          [1651579224.947911][4404:4404] CHIP:DMG: {
+          [1651579224.947937][4404:4404] CHIP:DMG:        AttributePathIBs =
+          [1651579224.947970][4404:4404] CHIP:DMG:        [
+          [1651579224.947999][4404:4404] CHIP:DMG:                AttributePathIB =
+          [1651579224.948067][4404:4404] CHIP:DMG:                {
+          [1651579224.948108][4404:4404] CHIP:DMG:                        Endpoint = 0x0,
+          [1651579224.948150][4404:4404] CHIP:DMG:                        Cluster = 0x3e,
+          [1651579224.948195][4404:4404] CHIP:DMG:                        Attribute = 0x0000_0004,
+          [1651579224.948236][4404:4404] CHIP:DMG:                }
+          [1651579224.948274][4404:4404] CHIP:DMG:
+          [1651579224.948308][4404:4404] CHIP:DMG:        ],
+          [1651579224.948343][4404:4404] CHIP:DMG:
+          [1651579224.948376][4404:4404] CHIP:DMG:        isFabricFiltered = true,
+          [1651579224.948407][4404:4404] CHIP:DMG:        InteractionModelRevision = 1
+          [1651579224.948438][4404:4404] CHIP:DMG: },
+      disabled: true
+
+    - label: "DUT reads CurrentFabricIndex attribute from TH1"
+      verification: |
+          ./chip-tool operationalcredentials read   current-fabric-index   1 0
+          [1651579270.634540][4404:4404] CHIP:DMG: ReadRequestMessage =
+          [1651579270.634587][4404:4404] CHIP:DMG: {
+          [1651579270.634627][4404:4404] CHIP:DMG:        AttributePathIBs =
+          [1651579270.634675][4404:4404] CHIP:DMG:        [
+          [1651579270.634719][4404:4404] CHIP:DMG:                AttributePathIB =
+          [1651579270.634774][4404:4404] CHIP:DMG:                {
+          [1651579270.634826][4404:4404] CHIP:DMG:                        Endpoint = 0x0,
+          [1651579270.634883][4404:4404] CHIP:DMG:                        Cluster = 0x3e,
+          [1651579270.634946][4404:4404] CHIP:DMG:                        Attribute = 0x0000_0005,
+          [1651579270.635001][4404:4404] CHIP:DMG:                }
+          [1651579270.635056][4404:4404] CHIP:DMG:
+          [1651579270.635105][4404:4404] CHIP:DMG:        ],
+          [1651579270.635188][4404:4404] CHIP:DMG:
+          [1651579270.635239][4404:4404] CHIP:DMG:        isFabricFiltered = true,
+          [1651579270.635286][4404:4404] CHIP:DMG:        InteractionModelRevision = 1
+          [1651579270.635329][4404:4404] CHIP:DMG: },
+      disabled: true
+
+    - label: "DUT sends RemoveFabric command to TH1"
+      verification: |
+          ./chip-tool operationalcredentials remove-fabric 1 1 0
+
+
+          [1651579316.916807][4404:4404] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:13617524 on exchange 52666r
+          [1651579316.916893][4404:4404] CHIP:EM: Handling via exchange: 52666r, Delegate: 0xaaaaae69a088
+          [1651579316.917074][4404:4404] CHIP:DMG: InvokeRequestMessage =
+          [1651579316.917139][4404:4404] CHIP:DMG: {
+          [1651579316.917194][4404:4404] CHIP:DMG:        suppressResponse = false,
+          [1651579316.917258][4404:4404] CHIP:DMG:        timedRequest = false,
+          [1651579316.917317][4404:4404] CHIP:DMG:        InvokeRequests =
+          [1651579316.917390][4404:4404] CHIP:DMG:        [
+          [1651579316.917449][4404:4404] CHIP:DMG:                CommandDataIB =
+          [1651579316.917520][4404:4404] CHIP:DMG:                {
+          [1651579316.917583][4404:4404] CHIP:DMG:                        CommandPathIB =
+          [1651579316.917656][4404:4404] CHIP:DMG:                        {
+          [1651579316.917731][4404:4404] CHIP:DMG:                                EndpointId = 0x0,
+          [1651579316.917813][4404:4404] CHIP:DMG:                                ClusterId = 0x3e,
+          [1651579316.917892][4404:4404] CHIP:DMG:                                CommandId = 0xa,
+          [1651579316.917965][4404:4404] CHIP:DMG:                        },
+          [1651579316.918043][4404:4404] CHIP:DMG:
+          [1651579316.918111][4404:4404] CHIP:DMG:                        CommandData =
+          [1651579316.918185][4404:4404] CHIP:DMG:                        {
+          [1651579316.918261][4404:4404] CHIP:DMG:                                0x0 = 1,
+          [1651579316.918339][4404:4404] CHIP:DMG:                        },
+          [1651579316.918408][4404:4404] CHIP:DMG:                },
+          [1651579316.918484][4404:4404] CHIP:DMG:
+          [1651579316.918541][4404:4404] CHIP:DMG:        ],
+          [1651579316.918612][4404:4404] CHIP:DMG:
+          [1651579316.918669][4404:4404] CHIP:DMG:        InteractionModelRevision = 1
+          [1651579316.918726][4404:4404] CHIP:DMG: },
+          [1651579316.918863][4404:4404] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003E e=0 p=a
+          [1651579316.918939][4404:4404] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label: "Commission TH1 with DUT"
+      verification: |
+
+      disabled: true

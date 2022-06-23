@@ -126,6 +126,7 @@ CHIP_ERROR StorageAdapter::SyncDeleteKeyValue(const char * key)
         return err;
     }
 
+    ChipLogDetail(Controller, "StorageAdapter::DeleteKeyValue: Key = %s", key);
     mDeleteKeyCb(mContext, key);
     return CHIP_NO_ERROR;
 }

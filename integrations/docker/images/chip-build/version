@@ -1,1 +1,1 @@
-0.5.80 Version bump reason: [Tizen] Add vscode debug support
+0.5.81 Version bump reason: [Ameba] Update Ameba SDK to use BLE random address and add uxTaskGetFreeStackSize and uxTaskGetStackSize

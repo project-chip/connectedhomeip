@@ -19,7 +19,6 @@ name:
 config:
     nodeId: 0x12344321
     cluster: "Application Basic"
-    # Default endpoint is 3, since that's where tv-app has this cluster.
     endpoint: 3
 
 tests:
@@ -31,7 +30,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -47,13 +46,31 @@ tests:
           constraints:
               type: map32
 
-    #Issue 10988
+    #Issue 10988 and 18940
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS:
+          PICS_SKIP_SAMPLE_APP && MC_APBSC.S.A0000 && MC_APBSC.S.A0001 &&
+          MC_APBSC.S.A0003
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           value: [2, 4, 5, 6, 7, 65528, 65529, 65531, 65532, 65533]
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
           constraints:
               type: list
 
@@ -72,23 +89,3 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
-    #Issue 10988
-    - label: "Read the global attribute: AcceptedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          value: [0, 1]
-          constraints:
-              type: list
-
-    #Issue 17459
-    - label: "Read the global attribute: GeneratedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          value: [2]
-          constraints:
-              type: list

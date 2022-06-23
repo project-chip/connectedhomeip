@@ -71,6 +71,10 @@ using chip::ASN1::OID;
 #define CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES CHIP_CONFIG_TEST
 #endif
 
+#ifndef CHIP_CONFIG_INTERNAL_FLAG_GENERATE_OP_CERT_TEST_CASES
+#define CHIP_CONFIG_INTERNAL_FLAG_GENERATE_OP_CERT_TEST_CASES CHIP_CONFIG_TEST
+#endif
+
 #define COPYRIGHT_STRING                                                                                                           \
     "Copyright (c) 2021-2022 Project CHIP Authors"                                                                                 \
     "Copyright (c) 2019 Google LLC."                                                                                               \
@@ -117,13 +121,13 @@ struct FutureExtension
     const char * info;
 };
 
-/** Attestation Certificate Error Flags
+/** Certificate Error Flags
  *
  * By default all methods (if none of the class setters were used) return valid
- * attestation certificate configuration parameter as described in the spec.
+ * certificate configuration parameter as described in the spec.
  * These parameters can be modified to inject errors into certificate structure.
  */
-class AttCertStructConfig
+class CertStructConfig
 {
 public:
     void EnableErrorTestCase() { mEnabled = true; }
@@ -132,6 +136,7 @@ public:
     void SetSubjectVIDMismatch() { mFlags.Set(CertErrorFlags::kSubjectVIDMismatch); }
     void SetSubjectPIDMismatch() { mFlags.Set(CertErrorFlags::kSubjectPIDMismatch); }
     void SetSigCurveWrong() { mFlags.Set(CertErrorFlags::kSigCurve); }
+    void SetPublicKeyError() { mFlags.Set(CertErrorFlags::kPublicKey); }
     void SetExtensionBasicMissing() { mFlags.Set(CertErrorFlags::kExtBasicMissing); }
     void SetExtensionBasicCriticalMissing() { mFlags.Set(CertErrorFlags::kExtBasicCriticalMissing); }
     void SetExtensionBasicCriticalWrong() { mFlags.Set(CertErrorFlags::kExtBasicCriticalWrong); }
@@ -152,16 +157,42 @@ public:
     void SetExtensionExtendedKeyUsagePresent() { mFlags.Set(CertErrorFlags::kExtExtendedKeyUsage); }
     void SetExtensionAuthorityInfoAccessPresent() { mFlags.Set(CertErrorFlags::kExtAuthorityInfoAccess); }
     void SetExtensionSubjectAltNamePresent() { mFlags.Set(CertErrorFlags::kExtSubjectAltName); }
+    void SetSignatureError() { mFlags.Set(CertErrorFlags::kSignature); }
+
+    void SetCertOversized() { mFlags.Set(CertErrorFlags::kCertOversized); }
+    void SetSerialNumberMissing() { mFlags.Set(CertErrorFlags::kSerialNumberMissing); }
+    void SetIssuerMissing() { mFlags.Set(CertErrorFlags::kIssuerMissing); }
+    void SetValidityNotBeforeMissing() { mFlags.Set(CertErrorFlags::kValidityNotBeforeMissing); }
+    void SetValidityNotAfterMissing() { mFlags.Set(CertErrorFlags::kValidityNotAfterMissing); }
+    void SetValidityWrong() { mFlags.Set(CertErrorFlags::kValidityWrong); }
+    void SetSubjectMissing() { mFlags.Set(CertErrorFlags::kSubjectMissing); }
+    void SetSubjectNodeIdMissing() { mFlags.Set(CertErrorFlags::kSubjectNodeIdMissing); }
+    void SetSubjectNodeIdInvalid() { mFlags.Set(CertErrorFlags::kSubjectNodeIdInvalid); }
+    void SetSubjectNodeIdTwice() { mFlags.Set(CertErrorFlags::kSubjectNodeIdTwice); }
+    void SetSubjectFabricIdMissing() { mFlags.Set(CertErrorFlags::kSubjectFabricIdMissing); }
+    void SetSubjectFabricIdInvalid() { mFlags.Set(CertErrorFlags::kSubjectFabricIdInvalid); }
+    void SetSubjectFabricIdTwice() { mFlags.Set(CertErrorFlags::kSubjectFabricIdTwice); }
+    void SetSubjectFabricIdMismatch() { mFlags.Set(CertErrorFlags::kSubjectFabricIdMismatch); }
+    void SetSubjectCATInvalid() { mFlags.Set(CertErrorFlags::kSubjectCATInvalid); }
+    void SetExtensionExtendedKeyUsageMissing() { mFlags.Set(CertErrorFlags::kExtExtendedKeyUsageMissing); }
 
     bool IsErrorTestCaseEnabled() { return mEnabled; }
     int GetCertVersion() { return (mEnabled && mFlags.Has(CertErrorFlags::kCertVersion)) ? 1 : 2; }
-    const EVP_MD * GetSignatureAlgorithm()
+    const EVP_MD * GetSignatureAlgorithmDER()
     {
         return (mEnabled && mFlags.Has(CertErrorFlags::kSigAlgo)) ? EVP_sha1() : EVP_sha256();
+    }
+    uint8_t GetSignatureAlgorithmTLVEnum()
+    {
+        return (mEnabled && mFlags.Has(CertErrorFlags::kSigAlgo)) ? 0x02
+                                                                  : GetOIDEnum(chip::ASN1::
+
+                                                                                   kOID_SigAlgo_ECDSAWithSHA256);
     }
     bool IsSubjectVIDMismatch() { return (mEnabled && mFlags.Has(CertErrorFlags::kSubjectVIDMismatch)); }
     bool IsSubjectPIDMismatch() { return (mEnabled && mFlags.Has(CertErrorFlags::kSubjectPIDMismatch)); }
     bool IsSigCurveWrong() { return (mEnabled && mFlags.Has(CertErrorFlags::kSigCurve)); }
+    bool IsPublicKeyError() { return (mEnabled && mFlags.Has(CertErrorFlags::kPublicKey)); }
     bool IsExtensionBasicPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kExtBasicMissing)); }
     bool IsExtensionBasicCriticalPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kExtBasicCriticalMissing)); }
     bool IsExtensionBasicCritical() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kExtBasicCriticalWrong)); }
@@ -197,6 +228,43 @@ public:
         }
         return 0;
     }
+    bool IsExtensionBasicPathLenPresent()
+    {
+        return (mEnabled &&
+                (mFlags.Has(CertErrorFlags::kExtBasicPathLenWrong) || mFlags.Has(CertErrorFlags::kExtBasicPathLen0) ||
+                 mFlags.Has(CertErrorFlags::kExtBasicPathLen1) || mFlags.Has(CertErrorFlags::kExtBasicPathLen2)));
+    }
+    int GetExtensionBasicPathLenValue(uint8_t & certType)
+    {
+        if (mFlags.Has(CertErrorFlags::kExtBasicPathLen0))
+        {
+            return 0;
+        }
+        if (mFlags.Has(CertErrorFlags::kExtBasicPathLen1))
+        {
+            return 1;
+        }
+        if (mFlags.Has(CertErrorFlags::kExtBasicPathLen2))
+        {
+            return 2;
+        }
+        if (mFlags.Has(CertErrorFlags::kExtBasicPathLenWrong))
+        {
+            if (certType == chip::Credentials::kCertType_Node)
+            {
+                return 2;
+            }
+            if (certType == chip::Credentials::kCertType_ICA)
+            {
+                return 1;
+            }
+            if (certType == chip::Credentials::kCertType_Root)
+            {
+                return 0;
+            }
+        }
+        return 0;
+    }
     bool IsExtensionKeyUsagePresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kExtKeyUsageMissing)); }
     bool IsExtensionKeyUsageCriticalPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kExtKeyUsageCriticalMissing)); }
     bool IsExtensionKeyUsageCritical() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kExtKeyUsageCriticalWrong)); }
@@ -208,35 +276,75 @@ public:
     bool IsExtensionExtendedKeyUsagePresent() { return (mEnabled && mFlags.Has(CertErrorFlags::kExtExtendedKeyUsage)); }
     bool IsExtensionAuthorityInfoAccessPresent() { return (mEnabled && mFlags.Has(CertErrorFlags::kExtAuthorityInfoAccess)); }
     bool IsExtensionSubjectAltNamePresent() { return (mEnabled && mFlags.Has(CertErrorFlags::kExtSubjectAltName)); }
+    bool IsSignatureError() { return (mEnabled && mFlags.Has(CertErrorFlags::kSignature)); }
+
+    bool IsCertOversized() { return (mEnabled && mFlags.Has(CertErrorFlags::kCertOversized)); }
+    bool IsSerialNumberPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kSerialNumberMissing)); }
+    bool IsIssuerPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kIssuerMissing)); }
+    bool IsValidityNotBeforePresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kValidityNotBeforeMissing)); }
+    bool IsValidityNotAfterPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kValidityNotAfterMissing)); }
+    bool IsValidityCorrect() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kValidityWrong)); }
+    bool IsSubjectPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kSubjectMissing)); }
+    bool IsSubjectNodeIdPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kSubjectNodeIdMissing)); }
+    bool IsSubjectNodeIdValid() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kSubjectNodeIdInvalid)); }
+    bool IsSubjectNodeIdRepeatsTwice() { return (mEnabled && mFlags.Has(CertErrorFlags::kSubjectNodeIdTwice)); }
+    bool IsSubjectFabricIdPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kSubjectFabricIdMissing)); }
+    bool IsSubjectFabricIdValid() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kSubjectFabricIdInvalid)); }
+    bool IsSubjectFabricIdRepeatsTwice() { return (mEnabled && mFlags.Has(CertErrorFlags::kSubjectFabricIdTwice)); }
+    bool IsSubjectFabricIdMismatch() { return (mEnabled && mFlags.Has(CertErrorFlags::kSubjectFabricIdMismatch)); }
+    bool IsSubjectCATValid() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kSubjectCATInvalid)); }
+    bool IsExtensionExtendedKeyUsageMissing() { return (mEnabled && mFlags.Has(CertErrorFlags::kExtExtendedKeyUsageMissing)); }
+
+    static constexpr uint8_t kPublicKeyErrorByte = 20;
 
 private:
-    enum class CertErrorFlags : uint32_t
+    enum class CertErrorFlags : uint64_t
     {
-        kCertVersion                = 0x00000001,
-        kSigAlgo                    = 0x00000002,
-        kSubjectVIDMismatch         = 0x00000004,
-        kSubjectPIDMismatch         = 0x00000008,
-        kSigCurve                   = 0x00000010,
-        kExtBasicMissing            = 0x00000020,
-        kExtBasicCriticalMissing    = 0x00000040,
-        kExtBasicCriticalWrong      = 0x00000080,
-        kExtBasicCAMissing          = 0x00000100,
-        kExtBasicCAWrong            = 0x00000200,
-        kExtBasicPathLenWrong       = 0x00000400,
-        kExtBasicPathLen0           = 0x00000800,
-        kExtBasicPathLen1           = 0x00001000,
-        kExtBasicPathLen2           = 0x00002000,
-        kExtKeyUsageMissing         = 0x00004000,
-        kExtKeyUsageCriticalMissing = 0x00008000,
-        kExtKeyUsageCriticalWrong   = 0x00010000,
-        kExtKeyUsageDigSig          = 0x00020000,
-        kExtKeyUsageKeyCertSign     = 0x00040000,
-        kExtKeyUsageCRLSign         = 0x00080000,
-        kExtAKIDMissing             = 0x00100000,
-        kExtSKIDMissing             = 0x00200000,
-        kExtExtendedKeyUsage        = 0x00400000,
-        kExtAuthorityInfoAccess     = 0x00800000,
-        kExtSubjectAltName          = 0x01000000,
+        kCertVersion                = 0x0000000000000001,
+        kSigAlgo                    = 0x0000000000000002,
+        kSubjectVIDMismatch         = 0x0000000000000004, // DA specific
+        kSubjectPIDMismatch         = 0x0000000000000008, // DA specific
+        kSigCurve                   = 0x0000000000000010,
+        kPublicKey                  = 0x0000000000000020,
+        kExtBasicMissing            = 0x0000000000000040,
+        kExtBasicCriticalMissing    = 0x0000000000000080,
+        kExtBasicCriticalWrong      = 0x0000000000000100,
+        kExtBasicCAMissing          = 0x0000000000000200,
+        kExtBasicCAWrong            = 0x0000000000000400,
+        kExtBasicPathLenWrong       = 0x0000000000000800,
+        kExtBasicPathLen0           = 0x0000000000001000,
+        kExtBasicPathLen1           = 0x0000000000002000,
+        kExtBasicPathLen2           = 0x0000000000004000,
+        kExtKeyUsageMissing         = 0x0000000000008000,
+        kExtKeyUsageCriticalMissing = 0x0000000000010000,
+        kExtKeyUsageCriticalWrong   = 0x0000000000020000,
+        kExtKeyUsageDigSig          = 0x0000000000040000,
+        kExtKeyUsageKeyCertSign     = 0x0000000000080000,
+        kExtKeyUsageCRLSign         = 0x0000000000100000,
+        kExtAKIDMissing             = 0x0000000000200000,
+        kExtSKIDMissing             = 0x0000000000400000,
+        kExtExtendedKeyUsage        = 0x0000000000800000, // DA specific
+        kExtAuthorityInfoAccess     = 0x0000000001000000, // DA specific
+        kExtSubjectAltName          = 0x0000000002000000, // DA specific
+        kSignature                  = 0x0000000004000000,
+
+        // Op Cert Specific Flags:
+        kCertOversized              = 0x0000000100000000,
+        kSerialNumberMissing        = 0x0000000200000000,
+        kIssuerMissing              = 0x0000000400000000,
+        kValidityNotBeforeMissing   = 0x0000000800000000,
+        kValidityNotAfterMissing    = 0x0000001000000000,
+        kValidityWrong              = 0x0000002000000000,
+        kSubjectMissing             = 0x0000004000000000,
+        kSubjectNodeIdMissing       = 0x0000008000000000,
+        kSubjectNodeIdInvalid       = 0x0000010000000000,
+        kSubjectNodeIdTwice         = 0x0000020000000000,
+        kSubjectFabricIdMissing     = 0x0000040000000000,
+        kSubjectFabricIdInvalid     = 0x0000080000000000,
+        kSubjectFabricIdTwice       = 0x0000100000000000,
+        kSubjectFabricIdMismatch    = 0x0000200000000000,
+        kSubjectCATInvalid          = 0x0000400000000000,
+        kExtExtendedKeyUsageMissing = 0x0000800000000000,
     };
 
     bool mEnabled = false;
@@ -246,7 +354,9 @@ private:
 class ToolChipDN : public chip::Credentials::ChipDN
 {
 public:
-    bool SetCertSubjectDN(X509 * cert) const;
+    bool SetCertName(X509_NAME * name) const;
+    bool SetCertSubjectDN(X509 * cert) const { return SetCertName(X509_get_subject_name(cert)); };
+    bool SetCertIssuerDN(X509 * cert) const { return SetCertName(X509_get_issuer_name(cert)); };
     bool HasAttr(chip::ASN1::OID oid) const;
     void PrintDN(FILE * file, const char * name) const;
 };
@@ -268,15 +378,20 @@ extern bool LoadChipCert(const char * fileName, bool isTrused, chip::Credentials
                          chip::MutableByteSpan & chipCert);
 
 extern bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt);
+extern bool WriteChipCert(const char * fileName, const chip::ByteSpan & cert, CertFormat certFmt);
 
 extern bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom,
                      uint32_t validDays, int pathLen, const FutureExtension * futureExts, uint8_t futureExtsCount, X509 * newCert,
-                     EVP_PKEY * newKey);
+                     EVP_PKEY * newKey, CertStructConfig & certConfig);
+extern CHIP_ERROR MakeCertChipTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey,
+                                  const struct tm & validFrom, uint32_t validDays, int pathLen, const FutureExtension * futureExts,
+                                  uint8_t futureExtsCount, X509 * x509Cert, EVP_PKEY * newKey, CertStructConfig & certConfig,
+                                  chip::MutableByteSpan & chipCert);
 extern bool ResignCert(X509 * cert, X509 * caCert, EVP_PKEY * caKey);
 
 extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subjectVID, uint16_t subjectPID,
                         bool encodeVIDandPIDasCN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom, uint32_t validDays,
-                        X509 * newCert, EVP_PKEY * newKey, AttCertStructConfig & certConfig);
+                        X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig);
 extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool GenerateKeyPair_Secp256k1(EVP_PKEY * key);
 extern bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupportedCurve = false);

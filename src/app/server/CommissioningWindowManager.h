@@ -90,7 +90,6 @@ public:
     void OnSessionEstablished(const SessionHandle & session) override;
 
     void Shutdown();
-    void Cleanup();
 
     void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event);
 
@@ -129,6 +128,8 @@ private:
     // advertisements, because Shutdown and Cleanup want to handle those
     // differently.
     void ResetState();
+
+    void Cleanup();
 
     /**
      * Function that gets called when our commissioning window timeout timer
