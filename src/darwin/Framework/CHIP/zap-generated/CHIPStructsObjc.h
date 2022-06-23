@@ -273,13 +273,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull bootReason;
 @end
 
-@interface CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull id;
-@property (strong, nonatomic) NSString * _Nonnull name;
-@property (strong, nonatomic) NSData * _Nonnull faultRecording;
-- (instancetype)init;
-@end
-
 @interface CHIPSoftwareDiagnosticsClusterThreadMetrics : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull id;
 @property (strong, nonatomic) NSString * _Nullable name;
@@ -290,7 +283,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPSoftwareDiagnosticsClusterSoftwareFaultEvent : NSObject
-@property (strong, nonatomic) CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct * _Nonnull softwareFault;
+@property (strong, nonatomic) NSNumber * _Nonnull id;
+@property (strong, nonatomic) NSString * _Nullable name;
+@property (strong, nonatomic) NSData * _Nullable faultRecording;
 @end
 
 @interface CHIPThreadNetworkDiagnosticsClusterNeighborTable : NSObject

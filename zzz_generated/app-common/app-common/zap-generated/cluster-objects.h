@@ -11179,31 +11179,6 @@ public:
 } // namespace GeneralDiagnostics
 namespace SoftwareDiagnostics {
 namespace Structs {
-namespace SoftwareFaultStruct {
-enum class Fields
-{
-    kId             = 0,
-    kName           = 1,
-    kFaultRecording = 2,
-};
-
-struct Type
-{
-public:
-    uint64_t id = static_cast<uint64_t>(0);
-    chip::CharSpan name;
-    chip::ByteSpan faultRecording;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace SoftwareFaultStruct
 namespace ThreadMetrics {
 enum class Fields
 {
@@ -11385,7 +11360,9 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields
 {
-    kSoftwareFault = 0,
+    kId             = 0,
+    kName           = 1,
+    kFaultRecording = 2,
 };
 
 struct Type
@@ -11396,7 +11373,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    Structs::SoftwareFaultStruct::Type softwareFault;
+    uint64_t id = static_cast<uint64_t>(0);
+    Optional<chip::CharSpan> name;
+    Optional<chip::ByteSpan> faultRecording;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -11408,7 +11387,9 @@ public:
     static constexpr EventId GetEventId() { return Events::SoftwareFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
 
-    Structs::SoftwareFaultStruct::DecodableType softwareFault;
+    uint64_t id = static_cast<uint64_t>(0);
+    Optional<chip::CharSpan> name;
+    Optional<chip::ByteSpan> faultRecording;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
