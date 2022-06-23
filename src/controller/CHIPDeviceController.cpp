@@ -164,14 +164,9 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     //    serialize/deserialize.
     // 3) We have no keypair at all, and the fabric table has been initialized
     //    with a key store.
-    if (params.hasExternallyOwnedOperationalKeypair)
+    if (params.operationalKeypair != nullptr)
     {
-        hasExternallyOwnedKeypair  = true;
-        externalOperationalKeypair = params.operationalKeypair;
-    }
-    else if (params.operationalKeypair)
-    {
-        hasExternallyOwnedKeypair  = false;
+        hasExternallyOwnedKeypair  = params.hasExternallyOwnedOperationalKeypair;
         externalOperationalKeypair = params.operationalKeypair;
     }
 

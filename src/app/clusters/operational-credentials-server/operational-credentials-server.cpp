@@ -758,6 +758,9 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 exit:
     if (needRevert)
     {
+        // Here, on revert, we DO NOT call FabricTable::Delete as this would also remove the existing
+        // trusted root previously added. It possibly got reverted in case of the worst kinds of errors,
+        // but a better impl of the innards of FabricTable::CommitPendingFabricData would make it work.
         fabricTable.RevertPendingOpCertsExceptRoot();
 
         // Revert IPK and ACL entries added, ignoring errors, since some steps may have been skipped

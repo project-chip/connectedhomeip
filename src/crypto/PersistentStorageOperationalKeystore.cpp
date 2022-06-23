@@ -173,23 +173,18 @@ bool PersistentStorageOperationalKeystore::HasOpKeypairForFabric(FabricIndex fab
         return true;
     }
 
+    // TODO(#16958): need to actually read the key to know if it's there due to platforms not
+    //               properly enforcing CHIP_ERROR_BUFFER_TOO_SMALL behavior needed by
+    //               PersistentStorageDelegate. Very unfortunate, needs fixing ASAP.
+
+    // Use a CapacityBoundBuffer to get RAII secret data clearing on scope exit.
+    Crypto::CapacityBoundBuffer<OpKeyTLVMaxSize()> buf;
+
     DefaultStorageKeyAllocator keyAlloc;
-    uint16_t keySize = 0;
-    CHIP_ERROR err   = mStorage->SyncGetKeyValue(keyAlloc.FabricOpKey(fabricIndex), nullptr, keySize);
+    uint16_t keySize = static_cast<uint16_t>(buf.Capacity());
+    CHIP_ERROR err   = mStorage->SyncGetKeyValue(keyAlloc.FabricOpKey(fabricIndex), buf.Bytes(), keySize);
 
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        // Obviously not found
-        return false;
-    }
-    if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) && (keySize > 0))
-    {
-        // On found, we actually expect an "error", since we didn't want to read it out.
-        return true;
-    }
-
-    // On any other error, we consider the key not found
-    return false;
+    return (err == CHIP_NO_ERROR);
 }
 
 CHIP_ERROR PersistentStorageOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabricIndex,
