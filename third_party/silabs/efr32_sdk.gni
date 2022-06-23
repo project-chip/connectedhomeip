@@ -125,9 +125,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/",
       "${efr32_sdk_root}/util/third_party/freertos/cmsis/Include",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/include",
-
-      # "${sdk_support_root}/matter/efr32",
-      # "${sdk_support_root}/matter/efr32/${efr32_family}/",
       "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/config",
       "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/autogen",
     ]
