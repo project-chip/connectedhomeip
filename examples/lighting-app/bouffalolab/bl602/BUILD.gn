@@ -82,6 +82,7 @@ bl602_executable("lighting_app") {
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/examples/providers:device_info_provider",
   ]
 
   include_dirs = [ "include" ]

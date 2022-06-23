@@ -22,6 +22,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
 #include <tcpip.h>
+#include <wifi_mgmr.h>
 #include <wifi_mgmr_api.h>
 #include <wifi_mgmr_ext.h>
 
@@ -304,12 +305,67 @@ void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
     }
 }
 
-#if 0
-CHIP_ERROR GetConnectedNetwork(Network & network)
+CHIP_ERROR GetConfiguredNetwork(Network & network)
 {
+    uint8_t ssid[64];
+    uint16_t ssid_len;
+
+    ssid_len = wifi_mgmr_profile_ssid_get(ssid);
+    if (!ssid_len || ssid_len > DeviceLayer::Internal::kMaxWiFiSSIDLength)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    memcpy(network.networkID, ssid, ssid_len);
+    network.networkIDLen = ssid_len;
+
     return CHIP_NO_ERROR;
 }
-#endif
+
+void BLWiFiDriver::OnNetworkStatusChange()
+{
+    Network configuredNetwork;
+    bool staEnabled = false, staConnected = false;
+    // VerifyOrReturn(ESP32Utils::IsStationEnabled(staEnabled) == CHIP_NO_ERROR);
+    VerifyOrReturn(staEnabled && mpStatusChangeCallback != nullptr);
+    CHIP_ERROR err = GetConfiguredNetwork(configuredNetwork);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
+        return;
+    }
+
+    if (ConnectivityManagerImpl::mWiFiStationState == ConnectivityManager::kWiFiStationState_Connected)
+    {
+        staConnected = true;
+    }
+
+    if (staConnected)
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(
+            Status::kSuccess, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)), NullOptional);
+        return;
+    }
+    mpStatusChangeCallback->OnNetworkingStatusChange(
+        Status::kSuccess, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)), NullOptional);
+}
+
+CHIP_ERROR BLWiFiDriver::SetLastDisconnectReason(const ChipDeviceEvent * event)
+{
+    // VerifyOrReturnError(event->Type == DeviceEventType::kRtkWiFiStationDisconnectedEvent, CHIP_ERROR_INVALID_ARGUMENT);
+
+    uint16_t status_code, reason_code;
+
+    wifi_mgmr_conn_result_get(&status_code, &reason_code);
+    mLastDisconnectedReason = reason_code;
+
+    return CHIP_NO_ERROR;
+}
+
+int32_t BLWiFiDriver::GetLastDisconnectReason()
+{
+    return mLastDisconnectedReason;
+}
 
 size_t BLWiFiDriver::WiFiNetworkIterator::Count()
 {
@@ -318,7 +374,6 @@ size_t BLWiFiDriver::WiFiNetworkIterator::Count()
 
 bool BLWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 {
-#if 0
     if (mExhausted || mDriver->mStagingNetwork.ssidLen == 0)
     {
         return false;
@@ -329,7 +384,7 @@ bool BLWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     mExhausted        = true;
 
     Network connectedNetwork;
-    CHIP_ERROR err = GetConnectedNetwork(connectedNetwork);
+    CHIP_ERROR err = GetConfiguredNetwork(connectedNetwork);
     if (err == CHIP_NO_ERROR)
     {
         if (connectedNetwork.networkIDLen == item.networkIDLen &&
@@ -338,7 +393,6 @@ bool BLWiFiDriver::WiFiNetworkIterator::Next(Network & item)
             item.connected = true;
         }
     }
-#endif
     return true;
 }
 
