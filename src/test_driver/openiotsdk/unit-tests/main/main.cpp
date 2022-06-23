@@ -24,32 +24,6 @@
 
 using namespace ::chip;
 
-extern "C" uint32_t __end__;
-extern "C" uint32_t __HeapLimit;
-
-// Turn off the errno macro and use actual global variable instead.
-#undef errno
-extern "C" int errno;
-
-// The default _sbrk doesn't have the correct symbols to locate the heap, to provide them
-// we use that fact that _sbrk has a weak attribute which allows users to override it.
-extern "C" caddr_t _sbrk(int incr)
-{
-    static uint32_t heap = (uint32_t) &__end__;
-    uint32_t prev_heap   = heap;
-    uint32_t new_heap    = heap + incr;
-
-    /* __HeapLimit is end of heap section */
-    if (new_heap > (uint32_t) &__HeapLimit)
-    {
-        errno = ENOMEM;
-        return (caddr_t) -1;
-    }
-
-    heap = new_heap;
-    return (caddr_t) prev_heap;
-}
-
 static void test_thread(void * argument)
 {
     printf("Open IoT SDK unit-tests run...\r\n");
