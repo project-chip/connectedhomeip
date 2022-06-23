@@ -221,10 +221,10 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/binapploader.o",
-        "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libbluetooth.a",
-        "${efr32_sdk_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg12_gcc_release.a",
-        "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
+        "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/binapploader.o",
+        "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libbluetooth.a",
+        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg12_gcc_release.a",
+        "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
       ]
 
       defines += [ "EFR32MG12" ]
@@ -239,10 +239,10 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG21/GCC/binapploader.o",
-        "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG21/GCC/libbluetooth.a",
-        "${efr32_sdk_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg21_gcc_release.a",
-        "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
+        "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG21/GCC/binapploader.o",
+        "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG21/GCC/libbluetooth.a",
+        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg21_gcc_release.a",
+        "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
       ]
 
       defines += [
@@ -260,10 +260,10 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libapploader.a",
-        "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libbluetooth.a",
-        "${efr32_sdk_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a",
-        "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
+        "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libapploader.a",
+        "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libbluetooth.a",
+        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a",
+        "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
       ]
 
       defines += [
