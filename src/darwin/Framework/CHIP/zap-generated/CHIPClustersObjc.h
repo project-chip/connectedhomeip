@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Identify
- *    
+ *
  */
 @interface CHIPIdentify : CHIPCluster
 
@@ -125,7 +125,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Groups
- *    
+ *
  */
 @interface CHIPGroups : CHIPCluster
 
@@ -211,7 +211,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Scenes
- *    
+ *
  */
 @interface CHIPScenes : CHIPCluster
 
@@ -353,7 +353,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster On/Off
- *    
+ *
  */
 @interface CHIPOnOff : CHIPCluster
 
@@ -491,7 +491,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster On/off Switch Configuration
- *    
+ *
  */
 @interface CHIPOnOffSwitchConfiguration : CHIPCluster
 
@@ -575,7 +575,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Level Control
- *    
+ *
  */
 @interface CHIPLevelControl : CHIPCluster
 
@@ -811,7 +811,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Binary Input (Basic)
- *    
+ *
  */
 @interface CHIPBinaryInputBasic : CHIPCluster
 
@@ -975,7 +975,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Descriptor
- *    
+ *
  */
 @interface CHIPDescriptor : CHIPCluster
 
@@ -1077,7 +1077,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Binding
- *    
+ *
  */
 @interface CHIPBinding : CHIPCluster
 
@@ -1151,7 +1151,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Access Control
- *    
+ *
  */
 @interface CHIPAccessControl : CHIPCluster
 
@@ -1267,7 +1267,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Bridged Actions
- *    
+ *
  */
 @interface CHIPBridgedActions : CHIPCluster
 
@@ -1383,7 +1383,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Basic
- *    
+ *
  */
 @interface CHIPBasic : CHIPCluster
 
@@ -1655,7 +1655,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster OTA Software Update Provider
- *    
+ *
  */
 @interface CHIPOtaSoftwareUpdateProvider : CHIPCluster
 
@@ -1723,7 +1723,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster OTA Software Update Requestor
- *    
+ *
  */
 @interface CHIPOtaSoftwareUpdateRequestor : CHIPCluster
 
@@ -1829,7 +1829,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Localization Configuration
- *    
+ *
  */
 @interface CHIPLocalizationConfiguration : CHIPCluster
 
@@ -1913,7 +1913,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Time Format Localization
- *    
+ *
  */
 @interface CHIPTimeFormatLocalization : CHIPCluster
 
@@ -2009,7 +2009,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Unit Localization
- *    
+ *
  */
 @interface CHIPUnitLocalization : CHIPCluster
 
@@ -2083,7 +2083,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Power Source Configuration
- *    
+ *
  */
 @interface CHIPPowerSourceConfiguration : CHIPCluster
 
@@ -2155,7 +2155,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Power Source
- *    
+ *
  */
 @interface CHIPPowerSource : CHIPCluster
 
@@ -2527,7 +2527,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster General Commissioning
- *    
+ *
  */
 @interface CHIPGeneralCommissioning : CHIPCluster
 
@@ -2649,7 +2649,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Network Commissioning
- *    
+ *
  */
 @interface CHIPNetworkCommissioning : CHIPCluster
 
@@ -2805,7 +2805,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Diagnostic Logs
- *    
+ *
  */
 @interface CHIPDiagnosticLogs : CHIPCluster
 
@@ -2869,7 +2869,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster General Diagnostics
- *    
+ *
  */
 @interface CHIPGeneralDiagnostics : CHIPCluster
 
@@ -3023,7 +3023,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Software Diagnostics
- *    
+ *
  */
 @interface CHIPSoftwareDiagnostics : CHIPCluster
 
@@ -3129,7 +3129,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Thread Network Diagnostics
- *    
+ *
  */
 @interface CHIPThreadNetworkDiagnostics : CHIPCluster
 
@@ -3825,7 +3825,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster WiFi Network Diagnostics
- *    
+ *
  */
 @interface CHIPWiFiNetworkDiagnostics : CHIPCluster
 
@@ -4021,7 +4021,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Ethernet Network Diagnostics
- *    
+ *
  */
 @interface CHIPEthernetNetworkDiagnostics : CHIPCluster
 
@@ -4177,7 +4177,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Bridged Device Basic
- *    
+ *
  */
 @interface CHIPBridgedDeviceBasic : CHIPCluster
 
@@ -4391,7 +4391,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Switch
- *    
+ *
  */
 @interface CHIPSwitch : CHIPCluster
 
@@ -4483,7 +4483,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster AdministratorCommissioning
- *    
+ *
  */
 @interface CHIPAdministratorCommissioning : CHIPCluster
 
@@ -4583,7 +4583,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Operational Credentials
- *    
+ *
  */
 @interface CHIPOperationalCredentials : CHIPCluster
 
@@ -4721,7 +4721,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Group Key Management
- *    
+ *
  */
 @interface CHIPGroupKeyManagement : CHIPCluster
 
@@ -4833,7 +4833,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Fixed Label
- *    
+ *
  */
 @interface CHIPFixedLabel : CHIPCluster
 
@@ -4905,7 +4905,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster User Label
- *    
+ *
  */
 @interface CHIPUserLabel : CHIPCluster
 
@@ -4979,7 +4979,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Boolean State
- *    
+ *
  */
 @interface CHIPBooleanState : CHIPCluster
 
@@ -5051,7 +5051,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Mode Select
- *    
+ *
  */
 @interface CHIPModeSelect : CHIPCluster
 
@@ -5179,7 +5179,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Door Lock
- *    
+ *
  */
 @interface CHIPDoorLock : CHIPCluster
 
@@ -5673,7 +5673,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Window Covering
- *    
+ *
  */
 @interface CHIPWindowCovering : CHIPCluster
 
@@ -5977,7 +5977,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Barrier Control
- *    
+ *
  */
 @interface CHIPBarrierControl : CHIPCluster
 
@@ -6157,7 +6157,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Pump Configuration and Control
- *    
+ *
  */
 @interface CHIPPumpConfigurationAndControl : CHIPCluster
 
@@ -6457,7 +6457,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Thermostat
- *    
+ *
  */
 @interface CHIPThermostat : CHIPCluster
 
@@ -7073,7 +7073,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Fan Control
- *    
+ *
  */
 @interface CHIPFanControl : CHIPCluster
 
@@ -7257,7 +7257,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Thermostat User Interface Configuration
- *    
+ *
  */
 @interface CHIPThermostatUserInterfaceConfiguration : CHIPCluster
 
@@ -7355,7 +7355,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Color Control
- *    
+ *
  */
 @interface CHIPColorControl : CHIPCluster
 
@@ -8001,7 +8001,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Illuminance Measurement
- *    
+ *
  */
 @interface CHIPIlluminanceMeasurement : CHIPCluster
 
@@ -8113,7 +8113,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Temperature Measurement
- *    
+ *
  */
 @interface CHIPTemperatureMeasurement : CHIPCluster
 
@@ -8215,7 +8215,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Pressure Measurement
- *    
+ *
  */
 @interface CHIPPressureMeasurement : CHIPCluster
 
@@ -8367,7 +8367,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Flow Measurement
- *    
+ *
  */
 @interface CHIPFlowMeasurement : CHIPCluster
 
@@ -8469,7 +8469,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Relative Humidity Measurement
- *    
+ *
  */
 @interface CHIPRelativeHumidityMeasurement : CHIPCluster
 
@@ -8571,7 +8571,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Occupancy Sensing
- *    
+ *
  */
 @interface CHIPOccupancySensing : CHIPCluster
 
@@ -8771,7 +8771,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Wake on LAN
- *    
+ *
  */
 @interface CHIPWakeOnLan : CHIPCluster
 
@@ -8843,7 +8843,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Channel
- *    
+ *
  */
 @interface CHIPChannel : CHIPCluster
 
@@ -8941,7 +8941,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Target Navigator
- *    
+ *
  */
 @interface CHIPTargetNavigator : CHIPCluster
 
@@ -9025,7 +9025,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Media Playback
- *    
+ *
  */
 @interface CHIPMediaPlayback : CHIPCluster
 
@@ -9195,7 +9195,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Media Input
- *    
+ *
  */
 @interface CHIPMediaInput : CHIPCluster
 
@@ -9289,7 +9289,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Low Power
- *    
+ *
  */
 @interface CHIPLowPower : CHIPCluster
 
@@ -9355,7 +9355,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Keypad Input
- *    
+ *
  */
 @interface CHIPKeypadInput : CHIPCluster
 
@@ -9419,7 +9419,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Content Launcher
- *    
+ *
  */
 @interface CHIPContentLauncher : CHIPCluster
 
@@ -9507,7 +9507,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Audio Output
- *    
+ *
  */
 @interface CHIPAudioOutput : CHIPCluster
 
@@ -9593,7 +9593,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Application Launcher
- *    
+ *
  */
 @interface CHIPApplicationLauncher : CHIPCluster
 
@@ -9683,7 +9683,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Application Basic
- *    
+ *
  */
 @interface CHIPApplicationBasic : CHIPCluster
 
@@ -9825,7 +9825,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Account Login
- *    
+ *
  */
 @interface CHIPAccountLogin : CHIPCluster
 
@@ -9895,7 +9895,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Electrical Measurement
- *    
+ *
  */
 @interface CHIPElectricalMeasurement : CHIPCluster
 
@@ -11259,7 +11259,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 /**
  * Cluster Test Cluster
- *    
+ *
  */
 @interface CHIPTestCluster : CHIPCluster
 

@@ -19681,4 +19681,3 @@ void CHIPNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge
          self->mEstablishedHandler = nil;
      }
 }
-

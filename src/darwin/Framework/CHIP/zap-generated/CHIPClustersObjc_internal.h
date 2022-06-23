@@ -340,4 +340,3 @@
 @interface CHIPTestCluster ()
 @property (readonly) chip::Controller::TestClusterCluster cppCluster;
 @end
-
