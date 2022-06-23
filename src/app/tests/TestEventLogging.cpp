@@ -332,7 +332,7 @@ nlTestSuite sSuite =
 
 int TestEventLogging()
 {
-    static TestContext gContext;
+    TestContext gContext;
     nlTestRunner(&sSuite, &gContext);
     return (nlTestRunnerStats(&sSuite));
 }

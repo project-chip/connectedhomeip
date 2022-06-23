@@ -208,15 +208,10 @@ CHIP_ERROR LastKnownGoodTime::RevertPendingLastKnownGoodChipEpochTime()
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        // We do not expect to arrive here unless Init() failed, the kvstore
-        // broke, or some other code removed our value from persistence.
-        // However, clearing the in-memory value is the right thing to do for
-        // all of these cases.  If there was no value known when we attempted to
-        // update to a new pending value, update will have failed and
-        // `mLastKnownGoodChipEpochTime` should already be clear, making this a
-        // no-op.  And if something else has broken, clearing our in-memory
-        // value will make it obvious that we no longer have a valid last known
-        // good time.
+        // We do not expect to arrive here unless the kvstore broke or some
+        // other code removed our value from persistence.  However, clearing the
+        // in-memory value is the right thing to do for all cases.  This will
+        // prevent other code from consuming an invalid time.
         ChipLogError(TimeService,
                      "Clearing Last Known Good Time; failed to load a previous value from persistence: %" CHIP_ERROR_FORMAT,
                      err.Format());
