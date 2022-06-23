@@ -20,8 +20,8 @@
 #ifndef CHIP_COMMAND_PAYLOADS_H
 #define CHIP_COMMAND_PAYLOADS_H
 
-#import <Foundation/Foundation.h>
 #import <CHIP/CHIPStructsObjc.h>
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -40,11 +40,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPIdentifyClusterTriggerEffectParams : NSObject
 
@@ -63,11 +63,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupsClusterAddGroupParams : NSObject
 
@@ -86,11 +86,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupsClusterAddGroupResponseParams : NSObject
 
@@ -109,11 +109,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupsClusterViewGroupParams : NSObject
 
@@ -130,11 +130,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupsClusterViewGroupResponseParams : NSObject
 
@@ -155,11 +155,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupsClusterGetGroupMembershipParams : NSObject
 
@@ -176,11 +176,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupsClusterGetGroupMembershipResponseParams : NSObject
 
@@ -199,11 +199,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupsClusterRemoveGroupParams : NSObject
 
@@ -220,11 +220,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupsClusterRemoveGroupResponseParams : NSObject
 
@@ -243,11 +243,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupsClusterRemoveAllGroupsParams : NSObject
 /**
@@ -262,11 +262,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupsClusterAddGroupIfIdentifyingParams : NSObject
 
@@ -285,11 +285,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterAddSceneParams : NSObject
 
@@ -314,11 +314,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterAddSceneResponseParams : NSObject
 
@@ -339,11 +339,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterViewSceneParams : NSObject
 
@@ -362,11 +362,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterViewSceneResponseParams : NSObject
 
@@ -393,11 +393,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterRemoveSceneParams : NSObject
 
@@ -416,11 +416,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterRemoveSceneResponseParams : NSObject
 
@@ -441,11 +441,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterRemoveAllScenesParams : NSObject
 
@@ -462,11 +462,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterRemoveAllScenesResponseParams : NSObject
 
@@ -485,11 +485,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterStoreSceneParams : NSObject
 
@@ -508,11 +508,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterStoreSceneResponseParams : NSObject
 
@@ -533,11 +533,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterRecallSceneParams : NSObject
 
@@ -558,11 +558,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterGetSceneMembershipParams : NSObject
 
@@ -579,11 +579,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterGetSceneMembershipResponseParams : NSObject
 
@@ -606,11 +606,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterEnhancedAddSceneParams : NSObject
 
@@ -635,11 +635,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterEnhancedAddSceneResponseParams : NSObject
 
@@ -660,11 +660,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterEnhancedViewSceneParams : NSObject
 
@@ -683,11 +683,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterEnhancedViewSceneResponseParams : NSObject
 
@@ -714,11 +714,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterCopySceneParams : NSObject
 
@@ -743,11 +743,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPScenesClusterCopySceneResponseParams : NSObject
 
@@ -768,11 +768,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOnOffClusterOffParams : NSObject
 /**
@@ -787,11 +787,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOnOffClusterOnParams : NSObject
 /**
@@ -806,11 +806,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOnOffClusterToggleParams : NSObject
 /**
@@ -825,11 +825,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOnOffClusterOffWithEffectParams : NSObject
 
@@ -848,11 +848,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOnOffClusterOnWithRecallGlobalSceneParams : NSObject
 /**
@@ -867,11 +867,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOnOffClusterOnWithTimedOffParams : NSObject
 
@@ -892,11 +892,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPLevelControlClusterMoveToLevelParams : NSObject
 
@@ -919,11 +919,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPLevelControlClusterMoveParams : NSObject
 
@@ -946,11 +946,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPLevelControlClusterStepParams : NSObject
 
@@ -975,11 +975,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPLevelControlClusterStopParams : NSObject
 
@@ -998,11 +998,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPLevelControlClusterMoveToLevelWithOnOffParams : NSObject
 
@@ -1021,11 +1021,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPLevelControlClusterMoveWithOnOffParams : NSObject
 
@@ -1044,11 +1044,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPLevelControlClusterStepWithOnOffParams : NSObject
 
@@ -1069,11 +1069,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPLevelControlClusterStopWithOnOffParams : NSObject
 /**
@@ -1088,11 +1088,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPLevelControlClusterMoveToClosestFrequencyParams : NSObject
 
@@ -1109,11 +1109,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAlarmsClusterResetAlarmParams : NSObject
 
@@ -1132,11 +1132,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAlarmsClusterAlarmParams : NSObject
 
@@ -1155,11 +1155,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAlarmsClusterResetAllAlarmsParams : NSObject
 /**
@@ -1174,11 +1174,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAlarmsClusterGetAlarmResponseParams : NSObject
 
@@ -1201,11 +1201,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAlarmsClusterGetAlarmParams : NSObject
 /**
@@ -1220,11 +1220,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAlarmsClusterResetAlarmLogParams : NSObject
 /**
@@ -1239,11 +1239,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterPowerProfileRequestParams : NSObject
 
@@ -1260,11 +1260,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterPowerProfileNotificationParams : NSObject
 
@@ -1287,11 +1287,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterPowerProfileStateRequestParams : NSObject
 /**
@@ -1306,11 +1306,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterPowerProfileResponseParams : NSObject
 
@@ -1333,11 +1333,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterGetPowerProfilePriceResponseParams : NSObject
 
@@ -1360,11 +1360,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterPowerProfileStateResponseParams : NSObject
 
@@ -1383,11 +1383,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterGetOverallSchedulePriceResponseParams : NSObject
 
@@ -1408,11 +1408,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterGetPowerProfilePriceParams : NSObject
 
@@ -1429,11 +1429,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterEnergyPhasesScheduleNotificationParams : NSObject
 
@@ -1454,11 +1454,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterPowerProfilesStateNotificationParams : NSObject
 
@@ -1477,11 +1477,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterEnergyPhasesScheduleResponseParams : NSObject
 
@@ -1502,11 +1502,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterGetOverallSchedulePriceParams : NSObject
 /**
@@ -1521,11 +1521,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterPowerProfileScheduleConstraintsRequestParams : NSObject
 
@@ -1542,11 +1542,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterEnergyPhasesScheduleRequestParams : NSObject
 
@@ -1563,11 +1563,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterEnergyPhasesScheduleStateRequestParams : NSObject
 
@@ -1584,11 +1584,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterEnergyPhasesScheduleStateResponseParams : NSObject
 
@@ -1609,11 +1609,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterGetPowerProfilePriceExtendedResponseParams : NSObject
 
@@ -1636,11 +1636,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterEnergyPhasesScheduleStateNotificationParams : NSObject
 
@@ -1661,11 +1661,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterPowerProfileScheduleConstraintsNotificationParams : NSObject
 
@@ -1686,11 +1686,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterPowerProfileScheduleConstraintsResponseParams : NSObject
 
@@ -1711,11 +1711,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPowerProfileClusterGetPowerProfilePriceExtendedParams : NSObject
 
@@ -1736,11 +1736,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceControlClusterExecutionOfACommandParams : NSObject
 
@@ -1757,11 +1757,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceControlClusterSignalStateResponseParams : NSObject
 
@@ -1782,11 +1782,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceControlClusterSignalStateParams : NSObject
 /**
@@ -1801,11 +1801,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceControlClusterSignalStateNotificationParams : NSObject
 
@@ -1826,11 +1826,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceControlClusterWriteFunctionsParams : NSObject
 
@@ -1851,11 +1851,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceControlClusterOverloadPauseResumeParams : NSObject
 /**
@@ -1870,11 +1870,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceControlClusterOverloadPauseParams : NSObject
 /**
@@ -1889,11 +1889,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceControlClusterOverloadWarningParams : NSObject
 
@@ -1910,11 +1910,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPollControlClusterCheckInParams : NSObject
 /**
@@ -1929,11 +1929,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPollControlClusterCheckInResponseParams : NSObject
 
@@ -1952,11 +1952,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPollControlClusterFastPollStopParams : NSObject
 /**
@@ -1971,11 +1971,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPollControlClusterSetLongPollIntervalParams : NSObject
 
@@ -1992,11 +1992,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPPollControlClusterSetShortPollIntervalParams : NSObject
 
@@ -2013,11 +2013,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBridgedActionsClusterInstantActionParams : NSObject
 
@@ -2036,11 +2036,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBridgedActionsClusterInstantActionWithTransitionParams : NSObject
 
@@ -2061,11 +2061,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBridgedActionsClusterStartActionParams : NSObject
 
@@ -2084,11 +2084,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBridgedActionsClusterStartActionWithDurationParams : NSObject
 
@@ -2109,11 +2109,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBridgedActionsClusterStopActionParams : NSObject
 
@@ -2132,11 +2132,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBridgedActionsClusterPauseActionParams : NSObject
 
@@ -2155,11 +2155,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBridgedActionsClusterPauseActionWithDurationParams : NSObject
 
@@ -2180,11 +2180,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBridgedActionsClusterResumeActionParams : NSObject
 
@@ -2203,11 +2203,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBridgedActionsClusterEnableActionParams : NSObject
 
@@ -2226,11 +2226,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBridgedActionsClusterEnableActionWithDurationParams : NSObject
 
@@ -2251,11 +2251,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBridgedActionsClusterDisableActionParams : NSObject
 
@@ -2274,11 +2274,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBridgedActionsClusterDisableActionWithDurationParams : NSObject
 
@@ -2299,11 +2299,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBasicClusterMfgSpecificPingParams : NSObject
 /**
@@ -2318,11 +2318,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOtaSoftwareUpdateProviderClusterQueryImageParams : NSObject
 
@@ -2353,11 +2353,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams : NSObject
 
@@ -2388,11 +2388,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject
 
@@ -2411,11 +2411,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject
 
@@ -2434,11 +2434,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject
 
@@ -2457,11 +2457,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams : NSObject
 
@@ -2486,11 +2486,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGeneralCommissioningClusterArmFailSafeParams : NSObject
 
@@ -2509,11 +2509,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGeneralCommissioningClusterArmFailSafeResponseParams : NSObject
 
@@ -2532,11 +2532,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGeneralCommissioningClusterSetRegulatoryConfigParams : NSObject
 
@@ -2557,11 +2557,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseParams : NSObject
 
@@ -2580,11 +2580,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGeneralCommissioningClusterCommissioningCompleteParams : NSObject
 /**
@@ -2599,11 +2599,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGeneralCommissioningClusterCommissioningCompleteResponseParams : NSObject
 
@@ -2622,11 +2622,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPNetworkCommissioningClusterScanNetworksParams : NSObject
 
@@ -2645,11 +2645,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPNetworkCommissioningClusterScanNetworksResponseParams : NSObject
 
@@ -2672,11 +2672,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams : NSObject
 
@@ -2697,11 +2697,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkParams : NSObject
 
@@ -2720,11 +2720,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPNetworkCommissioningClusterRemoveNetworkParams : NSObject
 
@@ -2743,11 +2743,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPNetworkCommissioningClusterNetworkConfigResponseParams : NSObject
 
@@ -2768,11 +2768,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPNetworkCommissioningClusterConnectNetworkParams : NSObject
 
@@ -2791,11 +2791,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPNetworkCommissioningClusterConnectNetworkResponseParams : NSObject
 
@@ -2816,11 +2816,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPNetworkCommissioningClusterReorderNetworkParams : NSObject
 
@@ -2841,11 +2841,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDiagnosticLogsClusterRetrieveLogsRequestParams : NSObject
 
@@ -2866,11 +2866,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDiagnosticLogsClusterRetrieveLogsResponseParams : NSObject
 
@@ -2893,11 +2893,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGeneralDiagnosticsClusterTestEventTriggerParams : NSObject
 
@@ -2916,11 +2916,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPSoftwareDiagnosticsClusterResetWatermarksParams : NSObject
 /**
@@ -2935,11 +2935,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPThreadNetworkDiagnosticsClusterResetCountsParams : NSObject
 /**
@@ -2954,11 +2954,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPWiFiNetworkDiagnosticsClusterResetCountsParams : NSObject
 /**
@@ -2973,11 +2973,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPEthernetNetworkDiagnosticsClusterResetCountsParams : NSObject
 /**
@@ -2992,11 +2992,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAdministratorCommissioningClusterOpenCommissioningWindowParams : NSObject
 
@@ -3021,11 +3021,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAdministratorCommissioningClusterOpenBasicCommissioningWindowParams : NSObject
 
@@ -3042,11 +3042,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAdministratorCommissioningClusterRevokeCommissioningParams : NSObject
 /**
@@ -3061,11 +3061,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOperationalCredentialsClusterAttestationRequestParams : NSObject
 
@@ -3082,11 +3082,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOperationalCredentialsClusterAttestationResponseParams : NSObject
 
@@ -3105,11 +3105,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOperationalCredentialsClusterCertificateChainRequestParams : NSObject
 
@@ -3126,11 +3126,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOperationalCredentialsClusterCertificateChainResponseParams : NSObject
 
@@ -3147,11 +3147,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOperationalCredentialsClusterCSRRequestParams : NSObject
 
@@ -3170,11 +3170,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOperationalCredentialsClusterCSRResponseParams : NSObject
 
@@ -3193,11 +3193,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOperationalCredentialsClusterAddNOCParams : NSObject
 
@@ -3222,11 +3222,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOperationalCredentialsClusterUpdateNOCParams : NSObject
 
@@ -3245,11 +3245,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOperationalCredentialsClusterNOCResponseParams : NSObject
 
@@ -3270,11 +3270,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOperationalCredentialsClusterUpdateFabricLabelParams : NSObject
 
@@ -3291,11 +3291,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOperationalCredentialsClusterRemoveFabricParams : NSObject
 
@@ -3312,11 +3312,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPOperationalCredentialsClusterAddTrustedRootCertificateParams : NSObject
 
@@ -3333,11 +3333,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupKeyManagementClusterKeySetWriteParams : NSObject
 
@@ -3354,11 +3354,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupKeyManagementClusterKeySetReadParams : NSObject
 
@@ -3375,11 +3375,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupKeyManagementClusterKeySetReadResponseParams : NSObject
 
@@ -3396,11 +3396,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupKeyManagementClusterKeySetRemoveParams : NSObject
 
@@ -3417,11 +3417,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupKeyManagementClusterKeySetReadAllIndicesParams : NSObject
 
@@ -3438,11 +3438,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams : NSObject
 
@@ -3459,11 +3459,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPModeSelectClusterChangeToModeParams : NSObject
 
@@ -3480,11 +3480,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterLockDoorParams : NSObject
 
@@ -3501,11 +3501,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterUnlockDoorParams : NSObject
 
@@ -3522,11 +3522,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterUnlockWithTimeoutParams : NSObject
 
@@ -3545,11 +3545,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterSetWeekDayScheduleParams : NSObject
 
@@ -3578,11 +3578,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterGetWeekDayScheduleParams : NSObject
 
@@ -3601,11 +3601,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterGetWeekDayScheduleResponseParams : NSObject
 
@@ -3636,11 +3636,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterClearWeekDayScheduleParams : NSObject
 
@@ -3659,11 +3659,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterSetYearDayScheduleParams : NSObject
 
@@ -3686,11 +3686,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterGetYearDayScheduleParams : NSObject
 
@@ -3709,11 +3709,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterGetYearDayScheduleResponseParams : NSObject
 
@@ -3738,11 +3738,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterClearYearDayScheduleParams : NSObject
 
@@ -3761,11 +3761,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterSetHolidayScheduleParams : NSObject
 
@@ -3788,11 +3788,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterGetHolidayScheduleParams : NSObject
 
@@ -3809,11 +3809,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterGetHolidayScheduleResponseParams : NSObject
 
@@ -3838,11 +3838,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterClearHolidayScheduleParams : NSObject
 
@@ -3859,11 +3859,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterSetUserParams : NSObject
 
@@ -3892,11 +3892,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterGetUserParams : NSObject
 
@@ -3913,11 +3913,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterGetUserResponseParams : NSObject
 
@@ -3952,11 +3952,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterClearUserParams : NSObject
 
@@ -3973,11 +3973,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterSetCredentialParams : NSObject
 
@@ -4004,11 +4004,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterSetCredentialResponseParams : NSObject
 
@@ -4029,11 +4029,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterGetCredentialStatusParams : NSObject
 
@@ -4050,11 +4050,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterGetCredentialStatusResponseParams : NSObject
 
@@ -4079,11 +4079,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPDoorLockClusterClearCredentialParams : NSObject
 
@@ -4100,11 +4100,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPWindowCoveringClusterUpOrOpenParams : NSObject
 /**
@@ -4119,11 +4119,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPWindowCoveringClusterDownOrCloseParams : NSObject
 /**
@@ -4138,11 +4138,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPWindowCoveringClusterStopMotionParams : NSObject
 /**
@@ -4157,11 +4157,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPWindowCoveringClusterGoToLiftValueParams : NSObject
 
@@ -4178,11 +4178,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPWindowCoveringClusterGoToLiftPercentageParams : NSObject
 
@@ -4199,11 +4199,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPWindowCoveringClusterGoToTiltValueParams : NSObject
 
@@ -4220,11 +4220,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPWindowCoveringClusterGoToTiltPercentageParams : NSObject
 
@@ -4241,11 +4241,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBarrierControlClusterBarrierControlGoToPercentParams : NSObject
 
@@ -4262,11 +4262,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPBarrierControlClusterBarrierControlStopParams : NSObject
 /**
@@ -4281,11 +4281,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPThermostatClusterSetpointRaiseLowerParams : NSObject
 
@@ -4304,11 +4304,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPThermostatClusterGetWeeklyScheduleResponseParams : NSObject
 
@@ -4331,11 +4331,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPThermostatClusterSetWeeklyScheduleParams : NSObject
 
@@ -4358,11 +4358,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPThermostatClusterGetWeeklyScheduleParams : NSObject
 
@@ -4381,11 +4381,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPThermostatClusterClearWeeklyScheduleParams : NSObject
 /**
@@ -4400,11 +4400,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterMoveToHueParams : NSObject
 
@@ -4429,11 +4429,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterMoveHueParams : NSObject
 
@@ -4456,11 +4456,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterStepHueParams : NSObject
 
@@ -4485,11 +4485,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterMoveToSaturationParams : NSObject
 
@@ -4512,11 +4512,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterMoveSaturationParams : NSObject
 
@@ -4539,11 +4539,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterStepSaturationParams : NSObject
 
@@ -4568,11 +4568,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterMoveToHueAndSaturationParams : NSObject
 
@@ -4597,11 +4597,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterMoveToColorParams : NSObject
 
@@ -4626,11 +4626,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterMoveColorParams : NSObject
 
@@ -4653,11 +4653,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterStepColorParams : NSObject
 
@@ -4682,11 +4682,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterMoveToColorTemperatureParams : NSObject
 
@@ -4709,11 +4709,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterEnhancedMoveToHueParams : NSObject
 
@@ -4738,11 +4738,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterEnhancedMoveHueParams : NSObject
 
@@ -4765,11 +4765,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterEnhancedStepHueParams : NSObject
 
@@ -4794,11 +4794,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterEnhancedMoveToHueAndSaturationParams : NSObject
 
@@ -4823,11 +4823,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterColorLoopSetParams : NSObject
 
@@ -4856,11 +4856,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterStopMoveStepParams : NSObject
 
@@ -4879,11 +4879,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterMoveColorTemperatureParams : NSObject
 
@@ -4910,11 +4910,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPColorControlClusterStepColorTemperatureParams : NSObject
 
@@ -4943,11 +4943,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPChannelClusterChangeChannelParams : NSObject
 
@@ -4964,11 +4964,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPChannelClusterChangeChannelResponseParams : NSObject
 
@@ -4987,11 +4987,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPChannelClusterChangeChannelByNumberParams : NSObject
 
@@ -5010,11 +5010,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPChannelClusterSkipChannelParams : NSObject
 
@@ -5031,11 +5031,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTargetNavigatorClusterNavigateTargetParams : NSObject
 
@@ -5054,11 +5054,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTargetNavigatorClusterNavigateTargetResponseParams : NSObject
 
@@ -5077,11 +5077,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaPlaybackClusterPlayParams : NSObject
 /**
@@ -5096,11 +5096,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaPlaybackClusterPauseParams : NSObject
 /**
@@ -5115,11 +5115,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaPlaybackClusterStopPlaybackParams : NSObject
 /**
@@ -5134,11 +5134,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaPlaybackClusterStartOverParams : NSObject
 /**
@@ -5153,11 +5153,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaPlaybackClusterPreviousParams : NSObject
 /**
@@ -5172,11 +5172,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaPlaybackClusterNextParams : NSObject
 /**
@@ -5191,11 +5191,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaPlaybackClusterRewindParams : NSObject
 /**
@@ -5210,11 +5210,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaPlaybackClusterFastForwardParams : NSObject
 /**
@@ -5229,11 +5229,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaPlaybackClusterSkipForwardParams : NSObject
 
@@ -5250,11 +5250,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaPlaybackClusterSkipBackwardParams : NSObject
 
@@ -5271,11 +5271,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaPlaybackClusterPlaybackResponseParams : NSObject
 
@@ -5294,11 +5294,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaPlaybackClusterSeekParams : NSObject
 
@@ -5315,11 +5315,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaInputClusterSelectInputParams : NSObject
 
@@ -5336,11 +5336,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaInputClusterShowInputStatusParams : NSObject
 /**
@@ -5355,11 +5355,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaInputClusterHideInputStatusParams : NSObject
 /**
@@ -5374,11 +5374,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMediaInputClusterRenameInputParams : NSObject
 
@@ -5397,11 +5397,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPLowPowerClusterSleepParams : NSObject
 /**
@@ -5416,11 +5416,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPKeypadInputClusterSendKeyParams : NSObject
 
@@ -5437,11 +5437,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPKeypadInputClusterSendKeyResponseParams : NSObject
 
@@ -5458,11 +5458,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPContentLauncherClusterLaunchContentParams : NSObject
 
@@ -5483,11 +5483,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPContentLauncherClusterLaunchURLParams : NSObject
 
@@ -5508,11 +5508,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPContentLauncherClusterLaunchResponseParams : NSObject
 
@@ -5531,11 +5531,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAudioOutputClusterSelectOutputParams : NSObject
 
@@ -5552,11 +5552,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAudioOutputClusterRenameOutputParams : NSObject
 
@@ -5575,11 +5575,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplicationLauncherClusterLaunchAppParams : NSObject
 
@@ -5598,11 +5598,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplicationLauncherClusterStopAppParams : NSObject
 
@@ -5619,11 +5619,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplicationLauncherClusterHideAppParams : NSObject
 
@@ -5640,11 +5640,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplicationLauncherClusterLauncherResponseParams : NSObject
 
@@ -5663,11 +5663,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAccountLoginClusterGetSetupPINParams : NSObject
 
@@ -5684,11 +5684,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAccountLoginClusterGetSetupPINResponseParams : NSObject
 
@@ -5705,11 +5705,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAccountLoginClusterLoginParams : NSObject
 
@@ -5728,11 +5728,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPAccountLoginClusterLogoutParams : NSObject
 /**
@@ -5747,11 +5747,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMessagingClusterDisplayMessageParams : NSObject
 
@@ -5778,11 +5778,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMessagingClusterGetLastMessageParams : NSObject
 /**
@@ -5797,11 +5797,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMessagingClusterCancelMessageParams : NSObject
 
@@ -5820,11 +5820,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMessagingClusterMessageConfirmationParams : NSObject
 
@@ -5847,11 +5847,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMessagingClusterDisplayProtectedMessageParams : NSObject
 
@@ -5878,11 +5878,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMessagingClusterGetMessageCancellationParams : NSObject
 
@@ -5899,11 +5899,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPMessagingClusterCancelAllMessagesParams : NSObject
 
@@ -5920,11 +5920,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceEventsAndAlertClusterGetAlertsParams : NSObject
 /**
@@ -5939,11 +5939,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceEventsAndAlertClusterGetAlertsResponseParams : NSObject
 
@@ -5962,11 +5962,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceEventsAndAlertClusterAlertsNotificationParams : NSObject
 
@@ -5985,11 +5985,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceEventsAndAlertClusterEventsNotificationParams : NSObject
 
@@ -6008,11 +6008,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceStatisticsClusterLogNotificationParams : NSObject
 
@@ -6035,11 +6035,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceStatisticsClusterLogRequestParams : NSObject
 
@@ -6056,11 +6056,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceStatisticsClusterLogResponseParams : NSObject
 
@@ -6083,11 +6083,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceStatisticsClusterLogQueueRequestParams : NSObject
 /**
@@ -6102,11 +6102,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceStatisticsClusterLogQueueResponseParams : NSObject
 
@@ -6125,11 +6125,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPApplianceStatisticsClusterStatisticsAvailableParams : NSObject
 
@@ -6148,11 +6148,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandParams : NSObject
 
@@ -6175,11 +6175,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPElectricalMeasurementClusterGetProfileInfoCommandParams : NSObject
 /**
@@ -6194,11 +6194,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams : NSObject
 
@@ -6225,11 +6225,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPElectricalMeasurementClusterGetMeasurementProfileCommandParams : NSObject
 
@@ -6250,11 +6250,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestParams : NSObject
 /**
@@ -6269,11 +6269,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestSpecificResponseParams : NSObject
 
@@ -6290,11 +6290,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestNotHandledParams : NSObject
 /**
@@ -6309,11 +6309,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestAddArgumentsResponseParams : NSObject
 
@@ -6330,11 +6330,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestSpecificParams : NSObject
 /**
@@ -6349,11 +6349,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestSimpleArgumentResponseParams : NSObject
 
@@ -6370,11 +6370,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestUnknownCommandParams : NSObject
 /**
@@ -6389,11 +6389,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestStructArrayArgumentResponseParams : NSObject
 
@@ -6420,11 +6420,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestAddArgumentsParams : NSObject
 
@@ -6443,11 +6443,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestListInt8UReverseResponseParams : NSObject
 
@@ -6464,11 +6464,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestSimpleArgumentRequestParams : NSObject
 
@@ -6485,11 +6485,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestEnumsResponseParams : NSObject
 
@@ -6508,11 +6508,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestStructArrayArgumentRequestParams : NSObject
 
@@ -6539,11 +6539,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestNullableOptionalResponseParams : NSObject
 
@@ -6566,11 +6566,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestStructArgumentRequestParams : NSObject
 
@@ -6587,11 +6587,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestComplexNullableOptionalResponseParams : NSObject
 
@@ -6662,11 +6662,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestNestedStructArgumentRequestParams : NSObject
 
@@ -6683,11 +6683,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterBooleanResponseParams : NSObject
 
@@ -6704,11 +6704,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestListStructArgumentRequestParams : NSObject
 
@@ -6725,11 +6725,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterSimpleStructResponseParams : NSObject
 
@@ -6746,11 +6746,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestListInt8UArgumentRequestParams : NSObject
 
@@ -6767,11 +6767,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestEmitTestEventResponseParams : NSObject
 
@@ -6788,11 +6788,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestNestedStructListArgumentRequestParams : NSObject
 
@@ -6809,11 +6809,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestEmitTestFabricScopedEventResponseParams : NSObject
 
@@ -6830,11 +6830,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestListNestedStructListArgumentRequestParams : NSObject
 
@@ -6851,11 +6851,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestListInt8UReverseRequestParams : NSObject
 
@@ -6872,11 +6872,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestEnumsRequestParams : NSObject
 
@@ -6895,11 +6895,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestNullableOptionalRequestParams : NSObject
 
@@ -6916,11 +6916,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestComplexNullableOptionalRequestParams : NSObject
 
@@ -6959,11 +6959,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterSimpleStructEchoRequestParams : NSObject
 
@@ -6980,11 +6980,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTimedInvokeRequestParams : NSObject
 /**
@@ -6999,11 +6999,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams : NSObject
 
@@ -7020,11 +7020,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestEmitTestEventRequestParams : NSObject
 
@@ -7045,11 +7045,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 @interface CHIPTestClusterClusterTestEmitTestFabricScopedEventRequestParams : NSObject
 
@@ -7066,11 +7066,11 @@ NS_ASSUME_NONNULL_BEGIN
  * desired security properties but large enough that it will allow a round-trip
  * from the sever to the client (for the status response and actual invoke
  * request) within the timeout window.
-  *
-  */
- @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
 
- - (instancetype)init;
+- (instancetype)init;
 @end
 
 NS_ASSUME_NONNULL_END
