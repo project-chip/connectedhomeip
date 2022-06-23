@@ -431,7 +431,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         // Validate iterator sees nothing yet
         {
             numFabricsIterated = 0;
-            bool saw1 = false;
+            bool saw1          = false;
             for (const auto & iterFabricInfo : fabricTable)
             {
                 ++numFabricsIterated;
@@ -462,7 +462,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         // Validate iterator sees pending
         {
             numFabricsIterated = 0;
-            bool saw1 = false;
+            bool saw1          = false;
             for (const auto & iterFabricInfo : fabricTable)
             {
                 ++numFabricsIterated;
@@ -515,7 +515,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         // Validate iterator sees committed
         {
             numFabricsIterated = 0;
-            bool saw1 = false;
+            bool saw1          = false;
             for (const auto & iterFabricInfo : fabricTable)
             {
                 ++numFabricsIterated;
@@ -605,8 +605,8 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         // Verify we can now see 2 fabrics with the iterator
         {
             numFabricsIterated = 0;
-            bool saw1 = false;
-            bool saw2 = false;
+            bool saw1          = false;
+            bool saw2          = false;
             for (const auto & iterFabricInfo : fabricTable)
             {
                 ++numFabricsIterated;
@@ -660,8 +660,8 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         // Validate iterator sees the pending data
         {
             numFabricsIterated = 0;
-            bool saw1 = false;
-            bool saw2 = false;
+            bool saw1          = false;
+            bool saw2          = false;
             for (const auto & iterFabricInfo : fabricTable)
             {
                 ++numFabricsIterated;
@@ -727,8 +727,8 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         // Validate iterator sees the committed update
         {
             numFabricsIterated = 0;
-            bool saw1 = false;
-            bool saw2 = false;
+            bool saw1          = false;
+            bool saw2          = false;
             for (const auto & iterFabricInfo : fabricTable)
             {
                 ++numFabricsIterated;
@@ -825,8 +825,8 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         // Validate iterator only sees the remaining fabric
         {
             numFabricsIterated = 0;
-            bool saw1 = false;
-            bool saw2 = false;
+            bool saw1          = false;
+            bool saw2          = false;
             for (const auto & iterFabricInfo : fabricTable)
             {
                 ++numFabricsIterated;

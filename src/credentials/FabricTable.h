@@ -231,7 +231,6 @@ protected:
  * Iterates over valid fabrics within a list
  */
 
-// TODO: Convert iterator to deal with pending fabric!
 class ConstFabricIterator
 {
 public:
@@ -239,7 +238,8 @@ public:
     using pointer    = FabricInfo *;
     using reference  = FabricInfo &;
 
-    ConstFabricIterator(const FabricInfo * start, size_t index, size_t maxSize) : mStart(start), mIndex(index), mMaxSize(maxSize)
+    ConstFabricIterator(const FabricInfo * start, const FabricInfo * pending, size_t index, size_t maxSize) :
+        mStart(start), mPending(pending), mIndex(index), mMaxSize(maxSize)
     {
         if (mIndex >= maxSize)
         {
@@ -261,8 +261,23 @@ public:
         return other;
     }
 
-    const FabricInfo & operator*() const { return mStart[mIndex]; }
-    const FabricInfo * operator->() const { return mStart + mIndex; }
+    const FabricInfo & operator*() const
+    {
+        if (IsAtEnd())
+        {
+            return mStart[mIndex];
+        }
+
+        return *GetCurrent();
+    }
+    const FabricInfo * operator->() const
+    {
+        if (IsAtEnd())
+        {
+            return mStart + mIndex;
+        }
+        return GetCurrent();
+    }
 
     bool operator==(const ConstFabricIterator & other)
     {
@@ -271,6 +286,7 @@ public:
             return other.IsAtEnd();
         }
 
+        // Pending entry does not participate in finding this.
         return (mStart == other.mStart) && (mIndex == other.mIndex) && (mMaxSize == other.mMaxSize);
     }
     bool operator!=(const ConstFabricIterator & other) { return !(*this == other); }
@@ -279,8 +295,22 @@ public:
 
 private:
     const FabricInfo * mStart;
+    const FabricInfo * mPending; //< Pointer to the shadow pending entry, nullptr if none
     size_t mIndex;
     size_t mMaxSize;
+
+    const FabricInfo * GetCurrent() const
+    {
+        const auto * current = mStart + mIndex;
+
+        // If we reached the pending entry, return that instead of the underlying entry from the mStates.
+        if ((mPending != nullptr) && mPending->IsInitialized() && (current->GetFabricIndex() == mPending->GetFabricIndex()))
+        {
+            current = mPending;
+        }
+
+        return current;
+    }
 
     ConstFabricIterator & Advance()
     {
@@ -411,8 +441,15 @@ public:
 
     uint8_t FabricCount() const { return mFabricCount; }
 
-    ConstFabricIterator cbegin() const { return ConstFabricIterator(mStates, 0, CHIP_CONFIG_MAX_FABRICS); }
-    ConstFabricIterator cend() const { return ConstFabricIterator(mStates, CHIP_CONFIG_MAX_FABRICS, CHIP_CONFIG_MAX_FABRICS); }
+    ConstFabricIterator cbegin() const
+    {
+        const FabricInfo * pending = GetShadowPendingFabricEntry();
+        return ConstFabricIterator(mStates, pending, 0, CHIP_CONFIG_MAX_FABRICS);
+    }
+    ConstFabricIterator cend() const
+    {
+        return ConstFabricIterator(mStates, nullptr, CHIP_CONFIG_MAX_FABRICS, CHIP_CONFIG_MAX_FABRICS);
+    }
     ConstFabricIterator begin() const { return cbegin(); }
     ConstFabricIterator end() const { return cend(); }
 
@@ -498,17 +535,17 @@ public:
      */
     bool HasOperationalKeyForFabric(FabricIndex fabricIndex) const;
 
-    // TODO: REVIEW DOCS
+    // TODO: Document
     CHIP_ERROR AddNewPendingTrustedRootCert(const ByteSpan & rcac);
 
-    // TODO: REVIEW DOCS
+    // TODO: Document
     CHIP_ERROR AddNewPendingFabricWithOperationalKeystore(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
                                                           FabricIndex * outNewFabricIndex)
     {
         return AddNewPendingFabricCommon(noc, icac, vendorId, nullptr, false, outNewFabricIndex);
     };
 
-    // TODO: REVIEW DOCS
+    // TODO: Document
     CHIP_ERROR AddNewPendingFabricWithProvidedOpKey(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
                                                     Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
                                                     FabricIndex * outNewFabricIndex)
@@ -516,7 +553,7 @@ public:
         return AddNewPendingFabricCommon(noc, icac, vendorId, existingOpKey, isExistingOpKeyExternallyOwned, outNewFabricIndex);
     };
 
-    // TODO: REVIEW DOCS
+    // TODO: Document
     CHIP_ERROR UpdatePendingFabricWithOperationalKeystore(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac)
     {
         return UpdatePendingFabricCommon(fabricIndex, noc, icac, nullptr, false);
@@ -675,6 +712,20 @@ private:
      */
     CHIP_ERROR FindExistingFabricByNocChaining(FabricIndex currentFabricIndex, const ByteSpan & noc,
                                                FabricIndex & outMatchingFabricIndex) const;
+
+    /**
+     * @brief Get the shadow FabricInfo entry that is pending for updates, if an
+     *        update is in progress.
+     *
+     * @return a pointer to the shadow pending fabric or nullptr if none is active.
+     */
+    const FabricInfo * GetShadowPendingFabricEntry() const
+    {
+        bool hasPendingFabric = mPendingFabric.IsInitialized() &&
+            mStateFlags.HasAll(StateFlags::kIsPendingFabricDataPresent, StateFlags::kIsUpdatePending);
+
+        return hasPendingFabric ? &mPendingFabric : nullptr;
+    }
 
     /**
      * Read our fabric index info from the given TLV reader and set up the

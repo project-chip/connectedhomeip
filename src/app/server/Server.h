@@ -121,7 +121,7 @@ struct ServerInitParams
     // Operational keystore with access to the operational keys: MUST be injected.
     Crypto::OperationalKeystore * operationalKeystore = nullptr;
     // Operational certificate store with access to the operational certs in persisted storage:
-    // MUST be injected.
+    // must not be null at timne of Server::Init().
     Credentials::OperationalCertificateStore * opCertStore = nullptr;
 };
 
@@ -237,6 +237,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         }
 
         // OpCertStore can be injected but default to persistent storage default
+        // for simplicity of the examples.
         if (this->opCertStore == nullptr)
         {
             // WARNING: PersistentStorageOpCertStore::Finish() is never called. It's fine for
