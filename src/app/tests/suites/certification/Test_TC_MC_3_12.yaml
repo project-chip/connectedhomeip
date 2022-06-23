@@ -30,9 +30,11 @@ tests:
                 value: nodeId
 
     - label: "Hide Input Status Command"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "HideInputStatus"
+      response:
+          error: 0
 
     - label: "Show Input Status Command"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "ShowInputStatus"
+      response:
+          error: 0

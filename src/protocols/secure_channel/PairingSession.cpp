@@ -84,13 +84,13 @@ void PairingSession::DiscardExchange()
     }
 }
 
-CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpConfig,
+CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpLocalConfig,
                                                TLV::TLVWriter & tlvWriter)
 {
     TLV::TLVType mrpParamsContainer;
     ReturnErrorOnFailure(tlvWriter.StartContainer(tag, TLV::kTLVType_Structure, mrpParamsContainer));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mrpConfig.mIdleRetransTimeout.count()));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), mrpConfig.mActiveRetransTimeout.count()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mrpLocalConfig.mIdleRetransTimeout.count()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), mrpLocalConfig.mActiveRetransTimeout.count()));
     return tlvWriter.EndContainer(mrpParamsContainer);
 }
 

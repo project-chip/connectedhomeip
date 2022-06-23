@@ -87,6 +87,8 @@ pthread_t sIOThread = PTHREAD_NULL;
 
 jclass sChipDeviceControllerExceptionCls = NULL;
 
+const char * PARAMS_CLASS = "()Lchip/devicecontroller/ControllerParams;";
+
 } // namespace
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -153,9 +155,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     chip::Platform::MemoryShutdown();
 }
 
-JNI_METHOD(jlong, newDeviceController)
-(JNIEnv * env, jobject self, jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
- jbyteArray operationalCertificate, jbyteArray ipk)
+JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject controllerParams)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -163,13 +163,47 @@ JNI_METHOD(jlong, newDeviceController)
     long result                              = 0;
 
     ChipLogProgress(Controller, "newDeviceController() called");
-    std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
-        new chip::Controller::AndroidOperationalCredentialsIssuer());
-    wrapper = AndroidDeviceControllerWrapper::AllocateNew(
-        sJVM, self, kLocalDeviceId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(), DeviceLayer::TCPEndPointManager(),
-        DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate, rootCertificate, intermediateCertificate,
-        operationalCertificate, ipk, &err);
+
+    // Retrieve initialization params.
+    jmethodID getUdpListenPort;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getUdpListenPort", PARAMS_CLASS, &getUdpListenPort);
     SuccessOrExit(err);
+
+    jmethodID getKeypairDelegate;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getKeypairDelegate", PARAMS_CLASS,
+                                                        &getKeypairDelegate);
+
+    jmethodID getRootCertificate;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getRootCertificate", PARAMS_CLASS,
+                                                        &getRootCertificate);
+
+    jmethodID getIntermediateCertificate;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIntermediateCertificate", PARAMS_CLASS,
+                                                        &getIntermediateCertificate);
+
+    jmethodID getOperationalCertificate;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getOperationalCertificate", PARAMS_CLASS,
+                                                        &getOperationalCertificate);
+
+    jmethodID getIpk;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIpk", PARAMS_CLASS, &getIpk);
+
+    {
+        uint16_t listenPort                = env->CallIntMethod(controllerParams, getUdpListenPort);
+        jobject keypairDelegate            = env->CallObjectMethod(controllerParams, getKeypairDelegate);
+        jbyteArray rootCertificate         = (jbyteArray) env->CallObjectMethod(controllerParams, getRootCertificate);
+        jbyteArray intermediateCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getIntermediateCertificate);
+        jbyteArray operationalCertificate  = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
+        jbyteArray ipk                     = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
+
+        std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
+            new chip::Controller::AndroidOperationalCredentialsIssuer());
+        wrapper = AndroidDeviceControllerWrapper::AllocateNew(
+            sJVM, self, kLocalDeviceId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(), DeviceLayer::TCPEndPointManager(),
+            DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate, rootCertificate, intermediateCertificate,
+            operationalCertificate, ipk, listenPort, &err);
+        SuccessOrExit(err);
+    }
 
     // Create and start the IO thread. Must be called after Controller()->Init
     if (sIOThread == PTHREAD_NULL)

@@ -754,8 +754,33 @@ PICS:
           SupportedStreamingProtocols attribute?"
       id: MC_CONTENTLAUNCHER.S.A0001
 
+    #Pressure Measurement
+    - label: "Does the device implement the MeasuredValue attribute?"
+      id: PRS.S.A0000
+
+    - label: "Does the device implement the MinMeasuredValue attribute?"
+      id: PRS.S.A0001
+
+    - label: "Does the device implement the MaxMeasuredValue attribute?"
+      id: PRS.S.A0002
+
     - label: "Does the device implement the Tolerance attribute?"
       id: PRS.S.A0003
+
+    - label: "Does the device implement the ScaledValue attribute?"
+      id: PRS.S.A0010
+
+    - label: "Does the device implement the MinScaledValue attribute?"
+      id: PRS.S.A0011
+
+    - label: "Does the device implement the MaxScaledValue attribute?"
+      id: PRS.S.A0012
+
+    - label: "Does the device implement the ScaledTolerance attribute?"
+      id: PRS.S.A0013
+
+    - label: "Does the device implement the Scale attribute?"
+      id: PRS.S.A0014
 
     - label: "Does the device implement the Occupancy attribute?"
       id: OCC.S.A0000

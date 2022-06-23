@@ -86,6 +86,14 @@ private:
                                                       onCompletion);
     }
 
+    CHIP_ERROR GenerateChipNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
+                                    const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
+                                    Callback::Callback<OnNOCChainGeneration> * onCompletion) override
+    {
+        return mExampleOpCredsIssuer.GenerateChipNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC,
+                                                          PAI, onCompletion);
+    }
+
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override { mExampleOpCredsIssuer.SetNodeIdForNextNOCRequest(nodeId); }
 
     void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mExampleOpCredsIssuer.SetFabricIdForNextNOCRequest(fabricId); }

@@ -18,8 +18,8 @@ steps:
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
-              --target-glob '*' --skip-target-glob '{tizen-*,*-tests}' build
-              --create-archives /workspace/artifacts/
+              --target-glob '*' --skip-target-glob '{efr32-*,tizen-*,*-tests}'
+              build --create-archives /workspace/artifacts/
       id: CompileAll
       waitFor:
           - Bootstrap

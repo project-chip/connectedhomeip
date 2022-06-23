@@ -30,11 +30,16 @@ tests:
 
     #Issue #10811 if condition is required, need YAML support for this
     - label: "Reads Type attribute from DUT"
-      command: "readAttribute"
-      attribute: "Type"
-      PICS: A_TYPE
-      response:
-          constraints:
-              type: enum8
-              minValue: 0
-              maxValue: 9
+      verification: |
+          ./chip-tool windowcovering read type 1 1
+          [1650882457.304607][8640:8645] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0000 DataVersion: 366273182
+          [1650882457.304694][8640:8645] CHIP:TOO:   Type: enum8
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
