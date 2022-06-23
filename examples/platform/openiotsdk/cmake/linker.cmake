@@ -21,8 +21,14 @@
 
 function(set_target_link target)
     target_link_libraries(${target}
-        mdh-platform-startup-linker
+        mdh-arm-corstone-300-startup
     )
+
+    if (NOT LINKER_SCRIPT)        
+        set(LINKER_SCRIPT ${OPENIOTSDK_COMMON}/ld/cs300_gcc.ld)
+    endif()
+    target_link_options(${APP_TARGET} PRIVATE -T ${LINKER_SCRIPT})
+    set_target_properties(${APP_TARGET} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
 
     target_link_options(${target}
         PRIVATE
