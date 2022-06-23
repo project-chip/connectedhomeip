@@ -28,43 +28,38 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #issue #12884 Media cluster commands and precondition not supported
-    - label: "Precondition: Connect media content available for playback"
-      disabled: true
-
-    #Issue 18109
     - label:
           "Precondition: Media content in a paused state at the beginning of the
           content"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "Pause"
-
-    - label: "log a command"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
+      response:
           values:
-              - name: "message"
-                value: "Verify that media is paused"
+              - name: "status"
+                value: 0
 
     - label: "Reads the CurrentState attribute"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
-    - label: "sends a Play command"
-      PICS: PICS_SKIP_SAMPLE_APP
+    - label: "Sends a Play command"
       command: "Play"
+      response:
+          values:
+              - name: "status"
+                value: 0
 
-    - label: "log a command"
+    - label: "Verify that the media state is playing"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Physically verify that the media is playing"
+                value: "Please enter 'y' if media state is playing"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads the playback state attribute"
       command: "readAttribute"
@@ -73,38 +68,48 @@ tests:
           value: 0
 
     - label: "sends a Pause command"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "Pause"
+      response:
+          values:
+              - name: "status"
+                value: 0
 
-    - label: "log a command"
+    - label: "Verify that the media is paused"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Physically verify that the media is paused"
+                value: "Please enter 'y' if media state is paused"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads the playback state attribute"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
-    - label: "sends a Stop command"
-      PICS: PICS_SKIP_SAMPLE_APP
+    - label: "Sends a Stop command"
       command: "StopPlayback"
+      response:
+          values:
+              - name: "status"
+                value: 0
 
-    - label: "log a command"
+    - label: "Verify that the media is stoped"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Physically verify that the media is stoped"
+                value: "Please enter 'y' if media state is stoped"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads the playback state attribute"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentState"
       response:

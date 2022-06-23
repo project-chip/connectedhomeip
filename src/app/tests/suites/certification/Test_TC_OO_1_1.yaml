@@ -36,13 +36,22 @@ tests:
           constraints:
               type: uint16
 
+    - label: "read the optional global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: OO_LT
+      response:
+          value: 1
+          constraints:
+              type: map32
+
     #issue 17495
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 16384, 16385, 16386, 16387]
+          value:
+              [0, 16384, 16385, 16386, 16387, 65528, 65529, 65531, 65532, 65533]
           constraints:
               type: list
 
@@ -77,12 +86,3 @@ tests:
           value: []
           constraints:
               type: list
-
-    - label: "read the optional global attribute: FeatureMap"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      PICS: OO_LT
-      response:
-          value: 1
-          constraints:
-              type: map32

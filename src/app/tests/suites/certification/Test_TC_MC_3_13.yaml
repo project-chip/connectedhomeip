@@ -37,7 +37,6 @@ tests:
               type: list
 
     - label: "Rename Input Command"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "RenameInput"
       arguments:
           values:
@@ -45,16 +44,6 @@ tests:
                 value: 1
               - name: "name"
                 value: "A1"
-
-    - label: "Rename Input Command"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "RenameInput"
-      arguments:
-          values:
-              - name: "index"
-                value: 1
-              - name: "name"
-                value: "A2"
 
     - label: "Read attribute media input list"
       command: "readAttribute"

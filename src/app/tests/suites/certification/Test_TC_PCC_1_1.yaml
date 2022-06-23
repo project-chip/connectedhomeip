@@ -69,20 +69,6 @@ tests:
           constraints:
               type: list
 
-    #issue #15011 disabled steps below Global attributes missing from YAML framework
-    - label: "TH reads the EventList attribute from the DUT"
-      verification: |
-          Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
     - label: "TH reads the AcceptedCommandList attribute from the DUT"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -98,3 +84,17 @@ tests:
           value: []
           constraints:
               type: list
+
+    #issue #15011 disabled steps below Global attributes missing from YAML framework
+    - label: "TH reads the EventList attribute from the DUT"
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

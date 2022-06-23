@@ -103,8 +103,6 @@ public:
     static const uint16_t kAliceKeyId   = 2;
     static const uint16_t kCharlieKeyId = 3;
     static const uint16_t kDavidKeyId   = 4;
-    NodeId GetBobNodeId() const;
-    NodeId GetAliceNodeId() const;
     GroupId GetFriendsGroupId() const { return mFriendsGroupId; }
 
     SessionManager & GetSecureSessionManager() { return mSessionManager; }
