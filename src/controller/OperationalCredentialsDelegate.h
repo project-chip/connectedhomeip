@@ -89,7 +89,10 @@ public:
     virtual CHIP_ERROR GenerateChipNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
                                             const ByteSpan & attestationSignature, const ByteSpan & attestationChallenge,
                                             const ByteSpan & DAC, const ByteSpan & PAI,
-                                            Callback::Callback<OnNOCChainGeneration> * onCompletion) = 0;
+                                            Callback::Callback<OnNOCChainGeneration> * onCompletion)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     /**
      *   This function sets the node ID for which the next NOC Chain would be requested. The node ID is

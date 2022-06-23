@@ -1123,7 +1123,8 @@ CHIP_ERROR DeviceCommissioner::IssueNOCChain(const ByteSpan & NOCSRElements, Nod
     MATTER_TRACE_EVENT_SCOPE("IssueNOCChain", "DeviceCommissioner");
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(Controller, "Getting certificate chain for the device from the issuer");
+    ChipLogProgress(Controller, "Getting certificate chain for the device on fabric idx %u",
+                    static_cast<unsigned>(mFabricInfo->GetFabricIndex()));
 
     mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(nodeId);
 
@@ -1132,7 +1133,7 @@ CHIP_ERROR DeviceCommissioner::IssueNOCChain(const ByteSpan & NOCSRElements, Nod
         mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(mFabricInfo->GetFabricId());
     }
 
-    // Note: attestationSignature, attestationChallenge, DAC, PAI are not used by existing OperationalCredentialsIssuer-s.
+    // Note: attestationSignature, attestationChallenge, DAC, PAI are not used by existing OperationalCredentialsIssuer.
     return mOperationalCredentialsDelegate->GenerateChipNOCChain(NOCSRElements, ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(),
                                                                  ByteSpan(), callback);
 }

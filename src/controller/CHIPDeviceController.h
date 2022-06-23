@@ -611,7 +611,9 @@ public:
     // Commissioner will establish new device connections after PASE.
     OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId) override;
 
-    // Uses associated fabrics to issue the NOC chain.
+    // Issue an NOC chain using the associated OperationalCredentialsDelegate.
+    // NOTE: This is only valid assuming that `mOperationalCredentialsDelegate` is what is desired
+    // to issue the NOC chain.
     CHIP_ERROR IssueNOCChain(const ByteSpan & NOCSRElements, NodeId nodeId,
                              chip::Callback::Callback<OnNOCChainGeneration> * callback);
 
