@@ -418,16 +418,21 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     // Sequence 1: Add node ID 55 on fabric 11, using externally owned key and no ICAC --> Yield fabricIndex 1
     {
         FabricId fabricId = 11;
-        NodeId nodeId = 55;
-        NL_TEST_ASSERT_SUCCESS(inSuite, fabric11CertAuthority.SetIncludeIcac(false).GenerateNocChain(fabricId, nodeId, fabric11Node55Keypair.Pubkey()).GetStatus());
+        NodeId nodeId     = 55;
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabric11CertAuthority.SetIncludeIcac(false)
+                                   .GenerateNocChain(fabricId, nodeId, fabric11Node55Keypair.Pubkey())
+                                   .GetStatus());
         ByteSpan rcac = fabric11CertAuthority.GetRcac();
-        ByteSpan noc = fabric11CertAuthority.GetNoc();
+        ByteSpan noc  = fabric11CertAuthority.GetNoc();
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac));
         FabricIndex newFabricIndex = kUndefinedFabricIndex;
-        bool keyIsExternallyOwned = true;
+        bool keyIsExternallyOwned  = true;
 
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
-        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingFabricWithProvidedOpKey(noc, ByteSpan{}, kVendorId, &fabric11Node55Keypair, keyIsExternallyOwned, &newFabricIndex));
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricTable.AddNewPendingFabricWithProvidedOpKey(noc, ByteSpan{}, kVendorId, &fabric11Node55Keypair,
+                                                                                keyIsExternallyOwned, &newFabricIndex));
         NL_TEST_ASSERT(inSuite, newFabricIndex == 1);
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
 
@@ -446,7 +451,8 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         {
             Credentials::ChipCertificateSet certificates;
             NL_TEST_ASSERT_SUCCESS(inSuite, certificates.Init(1));
-            NL_TEST_ASSERT_SUCCESS(inSuite, certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
+            NL_TEST_ASSERT_SUCCESS(inSuite,
+                                   certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
             Crypto::P256PublicKey rcacPublicKey(certificates.GetCertSet()[0].mPublicKey);
 
             NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == newFabricIndex);
@@ -462,9 +468,10 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
 
         // Validate that fabric has the correct operational key by verifying a signature
         Crypto::P256ECDSASignature sig;
-        uint8_t message[] = {'m', 's', 'g'};
-        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(newFabricIndex, ByteSpan{message}, sig));
-        NL_TEST_ASSERT_SUCCESS(inSuite, fabric11Node55Keypair.Pubkey().ECDSA_validate_msg_signature(&message[0], sizeof(message), sig));
+        uint8_t message[] = { 'm', 's', 'g' };
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(newFabricIndex, ByteSpan{ message }, sig));
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabric11Node55Keypair.Pubkey().ECDSA_validate_msg_signature(&message[0], sizeof(message), sig));
     }
 
     size_t numStorageAfterFirstAdd = storage.GetNumKeys();
@@ -472,23 +479,25 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     // Sequence 2: Add node ID 999 on fabric 44, using operational keystore and ICAC --> Yield fabricIndex 2
     {
         FabricId fabricId = 44;
-        NodeId nodeId = 999;
+        NodeId nodeId     = 999;
 
         uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
-        MutableByteSpan csrSpan{csrBuf};
+        MutableByteSpan csrSpan{ csrBuf };
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
-        NL_TEST_ASSERT_SUCCESS(inSuite, fabric44CertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabric44CertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
         ByteSpan rcac = fabric44CertAuthority.GetRcac();
         ByteSpan icac = fabric44CertAuthority.GetIcac();
-        ByteSpan noc = fabric44CertAuthority.GetNoc();
+        ByteSpan noc  = fabric44CertAuthority.GetNoc();
 
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac));
         FabricIndex newFabricIndex = kUndefinedFabricIndex;
 
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
-        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex));
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex));
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
         NL_TEST_ASSERT(inSuite, newFabricIndex == 2);
         // No storage yet
@@ -498,7 +507,8 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.CommitPendingFabricData());
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
 
-        NL_TEST_ASSERT_EQUALS(inSuite, storage.GetNumKeys(), (numStorageAfterFirstAdd + 5)); // 3 opcerts + fabric metadata + 1 operational key
+        NL_TEST_ASSERT_EQUALS(inSuite, storage.GetNumKeys(),
+                              (numStorageAfterFirstAdd + 5)); // 3 opcerts + fabric metadata + 1 operational key
 
         // Validate contents
         const auto * fabricInfo = fabricTable.FindFabricWithIndex(2);
@@ -507,7 +517,8 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         {
             Credentials::ChipCertificateSet certificates;
             NL_TEST_ASSERT_SUCCESS(inSuite, certificates.Init(1));
-            NL_TEST_ASSERT_SUCCESS(inSuite, certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
+            NL_TEST_ASSERT_SUCCESS(inSuite,
+                                   certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
             Crypto::P256PublicKey rcacPublicKey(certificates.GetCertSet()[0].mPublicKey);
 
             NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == newFabricIndex);
@@ -524,12 +535,12 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         // Validate that fabric has the correct operational key by verifying a signature
         {
             Crypto::P256ECDSASignature sig;
-            uint8_t message[] = {'m', 's', 'g'};
+            uint8_t message[] = { 'm', 's', 'g' };
 
             Crypto::P256PublicKey nocPubKey;
             NL_TEST_ASSERT_SUCCESS(inSuite, VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), nocPubKey));
 
-            NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(newFabricIndex, ByteSpan{message}, sig));
+            NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(newFabricIndex, ByteSpan{ message }, sig));
             NL_TEST_ASSERT_SUCCESS(inSuite, nocPubKey.ECDSA_validate_msg_signature(&message[0], sizeof(message), sig));
         }
     }
@@ -538,19 +549,21 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
 
     // Sequence 3: Update node ID 999 to 1000 on fabric 44, using operational keystore and no ICAC --> Stays fabricIndex 2
     {
-        FabricId fabricId = 44;
-        NodeId nodeId = 1000;
+        FabricId fabricId       = 44;
+        NodeId nodeId           = 1000;
         FabricIndex fabricIndex = 2;
 
         uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
-        MutableByteSpan csrSpan{csrBuf};
+        MutableByteSpan csrSpan{ csrBuf };
 
         // Make sure to tag fabric index to pending opkey: otherwise the UpdateNOC fails
-        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::MakeOptional(static_cast<FabricIndex>(2)), csrSpan));
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricTable.AllocatePendingOperationalKey(chip::MakeOptional(static_cast<FabricIndex>(2)), csrSpan));
 
-        NL_TEST_ASSERT_SUCCESS(inSuite, fabric44CertAuthority.SetIncludeIcac(false).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabric44CertAuthority.SetIncludeIcac(false).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
         ByteSpan rcac = fabric44CertAuthority.GetRcac();
-        ByteSpan noc = fabric44CertAuthority.GetNoc();
+        ByteSpan noc  = fabric44CertAuthority.GetNoc();
 
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.UpdatePendingFabricWithOperationalKeystore(2, noc, ByteSpan{}));
@@ -572,7 +585,8 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         {
             Credentials::ChipCertificateSet certificates;
             NL_TEST_ASSERT_SUCCESS(inSuite, certificates.Init(1));
-            NL_TEST_ASSERT_SUCCESS(inSuite, certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
+            NL_TEST_ASSERT_SUCCESS(inSuite,
+                                   certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
             Crypto::P256PublicKey rcacPublicKey(certificates.GetCertSet()[0].mPublicKey);
 
             NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == fabricIndex);
@@ -589,12 +603,12 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         // Validate that fabric has the correct operational key by verifying a signature
         {
             Crypto::P256ECDSASignature sig;
-            uint8_t message[] = {'m', 's', 'g'};
+            uint8_t message[] = { 'm', 's', 'g' };
 
             Crypto::P256PublicKey nocPubKey;
             NL_TEST_ASSERT_SUCCESS(inSuite, VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), nocPubKey));
 
-            NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(fabricIndex, ByteSpan{message}, sig));
+            NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(fabricIndex, ByteSpan{ message }, sig));
             NL_TEST_ASSERT_SUCCESS(inSuite, nocPubKey.ECDSA_validate_msg_signature(&message[0], sizeof(message), sig));
         }
     }
@@ -619,7 +633,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
                 NL_TEST_ASSERT(inSuite, fabricInfo->GetNodeId() == 1000);
                 NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricId() == 44);
                 NL_TEST_ASSERT(inSuite, fabricInfo->GetVendorId() == kVendorId);
-                NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricLabel().data_equal(CharSpan{"roboto", strlen("roboto")}));
+                NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricLabel().data_equal(CharSpan{ "roboto", strlen("roboto") }));
             }
         }
     }
@@ -644,7 +658,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, fabricInfo->GetNodeId() == 1000);
             NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricId() == 44);
             NL_TEST_ASSERT(inSuite, fabricInfo->GetVendorId() == kVendorId);
-            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricLabel().data_equal(CharSpan{"roboto", strlen("roboto")}));
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricLabel().data_equal(CharSpan{ "roboto", strlen("roboto") }));
 
             Crypto::P256PublicKey rootPublicKeyOfFabric;
             NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.FetchRootPubkey(2, rootPublicKeyOfFabric));
@@ -653,18 +667,19 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         // Validate that fabric has the correct operational key by verifying a signature
         {
             uint8_t nocBuf[Credentials::kMaxCHIPCertLength];
-            MutableByteSpan nocSpan{nocBuf};
+            MutableByteSpan nocSpan{ nocBuf };
             NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.FetchNOCCert(2, nocSpan));
 
             Credentials::ChipCertificateSet certificates;
             NL_TEST_ASSERT_SUCCESS(inSuite, certificates.Init(1));
-            NL_TEST_ASSERT_SUCCESS(inSuite, certificates.LoadCert(nocSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
+            NL_TEST_ASSERT_SUCCESS(inSuite,
+                                   certificates.LoadCert(nocSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
             Crypto::P256PublicKey nocPubKey(certificates.GetCertSet()[0].mPublicKey);
 
             Crypto::P256ECDSASignature sig;
-            uint8_t message[] = {'m', 's', 'g'};
+            uint8_t message[] = { 'm', 's', 'g' };
 
-            NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(2, ByteSpan{message}, sig));
+            NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(2, ByteSpan{ message }, sig));
             NL_TEST_ASSERT_SUCCESS(inSuite, nocPubKey.ECDSA_validate_msg_signature(&message[0], sizeof(message), sig));
         }
     }
