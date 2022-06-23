@@ -1192,13 +1192,13 @@ CHIP_ERROR DeviceCommissioner::IssueNOCChain(const ByteSpan & NOCSRElements, Nod
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogProgress(Controller, "Getting certificate chain for the device on fabric idx %u",
-                    static_cast<unsigned>(mFabricInfo->GetFabricIndex()));
+                    static_cast<unsigned>(mFabricIndex));
 
     mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(nodeId);
 
-    if (mFabricInfo != nullptr)
+    if (mFabricIndex != kUndefinedFabricIndex)
     {
-        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(mFabricInfo->GetFabricId());
+        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(GetFabricId());
     }
 
     // Note: attestationSignature, attestationChallenge, DAC, PAI are not used by existing OperationalCredentialsIssuer.
