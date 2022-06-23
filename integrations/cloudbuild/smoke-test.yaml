@@ -45,25 +45,22 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    # Disabled until EFR32 builds work on vscode image (changes in #19778
-    # resulted in git-lfs needed in docker image and build steps)
-    #
-    # - name: "connectedhomeip/chip-build-vscode:0.5.79"
-    #   id: EFR32
-    #   env:
-    #       - PW_ENVIRONMENT_ROOT=/pwenv
-    #   args:
-    #       - >-
-    #           ./scripts/build/build_examples.py --enable-flashbundle
-    #           --target-glob '*-brd4161a-{lock,light,unit-test}*' build
-    #           --create-archives /workspace/artifacts/
-    #   waitFor:
-    #       - Bootstrap
-    #       - NRFConnect
-    #   entrypoint: ./scripts/run_in_build_env.sh
-    #   volumes:
-    #       - name: pwenv
-    #         path: /pwenv
+    - name: "connectedhomeip/chip-build-vscode:0.5.79"
+      id: EFR32
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./scripts/build/build_examples.py --enable-flashbundle
+              --target-glob '*-brd4161a-{lock,light,unit-test}*' build
+              --create-archives /workspace/artifacts/
+      waitFor:
+          - Bootstrap
+          - NRFConnect
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
 
     - name: "connectedhomeip/chip-build-vscode:0.5.79"
       id: Linux
@@ -76,8 +73,7 @@ steps:
               --create-archives /workspace/artifacts/
       waitFor:
           - Bootstrap
-          - NRFConnect
-          # - EFR32
+          - EFR32
       entrypoint: ./scripts/run_in_build_env.sh
       volumes:
           - name: pwenv
