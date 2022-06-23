@@ -86,9 +86,10 @@ public:
                    const char * szApplicationVersion, const char * setupPIN, jobject manager) :
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
-        mAccountLoginDelegate(setupPIN), mContentLauncherDelegate(new ContentAppAttributeDelegate(manager, app::Clusters::ContentLauncher::Id), { "image/*", "video/*" },
-                                                                  to_underlying(SupportedStreamingProtocol::kDash) |
-                                                                      to_underlying(SupportedStreamingProtocol::kHls)),
+        mAccountLoginDelegate(setupPIN),
+        mContentLauncherDelegate(
+            new ContentAppAttributeDelegate(manager, app::Clusters::ContentLauncher::Id), { "image/*", "video/*" },
+            to_underlying(SupportedStreamingProtocol::kDash) | to_underlying(SupportedStreamingProtocol::kHls)),
         mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
 

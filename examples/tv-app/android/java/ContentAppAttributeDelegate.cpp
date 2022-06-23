@@ -34,7 +34,7 @@ namespace chip {
 namespace AppPlatform {
 
 using AttributeAccessInterface = app::AttributeAccessInterface;
-using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
+using LaunchResponseType       = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
 
 const char * ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttributePath & aPath)
 {
@@ -45,26 +45,27 @@ const char * ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttr
         ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read being called for endpoint %d cluster %d attribute %d",
                         aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 
-        jstring resp = (jstring) env->CallObjectMethod(
-            mContentAppEndpointManager, mReadAttributeMethod, static_cast<jint>(aPath.mEndpointId),
-            static_cast<jint>(aPath.mClusterId), static_cast<jint>(aPath.mAttributeId));
+        jstring resp =
+            (jstring) env->CallObjectMethod(mContentAppEndpointManager, mReadAttributeMethod, static_cast<jint>(aPath.mEndpointId),
+                                            static_cast<jint>(aPath.mClusterId), static_cast<jint>(aPath.mAttributeId));
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ContentAppAttributeDelegate::Read");
             env->ExceptionDescribe();
             env->ExceptionClear();
-//            FormatResponseData(handlerContext, "{\"value\":{}}");
+            //            FormatResponseData(handlerContext, "{\"value\":{}}");
             return "";
         }
         const char * respStr = env->GetStringUTFChars(resp, 0);
         ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read got response %s", respStr);
-//        FormatResponseData(handlerContext, respStr);
+        //        FormatResponseData(handlerContext, respStr);
         return respStr;
     }
     return "";
 }
 
-CHIP_ERROR ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttributePath & aPath,
+                                             chip::app::AttributeValueEncoder & aEncoder)
 {
     if (aPath.mEndpointId >= FIXED_ENDPOINT_COUNT)
     {
@@ -73,20 +74,20 @@ CHIP_ERROR ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttrib
         ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read being called for endpoint %d cluster %d attribute %d",
                         aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 
-        jstring resp = (jstring) env->CallObjectMethod(
-            mContentAppEndpointManager, mReadAttributeMethod, static_cast<jint>(aPath.mEndpointId),
-            static_cast<jint>(aPath.mClusterId), static_cast<jint>(aPath.mAttributeId));
+        jstring resp =
+            (jstring) env->CallObjectMethod(mContentAppEndpointManager, mReadAttributeMethod, static_cast<jint>(aPath.mEndpointId),
+                                            static_cast<jint>(aPath.mClusterId), static_cast<jint>(aPath.mAttributeId));
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ContentAppAttributeDelegate::Read");
             env->ExceptionDescribe();
             env->ExceptionClear();
-//            FormatResponseData(handlerContext, "{\"value\":{}}");
+            //            FormatResponseData(handlerContext, "{\"value\":{}}");
             return CHIP_NO_ERROR;
         }
         const char * respStr = env->GetStringUTFChars(resp, 0);
         ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read got response %s", respStr);
-//        FormatResponseData(handlerContext, respStr);
+        //        FormatResponseData(handlerContext, respStr);
         return CHIP_NO_ERROR;
     }
     return CHIP_NO_ERROR;

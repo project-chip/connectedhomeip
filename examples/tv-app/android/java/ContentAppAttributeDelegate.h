@@ -36,7 +36,8 @@ using AttributeAccessInterface = app::AttributeAccessInterface;
 class ContentAppAttributeDelegate : public AttributeAccessInterface
 {
 public:
-    ContentAppAttributeDelegate(jobject manager, ClusterId aClusterId) : AttributeAccessInterface(Optional<EndpointId>::Missing(), aClusterId)
+    ContentAppAttributeDelegate(jobject manager, ClusterId aClusterId) :
+        AttributeAccessInterface(Optional<EndpointId>::Missing(), aClusterId)
     {
         if (manager == nullptr)
         {
@@ -63,8 +64,7 @@ private:
         VerifyOrReturn(ContentAppEndpointManagerClass != nullptr,
                        ChipLogError(Zcl, "Failed to get ContentAppEndpointManager Java class"));
 
-        mReadAttributeMethod =
-            env->GetMethodID(ContentAppEndpointManagerClass, "readAttribute", "(III)Ljava/lang/String;");
+        mReadAttributeMethod = env->GetMethodID(ContentAppEndpointManagerClass, "readAttribute", "(III)Ljava/lang/String;");
         if (mReadAttributeMethod == nullptr)
         {
             ChipLogError(Zcl, "Failed to access ContentAppEndpointManager 'readAttribute' method");
@@ -73,7 +73,7 @@ private:
     }
 
     jobject mContentAppEndpointManager = nullptr;
-    jmethodID mReadAttributeMethod       = nullptr;
+    jmethodID mReadAttributeMethod     = nullptr;
 };
 
 } // namespace AppPlatform

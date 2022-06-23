@@ -79,7 +79,7 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
             return;
         }
 
-        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        JNIEnv * env      = JniReferences::GetInstance().GetEnvForCurrentThread();
         Json::Value value = json["value"];
         UtfString jsonString(env, JsonToString(value).c_str());
 

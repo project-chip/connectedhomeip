@@ -27,8 +27,8 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
-AppContentLauncherManager::AppContentLauncherManager(ContentAppAttributeDelegate * attributeDelegate, list<std::string> acceptHeaderList,
-                                                     uint32_t supportedStreamingProtocols) :
+AppContentLauncherManager::AppContentLauncherManager(ContentAppAttributeDelegate * attributeDelegate,
+                                                     list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols) :
     mAttributeDelegate(attributeDelegate)
 {
     mAcceptHeaderList            = acceptHeaderList;
@@ -83,19 +83,24 @@ void AppContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResp
 CHIP_ERROR AppContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
 {
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetAcceptHeaderList");
-    chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id);
+    chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::ContentLauncher::Id,
+                                               chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id);
     const char * resStr = mAttributeDelegate->Read(aPath);
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response %s", resStr);
 
-    if (resStr != nullptr && *resStr != 0) {
+    if (resStr != nullptr && *resStr != 0)
+    {
         Json::Reader reader;
         Json::Value value;
         reader.parse(resStr, value);
         const char * attrId = to_string(chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id).c_str();
-        ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response parsing done. reading attr %s", attrId);
-        if (value[attrId].isArray()) {
+        ChipLogProgress(
+            Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response parsing done. reading attr %s", attrId);
+        if (value[attrId].isArray())
+        {
             mAcceptHeaderList.clear();
-            for (Json::Value & entry : value[attrId]) {
+            for (Json::Value & entry : value[attrId])
+            {
                 mAcceptHeaderList.push_back(entry.asString());
             }
         }
@@ -114,11 +119,13 @@ CHIP_ERROR AppContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEn
 uint32_t AppContentLauncherManager::HandleGetSupportedStreamingProtocols()
 {
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols");
-    chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id);
+    chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::ContentLauncher::Id,
+                                               chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id);
     const char * resStr = mAttributeDelegate->Read(aPath);
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response %s", resStr);
 
-    if (resStr == nullptr || *resStr == 0) {
+    if (resStr == nullptr || *resStr == 0)
+    {
         return mSupportedStreamingProtocols;
     }
 
@@ -126,10 +133,12 @@ uint32_t AppContentLauncherManager::HandleGetSupportedStreamingProtocols()
     Json::Value value;
     reader.parse(resStr, value);
     const char * attrId = to_string(chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id).c_str();
-    ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response parsing done. reading attr %s", attrId);
-    if (!value[attrId].empty()) {
+    ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response parsing done. reading attr %s",
+                    attrId);
+    if (!value[attrId].empty())
+    {
         uint32_t supportedStreamingProtocols = static_cast<uint32_t>(value[attrId].asInt());
-        mSupportedStreamingProtocols = supportedStreamingProtocols;
+        mSupportedStreamingProtocols         = supportedStreamingProtocols;
     }
     return mSupportedStreamingProtocols;
 }
