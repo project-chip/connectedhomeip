@@ -38,7 +38,10 @@ target_sources(${APP_TARGET} PRIVATE
                 main/main.cpp
 )
 
-target_link_libraries(${APP_TARGET} openiotsdk-chip)
+target_link_libraries(${APP_TARGET} 
+    cmsis-rtos-implementation
+    openiotsdk-chip
+)
 
 # Link the *whole-archives* to keep the static test objects.
 target_link_options(${APP_TARGET} PUBLIC -Wl,--whole-archive "${CMAKE_CURRENT_BINARY_DIR}/chip_build/lib/libCHIP_tests_custom.a" -Wl,--no-whole-archive)
