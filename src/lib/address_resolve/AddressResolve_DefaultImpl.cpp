@@ -259,8 +259,8 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
 
         result.address.SetPort(nodeData.resolutionData.port);
         result.address.SetInterface(nodeData.resolutionData.interfaceId);
-        result.mrpConfig   = nodeData.resolutionData.GetMRPConfig();
-        result.supportsTcp = nodeData.resolutionData.supportsTcp;
+        result.mrpRemoteConfig = nodeData.resolutionData.GetRemoteMRPConfig();
+        result.supportsTcp     = nodeData.resolutionData.supportsTcp;
 
         for (size_t i = 0; i < nodeData.resolutionData.numIPs; i++)
         {

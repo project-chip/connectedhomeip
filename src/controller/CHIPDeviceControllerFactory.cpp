@@ -241,7 +241,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         .fabricTable              = stateParams.fabricTable,
         .clientPool               = stateParams.caseClientPool,
         .groupDataProvider        = stateParams.groupDataProvider,
-        .mrpLocalConfig           = Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
+        .mrpLocalConfig           = GetLocalMRPConfig(),
     };
 
     CASESessionManagerConfig sessionManagerConfig = {

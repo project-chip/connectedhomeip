@@ -47,7 +47,7 @@ public:
         mEphemeralInitiatorNodeId(ephemeralInitiatorNodeID), mSessionRole(sessionRole),
         mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
         mLastPeerActivityTime(System::Clock::kZero), // Start at zero to default to IDLE state
-        mMRPConfig(config)
+        mRemoteMRPConfig(config)
     {}
     ~UnauthenticatedSession() override { VerifyOrDie(GetReferenceCount() == 0); }
 
@@ -90,7 +90,7 @@ public:
         switch (mPeerAddress.GetTransportType())
         {
         case Transport::Type::kUdp:
-            return GetMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
+            return GetRemoteMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
         default:
@@ -118,12 +118,12 @@ public:
 
     System::Clock::Timestamp GetMRPBaseTimeout() override
     {
-        return IsPeerActive() ? GetMRPConfig().mActiveRetransTimeout : GetMRPConfig().mIdleRetransTimeout;
+        return IsPeerActive() ? GetRemoteMRPConfig().mActiveRetransTimeout : GetRemoteMRPConfig().mIdleRetransTimeout;
     }
 
-    void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
+    void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteMRPConfig = config; }
 
-    const ReliableMessageProtocolConfig & GetMRPConfig() const override { return mMRPConfig; }
+    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const override { return mRemoteMRPConfig; }
 
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
@@ -133,7 +133,7 @@ private:
     PeerAddress mPeerAddress;
     System::Clock::Timestamp mLastActivityTime;     ///< Timestamp of last tx or rx
     System::Clock::Timestamp mLastPeerActivityTime; ///< Timestamp of last rx
-    ReliableMessageProtocolConfig mMRPConfig;
+    ReliableMessageProtocolConfig mRemoteMRPConfig;
     PeerMessageCounter mPeerMessageCounter;
 };
 

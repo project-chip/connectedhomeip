@@ -31,24 +31,32 @@ namespace chip {
 
 using namespace System::Clock::Literals;
 
-ReliableMessageProtocolConfig GetLocalMRPConfig()
+ReliableMessageProtocolConfig GetDefaultMRPConfig()
 {
-    ReliableMessageProtocolConfig config(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL,
-                                         CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
+    // Default MRP intervals are defined in spec <2.11.3. Parameters and Constants>
+    static constexpr const System::Clock::Milliseconds32 idleRetransTimeout   = 4000_ms32;
+    static constexpr const System::Clock::Milliseconds32 activeRetransTimeout = 300_ms32;
+    return ReliableMessageProtocolConfig(idleRetransTimeout, activeRetransTimeout);
+}
+
+Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
+{
+    ReliableMessageProtocolConfig config(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL, CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     DeviceLayer::ConnectivityManager::SEDIntervalsConfig sedIntervalsConfig;
 
     if (DeviceLayer::ConnectivityMgr().GetSEDIntervalsConfig(sedIntervalsConfig) == CHIP_NO_ERROR)
     {
-        // Increase default MRP retry intervals by SED intervals. That is, intervals for
+        // Increase local MRP retry intervals by SED intervals. That is, intervals for
         // which the device can be at sleep and not be able to receive any messages).
         config.mIdleRetransTimeout += sedIntervalsConfig.IdleIntervalMS;
         config.mActiveRetransTimeout += sedIntervalsConfig.ActiveIntervalMS;
     }
 #endif
 
-    return config;
+    return (config == GetDefaultMRPConfig()) ? Optional<ReliableMessageProtocolConfig>::Missing()
+                                             : Optional<ReliableMessageProtocolConfig>::Value(config);
 }
 
 } // namespace chip

@@ -62,9 +62,9 @@ public:
 
     bool RequireMRP() const override { return false; }
 
-    const ReliableMessageProtocolConfig & GetMRPConfig() const override
+    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const override
     {
-        static const ReliableMessageProtocolConfig cfg(GetLocalMRPConfig());
+        static const ReliableMessageProtocolConfig cfg(GetDefaultMRPConfig());
         VerifyOrDie(false);
         return cfg;
     }
@@ -116,9 +116,9 @@ public:
 
     bool RequireMRP() const override { return false; }
 
-    const ReliableMessageProtocolConfig & GetMRPConfig() const override
+    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const override
     {
-        static const ReliableMessageProtocolConfig cfg(GetLocalMRPConfig());
+        static const ReliableMessageProtocolConfig cfg(GetDefaultMRPConfig());
         VerifyOrDie(false);
         return cfg;
     }
