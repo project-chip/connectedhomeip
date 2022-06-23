@@ -242,12 +242,10 @@ int mdns_responder_ops(struct netif * netif)
     return slot;
 }
 
-#if 1
 static err_t mdns_responder_start_netifapi_errt_fn(struct netif * netif)
 {
     return mdns_responder_ops(netif);
 }
-#endif
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
