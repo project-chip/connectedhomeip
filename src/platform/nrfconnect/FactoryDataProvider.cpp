@@ -59,7 +59,8 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
     // Check if factory data version is correct
     if (mFactoryData.version != CONFIG_CHIP_FACTORY_DATA_VERSION)
     {
-        ChipLogError(DeviceLayer, "Factory data version mismatch. Flash version: %d vs code version: %d", mFactoryData.version, CONFIG_CHIP_FACTORY_DATA_VERSION);
+        ChipLogError(DeviceLayer, "Factory data version mismatch. Flash version: %d vs code version: %d", mFactoryData.version,
+                     CONFIG_CHIP_FACTORY_DATA_VERSION);
         return CHIP_ERROR_VERSION_MISMATCH;
     }
 
