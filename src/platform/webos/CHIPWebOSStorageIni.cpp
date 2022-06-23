@@ -43,24 +43,6 @@ CHIP_ERROR ChipLinuxStorageIni::Init()
     return RemoveAll();
 }
 
-CHIP_ERROR ChipLinuxStorageIni::GetDefaultSection(std::map<std::string, std::string> & section)
-{
-    CHIP_ERROR retval = CHIP_NO_ERROR;
-
-    auto it = mConfigStore.sections.find("DEFAULT");
-
-    if (it != mConfigStore.sections.end())
-    {
-        section = mConfigStore.sections["DEFAULT"];
-    }
-    else
-    {
-        retval = CHIP_ERROR_KEY_NOT_FOUND;
-    }
-
-    return retval;
-}
-
 CHIP_ERROR ChipLinuxStorageIni::AddConfig(const std::string & configFile)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
@@ -125,13 +107,13 @@ CHIP_ERROR ChipLinuxStorageIni::CommitConfig(const std::string & configFile)
 CHIP_ERROR ChipLinuxStorageIni::GetUInt16Value(const char * key, uint16_t & val)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
-    std::map<std::string, std::string> section;
 
-    retval = GetDefaultSection(section);
+    auto isConfigFind = mConfigStore.sections.find("DEFAULT");
 
-    if (retval == CHIP_NO_ERROR)
+    if (isConfigFind != mConfigStore.sections.end())
     {
-        auto it = section.find(key);
+        std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
+        auto it                                      = section.find(key);
 
         if (it != section.end())
         {
@@ -152,13 +134,12 @@ CHIP_ERROR ChipLinuxStorageIni::GetUInt16Value(const char * key, uint16_t & val)
 CHIP_ERROR ChipLinuxStorageIni::GetUIntValue(const char * key, uint32_t & val)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
-    std::map<std::string, std::string> section;
+    auto isConfigFind = mConfigStore.sections.find("DEFAULT");
 
-    retval = GetDefaultSection(section);
-
-    if (retval == CHIP_NO_ERROR)
+    if (isConfigFind != mConfigStore.sections.end())
     {
-        auto it = section.find(key);
+        std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
+        auto it                                      = section.find(key);
 
         if (it != section.end())
         {
@@ -179,13 +160,12 @@ CHIP_ERROR ChipLinuxStorageIni::GetUIntValue(const char * key, uint32_t & val)
 CHIP_ERROR ChipLinuxStorageIni::GetUInt64Value(const char * key, uint64_t & val)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
-    std::map<std::string, std::string> section;
+    auto isConfigFind = mConfigStore.sections.find("DEFAULT");
 
-    retval = GetDefaultSection(section);
-
-    if (retval == CHIP_NO_ERROR)
+    if (isConfigFind != mConfigStore.sections.end())
     {
-        auto it = section.find(key);
+        std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
+        auto it                                      = section.find(key);
 
         if (it != section.end())
         {
@@ -206,13 +186,12 @@ CHIP_ERROR ChipLinuxStorageIni::GetUInt64Value(const char * key, uint64_t & val)
 CHIP_ERROR ChipLinuxStorageIni::GetStringValue(const char * key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
-    std::map<std::string, std::string> section;
+    auto isConfigFind = mConfigStore.sections.find("DEFAULT");
 
-    retval = GetDefaultSection(section);
-
-    if (retval == CHIP_NO_ERROR)
+    if (isConfigFind != mConfigStore.sections.end())
     {
-        auto it = section.find(key);
+        std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
+        auto it                                      = section.find(key);
 
         if (it != section.end())
         {
@@ -251,12 +230,13 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key,
                                                             size_t & encodedDataLen, size_t & decodedDataLen)
 {
     size_t encodedDataPaddingLen = 0;
-    std::map<std::string, std::string> section;
-    CHIP_ERROR err = GetDefaultSection(section);
-    if (err != CHIP_NO_ERROR)
+    auto isConfigFind            = mConfigStore.sections.find("DEFAULT");
+
+    if (isConfigFind == mConfigStore.sections.end())
     {
-        return err;
+        return CHIP_ERROR_KEY_NOT_FOUND;
     }
+    std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
 
     auto it = section.find(key);
     if (it == section.end())
@@ -333,12 +313,13 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * d
 
 bool ChipLinuxStorageIni::HasValue(const char * key)
 {
-    std::map<std::string, std::string> section;
+    auto isConfigFind = mConfigStore.sections.find("DEFAULT");
 
-    if (GetDefaultSection(section) != CHIP_NO_ERROR)
+    if (isConfigFind == mConfigStore.sections.end())
         return false;
 
-    auto it = section.find(key);
+    std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
+    auto it                                      = section.find(key);
 
     return it != section.end();
 }
