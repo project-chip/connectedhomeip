@@ -30,10 +30,10 @@ using namespace ::chip;
 
 static void test_thread(void * argument)
 {
-    printf("Open IoT SDK unit-tests run...\r\n");
+    ChipLogProgress(NotSpecified, "Open IoT SDK unit-tests run...");
     int status = RunRegisteredUnitTests();
-    printf("Test status: %d\r\n", status);
-    printf("Open IoT SDK unit-tests completed\r\n");
+    ChipLogProgress(NotSpecified, "Test status: %d", status);
+    ChipLogProgress(NotSpecified, "Open IoT SDK unit-tests completed");
     exit(status);
 }
 
@@ -42,7 +42,7 @@ int main()
     osStatus_t ret = osKernelInitialize();
     if (ret != osOK)
     {
-        printf("osKernelInitialize failed: %d\r\n", ret);
+        ChipLogError(NotSpecified, "osKernelInitialize failed: %d", ret);
         return EXIT_FAILURE;
     }
 
@@ -59,26 +59,25 @@ int main()
     osThreadId_t thread = osThreadNew(test_thread, NULL, &thread_attr);
     if (thread == NULL)
     {
-        printf("Failed to create thread\r\n");
+        ChipLogError(NotSpecified, "Failed to create thread");
         return EXIT_FAILURE;
     }
 
     osKernelState_t state = osKernelGetState();
     if (state == osKernelReady)
     {
-        printf("Starting kernel\r\n");
+        ChipLogError(NotSpecified, "Starting kernel");
         ret = osKernelStart();
         if (ret != osOK)
         {
-            printf("Failed to start kernel: %d\r\n", ret);
+            ChipLogError(NotSpecified, "Failed to start kernel: %d", ret);
             return EXIT_FAILURE;
         }
     }
     else
     {
-        printf("Kernel not ready: %d\r\n", state);
+        ChipLogError(NotSpecified, "Kernel not ready: %d", state);
         return EXIT_FAILURE;
     }
-
     return 0;
 }

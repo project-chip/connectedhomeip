@@ -59,21 +59,30 @@ char logMsgBuffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
  */
 void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-    size_t prefixLen = 0;
-    snprintf(logMsgBuffer, sizeof(logMsgBuffer), "[%s]", module);
-    logMsgBuffer[sizeof(logMsgBuffer) - 2] = 0; // -2 to allow at least one char for the vsnprintf
-    prefixLen                              = strlen(logMsgBuffer);
-    vsnprintf(logMsgBuffer + prefixLen, sizeof(logMsgBuffer) - prefixLen, msg, v);
+    vsnprintf(logMsgBuffer, sizeof(logMsgBuffer), msg, v);
 
-    // TODO
+    const char * category_prefix;
+    switch (category)
+    {
+    case kLogCategory_Error:
+        category_prefix = "\x1b[31m[ERR]\x1b[0m";
+        break;
+    case kLogCategory_Progress:
+    default:
+        category_prefix = "\x1b[32m[INF]\x1b[0m";
+        break;
+    case kLogCategory_Detail:
+        category_prefix = "\x1b[90m[DBG]\x1b[0m";
+        break;
+    case kLogCategory_Automation:
+        category_prefix = "";
+        break;
+    }
+
+    printf("%s [%s] %s\r\n", category_prefix, module, logMsgBuffer);
 
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();
-}
-
-void openiotsdk_logging_init()
-{
-    // TODO
 }
 
 } // namespace Platform
