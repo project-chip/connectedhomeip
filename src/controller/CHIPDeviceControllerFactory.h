@@ -176,7 +176,7 @@ public:
             VerifyOrReturnError(groupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
             mSessionResumptionStorage = sessionResumptionStorage;
-            mGroupDataProvider = groupDataProvider;
+            mGroupDataProvider        = groupDataProvider;
             return CHIP_NO_ERROR;
         };
 
@@ -221,7 +221,7 @@ public:
             }
         }
 
-        Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
+        Credentials::GroupDataProvider * mGroupDataProvider  = nullptr;
         SessionResumptionStorage * mSessionResumptionStorage = nullptr;
     };
 
