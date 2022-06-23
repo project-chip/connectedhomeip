@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <nlunit-test.h>
 #include <lib/core/CHIPError.h>
+#include <nlunit-test.h>
 
 /**
  *  @def NL_TEST_ASSERT_SUCCESS(inSuite, expression)
@@ -34,18 +34,19 @@
  *                              assertion fails.
  *
  */
-#define NL_TEST_ASSERT_SUCCESS(inSuite, inExpression)                                        \
-    do {                                                                                     \
-        CHIP_ERROR _inner_err = (inExpression);                                              \
-        (inSuite)->performedAssertions += 1;                                                 \
-                                                                                             \
-        if (_inner_err != CHIP_NO_ERROR)                                                     \
-        {                                                                                    \
-            printf("%s:%u: assertion failed due to error: \"%s\": %" CHIP_ERROR_FORMAT "\n", \
-                   __FILE__, __LINE__, #inExpression, _inner_err.Format());                  \
-            (inSuite)->failedAssertions += 1;                                                \
-            (inSuite)->flagError = true;                                                     \
-        }                                                                                    \
+#define NL_TEST_ASSERT_SUCCESS(inSuite, inExpression)                                                                              \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR _inner_err = (inExpression);                                                                                    \
+        (inSuite)->performedAssertions += 1;                                                                                       \
+                                                                                                                                   \
+        if (_inner_err != CHIP_NO_ERROR)                                                                                           \
+        {                                                                                                                          \
+            printf("%s:%u: assertion failed due to error: \"%s\": %" CHIP_ERROR_FORMAT "\n", __FILE__, __LINE__, #inExpression,    \
+                   _inner_err.Format());                                                                                           \
+            (inSuite)->failedAssertions += 1;                                                                                      \
+            (inSuite)->flagError = true;                                                                                           \
+        }                                                                                                                          \
     } while (0)
 
 /**
@@ -62,15 +63,15 @@
  *                              assertion fails.
  *
  */
-#define NL_TEST_ASSERT_EQUALS(inSuite, inExpr1, inExpr2)     \
-    do {                                                     \
-        (inSuite)->performedAssertions += 1;                 \
-                                                             \
-        if ((inExpr1) != (inExpr2))                          \
-        {                                                    \
-            printf("%s:%u: assertion failed: %s == %s\n",    \
-                   __FILE__, __LINE__, #inExpr1, #inExpr2);  \
-            (inSuite)->failedAssertions += 1;                \
-            (inSuite)->flagError = true;                     \
-        }                                                    \
+#define NL_TEST_ASSERT_EQUALS(inSuite, inExpr1, inExpr2)                                                                           \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        (inSuite)->performedAssertions += 1;                                                                                       \
+                                                                                                                                   \
+        if ((inExpr1) != (inExpr2))                                                                                                \
+        {                                                                                                                          \
+            printf("%s:%u: assertion failed: %s == %s\n", __FILE__, __LINE__, #inExpr1, #inExpr2);                                 \
+            (inSuite)->failedAssertions += 1;                                                                                      \
+            (inSuite)->flagError = true;                                                                                           \
+        }                                                                                                                          \
     } while (0)
