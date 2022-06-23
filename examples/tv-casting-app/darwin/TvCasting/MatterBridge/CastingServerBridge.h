@@ -16,6 +16,7 @@
  */
 
 #import "DiscoveredNodeData.h"
+#import "OnboardingPayload.h"
 #import <Foundation/Foundation.h>
 
 #ifndef CastingServerBridge_h
@@ -26,6 +27,8 @@
 @property void (^_Nullable commissioningCompleteCallback)(bool);
 
 @property void (^_Nullable launchUrlResponseCallback)(bool);
+
+@property OnboardingPayload * _Nonnull onboardingPayload;
 
 + (CastingServerBridge * _Nullable)getSharedInstance;
 
@@ -70,6 +73,13 @@
                            platformInterface:(unsigned int)platformInterface
                                  clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                        udcRequestSentHandler:(nullable void (^)(bool))udcRequestSentHandler;
+
+/*!
+ @brief Return the onboarding payload for this app (setup passcode, discriminator)
+
+ @return Onboarding payload
+ */
+- (OnboardingPayload * _Nonnull)getOnboardingPaylod;
 
 /*!
  @brief Request opening of a basic commissioning window
