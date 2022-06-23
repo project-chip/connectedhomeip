@@ -60,8 +60,10 @@ RUN set -x \
     udev \
     unzip \
     wget \
+    git-lfs \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/ \
+    && git lfs install \
     && : # last line
 
 # Cmake (Mbed OS requires >=3.19.0-rc3 version which is not available in Ubuntu 20.04 repository)
