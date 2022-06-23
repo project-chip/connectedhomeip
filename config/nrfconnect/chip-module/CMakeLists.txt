@@ -102,6 +102,11 @@ if (CONFIG_POSIX_API)
         -D_SYS__PTHREADTYPES_H_
         -isystem${ZEPHYR_BASE}/include/zephyr/posix
     )
+# a dirty hack to avoid make_gn_args.py issue with missing parameters (for testing only)
+else()
+    list(APPEND CHIP_CFLAGS
+    anything
+    )
 endif()
 
 if (CONFIG_NORDIC_SECURITY_BACKEND)
@@ -219,7 +224,7 @@ chip_gn_arg_bool  ("chip_progress_logging"                  CONFIG_MATTER_LOG_LE
 chip_gn_arg_bool  ("chip_detail_logging"                    CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
 chip_gn_arg_bool  ("chip_automation_logging"                "false")
 chip_gn_arg_bool  ("chip_malloc_sys_heap"                   CONFIG_CHIP_MALLOC_SYS_HEAP)
-chip_gn_arg_bool  ("chip_enable_wifi"                       "true")
+chip_gn_arg_bool  ("chip_enable_wifi"                       CONFIG_WIFI_NRF)
 
 if (CONFIG_CHIP_ROTATING_DEVICE_ID)
     chip_gn_arg_bool("chip_enable_rotating_device_id"          "true")
