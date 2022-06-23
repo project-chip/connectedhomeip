@@ -54,9 +54,9 @@ Silicon Labs platform.
 
 -   Install some additional tools (likely already present for CHIP developers):
 
-    - Linux: `sudo apt-get install git libwebkitgtk-1.0-0 ninja-build`
+    -   Linux: `sudo apt-get install git libwebkitgtk-1.0-0 ninja-build`
 
-    - Mac OS X: `brew install ninja`
+    -   Mac OS X: `brew install ninja`
 
 -   Supported hardware:
 
@@ -271,14 +271,12 @@ combination with JLinkRTTClient as follows:
     need to add a static ipv6 addresses on both device and then an ipv6 route to
     the border router on your PC
 
-    - On Border Router:
-      `sudo ip addr add dev <Network interface> 2002::2/64`
+    -   On Border Router: `sudo ip addr add dev <Network interface> 2002::2/64`
 
-    - On PC(Linux):
-      `sudo ip addr add dev <Network interface> 2002::1/64`
+    -   On PC(Linux): `sudo ip addr add dev <Network interface> 2002::1/64`
 
-    - Add Ipv6 route on PC(Linux)
-      `sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2`
+    -   Add Ipv6 route on PC(Linux)
+        `sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2`
 
 <a name="running-pigweed-rpc-console"></a>
 
