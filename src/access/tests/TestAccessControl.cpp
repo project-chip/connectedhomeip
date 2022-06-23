@@ -777,7 +777,8 @@ constexpr EntryData entryData1[] = {
 };
 
 constexpr size_t entryData1Count = ArraySize(entryData1);
-static_assert(entryData1Count == (kNumFabric1EntriesInEntryData1 + kNumFabric2EntriesInEntryData1), "Must maintain both fabric counts for some tests");
+static_assert(entryData1Count == (kNumFabric1EntriesInEntryData1 + kNumFabric2EntriesInEntryData1),
+              "Must maintain both fabric counts for some tests");
 
 struct CheckData
 {
@@ -1771,7 +1772,7 @@ void TestDeleteEntry(nlTestSuite * inSuite, void * inContext)
         // After deleting Fabric index 1, we should have the number of entries of Fabric index 2
         NL_TEST_ASSERT(inSuite, accessControl.DeleteAllEntriesForFabric(1) == CHIP_NO_ERROR);
         size_t numEntriesForFabricIndex2 = 0;
-        size_t numTotalEntries = 0;
+        size_t numTotalEntries           = 0;
         NL_TEST_ASSERT(inSuite, accessControl.GetEntryCount(2, numEntriesForFabricIndex2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, accessControl.GetEntryCount(numTotalEntries) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, numEntriesForFabricIndex2 == kNumFabric2EntriesInEntryData1);

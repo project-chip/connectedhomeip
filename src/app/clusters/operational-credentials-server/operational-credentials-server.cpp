@@ -371,7 +371,7 @@ constexpr size_t kMaxRspLen = 900;
 // logic.
 class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
 {
-  public:
+public:
     // Gets called when a fabric is deleted from KVS store
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
@@ -402,10 +402,7 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
         NotifyFabricTableChanged();
     }
 
-    void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override
-    {
-        NotifyFabricTableChanged();
-    }
+    void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override { NotifyFabricTableChanged(); }
 
     // Gets called when a fabric in FabricTable is persisted to storage
     void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override
@@ -423,14 +420,13 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
         NotifyFabricTableChanged();
     }
 
-  private:
+private:
     void NotifyFabricTableChanged()
     {
         // Opcreds cluster is always on Endpoint 0
         MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id,
                                                OperationalCredentials::Attributes::CommissionedFabrics::Id);
-        MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id,
-                                               OperationalCredentials::Attributes::Fabrics::Id);
+        MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
     }
 };
 
@@ -798,12 +794,12 @@ exit:
         // and error handling does not assist.
         if (groupDataProvider != nullptr)
         {
-            (void)groupDataProvider->RemoveFabric(newFabricIndex);
+            (void) groupDataProvider->RemoveFabric(newFabricIndex);
         }
 
         // TODO(#19898): All ACL work done within AddNOC does not trigger ACL cluster updates
 
-        (void)Access::GetAccessControl().DeleteAllEntriesForFabric(newFabricIndex);
+        (void) Access::GetAccessControl().DeleteAllEntriesForFabric(newFabricIndex);
 
         MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
                                                OperationalCredentials::Attributes::CommissionedFabrics::Id);
@@ -860,7 +856,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     FabricInfo * fabricInfo           = RetrieveCurrentFabric(commandObj);
 
     bool csrWasForUpdateNoc = false; //< Output param of HasPendingOperationalKey
-    bool hasPendingKey  = fabricTable.HasPendingOperationalKey(csrWasForUpdateNoc);
+    bool hasPendingKey      = fabricTable.HasPendingOperationalKey(csrWasForUpdateNoc);
 
     VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, nonDefaultStatus = Status::InvalidCommand);
     VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,

@@ -450,8 +450,7 @@ private:
             CHIP_ERROR aclErr = Access::GetAccessControl().DeleteAllEntriesForFabric(fabricIndex);
             if (aclErr != CHIP_NO_ERROR)
             {
-                ChipLogError(AppServer,
-                             "Warning, failed to delete access control state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                ChipLogError(AppServer, "Warning, failed to delete access control state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
                              static_cast<unsigned>(fabricIndex), aclErr.Format());
             }
         }

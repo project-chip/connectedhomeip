@@ -597,7 +597,7 @@ public:
             while (aclCount)
             {
                 CHIP_ERROR err = DeleteEntry(nullptr, fabricIndex, --aclCount);
-                stickyError = (stickyError == CHIP_NO_ERROR) ? err : stickyError;
+                stickyError    = (stickyError == CHIP_NO_ERROR) ? err : stickyError;
             }
         }
 
