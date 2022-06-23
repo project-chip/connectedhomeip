@@ -21,6 +21,7 @@
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "LEDWidget.h"
+#include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -40,7 +41,6 @@
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
 #include <platform/bouffalolab/BL602/OTAImageProcessorImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <DeviceInfoProviderImpl.h>
 
 #include <bl_sys_ota.h>
 #include <lib/support/ErrorStr.h>
