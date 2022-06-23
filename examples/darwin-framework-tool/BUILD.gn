@@ -97,7 +97,7 @@ executable("darwin-framework-tool") {
     "${chip_root}/third_party/jsoncpp",
   ]
 
-  frameworks = [ "Matter.framework" ]
+  frameworks = [ "Matter.framework", "Security.framework" ]
 
   public_configs = [ ":config" ]
 
