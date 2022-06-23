@@ -22,8 +22,6 @@
  *      implementation.
  */
 
-#include "TestMessagingLayer.h"
-
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>

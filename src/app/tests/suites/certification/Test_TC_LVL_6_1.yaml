@@ -28,16 +28,20 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Sending on command"
-      cluster: "On/Off"
-      command: "on"
+    - label: "Reads Minlevel attribute from DUT"
+      command: "readAttribute"
+      attribute: "min level"
+      response:
+          saveAs: MinlevelValue
+          constraints:
+              type: uint8
 
-    - label: "Precondition: set DUT to lowest point"
-      command: "MoveToLevel"
+    - label: "Sends MoveToLevelWithOnOff command to DUT"
+      command: "MoveToLevelWithOnOff"
       arguments:
           values:
               - name: "level"
-                value: 0
+                value: 1
               - name: "transitionTime"
                 value: 0
               - name: "optionMask"
@@ -45,15 +49,6 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait 100ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
-    # For lighting Device type current level minimal value is 1
     - label: "Reads CurrentLevel attribute from DUT"
       command: "readAttribute"
       attribute: "current level"
@@ -70,19 +65,19 @@ tests:
               - name: "moveMode"
                 value: 0
               - name: "rate"
-                value: 1
+                value: 5
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait 2000ms"
+    - label: "Wait 5000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 2000
+                value: 5000
 
     - label: "Sends stop command to DUT"
       command: "Stop"
@@ -93,10 +88,70 @@ tests:
               - name: "optionOverride"
                 value: 0
 
+    - label: "user prompt message"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Physically verify that the device has stopped
+                    transitioning."
+
     - label: "Reads CurrentLevel attribute from DUT"
       command: "readAttribute"
       attribute: "current level"
       response:
+          value: 25
+          constraints:
+              notValue: CurrentLevelValue
+
+    - label: "Sends a move up command to DUT"
+      command: "Move"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 0
+              - name: "rate"
+                value: 5
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 5000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Sends stop command to DUT"
+      command: "Stop"
+      arguments:
+          values:
+              - name: "optionMask"
+                value: 0
+              - name: "optionOverride"
+                value: 0
+
+    - label: "user prompt message"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Physically verify that the device has stopped
+                    transitioning."
+
+    - label: "Reads CurrentLevel attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: 50
           constraints:
               notValue: CurrentLevelValue
 
@@ -120,7 +175,3 @@ tests:
           values:
               - name: "ms"
                 value: 100
-
-    - label: "Sending off command"
-      cluster: "On/Off"
-      command: "off"

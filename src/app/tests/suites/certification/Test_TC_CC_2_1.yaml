@@ -189,12 +189,18 @@ tests:
           constraints:
               type: uint16
 
+    - label: "read the optional global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          saveAs: FeatureMapValue
+
     - label: "Reads ColorCapabilities attribute from DUT"
       PICS: CC.S.A400a
       command: "readAttribute"
       attribute: "ColorCapabilities"
       response:
-          value: 0
+          value: FeatureMapValue
 
     - label: "Validate constraints of attribute: ColorCapabilities"
       PICS: CC.S.A400a
