@@ -12,11 +12,11 @@ Generating tizen-arm-light
 
 ```sh
 gn gen --check \
-	--fail-on-unused-args \
-	--export-compile-commands \
-	--root=$PW_PROJECT_ROOT/examples/lighting-app/tizen \
-	"--args=target_os=\"tizen\" target_cpu=\"arm\" tizen_sdk_root=\"$TIZEN_SDK_ROOT\" tizen_sdk_sysroot=\"$TIZEN_SDK_SYSROOT\"" \
-	$PW_PROJECT_ROOT/out/tizen-arm-light
+    --fail-on-unused-args \
+    --export-compile-commands \
+    --root=$PW_PROJECT_ROOT/examples/lighting-app/tizen \
+    "--args=target_os=\"tizen\" target_cpu=\"arm\" tizen_sdk_root=\"$TIZEN_SDK_ROOT\" tizen_sdk_sysroot=\"$TIZEN_SDK_SYSROOT\"" \
+    $PW_PROJECT_ROOT/out/tizen-arm-light
 ```
 
 Building tizen-arm-light
@@ -33,16 +33,16 @@ author data as needed.
 
 ```sh
 $TIZEN_SDK_ROOT/tools/ide/bin/tizen certificate \
-	--alias=CHIP \
-	--name=CHIP \
-	--email=chip@tizen.org \
-	--password=chiptizen
+    --alias=CHIP \
+    --name=CHIP \
+    --email=chip@tizen.org \
+    --password=chiptizen
 
 $TIZEN_SDK_ROOT/tools/ide/bin/tizen security-profiles add \
-	--active \
-	--name=CHIP \
-	--author=$HOME/tizen-sdk-data/keystore/author/author.p12 \
-	--password=chiptizen
+    --active \
+    --name=CHIP \
+    --author=$HOME/tizen-sdk-data/keystore/author/author.p12 \
+    --password=chiptizen
 ```
 
 This is only _one-time action_. To regenerate the author certificate and
@@ -51,9 +51,9 @@ specified commands:
 
 ```sh
 rm -r \
-	$HOME/tizen-sdk-data \
-	$HOME/.tizen-cli-config \
-	$HOME/.secretsdb
+    $HOME/tizen-sdk-data \
+    $HOME/.tizen-cli-config \
+    $HOME/.secretsdb
 ```
 
 After that, normally call scripts to generate the author certificate and
@@ -97,3 +97,50 @@ e.g.:
 ```sh
 app_launcher --start=org.tizen.matter.example.lighting discriminator 43 wifi true
 ```
+
+## Vscode support
+
+To run all commands below `sdb` has to be installed on computer and available in
+`PATH`. Also vscode has to have the `augustocdias.tasks-shell-input` extension
+installed.
+
+### Tasks
+
+1. Build app:
+
+```
+open the Command Palette (Ctrl+Shift+P) ->
+    Tasks: Run Task ->
+    Build LightingApp (Tizen)
+```
+
+2. SDB connect to device: required to run Tizen commands below if device is
+   debugged over network
+
+```
+open the Command Palette (Ctrl+Shift+P) ->
+    Tasks: Run Task -> Connect to device (Tizen) ->
+    insert IP address and port
+```
+
+3. Install app: it is separated from build app step.
+
+```
+open the Command Palette (Ctrl+Shift+P) ->
+    Tasks: Run Task ->
+    Install LightingApp (Tizen)
+```
+
+4. Launch LightingApp with gdbserver attached: require to install app
+   previously.
+
+```
+open the Command Palette (Ctrl+Shift+P) ->
+    Tasks: Run Task ->
+    Launch LightingApp with gdbserver attached (Tizen)
+```
+
+### Debug
+
+To debug app using vscode gdbserver has to be available on the target device,
+run `./scripts/helpers/tizen_gdbserver_run.sh --help` for more information.

@@ -39,8 +39,14 @@ public class ChipDeviceController {
     return;
   }
 
+  /** Returns a new {@link ChipDeviceController} with default parameters. */
   public ChipDeviceController() {
-    deviceControllerPtr = newDeviceController();
+    this(ControllerParams.newBuilder().build());
+  }
+
+  /** Returns a new {@link ChipDeviceController} with the specified parameters. */
+  public ChipDeviceController(ControllerParams params) {
+    deviceControllerPtr = newDeviceController(params);
   }
 
   public void setCompletionListener(CompletionListener listener) {
@@ -414,7 +420,7 @@ public class ChipDeviceController {
       long devicePtr,
       List<ChipAttributePath> attributePaths);
 
-  private native long newDeviceController();
+  private native long newDeviceController(ControllerParams params);
 
   private native void pairDevice(
       long deviceControllerPtr,

@@ -35,6 +35,7 @@
 #include <setup_payload/SetupPayload.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <testing/CustomCSRResponse.h>
 
 struct LinuxDeviceOptions
 {
@@ -57,6 +58,8 @@ struct LinuxDeviceOptions
     bool traceStreamToLogEnabled        = false;
     chip::Optional<std::string> traceStreamFilename;
     chip::Credentials::DeviceAttestationCredentialsProvider * dacProvider = nullptr;
+    chip::CSRResponseOptions mCSRResponseOptions;
+    uint8_t testEventTriggerEnableKey[16] = { 0 };
 
     static LinuxDeviceOptions & GetInstance();
 };

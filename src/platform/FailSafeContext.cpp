@@ -41,6 +41,12 @@ void FailSafeContext::HandleArmFailSafeTimer(System::Layer * layer, void * aAppS
     failSafeContext->FailSafeTimerExpired();
 }
 
+void FailSafeContext::HandleMaxCumulativeFailSafeTimer(System::Layer * layer, void * aAppState)
+{
+    FailSafeContext * failSafeContext = reinterpret_cast<FailSafeContext *>(aAppState);
+    failSafeContext->FailSafeTimerExpired();
+}
+
 void FailSafeContext::HandleDisarmFailSafe(intptr_t arg)
 {
     FailSafeContext * failSafeContext = reinterpret_cast<FailSafeContext *>(arg);
@@ -85,19 +91,36 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
 
 CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength)
 {
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    bool cancelTimersIfError = false;
+    if (!mFailSafeArmed)
+    {
+        System::Clock::Timeout maxCumulativeTimeout = System::Clock::Seconds32(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC);
+        SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(maxCumulativeTimeout, HandleMaxCumulativeFailSafeTimer, this));
+        cancelTimersIfError = true;
+    }
+
+    SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafeTimer, this));
+    SuccessOrExit(err = CommitToStorage());
+    SuccessOrExit(err = ConfigurationMgr().SetFailSafeArmed(true));
+
     mFailSafeArmed = true;
     mFabricIndex   = accessingFabricIndex;
 
-    ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafeTimer, this));
-    ReturnErrorOnFailure(CommitToStorage());
-    ReturnErrorOnFailure(ConfigurationMgr().SetFailSafeArmed(true));
+exit:
 
-    return CHIP_NO_ERROR;
+    if (err != CHIP_NO_ERROR && cancelTimersIfError)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
+        DeviceLayer::SystemLayer().CancelTimer(HandleMaxCumulativeFailSafeTimer, this);
+    }
+    return err;
 }
 
 void FailSafeContext::DisarmFailSafe()
 {
     DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleMaxCumulativeFailSafeTimer, this);
 
     ResetState();
 
@@ -200,6 +223,7 @@ void FailSafeContext::ForceFailSafeTimerExpiry()
 
     // Cancel the timer since we force its action
     DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafeTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleMaxCumulativeFailSafeTimer, this);
 
     FailSafeTimerExpired();
 }

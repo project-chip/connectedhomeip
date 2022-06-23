@@ -254,9 +254,9 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 
-    mLaunchContentMethod = env->GetMethodID(
-        ContentLauncherClass, "launchContent",
-        "([Lcom/tcl/chip/tvapp/ContentLaunchSearchParameter;ZLjava/lang/String;)Lcom/tcl/chip/tvapp/ContentLaunchResponse;");
+    mLaunchContentMethod = env->GetMethodID(ContentLauncherClass, "launchContent",
+                                            "([Lcom/matter/tv/server/tvapp/ContentLaunchSearchParameter;ZLjava/lang/String;)Lcom/"
+                                            "matter/tv/server/tvapp/ContentLaunchResponse;");
     if (mLaunchContentMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ContentLauncherManager 'launchContent' method");
@@ -264,8 +264,8 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
     }
 
     mLaunchUrlMethod = env->GetMethodID(ContentLauncherClass, "launchUrl",
-                                        "(Ljava/lang/String;Ljava/lang/String;Lcom/tcl/chip/tvapp/"
-                                        "ContentLaunchBrandingInformation;)Lcom/tcl/chip/tvapp/ContentLaunchResponse;");
+                                        "(Ljava/lang/String;Ljava/lang/String;Lcom/matter/tv/server/tvapp/"
+                                        "ContentLaunchBrandingInformation;)Lcom/matter/tv/server/tvapp/ContentLaunchResponse;");
     if (mLaunchUrlMethod == nullptr)
     {
         ChipLogError(AppServer, "Failed to access 'launchUrl' method");

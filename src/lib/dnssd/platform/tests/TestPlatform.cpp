@@ -46,13 +46,14 @@ test::ExpectedCall operationalCall1 = test::ExpectedCall()
                                           .SetInstanceName("BEEFBEEFF00DF00D-1111222233334444")
                                           .SetHostName(host)
                                           .AddSubtype("_IBEEFBEEFF00DF00D");
-OperationalAdvertisingParameters operationalParams2 = OperationalAdvertisingParameters()
-                                                          .SetPeerId(kPeerId2)
-                                                          .SetMac(ByteSpan(kMac))
-                                                          .SetPort(CHIP_PORT)
-                                                          .EnableIpV4(true)
-                                                          .SetMRPConfig({ 32_ms32, 30_ms32 }) // SII and SAI to match below
-                                                          .SetTcpSupported(Optional<bool>(true));
+OperationalAdvertisingParameters operationalParams2 =
+    OperationalAdvertisingParameters()
+        .SetPeerId(kPeerId2)
+        .SetMac(ByteSpan(kMac))
+        .SetPort(CHIP_PORT)
+        .EnableIpV4(true)
+        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(32_ms32, 30_ms32)) // SII and SAI to match below
+        .SetTcpSupported(Optional<bool>(true));
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
                                           .SetServiceName("_matter")
@@ -95,7 +96,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"))
         .SetTcpSupported(chip::Optional<bool>(true))
         // 3600005 is over the max, so this should be adjusted by the platform
-        .SetMRPConfig({ 3600000_ms32, 3600005_ms32 });
+        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32));
 
 test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .SetProtocol(DnssdServiceProtocol::kDnssdProtocolUdp)

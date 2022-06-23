@@ -26,14 +26,17 @@ tests:
 
       disabled: true
 
-    - label: "TH reads Tolerance attribute from DUT"
+    - label: "TH reads from the DUT the Tolerance attribute"
       verification: |
           ./chip-tool pressuremeasurement read tolerance 1 1
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
-    - label: "TH reads MeasuredValue attribute from DUT"
+    - label: "TH reads from the DUT the MeasuredValue attribute"
       verification: |
           ./chip-tool pressuremeasurement read measured-value 1 1
+
           [1646049376.457970][12096:12101] CHIP:DMG:         SuppressResponse = true,
           [1646049376.458003][12096:12101] CHIP:DMG:         InteractionModelRevision = 1
           [1646049376.458033][12096:12101] CHIP:DMG: }
@@ -42,27 +45,37 @@ tests:
           [1646049376.458395][12096:12101] CHIP:TOO:   MeasuredValue: 0
       disabled: true
 
-    - label: "TH reads MeasuredValue attribute from DUT"
+    - label: "TH reads from the DUT the MeasuredValue attribute"
       verification: |
+          ./chip-tool pressuremeasurement read measured-value 1 1
 
+          CHIP:TOO:   MeasuredValue: 0
       disabled: true
 
-    - label: "TH reads Scale attribute from DUT"
+    - label: "TH reads from the DUT the Scale attribute"
       verification: |
           ./chip-tool pressuremeasurement read scale 1 1
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)  NOT IMPLEMENTED IN SDK
       disabled: true
 
-    - label: "TH reads ScaledValue attribute from DUT"
+    - label: "TH reads from the DUT the ScaledValue attribute"
       verification: |
           ./chip-tool pressuremeasurement read scaled-value 1 1
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)  NOT IMPLEMENTED IN SDK
       disabled: true
 
-    - label: "TH reads ScaledTolerance attribute from DUT"
+    - label: "TH reads from the DUT the ScaledTolerance attribute"
       verification: |
           ./chip-tool pressuremeasurement read scaled-tolerance 1 1
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)  NOT IMPLEMENTED IN SDK
       disabled: true
 
-    - label: "TH reads ScaledValue attribute from DUT"
+    - label: "TH reads from the DUT the ScaledValue attribute"
       verification: |
           ./chip-tool pressuremeasurement read scaled-value 1 1
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)  NOT IMPLEMENTED IN SDK
       disabled: true

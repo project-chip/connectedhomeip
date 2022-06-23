@@ -82,13 +82,23 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
         err = aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
             for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
             {
-                if (emberAfEndpointIndexIsEnabled(index))
-                {
-                    EndpointId composedEndpointId = emberAfParentEndpointFromIndex(index);
-                    if (composedEndpointId == chip::kInvalidEndpointId || composedEndpointId != endpoint)
-                        continue;
+                if (!emberAfEndpointIndexIsEnabled(index))
+                    continue;
 
-                    ReturnErrorOnFailure(encoder.Encode(emberAfEndpointFromIndex(index)));
+                uint16_t childIndex = index;
+                while (childIndex != chip::kInvalidListIndex)
+                {
+                    EndpointId parentEndpointId = emberAfParentEndpointFromIndex(childIndex);
+                    if (parentEndpointId == chip::kInvalidEndpointId)
+                        break;
+
+                    if (parentEndpointId == endpoint)
+                    {
+                        ReturnErrorOnFailure(encoder.Encode(emberAfEndpointFromIndex(index)));
+                        break;
+                    }
+
+                    childIndex = emberAfIndexFromEndpoint(parentEndpointId);
                 }
             }
 

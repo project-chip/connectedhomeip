@@ -41,6 +41,7 @@ tests:
           value: 1
 
     - label: "Read current color temprature"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -50,6 +51,7 @@ tests:
               maxValue: 65279
 
     - label: "Move up color temperature command"
+      PICS: CC.S.C4B.Rsp
       command: "MoveColorTemperature"
       arguments:
           values:
@@ -75,6 +77,7 @@ tests:
                 value: 90
 
     - label: "Read current color temprature attribute from DUT several times"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -92,6 +95,7 @@ tests:
                 value: 95
 
     - label: "Read current color temprature attribute from DUT several times"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -109,6 +113,7 @@ tests:
                 value: 100
 
     - label: "Read current color temprature attribute from DUT several times"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -118,6 +123,7 @@ tests:
               maxValue: 65279
 
     - label: "Move down color temperature command"
+      PICS: CC.S.C4B.Rsp
       command: "MoveColorTemperature"
       arguments:
           values:
@@ -143,6 +149,7 @@ tests:
                 value: 190
 
     - label: "Read current color temprature attribute from DUT several times"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -160,6 +167,7 @@ tests:
                 value: 195
 
     - label: "Read current color temprature attribute from DUT several times"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -177,6 +185,7 @@ tests:
                 value: 200
 
     - label: "Read current color temprature attribute from DUT several times"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -186,6 +195,7 @@ tests:
               maxValue: 65279
 
     - label: "Move up color temperature command"
+      PICS: CC.S.C4B.Rsp
       command: "MoveColorTemperature"
       arguments:
           values:
@@ -203,6 +213,7 @@ tests:
                 value: 0
 
     - label: "Stop Color Temperature command"
+      PICS: CC.S.C4B.Rsp
       command: "MoveColorTemperature"
       arguments:
           values:
@@ -228,6 +239,7 @@ tests:
                 value: 90
 
     - label: "Read current color temprature attribute from DUT several times"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -245,6 +257,7 @@ tests:
                 value: 95
 
     - label: "Read current color temprature attribute from DUT several times"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -262,6 +275,7 @@ tests:
                 value: 100
 
     - label: "Read current color temprature attribute from DUT several times"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -271,6 +285,7 @@ tests:
               maxValue: 65279
 
     - label: "Move down color temperature command"
+      PICS: CC.S.C4B.Rsp
       command: "MoveColorTemperature"
       arguments:
           values:
@@ -288,6 +303,7 @@ tests:
                 value: 0
 
     - label: "Stop Color Temperature command"
+      PICS: CC.S.C4B.Rsp
       command: "MoveColorTemperature"
       arguments:
           values:
@@ -313,6 +329,7 @@ tests:
                 value: 140
 
     - label: "Read current color temprature attribute from DUT several times"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -330,6 +347,7 @@ tests:
                 value: 145
 
     - label: "Read current color temprature attribute from DUT several times"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -347,6 +365,7 @@ tests:
                 value: 150
 
     - label: "Read current color temprature attribute from DUT several times"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:

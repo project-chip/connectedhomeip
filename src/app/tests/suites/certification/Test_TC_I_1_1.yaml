@@ -33,13 +33,16 @@ tests:
       attribute: "ClusterRevision"
       response:
           value: 4
-
-    - label: "Read the global attribute constraints : ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
           constraints:
               type: uint16
+
+    - label: "TH reads the FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
@@ -80,19 +83,3 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
-    #issue #17483
-    - label:
-          "Read FeatureMap attribute from the DUT and Verify that the DUT
-          response indicates FeatureMap attribute has the value 0"
-      verification: |
-          Not implemented in SDK
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter '0' for success"
-              - name: "expectedValue"
-                value: 0

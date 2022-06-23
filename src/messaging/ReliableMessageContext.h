@@ -164,6 +164,9 @@ protected:
 
         /// When set, signifies that the exchange created sorely for replying a StandaloneAck
         kFlagEphemeralExchange = (1u << 9),
+
+        /// When set, ignore session being released, because we are releasing it ourselves.
+        kFlagIgnoreSessionRelease = (1u << 10),
     };
 
     BitFlags<Flags> mFlags; // Internal state flags

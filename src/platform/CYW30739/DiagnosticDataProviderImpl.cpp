@@ -95,23 +95,36 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
     return err;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
-    NetworkInterface * ifp = Platform::New<NetworkInterface>();
+    auto ifp = Platform::New<NetworkInterface>();
+    VerifyOrReturnError(ifp != nullptr, CHIP_ERROR_NO_MEMORY);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
     ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
     ifp->isOperational             = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
-#else
-    /* TODO */
-#endif
-    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
-    ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
+    ifp->hardwareAddress = ByteSpan(ifp->MacAddress);
+    ifp->type            = app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
+
+    static_assert(sizeof(ifp->MacAddress) >= ConfigurationManager::kPrimaryMACAddressLength, "Invalid MacAddress buffer size");
+    ConfigurationMgr().GetPrimary802154MACAddress(ifp->MacAddress);
+
+    /* Thread only support IPv6 */
+    uint8_t ipv6AddressesCount = 0;
+    for (Inet::InterfaceAddressIterator iterator; iterator.Next() && ipv6AddressesCount < kMaxIPv6AddrCount;)
+    {
+        chip::Inet::IPAddress ipv6Address;
+        if (iterator.GetAddress(ipv6Address) == CHIP_NO_ERROR)
+        {
+            memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipv6Address.Addr, kMaxIPv6AddrSize);
+            ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
+            ipv6AddressesCount++;
+        }
+    }
+    ifp->IPv6Addresses = app::DataModel::List<const ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
 
     *netifpp = ifp;
     return CHIP_NO_ERROR;
@@ -126,6 +139,7 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
         Platform::Delete(del);
     }
 }
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 
 } // namespace DeviceLayer
 } // namespace chip

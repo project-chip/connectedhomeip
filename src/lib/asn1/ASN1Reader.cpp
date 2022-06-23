@@ -53,7 +53,9 @@ CHIP_ERROR ASN1Reader::Next()
     ReturnErrorCodeIf(EndOfContents, ASN1_END);
     ReturnErrorCodeIf(IndefiniteLen, ASN1_ERROR_UNSUPPORTED_ENCODING);
 
-    mElemStart += (mHeadLen + ValueLen);
+    // Note: avoid using addition assignment operator (+=), which may result in integer overflow
+    // in the right hand side of an assignment (mHeadLen + ValueLen).
+    mElemStart = mElemStart + mHeadLen + ValueLen;
 
     ResetElementState();
 

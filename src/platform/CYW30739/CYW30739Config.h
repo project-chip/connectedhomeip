@@ -45,8 +45,10 @@ class CYW30739Config
 public:
     using Key = uint32_t;
 
-    static constexpr uint8_t kChipFactory_KeyBase = 0x00;
-    static constexpr uint8_t kChipConfig_KeyBase  = 0x01;
+    static constexpr uint8_t kChipFactory_KeyBase  = 0x00;
+    static constexpr uint8_t kChipConfig_KeyBase   = 0x01;
+    static constexpr uint8_t kChipKvsValue_KeyBase = 0x02;
+    static constexpr uint8_t kChipKvsKey_KeyBase   = 0x03;
 
     // Key definitions for well-known keys.
     // Factory config keys
@@ -94,11 +96,13 @@ public:
 
     static CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
     static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen);
+    static CHIP_ERROR ReadConfigValueBin(Key key, void * buf, size_t bufSize, size_t & outLen);
     template <typename T>
     static CHIP_ERROR WriteConfigValue(Key key, T val);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
     static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
+    static CHIP_ERROR WriteConfigValueBin(Key key, const void * data, size_t dataLen);
     static CHIP_ERROR ClearConfigValue(Key key);
     static bool ConfigValueExists(Key key);
     static CHIP_ERROR FactoryResetConfig(void);

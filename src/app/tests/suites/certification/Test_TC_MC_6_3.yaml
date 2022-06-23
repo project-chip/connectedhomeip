@@ -18,6 +18,9 @@ config:
     nodeId: 0x12344321
     cluster: "Media Playback"
     endpoint: 1
+    SeekPosition:
+        type: INT64U
+        defaultValue: 100000000
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -28,76 +31,120 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #issue #12884 Media cluster commands and precondition not supported
-    - label: "Precondition: Connect media content available for playback"
-      disabled: true
-
-    #Issue 18109
     - label:
           "Precondition: Media content in a paused state at the beginning of the
           content"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "Pause"
-
-    - label: "log a command"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
+      response:
           values:
-              - name: "message"
-                value: "Verify that media is paused"
+              - name: "status"
+                value: 0
 
     - label: "Sends a Seek command"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "Seek"
       arguments:
           values:
               - name: "Position"
                 value: 10000
+      response:
+          values:
+              - name: "status"
+                value: 0
 
-    - label: "log a command"
+    - label:
+          "Verify that the media has moved to 10 seconds from the starting point"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
                 value:
-                    "Verify that the media has moved to 10 seconds from the
-                    starting point."
+                    "Please enter 'y' if media has moved to 10 seconds from the
+                    starting point"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads the SampledPosition attribute"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
           value: 10000
 
-    #Issue  #11475 User action needed
-    - label: "log a command"
+    #Issue 10988
+    - label: "TH reads the StartTime attribute from the DUT"
+      verification: |
+          ./chip-tool mediaplayback read start-time 1 1
+          [1654001778189] [97015:7707437] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0001 DataVersion: 775839144
+          [1654001778190] [97015:7707437] CHIP: [TOO]   StartTime: 0
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value:
-                    "User prompt needed to enter the value beyond the furthest
-                    valid position"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    # todo : Need a user input
+    #Issue 10988
+    - label: "TH reads the SeekRangeEnd attribute from the DUT"
+      verification: |
+          ./chip-tool mediaplayback read seek-range-end 1 1
+          [1654002119527] [97409:7712444] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0005 DataVersion: 775839144
+          [1654002119527] [97409:7712444] CHIP: [TOO]   SeekRangeEnd: 80000
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue 10988
+    - label: "TH reads the SeekRangeStart attribute from the DUT"
+      verification: |
+          ./chip-tool mediaplayback read seek-range-start 1 1
+          [1654751320.161753][2491:2496] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0006 DataVersion: 1615951406
+          [1654751320.161846][2491:2496] CHIP:TOO:   SeekRangeStart: 10000
+          [1654751320.161941][2491:2496] CHIP:EM: Sending Standalone Ack for MessageCounter:120565821 on exchange 1929
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue 10988
+    - label: "TH reads the Duration attribute from the DUT"
+      verification: |
+          ./chip-tool mediaplayback read duration 1 1
+          [1654001869267] [97168:7708957] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0002 DataVersion: 775839144
+          [1654001869267] [97168:7708957] CHIP: [TOO]   Duration: 80000
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
     - label:
           "Sends a Seek command Position value beyond the furthest valid
           position"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "Seek"
       arguments:
           values:
               - name: "position"
-                value: 10000
-
-    # response: SEEK_OUT_OF_RANGE
-    - label: "Reads the SampledPosition attribute"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "readAttribute"
-      attribute: "SampledPosition"
+                value: SeekPosition
       response:
-          error: 5
+          values:
+              - name: "status"
+                value: 5

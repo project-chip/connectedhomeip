@@ -115,10 +115,8 @@ CHIP_ERROR AppTask::Init()
 
 #ifdef CONFIG_OPENTHREAD_MTD_SED
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#elif CONFIG_OPENTHREAD_MTD
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #else
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #endif
     if (err != CHIP_NO_ERROR)
     {
@@ -160,7 +158,14 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     // Print initial configs
+#if CONFIG_CHIP_FACTORY_DATA
+    ReturnErrorOnFailure(mFactoryDataProvider.Init());
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
     static chip::CommonCaseDeviceServerInitParams initParams;
     ReturnErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
     ReturnErrorOnFailure(Server::GetInstance().Init(initParams));

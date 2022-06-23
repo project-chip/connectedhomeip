@@ -28,9 +28,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue 17510
     - label: "TH sends CEC Settings Keys(0x0A) to DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -38,7 +36,6 @@ tests:
                 value: 0x0A
 
     - label: "TH sends CEC Home Keys(0x09) to DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:

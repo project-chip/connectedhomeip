@@ -5,7 +5,7 @@ import android.util.Log;
 import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
 import com.matter.tv.server.service.ContentAppAgentService;
-import com.tcl.chip.tvapp.ContentAppEndpointManager;
+import com.matter.tv.server.tvapp.ContentAppEndpointManager;
 
 public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager {
 

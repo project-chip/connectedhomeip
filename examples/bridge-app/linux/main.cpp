@@ -44,16 +44,19 @@
 
 #include "CommissionableInit.h"
 #include "Device.h"
+#include "main.h"
 #include <app/server/Server.h>
 
 #include <cassert>
 #include <iostream>
+#include <vector>
 
 using namespace chip;
 using namespace chip::Credentials;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
+using namespace chip::app::Clusters;
 
 namespace {
 
@@ -64,6 +67,7 @@ const int kDescriptorAttributeArraySize = 254;
 EndpointId gCurrentEndpointId;
 EndpointId gFirstDynamicEndpointId;
 Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+std::vector<Room *> gRooms;
 
 // ENDPOINT DEFINITIONS:
 // =================================================================================
@@ -148,6 +152,21 @@ DeviceSwitch Switch2("Switch 2", "Office",
                      EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH | EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_RELEASE |
                          EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_LONG_PRESS |
                          EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_MULTI_PRESS);
+
+// Declare Bridged endpoints used for Action clusters
+DataVersion gActionLight1DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gActionLight2DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gActionLight3DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gActionLight4DataVersions[ArraySize(bridgedLightClusters)];
+
+DeviceOnOff ActionLight1("Action Light 1", "Room 1");
+DeviceOnOff ActionLight2("Action Light 2", "Room 1");
+DeviceOnOff ActionLight3("Action Light 3", "Room 2");
+DeviceOnOff ActionLight4("Action Light 4", "Room 2");
+
+Room room1("Room 1", 0xE001, BridgedActions::EndpointListTypeEnum::kRoom, true);
+Room room2("Room 2", 0xE002, BridgedActions::EndpointListTypeEnum::kRoom, true);
+Room room3("Zone 3", 0xE003, BridgedActions::EndpointListTypeEnum::kZone, false);
 
 // ---------------------------------------------------------------------------
 //
@@ -255,6 +274,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
             while (1)
             {
                 dev->SetEndpointId(gCurrentEndpointId);
+                dev->SetParentEndpointId(parentEndpointId);
                 ret =
                     emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)
@@ -298,6 +318,46 @@ int RemoveDeviceEndpoint(Device * dev)
         index++;
     }
     return -1;
+}
+
+std::vector<EndpointListInfo> GetEndpointListInfo(chip::EndpointId parentId)
+{
+    std::vector<EndpointListInfo> infoList;
+
+    for (auto room : gRooms)
+    {
+        if (room->getIsVisible())
+        {
+            EndpointListInfo info(room->getEndpointListId(), room->getName(), room->getType());
+            int index = 0;
+            while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+            {
+                if ((gDevices[index] != nullptr) && (gDevices[index]->GetParentEndpointId() == parentId))
+                {
+                    std::string location;
+                    if (room->getType() == BridgedActions::EndpointListTypeEnum::kZone)
+                    {
+                        location = gDevices[index]->GetZone();
+                    }
+                    else
+                    {
+                        location = gDevices[index]->GetLocation();
+                    }
+                    if (room->getName().compare(location) == 0)
+                    {
+                        info.AddEndpointId(gDevices[index]->GetEndpointId());
+                    }
+                }
+                index++;
+            }
+            if (info.GetEndpointListSize() > 0)
+            {
+                infoList.push_back(info);
+            }
+        }
+    }
+
+    return infoList;
 }
 
 void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
@@ -614,25 +674,31 @@ void * bridge_polling_thread(void * context)
         if (kbhit())
         {
             int ch = getchar();
+
+            // Commands used for the actions bridge test plan.
             if (ch == '2' && light2_added == false)
             {
+                // TC-BR-2 step 2, Add Light2
                 AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                                   Span<DataVersion>(gLight2DataVersions), 1);
                 light2_added = true;
             }
             else if (ch == '4' && light1_added == true)
             {
+                // TC-BR-2 step 4, Remove Light 1
                 RemoveDeviceEndpoint(&Light1);
                 light1_added = false;
             }
             if (ch == '5' && light1_added == false)
             {
+                // TC-BR-2 step 5, Add Light 1 back
                 AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                                   Span<DataVersion>(gLight1DataVersions), 1);
                 light1_added = true;
             }
             if (ch == 'b')
             {
+                // TC-BR-3 step 1b, rename lights
                 if (light1_added)
                 {
                     Light1.SetName("Light 1b");
@@ -644,6 +710,7 @@ void * bridge_polling_thread(void * context)
             }
             if (ch == 'c')
             {
+                // TC-BR-3 step 2c, change the state of the lights
                 if (light1_added)
                 {
                     Light1.Toggle();
@@ -652,6 +719,31 @@ void * bridge_polling_thread(void * context)
                 {
                     Light2.Toggle();
                 }
+            }
+
+            // Commands used for the actions cluster test plan.
+            if (ch == 'r')
+            {
+                // TC-ACT-2.2 step 2c, rename "Room 1"
+                room1.setName("Room 1 renamed");
+                ActionLight1.SetLocation(room1.getName());
+                ActionLight2.SetLocation(room1.getName());
+            }
+            if (ch == 'f')
+            {
+                // TC-ACT-2.2 step 2f, move "Action Light 3" from "Room 2" to "Room 1"
+                ActionLight3.SetLocation(room1.getName());
+            }
+            if (ch == 'i')
+            {
+                // TC-ACT-2.2 step 2i, remove "Room 2" (make it not visible in the endpoint list), do not remove the lights
+                room2.setIsVisible(false);
+            }
+            if (ch == 'l')
+            {
+                // TC-ACT-2.2 step 2l, add a new "Zone 3" and add "Action Light 2" to the new zone
+                room3.setIsVisible(true);
+                ActionLight2.SetZone("Zone 3");
             }
             continue;
         }
@@ -669,7 +761,6 @@ int main(int argc, char * argv[])
     memset(gDevices, 0, sizeof(gDevices));
 
     // Setup Mock Devices
-
     Light1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
     Light2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
 
@@ -681,6 +772,17 @@ int main(int argc, char * argv[])
 
     Switch1.SetReachable(true);
     Switch2.SetReachable(true);
+
+    // Setup devices for action cluster tests
+    ActionLight1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+    ActionLight2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+    ActionLight3.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+    ActionLight4.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+
+    ActionLight1.SetReachable(true);
+    ActionLight2.SetReachable(true);
+    ActionLight3.SetReachable(true);
+    ActionLight4.SetReachable(true);
 
     // Define composed device with two switches
     ComposedDevice ComposedDevice("Composed Switcher", "Bedroom");
@@ -751,6 +853,19 @@ int main(int argc, char * argv[])
     AddDeviceEndpoint(&ComposedPowerSource, &bridgedPowerSourceEndpoint,
                       Span<const EmberAfDeviceType>(gComposedPowerSourceDeviceTypes),
                       Span<DataVersion>(gComposedPowerSourceDataVersions), ComposedDevice.GetEndpointId());
+
+    // Add 4 lights for the Action Clusters tests
+    AddDeviceEndpoint(&ActionLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gActionLight1DataVersions), 1);
+    AddDeviceEndpoint(&ActionLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gActionLight2DataVersions), 1);
+    AddDeviceEndpoint(&ActionLight3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gActionLight3DataVersions), 1);
+    AddDeviceEndpoint(&ActionLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gActionLight4DataVersions), 1);
+    gRooms.push_back(&room1);
+    gRooms.push_back(&room2);
+    gRooms.push_back(&room3);
 
     {
         pthread_t poll_thread;

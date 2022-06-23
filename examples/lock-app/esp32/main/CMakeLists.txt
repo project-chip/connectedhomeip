@@ -81,7 +81,7 @@ pw_proto_library(descriptor_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 pw_proto_library(device_service
@@ -94,7 +94,7 @@ pw_proto_library(device_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 pw_proto_library(button_service
@@ -105,7 +105,7 @@ pw_proto_library(button_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 pw_proto_library(locking_service
@@ -116,7 +116,7 @@ pw_proto_library(locking_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 target_link_libraries(${COMPONENT_LIB} PUBLIC

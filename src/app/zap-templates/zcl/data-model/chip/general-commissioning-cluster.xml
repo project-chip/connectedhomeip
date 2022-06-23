@@ -32,7 +32,8 @@ limitations under the License.
   </enum>
   <struct name="BasicCommissioningInfo">
     <cluster code="0x0030"/>
-    <item name="FailSafeExpiryLengthSeconds" type="INT16U"/>
+    <item fieldId="0" name="FailSafeExpiryLengthSeconds" type="INT16U"/>
+    <item fieldId="1" name="MaxCumulativeFailsafeSeconds" type="INT16U"/>
   </struct>
   <cluster>
     <domain>General</domain>

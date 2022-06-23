@@ -41,13 +41,9 @@
 
 // Code used to configure the cluster event mechanism
 #define EMBER_AF_GENERATED_EVENT_CODE                                                                                              \
-    EmberEventControl emberAfLevelControlClusterServerTickCallbackControl1;                                                        \
     EmberEventControl emberAfBarrierControlClusterServerTickCallbackControl1;                                                      \
-    EmberEventControl emberAfIasZoneClusterServerTickCallbackControl1;                                                             \
-    extern EmberEventControl emberAfPluginIasZoneServerManageQueueEventControl;                                                    \
     extern void emberAfPluginDoorLockServerLockoutEventHandler(void);                                                              \
     extern void emberAfPluginDoorLockServerRelockEventHandler(void);                                                               \
-    extern void emberAfPluginIasZoneServerManageQueueEventHandler(void);                                                           \
     static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, chip::EndpointId endpoint)           \
     {                                                                                                                              \
         /* emberAfPushEndpointNetworkIndex(endpoint); */                                                                           \
@@ -55,43 +51,25 @@
         (*callback)(endpoint);                                                                                                     \
         /* emberAfPopNetworkIndex(); */                                                                                            \
     }                                                                                                                              \
-    void emberAfLevelControlClusterServerTickCallbackWrapperFunction1(void)                                                        \
-    {                                                                                                                              \
-        clusterTickWrapper(&emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallback,    \
-                           1);                                                                                                     \
-    }                                                                                                                              \
     void emberAfBarrierControlClusterServerTickCallbackWrapperFunction1(void)                                                      \
     {                                                                                                                              \
         clusterTickWrapper(&emberAfBarrierControlClusterServerTickCallbackControl1,                                                \
                            emberAfBarrierControlClusterServerTickCallback, 1);                                                     \
     }                                                                                                                              \
-    void emberAfIasZoneClusterServerTickCallbackWrapperFunction1(void)                                                             \
-    {                                                                                                                              \
-        clusterTickWrapper(&emberAfIasZoneClusterServerTickCallbackControl1, emberAfIasZoneClusterServerTickCallback, 1);          \
-    }                                                                                                                              \
     /*to finish*/
 
 // EmberEventData structs used to populate the EmberEventData table
 #define EMBER_AF_GENERATED_EVENTS                                                                                                  \
-    { &emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallbackWrapperFunction1 },       \
-        { &emberAfBarrierControlClusterServerTickCallbackControl1,                                                                 \
-          emberAfBarrierControlClusterServerTickCallbackWrapperFunction1 },                                                        \
-        { &emberAfIasZoneClusterServerTickCallbackControl1, emberAfIasZoneClusterServerTickCallbackWrapperFunction1 },             \
-        { &emberAfPluginIasZoneServerManageQueueEventControl, emberAfPluginIasZoneServerManageQueueEventHandler },
+    { &emberAfBarrierControlClusterServerTickCallbackControl1, emberAfBarrierControlClusterServerTickCallbackWrapperFunction1 },
 
 #define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
-    "Level Control Cluster Server EP 1", "Barrier Control Cluster Server EP 1", "IAS Zone Cluster Server EP 1",                    \
-        "Door Lock Server Cluster Plugin Lockout", "Door Lock Server Cluster Plugin Relock", "IAS Zone Server Plugin ManageQueue",
+    "Barrier Control Cluster Server EP 1", "Door Lock Server Cluster Plugin Lockout", "Door Lock Server Cluster Plugin Relock",
 
 // The length of the event context table used to track and retrieve cluster events
-#define EMBER_AF_EVENT_CONTEXT_LENGTH 3
+#define EMBER_AF_EVENT_CONTEXT_LENGTH 1
 
 // EmberAfEventContext structs used to populate the EmberAfEventContext table
 #define EMBER_AF_GENERATED_EVENT_CONTEXT                                                                                           \
-    { 0x1, 0x8, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfLevelControlClusterServerTickCallbackControl1 },          \
-        { 0x1, 0x103, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfBarrierControlClusterServerTickCallbackControl1 },  \
-    {                                                                                                                              \
-        0x1, 0x500, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfIasZoneClusterServerTickCallbackControl1              \
-    }
+    { 0x1, 0x103, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfBarrierControlClusterServerTickCallbackControl1 },
 
 #endif // __AF_GEN_EVENT__

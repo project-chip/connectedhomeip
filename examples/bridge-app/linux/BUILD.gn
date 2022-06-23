@@ -24,6 +24,7 @@ executable("chip-bridge-app") {
     "${chip_root}/examples/tv-app/tv-common/include/CHIPProjectAppConfig.h",
     "Device.cpp",
     "include/Device.h",
+    "include/main.h",
     "main.cpp",
   ]
 

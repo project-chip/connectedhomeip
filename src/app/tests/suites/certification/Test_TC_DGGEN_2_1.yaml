@@ -1,0 +1,168 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 85.2.1. [TC-DGGEN-2.1] Attributes with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "General Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH reads NetworkInterfaces structure attribute from DUT."
+      command: "readAttribute"
+      attribute: "NetworkInterfaces"
+      response:
+          constraints:
+              type: list
+
+    - label: "TH reads a RebootCount attribute value from DUT."
+      command: "readAttribute"
+      attribute: "RebootCount"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "Reboot DUT (node)"
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Reboot DUT (node)"
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "DUT reboots and TH reads a UpTime attribute value of DUT since some
+          arbitrary start time of DUT rebooting."
+      command: "readAttribute"
+      attribute: "UpTime"
+      response:
+          constraints:
+              type: uint64
+
+    - label: "TH reads a TotalOperationalHours attribute value from DUT."
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
+      response:
+          constraints:
+              type: uint32
+
+    - label: "Reboot DUT (node)"
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH reads BootReason attribute value from DUT."
+      command: "readAttribute"
+      attribute: "BootReasons"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 6
+
+    #issue #13029
+    - label: "TH reads ActiveHardwareFaults attribute value from DUT."
+      verification: |
+          ./chip-tool generaldiagnostics read active-hardware-faults 1 0
+          [1654682785.894724][33006:33011] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0005 DataVersion: 804003636
+          [1654682785.894846][33006:33011] CHIP:TOO:   ActiveHardwareFaults: 0 entries
+          [1654682785.894952][33006:33011] CHIP:EM: Sending Standalone Ack for MessageCounter:30803984 on exchange 62441i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "TH reads ActiveRadioFaults attribute value from DUT."
+      verification: |
+          ./chip-tool generaldiagnostics read active-radio-faults 1 0
+          [1654682886.109092][33026:33031] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0006 DataVersion: 804003636
+          [1654682886.109197][33026:33031] CHIP:TOO:   ActiveRadioFaults: 0 entries
+          [1654682886.109321][33026:33031] CHIP:EM: Sending Standalone Ack for MessageCounter:174138703 on exchange 49820i
+
+
+          ./chip-tool generaldiagnostics subscribe active-radio-faults 100 1000 1 0
+
+          [1654682933.931539][33037:33042] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0006 DataVersion: 804003636
+          [1654682933.931617][33037:33042] CHIP:TOO:   ActiveRadioFaults: 0 entries
+          [1654682933.931659][33037:33042] CHIP:DMG: MoveToState ReadClient[0xffff7c0042e0]: Moving to [AwaitingSu]
+          [1654682933.931711][33037:33042] CHIP:EM: Piggybacking Ack for MessageCounter:4435222 on exchange: 32960i
+          [1654682933.931773][33037:33042] CHIP:IN: Prepared secure message 0xaaab093c04b8 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 32960i with MessageCounter:3568188.
+          [1654682933.931813][33037:33042] CHIP:IN: Sending encrypted msg 0xaaab093c04b8 with MessageCounter:3568188 to 0x0000000000000001 (1) at monotonic time: 0000000000CD8AFA msec
+          [1654682933.933165][33037:33042] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:4435223 on exchange 32960i
+          [1654682933.933260][33037:33042] CHIP:EM: Found matching exchange: 32960i, Delegate: 0xffff7c0042e0
+          [1654682933.933312][33037:33042] CHIP:EM: Rxd Ack; Removing MessageCounter:3568188 from Retrans Table on exchange 32960i
+          [1654682933.933345][33037:33042] CHIP:EM: Removed CHIP MessageCounter:3568188 from RetransTable on exchange 32960i
+          [1654682933.933408][33037:33042] CHIP:DMG: SubscribeResponseMessage =
+          [1654682933.933445][33037:33042] CHIP:DMG: {
+          [1654682933.933478][33037:33042] CHIP:DMG:         SubscriptionId = 0xc5357d7e,
+          [1654682933.933513][33037:33042] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
+          [1654682933.933548][33037:33042] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
+          [1654682933.933583][33037:33042] CHIP:DMG:         InteractionModelRevision = 1
+          [1654682933.933615][33037:33042] CHIP:DMG: }
+          [1654682933.933655][33037:33042] CHIP:DMG: Subscription established with SubscriptionID = 0xc5357d7e MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "TH reads ActiveNetworkFaults attribute value from DUT."
+      verification: |
+          ./chip-tool generaldiagnostics read active-network-faults 1 0
+
+          [1654683004.591353][33044:33049] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0007 DataVersion: 804003636
+          [1654683004.591438][33044:33049] CHIP:TOO:   ActiveNetworkFaults: 0 entries
+          [1654683004.591526][33044:33049] CHIP:EM: Sending Standalone Ack for MessageCounter:113863817 on exchange 44900i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

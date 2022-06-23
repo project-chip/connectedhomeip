@@ -155,7 +155,7 @@ CHIP_ERROR PASESession::SetupSpake2p()
 }
 
 CHIP_ERROR PASESession::WaitForPairing(SessionManager & sessionManager, const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount,
-                                       const ByteSpan & salt, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                                       const ByteSpan & salt, Optional<ReliableMessageProtocolConfig> mrpLocalConfig,
                                        SessionEstablishmentDelegate * delegate)
 {
     // Return early on error here, as we have not initialized any state yet
@@ -189,7 +189,7 @@ CHIP_ERROR PASESession::WaitForPairing(SessionManager & sessionManager, const Sp
     mIterationCount  = pbkdf2IterCount;
     mNextExpectedMsg = MsgType::PBKDFParamRequest;
     mPairingComplete = false;
-    mLocalMRPConfig  = mrpConfig;
+    mLocalMRPConfig  = mrpLocalConfig;
 
     ChipLogDetail(SecureChannel, "Waiting for PBKDF param request");
 
@@ -202,7 +202,7 @@ exit:
 }
 
 CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUpPINCode,
-                             Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
+                             Optional<ReliableMessageProtocolConfig> mrpLocalConfig, Messaging::ExchangeContext * exchangeCtxt,
                              SessionEstablishmentDelegate * delegate)
 {
     MATTER_TRACE_EVENT_SCOPE("Pair", "PASESession");
@@ -215,7 +215,7 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
     mExchangeCtxt = exchangeCtxt;
     mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
 
-    mLocalMRPConfig = mrpConfig;
+    mLocalMRPConfig = mrpLocalConfig;
 
     err = SendPBKDFParamRequest();
     SuccessOrExit(err);

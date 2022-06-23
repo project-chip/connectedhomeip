@@ -25,6 +25,7 @@
 #include <memory>
 
 #include <app/AttributeAccessInterface.h>
+#include <inet/UDPEndPoint.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -32,6 +33,10 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <inet/TCPEndPoint.h>
+#endif
 
 namespace chip {
 
@@ -157,6 +162,12 @@ public:
 
     void SetDelegate(ConnectivityManagerDelegate * delegate) { mDelegate = delegate; }
     ConnectivityManagerDelegate * GetDelegate() const { return mDelegate; }
+
+    chip::Inet::EndPointManager<Inet::UDPEndPoint> & UDPEndPointManager();
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    chip::Inet::EndPointManager<Inet::TCPEndPoint> & TCPEndPointManager();
+#endif
 
     // WiFi station methods
     WiFiStationMode GetWiFiStationMode();
@@ -322,6 +333,18 @@ extern ConnectivityManagerImpl & ConnectivityMgrImpl();
 
 namespace chip {
 namespace DeviceLayer {
+
+inline chip::Inet::EndPointManager<Inet::UDPEndPoint> & ConnectivityManager::UDPEndPointManager()
+{
+    return static_cast<ImplClass *>(this)->_UDPEndPointManager();
+}
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+inline chip::Inet::EndPointManager<Inet::TCPEndPoint> & ConnectivityManager::TCPEndPointManager()
+{
+    return static_cast<ImplClass *>(this)->_TCPEndPointManager();
+}
+#endif
 
 inline ConnectivityManager::WiFiStationMode ConnectivityManager::GetWiFiStationMode()
 {

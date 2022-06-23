@@ -297,6 +297,14 @@ CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddres
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceController::GetPeerAddress(NodeId nodeId, Transport::PeerAddress & addr)
+{
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(
+        PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(nodeId), addr));
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
                                                  Spake2pVerifier & outVerifier)
 {
@@ -626,8 +634,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &device->GetPairing());
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
-    err = device->GetPairing().Pair(*mSystemState->SessionMgr(), params.GetSetupPINCode(),
-                                    Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), exchangeCtxt, this);
+    err = device->GetPairing().Pair(*mSystemState->SessionMgr(), params.GetSetupPINCode(), GetLocalMRPConfig(), exchangeCtxt, this);
     SuccessOrExit(err);
 
 exit:
@@ -1107,6 +1114,27 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
     report.Set<NocChain>(NocChain(noc, icac, rcac, ipk.HasValue() ? ipk.Value() : AesCcm128KeySpan(placeHolderIpk),
                                   adminSubject.HasValue() ? adminSubject.Value() : commissioner->GetNodeId()));
     commissioner->CommissioningStageComplete(status, report);
+}
+
+CHIP_ERROR DeviceCommissioner::IssueNOCChain(const ByteSpan & NOCSRElements, NodeId nodeId,
+                                             chip::Callback::Callback<OnNOCChainGeneration> * callback)
+{
+    MATTER_TRACE_EVENT_SCOPE("IssueNOCChain", "DeviceCommissioner");
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(Controller, "Getting certificate chain for the device on fabric idx %u",
+                    static_cast<unsigned>(mFabricInfo->GetFabricIndex()));
+
+    mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(nodeId);
+
+    if (mFabricInfo != nullptr)
+    {
+        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(mFabricInfo->GetFabricId());
+    }
+
+    // Note: attestationSignature, attestationChallenge, DAC, PAI are not used by existing OperationalCredentialsIssuer.
+    return mOperationalCredentialsDelegate->GenerateChipNOCChain(NOCSRElements, ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(),
+                                                                 ByteSpan(), callback);
 }
 
 CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements,
