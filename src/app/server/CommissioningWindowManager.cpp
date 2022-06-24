@@ -115,7 +115,7 @@ void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
 void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
 {
     mFailedCommissioningAttempts++;
-    ChipLogError(AppServer, "Commissioning failed (attempt %d): %s", mFailedCommissioningAttempts, ErrorStr(err));
+    ChipLogError(AppServer, "Commissioning failed (attempt %d): %" CHIP_ERROR_FORMAT, mFailedCommissioningAttempts, err.Format());
 #if CONFIG_NETWORK_LAYER_BLE
     mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif

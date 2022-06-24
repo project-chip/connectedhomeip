@@ -273,7 +273,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     else if (!payloadHeader.NeedsAck())
     {
         // Using same error message for all errors to reduce code size.
-        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR));
+        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT,
+                     CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR.Format());
         return;
     }
 
@@ -287,7 +288,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         if (err != CHIP_NO_ERROR)
         {
             // Using same error message for all errors to reduce code size.
-            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT, err.Format());
             SendStandaloneAckIfNeeded(packetHeader, payloadHeader, session, msgFlags, std::move(msgBuf));
             return;
         }
@@ -302,7 +303,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             }
 
             // Using same error message for all errors to reduce code size.
-            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_NO_MEMORY));
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT, CHIP_ERROR_NO_MEMORY.Format());
             // No resource for creating new exchange, SendStandaloneAckIfNeeded probably also fails, so do not try it here
             return;
         }
@@ -312,7 +313,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         if (ec->IsEncryptionRequired() != packetHeader.IsEncrypted())
         {
-            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_INVALID_MESSAGE_TYPE));
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT,
+                         CHIP_ERROR_INVALID_MESSAGE_TYPE.Format());
             ec->Close();
             SendStandaloneAckIfNeeded(packetHeader, payloadHeader, session, msgFlags, std::move(msgBuf));
             return;
@@ -322,7 +324,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         if (err != CHIP_NO_ERROR)
         {
             // Using same error message for all errors to reduce code size.
-            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT, err.Format());
         }
         return;
     }
@@ -348,7 +350,7 @@ void ExchangeManager::SendStandaloneAckIfNeeded(const PacketHeader & packetHeade
     if (ec == nullptr)
     {
         // Using same error message for all errors to reduce code size.
-        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_NO_MEMORY));
+        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT, CHIP_ERROR_NO_MEMORY.Format());
         return;
     }
 
@@ -360,7 +362,7 @@ void ExchangeManager::SendStandaloneAckIfNeeded(const PacketHeader & packetHeade
     if (err != CHIP_NO_ERROR)
     {
         // Using same error message for all errors to reduce code size.
-        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
+        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // The exchange should be closed inside HandleMessage function. So don't bother close it here.

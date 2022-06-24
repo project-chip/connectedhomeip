@@ -1604,7 +1604,8 @@ CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
         break;
     };
     mState = State::kInitialized;
-    ChipLogError(SecureChannel, "Received error (protocol code %d) during pairing process. %s", protocolCode, ErrorStr(err));
+    ChipLogError(SecureChannel, "Received error (protocol code %d) during pairing process: %" CHIP_ERROR_FORMAT, protocolCode,
+                 err.Format());
     return err;
 }
 

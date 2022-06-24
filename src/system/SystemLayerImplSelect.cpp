@@ -380,7 +380,7 @@ void LayerImplSelect::HandleEvents()
 
     if (!IsSelectResultValid())
     {
-        ChipLogError(DeviceLayer, "select failed: %s\n", ErrorStr(CHIP_ERROR_POSIX(errno)));
+        ChipLogError(DeviceLayer, "Select failed: %" CHIP_ERROR_FORMAT, CHIP_ERROR_POSIX(errno).Format());
         return;
     }
 

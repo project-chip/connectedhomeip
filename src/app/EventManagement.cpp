@@ -27,7 +27,6 @@
 #include <lib/core/CHIPEventLoggingConfig.h>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::TLV;
@@ -468,7 +467,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(EventLogging, "Log event with error %s", ErrorStr(err));
+        ChipLogError(EventLogging, "Log event with error %" CHIP_ERROR_FORMAT, err.Format());
         writer = checkpoint;
     }
     else if (opts.mPriority >= CHIP_CONFIG_EVENT_GLOBAL_PRIORITY)
