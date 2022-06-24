@@ -1875,10 +1875,10 @@ void TestReadInteraction::TestSubscribePartialOverlap(nlTestSuite * apSuite, voi
     readPrepareParams.mEventPathParamsListSize = 0;
 
     std::unique_ptr<chip::app::AttributePathParams[]> attributePathParams(new chip::app::AttributePathParams[2]);
-    attributePathParams[0].mClusterId                    = Test::MockClusterId(3);
-    attributePathParams[0].mAttributeId                  = Test::MockAttributeId(1);
-    readPrepareParams.mpAttributePathParamsList          = attributePathParams.get();
-    readPrepareParams.mAttributePathParamsListSize       = 1;
+    attributePathParams[0].mClusterId              = Test::MockClusterId(3);
+    attributePathParams[0].mAttributeId            = Test::MockAttributeId(1);
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams.get();
+    readPrepareParams.mAttributePathParamsListSize = 1;
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 0;
@@ -1950,11 +1950,11 @@ void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap(nlTestSuite * apSuit
     readPrepareParams.mEventPathParamsListSize = 0;
 
     std::unique_ptr<chip::app::AttributePathParams[]> attributePathParams(new chip::app::AttributePathParams[1]);
-    attributePathParams[0].mClusterId                    = Test::kMockEndpoint2;
-    attributePathParams[0].mClusterId                    = Test::MockClusterId(3);
-    attributePathParams[0].mAttributeId                  = Test::MockAttributeId(1);
-    readPrepareParams.mpAttributePathParamsList          = attributePathParams.get();
-    readPrepareParams.mAttributePathParamsListSize       = 1;
+    attributePathParams[0].mClusterId              = Test::kMockEndpoint2;
+    attributePathParams[0].mClusterId              = Test::MockClusterId(3);
+    attributePathParams[0].mAttributeId            = Test::MockAttributeId(1);
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams.get();
+    readPrepareParams.mAttributePathParamsListSize = 1;
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 0;
