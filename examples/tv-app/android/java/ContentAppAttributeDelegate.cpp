@@ -21,8 +21,8 @@
  */
 
 #include "ContentAppAttributeDelegate.h"
-#include <app/AttributeAccessInterface.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -32,7 +32,7 @@
 namespace chip {
 namespace AppPlatform {
 
-using LaunchResponseType       = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
+using LaunchResponseType = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
 
 const char * ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttributePath & aPath)
 {
