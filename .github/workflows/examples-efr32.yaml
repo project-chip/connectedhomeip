@@ -25,7 +25,7 @@ concurrency:
 jobs:
   efr32:
     name: EFR32
-    timeout-minutes: 60
+    timeout-minutes: 90
 
     env:
       EFR32_BOARD: BRD4161A
