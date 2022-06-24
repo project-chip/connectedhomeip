@@ -1330,7 +1330,7 @@ void FabricTable::RevertPendingFabricData()
 {
     if (mIsPendingFabricDataPresent)
     {
-        ChipLogError(FabricProvisioning, "Reverting pending fabric data for fabric 0x%u",
+        ChipLogError(FabricProvisioning, "Reverting pending fabric data for fabric 0x%x",
                      static_cast<unsigned>(mFabricIndexWithPendingState));
     }
 

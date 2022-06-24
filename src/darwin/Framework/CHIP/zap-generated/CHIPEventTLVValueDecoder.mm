@@ -850,15 +850,30 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
             CHIPSoftwareDiagnosticsClusterSoftwareFaultEvent * value = [CHIPSoftwareDiagnosticsClusterSoftwareFaultEvent new];
 
             do {
-                CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct * _Nonnull memberValue;
-                memberValue = [CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct new];
-                memberValue.id = [NSNumber numberWithUnsignedLongLong:cppValue.softwareFault.id];
-                memberValue.name = [[NSString alloc] initWithBytes:cppValue.softwareFault.name.data()
-                                                            length:cppValue.softwareFault.name.size()
-                                                          encoding:NSUTF8StringEncoding];
-                memberValue.faultRecording = [NSData dataWithBytes:cppValue.softwareFault.faultRecording.data()
-                                                            length:cppValue.softwareFault.faultRecording.size()];
-                value.softwareFault = memberValue;
+                NSNumber * _Nonnull memberValue;
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.id];
+                value.id = memberValue;
+            } while (0);
+            do {
+                NSString * _Nullable memberValue;
+                if (cppValue.name.HasValue()) {
+                    memberValue = [[NSString alloc] initWithBytes:cppValue.name.Value().data()
+                                                           length:cppValue.name.Value().size()
+                                                         encoding:NSUTF8StringEncoding];
+                } else {
+                    memberValue = nil;
+                }
+                value.name = memberValue;
+            } while (0);
+            do {
+                NSData * _Nullable memberValue;
+                if (cppValue.faultRecording.HasValue()) {
+                    memberValue = [NSData dataWithBytes:cppValue.faultRecording.Value().data()
+                                                 length:cppValue.faultRecording.Value().size()];
+                } else {
+                    memberValue = nil;
+                }
+                value.faultRecording = memberValue;
             } while (0);
 
             return value;

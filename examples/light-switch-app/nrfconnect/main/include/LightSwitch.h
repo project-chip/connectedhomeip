@@ -31,9 +31,11 @@ public:
         Off     /// Turn off light on lighting-app device
     };
 
-    void Init(chip::EndpointId aLightSwitchEndpoint);
+    void Init(chip::EndpointId aLightDimmerSwitchEndpoint, chip::EndpointId aLightGenericSwitchEndpointId);
     void InitiateActionSwitch(Action);
     void DimmerChangeBrightness();
+    void GenericSwitchInitialPress();
+    void GenericSwitchReleasePress();
     chip::EndpointId GetLightSwitchEndpointId() { return mLightSwitchEndpoint; }
 
     static LightSwitch & GetInstance()
@@ -47,4 +49,5 @@ private:
     constexpr static auto kMaximumBrightness                 = 254;
 
     chip::EndpointId mLightSwitchEndpoint;
+    chip::EndpointId mLightGenericSwitchEndpointId;
 };

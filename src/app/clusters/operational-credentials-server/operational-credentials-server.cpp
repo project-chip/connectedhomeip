@@ -804,7 +804,7 @@ exit:
     else
     {
         commandObj->AddStatus(commandPath, nonDefaultStatus);
-        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02u", to_underlying(nonDefaultStatus));
+        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02x", to_underlying(nonDefaultStatus));
     }
 
     return true;
@@ -925,7 +925,7 @@ exit:
     else
     {
         commandObj->AddStatus(commandPath, nonDefaultStatus);
-        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02u", to_underlying(nonDefaultStatus));
+        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02x", to_underlying(nonDefaultStatus));
     }
 
     return true;
@@ -1051,7 +1051,7 @@ exit:
     if (finalStatus != Status::Success)
     {
         commandObj->AddStatus(commandPath, finalStatus);
-        ChipLogError(Zcl, "OpCreds: Failed AttestationRequest request with IM error 0x%02u (err = %" CHIP_ERROR_FORMAT ")",
+        ChipLogError(Zcl, "OpCreds: Failed AttestationRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
                      to_underlying(finalStatus), err.Format());
     }
 
@@ -1171,7 +1171,7 @@ exit:
     if (finalStatus != Status::Success)
     {
         commandObj->AddStatus(commandPath, finalStatus);
-        ChipLogError(Zcl, "OpCreds: Failed CSRRequest request with IM error 0x%02u (err = %" CHIP_ERROR_FORMAT ")",
+        ChipLogError(Zcl, "OpCreds: Failed CSRRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
                      to_underlying(finalStatus), err.Format());
     }
 
@@ -1229,7 +1229,7 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
 exit:
     if (finalStatus != Status::Success)
     {
-        ChipLogError(Zcl, "OpCreds: Failed AddTrustedRootCertificate request with IM error 0x%02u (err = %" CHIP_ERROR_FORMAT ")",
+        ChipLogError(Zcl, "OpCreds: Failed AddTrustedRootCertificate request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
                      to_underlying(finalStatus), err.Format());
     }
 

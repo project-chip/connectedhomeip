@@ -174,7 +174,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.sessionResumptionStorage = std::move(sessionResumptionStorage);
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
-    ReturnErrorOnFailure(delegate->Init(stateParams.sessionMgr, stateParams.groupDataProvider));
+    ReturnErrorOnFailure(delegate->Init(stateParams.sessionResumptionStorage.get(), stateParams.groupDataProvider));
     stateParams.fabricTableDelegate = delegate.get();
     ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(stateParams.fabricTableDelegate));
     delegate.release();

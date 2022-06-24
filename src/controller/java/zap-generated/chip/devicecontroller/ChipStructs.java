@@ -678,36 +678,6 @@ public class ChipStructs {
     }
   }
 
-  public static class SoftwareDiagnosticsClusterSoftwareFaultStruct {
-    public Long id;
-    public String name;
-    public byte[] faultRecording;
-
-    public SoftwareDiagnosticsClusterSoftwareFaultStruct(
-        Long id, String name, byte[] faultRecording) {
-      this.id = id;
-      this.name = name;
-      this.faultRecording = faultRecording;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("SoftwareDiagnosticsClusterSoftwareFaultStruct {\n");
-      output.append("\tid: ");
-      output.append(id);
-      output.append("\n");
-      output.append("\tname: ");
-      output.append(name);
-      output.append("\n");
-      output.append("\tfaultRecording: ");
-      output.append(Arrays.toString(faultRecording));
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
   public static class SoftwareDiagnosticsClusterThreadMetrics {
     public Long id;
     public Optional<String> name;

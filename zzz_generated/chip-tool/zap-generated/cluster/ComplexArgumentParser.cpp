@@ -1802,36 +1802,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::
     ComplexArgumentParser::Finalize(request.h);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SoftwareFaultStruct.id", "id", value.isMember("id")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SoftwareFaultStruct.name", "name", value.isMember("name")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SoftwareFaultStruct.faultRecording", "faultRecording",
-                                                                  value.isMember("faultRecording")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "id");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.id, value["id"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "faultRecording");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.faultRecording, value["faultRecording"]));
-
-    return CHIP_NO_ERROR;
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.id);
-    ComplexArgumentParser::Finalize(request.name);
-    ComplexArgumentParser::Finalize(request.faultRecording);
-}
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::ContentLauncher::Structs::StyleInformation::Type & request,
                                         Json::Value & value)
 {
