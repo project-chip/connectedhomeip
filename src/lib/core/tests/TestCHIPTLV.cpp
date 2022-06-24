@@ -36,6 +36,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/Constants.h>
@@ -201,8 +202,10 @@ void ForEachElement(nlTestSuite * inSuite, TLVReader & reader, void * context,
 struct TestTLVContext
 {
     nlTestSuite * mSuite;
-    int mEvictionCount;
-    uint32_t mEvictedBytes;
+    int mEvictionCount = 0;
+    uint32_t mEvictedBytes = 0;
+
+    TestTLVContext(nlTestSuite *suite) : mSuite(suite) {}
 };
 
 void TestNull(nlTestSuite * inSuite, TLVReader & reader, Tag tag)
@@ -4448,14 +4451,7 @@ int TestCHIPTLV(void)
         TestCHIPTLV_Teardown
     };
     // clang-format on
-    TestTLVContext context;
-
-    context.mSuite = &theSuite;
-
-    // Run test suit against one context
-    nlTestRunner(&theSuite, &context);
-
-    return (nlTestRunnerStats(&theSuite));
+    return chip::ExecuteTestsWithContext<TestTLVContext>(&theSuite, &theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestCHIPTLV)

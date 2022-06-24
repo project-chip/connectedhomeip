@@ -31,6 +31,7 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <system/SystemError.h>
@@ -482,12 +483,7 @@ static int TestTeardown(void * aContext)
 
 int TestSystemTimer(void)
 {
-    TestContext context;
-
-    // Run test suit againt one lContext.
-    nlTestRunner(&kTheSuite, &context);
-
-    return nlTestRunnerStats(&kTheSuite);
+    return chip::ExecuteTestsWithContext<TestContext>(&kTheSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestSystemTimer)
