@@ -489,7 +489,7 @@ public:
     /**
      * @brief Get the RCAC (operational root certificate) associated with a fabric.
      *
-     * If a root is pending from `AddNewPendingTrustedRootCert`, it is returned.
+     * If a root is pending for `fabricIndex` from `AddNewPendingTrustedRootCert`, it is returned.
      *
      * @param fabricIndex - Fabric for which to get the RCAC
      * @param outCert - MutableByteSpan to receive the certificate. Resized to actual size.
@@ -503,8 +503,8 @@ public:
     /**
      * @brief Get the ICAC (operational intermediate certificate) associated with a fabric.
      *
-     * If a fabric is pending from add/update operation for the given `fabricIndex`, it is
-     * returned.
+     * If a fabric is pending from add/update operation for the given `fabricIndex`, its
+     * ICAC is returned.
      *
      * If an NOC exists, but the ICAC is not present in the chain, CHIP_NO_ERROR is
      * returned and `outCert` is resized to 0 length so that its `empty()` method returns true.
@@ -521,8 +521,8 @@ public:
     /**
      * @brief Get the NOC (Node Operational Certificate) associated with a fabric.
      *
-     * If a fabric is pending from add/update operation for the given `fabricIndex`, it is
-     * returned.
+     * If a fabric is pending from add/update operation for the given `fabricIndex`, its
+     * NOC is returned.
      *
      * @param fabricIndex - Fabric for which to get the NOC
      * @param outCert - MutableByteSpan to receive the certificate. Resized to actual size.
@@ -697,7 +697,7 @@ public:
      * Operational key is assumed to be pending or committed in the associated mOperationalKeystore.
      *
      * The new NOC chain becomes temporarily active for purposes of `Fetch*` and `SignWithOpKeyPair`, etc.
-     * The RCAC remains as before. To succeed this method call, NOC chain must chain back to an existing RCAC.
+     * The RCAC remains as before. For this method call to succeed, NOC chain must chain back to the existing RCAC.
      * The update fabric becomes permanent/persisted on successful `CommitPendingFabricData`. Changes revert
      * on `RevertPendingFabricData` or `RevertPendingOpCertsExceptRoot`. FabricId CANNOT be updated, but
      * CAT tags and Node ID in NOC can change between previous and new NOC for a given FabricId.
