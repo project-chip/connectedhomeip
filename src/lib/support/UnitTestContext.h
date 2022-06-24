@@ -59,4 +59,3 @@ inline int ExecuteTestsWithoutContext(struct _nlTestSuite* suite)
 }
 
 } // namespace chip
-
