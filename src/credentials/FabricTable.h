@@ -859,12 +859,16 @@ private:
     // Tries to set `mFabricIndexWithPendingState` and returns false if there's a clash.
     bool SetPendingDataFabricIndex(FabricIndex fabricIndex);
 
-    CHIP_ERROR AddOrUpdateInner(FabricIndex fabricIndex, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
-                                uint16_t vendorId, FabricIndex * outputIndex);
+    // Core validation logic for fabric additions/updates
+    CHIP_ERROR AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
+                                uint16_t vendorId);
 
+    // Common code for fabric addition, for either OperationalKeystore or injected key scenarios.
     CHIP_ERROR AddNewPendingFabricCommon(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
                                          Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
                                          FabricIndex * outNewFabricIndex);
+
+    // Common code for fabric updates, for either OperationalKeystore or injected key scenarios.
     CHIP_ERROR UpdatePendingFabricCommon(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
                                          Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned);
 

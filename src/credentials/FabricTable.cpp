@@ -703,12 +703,10 @@ CHIP_ERROR FabricTable::NotifyFabricCommitted(FabricIndex fabricIndex)
 }
 
 CHIP_ERROR
-FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
-                              uint16_t vendorId, FabricIndex * outputIndex)
+FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
+                              uint16_t vendorId)
 {
     // All parameters pre-validated before we get here
-
-    bool isAddition = (fabricIndex == kUndefinedFabricIndex);
 
     FabricInfo::InitParams newFabricInfo;
     FabricInfo * fabricEntry    = nullptr;
@@ -718,15 +716,6 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, Crypto::P256Keypair * exi
     if (isAddition)
     {
         // Initialization for Adding a fabric
-
-        // Make sure we have an available fabric index
-        if (!mNextAvailableFabricIndex.HasValue())
-        {
-            // No more indices available.  Bail out.
-            return CHIP_ERROR_NO_MEMORY;
-        }
-
-        fabricIndex = mNextAvailableFabricIndex.Value();
 
         // Find an available slot.
         for (auto & fabric : mStates)
@@ -845,8 +834,6 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, Crypto::P256Keypair * exi
         // Log but this is not sticky...
         ChipLogError(FabricProvisioning, "Failed to update pending Last Known Good Time: %" CHIP_ERROR_FORMAT, lkgtErr.Format());
     }
-
-    *outputIndex = fabricIndex;
 
     // Must be the last thing before we return, as this is undone later on error handling within Delete.
     if (isAddition)
@@ -1520,7 +1507,7 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
     VerifyOrReturnError(SetPendingDataFabricIndex(fabricIndexToUse), CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR err =
-        AddOrUpdateInner(kUndefinedFabricIndex, existingOpKey, isExistingOpKeyExternallyOwned, vendorId, outNewFabricIndex);
+        AddOrUpdateInner(fabricIndexToUse, /* isAddition = */ true, existingOpKey, isExistingOpKeyExternallyOwned, vendorId);
     if (err != CHIP_NO_ERROR)
     {
         // Revert partial state added on error
@@ -1528,23 +1515,11 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
         return err;
     }
 
-    if (fabricIndexToUse != *outNewFabricIndex)
-    {
-        ChipLogError(FabricProvisioning,
-                     "Fabric addition inconsistency! Determined we needed to add index 0x%x but added 0x%x. Reverting!",
-                     static_cast<unsigned>(fabricIndexToUse), static_cast<unsigned>(*outNewFabricIndex));
-        RevertPendingFabricData();
-
-        // After reverting, let's fail fatally if possible, as this should never happen.
-        VerifyOrDie(fabricIndexToUse == *outNewFabricIndex);
-
-        return CHIP_ERROR_INTERNAL;
-    }
-
     mStateFlags.Set(StateFlags::kIsAddPending);
     mStateFlags.Set(StateFlags::kIsPendingFabricDataPresent);
 
     // Notify that NOC was added (at least transiently)
+    *outNewFabricIndex = fabricIndexToUse;
     NotifyFabricUpdated(fabricIndexToUse);
 
     return CHIP_NO_ERROR;
@@ -1588,9 +1563,8 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
     ReturnErrorOnFailure(mOpCertStore->UpdateOpCertsForFabric(fabricIndex, noc, icac));
     VerifyOrReturnError(SetPendingDataFabricIndex(fabricIndex), CHIP_ERROR_INCORRECT_STATE);
 
-    FabricIndex newFabricIndex = kUndefinedFabricIndex;
     CHIP_ERROR err =
-        AddOrUpdateInner(fabricIndex, existingOpKey, isExistingOpKeyExternallyOwned, fabricInfo->GetVendorId(), &newFabricIndex);
+        AddOrUpdateInner(fabricIndex, /* isAddition = */ false, existingOpKey, isExistingOpKeyExternallyOwned, fabricInfo->GetVendorId());
     if (err != CHIP_NO_ERROR)
     {
         // Revert partial state added on error
@@ -1598,19 +1572,6 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
         //       ofher than the opcerts.
         mOpCertStore->RevertPendingOpCertsExceptRoot();
         return err;
-    }
-
-    if (fabricIndex != newFabricIndex)
-    {
-        ChipLogError(FabricProvisioning,
-                     "Fabric update inconsistency! Determined we needed to update index 0x%x but added 0x%x. Reverting!",
-                     static_cast<unsigned>(fabricIndex), static_cast<unsigned>(newFabricIndex));
-        RevertPendingFabricData();
-
-        // After reverting, let's fail fatally if possible, as this should never happen.
-        VerifyOrDie(fabricIndex == newFabricIndex);
-
-        return CHIP_ERROR_INTERNAL;
     }
 
     mStateFlags.Set(StateFlags::kIsUpdatePending);
