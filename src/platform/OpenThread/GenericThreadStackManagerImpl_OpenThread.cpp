@@ -1496,7 +1496,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             uint64_t activeTimestamp = (activeDataset.mActiveTimestamp.mSeconds << 16) |
                 (activeDataset.mActiveTimestamp.mTicks << 1) | activeDataset.mActiveTimestamp.mAuthoritative;
 #else
-            uint64_t activeTimestamp = activeDataset.mActiveTimestamp;
+            uint64_t activeTimestamp  = activeDataset.mActiveTimestamp;
 #endif
             err = encoder.Encode(activeTimestamp);
         }
