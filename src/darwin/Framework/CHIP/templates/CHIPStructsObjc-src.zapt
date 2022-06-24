@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_event_fields}}{{asStructPropertyName name}}:%@; {{/zcl_event_fields}}>", NSStringFromClass([self class]){{#zcl_event_fields}},{{#if isArray}}_{{asStructPropertyName name}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName name}}{{/if}}{{/zcl_event_fields}}];
+  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_event_fields}}{{asStructPropertyName name}}:%@; {{/zcl_event_fields}}>", NSStringFromClass([self class]){{#zcl_event_fields}},{{#if isArray}}_{{asStructPropertyName name}}{{else if (isOctetString type)}}[_{{asStructPropertyName name}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName name}}{{/if}}{{/zcl_event_fields}}];
   return descriptionString;
 }
 

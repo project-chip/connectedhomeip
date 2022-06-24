@@ -173,33 +173,47 @@ public:
     class ControllerFabricDelegate final : public chip::FabricTable::Delegate
     {
     public:
-        CHIP_ERROR Init(SessionManager * sessionManager, Credentials::GroupDataProvider * groupDataProvider)
+        CHIP_ERROR Init(SessionResumptionStorage * sessionResumptionStorage, Credentials::GroupDataProvider * groupDataProvider)
         {
-            VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(sessionResumptionStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(groupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-            mSessionManager    = sessionManager;
-            mGroupDataProvider = groupDataProvider;
+            mSessionResumptionStorage = sessionResumptionStorage;
+            mGroupDataProvider        = groupDataProvider;
             return CHIP_NO_ERROR;
         };
 
-        void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+        void OnFabricRemoved(const chip::FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
-
-            if (mSessionManager != nullptr)
-            {
-                mSessionManager->FabricRemoved(fabricIndex);
-            }
             if (mGroupDataProvider != nullptr)
             {
                 mGroupDataProvider->RemoveFabric(fabricIndex);
             }
+            ClearCASEResumptionStateOnFabricChange(fabricIndex);
         };
 
+        void OnFabricUpdated(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+        {
+            (void) fabricTable;
+            ClearCASEResumptionStateOnFabricChange(fabricIndex);
+        }
+
     private:
-        SessionManager * mSessionManager                    = nullptr;
-        Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
+        void ClearCASEResumptionStateOnFabricChange(chip::FabricIndex fabricIndex)
+        {
+            VerifyOrReturn(mSessionResumptionStorage != nullptr);
+            CHIP_ERROR err = mSessionResumptionStorage->DeleteAll(fabricIndex);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller,
+                             "Warning, failed to delete session resumption state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                             static_cast<unsigned>(fabricIndex), err.Format());
+            }
+        }
+
+        Credentials::GroupDataProvider * mGroupDataProvider  = nullptr;
+        SessionResumptionStorage * mSessionResumptionStorage = nullptr;
     };
 
 private:

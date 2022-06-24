@@ -414,21 +414,7 @@ private:
         void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
-            auto & sessionManager = mServer->GetSecureSessionManager();
-            sessionManager.FabricRemoved(fabricIndex);
-
-            // Remove all CASE session resumption state
-            auto * sessionResumptionStorage = mServer->GetSessionResumptionStorage();
-            if (sessionResumptionStorage != nullptr)
-            {
-                CHIP_ERROR err = sessionResumptionStorage->DeleteAll(fabricIndex);
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(AppServer,
-                                 "Warning, failed to delete session resumption state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
-                                 static_cast<unsigned>(fabricIndex), err.Format());
-                }
-            }
+            ClearCASEResumptionStateOnFabricChange(fabricIndex);
 
             Credentials::GroupDataProvider * groupDataProvider = mServer->GetGroupDataProvider();
             if (groupDataProvider != nullptr)
@@ -456,7 +442,26 @@ private:
             }
         }
 
+        void OnFabricUpdated(const FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+        {
+            (void) fabricTable;
+            ClearCASEResumptionStateOnFabricChange(fabricIndex);
+        }
+
     private:
+        void ClearCASEResumptionStateOnFabricChange(chip::FabricIndex fabricIndex)
+        {
+            auto * sessionResumptionStorage = mServer->GetSessionResumptionStorage();
+            VerifyOrReturn(sessionResumptionStorage != nullptr);
+            CHIP_ERROR err = sessionResumptionStorage->DeleteAll(fabricIndex);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer,
+                             "Warning, failed to delete session resumption state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                             static_cast<unsigned>(fabricIndex), err.Format());
+            }
+        }
+
         Server * mServer = nullptr;
     };
 

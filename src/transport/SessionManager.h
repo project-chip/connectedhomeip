@@ -120,7 +120,7 @@ private:
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
 };
 
-class DLL_EXPORT SessionManager : public TransportMgrDelegate
+class DLL_EXPORT SessionManager : public TransportMgrDelegate, public FabricTable::Delegate
 {
 public:
     SessionManager();
@@ -245,6 +245,28 @@ public:
 
     using SessionHandleCallback = bool (*)(void * context, SessionHandle & sessionHandle);
     CHIP_ERROR ForEachSessionHandle(void * context, SessionHandleCallback callback);
+
+    //// FabricTable::Delegate Implementation ////
+    void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        (void) fabricTable;
+        this->FabricRemoved(fabricIndex);
+    }
+    void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        (void) fabricTable;
+        (void) fabricIndex;
+    }
+    void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        (void) fabricTable;
+        (void) fabricIndex;
+    }
+    void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+    {
+        (void) fabricTable;
+        (void) fabricIndex;
+    }
 
 private:
     /**

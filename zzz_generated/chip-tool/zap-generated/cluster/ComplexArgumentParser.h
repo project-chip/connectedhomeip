@@ -207,10 +207,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TestCluster::St
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::StyleInformation::Type & request,
                         Json::Value & value);
 

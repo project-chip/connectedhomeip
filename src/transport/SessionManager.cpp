@@ -72,7 +72,10 @@ uint32_t EncryptedPacketBufferHandle::GetMessageCounter() const
 
 SessionManager::SessionManager() : mState(State::kNotReady) {}
 
-SessionManager::~SessionManager() {}
+SessionManager::~SessionManager()
+{
+    this->Shutdown();
+}
 
 CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
                                 Transport::MessageCounterManagerInterface * messageCounterManager,
@@ -82,6 +85,7 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(storageDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(fabricTable->AddFabricDelegate(this));
 
     mState                 = State::kInitialized;
     mSystemLayer           = systemLayer;
@@ -102,6 +106,10 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
 
 void SessionManager::Shutdown()
 {
+    if (mFabricTable != nullptr)
+    {
+        mFabricTable->RemoveFabricDelegate(this);
+    }
     mMessageCounterManager = nullptr;
 
     mState        = State::kNotReady;
