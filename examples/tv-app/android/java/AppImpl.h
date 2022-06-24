@@ -88,7 +88,7 @@ public:
                                   szApplicationVersion),
         mAccountLoginDelegate(setupPIN),
         mContentLauncherDelegate(
-            new ContentAppAttributeDelegate(manager, app::Clusters::ContentLauncher::Id), { "image/*", "video/*" },
+            new ContentAppAttributeDelegate(manager), { "image/*", "video/*" },
             to_underlying(SupportedStreamingProtocol::kDash) | to_underlying(SupportedStreamingProtocol::kHls)),
         mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
