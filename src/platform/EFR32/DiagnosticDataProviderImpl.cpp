@@ -28,10 +28,10 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #endif
-
 #include "AppConfig.h"
 #include "FreeRTOS.h"
 #include "heap_4_silabs.h"
+#include <lib/support/CHIPMemString.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
