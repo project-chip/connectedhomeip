@@ -51,6 +51,8 @@ public:
     void HandleNext(CommandResponseHelper<PlaybackResponseType> & helper) override;
     void HandleStartOver(CommandResponseHelper<PlaybackResponseType> & helper) override;
 
+    uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+
 protected:
     // NOTE: it does not make sense to have default state of playing with a speed of 0, but
     // the CI test cases expect these values, and need to be fixed.
@@ -64,4 +66,8 @@ protected:
 
     static const int kPlaybackMaxForwardSpeed = 10;
     static const int kPlaybackMaxRewindSpeed  = -10;
+
+private:
+    // TODO: set this based upon meta data from app
+    uint32_t mDynamicEndpointFeatureMap = 3;
 };

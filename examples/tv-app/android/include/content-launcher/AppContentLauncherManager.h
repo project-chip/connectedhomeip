@@ -19,6 +19,7 @@
 #pragma once
 
 #include "../../java/ContentAppCommandDelegate.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
 
 using chip::CharSpan;
@@ -47,6 +48,8 @@ public:
 
     void SetEndpointId(EndpointId epId) { mEndpointId = epId; };
 
+    uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+
 protected:
     std::list<std::string> mAcceptHeaderList;
     uint32_t mSupportedStreamingProtocols;
@@ -54,4 +57,7 @@ protected:
 private:
     EndpointId mEndpointId;
     ContentAppCommandDelegate mCommandDelegate;
+
+    // TODO: set this based upon meta data from app
+    uint32_t mDynamicEndpointFeatureMap = 3;
 };

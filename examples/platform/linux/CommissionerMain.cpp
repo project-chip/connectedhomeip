@@ -42,6 +42,7 @@
 #include <setup_payload/SetupPayload.h>
 
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
@@ -132,6 +133,10 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     factoryParams.groupDataProvider = &gGroupDataProvider;
 
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
+    uint16_t vendorId;
+    DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(vendorId);
+    ChipLogProgress(Support, " ----- Commissioner using vendorId 0x%04X", vendorId);
+    params.controllerVendorId = static_cast<VendorId>(vendorId);
 
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));
 

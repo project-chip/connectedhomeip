@@ -41,8 +41,14 @@ public:
     bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) override;
     bool HandleSkipChannel(const uint16_t & count) override;
 
+    uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+
 protected:
     uint16_t mCurrentChannelIndex;
     ChannelInfoType mCurrentChannel;
     std::vector<ChannelInfoType> mChannels;
+
+private:
+    // TODO: set this based upon meta data from app
+    uint32_t mDynamicEndpointFeatureMap = 3;
 };

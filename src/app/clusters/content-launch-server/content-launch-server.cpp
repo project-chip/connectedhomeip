@@ -120,18 +120,10 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
-bool HasFeature(chip::EndpointId endpoint, ContentLauncherFeature feature)
+bool Delegate::HasFeature(chip::EndpointId endpoint, ContentLauncherFeature feature)
 {
-    bool hasFeature     = false;
-    uint32_t featureMap = 0;
-
-    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-    if (EMBER_ZCL_STATUS_SUCCESS == status)
-    {
-        hasFeature = (featureMap & chip::to_underlying(feature));
-    }
-
-    return hasFeature;
+    uint32_t featureMap = GetFeatureMap(endpoint);
+    return (featureMap & chip::to_underlying(feature));
 }
 
 } // namespace ContentLauncher
@@ -154,6 +146,7 @@ public:
 private:
     CHIP_ERROR ReadAcceptHeaderAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadSupportedStreamingProtocolsAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 ContentLauncherAttrAccess gContentLauncherAttrAccess;
@@ -181,12 +174,27 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
 
         return ReadSupportedStreamingProtocolsAttribute(aEncoder, delegate);
     }
+    case app::Clusters::ContentLauncher::Attributes::FeatureMap::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
+    }
     default: {
         break;
     }
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ContentLauncherAttrAccess::ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                               Delegate * delegate)
+{
+    uint32_t featureFlag = delegate->GetFeatureMap(endpoint);
+    return aEncoder.Encode(featureFlag);
 }
 
 CHIP_ERROR ContentLauncherAttrAccess::ReadAcceptHeaderAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
@@ -220,7 +228,8 @@ bool emberAfContentLauncherClusterLaunchContentCallback(CommandHandler * command
 
     Delegate * delegate = GetDelegate(endpoint);
 
-    VerifyOrExit(isDelegateNull(delegate, endpoint) != true && HasFeature(endpoint, ContentLauncherFeature::kContentSearch),
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true &&
+                     delegate->HasFeature(endpoint, ContentLauncherFeature::kContentSearch),
                  err = CHIP_ERROR_INCORRECT_STATE);
 
     delegate->HandleLaunchContent(responder, decodableParameterList, autoplay, data.HasValue() ? data.Value() : CharSpan());
@@ -253,7 +262,7 @@ bool emberAfContentLauncherClusterLaunchURLCallback(CommandHandler * commandObj,
     app::CommandResponseHelper<Commands::LaunchResponse::Type> responder(commandObj, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
-    VerifyOrExit(isDelegateNull(delegate, endpoint) != true && HasFeature(endpoint, ContentLauncherFeature::kURLPlayback),
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true && delegate->HasFeature(endpoint, ContentLauncherFeature::kURLPlayback),
                  err = CHIP_ERROR_INCORRECT_STATE);
     {
         delegate->HandleLaunchUrl(responder, contentUrl, displayString.HasValue() ? displayString.Value() : CharSpan(),

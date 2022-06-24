@@ -17,6 +17,7 @@
  */
 
 #include "ContentLauncherManager.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 
 using namespace std;
 using namespace chip::app;
@@ -185,4 +186,16 @@ uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetSupportedStreamingProtocols");
     return mSupportedStreamingProtocols;
+}
+
+uint32_t ContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicEndpointFeatureMap;
+    }
+
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
 }
