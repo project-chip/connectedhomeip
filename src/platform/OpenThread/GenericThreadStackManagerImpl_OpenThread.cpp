@@ -1492,7 +1492,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            uint64_t activeTimestamp = activeDataset.mPendingTimestamp;
+            uint64_t activeTimestamp = (activeDataset.mActiveTimestamp.mSeconds << 16) | (activeDataset.mActiveTimestamp.mTicks << 1) | activeDataset.activeDataset.mActiveTimestamp.mTicks.mAuthoritative;
             err                      = encoder.Encode(activeTimestamp);
         }
     }
@@ -1505,7 +1505,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            uint64_t pendingTimestamp = activeDataset.mPendingTimestamp;
+            uint64_t pendingTimestamp = (activeDataset.mPendingTimestamp.mSeconds << 16) | (activeDataset.mPendingTimestamp.mTicks << 1) | activeDataset.mPendingTimestamp.mAuthoritative;
             err                       = encoder.Encode(pendingTimestamp);
         }
     }
