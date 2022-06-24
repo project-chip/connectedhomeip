@@ -125,11 +125,11 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
+    FabricTableHolder fabricTableHolder;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
-    FabricTableHolder fabricTableHolder;
 
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
     NL_TEST_ASSERT(inSuite,
