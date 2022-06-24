@@ -200,7 +200,7 @@ void ForEachElement(nlTestSuite * inSuite, TLVReader & reader, void * context,
 
 struct TestTLVContext
 {
-    nlTestSuite * mSuite;
+    nlTestSuite * mSuite = nullptr;
     int mEvictionCount     = 0;
     uint32_t mEvictedBytes = 0;
 
@@ -4455,9 +4455,7 @@ int TestCHIPTLV(void)
         TestCHIPTLV_Teardown
     };
     // clang-format on
-    TestTLVContext context;
-
-    context.mSuite = &theSuite;
+    TestTLVContext context(&theSuite);
 
     // Run test suit against one context
     nlTestRunner(&theSuite, &context);
