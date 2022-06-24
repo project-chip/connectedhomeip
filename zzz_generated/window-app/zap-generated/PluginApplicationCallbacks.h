@@ -24,8 +24,9 @@
 #define MATTER_PLUGINS_INIT                                                                                                        \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterGroupsPluginServerInitCallback();                                                                                        \
-    MatterScenesPluginClientInitCallback();                                                                                        \
+    MatterScenesPluginServerInitCallback();                                                                                        \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
+    MatterBindingPluginServerInitCallback();                                                                                       \
     MatterAccessControlPluginServerInitCallback();                                                                                 \
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
