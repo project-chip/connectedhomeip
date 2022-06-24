@@ -229,8 +229,8 @@ void TestSecureSessionTable::ValidateSessionSorting(nlTestSuite * inSuite, void 
     // This validates evicting an over-minima fabric from the session table where there
     // are sessions from two fabrics, Fabric1 and Fabric2.
     //
-    // Fabric1 has 2 sessions, and Fabric2 has 3 sessions. Fabric2 will be selected since
-    // it has more sessions than Fabric2.
+    // Fabric1 has 2 sessions, and Fabric2 has 4 sessions. Fabric2 will be selected since
+    // it has more sessions than Fabric1.
     //
     // Within that set, there are equal sessions to each node, so the session with the
     // older timestamp will be selected.

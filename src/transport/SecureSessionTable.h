@@ -254,8 +254,8 @@ private:
     ObjectPool<SecureSession, CHIP_CONFIG_SECURE_SESSION_POOL_SIZE> mEntries;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    uint32_t mMaxSessionTableSize = CHIP_CONFIG_SECURE_SESSION_POOL_SIZE;
-    void SetMaxSessionTableSize(uint32_t size) { mMaxSessionTableSize = size; }
+    size_t mMaxSessionTableSize = CHIP_CONFIG_SECURE_SESSION_POOL_SIZE;
+    void SetMaxSessionTableSize(size_t size) { mMaxSessionTableSize = size; }
 #endif
 
     uint16_t mNextSessionId = 0;
