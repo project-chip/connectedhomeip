@@ -30,7 +30,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.79
+            image: connectedhomeip/chip-build:0.5.84
             options: --user root
 
         steps:
@@ -53,7 +53,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.5.79
+            image: connectedhomeip/chip-build-esp32:0.5.84
             options: --user root
 
         steps:
@@ -76,7 +76,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.5.79
+            image: connectedhomeip/chip-build-nrf-platform:0.5.84
             options: --user root
 
         steps:
