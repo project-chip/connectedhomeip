@@ -59,6 +59,20 @@ struct CommissioningView: View {
                 Text("Failed to open Commissioning window!")
                     .foregroundColor(Color.red)
             }
+            
+            if(viewModel.commisisoningComplete == true)
+            {
+                NavigationLink(
+                    destination: ContentLauncherView(),
+                    label: {
+                        Text("Next")
+                            .frame(width: 75, height: 30, alignment: .center)
+                            .border(Color.black, width: 1)
+                    }
+                ).background(Color.blue)
+                    .foregroundColor(Color.white)
+                    .padding()
+            }
         }
         .navigationTitle("Commissioning...")
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)

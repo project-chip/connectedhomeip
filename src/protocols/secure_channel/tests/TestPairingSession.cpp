@@ -85,8 +85,7 @@ void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, session.DecodeMRPParametersIfPresent(TLV::ContextTag(1), reader) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, session.GetRemoteMRPConfig().mIdleRetransTimeout == config.mIdleRetransTimeout);
-    NL_TEST_ASSERT(inSuite, session.GetRemoteMRPConfig().mActiveRetransTimeout == config.mActiveRetransTimeout);
+    NL_TEST_ASSERT(inSuite, session.GetRemoteMRPConfig() == config);
 }
 
 void PairingSessionTryDecodeMissingMRPParams(nlTestSuite * inSuite, void * inContext)
@@ -113,8 +112,7 @@ void PairingSessionTryDecodeMissingMRPParams(nlTestSuite * inSuite, void * inCon
     NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, session.DecodeMRPParametersIfPresent(TLV::ContextTag(2), reader) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, session.GetRemoteMRPConfig().mIdleRetransTimeout == GetLocalMRPConfig().mIdleRetransTimeout);
-    NL_TEST_ASSERT(inSuite, session.GetRemoteMRPConfig().mActiveRetransTimeout == GetLocalMRPConfig().mActiveRetransTimeout);
+    NL_TEST_ASSERT(inSuite, session.GetRemoteMRPConfig() == GetDefaultMRPConfig());
 }
 
 // Test Suite

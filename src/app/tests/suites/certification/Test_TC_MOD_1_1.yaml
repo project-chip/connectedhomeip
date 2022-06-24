@@ -42,7 +42,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: map8
+              type: map32
 
     #if condition needed #Issue 10988
     - label: "TH reads the AttributeList attribute from the DUT"
@@ -74,6 +74,7 @@ tests:
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
+          value: [0]
           constraints:
               type: list
 
@@ -81,5 +82,6 @@ tests:
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
+          value: []
           constraints:
               type: list

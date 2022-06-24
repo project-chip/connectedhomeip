@@ -1,0 +1,64 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 43.2.1. [TC-DGSW-2.1] Attributes with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Software Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #issue 873
+    - label:
+          "Reads a list of ThreadMetrics struct non-global attribute from DUT."
+      command: "readAttribute"
+      attribute: "ThreadMetrics"
+      PICS: DGSW.S.A0001
+      response:
+          constraints:
+              type: list
+
+    - label: "Reads CurrentHeapFree non-global attribute value from DUT"
+      command: "readAttribute"
+      attribute: "CurrentHeapFree"
+      PICS: DGSW.S.A0002
+      response:
+          constraints:
+              type: uint64
+
+    - label: "Reads CurrentHeapUsed non-global attribute value from DUT"
+      command: "readAttribute"
+      attribute: "CurrentHeapUsed"
+      PICS: DGSW.S.A0003
+      response:
+          constraints:
+              type: uint64
+
+    - label:
+          "Reads CurrentHeapHighWaterMark non-global attribute value from DUT"
+      command: "readAttribute"
+      attribute: "CurrentHeapHighWatermark"
+      PICS: DGSW.S.A0004
+      response:
+          constraints:
+              type: uint64

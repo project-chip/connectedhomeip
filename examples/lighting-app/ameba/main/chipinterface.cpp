@@ -43,6 +43,10 @@
 
 #include <lwip_netconf.h>
 
+#if CONFIG_ENABLE_PW_RPC
+#include "Rpc.h"
+#endif
+
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
@@ -137,6 +141,10 @@ extern "C" void ChipTest(void)
 {
     ChipLogProgress(DeviceLayer, "Lighting App Demo!");
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if CONFIG_ENABLE_PW_RPC
+    chip::rpc::Init();
+#endif
 
     initPref();
 

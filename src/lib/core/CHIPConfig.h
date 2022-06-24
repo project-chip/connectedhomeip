@@ -650,10 +650,15 @@
  * secure sessions. This controls the maximum number of concurrent
  * established secure sessions across all supported transports.
  *
- * This is sized to cover the sum of the following:
+ * This is sized by default to cover the sum of the following:
  *  - At least 3 CASE sessions / fabric (Spec Ref: 4.13.2.8)
  *  - 1 reserved slot for CASEServer as a responder.
  *  - 1 reserved slot for PASE.
+ *
+ *  NOTE: On heap-based platforms, there is no pre-allocation of the pool.
+ *  Due to the use of an LRU-scheme to manage sessions, the actual active
+ *  size of the pool will grow up to the value of this define,
+ *  after which, it will remain at or around this size indefinitely.
  *
  */
 #ifndef CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
@@ -792,11 +797,9 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  * The default value comes from 3sub per fabric * max number of fabrics.
  *
- * TODO: (#17085) Should be changed to (CHIP_CONFIG_MAX_FABRICS * 3) after we can hold more read handlers on more concise
- * devices.
  */
 #ifndef CHIP_IM_MAX_NUM_SUBSCRIPTIONS
-#define CHIP_IM_MAX_NUM_SUBSCRIPTIONS (CHIP_CONFIG_MAX_FABRICS * 2)
+#define CHIP_IM_MAX_NUM_SUBSCRIPTIONS (CHIP_CONFIG_MAX_FABRICS * 3)
 #endif
 
 /**
@@ -826,9 +829,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief The maximum number of path objects for subscriptions, limits the number of attributes being subscribed at the same time.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS
-// #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * 3)
-// TODO: (#17085) Should be (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * 3)
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * 2)
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * 3)
 #endif
 
 /**
@@ -878,13 +879,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CONFIG_IM_BUILD_FOR_UNIT_TEST
+ * @def CONFIG_BUILD_FOR_HOST_UNIT_TEST
  *
- * @brief Defines whether we're currently building the IM for unit testing, which enables a set of features
- *        that are only utilized in those tests.
+ * @brief Defines whether we're currently building for unit testing, which enables a set of features
+ *        that are only utilized in those tests. This flag should not be enabled on devices. If you have a test
+ *        that uses this flag, either appropriately conditionalize the entire test on this flag, or to exclude
+ *        the compliation of that test source file entirely.
  */
-#ifndef CONFIG_IM_BUILD_FOR_UNIT_TEST
-#define CONFIG_IM_BUILD_FOR_UNIT_TEST 0
+#ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 0
 #endif
 
 /**

@@ -193,8 +193,8 @@ CHIP_ERROR
 CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabricTable,
                                             SessionResumptionStorage * sessionResumptionStorage,
                                             Credentials::CertificateValidityPolicy * policy,
-                                            SessionEstablishmentDelegate * delegate, ScopedNodeId previouslyEstablishedPeer,
-                                            Optional<ReliableMessageProtocolConfig> mrpConfig)
+                                            SessionEstablishmentDelegate * delegate, const ScopedNodeId & previouslyEstablishedPeer,
+                                            Optional<ReliableMessageProtocolConfig> mrpLocalConfig)
 {
     // Below VerifyOrReturnError is not SuccessOrExit since we only want to goto `exit:` after
     // Init has been successfully called.
@@ -207,7 +207,7 @@ CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, Fab
     mFabricsTable             = fabricTable;
     mRole                     = CryptoContext::SessionRole::kResponder;
     mSessionResumptionStorage = sessionResumptionStorage;
-    mLocalMRPConfig           = mrpConfig;
+    mLocalMRPConfig           = mrpLocalConfig;
 
     ChipLogDetail(SecureChannel, "Allocated SecureSession (%p) - waiting for Sigma1 msg",
                   mSecureSessionHolder.Get().Value()->AsSecureSession());
@@ -223,7 +223,7 @@ exit:
 CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, FabricTable * fabricTable, ScopedNodeId peerScopedNodeId,
                                          ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
                                          Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
-                                         Optional<ReliableMessageProtocolConfig> mrpConfig)
+                                         Optional<ReliableMessageProtocolConfig> mrpLocalConfig)
 {
     MATTER_TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -255,7 +255,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     mFabricsTable             = fabricTable;
     mFabricIndex              = fabricInfo->GetFabricIndex();
     mSessionResumptionStorage = sessionResumptionStorage;
-    mLocalMRPConfig           = mrpConfig;
+    mLocalMRPConfig           = mrpLocalConfig;
 
     mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
     mPeerNodeId  = peerScopedNodeId.GetNodeId();
@@ -482,7 +482,7 @@ CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom)
+CHIP_ERROR CASESession::FindLocalNodeFromDestinationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom)
 {
     VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -604,13 +604,13 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     }
 
     // Attempt to match the initiator's desired destination based on local fabric table.
-    err = FindLocalNodeFromDestionationId(destinationIdentifier, initiatorRandom);
+    err = FindLocalNodeFromDestinationId(destinationIdentifier, initiatorRandom);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(SecureChannel, "CASE matched destination ID: fabricIndex %u, NodeID 0x" ChipLogFormatX64,
                         static_cast<unsigned>(mFabricIndex), ChipLogValueX64(mLocalNodeId));
 
-        // Side-effect of FindLocalNodeFromDestionationId success was that mFabricIndex/mLocalNodeId are now
+        // Side-effect of FindLocalNodeFromDestinationId success was that mFabricIndex/mLocalNodeId are now
         // set to the local fabric and associated NodeId that was targeted by the initiator.
     }
     else
@@ -1727,7 +1727,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     Protocols::SecureChannel::MsgType msgType = static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType());
     SuccessOrExit(err);
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     if (mStopHandshakeAtState.HasValue() && mState == mStopHandshakeAtState.Value())
     {
         mStopHandshakeAtState = Optional<State>::Missing();
@@ -1741,7 +1741,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
         mExchangeCtxt->WillSendMessage();
         return CHIP_NO_ERROR;
     }
-#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 #if CHIP_CONFIG_SLOW_CRYPTO
     if (msgType == Protocols::SecureChannel::MsgType::CASE_Sigma1 || msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2 ||

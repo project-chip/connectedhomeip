@@ -257,6 +257,12 @@ tests:
       endpoint: 1
       command: "RemoveAllGroups"
 
+    - label: "Read GroupTable 3"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value: []
+
     - label: "KeySet Remove 2"
       command: "KeySetRemove"
       arguments:

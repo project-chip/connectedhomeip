@@ -154,6 +154,10 @@ public:
     CHIP_ERROR InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
                                             uint16_t peerSessionId, FabricIndex fabricIndex,
                                             const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role);
+    CHIP_ERROR InjectCaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, uint16_t peerSessionId,
+                                            NodeId localNodeId, NodeId peerNodeId, FabricIndex fabric,
+                                            const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role,
+                                            const CATValues & cats = CATValues{});
 
     /**
      * @brief
@@ -170,16 +174,9 @@ public:
     Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType,
                                             const ScopedNodeId & sessionEvictionHint);
 
-    void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(const ScopedNodeId & node);
-    void ExpireAllPairingsForPeerExceptPending(const ScopedNodeId & node);
     void ExpireAllPairingsForFabric(FabricIndex fabric);
     void ExpireAllPASEPairings();
-
-    // This API is used by commands that need to release all existing sessions on a fabric but need to make sure the response to the
-    // command still goes out on the exchange the command came in on. This API flags that the release of the session used by the
-    // exchange is deferred until the exchange is done.
-    void ReleaseSessionsForFabricExceptOne(FabricIndex fabricIndex, const SessionHandle & deferred);
 
     /**
      * @brief
@@ -212,6 +209,7 @@ public:
     void FabricRemoved(FabricIndex fabricIndex);
 
     TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
+    Transport::SecureSessionTable & GetSecureSessions() { return mSecureSessions; }
 
     /**
      * @brief

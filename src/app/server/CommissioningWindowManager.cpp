@@ -66,7 +66,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         ChipLogError(AppServer, "Failsafe timer expired");
         if (mPASESession)
         {
-            mPASESession->AsSecureSession()->MarkForRemoval();
+            mPASESession->AsSecureSession()->MarkForEviction();
         }
         HandleFailedAttempt(CHIP_ERROR_TIMEOUT);
     }
@@ -103,8 +103,6 @@ void CommissioningWindowManager::ResetState()
 void CommissioningWindowManager::Cleanup()
 {
     StopAdvertisement(/* aShuttingDown = */ false);
-    ExpireFailSafeIfArmed();
-
     ResetState();
 }
 
@@ -177,7 +175,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
         {
             ChipLogError(AppServer, "Error arming failsafe on PASE session establishment completion");
             // Don't allow a PASE session to hang around without a fail-safe.
-            session->AsSecureSession()->MarkForRemoval();
+            session->AsSecureSession()->MarkForEviction();
             HandleFailedAttempt(err);
         }
     }
@@ -221,9 +219,8 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
     if (mUseECM)
     {
         ReturnErrorOnFailure(SetTemporaryDiscriminator(mECMDiscriminator));
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(
-            mServer->GetSecureSessionManager(), mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength),
-            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(mServer->GetSecureSessionManager(), mECMPASEVerifier, mECMIterations,
+                                                            ByteSpan(mECMSalt, mECMSaltLength), GetLocalMRPConfig(), this));
     }
     else
     {
@@ -245,8 +242,7 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
         ReturnErrorOnFailure(verifier.Deserialize(ByteSpan(serializedVerifier)));
 
         ReturnErrorOnFailure(mPairingSession.WaitForPairing(mServer->GetSecureSessionManager(), verifier, iterationCount, saltSpan,
-                                                            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
-                                                            this));
+                                                            GetLocalMRPConfig(), this));
     }
 
     ReturnErrorOnFailure(StartAdvertisement());

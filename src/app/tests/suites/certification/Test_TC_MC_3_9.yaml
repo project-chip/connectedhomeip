@@ -18,6 +18,12 @@ config:
     nodeId: 0x12344321
     cluster: "Application Launcher"
     endpoint: 1
+    catalogVendorId:
+        type: INT16U
+        defaultValue: 123
+    applicationId:
+        type: CHAR_STRING
+        defaultValue: "exampleid"
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -28,18 +34,20 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue 17968
     - label: "TH sends HideApp command to DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "HideApp"
       arguments:
           values:
               - name: "application"
-                value: { catalogVendorId: 1234, applicationId: "HelloWorldApp" }
+                value:
+                    {
+                        catalogVendorId: catalogVendorId,
+                        applicationId: applicationId,
+                    }
 
     - label: "Reads the Status attribute"
-      PICS: PICS_SKIP_SAMPLE_APP
       cluster: "Application Basic"
+      endpoint: 3
       command: "readAttribute"
       attribute: "Status"
       response:

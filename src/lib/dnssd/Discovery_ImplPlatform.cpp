@@ -277,7 +277,7 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
         return CopyTextRecordValue(buffer, bufferLen, params.GetTcpSupported());
     case TxtFieldKey::kSleepyIdleInterval:
     case TxtFieldKey::kSleepyActiveInterval:
-        return CopyTextRecordValue(buffer, bufferLen, params.GetMRPConfig(), key == TxtFieldKey::kSleepyIdleInterval);
+        return CopyTextRecordValue(buffer, bufferLen, params.GetLocalMRPConfig(), key == TxtFieldKey::kSleepyIdleInterval);
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

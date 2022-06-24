@@ -30,7 +30,7 @@
     {{#if_chip_enum type}}
       {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:chip::to_underlying({{source}})];
     {{else}}
-      {{#if_is_bitmap type}}
+      {{#if_is_strongly_typed_bitmap type}}
         {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}.Raw()];
       {{else if (isOctetString type)}}
         {{target}} = [NSData dataWithBytes:{{source}}.data() length:{{source}}.size()];
@@ -38,7 +38,7 @@
         {{target}} = [[NSString alloc] initWithBytes:{{source}}.data() length:{{source}}.size() encoding:NSUTF8StringEncoding];
       {{else}}
         {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}];
-      {{/if_is_bitmap}}
+      {{/if_is_strongly_typed_bitmap}}
     {{/if_chip_enum}}
   {{/if_is_struct}}
 {{/if}}

@@ -28,12 +28,23 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue 17967
-    - label: "Read Current App ID attribute."
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "readAttribute"
-      attribute: "CurrentApp"
-      response:
-          value: null
-          constraints:
-              type: ApplicationEP
+    # Issue 13029
+    - label:
+          "TH reads CurrentApp attribute from the DUT and Verify the in-focus
+          application attributes, which should include the display Application
+          ID(type:uint16) Catalog Vendor ID(type:string) or Null if there is no
+          current in-focus application"
+      verification: |
+          ./chip-tool applicationlauncher read current-app 1 1
+          [1653909423.450195][16364:16369] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050C Attribute 0x0000_0001 DataVersion: 2386582479
+          [1653909423.450227][16364:16369] CHIP:TOO:   CurrentApp: null
+          [1653909423.450318][16364:16369] CHIP:EM: Sending Standalone Ack for MessageCounter:2071603 on exchange 4134i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
