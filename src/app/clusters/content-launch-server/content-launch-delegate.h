@@ -52,7 +52,6 @@ public:
     virtual uint32_t HandleGetSupportedStreamingProtocols() = 0;
 
     bool HasFeature(chip::EndpointId endpoint, ContentLauncherFeature feature);
-
     virtual uint32_t GetFeatureMap(chip::EndpointId endpoint) = 0;
 
     virtual ~Delegate() = default;

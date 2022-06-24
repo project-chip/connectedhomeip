@@ -174,14 +174,14 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
 
         return ReadSupportedStreamingProtocolsAttribute(aEncoder, delegate);
     }
-    case app::Clusters::ContentLauncher::Attributes::FeatureMap::Id:
+    case app::Clusters::ContentLauncher::Attributes::FeatureMap::Id: {
         if (isDelegateNull(delegate, endpoint))
         {
             return CHIP_NO_ERROR;
         }
 
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
-
+    }
     default: {
         break;
     }

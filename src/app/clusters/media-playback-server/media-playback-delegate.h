@@ -59,6 +59,8 @@ public:
     virtual void HandleNext(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)        = 0;
     virtual void HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)   = 0;
 
+    virtual uint32_t GetFeatureMap(chip::EndpointId endpoint) = 0;
+
     virtual ~Delegate() = default;
 };
 
