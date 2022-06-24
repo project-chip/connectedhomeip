@@ -43,6 +43,7 @@ ALL_PLATFORMS = set([
     'telink',
     'tizen',
     'webos',
+    'mw320',
 ])
 
 Module = namedtuple('Module', 'name path platforms')

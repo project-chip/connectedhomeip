@@ -242,6 +242,10 @@
 	url = https://github.com/TexasInstruments/cc32xx_open_sdk.git
 	branch = main
 	platform = cc32xx
+[submodule "third_party/nxp/mw320_sdk/repo"]
+	path = third_party/nxp/mw320_sdk/repo
+	url = https://github.com/nxptest/mw320_sdk
+	platforms = mw320
 [submodule "third_party/nxp/libs/mbedtls/repo"]
 	path = third_party/nxp/libs/mbedtls/repo
 	url = https://github.com/NXPmicro/mbedtls.git
