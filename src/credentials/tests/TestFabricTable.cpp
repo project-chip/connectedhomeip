@@ -181,7 +181,7 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, lastKnownGoodTime == buildTime);
 
-            // Verify that calling the fail-safe roll back interface does change
+            // Verify that calling the fail-safe roll back interface does not change
             // last known good time, as it hadn't been updated in the first place.
             fabricTable.RevertPendingFabricData();
             NL_TEST_ASSERT(inSuite, fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime) == CHIP_NO_ERROR);

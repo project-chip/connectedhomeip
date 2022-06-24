@@ -279,19 +279,14 @@ public:
 
     const FabricInfo & operator*() const
     {
-        if (IsAtEnd())
-        {
-            return mStart[mIndex];
-        }
+        VerifyOrDie(!IsAtEnd());
 
         return *GetCurrent();
     }
     const FabricInfo * operator->() const
     {
-        if (IsAtEnd())
-        {
-            return mStart + mIndex;
-        }
+        VerifyOrDie(!IsAtEnd());
+
         return GetCurrent();
     }
 
@@ -428,8 +423,8 @@ public:
     void Shutdown();
 
     // Forget a fabric in memory: doesn't delete any persistent state, just
-    // reverts any pending state (blindly) and then make the fabric table
-    // entry get reset.
+    // reverts any pending state (blindly) and then resets the fabric table
+    // entry.
     //
     // TODO: We have to determine if we should remove this call.
     void Forget(FabricIndex fabricIndex);
@@ -594,7 +589,7 @@ public:
 
     /**
      * @brief Returns whether an operational key is pending (true if `AllocatePendingOperationalKey` was
-     *        previously successfully called, false otherwise.
+     *        previously successfully called, false otherwise).
      *
      * @param outIsPendingKeyForUpdateNoc this is set to true if the `AllocatePendingOperationalKey` had an
      *                                    associated fabric index attached, indicating it's for UpdateNoc
@@ -855,13 +850,13 @@ private:
         return TLV::EstimateStructOverhead(sizeof(FabricIndex), CHIP_CONFIG_MAX_FABRICS * (1 + sizeof(FabricIndex)) + 1);
     }
 
-    // Load a FabricInfo metatada item from storage for a given new fabric index Returns internal error on failure.
+    // Load a FabricInfo metatada item from storage for a given new fabric index. Returns internal error on failure.
     CHIP_ERROR LoadFromStorage(FabricInfo * fabric, FabricIndex newFabricIndex);
 
     // Store a given fabric metadata directly/immediately. Used by internal operations.
     CHIP_ERROR StoreFabricMetadata(const FabricInfo * fabricInfo) const;
 
-    // Tries to set `mFabricIndexWithPendingState` and returns false if there's a clash
+    // Tries to set `mFabricIndexWithPendingState` and returns false if there's a clash.
     bool SetPendingDataFabricIndex(FabricIndex fabricIndex);
 
     CHIP_ERROR AddOrUpdateInner(FabricIndex fabricIndex, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
@@ -923,10 +918,13 @@ private:
      */
     const FabricInfo * GetShadowPendingFabricEntry() const
     {
-        bool hasPendingFabric = mPendingFabric.IsInitialized() &&
-            mStateFlags.HasAll(StateFlags::kIsPendingFabricDataPresent, StateFlags::kIsUpdatePending);
+        return HasPendingFabricUpdate() ? &mPendingFabric : nullptr;
+    }
 
-        return hasPendingFabric ? &mPendingFabric : nullptr;
+    // Returns true if we have a shadow entry pending for a fabruc update.
+    bool HasPendingFabricUpdate() const
+    {
+        return mPendingFabric.IsInitialized() && mStateFlags.HasAll(StateFlags::kIsPendingFabricDataPresent, StateFlags::kIsUpdatePending);
     }
 
     // Verifies credentials, using the provided root certificate.
@@ -940,10 +938,10 @@ private:
     // The `existingFabricId` is passed for UpdateNOC, and must match the Fabric, to make sure that we are
     // not trying to change FabricID with UpdateNOC. If set to kUndefinedFabricId, we are doing AddNOC and
     // we don't need to check match to pre-existing fabric.
-    CHIP_ERROR ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
-                                        FabricId existingFabricId, Credentials::CertificateValidityPolicy * policy,
-                                        CompressedFabricId & outCompressedFabricId, FabricId & outFabricId, NodeId & outNodeId,
-                                        Crypto::P256PublicKey & outNocPubkey) const;
+    static CHIP_ERROR ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                               FabricId existingFabricId, Credentials::CertificateValidityPolicy * policy,
+                                               CompressedFabricId & outCompressedFabricId, FabricId & outFabricId, NodeId & outNodeId,
+                                               Crypto::P256PublicKey & outNocPubkey, Crypto::P256PublicKey & outRootPubkey);
 
     /**
      * Read our fabric index info from the given TLV reader and set up the
