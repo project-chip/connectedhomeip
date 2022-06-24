@@ -172,27 +172,6 @@ server cluster Scenes = 5 {
     group_id groupId = 0;
   }
 
-  request struct EnhancedAddSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
-    INT16U transitionTime = 2;
-    CHAR_STRING sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
-  }
-
-  request struct EnhancedViewSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
-  }
-
-  request struct CopySceneRequest {
-    ScenesCopyMode mode = 0;
-    group_id groupIdFrom = 1;
-    INT8U sceneIdFrom = 2;
-    group_id groupIdTo = 3;
-    INT8U sceneIdTo = 4;
-  }
-
   response struct AddSceneResponse = 0 {
     ENUM8 status = 0;
     group_id groupId = 1;
@@ -239,9 +218,6 @@ server cluster Scenes = 5 {
   command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
   command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
   command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
-  command EnhancedAddScene(EnhancedAddSceneRequest): EnhancedAddSceneResponse = 64;
-  command EnhancedViewScene(EnhancedViewSceneRequest): EnhancedViewSceneResponse = 65;
-  command CopyScene(CopySceneRequest): CopySceneResponse = 66;
 }
 
 server cluster Descriptor = 29 {
