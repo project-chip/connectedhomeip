@@ -41,7 +41,7 @@ public:
 /// Executes nlTestRunner for the given test suite while
 /// allocating the given context type on the heap
 template <class Context, typename... Args>
-int ExecuteTestsWithContext(struct _nlTestSuite* suite, Args&& ... args)
+inline int ExecuteTestsWithContext(struct _nlTestSuite* suite, Args&& ... args)
 {
   {
     ScopedMemoryInit ensureHeapIsInitialized;
@@ -52,7 +52,7 @@ int ExecuteTestsWithContext(struct _nlTestSuite* suite, Args&& ... args)
   return nlTestRunnerStats(suite);
 }
 
-int ExecuteTestsWithoutContext(struct _nlTestSuite* suite)
+inline int ExecuteTestsWithoutContext(struct _nlTestSuite* suite)
 {
   nlTestRunner(suite, nullptr);
   return nlTestRunnerStats(suite);
