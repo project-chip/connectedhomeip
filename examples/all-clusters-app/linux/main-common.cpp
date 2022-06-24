@@ -67,17 +67,17 @@ void HandleSoftwareFaultEvent(intptr_t arg)
     if (!IsClusterPresentOnAnyEndpoint(Clusters::SoftwareDiagnostics::Id))
         return;
 
-    Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type softwareFault;
+    Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type softwareFault;
     char threadName[kMaxThreadNameLength + 1];
 
     softwareFault.id = static_cast<uint64_t>(getpid());
     Platform::CopyString(threadName, std::to_string(softwareFault.id).c_str());
 
-    softwareFault.name = CharSpan::fromCharString(threadName);
+    softwareFault.name.SetValue(CharSpan::fromCharString(threadName));
 
-    std::time_t result           = std::time(nullptr);
-    char * asctime               = std::asctime(std::localtime(&result));
-    softwareFault.faultRecording = ByteSpan(Uint8::from_const_char(asctime), strlen(asctime));
+    std::time_t result = std::time(nullptr);
+    char * asctime     = std::asctime(std::localtime(&result));
+    softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(asctime), strlen(asctime)));
 
     Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
 }

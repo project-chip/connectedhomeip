@@ -21,7 +21,7 @@
 # Created JSON file can be checked using JSON SCHEMA file if it is provided.
 #
 # This script can be manipulated using following kConfigs:
-# - To merge generated factory data with final zephyr.hex file set kConfig CONFIG_CHIP_MERGE_FACTORY_DATA_WITH_FIRMWARE=y
+# - To merge generated factory data with final zephyr.hex file set kConfig CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE=y
 # - To use default certification paths set CONFIG_CHIP_FACTORY_DATA_USE_DEFAULTS_CERTS_PATH=y 
 # 
 # During generation process a some file will be created in zephyr's build directory:
@@ -187,7 +187,7 @@ nrfconnect_create_factory_data_hex_file(factory_data
                                         ${OUTPUT_FILE_PATH} 
                                         factory_data_hex)
 
-if(CONFIG_CHIP_MERGE_FACTORY_DATA_WITH_FIRMWARE)                                   
+if(CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)                                   
     # set custom target for merging factory_data hex file
     add_custom_target(factory_data_merge
         DEPENDS ${factory_data_hex}

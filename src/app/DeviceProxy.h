@@ -72,7 +72,7 @@ public:
 protected:
     virtual bool IsSecureConnected() const = 0;
 
-    ReliableMessageProtocolConfig mRemoteMRPConfig = GetLocalMRPConfig();
+    ReliableMessageProtocolConfig mRemoteMRPConfig = GetDefaultMRPConfig();
 };
 
 } // namespace chip

@@ -36,6 +36,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
+#include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
 #include <protocols/secure_channel/UnsolicitedStatusHandler.h>
 
 #include <transport/TransportMgr.h>
@@ -84,7 +85,7 @@ struct DeviceControllerSystemStateParams
     // Params that will be deallocated via Platform::Delete in
     // DeviceControllerSystemState::Shutdown.
     DeviceTransportMgr * transportMgr = nullptr;
-    Platform::UniquePtr<SessionResumptionStorage> sessionResumptionStorage;
+    Platform::UniquePtr<SimpleSessionResumptionStorage> sessionResumptionStorage;
     Credentials::CertificateValidityPolicy * certificateValidityPolicy            = nullptr;
     SessionManager * sessionMgr                                                   = nullptr;
     Protocols::SecureChannel::UnsolicitedStatusHandler * unsolicitedStatusHandler = nullptr;
@@ -203,7 +204,7 @@ private:
     CASEClientPool * mCASEClientPool                                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider                            = nullptr;
     FabricTable::Delegate * mFabricTableDelegate                                   = nullptr;
-    Platform::UniquePtr<SessionResumptionStorage> mSessionResumptionStorage;
+    Platform::UniquePtr<SimpleSessionResumptionStorage> mSessionResumptionStorage;
 
     // If mTempFabricTable is not null, it was created during
     // DeviceControllerFactory::InitSystemState and needs to be

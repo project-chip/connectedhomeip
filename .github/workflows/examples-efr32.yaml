@@ -50,25 +50,6 @@ jobs:
       - name: Checkout submodules
         run: scripts/checkout_submodules.py --shallow --platform efr32
 
-      - name: Install git-lfs # Temporary measure untill docker container is updated
-        run:
-          "curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash; \
-          apt-get install git-lfs; \
-          git lfs install;"
-
-      - name: Create LFS file hash list
-        run: git -C third_party/silabs/gecko_sdk lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
-
-      - name: Restore gecko_sdk LFS cache
-        uses: actions/cache@v2
-        id: lfs-cache
-        with:
-          path: .git/modules/third_party/silabs/gecko_sdk/lfs
-          key: lfs-${{ hashFiles('.lfs-assets-id') }}
-
-      - name: Git LFS Pull
-        run: git -C third_party/silabs/gecko_sdk lfs pull
-
       - name: Set up environment for size reports
         if: ${{ !env.ACT }}
         env:

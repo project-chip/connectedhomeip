@@ -217,7 +217,7 @@ class FactoryDataGenerator:
         """ If rotating device unique ID has not been provided it should be generated """
         log.warning("Can not find rotating device UID in provided arguments list. A new one will be generated.")
         rdu = secrets.token_bytes(16)
-        log.info("\n\nThe new rotate device UID: {}\n".format(rdu).hex())
+        log.info("\n\nThe new rotate device UID: {}\n".format(rdu.hex()))
         return rdu
 
     def _validate_output_json(self, output_json: str):
@@ -325,9 +325,6 @@ def main():
     optional_arguments.add_argument("--user", type=str,
                                     help="[string] Provide additional user-specific keys in Json format: {'name_1': 'value_1', 'name_2': 'value_2', ... 'name_n', 'value_n'}.")
     args = parser.parse_args()
-
-    if(args.chip_cert_path):
-        print("Generating DAC and PAI certificates is not supported yet")
 
     if args.verbose:
         log.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=log.DEBUG)

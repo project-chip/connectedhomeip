@@ -829,9 +829,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief The maximum number of path objects for subscriptions, limits the number of attributes being subscribed at the same time.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS
-// #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * 3)
-// TODO: (#17085) Should be (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * 3)
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * 2)
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * 3)
 #endif
 
 /**

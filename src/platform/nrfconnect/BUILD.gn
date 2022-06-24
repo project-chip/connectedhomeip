@@ -49,7 +49,18 @@ static_library("nrfconnect") {
     "SystemPlatformConfig.h",
   ]
 
+  public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
+
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  if (chip_enable_factory_data) {
+    sources += [
+      "FactoryDataParser.c",
+      "FactoryDataParser.h",
+      "FactoryDataProvider.cpp",
+      "FactoryDataProvider.h",
+    ]
+  }
 
   if (chip_enable_openthread) {
     sources += [

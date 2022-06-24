@@ -38,6 +38,7 @@ from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import *
+from . import clusters as Clusters
 import enum
 import threading
 import typing
@@ -59,6 +60,20 @@ _DevicePairingDelegate_OnCommissioningStatusUpdateFunct = CFUNCTYPE(
 # else seems to do it.
 _DeviceAvailableFunct = CFUNCTYPE(None, c_void_p, c_uint32)
 
+
+_IssueNOCChainCallbackPythonCallbackFunct = CFUNCTYPE(
+    None, py_object, c_uint32, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_uint64)
+
+
+@_IssueNOCChainCallbackPythonCallbackFunct
+def _IssueNOCChainCallbackPythonCallback(devCtrl, status: int, noc: c_void_p, nocLen: int, icac: c_void_p, icacLen: int, rcac: c_void_p, rcacLen: int, ipk: c_void_p, ipkLen: int, adminSubject: int):
+    nocBytes = string_at(noc, nocLen)[:]
+    icacBytes = string_at(icac, icacLen)[:]
+    rcacBytes = string_at(rcac, rcacLen)[:]
+    ipkBytes = None
+    if ipkLen > 0:
+        ipkBytes = string_at(ipk, ipkLen)[:]
+    devCtrl.NOCChainCallback(status, nocBytes, icacBytes, rcacBytes, ipkBytes, adminSubject)
 
 # This is a fix for WEAV-429. Jay Logue recommends revisiting this at a later
 # date to allow for truly multiple instances so this is temporary.
@@ -94,6 +109,8 @@ class ChipDeviceController():
         self._dmLib = None
 
         self._InitLib()
+
+        self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback(_IssueNOCChainCallbackPythonCallback)
 
         devCtrl = c_void_p(None)
 
@@ -328,6 +345,11 @@ class ChipDeviceController():
             return False
         return self._ChipStack.commissioningEventRes == 0
 
+    def NOCChainCallback(self, status, noc, icac, rcac, ipk, adminSubject):
+        self._ChipStack.callbackRes = (noc, icac, rcac, ipk, adminSubject)
+        self._ChipStack.completeEvent.set()
+        return
+
     def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes):
         ''' Commissions a Thread device over BLE
         '''
@@ -485,6 +507,21 @@ class ChipDeviceController():
 
         if res == 0:
             return fabricid.value
+        else:
+            raise self._ChipStack.ErrorToException(res)
+
+    def GetNodeId(self):
+        self.CheckIsActive()
+
+        nodeid = c_uint64(0)
+
+        res = self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetNodeId(
+                self.devCtrl, pointer(nodeid))
+        )
+
+        if res == 0:
+            return nodeid.value
         else:
             raise self._ChipStack.ErrorToException(res)
 
@@ -940,6 +977,14 @@ class ChipDeviceController():
 
         self._ChipStack.blockingCB = blockingCB
 
+    def IssueNOCChain(self, csr: Clusters.OperationalCredentials.Commands.CSRResponse, nodeId: int):
+        self.CheckIsActive()
+
+        return self._ChipStack.CallAsync(
+            lambda: self._dmLib.pychip_DeviceController_IssueNOCChain(
+                self.devCtrl, py_object(self), csr.NOCSRElements, len(csr.NOCSRElements), nodeId)
+        )
+
     # ----- Private Members -----
     def _InitLib(self):
         if self._dmLib is None:
@@ -1068,3 +1113,12 @@ class ChipDeviceController():
             self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport.argtypes = [
                 c_uint8]
             self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport.restype = c_bool
+
+            self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
+                c_void_p, py_object, c_char_p, c_size_t, c_uint64
+            ]
+            self._dmLib.pychip_DeviceController_IssueNOCChain.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.argtypes = [
+                _IssueNOCChainCallbackPythonCallbackFunct]
+            self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.restype = None

@@ -39,7 +39,7 @@ public:
      * @brief
      *   Called when a software fault that has taken place on the Node.
      */
-    void OnSoftwareFaultDetect(const chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault);
+    void OnSoftwareFaultDetect(const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault);
 
 private:
     static SoftwareDiagnosticsServer instance;

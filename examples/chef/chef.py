@@ -543,9 +543,9 @@ def main(argv: Sequence[str]) -> None:
 
         else:
             flush_print("RPC PW disabled")
-        if (options.build_target == "esp32"):
-            shell.run_cmd(
-                f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults")
+            if (options.build_target == "esp32"):
+                shell.run_cmd(
+                    f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults")
 
         flush_print(
             f"Product ID 0x{options.pid:02X} / Vendor ID 0x{options.vid:02X}")

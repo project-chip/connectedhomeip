@@ -44,6 +44,7 @@
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
     MatterAdministratorCommissioningPluginServerInitCallback();                                                                    \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
+    MatterGroupKeyManagementPluginServerInitCallback();                                                                            \
     MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterUserLabelPluginServerInitCallback();                                                                                     \
     MatterDoorLockPluginServerInitCallback();

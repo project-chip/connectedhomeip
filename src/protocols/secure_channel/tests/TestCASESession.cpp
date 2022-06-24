@@ -246,14 +246,17 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 
         caseSession.SetGroupDataProvider(&gDeviceGroupDataProvider);
         NL_TEST_ASSERT(inSuite,
-                       caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, nullptr,
-                                                                  ScopedNodeId()) == CHIP_ERROR_INVALID_ARGUMENT);
+                       caseSession.PrepareForSessionEstablishment(
+                           sessionManager, nullptr, nullptr, nullptr, nullptr, ScopedNodeId(),
+                           Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_ERROR_INVALID_ARGUMENT);
         NL_TEST_ASSERT(inSuite,
-                       caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, &delegate,
-                                                                  ScopedNodeId()) == CHIP_ERROR_INVALID_ARGUMENT);
-        NL_TEST_ASSERT(inSuite,
-                       caseSession.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate,
-                                                                  ScopedNodeId()) == CHIP_NO_ERROR);
+                       caseSession.PrepareForSessionEstablishment(
+                           sessionManager, nullptr, nullptr, nullptr, &delegate, ScopedNodeId(),
+                           Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_ERROR_INVALID_ARGUMENT);
+        NL_TEST_ASSERT(
+            inSuite,
+            caseSession.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate, ScopedNodeId(),
+                                                       Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
     }
 }
 
@@ -271,19 +274,20 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite,
                    pairing.EstablishSession(sessionManager, nullptr, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, nullptr,
-                                            nullptr, nullptr, nullptr) != CHIP_NO_ERROR);
+                                            nullptr, nullptr, nullptr,
+                                            Optional<ReliableMessageProtocolConfig>::Missing()) != CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
                    pairing.EstablishSession(sessionManager, &gCommissionerFabrics,
-                                            ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, nullptr, nullptr, nullptr,
-                                            nullptr) != CHIP_NO_ERROR);
+                                            ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, nullptr, nullptr, nullptr, nullptr,
+                                            Optional<ReliableMessageProtocolConfig>::Missing()) != CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
                    pairing.EstablishSession(sessionManager, &gCommissionerFabrics,
                                             ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, context, nullptr, nullptr,
-                                            &delegate) == CHIP_NO_ERROR);
+                                            &delegate, Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     auto & loopback = ctx.GetLoopback();
@@ -303,9 +307,9 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * context1 = ctx.NewUnauthenticatedExchangeToBob(&pairing1);
 
     NL_TEST_ASSERT(inSuite,
-                   pairing1.EstablishSession(sessionManager, &gCommissionerFabrics,
-                                             ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, context1, nullptr, nullptr,
-                                             &delegate) == CHIP_ERROR_BAD_REQUEST);
+                   pairing1.EstablishSession(
+                       sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, context1,
+                       nullptr, nullptr, &delegate, Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_ERROR_BAD_REQUEST);
     ctx.DrainAndServiceIO();
 
     loopback.mMessageSendError = CHIP_NO_ERROR;
@@ -407,7 +411,8 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner->EstablishSession(ctx.GetSecureSessionManager(), &gCommissionerFabrics,
                                                          ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
-                                                         nullptr, nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
+                                                         nullptr, nullptr, &delegateCommissioner,
+                                                         Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == sTestCaseMessageCount);
@@ -426,7 +431,8 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner1->EstablishSession(ctx.GetSecureSessionManager(), &gCommissionerFabrics,
                                                           ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner1,
-                                                          nullptr, nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
+                                                          nullptr, nullptr, &delegateCommissioner,
+                                                          Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     chip::Platform::Delete(pairingCommissioner);
@@ -831,7 +837,8 @@ static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContex
         ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner);
         auto establishmentReturnVal           = pairingCommissioner->EstablishSession(
             ctx.GetSecureSessionManager(), &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
-            contextCommissioner, &testVectors[i].initiatorStorage, nullptr, &delegateCommissioner);
+            contextCommissioner, &testVectors[i].initiatorStorage, nullptr, &delegateCommissioner,
+            Optional<ReliableMessageProtocolConfig>::Missing());
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(inSuite, establishmentReturnVal == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == testVectors[i].expectedSentMessageCount);
@@ -881,8 +888,9 @@ void CASESessionForTest::CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nl
 
     pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
-                                                                   &delegateAccessory, ScopedNodeId()) == CHIP_NO_ERROR);
+                   pairingAccessory.PrepareForSessionEstablishment(
+                       sessionManager, &gDeviceFabrics, nullptr, nullptr, &delegateAccessory, ScopedNodeId(),
+                       Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
 
     gDeviceFabrics.SendUpdateFabricNotificationForTest(gDeviceFabricIndex);
     ctx.DrainAndServiceIO();
@@ -891,7 +899,8 @@ void CASESessionForTest::CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nl
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.EstablishSession(sessionManager, &gCommissionerFabrics,
                                                         ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
-                                                        nullptr, nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
+                                                        nullptr, nullptr, &delegateCommissioner,
+                                                        Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     // At this point the CASESession is in the process of establishing. Confirm that there are no errors and there are session

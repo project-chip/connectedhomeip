@@ -8971,54 +8971,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace GeneralDiagnostics
 namespace SoftwareDiagnostics {
 namespace Structs {
-namespace SoftwareFaultStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kId)), id));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kName)), name));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFaultRecording)), faultRecording));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, id));
-            break;
-        case to_underlying(Fields::kName):
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
-            break;
-        case to_underlying(Fields::kFaultRecording):
-            ReturnErrorOnFailure(DataModel::Decode(reader, faultRecording));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-    return CHIP_NO_ERROR;
-}
-
-} // namespace SoftwareFaultStruct
 namespace ThreadMetrics {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -9159,7 +9111,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSoftwareFault)), softwareFault));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kId)), id));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kName)), name));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFaultRecording)), faultRecording));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -9178,8 +9132,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kSoftwareFault):
-            ReturnErrorOnFailure(DataModel::Decode(reader, softwareFault));
+        case to_underlying(Fields::kId):
+            ReturnErrorOnFailure(DataModel::Decode(reader, id));
+            break;
+        case to_underlying(Fields::kName):
+            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            break;
+        case to_underlying(Fields::kFaultRecording):
+            ReturnErrorOnFailure(DataModel::Decode(reader, faultRecording));
             break;
         default:
             break;

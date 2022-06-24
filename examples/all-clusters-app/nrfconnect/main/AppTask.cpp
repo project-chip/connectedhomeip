@@ -186,7 +186,14 @@ CHIP_ERROR AppTask::Init()
     k_timer_user_data_set(&sFunctionTimer, this);
 
     // Initialize CHIP server
+#if CONFIG_CHIP_FACTORY_DATA
+    ReturnErrorOnFailure(mFactoryDataProvider.Init());
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
 
     static CommonCaseDeviceServerInitParams initParams;
     static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(kTestEventTriggerEnableKey) };

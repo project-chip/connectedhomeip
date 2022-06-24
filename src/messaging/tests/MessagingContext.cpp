@@ -174,14 +174,16 @@ void MessagingContext::ExpireSessionBobToFriends()
 
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate)
 {
-    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mAliceAddress, GetLocalMRPConfig()).Value(),
-                                       delegate);
+    return mExchangeManager.NewContext(
+        mSessionManager.CreateUnauthenticatedSession(mAliceAddress, GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig())).Value(),
+        delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate)
 {
-    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mBobAddress, GetLocalMRPConfig()).Value(),
-                                       delegate);
+    return mExchangeManager.NewContext(
+        mSessionManager.CreateUnauthenticatedSession(mBobAddress, GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig())).Value(),
+        delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate)
