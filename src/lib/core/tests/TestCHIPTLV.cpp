@@ -200,9 +200,11 @@ void ForEachElement(nlTestSuite * inSuite, TLVReader & reader, void * context,
 
 struct TestTLVContext
 {
-    nlTestSuite * mSuite;
-    int mEvictionCount;
-    uint32_t mEvictedBytes;
+    nlTestSuite * mSuite   = nullptr;
+    int mEvictionCount     = 0;
+    uint32_t mEvictedBytes = 0;
+
+    TestTLVContext(nlTestSuite * suite) : mSuite(suite) {}
 };
 
 void TestNull(nlTestSuite * inSuite, TLVReader & reader, Tag tag)
@@ -237,13 +239,15 @@ void TestDupString(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const cha
     size_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    chip::Platform::ScopedMemoryBuffer<char> valBuffer;
-    char * val = valBuffer.Alloc(expectedLen + 1).Get();
-
+    char * val     = nullptr;
     CHIP_ERROR err = reader.DupString(val);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
+    NL_TEST_ASSERT(inSuite, val != nullptr);
+    if (val != nullptr)
+    {
+        NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
+    }
+    chip::Platform::MemoryFree(val);
 }
 
 void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const uint8_t * expectedVal, uint32_t expectedLen)
@@ -253,12 +257,15 @@ void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const uint
 
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> valBuffer;
-    uint8_t * val  = valBuffer.Alloc(expectedLen).Get();
+    uint8_t * val  = nullptr;
     CHIP_ERROR err = reader.DupBytes(val, expectedLen);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen) == 0);
+    NL_TEST_ASSERT(inSuite, val != nullptr);
+    if (val != nullptr)
+    {
+        NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen) == 0);
+    }
+    chip::Platform::MemoryFree(val);
 }
 
 void TestBufferContents(nlTestSuite * inSuite, const System::PacketBufferHandle & buffer, const uint8_t * expectedVal,
@@ -4448,9 +4455,7 @@ int TestCHIPTLV(void)
         TestCHIPTLV_Teardown
     };
     // clang-format on
-    TestTLVContext context;
-
-    context.mSuite = &theSuite;
+    TestTLVContext context(&theSuite);
 
     // Run test suit against one context
     nlTestRunner(&theSuite, &context);

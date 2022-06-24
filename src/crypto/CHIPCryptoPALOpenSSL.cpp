@@ -1816,6 +1816,9 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
     }
 
 exit:
+    ASN1_OBJECT_free(commonNameObj);
+    ASN1_OBJECT_free(matterVidObj);
+    ASN1_OBJECT_free(matterPidObj);
     X509_free(x509certificate);
 
     return err;
