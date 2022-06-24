@@ -46,6 +46,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
 {
     mHeaderParser.Init();
+    mParams = {};
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_mcuboot_set_buf(mBuffer, sizeof(mBuffer))));
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_multi_image_init(mBuffer, sizeof(mBuffer))));
 
