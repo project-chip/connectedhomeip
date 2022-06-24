@@ -109,6 +109,7 @@ void SessionManager::Shutdown()
     if (mFabricTable != nullptr)
     {
         mFabricTable->RemoveFabricDelegate(this);
+        mFabricTable = nullptr;
     }
     mMessageCounterManager = nullptr;
 
