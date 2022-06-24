@@ -36,28 +36,28 @@ using LaunchResponseType = chip::app::Clusters::ContentLauncher::Commands::Launc
 
 const char * ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttributePath & aPath)
 {
-    if (aPath.mEndpointId >= FIXED_ENDPOINT_COUNT)
+    if (aPath.mEndpointId < FIXED_ENDPOINT_COUNT)
     {
-        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-        ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read being called for endpoint %d cluster %d attribute %d",
-                        aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
-        jstring resp =
-            (jstring) env->CallObjectMethod(mContentAppEndpointManager, mReadAttributeMethod, static_cast<jint>(aPath.mEndpointId),
-                                            static_cast<jint>(aPath.mClusterId), static_cast<jint>(aPath.mAttributeId));
-        if (env->ExceptionCheck())
-        {
-            ChipLogError(Zcl, "Java exception in ContentAppAttributeDelegate::Read");
-            env->ExceptionDescribe();
-            env->ExceptionClear();
-            return "";
-        }
-        const char * respStr = env->GetStringUTFChars(resp, 0);
-        ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read got response %s", respStr);
-        return respStr;
+        return "";
     }
-    return "";
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read being called for endpoint %d cluster %d attribute %d",
+                    aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    jstring resp =
+        (jstring) env->CallObjectMethod(mContentAppEndpointManager, mReadAttributeMethod, static_cast<jint>(aPath.mEndpointId),
+                                        static_cast<jint>(aPath.mClusterId), static_cast<jint>(aPath.mAttributeId));
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(Zcl, "Java exception in ContentAppAttributeDelegate::Read");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return "";
+    }
+    const char * respStr = env->GetStringUTFChars(resp, 0);
+    ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read got response %s", respStr);
+    return respStr;
 }
 
 } // namespace AppPlatform
