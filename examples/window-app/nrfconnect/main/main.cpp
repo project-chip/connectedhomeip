@@ -23,6 +23,8 @@ LOG_MODULE_REGISTER(app, CONFIG_MATTER_LOG_LEVEL);
 
 using namespace ::chip;
 
+extern "C" int _open() { return 0; }
+
 int main()
 {
     CHIP_ERROR err = AppTask::Instance().StartApp();
