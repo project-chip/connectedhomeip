@@ -27,35 +27,32 @@ namespace chip {
 
 /// Performs a memory Init/Shutdown in a controlled manner
 /// (i.e. guarantees shutdown is called).
-class ScopedMemoryInit {
+class ScopedMemoryInit
+{
 public:
-  ScopedMemoryInit() {
-    VerifyOrDie(chip::Platform::MemoryInit() == CHIP_NO_ERROR);
-  }
+    ScopedMemoryInit() { VerifyOrDie(chip::Platform::MemoryInit() == CHIP_NO_ERROR); }
 
-  ~ScopedMemoryInit() {
-    chip::Platform::MemoryShutdown();
-  }
+    ~ScopedMemoryInit() { chip::Platform::MemoryShutdown(); }
 };
 
 /// Executes nlTestRunner for the given test suite while
 /// allocating the given context type on the heap
 template <class Context, typename... Args>
-inline int ExecuteTestsWithContext(struct _nlTestSuite* suite, Args&& ... args)
+inline int ExecuteTestsWithContext(struct _nlTestSuite * suite, Args &&... args)
 {
-  {
-    ScopedMemoryInit ensureHeapIsInitialized;
-    auto ctx = chip::Platform::MakeUnique<Context>(std::forward<Args>(args)...);
-    nlTestRunner(suite, ctx.get());
-  }
+    {
+        ScopedMemoryInit ensureHeapIsInitialized;
+        auto ctx = chip::Platform::MakeUnique<Context>(std::forward<Args>(args)...);
+        nlTestRunner(suite, ctx.get());
+    }
 
-  return nlTestRunnerStats(suite);
+    return nlTestRunnerStats(suite);
 }
 
-inline int ExecuteTestsWithoutContext(struct _nlTestSuite* suite)
+inline int ExecuteTestsWithoutContext(struct _nlTestSuite * suite)
 {
-  nlTestRunner(suite, nullptr);
-  return nlTestRunnerStats(suite);
+    nlTestRunner(suite, nullptr);
+    return nlTestRunnerStats(suite);
 }
 
 } // namespace chip

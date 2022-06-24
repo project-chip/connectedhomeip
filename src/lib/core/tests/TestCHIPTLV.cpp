@@ -202,10 +202,10 @@ void ForEachElement(nlTestSuite * inSuite, TLVReader & reader, void * context,
 struct TestTLVContext
 {
     nlTestSuite * mSuite;
-    int mEvictionCount = 0;
+    int mEvictionCount     = 0;
     uint32_t mEvictedBytes = 0;
 
-    TestTLVContext(nlTestSuite *suite) : mSuite(suite) {}
+    TestTLVContext(nlTestSuite * suite) : mSuite(suite) {}
 };
 
 void TestNull(nlTestSuite * inSuite, TLVReader & reader, Tag tag)
