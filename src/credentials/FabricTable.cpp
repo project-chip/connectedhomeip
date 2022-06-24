@@ -1872,7 +1872,7 @@ void FabricTable::RevertPendingOpCertsExceptRoot()
 
     if (mStateFlags.Has(StateFlags::kIsPendingFabricDataPresent))
     {
-        ChipLogError(FabricProvisioning, "Reverting pending fabric data for fabric 0x%u",
+        ChipLogError(FabricProvisioning, "Reverting pending fabric data for fabric 0x%x",
                      static_cast<unsigned>(mFabricIndexWithPendingState));
     }
 
