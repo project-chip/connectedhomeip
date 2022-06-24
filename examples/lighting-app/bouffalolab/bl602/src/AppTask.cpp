@@ -41,9 +41,9 @@
 #include <platform/bouffalolab/BL602/OTAImageProcessorImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <async_log.h>
 #include <bl_sys_ota.h>
 #include <lib/support/ErrorStr.h>
-#include <async_log.h>
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000

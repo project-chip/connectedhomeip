@@ -89,7 +89,7 @@ extern "C" int main()
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
     SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
-    CHIP_ERROR error              = deviceMgr.Init(&EchoCallbacks);
+    CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
     if (error != CHIP_NO_ERROR)
     {
         log_info("device init failed: %s", ErrorStr(error));
