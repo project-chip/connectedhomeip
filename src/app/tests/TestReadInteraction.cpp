@@ -37,6 +37,7 @@
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
@@ -2788,9 +2789,7 @@ nlTestSuite sSuite =
 
 int TestReadInteraction()
 {
-    TestContext sContext;
-    nlTestRunner(&sSuite, &sContext);
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestReadInteraction)
