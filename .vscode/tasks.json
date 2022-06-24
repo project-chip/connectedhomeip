@@ -305,8 +305,8 @@
                 },
                 "background": {
                     "activeOnStart": true,
-                    "beginsPattern": "^.*Listening for serial connection*",
-                    "endsPattern": "^.*GDBServer: Listening*"
+                    "beginsPattern": "^.*Trying*",
+                    "endsPattern": "^.*Connected to localhost*"
                 }
             }
         }

@@ -52,6 +52,8 @@ DEBUG=false
 EXAMPLE=""
 FVP_BIN=FVP_Corstone_SSE-300_Ethos-U55
 GDB_PLUGIN="${FAST_MODEL_PLUGINS_PATH}/GDBRemoteConnection.so"
+FVP_CONFIG_FILE="${CHIP_ROOT}/examples/platform/openiotsdk/fvp/cs300.conf"
+TELNET_TERMINAL_PORT=5000
 
 function build_with_cmake {
     CMAKE="$(which cmake)"
@@ -111,13 +113,16 @@ function run_fvp {
         exit 1
     fi
 
-    OPTIONS="-C mps3_board.visualisation.disable-visualisation=1 -C mps3_board.smsc_91c111.enabled=1 -C mps3_board.hostbridge.userNetworking=1 -C cpu0.semihosting-enable=1 -C mps3_board.telnetterminal0.start_telnet=0 -C mps3_board.uart0.out_file="-"  -C mps3_board.uart0.unbuffered_output=1 --stat  -C mps3_board.DISABLE_GATING=1"
+    OPTIONS="-C mps3_board.telnetterminal0.start_port=$TELNET_TERMINAL_PORT"
 
     if $DEBUG; then
         OPTIONS="${OPTIONS} --allow-debug-plugin --plugin $GDB_PLUGIN"
     fi
 
-    $FVP_BIN $OPTIONS --application $EXAMPLE_EXE_PATH
+    $FVP_BIN $OPTIONS -f $FVP_CONFIG_FILE --application $EXAMPLE_EXE_PATH >/dev/null 2>&1 &
+    sleep 1
+    telnet localhost ${TELNET_TERMINAL_PORT}
+    trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 }
 
 SHORT=C:,p:,d:,c,s,h
