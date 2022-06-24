@@ -340,7 +340,12 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     dnssdService.mTextEntries   = textEntries.empty() ? nullptr : textEntries.data();
     dnssdService.mTextEntrySize = textEntries.size();
 
-    rCtx->mCallback(rCtx->mCbContext, &dnssdService, chip::Span<chip::Inet::IPAddress>(&ipAddr, 1), CHIP_NO_ERROR);
+    { // Lock the stack mutex when calling the callback function, so that the callback
+      // function could safely perform message exchange (e.g. PASE session pairing).
+        chip::DeviceLayer::StackLock lock;
+        rCtx->mCallback(rCtx->mCbContext, &dnssdService, chip::Span<chip::Inet::IPAddress>(&ipAddr, 1), CHIP_NO_ERROR);
+    }
+
     rCtx->mInstance->RemoveContext(rCtx);
     return;
 
