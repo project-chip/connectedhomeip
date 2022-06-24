@@ -240,7 +240,7 @@ void TestDupString(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const cha
     size_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    char * val = nullptr;
+    char * val     = nullptr;
     CHIP_ERROR err = reader.DupString(val);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, val != nullptr);
