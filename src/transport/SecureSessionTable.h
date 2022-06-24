@@ -151,9 +151,9 @@ private:
         uint16_t mNumMatchingOnPeer;
 
         static_assert(CHIP_CONFIG_SECURE_SESSION_POOL_SIZE <= std::numeric_limits<decltype(mNumMatchingOnFabric)>::max(),
-                      "CHIP_CONFIG_SECURE_SESSION_POOL_SIZE must set to be less than or equal to 65535!");
+                      "mNumMatchingOnFabric must be able to count up to CHIP_CONFIG_SECURE_SESSION_POOL_SIZE!");
         static_assert(CHIP_CONFIG_SECURE_SESSION_POOL_SIZE <= std::numeric_limits<decltype(mNumMatchingOnPeer)>::max(),
-                      "CHIP_CONFIG_SECURE_SESSION_POOL_SIZE must set to be less than or equal to 65535!");
+                      "mNumMatchingOnPeer must be able to count up to CHIP_CONFIG_SECURE_SESSION_POOL_SIZE!");
 
         friend class SecureSessionTable;
     };
