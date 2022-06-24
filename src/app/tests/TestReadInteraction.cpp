@@ -1770,9 +1770,9 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     readPrepareParams.mEventPathParamsListSize = 0;
 
-    chip::app::AttributePathParams * attributePathParams = new chip::app::AttributePathParams[2];
+    std::unique_ptr<chip::app::AttributePathParams[]> attributePathParams(new chip::app::AttributePathParams[2]);
     // Subscribe to full wildcard paths, repeat twice to ensure chunking.
-    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams.get();
     readPrepareParams.mAttributePathParamsListSize = 2;
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
@@ -1874,10 +1874,10 @@ void TestReadInteraction::TestSubscribePartialOverlap(nlTestSuite * apSuite, voi
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     readPrepareParams.mEventPathParamsListSize = 0;
 
-    chip::app::AttributePathParams * attributePathParams = new chip::app::AttributePathParams[1];
+    std::unique_ptr<chip::app::AttributePathParams[]> attributePathParams(new chip::app::AttributePathParams[2]);
     attributePathParams[0].mClusterId                    = Test::MockClusterId(3);
     attributePathParams[0].mAttributeId                  = Test::MockAttributeId(1);
-    readPrepareParams.mpAttributePathParamsList          = attributePathParams;
+    readPrepareParams.mpAttributePathParamsList          = attributePathParams.get();
     readPrepareParams.mAttributePathParamsListSize       = 1;
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
@@ -1949,11 +1949,11 @@ void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap(nlTestSuite * apSuit
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     readPrepareParams.mEventPathParamsListSize = 0;
 
-    chip::app::AttributePathParams * attributePathParams = new chip::app::AttributePathParams[1];
+    std::unique_ptr<chip::app::AttributePathParams[]> attributePathParams(new chip::app::AttributePathParams[1]);
     attributePathParams[0].mClusterId                    = Test::kMockEndpoint2;
     attributePathParams[0].mClusterId                    = Test::MockClusterId(3);
     attributePathParams[0].mAttributeId                  = Test::MockAttributeId(1);
-    readPrepareParams.mpAttributePathParamsList          = attributePathParams;
+    readPrepareParams.mpAttributePathParamsList          = attributePathParams.get();
     readPrepareParams.mAttributePathParamsListSize       = 1;
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
