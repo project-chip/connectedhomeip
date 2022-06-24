@@ -308,7 +308,7 @@ bool CheckFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
         return true;
     }
 
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::UnsupportedAccess);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::FailsafeRequired);
     return false;
 }
 
