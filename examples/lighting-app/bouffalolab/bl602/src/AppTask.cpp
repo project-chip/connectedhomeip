@@ -21,7 +21,6 @@
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "LEDWidget.h"
-#include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -44,6 +43,7 @@
 
 #include <bl_sys_ota.h>
 #include <lib/support/ErrorStr.h>
+#include <async_log.h>
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -139,7 +139,6 @@ CHIP_ERROR AppTask::Init()
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -154,6 +153,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err;
 
     log_info("App Task entered\r\n");
+    enable_async_log();
 
     err = sWiFiNetworkCommissioningInstance.Init();
     if (CHIP_NO_ERROR != err)
