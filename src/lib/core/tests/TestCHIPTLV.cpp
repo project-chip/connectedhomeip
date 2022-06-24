@@ -244,8 +244,9 @@ void TestDupString(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const cha
     CHIP_ERROR err = reader.DupString(val);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, val != nullptr);
-    NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
-
+    if (val != nullptr) {
+        NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
+    }
     chip::Platform::MemoryFree(val);
 }
 
@@ -260,7 +261,9 @@ void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const uint
     CHIP_ERROR err = reader.DupBytes(val, expectedLen);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, val != nullptr);
-    NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen) == 0);
+    if (val != nullptr) {
+        NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen) == 0);
+    }
     chip::Platform::MemoryFree(val);
 }
 
