@@ -72,7 +72,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
 
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
                     params:(CHIPDeviceControllerStartupParams *)params
-                    fabric:(FabricInfo * _Nullable * _Nonnull)fabric;
+                    fabric:(const FabricInfo * _Nullable * _Nonnull)fabric;
 @end
 
 @implementation MatterControllerFactory
@@ -329,7 +329,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
     FabricTable fabricTableInstance;
     FabricTable * fabricTable = &fabricTableInstance;
     dispatch_sync(_chipWorkQueue, ^{
-        FabricInfo * fabric = nullptr;
+        const FabricInfo * fabric = nullptr;
         BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
         if (!ok) {
             CHIP_LOG_ERROR("Can't start on existing fabric: fabric matching failed");
@@ -404,7 +404,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
     FabricTable fabricTableInstance;
     FabricTable * fabricTable = &fabricTableInstance;
     dispatch_sync(_chipWorkQueue, ^{
-        FabricInfo * fabric = nullptr;
+        const FabricInfo * fabric = nullptr;
         BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
         if (!ok) {
             CHIP_LOG_ERROR("Can't start on new fabric: fabric matching failed");
@@ -465,7 +465,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
 // why it's provided by the caller.
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
                     params:(CHIPDeviceControllerStartupParams *)params
-                    fabric:(FabricInfo * _Nullable * _Nonnull)fabric
+                    fabric:(const FabricInfo * _Nullable * _Nonnull)fabric
 {
     CHIP_ERROR err = fabricTable.Init(
         { .storage = _persistentStorageDelegateBridge, .operationalKeystore = _keystore, .opCertStore = _opCertStore });
