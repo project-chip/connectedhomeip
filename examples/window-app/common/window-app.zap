@@ -6042,15 +6042,15 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "TriggerEffect",
               "code": 64,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
-              "outgoing": 0
+              "incoming": 1,
+              "outgoing": 1
             }
           ],
           "attributes": []
@@ -8993,7 +8993,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "TriggerEffect",
