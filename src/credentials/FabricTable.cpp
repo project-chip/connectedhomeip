@@ -1511,7 +1511,7 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
     if (err != CHIP_NO_ERROR)
     {
         // Revert partial state added on error
-        mOpCertStore->RevertPendingOpCertsExceptRoot();
+        RevertPendingOpCertsExceptRoot();
         return err;
     }
 
@@ -1570,7 +1570,7 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
         // Revert partial state added on error
         // TODO: Figure-out if there is a better way. We need to make sure we are not inconsistent on elements
         //       ofher than the opcerts.
-        mOpCertStore->RevertPendingOpCertsExceptRoot();
+        RevertPendingOpCertsExceptRoot();
         return err;
     }
 
