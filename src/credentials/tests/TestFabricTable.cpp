@@ -903,8 +903,8 @@ void TestPersistence(nlTestSuite * inSuite, void * inContext)
             MutableByteSpan csrSpan{ csrBuf };
             NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
-            NL_TEST_ASSERT_SUCCESS(inSuite,
-                                fabricCertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
+            NL_TEST_ASSERT_SUCCESS(
+                inSuite, fabricCertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
             ByteSpan rcac = fabricCertAuthority.GetRcac();
             ByteSpan icac = fabricCertAuthority.GetIcac();
             ByteSpan noc  = fabricCertAuthority.GetNoc();
@@ -913,7 +913,7 @@ void TestPersistence(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac));
             FabricIndex newFabricIndex = kUndefinedFabricIndex;
             NL_TEST_ASSERT_SUCCESS(inSuite,
-                                fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex));
+                                   fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex));
             NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
             NL_TEST_ASSERT(inSuite, newFabricIndex == 1);
 
@@ -927,7 +927,7 @@ void TestPersistence(nlTestSuite * inSuite, void * inContext)
                 Credentials::ChipCertificateSet certificates;
                 NL_TEST_ASSERT_SUCCESS(inSuite, certificates.Init(1));
                 NL_TEST_ASSERT_SUCCESS(inSuite,
-                                    certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
+                                       certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
                 Crypto::P256PublicKey rcacPublicKey(certificates.GetCertSet()[0].mPublicKey);
 
                 NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == 1);
@@ -962,16 +962,16 @@ void TestPersistence(nlTestSuite * inSuite, void * inContext)
             MutableByteSpan csrSpan{ csrBuf };
             NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
-            NL_TEST_ASSERT_SUCCESS(inSuite,
-                                fabricCertAuthority.SetIncludeIcac(false).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
+            NL_TEST_ASSERT_SUCCESS(
+                inSuite, fabricCertAuthority.SetIncludeIcac(false).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
             ByteSpan rcac = fabricCertAuthority.GetRcac();
             ByteSpan noc  = fabricCertAuthority.GetNoc();
 
             NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
             NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac));
             FabricIndex newFabricIndex = kUndefinedFabricIndex;
-            NL_TEST_ASSERT_SUCCESS(inSuite,
-                                fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, ByteSpan{}, kVendorId, &newFabricIndex));
+            NL_TEST_ASSERT_SUCCESS(
+                inSuite, fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, ByteSpan{}, kVendorId, &newFabricIndex));
             NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
             NL_TEST_ASSERT(inSuite, newFabricIndex == 2);
 
@@ -985,7 +985,7 @@ void TestPersistence(nlTestSuite * inSuite, void * inContext)
                 Credentials::ChipCertificateSet certificates;
                 NL_TEST_ASSERT_SUCCESS(inSuite, certificates.Init(1));
                 NL_TEST_ASSERT_SUCCESS(inSuite,
-                                    certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
+                                       certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
                 Crypto::P256PublicKey rcacPublicKey(certificates.GetCertSet()[0].mPublicKey);
 
                 NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == 2);
@@ -1016,8 +1016,8 @@ void TestPersistence(nlTestSuite * inSuite, void * inContext)
         // Verify we can now see 2 fabrics with the iterator
         {
             size_t numFabricsIterated = 0;
-            bool saw1          = false;
-            bool saw2          = false;
+            bool saw1                 = false;
+            bool saw2                 = false;
             for (const auto & iterFabricInfo : fabricTable)
             {
                 ++numFabricsIterated;
@@ -1058,8 +1058,8 @@ void TestPersistence(nlTestSuite * inSuite, void * inContext)
         // Verify we can see 2 fabrics with the iterator
         {
             size_t numFabricsIterated = 0;
-            bool saw1          = false;
-            bool saw2          = false;
+            bool saw1                 = false;
+            bool saw2                 = false;
             for (const auto & iterFabricInfo : fabricTable)
             {
                 ++numFabricsIterated;
@@ -1095,7 +1095,7 @@ void TestPersistence(nlTestSuite * inSuite, void * inContext)
                 Credentials::ChipCertificateSet certificates;
                 NL_TEST_ASSERT_SUCCESS(inSuite, certificates.Init(1));
                 NL_TEST_ASSERT_SUCCESS(inSuite,
-                                    certificates.LoadCert(rcacSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
+                                       certificates.LoadCert(rcacSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
                 Crypto::P256PublicKey rcacPublicKey(certificates.GetCertSet()[0].mPublicKey);
 
                 NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == 2);
@@ -1132,7 +1132,7 @@ void TestPersistence(nlTestSuite * inSuite, void * inContext)
                 Credentials::ChipCertificateSet certificates;
                 NL_TEST_ASSERT_SUCCESS(inSuite, certificates.Init(1));
                 NL_TEST_ASSERT_SUCCESS(inSuite,
-                                    certificates.LoadCert(rcacSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
+                                       certificates.LoadCert(rcacSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
                 Crypto::P256PublicKey rcacPublicKey(certificates.GetCertSet()[0].mPublicKey);
 
                 NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == 1);
@@ -1161,7 +1161,9 @@ void TestPersistence(nlTestSuite * inSuite, void * inContext)
                 uint8_t message[] = { 'm', 's', 'g' };
 
                 NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(2, ByteSpan{ message }, sig));
-                NL_TEST_ASSERT(inSuite, fIdx1PublicKey.ECDSA_validate_msg_signature(&message[0], sizeof(message), sig) == CHIP_ERROR_INVALID_SIGNATURE);
+                NL_TEST_ASSERT(inSuite,
+                               fIdx1PublicKey.ECDSA_validate_msg_signature(&message[0], sizeof(message), sig) ==
+                                   CHIP_ERROR_INVALID_SIGNATURE);
             }
         }
     }
@@ -1200,9 +1202,7 @@ void TestAddNocFailSafe(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
         NL_TEST_ASSERT_SUCCESS(inSuite,
-                               fabric11CertAuthority.SetIncludeIcac(false)
-                                   .GenerateNocChain(fabricId, nodeId, csrSpan)
-                                   .GetStatus());
+                               fabric11CertAuthority.SetIncludeIcac(false).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
         ByteSpan rcac = fabric11CertAuthority.GetRcac();
         ByteSpan noc  = fabric11CertAuthority.GetNoc();
 
