@@ -130,7 +130,6 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
-
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
