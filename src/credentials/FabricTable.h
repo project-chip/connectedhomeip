@@ -860,8 +860,8 @@ private:
     bool SetPendingDataFabricIndex(FabricIndex fabricIndex);
 
     // Core validation logic for fabric additions/updates
-    CHIP_ERROR AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
-                                uint16_t vendorId);
+    CHIP_ERROR AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::P256Keypair * existingOpKey,
+                                bool isExistingOpKeyExternallyOwned, uint16_t vendorId);
 
     // Common code for fabric addition, for either OperationalKeystore or injected key scenarios.
     CHIP_ERROR AddNewPendingFabricCommon(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
@@ -920,15 +920,13 @@ private:
      *
      * @return a pointer to the shadow pending fabric or nullptr if none is active.
      */
-    const FabricInfo * GetShadowPendingFabricEntry() const
-    {
-        return HasPendingFabricUpdate() ? &mPendingFabric : nullptr;
-    }
+    const FabricInfo * GetShadowPendingFabricEntry() const { return HasPendingFabricUpdate() ? &mPendingFabric : nullptr; }
 
     // Returns true if we have a shadow entry pending for a fabruc update.
     bool HasPendingFabricUpdate() const
     {
-        return mPendingFabric.IsInitialized() && mStateFlags.HasAll(StateFlags::kIsPendingFabricDataPresent, StateFlags::kIsUpdatePending);
+        return mPendingFabric.IsInitialized() &&
+            mStateFlags.HasAll(StateFlags::kIsPendingFabricDataPresent, StateFlags::kIsUpdatePending);
     }
 
     // Verifies credentials, using the provided root certificate.
@@ -944,8 +942,9 @@ private:
     // we don't need to check match to pre-existing fabric.
     static CHIP_ERROR ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
                                                FabricId existingFabricId, Credentials::CertificateValidityPolicy * policy,
-                                               CompressedFabricId & outCompressedFabricId, FabricId & outFabricId, NodeId & outNodeId,
-                                               Crypto::P256PublicKey & outNocPubkey, Crypto::P256PublicKey & outRootPubkey);
+                                               CompressedFabricId & outCompressedFabricId, FabricId & outFabricId,
+                                               NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
+                                               Crypto::P256PublicKey & outRootPubkey);
 
     /**
      * Read our fabric index info from the given TLV reader and set up the

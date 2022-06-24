@@ -96,9 +96,9 @@ void FabricInfo::operator=(FabricInfo && other)
     SetFabricLabel(other.GetFabricLabel());
 
     // Transfer ownership of operational keypair (if it was nullptr, it stays that way).
-    mOperationalKey = other.mOperationalKey;
-    mHasExternallyOwnedOperationalKey = other.mHasExternallyOwnedOperationalKey;
-    other.mOperationalKey = nullptr;
+    mOperationalKey                         = other.mOperationalKey;
+    mHasExternallyOwnedOperationalKey       = other.mHasExternallyOwnedOperationalKey;
+    other.mOperationalKey                   = nullptr;
     other.mHasExternallyOwnedOperationalKey = false;
 
     other.Reset();
@@ -596,8 +596,8 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric, FabricIndex newFabr
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(FabricProvisioning, "Failed to load Fabric (0x%x): %" CHIP_ERROR_FORMAT,
-                     static_cast<unsigned>(newFabricIndex), err.Format());
+        ChipLogError(FabricProvisioning, "Failed to load Fabric (0x%x): %" CHIP_ERROR_FORMAT, static_cast<unsigned>(newFabricIndex),
+                     err.Format());
         fabric->Reset();
         return err;
     }
@@ -703,8 +703,8 @@ CHIP_ERROR FabricTable::NotifyFabricCommitted(FabricIndex fabricIndex)
 }
 
 CHIP_ERROR
-FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
-                              uint16_t vendorId)
+FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::P256Keypair * existingOpKey,
+                              bool isExistingOpKeyExternallyOwned, uint16_t vendorId)
 {
     // All parameters pre-validated before we get here
 
@@ -1563,8 +1563,8 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
     ReturnErrorOnFailure(mOpCertStore->UpdateOpCertsForFabric(fabricIndex, noc, icac));
     VerifyOrReturnError(SetPendingDataFabricIndex(fabricIndex), CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_ERROR err =
-        AddOrUpdateInner(fabricIndex, /* isAddition = */ false, existingOpKey, isExistingOpKeyExternallyOwned, fabricInfo->GetVendorId());
+    CHIP_ERROR err = AddOrUpdateInner(fabricIndex, /* isAddition = */ false, existingOpKey, isExistingOpKeyExternallyOwned,
+                                      fabricInfo->GetVendorId());
     if (err != CHIP_NO_ERROR)
     {
         // Revert partial state added on error
@@ -1612,7 +1612,8 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
 
     if (isUpdating && hasPending && !hasInvalidInternalState)
     {
-        if (!mPendingFabric.IsInitialized() || (mPendingFabric.GetFabricIndex() != fabricIndexBeingCommitted) || (pendingFabricEntry == nullptr))
+        if (!mPendingFabric.IsInitialized() || (mPendingFabric.GetFabricIndex() != fabricIndexBeingCommitted) ||
+            (pendingFabricEntry == nullptr))
         {
             ChipLogError(FabricProvisioning, "Missing pending fabric on update during commit!");
             hasInvalidInternalState = true;
