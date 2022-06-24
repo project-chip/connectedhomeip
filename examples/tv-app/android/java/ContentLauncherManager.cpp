@@ -18,6 +18,7 @@
 
 #include "ContentLauncherManager.h"
 #include "TvApp-JNI.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <jni.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -271,4 +272,11 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
         ChipLogError(AppServer, "Failed to access 'launchUrl' method");
         env->ExceptionClear();
     }
+}
+
+uint32_t ContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
+{
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
 }
