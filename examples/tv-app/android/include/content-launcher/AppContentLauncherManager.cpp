@@ -94,8 +94,9 @@ CHIP_ERROR AppContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEn
         Json::Value value;
         reader.parse(resStr, value);
         std::string attrId = to_string(chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id).c_str();
-        ChipLogProgress(
-            Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response parsing done. reading attr %s", attrId.c_str());
+        ChipLogProgress(Zcl,
+                        "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response parsing done. reading attr %s",
+                        attrId.c_str());
         if (value[attrId].isArray())
         {
             mAcceptHeaderList.clear();
