@@ -40,15 +40,21 @@ public:
 
 /// Executes nlTestRunner for the given test suite while
 /// allocating the given context type on the heap
-template <class Context>
-int ExecuteTestsWithContext(struct _nlTestSuite* suite)
+template <class Context, typename... Args>
+int ExecuteTestsWithContext(struct _nlTestSuite* suite, Args&& ... args)
 {
   {
     ScopedMemoryInit ensureHeapIsInitialized;
-    auto ctx = chip::Platform::MakeUnique<Context>();
+    auto ctx = chip::Platform::MakeUnique<Context>(std::forward<Args>(args)...);
     nlTestRunner(suite, ctx.get());
   }
 
+  return nlTestRunnerStats(suite);
+}
+
+int ExecuteTestsWithoutContext(struct _nlTestSuite* suite)
+{
+  nlTestRunner(suite, nullptr);
   return nlTestRunnerStats(suite);
 }
 

@@ -277,11 +277,6 @@ const nlTest sTests[] =
 };
 // clang-format on
 
-struct TestContext
-{
-    nlTestSuite * mSuite;
-};
-
 } // namespace
 
 /**
@@ -322,7 +317,7 @@ int TestAdditionalDataPayload()
     // Generate machine-readable, comma-separated value (CSV) output.
     nl_test_set_output_style(OUTPUT_CSV);
 
-    return chip::ExecuteTestsWithContext<TestContext>(&theSuite);
+    return chip::ExecuteTestsWithoutContext(&theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestAdditionalDataPayload);
