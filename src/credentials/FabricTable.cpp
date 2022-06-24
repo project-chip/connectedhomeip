@@ -1570,6 +1570,9 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
     mStateFlags.Set(StateFlags::kIsAddPending);
     mStateFlags.Set(StateFlags::kIsPendingFabricDataPresent);
 
+    // Notify that NOC was added (at least transiently)
+    NotifyFabricUpdated(fabricIndexToUse);
+
     return CHIP_NO_ERROR;
 }
 
