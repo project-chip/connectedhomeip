@@ -200,7 +200,7 @@ void ForEachElement(nlTestSuite * inSuite, TLVReader & reader, void * context,
 
 struct TestTLVContext
 {
-    nlTestSuite * mSuite = nullptr;
+    nlTestSuite * mSuite   = nullptr;
     int mEvictionCount     = 0;
     uint32_t mEvictedBytes = 0;
 
