@@ -21,7 +21,6 @@
  */
 
 #include "ContentAppAttributeDelegate.h"
-
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <jni.h>
@@ -33,8 +32,7 @@
 namespace chip {
 namespace AppPlatform {
 
-using AttributeAccessInterface = app::AttributeAccessInterface;
-using LaunchResponseType       = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
+using LaunchResponseType = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
 
 const char * ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttributePath & aPath)
 {
@@ -53,87 +51,14 @@ const char * ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttr
             ChipLogError(Zcl, "Java exception in ContentAppAttributeDelegate::Read");
             env->ExceptionDescribe();
             env->ExceptionClear();
-            //            FormatResponseData(handlerContext, "{\"value\":{}}");
             return "";
         }
         const char * respStr = env->GetStringUTFChars(resp, 0);
         ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read got response %s", respStr);
-        //        FormatResponseData(handlerContext, respStr);
         return respStr;
     }
     return "";
 }
-
-CHIP_ERROR ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttributePath & aPath,
-                                             chip::app::AttributeValueEncoder & aEncoder)
-{
-    if (aPath.mEndpointId >= FIXED_ENDPOINT_COUNT)
-    {
-        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-        ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read being called for endpoint %d cluster %d attribute %d",
-                        aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
-        jstring resp =
-            (jstring) env->CallObjectMethod(mContentAppEndpointManager, mReadAttributeMethod, static_cast<jint>(aPath.mEndpointId),
-                                            static_cast<jint>(aPath.mClusterId), static_cast<jint>(aPath.mAttributeId));
-        if (env->ExceptionCheck())
-        {
-            ChipLogError(Zcl, "Java exception in ContentAppAttributeDelegate::Read");
-            env->ExceptionDescribe();
-            env->ExceptionClear();
-            //            FormatResponseData(handlerContext, "{\"value\":{}}");
-            return CHIP_NO_ERROR;
-        }
-        const char * respStr = env->GetStringUTFChars(resp, 0);
-        ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read got response %s", respStr);
-        //        FormatResponseData(handlerContext, respStr);
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_NO_ERROR;
-}
-
-/*
-void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::HandlerContext & handlerContext, const char * response)
-{
-    Json::Reader reader;
-    Json::Value value;
-    reader.parse(response, value);
-
-    switch (handlerContext.mRequestPath.mClusterId)
-    {
-    case app::Clusters::ContentLauncher::Id: {
-        LaunchResponseType launchResponse;
-        if (value["0"].empty())
-        {
-            launchResponse.status = chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum::kAuthFailed;
-        }
-        else
-        {
-            launchResponse.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(value["0"].asInt());
-            if (!value["1"].empty())
-            {
-                launchResponse.data = chip::MakeOptional(CharSpan::fromCharString(value["1"].asCString()));
-            }
-        }
-        handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, launchResponse);
-        handlerContext.SetCommandHandled();
-        break;
-    }
-
-    // case app::Clusters::TargetNavigator::Id:
-    //     break;
-
-    // case app::Clusters::MediaPlayback::Id:
-    //     break;
-
-    // case app::Clusters::AccountLogin::Id:
-    //     break;
-    default:
-        handlerContext.SetCommandNotHandled();
-    }
-}
-*/
 
 } // namespace AppPlatform
 } // namespace chip
