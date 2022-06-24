@@ -186,6 +186,9 @@ static_library("support") {
 }
 
 static_library("testing") {
+  output_name = "libSupportTesting"
+  output_dir = "${root_out_dir}/lib"
+
   sources = [
     "UnitTestRegistration.cpp",
     "UnitTestRegistration.h",
