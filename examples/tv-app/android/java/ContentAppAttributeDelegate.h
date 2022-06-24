@@ -31,13 +31,10 @@
 namespace chip {
 namespace AppPlatform {
 
-using AttributeAccessInterface = app::AttributeAccessInterface;
-
-class ContentAppAttributeDelegate : public AttributeAccessInterface
+class ContentAppAttributeDelegate
 {
 public:
-    ContentAppAttributeDelegate(jobject manager, ClusterId aClusterId) :
-        AttributeAccessInterface(Optional<EndpointId>::Missing(), aClusterId)
+    ContentAppAttributeDelegate(jobject manager)
     {
         if (manager == nullptr)
         {
@@ -47,7 +44,6 @@ public:
         InitializeJNIObjects(manager);
     }
 
-    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
     const char * Read(const chip::app::ConcreteReadAttributePath & aPath);
 
 private:
