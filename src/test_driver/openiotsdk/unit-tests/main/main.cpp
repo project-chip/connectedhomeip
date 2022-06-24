@@ -22,6 +22,10 @@
 #include <stdlib.h>
 #include <support/UnitTestRegistration.h>
 
+#include "NlTestLogger.h"
+
+constexpr nl_test_output_logger_t NlTestLogger::nl_test_logger;
+
 using namespace ::chip;
 
 static void test_thread(void * argument)
@@ -46,6 +50,8 @@ int main()
     {
         return EXIT_FAILURE;
     }
+
+    nlTestSetLogger(&NlTestLogger::nl_test_logger);
 
     static const osThreadAttr_t thread_attr = {
         .stack_size = 10240 // Allocate our threads with enough stack for printf

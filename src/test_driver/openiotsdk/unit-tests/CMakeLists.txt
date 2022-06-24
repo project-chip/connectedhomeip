@@ -32,6 +32,7 @@ include(${OPENIOTSDK_COMMON}/cmake/chip.cmake)
 
 target_include_directories(${APP_TARGET} PRIVATE
                            main/include
+                           ${CHIP_ROOT}/third_party/nlunit-test/repo/src
 )
 
 target_sources(${APP_TARGET} PRIVATE
