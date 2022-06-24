@@ -38,9 +38,8 @@ chip_test_suite("tests") {
       "TestIncrementalResolve.cpp",
     ]
 
-    public_deps += [
-      "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests:support",
-    ]
+    public_deps +=
+        [ "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests:support" ]
   }
 
   cflags = [ "-Wconversion" ]
