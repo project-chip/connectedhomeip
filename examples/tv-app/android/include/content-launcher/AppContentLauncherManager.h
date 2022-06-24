@@ -34,7 +34,7 @@ using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelega
 class AppContentLauncherManager : public ContentLauncherDelegate
 {
 public:
-    AppContentLauncherManager(ContentAppAttributeDelegate * attributeDelegate, std::list<std::string> acceptHeaderList,
+    AppContentLauncherManager(ContentAppAttributeDelegate attributeDelegate, std::list<std::string> acceptHeaderList,
                               uint32_t supportedStreamingProtocols);
 
     void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
@@ -53,5 +53,5 @@ protected:
 
 private:
     EndpointId mEndpointId;
-    ContentAppAttributeDelegate * mAttributeDelegate;
+    ContentAppAttributeDelegate mAttributeDelegate;
 };

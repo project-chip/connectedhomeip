@@ -87,7 +87,7 @@ public:
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
         mAccountLoginDelegate(setupPIN),
-        mContentLauncherDelegate(new ContentAppAttributeDelegate(manager), { "image/*", "video/*" },
+        mContentLauncherDelegate(ContentAppAttributeDelegate(manager), { "image/*", "video/*" },
                                  to_underlying(SupportedStreamingProtocol::kDash) |
                                      to_underlying(SupportedStreamingProtocol::kHls)),
         mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
