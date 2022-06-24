@@ -31,15 +31,26 @@
 
 using namespace ::chip;
 
-// Currently up to 10 users are support on the EFR32 platform
+// up to 10 users are supported on the EFR32 platform
 #define DOOR_LOCK_MAX_USERS 10
+// max credential size supported is 8
 #define DOOR_LOCK_MAX_CREDENTIAL_SIZE 8
-#define MININUM_USER_INDEX 1
-#define MINIMUM_CREDENTIAL_INDEX 1
-#define MAX_CREDENTIAL_PER_USER 10
-#define MAX_CREDENTIALS 50
+// up to 10 schedules of each type supported
+#define DOOR_LOCK_MAX_SCHEDULES 10
 
-static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
+// up to 10 credentials are supported per user
+#define MAX_CREDENTIAL_PER_USER 10
+
+// up to 10 schedules are supported per user
+#define MAX_SCHEDULE_PER_USER 10
+
+// user, credential and schedule indices are 1-indexed
+#define MIN_USER_INDEX 1
+#define MIN_CREDENTIAL_INDEX 1
+#define MIN_SCHEDULE_INDEX 1
+
+// 10 users with 10 credentials each max
+#define MAX_CREDENTIALS 100
 
 class LockManager
 {
@@ -61,7 +72,8 @@ public:
     } State;
 
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
-                    uint8_t maxNumberOfCredentialsPerUser, uint16_t numberOfSupportedUsers);
+                    uint8_t maxNumberOfCredentialsPerUser, uint16_t numberOfSupportedUsers, uint8_t numberOfWeekdaySchedulesPerUserSupported,
+                    uint8_t numberOfYeardaySchedulesPerUserSupported, uint8_t numberOfHolidaySchedulesPerUserSupported);
     bool NextState();
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
@@ -83,6 +95,22 @@ public:
 
     bool SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
                        DlCredentialStatus credentialStatus, DlCredentialType credentialType, const chip::ByteSpan & credentialData);
+
+    DlStatus GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
+                                          EmberAfPluginDoorLockWeekDaySchedule & schedule);
+
+    DlStatus SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
+                                          DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
+                                          uint8_t endHour, uint8_t endMinute);
+
+    DlStatus GetYeardaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
+                                          EmberAfPluginDoorLockYearDaySchedule & schedule);
+
+    DlStatus SetYeardaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime);
+
+    DlStatus GetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule);
+
+    DlStatus SetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode);
 
     bool setLockState(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
                       DlOperationError & err);
@@ -107,13 +135,19 @@ private:
 
     EmberAfPluginDoorLockUserInfo mLockUsers[DOOR_LOCK_MAX_USERS];
     EmberAfPluginDoorLockCredentialInfo mLockCredentials[MAX_CREDENTIALS];
+    EmberAfPluginDoorLockWeekDaySchedule mWeekdaySchedule[DOOR_LOCK_MAX_USERS][DOOR_LOCK_MAX_SCHEDULES];
+    EmberAfPluginDoorLockYearDaySchedule mYeardaySchedule[DOOR_LOCK_MAX_USERS][DOOR_LOCK_MAX_SCHEDULES];
+    EmberAfPluginDoorLockHolidaySchedule mHolidaySchedule[DOOR_LOCK_MAX_SCHEDULES];
 
     uint8_t mMaxCredentialsPerUser;
     uint16_t mMaxUsers;
+    uint8_t mNumberOfWeekdaySchedulesPerUserSupported;
+    uint8_t mNumberOfYeardaySchedulesPerUserSupported;
+    uint8_t mNumberOfHolidaySchedulesSupported;
 
     char mUserNames[ArraySize(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
     uint8_t mCredentialData[MAX_CREDENTIALS][DOOR_LOCK_MAX_CREDENTIAL_SIZE];
-    chip::Platform::ScopedMemoryBuffer<DlCredential> mCredentials[MAX_CREDENTIAL_PER_USER];
+    DlCredential mCredentials[DOOR_LOCK_MAX_USERS][MAX_CREDENTIAL_PER_USER];
 
     static LockManager sLock;
 };

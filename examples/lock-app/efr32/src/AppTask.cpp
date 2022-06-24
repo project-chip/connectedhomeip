@@ -254,9 +254,38 @@ CHIP_ERROR AppTask::Init()
                      endpointId);
         numberOfSupportedUsers = 10;
     }
+
+    uint8_t numberOfWeekdaySchedulesPerUserSupported = 0;
+    if (!DoorLockServer::Instance().GetNumberOfWeekDaySchedulesPerUserSupported(endpointId, numberOfWeekdaySchedulesPerUserSupported))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of supported weekday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+                     endpointId);
+        numberOfWeekdaySchedulesPerUserSupported = 10;
+    }
+
+    uint8_t numberOfYeardaySchedulesPerUserSupported = 0;
+    if (!DoorLockServer::Instance().GetNumberOfYearDaySchedulesPerUserSupported(endpointId, numberOfYeardaySchedulesPerUserSupported))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of supported yearday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+                     endpointId);
+        numberOfYeardaySchedulesPerUserSupported = 10;
+    }
+
+    uint8_t numberOfHolidaySchedulesSupported = 0;
+    if (!DoorLockServer::Instance().GetNumberOfHolidaySchedulesSupported(endpointId, numberOfHolidaySchedulesSupported))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of supported holiday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+                     endpointId);
+        numberOfHolidaySchedulesSupported = 10;
+    }
+
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    err = LockMgr().Init(state, maxCredentialsPerUser, numberOfSupportedUsers);
+    err = LockMgr().Init(state, maxCredentialsPerUser, numberOfSupportedUsers, numberOfWeekdaySchedulesPerUserSupported, 
+                         numberOfYeardaySchedulesPerUserSupported, numberOfHolidaySchedulesSupported);
     if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("LockMgr().Init() failed");
