@@ -418,7 +418,7 @@ CHIP_ERROR FabricTable::VerifyCredentials(const ByteSpan & noc, const ByteSpan &
     return CHIP_NO_ERROR;
 }
 
-FabricInfo * FabricTable::FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId)
+const FabricInfo * FabricTable::FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId) const
 {
     P256PublicKey candidatePubKey;
 
@@ -507,7 +507,7 @@ const FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex) con
     return nullptr;
 }
 
-FabricInfo * FabricTable::FindFabricWithCompressedId(CompressedFabricId compressedFabricId)
+const FabricInfo * FabricTable::FindFabricWithCompressedId(CompressedFabricId compressedFabricId) const
 {
     // Try to match pending fabric first if available
     bool hasPendingFabric =
@@ -609,7 +609,7 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric, FabricIndex newFabr
         err = FetchRootCert(newFabricIndex, rcacSpan);
     }
 
-    // TODO: Sweep-away fabrics without RCAC/NOC by deleting everything and marking fabric gone.
+    // TODO(#19935): Sweep-away fabrics without RCAC/NOC by deleting everything and marking fabric gone.
 
     if (err == CHIP_NO_ERROR)
     {
@@ -654,7 +654,7 @@ CHIP_ERROR FabricTable::AddNewFabricForTest(const ByteSpan & rootCert, const Byt
 
     SuccessOrExit(err = AddNewPendingTrustedRootCert(rootCert));
     SuccessOrExit(err = AddNewPendingFabricWithProvidedOpKey(nocCert, icacCert, VendorId::TestVendor1, opKey,
-                                                             /*hasExternallyOwnedKeypair =*/false, outFabricIndex));
+                                                             /*isExistingOpKeyExternallyOwned =*/false, outFabricIndex));
     SuccessOrExit(err = CommitPendingFabricData());
 exit:
     if (err != CHIP_NO_ERROR)
@@ -815,7 +815,7 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, Crypto::P256Keypair * exi
     {
         // Verify that public key in NOC matches public key of the provided keypair.
         // When operational key is not injected (e.g. when mOperationalKeystore != nullptr)
-        // the check is done by the keystore in `ActivatePendingOperationalKey`.
+        // the check is done by the keystore in `ActivateOpKeypairForFabric`.
         VerifyOrReturnError(existingOpKey->Pubkey().Length() == nocPubKey.Length(), CHIP_ERROR_INVALID_PUBLIC_KEY);
         VerifyOrReturnError(memcmp(existingOpKey->Pubkey().ConstBytes(), nocPubKey.ConstBytes(), nocPubKey.Length()) == 0,
                             CHIP_ERROR_INVALID_PUBLIC_KEY);
@@ -1418,19 +1418,6 @@ CHIP_ERROR FabricTable::AllocatePendingOperationalKey(Optional<FabricIndex> fabr
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricTable::ActivatePendingOperationalKey(const Crypto::P256PublicKey & nocSubjectPublicKey)
-{
-    // We can only manage commissionable pending fail-safe state if we have a keystore
-    VerifyOrReturnError(mOperationalKeystore != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    VerifyOrReturnError(mStateFlags.Has(StateFlags::kIsOperationalKeyPending), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(IsValidFabricIndex(mFabricIndexWithPendingState), CHIP_ERROR_INCORRECT_STATE);
-
-    ReturnErrorOnFailure(mOperationalKeystore->ActivateOpKeypairForFabric(mFabricIndexWithPendingState, nocSubjectPublicKey));
-    mStateFlags.Clear(StateFlags::kIsOperationalKeyPending);
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR FabricTable::AddNewPendingTrustedRootCert(const ByteSpan & rcac)
 {
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1727,6 +1714,10 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
                          "Failed to commit: tried to commit with only a new trusted root cert. No data committed.");
             hasInvalidInternalState = true;
             err                     = CHIP_ERROR_INCORRECT_STATE;
+        }
+        else
+        {
+            // There was nothing pending and no error...
         }
 
         // Clear all pending state anyway, in case it was partially stale!

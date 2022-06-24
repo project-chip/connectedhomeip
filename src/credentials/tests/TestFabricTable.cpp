@@ -107,7 +107,7 @@ static CHIP_ERROR LoadTestFabric(nlTestSuite * inSuite, FabricTable & fabricTabl
     NL_TEST_ASSERT(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcacSpan) == CHIP_NO_ERROR);
 
     CHIP_ERROR err = fabricTable.AddNewPendingFabricWithProvidedOpKey(nocSpan, icacSpan, VendorId::TestVendor1, &gFabric1OpKey,
-                                                                      /*hasExternallyOwnedKeypair =*/true, &fabricIndex);
+                                                                      /*isExistingOpKeyExternallyOwned =*/true, &fabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     if (doCommit)
