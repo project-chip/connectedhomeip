@@ -1569,7 +1569,7 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
     {
         // Revert partial state added on error
         // TODO: Figure-out if there is a better way. We need to make sure we are not inconsistent on elements
-        //       ofher than the opcerts.
+        //       other than the opcerts.
         RevertPendingOpCertsExceptRoot();
         return err;
     }
