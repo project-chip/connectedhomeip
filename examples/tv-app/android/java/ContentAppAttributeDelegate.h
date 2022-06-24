@@ -31,7 +31,7 @@
 namespace chip {
 namespace AppPlatform {
 
-class ContentAppAttributeDelegate 
+class ContentAppAttributeDelegate
 {
 public:
     ContentAppAttributeDelegate(jobject manager)
