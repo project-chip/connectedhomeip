@@ -877,7 +877,225 @@ void TestPersistence(nlTestSuite * inSuite, void * inContext)
 
 void TestAddNocFailSafe(nlTestSuite * inSuite, void * inContext)
 {
-    // TODO: Write test
+    Credentials::TestOnlyLocalCertificateAuthority fabric11CertAuthority;
+    Credentials::TestOnlyLocalCertificateAuthority fabric44CertAuthority;
+
+    chip::TestPersistentStorageDelegate storage;
+
+    storage.SetLoggingLevel(chip::TestPersistentStorageDelegate::LoggingLevel::kLogMutation);
+
+    // Initialize test CA and a Fabric 11 externally owned key
+    NL_TEST_ASSERT(inSuite, fabric11CertAuthority.Init().IsSuccess());
+    NL_TEST_ASSERT(inSuite, fabric44CertAuthority.Init().IsSuccess());
+
+    constexpr uint16_t kVendorId = 0xFFF1u;
+
+    // Initialize a fabric table.
+    ScopedFabricTable fabricTableHolder;
+    NL_TEST_ASSERT(inSuite, fabricTableHolder.Init(&storage) == CHIP_NO_ERROR);
+    FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+
+    NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+
+    size_t numFabricsIterated = 0;
+
+    size_t numStorageKeysAtStart = storage.GetNumKeys();
+
+    // Sequence 1: Add node ID 55 on fabric 11, see that pending works, and that revert works
+    {
+        FabricId fabricId = 11;
+        NodeId nodeId     = 55;
+
+        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        MutableByteSpan csrSpan{ csrBuf };
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
+
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabric11CertAuthority.SetIncludeIcac(false)
+                                   .GenerateNocChain(fabricId, nodeId, csrSpan)
+                                   .GetStatus());
+        ByteSpan rcac = fabric11CertAuthority.GetRcac();
+        ByteSpan noc  = fabric11CertAuthority.GetNoc();
+
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac));
+        FabricIndex newFabricIndex = kUndefinedFabricIndex;
+
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, ByteSpan{}, kVendorId, &newFabricIndex));
+        NL_TEST_ASSERT(inSuite, newFabricIndex == 1);
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
+
+        // No storage yet
+        NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == numStorageKeysAtStart); // Nothing yet
+
+        // Validate iterator sees pending
+        {
+            numFabricsIterated = 0;
+            bool saw1          = false;
+            for (const auto & iterFabricInfo : fabricTable)
+            {
+                ++numFabricsIterated;
+                if (iterFabricInfo.GetFabricIndex() == 1)
+                {
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetNodeId() == nodeId);
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetFabricId() == fabricId);
+                    saw1 = true;
+                }
+            }
+
+            NL_TEST_ASSERT(inSuite, numFabricsIterated == 1);
+            NL_TEST_ASSERT(inSuite, saw1 == true);
+        }
+
+        // Revert, should see nothing yet
+        fabricTable.RevertPendingFabricData();
+
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+
+        // No started except fabric index metadata
+        NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == (numStorageKeysAtStart + 1));
+
+        // Validate iterator sees nothing
+        {
+            numFabricsIterated = 0;
+            bool saw1          = false;
+            for (const auto & iterFabricInfo : fabricTable)
+            {
+                ++numFabricsIterated;
+                if (iterFabricInfo.GetFabricIndex() == 1)
+                {
+                    saw1 = true;
+                }
+            }
+
+            NL_TEST_ASSERT(inSuite, numFabricsIterated == 0);
+            NL_TEST_ASSERT(inSuite, saw1 == false);
+        }
+    }
+
+    size_t numStorageAfterRevert = storage.GetNumKeys();
+
+    // Sequence 2: Add node ID 999 on fabric 44, using operational keystore and ICAC --> Yield fabricIndex 1
+    {
+        FabricId fabricId = 44;
+        NodeId nodeId     = 999;
+
+        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        MutableByteSpan csrSpan{ csrBuf };
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
+
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabric44CertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
+        ByteSpan rcac = fabric44CertAuthority.GetRcac();
+        ByteSpan icac = fabric44CertAuthority.GetIcac();
+        ByteSpan noc  = fabric44CertAuthority.GetNoc();
+
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac));
+        FabricIndex newFabricIndex = kUndefinedFabricIndex;
+
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex));
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
+        NL_TEST_ASSERT(inSuite, newFabricIndex == 1);
+        // No storage yet
+        NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == numStorageAfterRevert);
+
+        // Commit, now storage should have keys
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.CommitPendingFabricData());
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
+
+        NL_TEST_ASSERT_EQUALS(inSuite, storage.GetNumKeys(),
+                              (numStorageAfterRevert + 5)); // 3 opcerts + fabric metadata + 1 operational key
+
+        // Validate contents
+        const auto * fabricInfo = fabricTable.FindFabricWithIndex(1);
+        NL_TEST_ASSERT(inSuite, fabricInfo != nullptr);
+        if (fabricInfo != nullptr)
+        {
+            Credentials::ChipCertificateSet certificates;
+            NL_TEST_ASSERT_SUCCESS(inSuite, certificates.Init(1));
+            NL_TEST_ASSERT_SUCCESS(inSuite,
+                                   certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
+            Crypto::P256PublicKey rcacPublicKey(certificates.GetCertSet()[0].mPublicKey);
+
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == newFabricIndex);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetNodeId() == nodeId);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricId() == fabricId);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetVendorId() == kVendorId);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricLabel().size() == 0);
+
+            Crypto::P256PublicKey rootPublicKeyOfFabric;
+            NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.FetchRootPubkey(newFabricIndex, rootPublicKeyOfFabric));
+            NL_TEST_ASSERT(inSuite, rootPublicKeyOfFabric.Matches(rcacPublicKey));
+        }
+
+        // Validate that fabric has the correct operational key by verifying a signature
+        {
+            Crypto::P256ECDSASignature sig;
+            uint8_t message[] = { 'm', 's', 'g' };
+
+            Crypto::P256PublicKey nocPubKey;
+            NL_TEST_ASSERT_SUCCESS(inSuite, VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), nocPubKey));
+
+            NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(newFabricIndex, ByteSpan{ message }, sig));
+            NL_TEST_ASSERT_SUCCESS(inSuite, nocPubKey.ECDSA_validate_msg_signature(&message[0], sizeof(message), sig));
+        }
+
+        // Verify we can now see the fabric with the iterator
+        {
+            numFabricsIterated = 0;
+            bool saw1          = false;
+            for (const auto & iterFabricInfo : fabricTable)
+            {
+                ++numFabricsIterated;
+                if (iterFabricInfo.GetFabricIndex() == 1)
+                {
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetNodeId() == 999);
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetFabricId() == 44);
+                    saw1 = true;
+                }
+            }
+
+            NL_TEST_ASSERT(inSuite, numFabricsIterated == 1);
+            NL_TEST_ASSERT(inSuite, saw1 == true);
+        }
+    }
+
+    size_t numStorageAfterAdd = storage.GetNumKeys();
+
+    // Sequence 3: Do a RevertPendingFabricData() again, see that it doesn't affect existing fabric
+
+    {
+        // Revert, should should look like a no-op
+        fabricTable.RevertPendingFabricData();
+
+        // No change of storage
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
+        NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == numStorageAfterAdd);
+
+        // Verify we can still see the fabric with the iterator
+        {
+            numFabricsIterated = 0;
+            bool saw1          = false;
+            for (const auto & iterFabricInfo : fabricTable)
+            {
+                ++numFabricsIterated;
+                if (iterFabricInfo.GetFabricIndex() == 1)
+                {
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetNodeId() == 999);
+                    NL_TEST_ASSERT(inSuite, iterFabricInfo.GetFabricId() == 44);
+                    saw1 = true;
+                }
+            }
+
+            NL_TEST_ASSERT(inSuite, numFabricsIterated == 1);
+            NL_TEST_ASSERT(inSuite, saw1 == true);
+        }
+    }
+
 }
 
 void TestUpdateNocFailSafe(nlTestSuite * inSuite, void * inContext)
@@ -896,6 +1114,16 @@ void TestFabricLabelChange(nlTestSuite * inSuite, void * inContext)
 }
 
 void TestCompressedFabricId(nlTestSuite * inSuite, void * inContext)
+{
+    // TODO: Write test
+}
+
+void TestAddNocRootCollision(nlTestSuite * inSuite, void * inContext)
+{
+    // TODO: Write test
+}
+
+void TestInvalidChaining(nlTestSuite * inSuite, void * inContext)
 {
     // TODO: Write test
 }
@@ -919,6 +1147,8 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Test interlock sequencing errors", TestSequenceErrors),
     NL_TEST_DEF("Test fabric label changes", TestFabricLabelChange),
     NL_TEST_DEF("Test compressed fabric ID is properly generated", TestCompressedFabricId),
+    NL_TEST_DEF("Test AddNOC root collision", TestAddNocRootCollision),
+    NL_TEST_DEF("Test invalid chaining in AddNOC and UpdateNOC", TestInvalidChaining),
 
     NL_TEST_SENTINEL()
 };
