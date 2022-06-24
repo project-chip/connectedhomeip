@@ -70,13 +70,13 @@ public:
 
     virtual bool IsActiveSession() const = 0;
 
-    virtual ScopedNodeId GetPeer() const                               = 0;
-    virtual ScopedNodeId GetLocalScopedNodeId() const                  = 0;
-    virtual Access::SubjectDescriptor GetSubjectDescriptor() const     = 0;
-    virtual bool RequireMRP() const                                    = 0;
-    virtual const ReliableMessageProtocolConfig & GetMRPConfig() const = 0;
-    virtual System::Clock::Timestamp GetMRPBaseTimeout()               = 0;
-    virtual System::Clock::Milliseconds32 GetAckTimeout() const        = 0;
+    virtual ScopedNodeId GetPeer() const                                     = 0;
+    virtual ScopedNodeId GetLocalScopedNodeId() const                        = 0;
+    virtual Access::SubjectDescriptor GetSubjectDescriptor() const           = 0;
+    virtual bool RequireMRP() const                                          = 0;
+    virtual const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const = 0;
+    virtual System::Clock::Timestamp GetMRPBaseTimeout()                     = 0;
+    virtual System::Clock::Milliseconds32 GetAckTimeout() const              = 0;
 
     // Returns a suggested timeout value based on the round-trip time it takes for the peer at the other end of the session to
     // receive a message, process it and send it back. This is computed based on the session type, the type of transport, sleepy

@@ -35,18 +35,14 @@ tests:
           constraints:
               type: list
 
-    #Issue 17985
     - label: "Select Input Command"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "SelectInput"
       arguments:
           values:
               - name: "index"
                 value: 1
 
-    #skipped due to above command failure
     - label: "Read current input list"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentInput"
       response:

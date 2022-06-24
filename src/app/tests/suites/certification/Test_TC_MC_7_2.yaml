@@ -36,9 +36,7 @@ tests:
           constraints:
               type: OutPutInfo
 
-    #Issue 18102
     - label: "Sends a RenameOutput command"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "RenameOutput"
       arguments:
           values:
@@ -51,6 +49,15 @@ tests:
     - label:
           "Reads the OutputList attribute from the DUT Verify that the output at
           the index provided in step 2 has the name CertTest"
+      verification: |
+          ./chip-tool audiooutput read output-list 1 1
+          [1651061821.366426][156898:156903] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_050B Attribute 0x0000_0000 DataVersion: 372822880
+          [1651061821.366510][156898:156903] CHIP:TOO:   OutputList: 3 entries
+          [1651061821.366575][156898:156903] CHIP:TOO:     [1]: {
+          [1651061821.366603][156898:156903] CHIP:TOO:       Index: 1
+          [1651061821.366619][156898:156903] CHIP:TOO:       OutputType: 0
+          [1651061821.366635][156898:156903] CHIP:TOO:       Name: CertTest
+          [1651061821.366651][156898:156903] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT

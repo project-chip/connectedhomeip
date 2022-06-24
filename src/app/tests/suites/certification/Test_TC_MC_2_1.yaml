@@ -30,3 +30,5 @@ tests:
 
     - label: "TH sends Sleep command to DUT"
       command: "Sleep"
+      response:
+          error: 0

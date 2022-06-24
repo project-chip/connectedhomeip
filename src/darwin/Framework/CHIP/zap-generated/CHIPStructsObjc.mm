@@ -900,30 +900,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _id = @(0);
-
-        _name = @"";
-
-        _faultRecording = [NSData data];
-    }
-    return self;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: id:%@; name:%@; faultRecording:%@; >", NSStringFromClass([self class]), _id, _name,
-                  [_faultRecording base64EncodedStringWithOptions:0]];
-    return descriptionString;
-}
-
-@end
-
 @implementation CHIPSoftwareDiagnosticsClusterThreadMetrics
 - (instancetype)init
 {
@@ -957,7 +933,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _softwareFault = [CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct new];
+        _id = @(0);
+
+        _name = nil;
+
+        _faultRecording = nil;
     }
     return self;
 }
@@ -965,7 +945,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: softwareFault:%@; >", NSStringFromClass([self class]), _softwareFault];
+        [NSString stringWithFormat:@"<%@: id:%@; name:%@; faultRecording:%@; >", NSStringFromClass([self class]), _id, _name,
+                  [_faultRecording base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 

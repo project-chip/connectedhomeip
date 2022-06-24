@@ -86,10 +86,6 @@ public:
         mPendingIcac.Free();
         mPendingNoc.Free();
 
-        mPendingRcacSize = 0;
-        mPendingIcacSize = 0;
-        mPendingNocSize  = 0;
-
         mPendingFabricIndex = kUndefinedFabricIndex;
         mStateFlags.ClearAll();
     }
@@ -116,13 +112,9 @@ protected:
     // This pending fabric index is `kUndefinedFabricIndex` if there are no pending certs at all for the fabric
     FabricIndex mPendingFabricIndex = kUndefinedFabricIndex;
 
-    Platform::ScopedMemoryBuffer<uint8_t> mPendingRcac;
-    Platform::ScopedMemoryBuffer<uint8_t> mPendingIcac;
-    Platform::ScopedMemoryBuffer<uint8_t> mPendingNoc;
-
-    uint16_t mPendingRcacSize = 0;
-    uint16_t mPendingIcacSize = 0;
-    uint16_t mPendingNocSize  = 0;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mPendingRcac;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mPendingIcac;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mPendingNoc;
 
     BitFlags<StateFlags> mStateFlags;
 };

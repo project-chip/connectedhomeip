@@ -435,7 +435,7 @@ static uint8_t * singletonAttributeLocation(const EmberAfAttributeMetadata * am)
     uint16_t index                     = 0;
     while (m < am)
     {
-        if ((m->mask & ATTRIBUTE_MASK_SINGLETON) != 0U)
+        if (m->IsSingleton() && !m->IsExternal())
         {
             index = static_cast<uint16_t>(index + m->size);
         }

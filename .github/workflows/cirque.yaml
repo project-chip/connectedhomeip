@@ -75,7 +75,7 @@ jobs:
                       ${{ runner.os }}-cirque-
 
             - name: Bootstrap
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   integrations/docker/images/chip-build-cirque/run.sh \
                     --env GITHUB_ACTION_RUN=1 \

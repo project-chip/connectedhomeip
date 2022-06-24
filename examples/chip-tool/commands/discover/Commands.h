@@ -48,8 +48,10 @@ public:
         result.address.ToString(addrBuffer);
 
         ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " at %s", peerId.GetNodeId(), addrBuffer);
-        ChipLogProgress(chipTool, "   MRP retry interval (idle): %" PRIu32 "ms", result.mrpConfig.mIdleRetransTimeout.count());
-        ChipLogProgress(chipTool, "   MRP retry interval (active): %" PRIu32 "ms", result.mrpConfig.mActiveRetransTimeout.count());
+        ChipLogProgress(chipTool, "   MRP retry interval (idle): %" PRIu32 "ms",
+                        result.mrpRemoteConfig.mIdleRetransTimeout.count());
+        ChipLogProgress(chipTool, "   MRP retry interval (active): %" PRIu32 "ms",
+                        result.mrpRemoteConfig.mActiveRetransTimeout.count());
         ChipLogProgress(chipTool, "   Supports TCP: %s", result.supportsTcp ? "yes" : "no");
         SetCommandExitStatus(CHIP_NO_ERROR);
     }

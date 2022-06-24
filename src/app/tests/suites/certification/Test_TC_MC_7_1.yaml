@@ -35,9 +35,7 @@ tests:
           constraints:
               type: OutPutInfo
 
-    #Issue 18100
     - label: "Sends a SelectAudioOutput command"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "SelectOutput"
       arguments:
           values:
@@ -45,7 +43,6 @@ tests:
                 value: 1
 
     - label: "Reads the CurrentOutput attribute"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentOutput"
       response:

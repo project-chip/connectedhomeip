@@ -270,7 +270,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             .fabricTable       = &mFabrics,
             .clientPool        = &mCASEClientPool,
             .groupDataProvider = mGroupsProvider,
-            .mrpLocalConfig    = Optional<ReliableMessageProtocolConfig>(GetLocalMRPConfig()),
+            .mrpLocalConfig    = GetLocalMRPConfig(),
         },
         .devicePool        = &mDevicePool,
     };

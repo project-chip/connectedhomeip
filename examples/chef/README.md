@@ -61,61 +61,11 @@ Run `chef.py -h` to see the available commands
 
 ## CI
 
-### zzz_generated
-
-To eliminate a dependency on ZAP in CI jobs, all chef examples found in
-`examples/chef/devices` must have their output from the ZAP tool cached in
-`examples/chef/zzz_generated`.
-
-To generate the cache, one may execute chef with the option `--generate_zzz`.
-This will run ZAP for all devices in `examples/chef/devices` and place the
-output into the appropriate directory structure.
-
-Other than the output from the ZAP tool, the cache directory contains two
-additional files for each device:
-
--   `INPUTMD5.txt` contains the md5 hex digest of the ZAP file used to generate
-    the directory.
--   `ZAPSHA.txt` contains the commit of ZAP in the user's tree when the
-    directory was generated.
-
-```
-zzz_generated/
-└── lighting-app
-    ├── INPUTMD5.txt
-    ├── zap-generated
-    │   ├── access.h
-    │   ├── af-gen-event.h
-    │   └── ...
-    └── ZAPSHA.txt
-```
-
-These additional files will be used by the CI jobs to validate whether the cache
-must be regenerated i.e. regeneration is needed when ZAP or the input ZAP files
-change.
-
-### Workflow
-
 All CI jobs for chef can be found in `.github/workflows/chef.yaml`.
-
-#### Validate
-
-The workflow begins by calling chef with `--validate_zzz`.
-
-`--validate_zzz` will recalculate the current ZAP commit and the md5 of all
-example ZAP files and compare with what is committed to `zzz_generated`.
-
-If the validation job fails, it will provide instructions to repair
-`zzz_generated` and no builds will run.
-
-#### Build
-
-Once the validation job is complete, there is a separate job for each platform,
-which run in parallel.
 
 These jobs use a platform-specific image with base `chip-build`.
 
-The build jobs call chef with the options `--ci -t <PLATFORM>`. The `--ci`
-option will execute builds for all devices specified in `_CI_ALLOW_LIST` defined
-in `chef.py` (so long as these devices are also in `/devices`) on the specified
-platform.
+CI jobs call chef with the options `--ci -t <PLATFORM>`. The `--ci` option will
+execute builds for all devices specified in `cicd_config["ci_allow_list"]`
+defined in `chef.py` (so long as these devices are also in `/devices`) on the
+specified platform.

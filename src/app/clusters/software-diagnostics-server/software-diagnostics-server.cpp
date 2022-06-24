@@ -200,7 +200,7 @@ SoftwareDiagnosticsServer & SoftwareDiagnosticsServer::Instance()
 }
 
 // Gets called when a software fault that has taken place on the Node.
-void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault)
+void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault)
 {
     ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
 
@@ -208,9 +208,8 @@ void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics:
     {
         // If Software Diagnostics cluster is implemented on this endpoint
         EventNumber eventNumber;
-        Events::SoftwareFault::Type event{ softwareFault };
 
-        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+        if (CHIP_NO_ERROR != LogEvent(softwareFault, endpoint, eventNumber))
         {
             ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
         }

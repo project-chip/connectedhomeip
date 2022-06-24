@@ -89,7 +89,7 @@ if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
 
 # WiFi settings
 if (chip_enable_wifi) {
-  wifi_sdk_dir = "${chip_root}/third_party/efr32_sdk/repo/matter/wifi"
+  wifi_sdk_dir = "${chip_root}/third_party/silabs/matter_support/matter/wifi"
   efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
   efr32_lwip_defs += [
     "LWIP_IPV4=1",
@@ -102,7 +102,7 @@ if (chip_enable_wifi) {
 
   if (use_rs911x) {
     wiseconnect_sdk_root =
-        "${chip_root}/third_party/efr32_sdk/wiseconnect-wifi-bt-sdk"
+        "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
     import("${wifi_sdk_dir}/rs911x/rs911x.gni")
   } else {
     import("${wifi_sdk_dir}/wf200/wf200.gni")

@@ -55,6 +55,7 @@ tests:
       attribute: "current level"
       response:
           value: 254
+          saveAs: CurrentLevelValue
           constraints:
               type: uint8
 
@@ -83,6 +84,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 1
+              maxValue: 254
 
     - label: "Reads the CurrentFrequency attribute"
       command: "readAttribute"

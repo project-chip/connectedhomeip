@@ -93,3 +93,19 @@ jobs:
               if: always()
               run: |
                   scripts/tools/check_test_pics.py src/app/tests/suites/certification/ci-pics-values src/app/tests/suites/certification/PICS.yaml
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for use of 0x%u and the like, which lead to misleading output.
+              if: always()
+              run: |
+                  git grep -n '0x%[0-9l.-]*[^0-9lxX".-]' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for use of '"0x" PRIu*' and the like, which lead to misleading output.
+              if: always()
+              run: |
+                  git grep -n '0x%[0-9-]*" *PRI[^xX]' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0

@@ -34,11 +34,7 @@
 #define INET_CONFIG_ERROR_MIN 1000000
 #define INET_CONFIG_ERROR_MAX 1000999
 
-#if LWIP_CONFIG_ENABLE_IPV4
 #define INET_CONFIG_ENABLE_IPV4 1
-#else
-#define INET_CONFIG_ENABLE_IPV4 0
-#endif
 
 // ========== Platform-specific Configuration Overrides =========
 

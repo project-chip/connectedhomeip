@@ -79,7 +79,7 @@ OperationalAdvertisingParameters operationalParams1 =
         .SetPort(CHIP_PORT)
         .EnableIpV4(true)
         .SetTcpSupported(chip::Optional<bool>(false))
-        .SetMRPConfig(ReliableMessageProtocolConfig(32_ms32, 30_ms32)); // Match SII, SAI below
+        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(32_ms32, 30_ms32)); // Match SII, SAI below
 OperationalAdvertisingParameters operationalParams2 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId2).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams3 =
@@ -180,7 +180,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"))
         .SetTcpSupported(chip::Optional<bool>(true))
         // 3600005 is more than the max so should be adjusted down
-        .SetMRPConfig(ReliableMessageProtocolConfig(3600000_ms32, 3600005_ms32));
+        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32));
 QNamePart txtCommissionableNodeParamsLargeEnhancedParts[] = { "D=22",          "VP=555+897",       "CM=2",       "DT=70000",
                                                               "DN=testy-test", "RI=id_that_spins", "PI=Pair me", "PH=3",
                                                               "SAI=3600000",   "SII=3600000",      "T=1" };

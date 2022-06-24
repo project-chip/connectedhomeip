@@ -368,23 +368,6 @@ void SessionManager::ExpireAllPASEPairings()
     });
 }
 
-void SessionManager::ReleaseSessionsForFabricExceptOne(FabricIndex fabricIndex, const SessionHandle & deferred)
-{
-    VerifyOrDie(deferred->IsSecureSession());
-    SecureSession * deferredSecureSession = deferred->AsSecureSession();
-
-    mSecureSessions.ForEachSession([&](auto session) {
-        if (session->GetPeer().GetFabricIndex() == fabricIndex)
-        {
-            if (session == deferredSecureSession)
-                session->MarkInactive();
-            else
-                session->MarkForEviction();
-        }
-        return Loop::Continue;
-    });
-}
-
 Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,
                                                         const ScopedNodeId & sessionEvictionHint)
 {
@@ -395,10 +378,10 @@ CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionH
                                                         uint16_t peerSessionId, FabricIndex fabric,
                                                         const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role)
 {
-    NodeId localNodeId = kUndefinedNodeId;
-    Optional<SessionHandle> session =
-        mSecureSessions.CreateNewSecureSessionForTest(chip::Transport::SecureSession::Type::kPASE, localSessionId, localNodeId,
-                                                      peerNodeId, CATValues{}, peerSessionId, fabric, GetLocalMRPConfig());
+    NodeId localNodeId              = kUndefinedNodeId;
+    Optional<SessionHandle> session = mSecureSessions.CreateNewSecureSessionForTest(
+        chip::Transport::SecureSession::Type::kPASE, localSessionId, localNodeId, peerNodeId, CATValues{}, peerSessionId, fabric,
+        GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
     VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
     SecureSession * secureSession = session.Value()->AsSecureSession();
     secureSession->SetPeerAddress(peerAddress);
@@ -417,9 +400,9 @@ CHIP_ERROR SessionManager::InjectCaseSessionWithTestKey(SessionHolder & sessionH
                                                         FabricIndex fabric, const Transport::PeerAddress & peerAddress,
                                                         CryptoContext::SessionRole role, const CATValues & cats)
 {
-    Optional<SessionHandle> session =
-        mSecureSessions.CreateNewSecureSessionForTest(chip::Transport::SecureSession::Type::kCASE, localSessionId, localNodeId,
-                                                      peerNodeId, cats, peerSessionId, fabric, GetLocalMRPConfig());
+    Optional<SessionHandle> session = mSecureSessions.CreateNewSecureSessionForTest(
+        chip::Transport::SecureSession::Type::kCASE, localSessionId, localNodeId, peerNodeId, cats, peerSessionId, fabric,
+        GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
     VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
     SecureSession * secureSession = session.Value()->AsSecureSession();
     secureSession->SetPeerAddress(peerAddress);
@@ -474,7 +457,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetH
     if (source.HasValue())
     {
         // Assume peer is the initiator, we are the responder.
-        optionalSession = mUnauthenticatedSessions.FindOrAllocateResponder(source.Value(), GetLocalMRPConfig());
+        optionalSession = mUnauthenticatedSessions.FindOrAllocateResponder(source.Value(), GetDefaultMRPConfig());
         if (!optionalSession.HasValue())
         {
             ChipLogError(Inet, "UnauthenticatedSession exhausted");
@@ -553,7 +536,13 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
 
     Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
 
-    if (!secureSession->IsDefunct() && !secureSession->IsActiveSession())
+    // We need to allow through messages even on sessions that are pending
+    // evictions, because for some cases (UpdateNOC, RemoveFabric, etc) there
+    // can be a single exchange alive on the session waiting for a MRP ack, and
+    // we need to make sure to send the ack through.  The exchange manager is
+    // responsible for ensuring that such messages do not lead to new exchange
+    // creation.
+    if (!secureSession->IsDefunct() && !secureSession->IsActiveSession() && !secureSession->IsPendingEviction())
     {
         ChipLogError(Inet, "Secure transport received message on a session in an invalid state (state = '%s')",
                      secureSession->GetStateStr());

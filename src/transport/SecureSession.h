@@ -72,7 +72,7 @@ public:
                   const ReliableMessageProtocolConfig & config) :
         mTable(table),
         mState(State::kEstablishing), mSecureSessionType(secureSessionType), mLocalNodeId(localNodeId), mPeerNodeId(peerNodeId),
-        mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mMRPConfig(config)
+        mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mRemoteMRPConfig(config)
     {
         MoveToState(State::kActive);
         Retain(); // Put the test session in Active state. This ref is released inside MarkForEviction
@@ -147,9 +147,6 @@ public:
      */
     void MarkAsDefunct();
 
-    // Used to prevent any new exchange created on the session while the existing exchanges finish their work.
-    void MarkInactive();
-
     Session::SessionType GetSessionType() const override { return Session::SessionType::kSecure; }
 #if CHIP_PROGRESS_LOGGING
     const char * GetSessionTypeString() const override { return "secure"; };
@@ -168,7 +165,7 @@ public:
         switch (mPeerAddress.GetTransportType())
         {
         case Transport::Type::kUdp:
-            return GetMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
+            return GetRemoteMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
         case Transport::Type::kBle:
@@ -192,9 +189,9 @@ public:
 
     const CATValues & GetPeerCATs() const { return mPeerCATs; }
 
-    void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
+    void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteMRPConfig = config; }
 
-    const ReliableMessageProtocolConfig & GetMRPConfig() const override { return mMRPConfig; }
+    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const override { return mRemoteMRPConfig; }
 
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
@@ -230,7 +227,7 @@ public:
 
     System::Clock::Timestamp GetMRPBaseTimeout() override
     {
-        return IsPeerActive() ? GetMRPConfig().mActiveRetransTimeout : GetMRPConfig().mIdleRetransTimeout;
+        return IsPeerActive() ? GetRemoteMRPConfig().mActiveRetransTimeout : GetRemoteMRPConfig().mIdleRetransTimeout;
     }
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
@@ -289,13 +286,6 @@ private:
         // When all SessionHandles go out of scope, the session will be released automatically.
         //
         kPendingEviction = 4,
-
-        //
-        // The session is still functional but it can't yield any new outbound or inbound exchanges.
-        // This is meant to be used in conjunction with ExchangeManager::AbortExchangesForFabricExceptOne, with the one
-        // exceptional exchange handling out of this state when it finishes whatever it needs the session for.
-        //
-        kInactive = 5,
     };
 
     const char * StateToString(State state) const;
@@ -314,7 +304,7 @@ private:
     PeerAddress mPeerAddress;
     System::Clock::Timestamp mLastActivityTime     = System::SystemClock().GetMonotonicTimestamp(); ///< Timestamp of last tx or rx
     System::Clock::Timestamp mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp(); ///< Timestamp of last rx
-    ReliableMessageProtocolConfig mMRPConfig       = GetLocalMRPConfig();
+    ReliableMessageProtocolConfig mRemoteMRPConfig = GetDefaultMRPConfig();
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;
 };

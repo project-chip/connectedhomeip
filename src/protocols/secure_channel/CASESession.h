@@ -80,15 +80,16 @@ public:
      * @param previouslyEstablishedPeer     If a session had previously been established successfully to a peer, this should
      *                                      be set to its scoped node-id. Else, this should be initialized to a
      *                                      default-constructed ScopedNodeId().
-     * @param mrpConfig                     MRP configuration to encode into Sigma2. If not provided, it won't be encoded.
+     * @param mrpLocalConfig                MRP configuration to encode into Sigma2. If not provided, it won't be encoded.
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR PrepareForSessionEstablishment(
-        SessionManager & sessionManager, FabricTable * fabricTable, SessionResumptionStorage * sessionResumptionStorage,
-        Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
-        const ScopedNodeId & previouslyEstablishedPeer,
-        Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
+    CHIP_ERROR PrepareForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabricTable,
+                                              SessionResumptionStorage * sessionResumptionStorage,
+                                              Credentials::CertificateValidityPolicy * policy,
+                                              SessionEstablishmentDelegate * delegate,
+                                              const ScopedNodeId & previouslyEstablishedPeer,
+                                              Optional<ReliableMessageProtocolConfig> mrpLocalConfig);
 
     /**
      * @brief
@@ -107,7 +108,7 @@ public:
     EstablishSession(SessionManager & sessionManager, FabricTable * fabricTable, ScopedNodeId peerScopedNodeId,
                      Messaging::ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
                      Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
-                     Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
+                     Optional<ReliableMessageProtocolConfig> mrpLocalConfig);
 
     /**
      * @brief Set the Group Data Provider which will be used to look up IPKs
@@ -226,7 +227,7 @@ private:
     CHIP_ERROR RecoverInitiatorIpk();
     // On success, sets locally maching mFabricInfo in internal state to the entry matched by
     // destinationId/initiatorRandom from processing of Sigma1, and sets mIpk to the right IPK.
-    CHIP_ERROR FindLocalNodeFromDestionationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom);
+    CHIP_ERROR FindLocalNodeFromDestinationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom);
 
     CHIP_ERROR SendSigma1();
     CHIP_ERROR HandleSigma1_and_SendSigma2(System::PacketBufferHandle && msg);

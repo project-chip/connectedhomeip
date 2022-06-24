@@ -882,7 +882,9 @@ server cluster SoftwareDiagnostics = 52 {
   }
 
   info event SoftwareFault = 0 {
-    SoftwareFaultStruct softwareFault = 0;
+    INT64U id = 0;
+    optional CHAR_STRING name = 1;
+    optional OCTET_STRING faultRecording = 2;
   }
 
   readonly attribute ThreadMetrics threadMetrics[] = 0;
@@ -1130,6 +1132,8 @@ server cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute int64u timeSinceReset = 8;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 server cluster Switch = 59 {
