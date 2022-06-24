@@ -840,7 +840,7 @@ CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(A
     }
 
     return err;
-} // namespace DeviceLayer
+}
 
 CHIP_ERROR
 ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
