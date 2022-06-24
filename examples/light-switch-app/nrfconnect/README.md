@@ -749,8 +749,10 @@ To test the Generic Switch, complete the following steps:
 
 2.  Subscribe to the `InitialPress` and `ShortRelease` event notifications:
 
-        switch subscribe-event initial-press 1 20 <node_id> 2 --is-urgent true
-        switch subscribe-event short-release 1 20 <node_id> 2 --is-urgent true --keepSubscriptions true
+```shell
+switch subscribe-event initial-press 1 20 <node_id> 2 --is-urgent true
+switch subscribe-event short-release 1 20 <node_id> 2 --is-urgent true --keepSubscriptions true
+```
 
 3.  Press **Button 3** to test the new configuration. When pressing and
     releasing **Button 3**, both events should be sent to the controller.
