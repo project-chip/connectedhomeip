@@ -415,10 +415,8 @@ uint32_t ChannelManager::GetFeatureMap(chip::EndpointId endpoint)
     {
         return mDynamicEndpointFeatureMap;
     }
-    else
-    {
-        uint32_t featureMap = 0;
-        Attributes::FeatureMap::Get(endpoint, &featureMap);
-        return featureMap;
-    }
+
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
 }
