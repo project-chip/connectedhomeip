@@ -113,19 +113,20 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
         for (x = 0; x < arraySize; x++)
         {
             ThreadMetrics * thread = new ThreadMetrics();
+            if (thread)
+            {
+                Platform::CopyString(thread->NameBuf, taskStatusArray[x].pcTaskName);
+                thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
+                thread->id = taskStatusArray[x].xTaskNumber;
+                thread->stackFreeMinimum.Emplace(taskStatusArray[x].usStackHighWaterMark);
 
-            strncpy(thread->NameBuf, taskStatusArray[x].pcTaskName, kMaxThreadNameLength - 1);
-            thread->NameBuf[kMaxThreadNameLength] = '\0';
-            thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
-            thread->id = taskStatusArray[x].xTaskNumber;
-            thread->stackFreeMinimum.Emplace(taskStatusArray[x].usStackHighWaterMark);
+                /* Unsupported metrics */
+                // thread->stackSize
+                // thread->stackFreeCurrent
 
-            /* Unsupported metrics */
-            // thread->stackSize
-            // thread->stackFreeCurrent
-
-            thread->Next = head;
-            head         = thread;
+                thread->Next = head;
+                head         = thread;
+            }
         }
 
         *threadMetricsOut = head;
