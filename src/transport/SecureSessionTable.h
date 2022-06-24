@@ -149,6 +149,12 @@ private:
         SecureSession * mSession;
         uint16_t mNumMatchingOnFabric;
         uint16_t mNumMatchingOnPeer;
+
+        static_assert(CHIP_CONFIG_SECURE_SESSION_POOL_SIZE <= std::numeric_limits<decltype(mNumMatchingOnFabric)>::max(),
+                      "CHIP_CONFIG_SECURE_SESSION_POOL_SIZE must set to be less than or equal to 65535!");
+        static_assert(CHIP_CONFIG_SECURE_SESSION_POOL_SIZE <= std::numeric_limits<decltype(mNumMatchingOnPeer)>::max(),
+                      "CHIP_CONFIG_SECURE_SESSION_POOL_SIZE must set to be less than or equal to 65535!");
+
         friend class SecureSessionTable;
     };
 
@@ -201,7 +207,7 @@ private:
      *
      *  - Key1:  Sessions on fabrics that have more sessions in the table are placed ahead of sessions on fabrics
      *           with lesser sessions. We conclusively know that if a particular fabric has more sessions in the table
-     *           than another, that that fabric is definitely over minimas (assuming a minimially sized session table
+     *           than another, then that fabric is definitely over minimas (assuming a minimally sized session table
      *           conformant to spec minimas).
      *
      *    Key2:  Sessions that match the eviction hint's fabric are placed ahead of those that don't. This ensures that
@@ -209,8 +215,8 @@ private:
      *           the eviction hint's fabric to ensure we evict sessions within the fabric that a new session might be about
      *           to be created within. This is essential to preventing cross-fabric denial of service possibilities.
      *
-     *    Key3:  Sessions with a higher mNumMatchingOnPeer are placed ahead of those with less. This ensures
-     *           we pick sessions that have a higher number of duplicated sessions to a peer over those with less since
+     *    Key3:  Sessions with a higher mNumMatchingOnPeer are placed ahead of those with a lower one. This ensures
+     *           we pick sessions that have a higher number of duplicated sessions to a peer over those with lower since
      *           evicting a duplicated session will have less of an impact to that peer.
      *
      *    Key4:  Sessions whose target peer's ScopedNodeId matches the eviction hint are placed ahead of those who don't. This
@@ -252,6 +258,15 @@ private:
 
     bool mRunningEvictionLogic = false;
     ObjectPool<SecureSession, CHIP_CONFIG_SECURE_SESSION_POOL_SIZE> mEntries;
+
+    size_t GetMaxSessionTableSize() const
+    {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        return mMaxSessionTableSize;
+#else
+        return CHIP_CONFIG_SECURE_SESSION_POOL_SIZE;
+#endif
+    }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     size_t mMaxSessionTableSize = CHIP_CONFIG_SECURE_SESSION_POOL_SIZE;

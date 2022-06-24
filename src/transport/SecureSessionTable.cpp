@@ -66,18 +66,12 @@ Optional<SessionHandle> SecureSessionTable::CreateNewSecureSession(SecureSession
     auto sessionId = FindUnusedSessionId();
     VerifyOrReturnValue(sessionId.HasValue(), Optional<SessionHandle>::Missing());
 
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    const size_t kMaxSessionTableSize = mMaxSessionTableSize;
-#else
-    const size_t kMaxSessionTableSize = CHIP_CONFIG_SECURE_SESSION_POOL_SIZE;
-#endif
-
     //
     // We allocate a new session out of the pool if we have space in it. If we don't, we need
     // to run the eviction algorithm to get a free slot. We shall ALWAYS be guaranteed to evict
     // an existing session in the table in normal operating circumstances.
     //
-    if (mEntries.Allocated() < kMaxSessionTableSize)
+    if (mEntries.Allocated() < GetMaxSessionTableSize())
     {
         allocated = mEntries.CreateObject(*this, secureSessionType, sessionId.Value());
     }
@@ -105,30 +99,25 @@ SecureSession * SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Se
 
     auto cleanup = MakeDefer([this]() { mRunningEvictionLogic = false; });
 
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    const size_t kMaxSessionTableSize = mMaxSessionTableSize;
-#else
-    const size_t kMaxSessionTableSize = CHIP_CONFIG_SECURE_SESSION_POOL_SIZE;
-#endif
-
     ChipLogProgress(SecureChannel, "Evicting a slot for session with LSID: %d, type: %u", localSessionId,
                     (uint8_t) secureSessionType);
 
-    VerifyOrDie(mEntries.Allocated() <= kMaxSessionTableSize);
+    VerifyOrDie(mEntries.Allocated() <= GetMaxSessionTableSize());
 
     //
     // Create a temporary list of objects each of which points to a session in the existing
     // session table, but are swappable. This allows them to then be used with a sorting algorithm
     // without affecting the sessions in the table itself.
     //
-    // The size of this shouldn't place significant demands on the stack - each item is
+    // The size of this shouldn't place significant demands on the stack if using the default
+    // configuration for CHIP_CONFIG_SECURE_SESSION_POOL_SIZE (17). Each item is
     // 8 bytes in size (on a 32-bit platform), and 16 bytes in size (on a 64-bit platform,
-    // including padding). A minimal, spec compliant value for CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
-    // is:
-    //
-    // (3 sessions / fabric * 5 fabrics + 1 reserved for CASE + 1 reserved for PASE) = 17 sessions.
+    // including padding).
     //
     // Total size of this stack variable = 17 * 8 = 136bytes (32-bit platform), 272 bytes (64-bit platform).
+    //
+    // Even if the define is set to a large value, it's likely not so bad on the sort of platform setup
+    // that would have that sort of pool size.
     //
     // We need to sort (as opposed to just a linear search for the smallest/largest item)
     // since it is possible that the candidate selected for eviction may not actually be
@@ -150,12 +139,12 @@ SecureSession * SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Se
     //
     // This will be used by the session eviction algorithm later.
     //
-    ForEachSession([&index, &sortableSessions, this](auto session) {
+    ForEachSession([&index, &sortableSessions, this](auto * session) {
         sortableSessions[index].mSession             = session;
         sortableSessions[index].mNumMatchingOnFabric = 0;
         sortableSessions[index].mNumMatchingOnPeer   = 0;
 
-        ForEachSession([session, index, &sortableSessions](auto otherSession) {
+        ForEachSession([session, index, &sortableSessions](auto * otherSession) {
             if (session != otherSession)
             {
                 if (session->GetFabricIndex() == otherSession->GetFabricIndex())
@@ -182,7 +171,7 @@ SecureSession * SecureSessionTable::EvictAndAllocate(uint16_t localSessionId, Se
     DefaultEvictionPolicy(policyContext);
     ChipLogProgress(SecureChannel, "Sorted sessions for eviction...");
 
-    auto numSessions = mEntries.Allocated();
+    const auto numSessions = mEntries.Allocated();
 
 #if CHIP_DETAIL_LOGGING
     ChipLogDetail(SecureChannel, "Sorted Eviction Candidates (ranked from best candidate to worst):");
@@ -255,96 +244,39 @@ void SecureSessionTable::DefaultEvictionPolicy(EvictionPolicyContext & evictionC
             return a.mNumMatchingOnFabric > b.mNumMatchingOnFabric;
         }
 
-        if (a.mNumMatchingOnFabric == b.mNumMatchingOnFabric)
+        bool doesAMatchSessionHintFabric =
+            a.mSession->GetPeer().GetFabricIndex() == evictionContext.GetSessionEvictionHint().GetFabricIndex();
+        bool doesBMatchSessionHintFabric =
+            b.mSession->GetPeer().GetFabricIndex() == evictionContext.GetSessionEvictionHint().GetFabricIndex();
+
+        //
+        // Sorting on Key2
+        //
+        if (doesAMatchSessionHintFabric != doesBMatchSessionHintFabric)
         {
-            bool doesAMatchSessionHintFabric =
-                a.mSession->GetPeer().GetFabricIndex() == evictionContext.GetSessionEvictionHint().GetFabricIndex();
-            bool doesBMatchSessionHintFabric =
-                b.mSession->GetPeer().GetFabricIndex() == evictionContext.GetSessionEvictionHint().GetFabricIndex();
-
-            //
-            // Sorting on Key2
-            //
-            if (doesAMatchSessionHintFabric != doesBMatchSessionHintFabric)
-            {
-                return doesAMatchSessionHintFabric > doesBMatchSessionHintFabric;
-            }
-
-            if (doesAMatchSessionHintFabric == doesBMatchSessionHintFabric)
-            {
-                //
-                // Sorting on Key3
-                //
-                if (a.mNumMatchingOnPeer != b.mNumMatchingOnPeer)
-                {
-                    return a.mNumMatchingOnPeer > b.mNumMatchingOnPeer;
-                }
-
-                if (a.mNumMatchingOnPeer == b.mNumMatchingOnPeer)
-                {
-                    int doesAMatchSessionHint = a.mSession->GetPeer() == evictionContext.GetSessionEvictionHint();
-                    int doesBMatchSessionHint = b.mSession->GetPeer() == evictionContext.GetSessionEvictionHint();
-
-                    //
-                    // Sorting on Key4
-                    //
-                    if (doesAMatchSessionHint != doesBMatchSessionHint)
-                    {
-                        return doesAMatchSessionHint > doesBMatchSessionHint;
-                    }
-
-                    if (doesAMatchSessionHint == doesBMatchSessionHint)
-                    {
-                        int aStateScore = 0, bStateScore = 0;
-
-                        auto assignStateScore = [](auto & score, const auto & session) {
-                            if (session.IsDefunct())
-                            {
-                                score = 2;
-                            }
-                            else if (session.IsActiveSession())
-                            {
-                                score = 1;
-                            }
-                            else
-                            {
-                                score = 0;
-                            }
-                        };
-
-                        assignStateScore(aStateScore, *a.mSession);
-                        assignStateScore(bStateScore, *b.mSession);
-
-                        //
-                        // Sorting on Key5
-                        //
-                        if (aStateScore != bStateScore)
-                        {
-                            return (aStateScore > bStateScore);
-                        }
-
-                        if (aStateScore == bStateScore)
-                        {
-                            //
-                            // Sorting on Key6
-                            //
-                            return (a->GetLastActivityTime() < b->GetLastActivityTime());
-                        }
-                    }
-                }
-            }
+            return doesAMatchSessionHintFabric > doesBMatchSessionHintFabric;
         }
 
-        return false;
-    });
+        //
+        // Sorting on Key3
+        //
+        if (a.mNumMatchingOnPeer != b.mNumMatchingOnPeer)
+        {
+            return a.mNumMatchingOnPeer > b.mNumMatchingOnPeer;
+        }
 
-#if 0
-    //
-    // Alternative implementation that uses multiple sorts.
-    //
-    evictionContext.Sort([](const auto & a, const auto & b) {
+        int doesAMatchSessionHint = a.mSession->GetPeer() == evictionContext.GetSessionEvictionHint();
+        int doesBMatchSessionHint = b.mSession->GetPeer() == evictionContext.GetSessionEvictionHint();
+
+        //
+        // Sorting on Key4
+        //
+        if (doesAMatchSessionHint != doesBMatchSessionHint)
+        {
+            return doesAMatchSessionHint > doesBMatchSessionHint;
+        }
+
         int aStateScore = 0, bStateScore = 0;
-
         auto assignStateScore = [](auto & score, const auto & session) {
             if (session.IsDefunct())
             {
@@ -363,47 +295,19 @@ void SecureSessionTable::DefaultEvictionPolicy(EvictionPolicyContext & evictionC
         assignStateScore(aStateScore, *a.mSession);
         assignStateScore(bStateScore, *b.mSession);
 
-        if (aStateScore > bStateScore) {
-            return true;
+        //
+        // Sorting on Key5
+        //
+        if (aStateScore != bStateScore)
+        {
+            return (aStateScore > bStateScore);
         }
 
-        if (aStateScore == bStateScore) {
-            return (a->GetLastActivityTime() < b->GetLastActivityTime());
-        }
-
-        return false;
+        //
+        // Sorting on Key6
+        //
+        return (a->GetLastActivityTime() < b->GetLastActivityTime());
     });
-
-    evictionContext.Sort([&evictionContext](const SortableSession& a, const SortableSession& b) {
-        (void)evictionContext;
-
-        if (a.mNumMatchingOnPeer > b.mNumMatchingOnPeer) {
-            return true;
-        }
-
-        if (a.mNumMatchingOnPeer == b.mNumMatchingOnPeer) {
-            int ScoreA = a.mSession->GetPeer() == evictionContext.GetSessionEvictionHint();
-            int ScoreB = b.mSession->GetPeer() == evictionContext.GetSessionEvictionHint();
-            return (ScoreA > ScoreB);
-        }
-
-        return false;
-    });
-
-    evictionContext.Sort([&evictionContext](const SortableSession& a, const SortableSession& b) {
-        if (a.mNumMatchingOnFabric > b.mNumMatchingOnFabric) {
-            return true;
-        }
-
-        if (a.mNumMatchingOnFabric == b.mNumMatchingOnFabric) {
-            int ScoreA = a.mSession->GetPeer().GetFabricIndex() == evictionContext.GetSessionEvictionHint().GetFabricIndex();
-            int ScoreB = b.mSession->GetPeer().GetFabricIndex() == evictionContext.GetSessionEvictionHint().GetFabricIndex();
-            return (ScoreA > ScoreB);
-        }
-
-        return false;
-    });
-#endif
 }
 
 Optional<SessionHandle> SecureSessionTable::FindSecureSessionByLocalKey(uint16_t localSessionId)

@@ -377,10 +377,10 @@ class BaseTestHelper:
         self.logger.info("Testing CASE defunct logic")
 
         #
-        # This tests establishing a subscription on a given CASE session, then mark it defunct (to simulate
+        # This tests establishes a subscription on a given CASE session, then marks it defunct (to simulate
         # encountering a transport timeout on the session).
         #
-        # Then, we write to an attribute from a *different* fabric and check to ensure we still get a report
+        # Then, we write to the attribute that was subscribed to from a *different* fabric and check to ensure we still get a report
         # on the sub we established previously. Since it was just marked defunct, it should return back to being
         # active and a report should get delivered.
         #
