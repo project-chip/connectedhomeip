@@ -593,7 +593,7 @@ int Test_Setup(void * inContext)
 
     uint8_t buf[sizeof(chip::CompressedFabricId)];
     chip::MutableByteSpan span(buf);
-    VerifyOrReturnError(CHIP_NO_ERROR == ctx.GetBobFabric()->GetCompressedId(span), FAILURE);
+    VerifyOrReturnError(CHIP_NO_ERROR == ctx.GetBobFabric()->GetCompressedFabricIdBytes(span), FAILURE);
     VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitData(&gGroupsProvider, ctx.GetBobFabricIndex(), span), FAILURE);
 
     return SUCCESS;

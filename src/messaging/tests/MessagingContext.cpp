@@ -35,7 +35,17 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
     mTransport = transport;
 
     ReturnErrorOnFailure(PlatformMemoryUser::Init());
-    ReturnErrorOnFailure(mFabricTable.Init(&mStorage));
+
+    ReturnErrorOnFailure(mOpKeyStore.Init(&mStorage));
+    ReturnErrorOnFailure(mOpCertStore.Init(&mStorage));
+
+    chip::FabricTable::InitParams initParams;
+    initParams.storage             = &mStorage;
+    initParams.operationalKeystore = &mOpKeyStore;
+    initParams.opCertStore         = &mOpCertStore;
+
+    ReturnErrorOnFailure(mFabricTable.Init(initParams));
+
     ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mMessageCounterManager, &mStorage, &mFabricTable));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
@@ -43,16 +53,13 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
 
     if (mInitializeNodes)
     {
-        FabricInfo aliceFabric;
-        FabricInfo bobFabric;
+        ReturnErrorOnFailure(mFabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                                                GetNodeA1CertAsset().mCert,
+                                                                                GetNodeA1CertAsset().mKey, &mAliceFabricIndex));
 
-        ReturnErrorOnFailure(aliceFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
-                                                             GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey));
-        ReturnErrorOnFailure(mFabricTable.AddNewFabricForTest(aliceFabric, &mAliceFabricIndex));
-
-        bobFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA2CertAsset().mCert,
-                                      GetNodeA2CertAsset().mKey);
-        ReturnErrorOnFailure(mFabricTable.AddNewFabricForTest(bobFabric, &mBobFabricIndex));
+        ReturnErrorOnFailure(mFabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                                                GetNodeA2CertAsset().mCert,
+                                                                                GetNodeA2CertAsset().mKey, &mBobFabricIndex));
 
         ReturnErrorOnFailure(CreateSessionBobToAlice());
         ReturnErrorOnFailure(CreateSessionAliceToBob());
@@ -73,6 +80,9 @@ CHIP_ERROR MessagingContext::Shutdown()
 
     mExchangeManager.Shutdown();
     mSessionManager.Shutdown();
+    mFabricTable.Shutdown();
+    mOpCertStore.Finish();
+    mOpKeyStore.Finish();
     return CHIP_NO_ERROR;
 }
 

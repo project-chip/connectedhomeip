@@ -42,6 +42,10 @@ public:
     PersistentStorageOperationalKeystore() = default;
     virtual ~PersistentStorageOperationalKeystore() { Finish(); }
 
+    // Non-copyable
+    PersistentStorageOperationalKeystore(PersistentStorageOperationalKeystore const &) = delete;
+    void operator=(PersistentStorageOperationalKeystore const &) = delete;
+
     /**
      * @brief Initialize the Operational Keystore to map to a given storage delegate.
      *

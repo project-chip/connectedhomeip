@@ -25,7 +25,7 @@ namespace {
 
 class BindingFabricTableDelegate : public chip::FabricTable::Delegate
 {
-    void OnFabricDeletedFromStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+    void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
     {
         chip::BindingTable & bindingTable = chip::BindingTable::GetInstance();
         auto iter                         = bindingTable.begin();
@@ -42,15 +42,6 @@ class BindingFabricTableDelegate : public chip::FabricTable::Delegate
         }
         chip::BindingManager::GetInstance().FabricRemoved(fabricIndex);
     }
-
-    // Intentionally left blank
-    void OnFabricRetrievedFromStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
-
-    // Intentionally left blank
-    void OnFabricPersistedToStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
-
-    // Intentionally left blank
-    void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
 };
 
 BindingFabricTableDelegate gFabricTableDelegate;

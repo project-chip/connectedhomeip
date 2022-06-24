@@ -23,6 +23,7 @@
 
 #include <credentials/CHIPCert.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/PersistentStorageOpCertStore.h>
 #include <errno.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -54,6 +55,20 @@ using namespace chip::Protocols;
 using TestContext = Test::LoopbackMessagingContext;
 
 namespace {
+CHIP_ERROR InitFabricTable(chip::FabricTable & fabricTable, chip::TestPersistentStorageDelegate * testStorage,
+                           chip::Crypto::OperationalKeystore * opKeyStore,
+                           chip::Credentials::PersistentStorageOpCertStore * opCertStore)
+{
+    ReturnErrorOnFailure(opCertStore->Init(testStorage));
+
+    chip::FabricTable::InitParams initParams;
+    initParams.storage             = testStorage;
+    initParams.operationalKeystore = opKeyStore;
+    initParams.opCertStore         = opCertStore;
+
+    return fabricTable.Init(initParams);
+}
+
 class TestCASESecurePairingDelegate : public SessionEstablishmentDelegate
 {
 public:
@@ -102,7 +117,7 @@ public:
 
     CHIP_ERROR ActivateOpKeypairForFabric(FabricIndex fabricIndex, const Crypto::P256PublicKey & nocPublicKey) override
     {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR CommitOpKeypairForFabric(FabricIndex fabricIndex) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -142,6 +157,9 @@ GroupDataProviderImpl gDeviceGroupDataProvider;
 TestPersistentStorageDelegate gDeviceStorageDelegate;
 TestOperationalKeystore gDeviceOperationalKeystore;
 
+Credentials::PersistentStorageOpCertStore gCommissionerOpCertStore;
+Credentials::PersistentStorageOpCertStore gDeviceOpCertStore;
+
 NodeId Node01_01 = 0xDEDEDEDE00010001;
 NodeId Node01_02 = 0xDEDEDEDE00010002;
 
@@ -163,7 +181,7 @@ CHIP_ERROR InitTestIpk(GroupDataProvider & groupDataProvider, const FabricInfo &
 
     uint8_t compressedId[sizeof(uint64_t)];
     MutableByteSpan compressedIdSpan(compressedId);
-    ReturnErrorOnFailure(fabricInfo.GetCompressedId(compressedIdSpan));
+    ReturnErrorOnFailure(fabricInfo.GetCompressedFabricIdBytes(compressedIdSpan));
     return groupDataProvider.SetKeySet(fabricInfo.GetFabricIndex(), compressedIdSpan, ipkKeySet);
 }
 
@@ -174,24 +192,24 @@ CHIP_ERROR InitCredentialSets()
     ReturnErrorOnFailure(gCommissionerGroupDataProvider.Init());
 
     FabricInfo commissionerFabric;
+    {
+        P256SerializedKeypair opKeysSerialized;
 
-    P256SerializedKeypair opKeysSerialized;
-    // TODO: Rename gCommissioner* to gInitiator*
-    memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_02_PublicKey, sTestCert_Node01_02_PublicKey_Len);
-    memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_02_PublicKey_Len, sTestCert_Node01_02_PrivateKey,
-           sTestCert_Node01_02_PrivateKey_Len);
+        // TODO: Rename gCommissioner* to gInitiator*
+        memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_02_PublicKey, sTestCert_Node01_02_PublicKey_Len);
+        memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_02_PublicKey_Len, sTestCert_Node01_02_PrivateKey,
+               sTestCert_Node01_02_PrivateKey_Len);
 
-    ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_02_PublicKey_Len + sTestCert_Node01_02_PrivateKey_Len));
+        ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_02_PublicKey_Len + sTestCert_Node01_02_PrivateKey_Len));
 
-    P256Keypair opKey;
-    ReturnErrorOnFailure(opKey.Deserialize(opKeysSerialized));
-    ReturnErrorOnFailure(commissionerFabric.SetOperationalKeypair(&opKey));
+        chip::ByteSpan rcacSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len);
+        chip::ByteSpan icacSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len);
+        chip::ByteSpan nocSpan(sTestCert_Node01_02_Chip, sTestCert_Node01_02_Chip_Len);
+        chip::ByteSpan opKeySpan(opKeysSerialized.ConstBytes(), opKeysSerialized.Length());
 
-    ReturnErrorOnFailure(commissionerFabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)));
-    ReturnErrorOnFailure(commissionerFabric.SetICACert(ByteSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len)));
-    ReturnErrorOnFailure(commissionerFabric.SetNOCCert(ByteSpan(sTestCert_Node01_02_Chip, sTestCert_Node01_02_Chip_Len)));
-
-    ReturnErrorOnFailure(gCommissionerFabrics.AddNewFabric(commissionerFabric, &gCommissionerFabricIndex));
+        ReturnErrorOnFailure(
+            gCommissionerFabrics.AddNewFabricForTest(rcacSpan, icacSpan, nocSpan, opKeySpan, &gCommissionerFabricIndex));
+    }
 
     FabricInfo * newFabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
     VerifyOrReturnError(newFabric != nullptr, CHIP_ERROR_INTERNAL);
@@ -202,23 +220,30 @@ CHIP_ERROR InitCredentialSets()
     ReturnErrorOnFailure(gDeviceGroupDataProvider.Init());
     FabricInfo deviceFabric;
 
-    auto deviceOpKey = Platform::MakeUnique<Crypto::P256Keypair>();
-    memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
-    memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
-           sTestCert_Node01_01_PrivateKey_Len);
+    {
+        P256SerializedKeypair opKeysSerialized;
 
-    ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));
+        auto deviceOpKey = Platform::MakeUnique<Crypto::P256Keypair>();
+        memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
+        memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
+               sTestCert_Node01_01_PrivateKey_Len);
 
-    ReturnErrorOnFailure(deviceOpKey->Deserialize(opKeysSerialized));
+        ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));
 
-    gDeviceOperationalKeystore.Init(1, std::move(deviceOpKey));
-    ReturnErrorOnFailure(gDeviceFabrics.Init(&gDeviceStorageDelegate, &gDeviceOperationalKeystore));
+        ReturnErrorOnFailure(deviceOpKey->Deserialize(opKeysSerialized));
 
-    ReturnErrorOnFailure(deviceFabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)));
-    ReturnErrorOnFailure(deviceFabric.SetICACert(ByteSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len)));
-    ReturnErrorOnFailure(deviceFabric.SetNOCCert(ByteSpan(sTestCert_Node01_01_Chip, sTestCert_Node01_01_Chip_Len)));
+        // Use an injected operational key for device
+        gDeviceOperationalKeystore.Init(1, std::move(deviceOpKey));
 
-    ReturnErrorOnFailure(gDeviceFabrics.AddNewFabric(deviceFabric, &gDeviceFabricIndex));
+        ReturnErrorOnFailure(
+            InitFabricTable(gDeviceFabrics, &gDeviceStorageDelegate, &gDeviceOperationalKeystore, &gDeviceOpCertStore));
+
+        chip::ByteSpan rcacSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len);
+        chip::ByteSpan icacSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len);
+        chip::ByteSpan nocSpan(sTestCert_Node01_01_Chip, sTestCert_Node01_01_Chip_Len);
+
+        ReturnErrorOnFailure(gDeviceFabrics.AddNewFabricForTest(rcacSpan, icacSpan, nocSpan, ByteSpan{}, &gDeviceFabricIndex));
+    }
 
     // TODO: Validate more cases of number of IPKs on both sides
     newFabric = gDeviceFabrics.FindFabricWithIndex(gDeviceFabricIndex);
@@ -980,7 +1005,8 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
     ctx.ConfigInitializeNodes(false);
     ReturnErrorOnFailure(ctx.Init());
 
-    gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
+    ReturnErrorOnFailure(InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr,
+                                         &gCommissionerOpCertStore));
 
     return InitCredentialSets();
 }

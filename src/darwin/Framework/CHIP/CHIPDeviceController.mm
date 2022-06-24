@@ -66,8 +66,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 static NSString * const kErrorGenerateNOC = @"Generating operational certificate failed";
 static NSString * const kErrorKeyAllocation = @"Generating new operational key failed";
 static NSString * const kErrorCSRValidation = @"Extracting public key from CSR failed";
-static NSString * const kErrorActivateKey = @"Activating new operational key failed";
-static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data failed";
 
 @interface CHIPDeviceController ()
 
@@ -264,16 +262,6 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
                 if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorGenerateNOC]) {
                     return;
                 }
-
-                errorCode = startupParams.fabricTable->ActivatePendingOperationalKey(pubKey);
-                if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorActivateKey]) {
-                    return;
-                }
-
-                errorCode = startupParams.fabricTable->CommitPendingFabricData();
-                if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommitPendingFabricData]) {
-                    return;
-                }
             }
             commissionerParams.controllerNOC = noc;
         }
@@ -287,15 +275,11 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
             return;
         }
 
-        chip::FabricIndex fabricIdx = 0;
-        errorCode = _cppCommissioner->GetFabricIndex(&fabricIdx);
-        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
-            return;
-        }
+        chip::FabricIndex fabricIdx = _cppCommissioner->GetFabricIndex();
 
         uint8_t compressedIdBuffer[sizeof(uint64_t)];
         chip::MutableByteSpan compressedId(compressedIdBuffer);
-        errorCode = _cppCommissioner->GetFabricInfo()->GetCompressedId(compressedId);
+        errorCode = _cppCommissioner->GetCompressedFabricIdBytes(compressedId);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
             return;
         }
@@ -723,13 +707,7 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
         return chip::kUndefinedFabricIndex;
     }
 
-    chip::FabricIndex fabricIdx;
-    CHIP_ERROR err = _cppCommissioner->GetFabricIndex(&fabricIdx);
-    if (err != CHIP_NO_ERROR) {
-        return chip::kUndefinedFabricIndex;
-    }
-
-    return fabricIdx;
+    return _cppCommissioner->GetFabricIndex();
 }
 
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
@@ -741,31 +719,19 @@ static NSString * const kErrorCommitPendingFabricData = @"Committing fabric data
         return CHIP_NO_ERROR;
     }
 
-    chip::FabricInfo * ourFabric = _cppCommissioner->GetFabricInfo();
-    if (!ourFabric) {
-        // Surprising!
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
     chip::FabricInfo * otherFabric = fabricTable->FindFabricWithIndex(fabricIndex);
     if (!otherFabric) {
-        // Also surprising!
+        // Should not happen...
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    if (ourFabric->GetFabricId() != otherFabric->GetFabricId()) {
+    if (_cppCommissioner->GetFabricId() != otherFabric->GetFabricId()) {
         *isRunning = NO;
         return CHIP_NO_ERROR;
     }
 
-    const chip::FabricTable * ourFabricTable = _cppCommissioner->GetFabricTable();
-    if (!ourFabricTable) {
-        // Surprising as well!
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
     chip::Crypto::P256PublicKey ourRootPublicKey, otherRootPublicKey;
-    ReturnErrorOnFailure(ourFabricTable->FetchRootPubkey(ourFabric->GetFabricIndex(), ourRootPublicKey));
+    ReturnErrorOnFailure(_cppCommissioner->GetRootPublicKey(ourRootPublicKey));
     ReturnErrorOnFailure(fabricTable->FetchRootPubkey(otherFabric->GetFabricIndex(), otherRootPublicKey));
 
     *isRunning = (ourRootPublicKey.Matches(otherRootPublicKey));

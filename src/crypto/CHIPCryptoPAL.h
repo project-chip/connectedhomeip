@@ -1581,6 +1581,7 @@ public:
 /**
  *  @brief Derives the Operational Group Key using the Key Derivation Function (KDF) from the given epoch key.
  * @param[in] epoch_key  The epoch key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
+ * @param[in] compressed_fabric_id The compressed fabric ID for the fabric (big endian byte string)
  * @param[out] out_key  Symmetric key used as the encryption key during message processing for group communication.
  The buffer size must be at least CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
  * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INTERNAL if the provided key is invalid.

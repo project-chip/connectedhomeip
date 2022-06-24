@@ -169,22 +169,12 @@ public:
     void OnSessionReleased() override;
 
     //// FabricTable::Delegate Implementation ////
-    void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         (void) fabricTable;
         InvalidateIfPendingEstablishmentOnFabric(fabricIndex);
     }
-    void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
-    {
-        (void) fabricTable;
-        (void) fabricIndex;
-    }
-    void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
-    {
-        (void) fabricTable;
-        (void) fabricIndex;
-    }
-    void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+    void OnFabricUpdated(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
     {
         (void) fabricTable;
         InvalidateIfPendingEstablishmentOnFabric(fabricIndex);

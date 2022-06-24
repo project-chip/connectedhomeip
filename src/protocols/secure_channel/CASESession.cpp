@@ -235,7 +235,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     // Use FabricTable directly to avoid situation of dangling index from stale FabricInfo
     // until we factor-out any FabricInfo direct usage.
     ReturnErrorCodeIf(peerScopedNodeId.GetFabricIndex() == kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
-    auto * fabricInfo = fabricTable->FindFabricWithIndex(peerScopedNodeId.GetFabricIndex());
+    const auto * fabricInfo = fabricTable->FindFabricWithIndex(peerScopedNodeId.GetFabricIndex());
     ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     err = Init(sessionManager, policy, delegate, peerScopedNodeId);
@@ -387,7 +387,7 @@ CHIP_ERROR CASESession::SendSigma1()
     uint8_t destinationIdentifier[kSHA256_Hash_Length] = { 0 };
 
     // Lookup fabric info.
-    auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    const auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
     ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Validate that we have a session ID allocated.
@@ -549,7 +549,7 @@ CHIP_ERROR CASESession::TryResumeSession(SessionResumptionStorage::ConstResumpti
     ReturnErrorOnFailure(
         ValidateSigmaResumeMIC(resume1MIC, initiatorRandom, resumptionId, ByteSpan(kKDFS1RKeyInfo), ByteSpan(kResume1MIC_Nonce)));
 
-    auto * fabricInfo = mFabricsTable->FindFabricWithIndex(node.GetFabricIndex());
+    const auto * fabricInfo = mFabricsTable->FindFabricWithIndex(node.GetFabricIndex());
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mFabricIndex = node.GetFabricIndex();
@@ -1477,18 +1477,16 @@ CHIP_ERROR CASESession::ValidatePeerIdentity(const ByteSpan & peerNOC, const Byt
                                              Crypto::P256PublicKey & peerPublicKey)
 {
     ReturnErrorCodeIf(mFabricsTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    const auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
     ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(SetEffectiveTime());
 
-    PeerId peerId;
-    FabricId peerNOCFabricId;
-    ReturnErrorOnFailure(fabricInfo->VerifyCredentials(peerNOC, peerICAC, mValidContext, peerId, peerNOCFabricId, peerPublicKey));
-
-    VerifyOrReturnError(fabricInfo->GetFabricId() == peerNOCFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
-
-    peerNodeId = peerId.GetNodeId();
+    CompressedFabricId unused;
+    FabricId peerFabricId;
+    ReturnErrorOnFailure(mFabricsTable->VerifyCredentials(mFabricIndex, peerNOC, peerICAC, mValidContext, unused, peerFabricId,
+                                                          peerNodeId, peerPublicKey));
+    VerifyOrReturnError(fabricInfo->GetFabricId() == peerFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
 
     return CHIP_NO_ERROR;
 }

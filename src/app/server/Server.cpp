@@ -115,6 +115,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrExit(initParams.accessDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.aclStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.groupDataProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(initParams.operationalKeystore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(initParams.opCertStore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryInit();
@@ -126,6 +128,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mDeviceStorage            = initParams.persistentStorageDelegate;
     mSessionResumptionStorage = initParams.sessionResumptionStorage;
     mOperationalKeystore      = initParams.operationalKeystore;
+    mOpCertStore              = initParams.opCertStore;
 
     mCertificateValidityPolicy = initParams.certificateValidityPolicy;
 
@@ -134,8 +137,15 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(mAttributePersister.Init(mDeviceStorage));
     SetAttributePersistenceProvider(&mAttributePersister);
 
-    err = mFabrics.Init(mDeviceStorage, mOperationalKeystore);
-    SuccessOrExit(err);
+    {
+        FabricTable::InitParams fabricTableInitParams;
+        fabricTableInitParams.storage             = mDeviceStorage;
+        fabricTableInitParams.operationalKeystore = mOperationalKeystore;
+        fabricTableInitParams.opCertStore         = mOpCertStore;
+
+        err = mFabrics.Init(fabricTableInitParams);
+        SuccessOrExit(err);
+    }
 
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     Access::SetAccessControl(mAccessControl);

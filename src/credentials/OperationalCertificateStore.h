@@ -223,6 +223,15 @@ public:
     virtual void RevertPendingOpCerts() = 0;
 
     /**
+     * @brief Same as RevertPendingOpCerts(), but leaves pending Trusted Root certs if they had
+     *        been added. This is is an operation to support the complex error handling of
+     *        AddNOC, where we don't want to have "sticking" ICAC/NOC after validation
+     *        problems, but don't want to lose the RCAC given in an AddTrustedRootCertificate
+     *        command.
+     */
+    virtual void RevertPendingOpCertsExceptRoot() = 0;
+
+    /**
      * @brief Get the operational certificate element requested, giving the pending data or committed
      *        data depending on prior `AddNewTrustedRootCertForFabric`, `AddNewOpCertsForFabric` or
      *        `UpdateOpCertsForFabric` calls.
@@ -242,6 +251,42 @@ public:
      */
     virtual CHIP_ERROR GetCertificate(FabricIndex fabricIndex, CertChainElement element,
                                       MutableByteSpan & outCertificate) const = 0;
+};
+
+/**
+ * @brief RAII class to operate on an OperationalCertificateStore with auto-revert if not committed.
+ *
+ * Use as:
+ *
+ * CHIP_ERROR FunctionWillReturnWithPendingReverted(....)
+ * {
+ *     OpCertStoreTransaction transaction(opCertStore);
+ *
+ *     ReturnErrorOnFailure(transaction->AddNewTrustedRootCertForFabric(...));
+ *     ReturnErrorOnFailure(transaction->AddNewOpCertsForFabric(...));
+ *     ReturnErrorOnFailure(transaction->CommitOpCertsForFabric(...));
+ *
+ *     return CHIP_NO_ERROR;
+ * }
+ */
+class OpCertStoreTransaction
+{
+public:
+    explicit OpCertStoreTransaction(OperationalCertificateStore & store) : mStore(store) {}
+    ~OpCertStoreTransaction()
+    {
+        // This is a no-op if CommitOpCertsForFabric had been called on the store
+        mStore.RevertPendingOpCerts();
+    }
+
+    // Non-copyable
+    OpCertStoreTransaction(OpCertStoreTransaction const &) = delete;
+    void operator=(OpCertStoreTransaction const &) = delete;
+
+    OperationalCertificateStore * operator->() { return &mStore; }
+
+private:
+    OperationalCertificateStore & mStore;
 };
 
 } // namespace Credentials

@@ -36,6 +36,7 @@
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/Constants.h>
 #include <messaging/ExchangeContext.h>
@@ -148,13 +149,16 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & 
     chip::TLV::TLVReader reader;
     chip::TLV::TLVWriter writer;
     size_t eventCount = 0;
-    uint8_t backingStore[1024];
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> backingStore;
+    VerifyOrDie(backingStore.Alloc(1024));
+
     size_t totalNumElements;
-    writer.Init(backingStore, 1024);
+    writer.Init(backingStore.Get(), 1024);
     err = alogMgmt.FetchEventsSince(writer, clusterInfo, startingEventNumber, eventCount, chip::Access::SubjectDescriptor{});
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV);
 
-    reader.Init(backingStore, writer.GetLengthWritten());
+    reader.Init(backingStore.Get(), writer.GetLengthWritten());
 
     err = chip::TLV::Utilities::Count(reader, totalNumElements, false);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -162,7 +166,7 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & 
     printf("totalNumElements vs expectedNumEvents vs eventCount : %u vs %u vs %u \n", static_cast<unsigned int>(totalNumElements),
            static_cast<unsigned int>(expectedNumEvents), static_cast<unsigned int>(eventCount));
     NL_TEST_ASSERT(apSuite, totalNumElements == expectedNumEvents && totalNumElements == eventCount);
-    reader.Init(backingStore, writer.GetLengthWritten());
+    reader.Init(backingStore.Get(), writer.GetLengthWritten());
     chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
 }
 
