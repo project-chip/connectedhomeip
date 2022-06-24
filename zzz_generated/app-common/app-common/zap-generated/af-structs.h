@@ -509,14 +509,6 @@ typedef struct _SecurityPolicy
     uint16_t Flags;
 } SecurityPolicy;
 
-// Struct for SoftwareFaultStruct
-typedef struct _SoftwareFaultStruct
-{
-    uint64_t Id;
-    chip::CharSpan Name;
-    chip::ByteSpan FaultRecording;
-} SoftwareFaultStruct;
-
 // Struct for TargetInfo
 typedef struct _TargetInfo
 {

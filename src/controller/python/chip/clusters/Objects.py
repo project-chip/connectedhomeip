@@ -10719,21 +10719,6 @@ class SoftwareDiagnostics(Cluster):
 
     class Structs:
         @dataclass
-        class SoftwareFaultStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="id", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
-                            ClusterObjectFieldDescriptor(Label="faultRecording", Tag=2, Type=bytes),
-                    ])
-
-            id: 'uint' = 0
-            name: 'str' = ""
-            faultRecording: 'bytes' = b""
-
-        @dataclass
         class ThreadMetrics(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10930,10 +10915,14 @@ class SoftwareDiagnostics(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="softwareFault", Tag=0, Type=SoftwareDiagnostics.Structs.SoftwareFaultStruct),
+                            ClusterObjectFieldDescriptor(Label="id", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=typing.Optional[str]),
+                            ClusterObjectFieldDescriptor(Label="faultRecording", Tag=2, Type=typing.Optional[bytes]),
                     ])
 
-            softwareFault: 'SoftwareDiagnostics.Structs.SoftwareFaultStruct' = field(default_factory=lambda: SoftwareDiagnostics.Structs.SoftwareFaultStruct())
+            id: 'uint' = 0
+            name: 'typing.Optional[str]' = None
+            faultRecording: 'typing.Optional[bytes]' = None
 
 
 @dataclass
