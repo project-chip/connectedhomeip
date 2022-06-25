@@ -133,6 +133,7 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/utils/include/",
       "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Inc/",
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/",
+      "${bl602_sdk_root}/components/utils/async_log/",
     ]
 
     #    if (bl602_board == "BL-HWC-G1") {
@@ -155,7 +156,6 @@ template("bl602_sdk") {
 
       "SYS_BLOG_ENABLE=1",
       "SYS_VFS_ENABLE=1",
-      "SYS_VFS_UART_ENABLE=1",
       "SYS_AOS_LOOP_ENABLE=1",
       "BL602=BL602",
       "SYS_LOOPRT_ENABLE=1",
@@ -539,6 +539,7 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/sys/bloop/looprt/src/looprt.c",
       "${bl602_sdk_root}/components/sys/bloop/loopset/src/loopset_led.c",
       "${bl602_sdk_root}/components/sys/bltime/bl_sys_time.c",
+      "${bl602_sdk_root}/components/utils/async_log/async_log.c",
       "${bl602_sdk_root}/components/utils/src/utils_crc.c",
       "${bl602_sdk_root}/components/utils/src/utils_dns.c",
       "${bl602_sdk_root}/components/utils/src/utils_hmac_sha1_fast.c",
