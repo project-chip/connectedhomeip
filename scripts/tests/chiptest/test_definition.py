@@ -207,8 +207,9 @@ class TestDefinition:
     name: str
     run_name: str
     target: TestTarget
+    is_manual: bool
 
-    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str):
+    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str, timeout_seconds: typing.Optional[int]):
         """
         Executes the given test case using the provided runner for execution.
         """
@@ -269,7 +270,8 @@ class TestDefinition:
             test_cmd = tool_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
             runner.RunSubprocess(
                 test_cmd,
-                name='TEST', dependencies=[apps_register])
+                name='TEST', dependencies=[apps_register],
+                timeout_seconds=timeout_seconds)
 
         except Exception:
             logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
