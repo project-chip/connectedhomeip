@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include "../../java/ContentAppAttributeDelegate.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
 
 using chip::CharSpan;
