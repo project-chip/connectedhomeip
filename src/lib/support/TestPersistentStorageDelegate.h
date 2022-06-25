@@ -189,7 +189,7 @@ public:
 
         for (const std::string & key : allKeysSorted)
         {
-            (void)key.c_str(); // Guard against log level disabling  error logging which would make `key` unused.
+            (void) key.c_str(); // Guard against log level disabling  error logging which would make `key` unused.
             ChipLogError(Test, "  -> %s", key.c_str());
         }
     }
