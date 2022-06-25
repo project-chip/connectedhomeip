@@ -250,6 +250,12 @@ function getManualTests() {
     'Test_TC_MF_1_26',
     'Test_TC_MF_1_27',
     'Test_TC_MF_1_28',
+    // Slow tests that should not run in CI because they take many minutes each
+    'Test_TC_MF_1_5',
+    'Test_TC_MF_1_6',
+    'Test_TC_MF_1_9',
+    'Test_TC_MF_1_10',
+    'Test_TC_MF_1_15',
   ];
 
   const ModeSelect = [
@@ -365,6 +371,10 @@ function getManualTests() {
     'Test_TC_CC_6_4',
     'Test_TC_CC_7_5',
     'Test_TC_CC_9_4',
+    // Slow tests that should not run in CI because they take many minutes each
+    'Test_TC_CC_9_1',
+    'Test_TC_CC_9_2',
+    'Test_TC_CC_9_3',
   ];
 
   const DoorLock = [
@@ -558,9 +568,6 @@ function getTests() {
     'Test_TC_CC_7_3',
     'Test_TC_CC_7_4',
     'Test_TC_CC_8_1',
-    'Test_TC_CC_9_1',
-    'Test_TC_CC_9_2',
-    'Test_TC_CC_9_3',
   ];
 
   const DeviceManagement = [
@@ -677,11 +684,6 @@ function getTests() {
   const MultipleFabrics = [
     'Test_TC_MF_1_3',
     'Test_TC_MF_1_4',
-    'Test_TC_MF_1_5',
-    'Test_TC_MF_1_6',
-    'Test_TC_MF_1_9',
-    'Test_TC_MF_1_10',
-    'Test_TC_MF_1_15',
   ];
 
   const OTASoftwareUpdate = [
