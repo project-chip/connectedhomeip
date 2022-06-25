@@ -47,14 +47,7 @@
 #define EMBER_AF_NETWORK_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_OTA_PROVIDER_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_OTA_REQUESTOR_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/gen_config.h
-#define EMBER_AF_OCCUPANCY_SENSING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
-#define EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-=======
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_temperaturesensor_19A4msmCzW/zap-generated/gen_config.h
 #define EMBER_AF_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_SCENES_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
-#define EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_SOFTWARE_DIAGNOSTICS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT (1)
@@ -152,33 +145,10 @@
 #define EMBER_AF_PLUGIN_OTA_SOFTWARE_UPDATE_REQUESTOR_SERVER
 #define EMBER_AF_PLUGIN_OTA_SOFTWARE_UPDATE_REQUESTOR
 
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/gen_config.h
-// Use this macro to check if the client side of the Occupancy Sensing cluster is included
-#define ZCL_USING_OCCUPANCY_SENSING_CLUSTER_CLIENT
-#define EMBER_AF_PLUGIN_OCCUPANCY_SENSING_CLIENT
-
-// Use this macro to check if the server side of the On/Off cluster is included
-#define ZCL_USING_ON_OFF_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_ON_OFF_SERVER
-#define EMBER_AF_PLUGIN_ON_OFF
-
-=======
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_temperaturesensor_19A4msmCzW/zap-generated/gen_config.h
 // Use this macro to check if the server side of the Operational Credentials cluster is included
 #define ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS_SERVER
 #define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS
-
-// Use this macro to check if the client side of the Scenes cluster is included
-#define ZCL_USING_SCENES_CLUSTER_CLIENT
-#define EMBER_AF_PLUGIN_SCENES_CLIENT
-
-// Use this macro to check if the server side of the Scenes cluster is included
-#define ZCL_USING_SCENES_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_SCENES_SERVER
-#define EMBER_AF_PLUGIN_SCENES
-// User options for server plugin Scenes
-#define EMBER_AF_PLUGIN_SCENES_TABLE_SIZE 3
 
 // Use this macro to check if the server side of the Software Diagnostics cluster is included
 #define ZCL_USING_SOFTWARE_DIAGNOSTICS_CLUSTER_SERVER

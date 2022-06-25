@@ -37,8 +37,6 @@ public:
     ~BindingCluster() {}
 };
 
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/CHIPClusters.h
-=======
 class DLL_EXPORT GroupsCluster : public ClusterBase
 {
 public:
@@ -46,26 +44,11 @@ public:
     ~GroupsCluster() {}
 };
 
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_temperaturesensor_19A4msmCzW/zap-generated/CHIPClusters.h
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
     OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
     ~OtaSoftwareUpdateProviderCluster() {}
-};
-
-class DLL_EXPORT OccupancySensingCluster : public ClusterBase
-{
-public:
-    OccupancySensingCluster() : ClusterBase(app::Clusters::OccupancySensing::Id) {}
-    ~OccupancySensingCluster() {}
-};
-
-class DLL_EXPORT ScenesCluster : public ClusterBase
-{
-public:
-    ScenesCluster() : ClusterBase(app::Clusters::Scenes::Id) {}
-    ~ScenesCluster() {}
 };
 
 } // namespace Controller
