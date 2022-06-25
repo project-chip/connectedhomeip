@@ -43,16 +43,16 @@
     49, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    /* Cluster: Thermostat, Attribute: HVACSystemTypeConfiguration, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: LocalTemperatureCalibration, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: RemoteSensing, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: HVAC system type configuration, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: local temperature calibration, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: remote sensing, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: system mode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
     /* Cluster: User Label, Attribute: label list, Privilege: view */ \
 }
@@ -73,16 +73,16 @@
     6, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     7, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    /* Cluster: Thermostat, Attribute: HVACSystemTypeConfiguration, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: LocalTemperatureCalibration, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: RemoteSensing, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: HVAC system type configuration, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: local temperature calibration, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: remote sensing, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: system mode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
     /* Cluster: User Label, Attribute: label list, Privilege: view */ \
 }
@@ -103,16 +103,16 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    /* Cluster: Thermostat, Attribute: HVACSystemTypeConfiguration, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: LocalTemperatureCalibration, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: RemoteSensing, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: HVAC system type configuration, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: local temperature calibration, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: remote sensing, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: view */ \
+    /* Cluster: Thermostat, Attribute: system mode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
     /* Cluster: User Label, Attribute: label list, Privilege: view */ \
 }
@@ -129,16 +129,16 @@
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     63, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
-    513, /* Cluster: Thermostat, Attribute: HVACSystemTypeConfiguration, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: LocalTemperatureCalibration, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: RemoteSensing, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
-    513, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: HVAC system type configuration, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: local temperature calibration, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: remote sensing, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: manage */ \
+    513, /* Cluster: Thermostat, Attribute: system mode, Privilege: manage */ \
     516, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
     65, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
 }
@@ -153,16 +153,16 @@
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
-    9, /* Cluster: Thermostat, Attribute: HVACSystemTypeConfiguration, Privilege: manage */ \
-    16, /* Cluster: Thermostat, Attribute: LocalTemperatureCalibration, Privilege: manage */ \
-    21, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
-    22, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
-    23, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
-    24, /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: manage */ \
-    25, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
-    26, /* Cluster: Thermostat, Attribute: RemoteSensing, Privilege: manage */ \
-    27, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
-    28, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
+    9, /* Cluster: Thermostat, Attribute: HVAC system type configuration, Privilege: manage */ \
+    16, /* Cluster: Thermostat, Attribute: local temperature calibration, Privilege: manage */ \
+    21, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
+    22, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
+    23, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \
+    24, /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: manage */ \
+    25, /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: manage */ \
+    26, /* Cluster: Thermostat, Attribute: remote sensing, Privilege: manage */ \
+    27, /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: manage */ \
+    28, /* Cluster: Thermostat, Attribute: system mode, Privilege: manage */ \
     1, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
     0, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
 }
@@ -177,16 +177,16 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: HVACSystemTypeConfiguration, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: LocalTemperatureCalibration, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: RemoteSensing, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: HVAC system type configuration, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: local temperature calibration, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: max cool setpoint limit, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: min setpoint dead band, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: remote sensing, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: control sequence of operation, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: system mode, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
 }
@@ -210,6 +210,7 @@
     4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     4, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     3, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
+    3, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
     49, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
@@ -224,6 +225,7 @@
     62, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
     5, /* Cluster: Scenes, Command: AddScene, Privilege: manage */ \
     5, /* Cluster: Scenes, Command: RemoveScene, Privilege: manage */ \
     5, /* Cluster: Scenes, Command: RemoveAllScenes, Privilege: manage */ \
@@ -247,6 +249,7 @@
     4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     5, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     0, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
+    1, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
     0, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
     2, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
     3, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
@@ -261,6 +264,7 @@
     9, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
     10, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     11, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    12, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
     0, /* Cluster: Scenes, Command: AddScene, Privilege: manage */ \
     2, /* Cluster: Scenes, Command: RemoveScene, Privilege: manage */ \
     3, /* Cluster: Scenes, Command: RemoveAllScenes, Privilege: manage */ \
@@ -284,6 +288,7 @@
     kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
@@ -298,6 +303,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Scenes, Command: AddScene, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Scenes, Command: RemoveScene, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Scenes, Command: RemoveAllScenes, Privilege: manage */ \

@@ -144,10 +144,7 @@
     4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     4, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     3, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/access.h
     3, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
-=======
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_temperaturesensor_19A4msmCzW/zap-generated/access.h
     49, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
@@ -163,10 +160,6 @@
     62, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
-    5, /* Cluster: Scenes, Command: AddScene, Privilege: manage */ \
-    5, /* Cluster: Scenes, Command: RemoveScene, Privilege: manage */ \
-    5, /* Cluster: Scenes, Command: RemoveAllScenes, Privilege: manage */ \
-    5, /* Cluster: Scenes, Command: StoreScene, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
@@ -186,10 +179,7 @@
     4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     5, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     0, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/access.h
     1, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
-=======
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_temperaturesensor_19A4msmCzW/zap-generated/access.h
     0, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
     2, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
     3, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
@@ -205,10 +195,6 @@
     10, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     11, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
     12, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
-    0, /* Cluster: Scenes, Command: AddScene, Privilege: manage */ \
-    2, /* Cluster: Scenes, Command: RemoveScene, Privilege: manage */ \
-    3, /* Cluster: Scenes, Command: RemoveAllScenes, Privilege: manage */ \
-    4, /* Cluster: Scenes, Command: StoreScene, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
@@ -228,10 +214,7 @@
     kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/access.h
     kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
-=======
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_temperaturesensor_19A4msmCzW/zap-generated/access.h
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateThreadNetwork, Privilege: administer */ \
@@ -247,10 +230,6 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: RemoveTrustedRootCertificate, Privilege: administer */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Scenes, Command: AddScene, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Scenes, Command: RemoveScene, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Scenes, Command: RemoveAllScenes, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Scenes, Command: StoreScene, Privilege: manage */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

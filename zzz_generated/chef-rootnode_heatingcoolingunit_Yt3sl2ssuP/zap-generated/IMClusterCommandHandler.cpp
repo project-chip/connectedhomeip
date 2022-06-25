@@ -393,7 +393,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/IMClusterCommandHandler.cpp
         case Commands::IdentifyQuery::Id: {
             Commands::IdentifyQuery::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
@@ -403,8 +402,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
-=======
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_dimmablelight_gY80DaqEUL/zap-generated/IMClusterCommandHandler.cpp
         default: {
             // Unrecognized command ID, error status will apply.
             apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);

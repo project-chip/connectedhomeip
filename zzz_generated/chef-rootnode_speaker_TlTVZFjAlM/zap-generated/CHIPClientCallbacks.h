@@ -31,7 +31,6 @@
 #include <lib/support/Span.h>
 
 // List specific responses
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/CHIPClientCallbacks.h
 void BindingClusterBindingListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                               chip::Callback::Cancelable * onFailureCallback);
 typedef void (*BindingBindingListAttributeCallback)(
@@ -51,43 +50,3 @@ void BindingClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
                                                     chip::Callback::Cancelable * onFailureCallback);
 typedef void (*BindingAttributeListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-void OccupancySensingClusterGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
-                                                                    chip::Callback::Cancelable * onSuccessCallback,
-                                                                    chip::Callback::Cancelable * onFailureCallback);
-typedef void (*OccupancySensingGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-void OccupancySensingClusterAcceptedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
-                                                                   chip::Callback::Cancelable * onSuccessCallback,
-                                                                   chip::Callback::Cancelable * onFailureCallback);
-typedef void (*OccupancySensingAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-void OccupancySensingClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
-                                                             chip::Callback::Cancelable * onSuccessCallback,
-                                                             chip::Callback::Cancelable * onFailureCallback);
-typedef void (*OccupancySensingAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-void ScenesClusterGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
-                                                          chip::Callback::Cancelable * onSuccessCallback,
-                                                          chip::Callback::Cancelable * onFailureCallback);
-typedef void (*ScenesGeneratedCommandListListAttributeCallback)(void * context,
-                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-void ScenesClusterAcceptedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
-                                                         chip::Callback::Cancelable * onSuccessCallback,
-                                                         chip::Callback::Cancelable * onFailureCallback);
-typedef void (*ScenesAcceptedCommandListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-void ScenesClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
-                                                   chip::Callback::Cancelable * onFailureCallback);
-typedef void (*ScenesAttributeListListAttributeCallback)(void * context,
-                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-=======
-typedef void (*BindingBindingListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & data);
-typedef void (*BindingGeneratedCommandListListAttributeCallback)(void * context,
-                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BindingAcceptedCommandListListAttributeCallback)(void * context,
-                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BindingAttributeListListAttributeCallback)(void * context,
-                                                          const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_contactsensor_DreXRHtsq9/zap-generated/CHIPClientCallbacks.h

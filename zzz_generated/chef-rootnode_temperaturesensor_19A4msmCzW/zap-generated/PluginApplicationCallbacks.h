@@ -40,14 +40,7 @@
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/PluginApplicationCallbacks.h
-    MatterOccupancySensingPluginClientInitCallback();                                                                              \
-    MatterOnOffPluginServerInitCallback();                                                                                         \
-=======
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_temperaturesensor_19A4msmCzW/zap-generated/PluginApplicationCallbacks.h
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
-    MatterScenesPluginClientInitCallback();                                                                                        \
-    MatterScenesPluginServerInitCallback();                                                                                        \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterSwitchPluginServerInitCallback();                                                                                        \
     MatterTemperatureMeasurementPluginServerInitCallback();                                                                        \

@@ -29,455 +29,643 @@
 #define GENERATED_DEFAULTS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 0, Cluster: General Commissioning (server), big-endian */                                                     \
+        /* Endpoint: 0, Cluster: Groups (server), big-endian */                                                                    \
                                                                                                                                    \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-        /* 0 - ActiveLocale, */                                                                                                    \
-        5, 'e', 'n', '-', 'U', 'S',                                                                                                \
+        /* 0 - FeatureMap, */                                                                                                      \
+        0x00, 0x00, 0x00, 0x00,                                                                                                    \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Descriptor (server), big-endian */                                                            \
+                                                                                                                                   \
+            /* 4 - FeatureMap, */                                                                                                  \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Access Control (server), big-endian */                                                        \
+                                                                                                                                   \
+            /* 8 - FeatureMap, */                                                                                                  \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Basic (server), big-endian */                                                                 \
+                                                                                                                                   \
+            /* 12 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: OTA Software Update Requestor (server), big-endian */                                         \
+                                                                                                                                   \
+            /* 16 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Localization Configuration (server), big-endian */                                            \
+                                                                                                                                   \
+            /* 20 - ActiveLocale, */                                                                                               \
+            5, 'e', 'n', '-', 'U', 'S',                                                                                            \
+                                                                                                                                   \
+            /* 26 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Time Format Localization (server), big-endian */                                              \
+                                                                                                                                   \
+            /* 30 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Commissioning (server), big-endian */                                                 \
                                                                                                                                    \
-            /* 6 - Breadcrumb, */                                                                                                  \
+            /* 34 - Breadcrumb, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 14 - FeatureMap, */                                                                                                 \
+            /* 42 - FeatureMap, */                                                                                                 \
             0x00, 0x00, 0x00, 0x06,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Network Commissioning (server), big-endian */                                                 \
                                                                                                                                    \
-            /* 18 - LastConnectErrorValue, */                                                                                      \
+            /* 46 - LastConnectErrorValue, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 22 - FeatureMap, */                                                                                                 \
+            /* 50 - FeatureMap, */                                                                                                 \
             0x00, 0x00, 0x00, 0x01,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Diagnostic Logs (server), big-endian */                                                       \
+                                                                                                                                   \
+            /* 54 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server), big-endian */                                                   \
                                                                                                                                    \
-            /* 26 - UpTime, */                                                                                                     \
+            /* 58 - UpTime, */                                                                                                     \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 34 - TotalOperationalHours, */                                                                                      \
+            /* 66 - TotalOperationalHours, */                                                                                      \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* 70 - FeatureMap, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Software Diagnostics (server), big-endian */                                                  \
                                                                                                                                    \
-            /* 38 - CurrentHeapFree, */                                                                                            \
+            /* 74 - CurrentHeapFree, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 46 - CurrentHeapUsed, */                                                                                            \
+            /* 82 - CurrentHeapUsed, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 54 - CurrentHeapHighWatermark, */                                                                                   \
+            /* 90 - CurrentHeapHighWatermark, */                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 62 - FeatureMap, */                                                                                                 \
+            /* 98 - FeatureMap, */                                                                                                 \
             0x00, 0x00, 0x00, 0x01,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Thread Network Diagnostics (server), big-endian */                                            \
                                                                                                                                    \
-            /* 66 - NetworkName, */                                                                                                \
+            /* 102 - NetworkName, */                                                                                               \
             0x00, 0x00,                                                                                                            \
                                                                                                                                    \
-            /* 68 - ExtendedPanId, */                                                                                              \
+            /* 104 - ExtendedPanId, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 76 - OverrunCount, */                                                                                               \
+            /* 112 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 84 - PartitionId, */                                                                                                \
+            /* 120 - PartitionId, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 88 - TxTotalCount, */                                                                                               \
+            /* 124 - TxTotalCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 92 - TxUnicastCount, */                                                                                             \
+            /* 128 - TxUnicastCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 96 - TxBroadcastCount, */                                                                                           \
+            /* 132 - TxBroadcastCount, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 100 - TxAckRequestedCount, */                                                                                       \
+            /* 136 - TxAckRequestedCount, */                                                                                       \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 104 - TxAckedCount, */                                                                                              \
+            /* 140 - TxAckedCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 108 - TxNoAckRequestedCount, */                                                                                     \
+            /* 144 - TxNoAckRequestedCount, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 112 - TxDataCount, */                                                                                               \
+            /* 148 - TxDataCount, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 116 - TxDataPollCount, */                                                                                           \
+            /* 152 - TxDataPollCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 120 - TxBeaconCount, */                                                                                             \
+            /* 156 - TxBeaconCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 124 - TxBeaconRequestCount, */                                                                                      \
+            /* 160 - TxBeaconRequestCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 128 - TxOtherCount, */                                                                                              \
+            /* 164 - TxOtherCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 132 - TxRetryCount, */                                                                                              \
+            /* 168 - TxRetryCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 136 - TxDirectMaxRetryExpiryCount, */                                                                               \
+            /* 172 - TxDirectMaxRetryExpiryCount, */                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 140 - TxIndirectMaxRetryExpiryCount, */                                                                             \
+            /* 176 - TxIndirectMaxRetryExpiryCount, */                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 144 - TxErrCcaCount, */                                                                                             \
+            /* 180 - TxErrCcaCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 148 - TxErrAbortCount, */                                                                                           \
+            /* 184 - TxErrAbortCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 152 - TxErrBusyChannelCount, */                                                                                     \
+            /* 188 - TxErrBusyChannelCount, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 156 - RxTotalCount, */                                                                                              \
+            /* 192 - RxTotalCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 160 - RxUnicastCount, */                                                                                            \
+            /* 196 - RxUnicastCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 164 - RxBroadcastCount, */                                                                                          \
+            /* 200 - RxBroadcastCount, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 168 - RxDataCount, */                                                                                               \
+            /* 204 - RxDataCount, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 172 - RxDataPollCount, */                                                                                           \
+            /* 208 - RxDataPollCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 176 - RxBeaconCount, */                                                                                             \
+            /* 212 - RxBeaconCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 180 - RxBeaconRequestCount, */                                                                                      \
+            /* 216 - RxBeaconRequestCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 184 - RxOtherCount, */                                                                                              \
+            /* 220 - RxOtherCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 188 - RxAddressFilteredCount, */                                                                                    \
+            /* 224 - RxAddressFilteredCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 192 - RxDestAddrFilteredCount, */                                                                                   \
+            /* 228 - RxDestAddrFilteredCount, */                                                                                   \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 196 - RxDuplicatedCount, */                                                                                         \
+            /* 232 - RxDuplicatedCount, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 200 - RxErrNoFrameCount, */                                                                                         \
+            /* 236 - RxErrNoFrameCount, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 204 - RxErrUnknownNeighborCount, */                                                                                 \
+            /* 240 - RxErrUnknownNeighborCount, */                                                                                 \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 208 - RxErrInvalidSrcAddrCount, */                                                                                  \
+            /* 244 - RxErrInvalidSrcAddrCount, */                                                                                  \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 212 - RxErrSecCount, */                                                                                             \
+            /* 248 - RxErrSecCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 216 - RxErrFcsCount, */                                                                                             \
+            /* 252 - RxErrFcsCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 220 - RxErrOtherCount, */                                                                                           \
+            /* 256 - RxErrOtherCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 224 - ActiveTimestamp, */                                                                                           \
+            /* 260 - ActiveTimestamp, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 232 - PendingTimestamp, */                                                                                          \
+            /* 268 - PendingTimestamp, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 240 - delay, */                                                                                                     \
+            /* 276 - delay, */                                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 244 - ChannelMask, */                                                                                               \
+            /* 280 - ChannelMask, */                                                                                               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 251 - FeatureMap, */                                                                                                \
+            /* 287 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x0F,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server), big-endian */                                              \
                                                                                                                                    \
-            /* 255 - BeaconLostCount, */                                                                                           \
+            /* 291 - BeaconLostCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 259 - BeaconRxCount, */                                                                                             \
+            /* 295 - BeaconRxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 263 - PacketMulticastRxCount, */                                                                                    \
+            /* 299 - PacketMulticastRxCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 267 - PacketMulticastTxCount, */                                                                                    \
+            /* 303 - PacketMulticastTxCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 271 - PacketUnicastRxCount, */                                                                                      \
+            /* 307 - PacketUnicastRxCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 275 - PacketUnicastTxCount, */                                                                                      \
+            /* 311 - PacketUnicastTxCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 279 - CurrentMaxRate, */                                                                                            \
+            /* 315 - CurrentMaxRate, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 287 - OverrunCount, */                                                                                              \
+            /* 323 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 295 - FeatureMap, */                                                                                                \
+            /* 331 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x03,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server), big-endian */                                          \
                                                                                                                                    \
-            /* 299 - FeatureMap, */                                                                                                \
+            /* 335 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x03,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Switch (server), big-endian */                                                                \
+                                                                                                                                   \
+            /* 339 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: AdministratorCommissioning (server), big-endian */                                            \
+                                                                                                                                   \
+            /* 343 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Operational Credentials (server), big-endian */                                               \
+                                                                                                                                   \
+            /* 347 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Group Key Management (server), big-endian */                                                  \
+                                                                                                                                   \
+            /* 351 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Fixed Label (server), big-endian */                                                           \
+                                                                                                                                   \
+            /* 355 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: User Label (server), big-endian */                                                            \
+                                                                                                                                   \
+            /* 359 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Identify (server), big-endian */                                                              \
+                                                                                                                                   \
+            /* 363 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Groups (server), big-endian */                                                                \
+                                                                                                                                   \
+            /* 367 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Scenes (server), big-endian */                                                                \
+                                                                                                                                   \
+            /* 371 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x01,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: On/Off (server), big-endian */                                                                \
+                                                                                                                                   \
+            /* 375 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Level Control (server), big-endian */                                                         \
                                                                                                                                    \
-            /* 303 - FeatureMap, */                                                                                                \
+            /* 379 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x01,                                                                                                \
-=======
-        /* 0 - Breadcrumb, */                                                                                                      \
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                            \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Descriptor (server), big-endian */                                                            \
+                                                                                                                                   \
+            /* 383 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Fan Control (server), big-endian */                                                           \
+                                                                                                                                   \
+            /* 387 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x03,                                                                                                \
     }
 
 #else // !BIGENDIAN_CPU
 #define GENERATED_DEFAULTS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 0, Cluster: General Commissioning (server), little-endian */                                                  \
+        /* Endpoint: 0, Cluster: Groups (server), little-endian */                                                                 \
                                                                                                                                    \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-        /* 0 - ActiveLocale, */                                                                                                    \
-        5, 'e', 'n', '-', 'U', 'S',                                                                                                \
+        /* 0 - FeatureMap, */                                                                                                      \
+        0x00, 0x00, 0x00, 0x00,                                                                                                    \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Descriptor (server), little-endian */                                                         \
+                                                                                                                                   \
+            /* 4 - FeatureMap, */                                                                                                  \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Access Control (server), little-endian */                                                     \
+                                                                                                                                   \
+            /* 8 - FeatureMap, */                                                                                                  \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Basic (server), little-endian */                                                              \
+                                                                                                                                   \
+            /* 12 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: OTA Software Update Requestor (server), little-endian */                                      \
+                                                                                                                                   \
+            /* 16 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Localization Configuration (server), little-endian */                                         \
+                                                                                                                                   \
+            /* 20 - ActiveLocale, */                                                                                               \
+            5, 'e', 'n', '-', 'U', 'S',                                                                                            \
+                                                                                                                                   \
+            /* 26 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Time Format Localization (server), little-endian */                                           \
+                                                                                                                                   \
+            /* 30 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Commissioning (server), little-endian */                                              \
                                                                                                                                    \
-            /* 6 - Breadcrumb, */                                                                                                  \
+            /* 34 - Breadcrumb, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 14 - FeatureMap, */                                                                                                 \
+            /* 42 - FeatureMap, */                                                                                                 \
             0x06, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Network Commissioning (server), little-endian */                                              \
                                                                                                                                    \
-            /* 18 - LastConnectErrorValue, */                                                                                      \
+            /* 46 - LastConnectErrorValue, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 22 - FeatureMap, */                                                                                                 \
+            /* 50 - FeatureMap, */                                                                                                 \
             0x01, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Diagnostic Logs (server), little-endian */                                                    \
+                                                                                                                                   \
+            /* 54 - FeatureMap, */                                                                                                 \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server), little-endian */                                                \
                                                                                                                                    \
-            /* 26 - UpTime, */                                                                                                     \
+            /* 58 - UpTime, */                                                                                                     \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 34 - TotalOperationalHours, */                                                                                      \
+            /* 66 - TotalOperationalHours, */                                                                                      \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* 70 - FeatureMap, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Software Diagnostics (server), little-endian */                                               \
                                                                                                                                    \
-            /* 38 - CurrentHeapFree, */                                                                                            \
+            /* 74 - CurrentHeapFree, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 46 - CurrentHeapUsed, */                                                                                            \
+            /* 82 - CurrentHeapUsed, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 54 - CurrentHeapHighWatermark, */                                                                                   \
+            /* 90 - CurrentHeapHighWatermark, */                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 62 - FeatureMap, */                                                                                                 \
+            /* 98 - FeatureMap, */                                                                                                 \
             0x01, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Thread Network Diagnostics (server), little-endian */                                         \
                                                                                                                                    \
-            /* 66 - NetworkName, */                                                                                                \
+            /* 102 - NetworkName, */                                                                                               \
             0x00, 0x00,                                                                                                            \
                                                                                                                                    \
-            /* 68 - ExtendedPanId, */                                                                                              \
+            /* 104 - ExtendedPanId, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 76 - OverrunCount, */                                                                                               \
+            /* 112 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 84 - PartitionId, */                                                                                                \
+            /* 120 - PartitionId, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 88 - TxTotalCount, */                                                                                               \
+            /* 124 - TxTotalCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 92 - TxUnicastCount, */                                                                                             \
+            /* 128 - TxUnicastCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 96 - TxBroadcastCount, */                                                                                           \
+            /* 132 - TxBroadcastCount, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 100 - TxAckRequestedCount, */                                                                                       \
+            /* 136 - TxAckRequestedCount, */                                                                                       \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 104 - TxAckedCount, */                                                                                              \
+            /* 140 - TxAckedCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 108 - TxNoAckRequestedCount, */                                                                                     \
+            /* 144 - TxNoAckRequestedCount, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 112 - TxDataCount, */                                                                                               \
+            /* 148 - TxDataCount, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 116 - TxDataPollCount, */                                                                                           \
+            /* 152 - TxDataPollCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 120 - TxBeaconCount, */                                                                                             \
+            /* 156 - TxBeaconCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 124 - TxBeaconRequestCount, */                                                                                      \
+            /* 160 - TxBeaconRequestCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 128 - TxOtherCount, */                                                                                              \
+            /* 164 - TxOtherCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 132 - TxRetryCount, */                                                                                              \
+            /* 168 - TxRetryCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 136 - TxDirectMaxRetryExpiryCount, */                                                                               \
+            /* 172 - TxDirectMaxRetryExpiryCount, */                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 140 - TxIndirectMaxRetryExpiryCount, */                                                                             \
+            /* 176 - TxIndirectMaxRetryExpiryCount, */                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 144 - TxErrCcaCount, */                                                                                             \
+            /* 180 - TxErrCcaCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 148 - TxErrAbortCount, */                                                                                           \
+            /* 184 - TxErrAbortCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 152 - TxErrBusyChannelCount, */                                                                                     \
+            /* 188 - TxErrBusyChannelCount, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 156 - RxTotalCount, */                                                                                              \
+            /* 192 - RxTotalCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 160 - RxUnicastCount, */                                                                                            \
+            /* 196 - RxUnicastCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 164 - RxBroadcastCount, */                                                                                          \
+            /* 200 - RxBroadcastCount, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 168 - RxDataCount, */                                                                                               \
+            /* 204 - RxDataCount, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 172 - RxDataPollCount, */                                                                                           \
+            /* 208 - RxDataPollCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 176 - RxBeaconCount, */                                                                                             \
+            /* 212 - RxBeaconCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 180 - RxBeaconRequestCount, */                                                                                      \
+            /* 216 - RxBeaconRequestCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 184 - RxOtherCount, */                                                                                              \
+            /* 220 - RxOtherCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 188 - RxAddressFilteredCount, */                                                                                    \
+            /* 224 - RxAddressFilteredCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 192 - RxDestAddrFilteredCount, */                                                                                   \
+            /* 228 - RxDestAddrFilteredCount, */                                                                                   \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 196 - RxDuplicatedCount, */                                                                                         \
+            /* 232 - RxDuplicatedCount, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 200 - RxErrNoFrameCount, */                                                                                         \
+            /* 236 - RxErrNoFrameCount, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 204 - RxErrUnknownNeighborCount, */                                                                                 \
+            /* 240 - RxErrUnknownNeighborCount, */                                                                                 \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 208 - RxErrInvalidSrcAddrCount, */                                                                                  \
+            /* 244 - RxErrInvalidSrcAddrCount, */                                                                                  \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 212 - RxErrSecCount, */                                                                                             \
+            /* 248 - RxErrSecCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 216 - RxErrFcsCount, */                                                                                             \
+            /* 252 - RxErrFcsCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 220 - RxErrOtherCount, */                                                                                           \
+            /* 256 - RxErrOtherCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 224 - ActiveTimestamp, */                                                                                           \
+            /* 260 - ActiveTimestamp, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 232 - PendingTimestamp, */                                                                                          \
+            /* 268 - PendingTimestamp, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 240 - delay, */                                                                                                     \
+            /* 276 - delay, */                                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 244 - ChannelMask, */                                                                                               \
+            /* 280 - ChannelMask, */                                                                                               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 251 - FeatureMap, */                                                                                                \
+            /* 287 - FeatureMap, */                                                                                                \
             0x0F, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server), little-endian */                                           \
                                                                                                                                    \
-            /* 255 - BeaconLostCount, */                                                                                           \
+            /* 291 - BeaconLostCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 259 - BeaconRxCount, */                                                                                             \
+            /* 295 - BeaconRxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 263 - PacketMulticastRxCount, */                                                                                    \
+            /* 299 - PacketMulticastRxCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 267 - PacketMulticastTxCount, */                                                                                    \
+            /* 303 - PacketMulticastTxCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 271 - PacketUnicastRxCount, */                                                                                      \
+            /* 307 - PacketUnicastRxCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 275 - PacketUnicastTxCount, */                                                                                      \
+            /* 311 - PacketUnicastTxCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 279 - CurrentMaxRate, */                                                                                            \
+            /* 315 - CurrentMaxRate, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 287 - OverrunCount, */                                                                                              \
+            /* 323 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 295 - FeatureMap, */                                                                                                \
+            /* 331 - FeatureMap, */                                                                                                \
             0x03, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server), little-endian */                                       \
                                                                                                                                    \
-            /* 299 - FeatureMap, */                                                                                                \
+            /* 335 - FeatureMap, */                                                                                                \
             0x03, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Switch (server), little-endian */                                                             \
+                                                                                                                                   \
+            /* 339 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: AdministratorCommissioning (server), little-endian */                                         \
+                                                                                                                                   \
+            /* 343 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Operational Credentials (server), little-endian */                                            \
+                                                                                                                                   \
+            /* 347 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Group Key Management (server), little-endian */                                               \
+                                                                                                                                   \
+            /* 351 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Fixed Label (server), little-endian */                                                        \
+                                                                                                                                   \
+            /* 355 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: User Label (server), little-endian */                                                         \
+                                                                                                                                   \
+            /* 359 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Identify (server), little-endian */                                                           \
+                                                                                                                                   \
+            /* 363 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Groups (server), little-endian */                                                             \
+                                                                                                                                   \
+            /* 367 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Scenes (server), little-endian */                                                             \
+                                                                                                                                   \
+            /* 371 - FeatureMap, */                                                                                                \
+            0x01, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: On/Off (server), little-endian */                                                             \
+                                                                                                                                   \
+            /* 375 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Level Control (server), little-endian */                                                      \
                                                                                                                                    \
-            /* 303 - FeatureMap, */                                                                                                \
+            /* 379 - FeatureMap, */                                                                                                \
             0x01, 0x00, 0x00, 0x00,                                                                                                \
-=======
-        /* 0 - Breadcrumb, */                                                                                                      \
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                            \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Descriptor (server), little-endian */                                                         \
+                                                                                                                                   \
+            /* 383 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Fan Control (server), little-endian */                                                        \
+                                                                                                                                   \
+            /* 387 - FeatureMap, */                                                                                                \
+            0x03, 0x00, 0x00, 0x00,                                                                                                \
     }
 
 #endif // BIGENDIAN_CPU
 
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-#define GENERATED_DEFAULTS_COUNT (65)
-=======
-#define GENERATED_DEFAULTS_COUNT (1)
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+#define GENERATED_DEFAULTS_COUNT (86)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -498,20 +686,11 @@
     }
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-#define GENERATED_MIN_MAX_DEFAULT_COUNT 1
-=======
 #define GENERATED_MIN_MAX_DEFAULT_COUNT 5
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
     {                                                                                                                              \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: Time Format Localization (server) */                                                              \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-        {                                                                                                                          \
-            (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1                                                                         \
-        } /* HourFormat */                                                                                                         \
-=======
         { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 }, /* HourFormat */                                                       \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Fan Control (server) */                                                                       \
@@ -521,48 +700,34 @@
         {                                                                                                                          \
             (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x64                                                                        \
         } /* speed setting */                                                                                                      \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
     }
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-#define GENERATED_ATTRIBUTE_COUNT 208
-=======
 #define GENERATED_ATTRIBUTE_COUNT 239
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: Groups (server) */                                                                                \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-        { 0x00000000, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },      /* name support */                                      \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */                                   \
-=======
-        { 0x00000000, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },        /* name support */                                    \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) }, /* FeatureMap */                                      \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },   /* ClusterRevision */                                 \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+        { 0x00000000, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },             /* name support */                               \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(0) }, /* FeatureMap */                                 \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },        /* ClusterRevision */                            \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Descriptor (server) */                                                                        \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* device list */      \
             { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* server list */      \
             { 0x00000002, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* client list */      \
             { 0x00000003, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* parts list */       \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(4) },                           /* FeatureMap */       \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ClusterRevision */  \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Access Control (server) */                                                                    \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                 \
               ZAP_EMPTY_DEFAULT() }, /* ACL */                                                                                     \
             { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                 \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-              ZAP_EMPTY_DEFAULT() },                                       /* Extension */                                         \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                   \
-=======
-              ZAP_EMPTY_DEFAULT() },                                         /* Extension */                                       \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) }, /* FeatureMap */                                      \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },   /* ClusterRevision */                                 \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+              ZAP_EMPTY_DEFAULT() },                                              /* Extension */                                  \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(8) }, /* FeatureMap */                                 \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },        /* ClusterRevision */                            \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Basic (server) */                                                                             \
             { 0x00000000, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(SINGLETON),               \
@@ -605,10 +770,7 @@
             { 0x00000011, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_SIMPLE_DEFAULT(1) }, /* Reachable */            \
             { 0x00000012, ZAP_TYPE(CHAR_STRING), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(SINGLETON),          \
               ZAP_EMPTY_DEFAULT() },                                                                   /* UniqueID */              \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-=======
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },                           /* FeatureMap */            \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(12) },                     /* FeatureMap */            \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */       \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */                                                     \
@@ -617,17 +779,14 @@
             { 0x00000001, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(1) },                          /* UpdatePossible */          \
             { 0x00000002, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },                            /* UpdateState */             \
             { 0x00000003, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_SIMPLE_DEFAULT(0) }, /* UpdateStateProgress */     \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(16) },                   /* FeatureMap */              \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                           /* ClusterRevision */         \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Localization Configuration (server) */                                                        \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
             { 0x00000001, ZAP_TYPE(CHAR_STRING), 36, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                  \
-              ZAP_LONG_DEFAULTS_INDEX(0) },                                                                /* ActiveLocale */      \
+              ZAP_LONG_DEFAULTS_INDEX(20) },                                                               /* ActiveLocale */      \
             { 0x00000002, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* SupportedLocales */  \
-=======
-            { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* SupportedLocales */  \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },                               /* FeatureMap */        \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(26) },                         /* FeatureMap */        \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */   \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Time Format Localization (server) */                                                          \
@@ -637,26 +796,18 @@
             { 0x00000001, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                         \
               ZAP_SIMPLE_DEFAULT(0) }, /* ActiveCalendarType */                                                                    \
             { 0x00000002, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
-              ZAP_EMPTY_DEFAULT() },                                       /* SupportedCalendarTypes */                            \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                   \
+              ZAP_EMPTY_DEFAULT() },                                               /* SupportedCalendarTypes */                    \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(30) }, /* FeatureMap */                                \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },         /* ClusterRevision */                           \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Commissioning (server) */                                                             \
-            { 0x00000000, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(0) }, /* Breadcrumb */        \
+            { 0x00000000, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(34) }, /* Breadcrumb */       \
             { 0x00000001, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
               ZAP_EMPTY_DEFAULT() },                                               /* BasicCommissioningInfo */                    \
             { 0x00000002, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },          /* RegulatoryConfig */                          \
             { 0x00000003, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },          /* LocationCapability */                        \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(14) }, /* FeatureMap */                                \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(42) }, /* FeatureMap */                                \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* ClusterRevision */                           \
-=======
-              ZAP_EMPTY_DEFAULT() }, /* BasicCommissioningInfo */                                                                  \
-            { 0x00000002, ZAP_TYPE(ENUM8), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* RegulatoryConfig */  \
-            { 0x00000003, ZAP_TYPE(ENUM8), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
-              ZAP_EMPTY_DEFAULT() },                                            /* LocationCapability */                           \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(6) },    /* FeatureMap */                                   \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                             \
             { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* MaxNetworks */       \
@@ -666,70 +817,48 @@
             { 0x00000004, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* InterfaceEnabled */        \
             { 0x00000005, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() },   /* LastNetworkingStatus */    \
             { 0x00000006, ZAP_TYPE(OCTET_STRING), 33, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* LastNetworkID */     \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
             { 0x00000007, ZAP_TYPE(INT32S), 4, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                       \
-              ZAP_LONG_DEFAULTS_INDEX(18) },                                       /* LastConnectErrorValue */                     \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(22) }, /* FeatureMap */                                \
+              ZAP_LONG_DEFAULTS_INDEX(46) },                                       /* LastConnectErrorValue */                     \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(50) }, /* FeatureMap */                                \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* ClusterRevision */                           \
-=======
-            { 0x00000007, ZAP_TYPE(INT32S), 4, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* LastConnectErrorValue */    \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(1) },                        /* FeatureMap */               \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                     /* ClusterRevision */          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Diagnostic Logs (server) */                                                                   \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) }, /* FeatureMap */                                      \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },   /* ClusterRevision */                                 \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(54) }, /* FeatureMap */                                \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },         /* ClusterRevision */                           \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server) */                                                               \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* NetworkInterfaces */ \
             { 0x00000001, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                            /* RebootCount */       \
-            { 0x00000002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(26) },                           /* UpTime */            \
-            { 0x00000003, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(34) }, /* TotalOperationalHours */                       \
+            { 0x00000002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(58) },                           /* UpTime */            \
+            { 0x00000003, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(66) }, /* TotalOperationalHours */                       \
             { 0x00000004, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },          /* BootReasons */                                 \
             { 0x00000005, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
               ZAP_EMPTY_DEFAULT() }, /* ActiveHardwareFaults */                                                                    \
             { 0x00000006, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ActiveRadioFaults */ \
             { 0x00000007, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-              ZAP_EMPTY_DEFAULT() },                                            /* ActiveNetworkFaults */                          \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
+              ZAP_EMPTY_DEFAULT() },                                               /* ActiveNetworkFaults */                       \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(70) }, /* FeatureMap */                                \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* ClusterRevision */                           \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                              \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ThreadMetrics */     \
-            { 0x00000001, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(38) },                           /* CurrentHeapFree */   \
-            { 0x00000002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(46) },                           /* CurrentHeapUsed */   \
-            { 0x00000003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(54) },   /* CurrentHeapHighWatermark */                  \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(62) }, /* FeatureMap */                                \
+            { 0x00000001, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(74) },                           /* CurrentHeapFree */   \
+            { 0x00000002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(82) },                           /* CurrentHeapUsed */   \
+            { 0x00000003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(90) },   /* CurrentHeapHighWatermark */                  \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(98) }, /* FeatureMap */                                \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* ClusterRevision */                           \
-=======
-              ZAP_EMPTY_DEFAULT() }, /* ActiveNetworkFaults */                                                                     \
-            { 0x00000008, ZAP_TYPE(BOOLEAN), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                              \
-              ZAP_EMPTY_DEFAULT() },                                            /* TestEventTriggersEnabled */                     \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },    /* FeatureMap */                                   \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
-                                                                                                                                   \
-            /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                              \
-            { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* ThreadMetrics */    \
-            { 0x00000001, ZAP_TYPE(INT64U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* CurrentHeapFree */  \
-            { 0x00000002, ZAP_TYPE(INT64U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* CurrentHeapUsed */  \
-            { 0x00000003, ZAP_TYPE(INT64U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
-              ZAP_EMPTY_DEFAULT() },                                            /* CurrentHeapHighWatermark */                     \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(1) },    /* FeatureMap */                                   \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                        \
             { 0x00000000, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                                   /* channel */           \
             { 0x00000001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* RoutingRole */       \
-            { 0x00000002, ZAP_TYPE(CHAR_STRING), 17, 0, ZAP_LONG_DEFAULTS_INDEX(66) },                     /* NetworkName */       \
+            { 0x00000002, ZAP_TYPE(CHAR_STRING), 17, 0, ZAP_LONG_DEFAULTS_INDEX(102) },                    /* NetworkName */       \
             { 0x00000003, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                            /* PanId */             \
-            { 0x00000004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(68) },                           /* ExtendedPanId */     \
+            { 0x00000004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(104) },                          /* ExtendedPanId */     \
             { 0x00000005, ZAP_TYPE(OCTET_STRING), 18, 0, ZAP_EMPTY_DEFAULT() },                            /* MeshLocalPrefix */   \
-            { 0x00000006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(76) },                           /* OverrunCount */      \
+            { 0x00000006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(112) },                          /* OverrunCount */      \
             { 0x00000007, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* NeighborTableList */ \
             { 0x00000008, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* RouteTableList */    \
-            { 0x00000009, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(84) },                           /* PartitionId */       \
+            { 0x00000009, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(120) },                          /* PartitionId */       \
             { 0x0000000A, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* weighting */         \
             { 0x0000000B, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* DataVersion */       \
             { 0x0000000C, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* StableDataVersion */ \
@@ -742,51 +871,50 @@
             { 0x00000013, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },   /* PartitionIdChangeCount */                     \
             { 0x00000014, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },   /* BetterPartitionAttachAttemptCount */          \
             { 0x00000015, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },   /* ParentChangeCount */                          \
-            { 0x00000016, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(88) },  /* TxTotalCount */                               \
-            { 0x00000017, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(92) },  /* TxUnicastCount */                             \
-            { 0x00000018, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(96) },  /* TxBroadcastCount */                           \
-            { 0x00000019, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(100) }, /* TxAckRequestedCount */                        \
-            { 0x0000001A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(104) }, /* TxAckedCount */                               \
-            { 0x0000001B, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(108) }, /* TxNoAckRequestedCount */                      \
-            { 0x0000001C, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(112) }, /* TxDataCount */                                \
-            { 0x0000001D, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(116) }, /* TxDataPollCount */                            \
-            { 0x0000001E, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(120) }, /* TxBeaconCount */                              \
-            { 0x0000001F, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(124) }, /* TxBeaconRequestCount */                       \
-            { 0x00000020, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(128) }, /* TxOtherCount */                               \
-            { 0x00000021, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(132) }, /* TxRetryCount */                               \
-            { 0x00000022, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(136) }, /* TxDirectMaxRetryExpiryCount */                \
-            { 0x00000023, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(140) }, /* TxIndirectMaxRetryExpiryCount */              \
-            { 0x00000024, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(144) }, /* TxErrCcaCount */                              \
-            { 0x00000025, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(148) }, /* TxErrAbortCount */                            \
-            { 0x00000026, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(152) }, /* TxErrBusyChannelCount */                      \
-            { 0x00000027, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(156) }, /* RxTotalCount */                               \
-            { 0x00000028, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(160) }, /* RxUnicastCount */                             \
-            { 0x00000029, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(164) }, /* RxBroadcastCount */                           \
-            { 0x0000002A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(168) }, /* RxDataCount */                                \
-            { 0x0000002B, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(172) }, /* RxDataPollCount */                            \
-            { 0x0000002C, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(176) }, /* RxBeaconCount */                              \
-            { 0x0000002D, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(180) }, /* RxBeaconRequestCount */                       \
-            { 0x0000002E, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(184) }, /* RxOtherCount */                               \
-            { 0x0000002F, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(188) }, /* RxAddressFilteredCount */                     \
-            { 0x00000030, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(192) }, /* RxDestAddrFilteredCount */                    \
-            { 0x00000031, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(196) }, /* RxDuplicatedCount */                          \
-            { 0x00000032, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(200) }, /* RxErrNoFrameCount */                          \
-            { 0x00000033, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(204) }, /* RxErrUnknownNeighborCount */                  \
-            { 0x00000034, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(208) }, /* RxErrInvalidSrcAddrCount */                   \
-            { 0x00000035, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(212) }, /* RxErrSecCount */                              \
-            { 0x00000036, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(216) }, /* RxErrFcsCount */                              \
-            { 0x00000037, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(220) }, /* RxErrOtherCount */                            \
-            { 0x00000038, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(224) }, /* ActiveTimestamp */                            \
-            { 0x00000039, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(232) }, /* PendingTimestamp */                           \
-            { 0x0000003A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(240) }, /* delay */                                      \
+            { 0x00000016, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(124) }, /* TxTotalCount */                               \
+            { 0x00000017, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(128) }, /* TxUnicastCount */                             \
+            { 0x00000018, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(132) }, /* TxBroadcastCount */                           \
+            { 0x00000019, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(136) }, /* TxAckRequestedCount */                        \
+            { 0x0000001A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(140) }, /* TxAckedCount */                               \
+            { 0x0000001B, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(144) }, /* TxNoAckRequestedCount */                      \
+            { 0x0000001C, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(148) }, /* TxDataCount */                                \
+            { 0x0000001D, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(152) }, /* TxDataPollCount */                            \
+            { 0x0000001E, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(156) }, /* TxBeaconCount */                              \
+            { 0x0000001F, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(160) }, /* TxBeaconRequestCount */                       \
+            { 0x00000020, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(164) }, /* TxOtherCount */                               \
+            { 0x00000021, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(168) }, /* TxRetryCount */                               \
+            { 0x00000022, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(172) }, /* TxDirectMaxRetryExpiryCount */                \
+            { 0x00000023, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(176) }, /* TxIndirectMaxRetryExpiryCount */              \
+            { 0x00000024, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(180) }, /* TxErrCcaCount */                              \
+            { 0x00000025, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(184) }, /* TxErrAbortCount */                            \
+            { 0x00000026, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(188) }, /* TxErrBusyChannelCount */                      \
+            { 0x00000027, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(192) }, /* RxTotalCount */                               \
+            { 0x00000028, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(196) }, /* RxUnicastCount */                             \
+            { 0x00000029, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(200) }, /* RxBroadcastCount */                           \
+            { 0x0000002A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(204) }, /* RxDataCount */                                \
+            { 0x0000002B, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(208) }, /* RxDataPollCount */                            \
+            { 0x0000002C, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(212) }, /* RxBeaconCount */                              \
+            { 0x0000002D, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(216) }, /* RxBeaconRequestCount */                       \
+            { 0x0000002E, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(220) }, /* RxOtherCount */                               \
+            { 0x0000002F, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(224) }, /* RxAddressFilteredCount */                     \
+            { 0x00000030, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(228) }, /* RxDestAddrFilteredCount */                    \
+            { 0x00000031, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(232) }, /* RxDuplicatedCount */                          \
+            { 0x00000032, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(236) }, /* RxErrNoFrameCount */                          \
+            { 0x00000033, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(240) }, /* RxErrUnknownNeighborCount */                  \
+            { 0x00000034, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(244) }, /* RxErrInvalidSrcAddrCount */                   \
+            { 0x00000035, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(248) }, /* RxErrSecCount */                              \
+            { 0x00000036, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(252) }, /* RxErrFcsCount */                              \
+            { 0x00000037, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(256) }, /* RxErrOtherCount */                            \
+            { 0x00000038, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(260) }, /* ActiveTimestamp */                            \
+            { 0x00000039, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(268) }, /* PendingTimestamp */                           \
+            { 0x0000003A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(276) }, /* delay */                                      \
             { 0x0000003B, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* SecurityPolicy */    \
-            { 0x0000003C, ZAP_TYPE(OCTET_STRING), 5, 0, ZAP_LONG_DEFAULTS_INDEX(244) },                    /* ChannelMask */       \
+            { 0x0000003C, ZAP_TYPE(OCTET_STRING), 5, 0, ZAP_LONG_DEFAULTS_INDEX(280) },                    /* ChannelMask */       \
             { 0x0000003D, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
               ZAP_EMPTY_DEFAULT() }, /* OperationalDatasetComponents */                                                            \
             { 0x0000003E, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
               ZAP_EMPTY_DEFAULT() },                                                /* ActiveNetworkFaultsList */                  \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(251) }, /* FeatureMap */                               \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(287) }, /* FeatureMap */                               \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                          \
@@ -795,47 +923,16 @@
             { 0x00000002, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() },         /* WiFiVersion */       \
             { 0x00000003, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_SIMPLE_DEFAULT(0x0000) }, /* ChannelNumber */     \
             { 0x00000004, ZAP_TYPE(INT8S), 1, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_SIMPLE_DEFAULT(0x00) },    /* Rssi */              \
-            { 0x00000005, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(255) },                          /* BeaconLostCount */   \
-            { 0x00000006, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(259) },                          /* BeaconRxCount */     \
-            { 0x00000007, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(263) },   /* PacketMulticastRxCount */                   \
-            { 0x00000008, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(267) },   /* PacketMulticastTxCount */                   \
-            { 0x00000009, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(271) },   /* PacketUnicastRxCount */                     \
-            { 0x0000000A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(275) },   /* PacketUnicastTxCount */                     \
-            { 0x0000000B, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(279) },   /* CurrentMaxRate */                           \
-            { 0x0000000C, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(287) },   /* OverrunCount */                             \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(295) }, /* FeatureMap */                               \
+            { 0x00000005, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(291) },                          /* BeaconLostCount */   \
+            { 0x00000006, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(295) },                          /* BeaconRxCount */     \
+            { 0x00000007, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(299) },   /* PacketMulticastRxCount */                   \
+            { 0x00000008, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(303) },   /* PacketMulticastTxCount */                   \
+            { 0x00000009, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(307) },   /* PacketUnicastRxCount */                     \
+            { 0x0000000A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(311) },   /* PacketUnicastTxCount */                     \
+            { 0x0000000B, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(315) },   /* CurrentMaxRate */                           \
+            { 0x0000000C, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(323) },   /* OverrunCount */                             \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(331) }, /* FeatureMap */                               \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
-=======
-              ZAP_EMPTY_DEFAULT() },                                              /* ActiveNetworkFaultsList */                    \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0x000F) }, /* FeatureMap */                                 \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },   /* ClusterRevision */                            \
-                                                                                                                                   \
-            /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                          \
-            { 0x00000000, ZAP_TYPE(OCTET_STRING), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),          \
-              ZAP_EMPTY_DEFAULT() }, /* bssid */                                                                                   \
-            { 0x00000001, ZAP_TYPE(ENUM8), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
-              ZAP_EMPTY_DEFAULT() }, /* SecurityType */                                                                            \
-            { 0x00000002, ZAP_TYPE(ENUM8), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
-              ZAP_EMPTY_DEFAULT() }, /* WiFiVersion */                                                                             \
-            { 0x00000003, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
-              ZAP_EMPTY_DEFAULT() }, /* ChannelNumber */                                                                           \
-            { 0x00000004, ZAP_TYPE(INT8S), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
-              ZAP_EMPTY_DEFAULT() },                                                                        /* Rssi */             \
-            { 0x00000005, ZAP_TYPE(INT32U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* BeaconLostCount */  \
-            { 0x00000006, ZAP_TYPE(INT32U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* BeaconRxCount */    \
-            { 0x00000007, ZAP_TYPE(INT32U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
-              ZAP_EMPTY_DEFAULT() }, /* PacketMulticastRxCount */                                                                  \
-            { 0x00000008, ZAP_TYPE(INT32U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
-              ZAP_EMPTY_DEFAULT() }, /* PacketMulticastTxCount */                                                                  \
-            { 0x00000009, ZAP_TYPE(INT32U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
-              ZAP_EMPTY_DEFAULT() }, /* PacketUnicastRxCount */                                                                    \
-            { 0x0000000A, ZAP_TYPE(INT32U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
-              ZAP_EMPTY_DEFAULT() }, /* PacketUnicastTxCount */                                                                    \
-            { 0x0000000B, ZAP_TYPE(INT64U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* CurrentMaxRate */   \
-            { 0x0000000C, ZAP_TYPE(INT64U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* OverrunCount */     \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(3) },                                /* FeatureMap */       \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                             /* ClusterRevision */  \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                      \
             { 0x00000000, ZAP_TYPE(ENUM8), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
@@ -850,27 +947,19 @@
             { 0x00000007, ZAP_TYPE(BOOLEAN), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),               \
               ZAP_EMPTY_DEFAULT() },                                                                        /* CarrierDetect */    \
             { 0x00000008, ZAP_TYPE(INT64U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* TimeSinceReset */   \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(299) },                         /* FeatureMap */       \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                             /* ClusterRevision */  \
-=======
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(3) },                                /* FeatureMap */       \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(335) },                         /* FeatureMap */       \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                             /* ClusterRevision */  \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Switch (server) */                                                                            \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) }, /* FeatureMap */                                      \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },   /* ClusterRevision */                                 \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(339) }, /* FeatureMap */                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },          /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                        \
             { 0x00000000, ZAP_TYPE(INT8U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* WindowStatus */      \
             { 0x00000001, ZAP_TYPE(FABRIC_IDX), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                           \
               ZAP_EMPTY_DEFAULT() },                                                                        /* AdminFabricIndex */ \
             { 0x00000002, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* AdminVendorId */    \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-=======
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },                                /* FeatureMap */       \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(343) },                         /* FeatureMap */       \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                             /* ClusterRevision */  \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                           \
@@ -881,12 +970,9 @@
             { 0x00000004, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
               ZAP_EMPTY_DEFAULT() }, /* TrustedRootCertificates */                                                                 \
             { 0x00000005, ZAP_TYPE(FABRIC_IDX), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                           \
-              ZAP_EMPTY_DEFAULT() },                                            /* CurrentFabricIndex */                           \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-=======
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },    /* FeatureMap */                                   \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
+              ZAP_EMPTY_DEFAULT() },                                                /* CurrentFabricIndex */                       \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(347) }, /* FeatureMap */                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Group Key Management (server) */                                                              \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                 \
@@ -895,90 +981,61 @@
             { 0x00000002, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
               ZAP_EMPTY_DEFAULT() }, /* MaxGroupsPerFabric */                                                                      \
             { 0x00000003, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
-              ZAP_EMPTY_DEFAULT() },                                       /* MaxGroupKeysPerFabric */                             \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                   \
+              ZAP_EMPTY_DEFAULT() },                                                /* MaxGroupKeysPerFabric */                    \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(351) }, /* FeatureMap */                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },          /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Fixed Label (server) */                                                                       \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* label list */        \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(355) },                        /* FeatureMap */        \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */   \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: User Label (server) */                                                                        \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                 \
-              ZAP_EMPTY_DEFAULT() },                                       /* label list */                                        \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                   \
+              ZAP_EMPTY_DEFAULT() },                                                /* label list */                               \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(359) }, /* FeatureMap */                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },          /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Identify (server) */                                                                          \
             { 0x00000000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x0) }, /* identify time */        \
             { 0x00000001, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x0) },                             /* identify type */        \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(363) },                     /* FeatureMap */           \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },                              /* ClusterRevision */      \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Groups (server) */                                                                            \
-            { 0x00000000, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },  /* name support */                                      \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */                                   \
+            { 0x00000000, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },         /* name support */                             \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(367) }, /* FeatureMap */                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },          /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Scenes (server) */                                                                            \
-            { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* scene count */                                  \
-            { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* current scene */                                \
-            { 0x00000002, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* current group */                                \
-            { 0x00000003, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },  /* scene valid */                                  \
-            { 0x00000004, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },       /* name support */                                 \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* ClusterRevision */                              \
+            { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },        /* scene count */                              \
+            { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },        /* current scene */                            \
+            { 0x00000002, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },     /* current group */                            \
+            { 0x00000003, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },      /* scene valid */                              \
+            { 0x00000004, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },         /* name support */                             \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(371) }, /* FeatureMap */                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },          /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: On/Off (server) */                                                                            \
-            { 0x00000000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0) }, /* OnOff */                                            \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },  /* ClusterRevision */                                  \
-                                                                                                                                   \
-            /* Endpoint: 1, Cluster: Level Control (server) */                                                                     \
-            { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* current level */                                   \
-            { 0x00000002, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* min level */                                       \
-            { 0x00000003, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0xFE) }, /* max level */                                       \
-            { 0x00000011, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                         \
-              ZAP_SIMPLE_DEFAULT(0xFE) },                                           /* on level */                                 \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(303) }, /* FeatureMap */                               \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(5) },          /* ClusterRevision */                          \
-=======
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },                            /* FeatureMap */           \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },                              /* ClusterRevision */      \
-                                                                                                                                   \
-            /* Endpoint: 1, Cluster: Groups (server) */                                                                            \
-            { 0x00000000, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },  /* name support */                                    \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) }, /* FeatureMap */                                      \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },   /* ClusterRevision */                                 \
-                                                                                                                                   \
-            /* Endpoint: 1, Cluster: Scenes (server) */                                                                            \
-            { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },      /* SceneCount */                                 \
-            { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },      /* CurrentScene */                               \
-            { 0x00000002, ZAP_TYPE(GROUP_ID), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* CurrentGroup */                               \
-            { 0x00000003, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* SceneValid */                                 \
-            { 0x00000004, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },       /* NameSupport */                                \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(1) },      /* FeatureMap */                                 \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },        /* ClusterRevision */                            \
-                                                                                                                                   \
-            /* Endpoint: 1, Cluster: On/Off (server) */                                                                            \
-            { 0x00000000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0) },  /* OnOff */                                           \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) }, /* FeatureMap */                                      \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },   /* ClusterRevision */                                 \
+            { 0x00000000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0) },         /* OnOff */                                    \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(375) }, /* FeatureMap */                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },          /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Level Control (server) */                                                                     \
             { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0) },    /* current level */                                   \
             { 0x00000002, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0) },    /* min level */                                       \
             { 0x00000003, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0xFE) }, /* max level */                                       \
             { 0x00000011, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                         \
-              ZAP_SIMPLE_DEFAULT(0xFE) },                                    /* on level */                                        \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(1) }, /* FeatureMap */                                      \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(5) },   /* ClusterRevision */                                 \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+              ZAP_SIMPLE_DEFAULT(0xFE) },                                           /* on level */                                 \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(379) }, /* FeatureMap */                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(5) },          /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Descriptor (server) */                                                                        \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* device list */       \
             { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* server list */       \
             { 0x00000002, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* client list */       \
             { 0x00000003, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* parts list */        \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */   \
-=======
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },                               /* FeatureMap */        \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(383) },                        /* FeatureMap */        \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */   \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Fan Control (server) */                                                                       \
@@ -986,18 +1043,15 @@
               ZAP_MIN_MAX_DEFAULTS_INDEX(1) }, /* fan mode */                                                                      \
             { 0x00000001, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
               ZAP_MIN_MAX_DEFAULTS_INDEX(2) }, /* fan mode sequence */                                                             \
-            { 0x00000002, ZAP_TYPE(INT8U), 1,                                                                                      \
-              ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                           \
+            { 0x00000002, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
               ZAP_MIN_MAX_DEFAULTS_INDEX(3) },                               /* percent setting */                                 \
             { 0x00000003, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* percent current */                                 \
             { 0x00000004, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(10) },   /* speed max */                                       \
-            { 0x00000005, ZAP_TYPE(INT8U), 1,                                                                                      \
-              ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                           \
-              ZAP_MIN_MAX_DEFAULTS_INDEX(4) },                               /* speed setting */                                   \
-            { 0x00000006, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* speed current */                                   \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(3) }, /* FeatureMap */                                      \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },   /* ClusterRevision */                                 \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+            { 0x00000005, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(4) },                                      /* speed setting */                            \
+            { 0x00000006, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },        /* speed current */                            \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(387) }, /* FeatureMap */                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },          /* ClusterRevision */                          \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -1033,13 +1087,6 @@
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayLevelControlServer[] = {                                                      \
         (EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback,                                              \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-=======
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayFanControlServer[] = {                                                        \
-        (EmberAfGenericClusterFunction) MatterFanControlClusterServerAttributeChangedCallback,                                     \
-        (EmberAfGenericClusterFunction) MatterFanControlClusterServerPreAttributeChangedCallback,                                  \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
     };
 
 // clang-format off
@@ -1144,7 +1191,6 @@
   /* Endpoint: 1, Cluster: Identify (server) */\
   /*   client_generated */ \
   0x00000000 /* Identify */, \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
   0x00000001 /* IdentifyQuery */, \
   chip::kInvalidCommandId /* end of list */, \
   /*   server_generated */ \
@@ -1152,11 +1198,6 @@
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Groups (server) */\
   /*   client_generated */ \
-=======
-  chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 1, Cluster: Groups (server) */\
-  /*   AcceptedCommandList (index=75) */ \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
   0x00000000 /* AddGroup */, \
   0x00000001 /* ViewGroup */, \
   0x00000002 /* GetGroupMembership */, \
@@ -1164,22 +1205,14 @@
   0x00000004 /* RemoveAllGroups */, \
   0x00000005 /* AddGroupIfIdentifying */, \
   chip::kInvalidCommandId /* end of list */, \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
   /*   server_generated */ \
-=======
-  /*   GeneratedCommandList (index=82)*/ \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
   0x00000000 /* AddGroupResponse */, \
   0x00000001 /* ViewGroupResponse */, \
   0x00000002 /* GetGroupMembershipResponse */, \
   0x00000003 /* RemoveGroupResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Scenes (server) */\
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
   /*   client_generated */ \
-=======
-  /*   AcceptedCommandList (index=87) */ \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
   0x00000000 /* AddScene */, \
   0x00000001 /* ViewScene */, \
   0x00000002 /* RemoveScene */, \
@@ -1188,11 +1221,7 @@
   0x00000005 /* RecallScene */, \
   0x00000006 /* GetSceneMembership */, \
   chip::kInvalidCommandId /* end of list */, \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
   /*   server_generated */ \
-=======
-  /*   GeneratedCommandList (index=95)*/ \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
   0x00000000 /* AddSceneResponse */, \
   0x00000001 /* ViewSceneResponse */, \
   0x00000002 /* RemoveSceneResponse */, \
@@ -1201,21 +1230,13 @@
   0x00000006 /* GetSceneMembershipResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: On/Off (server) */\
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
   /*   client_generated */ \
-=======
-  /*   AcceptedCommandList (index=102) */ \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
   0x00000000 /* Off */, \
   0x00000001 /* On */, \
   0x00000002 /* Toggle */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Level Control (server) */\
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
   /*   client_generated */ \
-=======
-  /*   AcceptedCommandList (index=106) */ \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
   0x00000000 /* MoveToLevel */, \
   0x00000001 /* Move */, \
   0x00000002 /* Step */, \
@@ -1238,8 +1259,8 @@
       /* Endpoint: 0, Cluster: Groups (server) */ \
       .clusterId = 0x00000004,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
-      .attributeCount = 2, \
-      .clusterSize = 3, \
+      .attributeCount = 3, \
+      .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayGroupsServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 0 ) ,\
@@ -1248,9 +1269,9 @@
   { \
       /* Endpoint: 0, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(2), \
-      .attributeCount = 5, \
-      .clusterSize = 0, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(3), \
+      .attributeCount = 6, \
+      .clusterSize = 4, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
@@ -1259,15 +1280,9 @@
   { \
       /* Endpoint: 0, Cluster: Access Control (server) */ \
       .clusterId = 0x0000001F,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(7), \
-      .attributeCount = 3, \
-      .clusterSize = 2, \
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(9), \
       .attributeCount = 4, \
       .clusterSize = 6, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
@@ -1276,15 +1291,9 @@
   { \
       /* Endpoint: 0, Cluster: Basic (server) */ \
       .clusterId = 0x00000028,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(10), \
-      .attributeCount = 20, \
-      .clusterSize = 37, \
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(13), \
       .attributeCount = 21, \
       .clusterSize = 41, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayBasicServer, \
       .acceptedCommandList = nullptr ,\
@@ -1293,11 +1302,7 @@
   { \
       /* Endpoint: 0, Cluster: OTA Software Update Provider (client) */ \
       .clusterId = 0x00000029,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(30), \
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(34), \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -1308,15 +1313,9 @@
   { \
       /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */ \
       .clusterId = 0x0000002A,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(30), \
-      .attributeCount = 5, \
-      .clusterSize = 5, \
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(34), \
       .attributeCount = 6, \
       .clusterSize = 9, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 12 ) ,\
@@ -1325,15 +1324,9 @@
   { \
       /* Endpoint: 0, Cluster: Localization Configuration (server) */ \
       .clusterId = 0x0000002B,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(35), \
-      .attributeCount = 3, \
-      .clusterSize = 38, \
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(40), \
-      .attributeCount = 3, \
-      .clusterSize = 6, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+      .attributeCount = 4, \
+      .clusterSize = 42, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayLocalizationConfigurationServer, \
       .acceptedCommandList = nullptr ,\
@@ -1342,15 +1335,9 @@
   { \
       /* Endpoint: 0, Cluster: Time Format Localization (server) */ \
       .clusterId = 0x0000002C,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(38), \
-      .attributeCount = 4, \
-      .clusterSize = 4, \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(43), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(44), \
       .attributeCount = 5, \
       .clusterSize = 8, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayTimeFormatLocalizationServer, \
       .acceptedCommandList = nullptr ,\
@@ -1359,11 +1346,7 @@
   { \
       /* Endpoint: 0, Cluster: General Commissioning (server) */ \
       .clusterId = 0x00000030,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(42), \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(48), \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+      .attributes = ZAP_ATTRIBUTE_INDEX(49), \
       .attributeCount = 6, \
       .clusterSize = 16, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1374,11 +1357,7 @@
   { \
       /* Endpoint: 0, Cluster: Network Commissioning (server) */ \
       .clusterId = 0x00000031,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(48), \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(54), \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+      .attributes = ZAP_ATTRIBUTE_INDEX(55), \
       .attributeCount = 10, \
       .clusterSize = 48, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1389,15 +1368,9 @@
   { \
       /* Endpoint: 0, Cluster: Diagnostic Logs (server) */ \
       .clusterId = 0x00000032,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(58), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(64), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(65), \
       .attributeCount = 2, \
       .clusterSize = 6, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 31 ) ,\
@@ -1406,10 +1379,9 @@
   { \
       /* Endpoint: 0, Cluster: General Diagnostics (server) */ \
       .clusterId = 0x00000033,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(58), \
-      .attributeCount = 9, \
-      .clusterSize = 17, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(67), \
+      .attributeCount = 10, \
+      .clusterSize = 21, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
@@ -1418,7 +1390,7 @@
   { \
       /* Endpoint: 0, Cluster: Software Diagnostics (server) */ \
       .clusterId = 0x00000034,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(67), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(77), \
       .attributeCount = 6, \
       .clusterSize = 30, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1429,7 +1401,7 @@
   { \
       /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */ \
       .clusterId = 0x00000035,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(73), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(83), \
       .attributeCount = 65, \
       .clusterSize = 247, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1440,64 +1412,12 @@
   { \
       /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */ \
       .clusterId = 0x00000036,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(138), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(148), \
       .attributeCount = 15, \
       .clusterSize = 58, \
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(66), \
-      .attributeCount = 11, \
-      .clusterSize = 6, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 37 ) ,\
-      .generatedCommandList = nullptr ,\
-    },\
-  { \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */ \
-      .clusterId = 0x00000037,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(153), \
-      .attributeCount = 11, \
-=======
-      /* Endpoint: 0, Cluster: Software Diagnostics (server) */ \
-      .clusterId = 0x00000034,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(77), \
-      .attributeCount = 6, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
-      .clusterSize = 6, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 39 ) ,\
-      .generatedCommandList = nullptr ,\
-    },\
-  { \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      /* Endpoint: 0, Cluster: Switch (server) */ \
-      .clusterId = 0x0000003B,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(164), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-=======
-      /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */ \
-      .clusterId = 0x00000035,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(83), \
-      .attributeCount = 65, \
-      .clusterSize = 6, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 41 ) ,\
-      .generatedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */ \
-      .clusterId = 0x00000036,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(148), \
-      .attributeCount = 15, \
-      .clusterSize = 6, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 43 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -1508,7 +1428,7 @@
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 45 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 39 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
@@ -1517,7 +1437,6 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(174), \
       .attributeCount = 2, \
       .clusterSize = 6, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
@@ -1526,15 +1445,9 @@
   { \
       /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */ \
       .clusterId = 0x0000003C,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(164), \
-      .attributeCount = 4, \
-      .clusterSize = 2, \
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(176), \
       .attributeCount = 5, \
       .clusterSize = 6, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 41 ) ,\
@@ -1543,15 +1456,9 @@
   { \
       /* Endpoint: 0, Cluster: Operational Credentials (server) */ \
       .clusterId = 0x0000003E,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(168), \
-      .attributeCount = 7, \
-      .clusterSize = 4, \
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(181), \
       .attributeCount = 8, \
-      .clusterSize = 6, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+      .clusterSize = 8, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 45 ) ,\
@@ -1560,15 +1467,9 @@
   { \
       /* Endpoint: 0, Cluster: Group Key Management (server) */ \
       .clusterId = 0x0000003F,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(175), \
-      .attributeCount = 5, \
-      .clusterSize = 2, \
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(189), \
       .attributeCount = 6, \
       .clusterSize = 6, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 60 ) ,\
@@ -1577,15 +1478,9 @@
   { \
       /* Endpoint: 0, Cluster: Fixed Label (server) */ \
       .clusterId = 0x00000040,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(180), \
-      .attributeCount = 2, \
-      .clusterSize = 2, \
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(195), \
       .attributeCount = 3, \
       .clusterSize = 6, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
@@ -1594,15 +1489,9 @@
   { \
       /* Endpoint: 0, Cluster: User Label (server) */ \
       .clusterId = 0x00000041,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(182), \
-      .attributeCount = 2, \
-      .clusterSize = 2, \
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(198), \
       .attributeCount = 3, \
       .clusterSize = 6, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
@@ -1611,15 +1500,9 @@
   { \
       /* Endpoint: 1, Cluster: Identify (server) */ \
       .clusterId = 0x00000003,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(184), \
-      .attributeCount = 3, \
-      .clusterSize = 5, \
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(201), \
       .attributeCount = 4, \
       .clusterSize = 9, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayIdentifyServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 68 ) ,\
@@ -1628,107 +1511,53 @@
   { \
       /* Endpoint: 1, Cluster: Groups (server) */ \
       .clusterId = 0x00000004,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(187), \
-      .attributeCount = 2, \
-      .clusterSize = 3, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(205), \
+      .attributeCount = 3, \
+      .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayGroupsServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 73 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 80 ) ,\
     },\
   { \
-      /* Endpoint: 1, Cluster: Scenes (client) */ \
-      .clusterId = 0x00000005,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(189), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(CLIENT), \
-      .functions = NULL, \
-      .acceptedCommandList = nullptr ,\
-      .generatedCommandList = nullptr ,\
-=======
-      .attributes = ZAP_ATTRIBUTE_INDEX(205), \
-      .attributeCount = 3, \
-      .clusterSize = 7, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayGroupsServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 75 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 82 ) ,\
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
-    },\
-  { \
       /* Endpoint: 1, Cluster: Scenes (server) */ \
       .clusterId = 0x00000005,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(189), \
-      .attributeCount = 6, \
-      .clusterSize = 8, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayScenesServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 85 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 93 ) ,\
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(208), \
       .attributeCount = 7, \
       .clusterSize = 12, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayScenesServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 87 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 95 ) ,\
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 85 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 93 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: On/Off (server) */ \
       .clusterId = 0x00000006,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(195), \
-      .attributeCount = 2, \
-      .clusterSize = 3, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayOnOffServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 100 ) ,\
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(215), \
       .attributeCount = 3, \
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayOnOffServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 102 ) ,\
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 100 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Level Control (server) */ \
       .clusterId = 0x00000008,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(197), \
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(218), \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .attributeCount = 6, \
       .clusterSize = 10, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayLevelControlServer, \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 104 ) ,\
-=======
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 106 ) ,\
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(203), \
-      .attributeCount = 5, \
-      .clusterSize = 2, \
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(224), \
       .attributeCount = 6, \
       .clusterSize = 6, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr ,\
@@ -1737,11 +1566,7 @@
   { \
       /* Endpoint: 1, Cluster: Binding (client) */ \
       .clusterId = 0x0000001E,  \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      .attributes = ZAP_ATTRIBUTE_INDEX(208), \
-=======
       .attributes = ZAP_ATTRIBUTE_INDEX(230), \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -1750,21 +1575,13 @@
       .generatedCommandList = nullptr ,\
     },\
   { \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-      /* Endpoint: 1, Cluster: Occupancy Sensing (client) */ \
-      .clusterId = 0x00000406,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(208), \
-=======
       /* Endpoint: 1, Cluster: Thermostat (client) */ \
       .clusterId = 0x00000201,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(230), \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-=======
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
     },\
@@ -1774,9 +1591,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(230), \
       .attributeCount = 9, \
       .clusterSize = 13, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
-      .functions = chipFuncArrayFanControlServer, \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
     },\
@@ -1786,16 +1602,12 @@
 
 #define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
 
-#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 27
+#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 28
 
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-        { ZAP_CLUSTER_INDEX(0), 22, 523 }, { ZAP_CLUSTER_INDEX(22), 9, 31 },                                                       \
-=======
-        { ZAP_CLUSTER_INDEX(0), 22, 215 }, { ZAP_CLUSTER_INDEX(22), 9, 64 },                                                       \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+        { ZAP_CLUSTER_INDEX(0), 22, 587 }, { ZAP_CLUSTER_INDEX(22), 9, 64 },                                                       \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1807,11 +1619,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (37)
 
 // Total size of attribute storage
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-#define ATTRIBUTE_MAX_SIZE (554)
-=======
-#define ATTRIBUTE_MAX_SIZE (279)
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
+#define ATTRIBUTE_MAX_SIZE (651)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)
@@ -1832,11 +1640,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 // Array of device types
 #define FIXED_DEVICE_TYPES                                                                                                         \
     {                                                                                                                              \
-<<<<<<< HEAD:examples/chef/zzz_generated/lighting-app/zap-generated/endpoint_config.h
-        { 0x0016, 1 }, { 0x0100, 1 }                                                                                               \
-=======
         { 0x0016, 1 }, { 0x0300, 1 }                                                                                               \
->>>>>>> c60233daa (Chef - Add 13 sample apps (#19663)):examples/chef/zzz_generated/rootnode_heatingcoolingunit_Yt3sl2ssuP/zap-generated/endpoint_config.h
     }
 
 // Array of device type offsets
