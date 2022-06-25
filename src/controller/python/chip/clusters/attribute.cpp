@@ -22,6 +22,7 @@
 #include <app/BufferedReadCallback.h>
 #include <app/ChunkedWriteCallback.h>
 #include <app/DeviceProxy.h>
+#include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 #include <app/WriteClient.h>
 #include <lib/support/CodeUtils.h>
@@ -144,9 +145,12 @@ public:
         gOnSubscriptionEstablishedCallback(mAppContext, aSubscriptionId);
     }
 
-    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override
+    CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
     {
-        gOnResubscriptionAttemptedCallback(mAppContext, aTerminationCause.AsInteger(), aNextResubscribeIntervalMsec);
+        ReturnErrorOnFailure(ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
+        gOnResubscriptionAttemptedCallback(mAppContext, aTerminationCause.AsInteger(),
+                                           apReadClient->ComputeTimeTillNextSubscription());
+        return CHIP_NO_ERROR;
     }
 
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
@@ -458,7 +462,6 @@ chip::ChipError::StorageType pychip_ReadClient_Read(void * appContext, ReadClien
             params.mMinIntervalFloorSeconds   = pyParams.minInterval;
             params.mMaxIntervalCeilingSeconds = pyParams.maxInterval;
             params.mKeepSubscriptions         = pyParams.keepSubscriptions;
-            params.mResubscribePolicy         = PythonResubscribePolicy;
 
             dataVersionFilters.release();
             attributePaths.release();

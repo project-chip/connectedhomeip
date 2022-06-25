@@ -27,7 +27,6 @@
 #pragma once
 
 #include <app/CommandSender.h>
-#include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/DLLUtil.h>

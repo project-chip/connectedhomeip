@@ -34,47 +34,10 @@
 namespace chip {
 namespace app {
 
-/**
- * @brief The default resubscribe policy will pick a random timeslot
- * with millisecond resolution over an ever increasing window,
- * following a fibonacci sequence up to CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX,
- * Average of the randomized wait time past the CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX
- * will be around one hour.
- * When the retry count resets to 0, the sequence starts from the beginning again.
- */
-static void DefaultResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & aNextSubscriptionIntervalMsec,
-                                     bool & aShouldResubscribe)
-{
-    uint32_t maxWaitTimeInMsec = 0;
-    uint32_t waitTimeInMsec    = 0;
-    uint32_t minWaitTimeInMsec = 0;
-
-    if (aNumCumulativeRetries <= CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX)
-    {
-        maxWaitTimeInMsec = GetFibonacciForIndex(aNumCumulativeRetries) * CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS;
-    }
-    else
-    {
-        maxWaitTimeInMsec = CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS;
-    }
-
-    if (maxWaitTimeInMsec != 0)
-    {
-        minWaitTimeInMsec = (CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP * maxWaitTimeInMsec) / 100;
-        waitTimeInMsec    = minWaitTimeInMsec + (Crypto::GetRandU32() % (maxWaitTimeInMsec - minWaitTimeInMsec));
-    }
-
-    aNextSubscriptionIntervalMsec = waitTimeInMsec;
-    aShouldResubscribe            = true;
-    ChipLogProgress(DataManagement,
-                    "Computing Resubscribe policy: attempts %" PRIu32 ", max wait time %" PRIu32 " ms, selected wait time %" PRIu32
-                    " ms",
-                    aNumCumulativeRetries, maxWaitTimeInMsec, waitTimeInMsec);
-}
-
 ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeManager * apExchangeMgr, Callback & apCallback,
                        InteractionType aInteractionType) :
-    mpCallback(apCallback)
+    mpCallback(apCallback),
+    mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
     // Error if already initialized.
     mpExchangeMgr    = apExchangeMgr;
@@ -102,7 +65,7 @@ void ReadClient::ClearActiveSubscriptionState()
 
 void ReadClient::StopResubscription()
 {
-    ClearActiveSubscriptionState();
+
     CancelLivenessCheckTimer();
     CancelResubscribeTimer();
     mpCallback.OnDeallocatePaths(std::move(mReadPrepareParams));
@@ -115,6 +78,8 @@ ReadClient::~ReadClient()
     if (IsSubscriptionType())
     {
         CancelLivenessCheckTimer();
+        CancelResubscribeTimer();
+
         //
         // Only remove ourselves from the engine's tracker list if we still continue to have a valid pointer to it.
         // This won't be the case if the engine shut down before this destructor was called (in which case, mpImEngine
@@ -127,7 +92,44 @@ ReadClient::~ReadClient()
     }
 }
 
-void ReadClient::Close(CHIP_ERROR aError)
+uint32_t ReadClient::ComputeTimeTillNextSubscription()
+{
+    uint32_t maxWaitTimeInMsec = 0;
+    uint32_t waitTimeInMsec    = 0;
+    uint32_t minWaitTimeInMsec = 0;
+
+    if (mNumRetries <= CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX)
+    {
+        maxWaitTimeInMsec = GetFibonacciForIndex(mNumRetries) * CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS;
+    }
+    else
+    {
+        maxWaitTimeInMsec = CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS;
+    }
+
+    if (maxWaitTimeInMsec != 0)
+    {
+        minWaitTimeInMsec = (CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP * maxWaitTimeInMsec) / 100;
+        waitTimeInMsec    = minWaitTimeInMsec + (Crypto::GetRandU32() % (maxWaitTimeInMsec - minWaitTimeInMsec));
+    }
+
+    return waitTimeInMsec;
+}
+
+CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscriptionMs, bool establishCASE)
+{
+    VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
+
+    mDoCaseOnNextResub = establishCASE;
+
+    ReturnErrorOnFailure(
+        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+            System::Clock::Milliseconds32(aTimeTillNextResubscriptionMs), OnResubscribeTimerCallback, this));
+
+    return CHIP_NO_ERROR;
+}
+
+void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
 {
     // OnDone below can destroy us before we unwind all the way back into the
     // exchange code and it tries to close itself.  Make sure that it doesn't
@@ -152,20 +154,30 @@ void ReadClient::Close(CHIP_ERROR aError)
     {
         if (aError != CHIP_NO_ERROR)
         {
-            uint32_t nextResubscribeMsec = 0;
+            ClearActiveSubscriptionState();
 
-            if (ResubscribeIfNeeded(nextResubscribeMsec))
+            //
+            // We infer that re-subscription was requested by virtue of having a non-zero list of event OR attribute paths present
+            // in mReadPrepareParams. This would only be the case if an application called SendAutoResubscribeRequest which
+            // populates mReadPrepareParams with the values provided by the application.
+            if (allowResubscription &&
+                (mReadPrepareParams.mEventPathParamsListSize != 0 || mReadPrepareParams.mAttributePathParamsListSize != 0))
             {
-                ChipLogProgress(DataManagement,
-                                "Will try to resubscribe to %02x:" ChipLogFormatX64 " at retry index %" PRIu32 " after %" PRIu32
-                                "ms due to error %" CHIP_ERROR_FORMAT,
-                                mFabricIndex, ChipLogValueX64(mPeerNodeId), mNumRetries, nextResubscribeMsec, aError.Format());
-                mpCallback.OnResubscriptionAttempt(aError, nextResubscribeMsec);
-                ClearActiveSubscriptionState();
-                return;
+                aError = mpCallback.OnResubscriptionNeeded(this, aError);
+                if (aError == CHIP_NO_ERROR)
+                {
+                    return;
+                }
             }
+
+            //
+            // Either something bad happened when requesting resubscription or the application has decided to not
+            // continue by returning an error. Let's convey the error back up to the application
+            // and shut everything down.
+            //
             mpCallback.OnError(aError);
         }
+
         StopResubscription();
     }
 
@@ -299,9 +311,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
-    mPeerNodeId  = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeerNodeId();
-    mFabricIndex = aReadPrepareParams.mSessionHolder->GetFabricIndex();
-
+    mPeer = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeer();
     MoveToState(ClientState::AwaitingInitialReport);
 
     return CHIP_NO_ERROR;
@@ -668,7 +678,8 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             DataVersion version = 0;
             ReturnErrorOnFailure(data.GetDataVersion(&version));
             attributePath.mDataVersion.SetValue(version);
-            if (mReadPrepareParams.mResubscribePolicy != nullptr)
+
+            if (mReadPrepareParams.mpDataVersionFilterList != nullptr)
             {
                 UpdateDataVersionFilters(attributePath);
             }
@@ -719,10 +730,11 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
 
             ReturnErrorOnFailure(data.GetData(&dataReader));
 
-            if (mReadPrepareParams.mResubscribePolicy != nullptr)
-            {
-                mReadPrepareParams.mEventNumber.SetValue(header.mEventNumber + 1);
-            }
+            //
+            // Update the event number being tracked in mReadPrepareParams in case
+            // we want to use it for re-subscriptions later.
+            //
+            mReadPrepareParams.mEventNumber.SetValue(header.mEventNumber + 1);
 
             NoteReportingData();
             mpCallback.OnEventData(header, &dataReader, nullptr);
@@ -760,10 +772,10 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 
     System::Clock::Timeout timeout = System::Clock::Seconds16(mMaxInterval) + mpExchangeCtx->GetSessionHandle()->GetAckTimeout();
     // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
-    ChipLogProgress(DataManagement,
-                    "Refresh LivenessCheckTime for %lu milliseconds with SubscriptionId = 0x%08" PRIx32
-                    " Peer = %02x:" ChipLogFormatX64,
-                    static_cast<long unsigned>(timeout.count()), mSubscriptionId, mFabricIndex, ChipLogValueX64(mPeerNodeId));
+    ChipLogProgress(
+        DataManagement,
+        "Refresh LivenessCheckTime for %lu milliseconds with SubscriptionId = 0x%08" PRIx32 " Peer = %02x:" ChipLogFormatX64,
+        static_cast<long unsigned>(timeout.count()), mSubscriptionId, mPeer.GetFabricIndex(), ChipLogValueX64(mPeer.GetNodeId()));
     err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
         timeout, OnLivenessTimeoutCallback, this);
 
@@ -800,7 +812,7 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
 
     ChipLogError(DataManagement,
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
-                 _this->mSubscriptionId, _this->mFabricIndex, ChipLogValueX64(_this->mPeerNodeId));
+                 _this->mSubscriptionId, _this->mPeer.GetFabricIndex(), ChipLogValueX64(_this->mPeer.GetNodeId()));
 
     // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
     // response timeouts).
@@ -827,7 +839,8 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     ChipLogProgress(DataManagement,
                     "Subscription established with SubscriptionID = 0x%08" PRIx32 " MinInterval = %u"
                     "s MaxInterval = %us Peer = %02x:" ChipLogFormatX64,
-                    mSubscriptionId, mMinIntervalFloorSeconds, mMaxInterval, mFabricIndex, ChipLogValueX64(mPeerNodeId));
+                    mSubscriptionId, mMinIntervalFloorSeconds, mMaxInterval, mPeer.GetFabricIndex(),
+                    ChipLogValueX64(mPeer.GetNodeId()));
 
     ReturnErrorOnFailure(subscribeResponse.ExitContainer());
 
@@ -835,10 +848,7 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
 
     mpCallback.OnSubscriptionEstablished(subscriptionId);
 
-    if (mReadPrepareParams.mResubscribePolicy != nullptr)
-    {
-        mNumRetries = 0;
-    }
+    mNumRetries = 0;
 
     RefreshLivenessCheckTimer();
 
@@ -848,12 +858,7 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
 CHIP_ERROR ReadClient::SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams)
 {
     mReadPrepareParams = std::move(aReadPrepareParams);
-    if (mReadPrepareParams.mResubscribePolicy == nullptr)
-    {
-        mReadPrepareParams.mResubscribePolicy = DefaultResubscribePolicy;
-    }
-
-    CHIP_ERROR err = SendSubscribeRequest(mReadPrepareParams);
+    CHIP_ERROR err     = SendSubscribeRequest(mReadPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
         StopResubscription();
@@ -880,6 +885,9 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
     Span<EventPathParams> eventPaths(aReadPrepareParams.mpEventPathParamsList, aReadPrepareParams.mEventPathParamsListSize);
     Span<DataVersionFilter> dataVersionFilters(aReadPrepareParams.mpDataVersionFilterList,
                                                aReadPrepareParams.mDataVersionFilterListSize);
+
+    VerifyOrReturnError(aReadPrepareParams.mAttributePathParamsListSize != 0 || aReadPrepareParams.mEventPathParamsListSize != 0,
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     System::PacketBufferHandle msgBuf;
     System::PacketBufferTLVWriter writer;
@@ -957,48 +965,99 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
     ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
-    mPeerNodeId  = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeerNodeId();
-    mFabricIndex = aReadPrepareParams.mSessionHolder->GetFabricIndex();
-
+    mPeer = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeer();
     MoveToState(ClientState::AwaitingInitialReport);
 
     return CHIP_NO_ERROR;
 }
 
-void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState)
+CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
 {
-    ReadClient * const _this = reinterpret_cast<ReadClient *>(apAppState);
-    assert(_this != nullptr);
-    _this->SendSubscribeRequest(_this->mReadPrepareParams);
-    _this->mNumRetries++;
+    VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
+
+    auto timeTillNextResubscription = ComputeTimeTillNextSubscription();
+    ChipLogProgress(DataManagement,
+                    "Will try to resubscribe to %02x:" ChipLogFormatX64 " at retry index %" PRIu32 " after %" PRIu32
+                    "ms due to error %" CHIP_ERROR_FORMAT,
+                    GetFabricIndex(), ChipLogValueX64(GetPeerNodeId()), mNumRetries, timeTillNextResubscription,
+                    aTerminationCause.Format());
+    ReturnErrorOnFailure(ScheduleResubscription(timeTillNextResubscription, aTerminationCause == CHIP_ERROR_TIMEOUT));
+    return CHIP_NO_ERROR;
 }
 
-bool ReadClient::ResubscribeIfNeeded(uint32_t & aNextResubscribeIntervalMsec)
+void ReadClient::HandleDeviceConnected(void * context, OperationalDeviceProxy * device)
 {
-    bool shouldResubscribe       = true;
-    uint32_t intervalMsec        = 0;
-    aNextResubscribeIntervalMsec = 0;
-    if (mReadPrepareParams.mResubscribePolicy == nullptr)
-    {
-        ChipLogDetail(DataManagement, "mResubscribePolicy is null");
-        return false;
-    }
-    mReadPrepareParams.mResubscribePolicy(mNumRetries, intervalMsec, shouldResubscribe);
-    if (!shouldResubscribe)
-    {
-        ChipLogProgress(DataManagement, "Resubscribe has been stopped");
-        return false;
-    }
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        System::Clock::Milliseconds32(intervalMsec), OnResubscribeTimerCallback, this);
+    ReadClient * const _this = static_cast<ReadClient *>(context);
+    VerifyOrDie(_this != nullptr);
+
+    _this->mReadPrepareParams.mSessionHolder.Release();
+    _this->mReadPrepareParams.mSessionHolder.Grab(device->GetSecureSession().Value());
+
+    auto err = _this->SendSubscribeRequest(_this->mReadPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement, "Fail to resubscribe with error %" CHIP_ERROR_FORMAT, err.Format());
-        return false;
+        _this->Close(err);
+    }
+}
+
+void ReadClient::HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR err)
+{
+    ReadClient * const _this = static_cast<ReadClient *>(context);
+    VerifyOrDie(_this != nullptr);
+
+    ChipLogError(DataManagement, "Failed connecting to device with error '%s'", err.AsString());
+
+    auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
+    VerifyOrDie(caseSessionManager != nullptr);
+
+    caseSessionManager->ReleaseSession(peerId);
+    _this->Close(err);
+}
+
+void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState)
+{
+    ReadClient * const _this = static_cast<ReadClient *>(apAppState);
+    assert(_this != nullptr);
+
+    CHIP_ERROR err;
+
+    ChipLogProgress(DataManagement, "OnResubscribeTimerCallback: DoCASE = %d", _this->mDoCaseOnNextResub);
+    _this->mNumRetries++;
+
+    if (_this->mDoCaseOnNextResub)
+    {
+        auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
+        VerifyOrDie(caseSessionManager != nullptr);
+
+        auto fabric =
+            InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->GetFabricTable()->FindFabricWithIndex(
+                _this->mPeer.GetFabricIndex());
+        VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_FABRIC_INDEX;
+                     ChipLogError(DataManagement, "Underlying fabric has gone away, stopping re-subscriptions!"););
+
+        PeerId peerId(fabric->GetCompressedFabricId(), _this->mPeer.GetNodeId());
+
+        auto proxy = caseSessionManager->FindExistingSession(peerId);
+        if (proxy != nullptr)
+        {
+            proxy->Disconnect();
+        }
+
+        caseSessionManager->FindOrEstablishSession(peerId, &_this->mOnConnectedCallback, &_this->mOnConnectionFailureCallback);
+        return;
     }
 
-    aNextResubscribeIntervalMsec = intervalMsec;
-    return true;
+    err = _this->SendSubscribeRequest(_this->mReadPrepareParams);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        //
+        // Call Close (which should trigger re-subscription again) EXCEPT if we got here because we didn't have a valid fabric.
+        // In that case, don't permit re-subscription to occur.
+        //
+        _this->Close(err, err != CHIP_ERROR_INVALID_FABRIC_INDEX);
+    }
 }
 
 void ReadClient::UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath)

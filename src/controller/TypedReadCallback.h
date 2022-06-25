@@ -109,12 +109,16 @@ private:
         }
     }
 
-    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override
+    CHIP_ERROR OnResubscriptionNeeded(chip::app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
     {
+        ReturnErrorOnFailure(app::ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
+
         if (mOnResubscriptionAttempt)
         {
-            mOnResubscriptionAttempt(*mReadClient.get(), aTerminationCause, aNextResubscribeIntervalMsec);
+            mOnResubscriptionAttempt(*mReadClient.get(), aTerminationCause, apReadClient->ComputeTimeTillNextSubscription());
         }
+
+        return CHIP_NO_ERROR;
     }
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
@@ -214,12 +218,16 @@ private:
         }
     }
 
-    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override
+    CHIP_ERROR OnResubscriptionNeeded(chip::app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
     {
+        ReturnErrorOnFailure(app::ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
+
         if (mOnResubscriptionAttempt)
         {
-            mOnResubscriptionAttempt(*mReadClient.get(), aTerminationCause, aNextResubscribeIntervalMsec);
+            mOnResubscriptionAttempt(*mReadClient.get(), aTerminationCause, apReadClient->ComputeTimeTillNextSubscription());
         }
+
+        return CHIP_NO_ERROR;
     }
 
     OnSuccessCallbackType mOnSuccess;

@@ -59,6 +59,8 @@
 #include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
 
+#include <app/CASESessionManager.h>
+
 namespace chip {
 namespace app {
 
@@ -102,17 +104,21 @@ public:
      *  Initialize the InteractionModel Engine.
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
+     *  @param[in]    apFabricTable    A pointer to the FabricTable object.
+     *  @param[in]    apCASESessionMgr An optional pointer to a CASESessionManager (used for re-subscriptions).
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
+                    CASESessionManager * apCASESessionMgr = nullptr);
 
     void Shutdown();
 
-    Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
+    Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; }
+    CASESessionManager * GetCASESessionManager() const { return mpCASESessionMgr; }
 
     /**
      * Tears down an active subscription.
@@ -544,6 +550,8 @@ private:
 #endif
 
     FabricTable * mpFabricTable;
+
+    CASESessionManager * mpCASESessionMgr = nullptr;
 
     // A magic number for tracking values between stack Shutdown()-s and Init()-s.
     // An ObjectHandle is valid iff. its magic equals to this one.

@@ -32,8 +32,10 @@
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
+#include <app/OperationalDeviceProxy.h>
 #include <app/ReadPrepareParams.h>
 #include <app/data-model/Decode.h>
+#include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -130,14 +132,30 @@ public:
         virtual void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) {}
 
         /**
-         * OnResubscriptionAttempt will be called when a re-subscription has been scheduled as a result of the termination of an
-         * in-progress or previously active subscription. This object MUST continue to exist after this call is completed. The
+         * OnResubscriptionNeeded will be called when a subscription that was started with SendAutoResubscribeRequest has terminated
+         * and re-subscription is needed. The termination cause is provided to help inform subsequent re-subscription logic.
+         *
+         * The base implementation automatically re-subscribes at appropriate intervals taking the termination cause into account
+         * (see ReadClient::DefaultResubscribePolicy for more details). If the default implementation doesn't suffice, the logic of
+         * ReadClient::DefaultResubscribePolicy is broken down into its constituent methods that are publicly available for
+         * applications to call and sequence.
+         *
+         * If the method is over-ridden, it's the application's responsibility to take the appropriate steps needed to eventually
+         * call-back into the ReadClient object to schedule a re-subscription (by invoking ReadClient::ScheduleResubscription).
+         *
+         * If the application DOES NOT want re-subscription to happen on a particular invocation of this method, returning anything
+         * other than CHIP_NO_ERROR will terminate the interaction and result in OnError, OnDeallocatePaths and OnDone being called
+         * in that sequence.
+         *
+         * This object MUST continue to exist after this call is completed. The
          * application shall wait until it receives an OnDone call to destroy the object.
          *
          * @param[in] aTerminationCause The cause of failure of the subscription that just terminated.
-         * @param[in] aNextResubscribeIntervalMsec How long we will wait before trying to auto-resubscribe.
          */
-        virtual void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) {}
+        virtual CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
+        {
+            return apReadClient->DefaultResubscribePolicy(aTerminationCause);
+        }
 
         /**
          * OnError will be called when an error occurs *after* a successful call to SendRequest(). The following
@@ -166,8 +184,7 @@ public:
          *      - Always be called exactly *once* for a given ReadClient instance.
          *      - Be called even in error circumstances.
          *      - Only be called after a successful call to SendRequest has been
-         *        made, when the read completes or the subscription is shut down.
-         *
+         *        made, when the read completes or the subscription is shut down.  *
          * @param[in] apReadClient the ReadClient for the completed interaction.
          */
         virtual void OnDone(ReadClient * apReadClient) = 0;
@@ -277,8 +294,8 @@ public:
         return mInteractionType == InteractionType::Subscribe ? returnType(mSubscriptionId) : returnType::Missing();
     }
 
-    FabricIndex GetFabricIndex() const { return mFabricIndex; }
-    NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    FabricIndex GetFabricIndex() const { return mPeer.GetFabricIndex(); }
+    NodeId GetPeerNodeId() const { return mPeer.GetNodeId(); }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
 
@@ -314,6 +331,32 @@ public:
     // OnDeallocatePaths when OnDone is called. SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since
     // that's the only case when the consumer moved a ReadParams into the client.
     CHIP_ERROR SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams);
+
+    //
+    // This provides a standard re-subscription policy implementation that given a termination cause, does the following:
+    //      - Calculates the time till next subscription with fibonacci back-off (implemented by ComputeTimeTillNextSubscription()).
+    //      - Schedules the next subscription attempt at the computed interval from the previous step. Operational discovery and
+    //        CASE establishment will be attempted if aTerminationCause was CHIP_ERROR_TIMEOUT. In all other cases, it will attempt
+    //        to re-use a previously established session.
+    //
+    CHIP_ERROR DefaultResubscribePolicy(CHIP_ERROR aTerminationCause);
+
+    //
+    // Computes the time till the next re-subscription with millisecond resolution over
+    // an even increasing window following a fibonacci sequence with the current retry count
+    // used as input to the fibonacci algorithm.
+    //
+    // CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX is used as the maximum ceiling for that input.
+    //
+    uint32_t ComputeTimeTillNextSubscription();
+
+    //
+    // Schedules a re-subscription aTimeTillNextResubscriptionMs into the future.
+    //
+    // If restablishCASE is true, operational discovery and CASE will be attempted at that time before
+    // the actual IM interaction is initiated.
+    //
+    CHIP_ERROR ScheduleResubscription(uint32_t aTimeTillNextResubscriptionMs, bool restablishCASE = true);
 
     // Like SendSubscribeRequest, but allows sending certain forms of invalid
     // subscribe requests that servers are expected to reject, for testing
@@ -405,13 +448,19 @@ private:
      * exchange and finally, signal to the application that it's
      * safe to release this object.
      *
-     * If aError != CHIP_NO_ERROR, it is delivered to the application through the OnError callback first.
+     * If aError != CHIP_NO_ERROR, this will trigger re-subscriptions if allowResubscription is true
+     * AND if this ReadClient instance is tracking a subscription AND the applications decides to do so
+     * in their implementation of Callback::OnResubscriptionNeeded().
      *
      */
-    void Close(CHIP_ERROR aError);
+    void Close(CHIP_ERROR aError, bool allowResubscription = true);
 
     void StopResubscription();
     void ClearActiveSubscriptionState();
+
+    static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device);
+    static void HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error);
+
     CHIP_ERROR GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
@@ -425,10 +474,14 @@ private:
     uint16_t mMinIntervalFloorSeconds = 0;
     uint16_t mMaxInterval             = 0;
     SubscriptionId mSubscriptionId    = 0;
-    NodeId mPeerNodeId                = kUndefinedNodeId;
-    FabricIndex mFabricIndex          = kUndefinedFabricIndex;
-    InteractionType mInteractionType  = InteractionType::Read;
+    ScopedNodeId mPeer;
+    InteractionType mInteractionType = InteractionType::Read;
     Timestamp mEventTimestamp;
+
+    bool mDoCaseOnNextResub = true;
+
+    chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
+    chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
     ReadClient * mpNext                 = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;
