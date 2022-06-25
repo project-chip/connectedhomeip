@@ -181,7 +181,7 @@ public:
      */
     virtual void DumpKeys()
     {
-        ChipLogDetail(Test, "TestPersistentStorageDelegate::DumpKeys: %u keys", static_cast<unsigned>(GetNumKeys()));
+        ChipLogError(Test, "TestPersistentStorageDelegate::DumpKeys: %u keys", static_cast<unsigned>(GetNumKeys()));
 
         auto allKeys = GetKeys();
         std::vector<std::string> allKeysSorted(allKeys.cbegin(), allKeys.cend());
@@ -189,7 +189,8 @@ public:
 
         for (const std::string & key : allKeysSorted)
         {
-            ChipLogDetail(Test, "  -> %s", key.c_str());
+            (void)key.c_str(); // Guard against log level disabling  error logging which would make `key` unused.
+            ChipLogError(Test, "  -> %s", key.c_str());
         }
     }
 
