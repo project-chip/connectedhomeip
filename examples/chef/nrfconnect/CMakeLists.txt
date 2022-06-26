@@ -72,8 +72,6 @@ if (CONFIG_ENABLE_CHIP_SHELL)
     ${CHEF}/shell_common/globals.cpp
     ${CHEF}/shell_common/cmd_misc.cpp
     ${CHEF}/shell_common/cmd_otcli.cpp
-    ${CHEF}/shell_common/cmd_ping.cpp
-    ${CHEF}/shell_common/cmd_send.cpp
   )
 
   target_include_directories(app PRIVATE

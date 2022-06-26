@@ -98,8 +98,6 @@ int main()
 
     cmd_misc_init();
     cmd_otcli_init();
-    cmd_ping_init();
-    cmd_send_init();
     cmd_app_server_init();
 
     ChipLogProgress(NotSpecified, "Mbed shell example application run");
