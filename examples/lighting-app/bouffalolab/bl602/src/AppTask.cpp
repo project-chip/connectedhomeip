@@ -41,6 +41,7 @@
 #include <platform/bouffalolab/BL602/OTAImageProcessorImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <async_log.h>
 #include <bl_sys_ota.h>
 #include <lib/support/ErrorStr.h>
 
@@ -152,6 +153,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err;
 
     log_info("App Task entered\r\n");
+    enable_async_log();
 
     err = sWiFiNetworkCommissioningInstance.Init();
     if (CHIP_NO_ERROR != err)

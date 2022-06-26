@@ -256,8 +256,6 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
     int slot;
     bool mdns_flag;
 
-    log_info("============================== ChipDnssdPublishService.\r\n");
-
     if (!(chip::DeviceLayer::ConnectivityMgrImpl()._IsWiFiStationConnected()))
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
