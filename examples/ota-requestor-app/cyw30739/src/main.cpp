@@ -104,7 +104,6 @@ APPLICATION_START()
     {
         printf("ERROR Shell Init %d\n", ret);
     }
-    cmd_ping_init();
     Engine::Root().RunMainLoop();
 
     assert(!wiced_rtos_check_for_stack_overflow());
