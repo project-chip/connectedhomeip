@@ -402,6 +402,7 @@ public:
         NotifyFabricTableChanged();
     }
 
+    // Gets called when a fabric is added/updated, but not necessarily committed to storage
     void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override { NotifyFabricTableChanged(); }
 
     // Gets called when a fabric in FabricTable is persisted to storage
@@ -412,12 +413,10 @@ public:
         VerifyOrReturn(fabric != nullptr);
 
         ChipLogProgress(Zcl,
-                        "OpCreds: Fabric  index 0x%x was committed to storage. Compressed Fabric Id 0x" ChipLogFormatX64
+                        "OpCreds: Fabric index 0x%x was committed to storage. Compressed Fabric Id 0x" ChipLogFormatX64
                         ", FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
                         static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
                         ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
-
-        NotifyFabricTableChanged();
     }
 
 private:

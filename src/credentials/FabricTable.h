@@ -279,19 +279,14 @@ public:
 
     const FabricInfo & operator*() const
     {
-        if (IsAtEnd())
-        {
-            return mStart[mIndex];
-        }
+        VerifyOrDie(!IsAtEnd());
 
         return *GetCurrent();
     }
     const FabricInfo * operator->() const
     {
-        if (IsAtEnd())
-        {
-            return mStart + mIndex;
-        }
+        VerifyOrDie(!IsAtEnd());
+
         return GetCurrent();
     }
 
@@ -428,8 +423,8 @@ public:
     void Shutdown();
 
     // Forget a fabric in memory: doesn't delete any persistent state, just
-    // reverts any pending state (blindly) and then make the fabric table
-    // entry get reset.
+    // reverts any pending state (blindly) and then resets the fabric table
+    // entry.
     //
     // TODO: We have to determine if we should remove this call.
     void Forget(FabricIndex fabricIndex);
@@ -494,7 +489,7 @@ public:
     /**
      * @brief Get the RCAC (operational root certificate) associated with a fabric.
      *
-     * If a root is pending from `AddNewPendingTrustedRootCert`, it is returned.
+     * If a root is pending for `fabricIndex` from `AddNewPendingTrustedRootCert`, it is returned.
      *
      * @param fabricIndex - Fabric for which to get the RCAC
      * @param outCert - MutableByteSpan to receive the certificate. Resized to actual size.
@@ -508,8 +503,8 @@ public:
     /**
      * @brief Get the ICAC (operational intermediate certificate) associated with a fabric.
      *
-     * If a fabric is pending from add/update operation for the given `fabricIndex`, it is
-     * returned.
+     * If a fabric is pending from add/update operation for the given `fabricIndex`, its
+     * ICAC is returned.
      *
      * If an NOC exists, but the ICAC is not present in the chain, CHIP_NO_ERROR is
      * returned and `outCert` is resized to 0 length so that its `empty()` method returns true.
@@ -526,8 +521,8 @@ public:
     /**
      * @brief Get the NOC (Node Operational Certificate) associated with a fabric.
      *
-     * If a fabric is pending from add/update operation for the given `fabricIndex`, it is
-     * returned.
+     * If a fabric is pending from add/update operation for the given `fabricIndex`, its
+     * NOC is returned.
      *
      * @param fabricIndex - Fabric for which to get the NOC
      * @param outCert - MutableByteSpan to receive the certificate. Resized to actual size.
@@ -594,7 +589,7 @@ public:
 
     /**
      * @brief Returns whether an operational key is pending (true if `AllocatePendingOperationalKey` was
-     *        previously successfully called, false otherwise.
+     *        previously successfully called, false otherwise).
      *
      * @param outIsPendingKeyForUpdateNoc this is set to true if the `AllocatePendingOperationalKey` had an
      *                                    associated fabric index attached, indicating it's for UpdateNoc
@@ -702,7 +697,7 @@ public:
      * Operational key is assumed to be pending or committed in the associated mOperationalKeystore.
      *
      * The new NOC chain becomes temporarily active for purposes of `Fetch*` and `SignWithOpKeyPair`, etc.
-     * The RCAC remains as before. To succeed this method call, NOC chain must chain back to an existing RCAC.
+     * The RCAC remains as before. For this method call to succeed, NOC chain must chain back to the existing RCAC.
      * The update fabric becomes permanent/persisted on successful `CommitPendingFabricData`. Changes revert
      * on `RevertPendingFabricData` or `RevertPendingOpCertsExceptRoot`. FabricId CANNOT be updated, but
      * CAT tags and Node ID in NOC can change between previous and new NOC for a given FabricId.
@@ -855,21 +850,25 @@ private:
         return TLV::EstimateStructOverhead(sizeof(FabricIndex), CHIP_CONFIG_MAX_FABRICS * (1 + sizeof(FabricIndex)) + 1);
     }
 
-    // Load a FabricInfo metatada item from storage for a given new fabric index Returns internal error on failure.
+    // Load a FabricInfo metatada item from storage for a given new fabric index. Returns internal error on failure.
     CHIP_ERROR LoadFromStorage(FabricInfo * fabric, FabricIndex newFabricIndex);
 
     // Store a given fabric metadata directly/immediately. Used by internal operations.
     CHIP_ERROR StoreFabricMetadata(const FabricInfo * fabricInfo) const;
 
-    // Tries to set `mFabricIndexWithPendingState` and returns false if there's a clash
+    // Tries to set `mFabricIndexWithPendingState` and returns false if there's a clash.
     bool SetPendingDataFabricIndex(FabricIndex fabricIndex);
 
-    CHIP_ERROR AddOrUpdateInner(FabricIndex fabricIndex, Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
-                                uint16_t vendorId, FabricIndex * outputIndex);
+    // Core validation logic for fabric additions/updates
+    CHIP_ERROR AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::P256Keypair * existingOpKey,
+                                bool isExistingOpKeyExternallyOwned, uint16_t vendorId);
 
+    // Common code for fabric addition, for either OperationalKeystore or injected key scenarios.
     CHIP_ERROR AddNewPendingFabricCommon(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
                                          Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
                                          FabricIndex * outNewFabricIndex);
+
+    // Common code for fabric updates, for either OperationalKeystore or injected key scenarios.
     CHIP_ERROR UpdatePendingFabricCommon(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
                                          Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned);
 
@@ -921,12 +920,13 @@ private:
      *
      * @return a pointer to the shadow pending fabric or nullptr if none is active.
      */
-    const FabricInfo * GetShadowPendingFabricEntry() const
-    {
-        bool hasPendingFabric = mPendingFabric.IsInitialized() &&
-            mStateFlags.HasAll(StateFlags::kIsPendingFabricDataPresent, StateFlags::kIsUpdatePending);
+    const FabricInfo * GetShadowPendingFabricEntry() const { return HasPendingFabricUpdate() ? &mPendingFabric : nullptr; }
 
-        return hasPendingFabric ? &mPendingFabric : nullptr;
+    // Returns true if we have a shadow entry pending for a fabruc update.
+    bool HasPendingFabricUpdate() const
+    {
+        return mPendingFabric.IsInitialized() &&
+            mStateFlags.HasAll(StateFlags::kIsPendingFabricDataPresent, StateFlags::kIsUpdatePending);
     }
 
     // Verifies credentials, using the provided root certificate.
@@ -940,10 +940,11 @@ private:
     // The `existingFabricId` is passed for UpdateNOC, and must match the Fabric, to make sure that we are
     // not trying to change FabricID with UpdateNOC. If set to kUndefinedFabricId, we are doing AddNOC and
     // we don't need to check match to pre-existing fabric.
-    CHIP_ERROR ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
-                                        FabricId existingFabricId, Credentials::CertificateValidityPolicy * policy,
-                                        CompressedFabricId & outCompressedFabricId, FabricId & outFabricId, NodeId & outNodeId,
-                                        Crypto::P256PublicKey & outNocPubkey) const;
+    static CHIP_ERROR ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                               FabricId existingFabricId, Credentials::CertificateValidityPolicy * policy,
+                                               CompressedFabricId & outCompressedFabricId, FabricId & outFabricId,
+                                               NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
+                                               Crypto::P256PublicKey & outRootPubkey);
 
     /**
      * Read our fabric index info from the given TLV reader and set up the

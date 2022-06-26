@@ -176,6 +176,24 @@ public:
      */
     virtual void SetLoggingLevel(LoggingLevel loggingLevel) { mLoggingLevel = loggingLevel; }
 
+    /**
+     * @brief Dump a list of all storage keys, sorted alphabetically
+     */
+    virtual void DumpKeys()
+    {
+        ChipLogError(Test, "TestPersistentStorageDelegate::DumpKeys: %u keys", static_cast<unsigned>(GetNumKeys()));
+
+        auto allKeys = GetKeys();
+        std::vector<std::string> allKeysSorted(allKeys.cbegin(), allKeys.cend());
+        std::sort(allKeysSorted.begin(), allKeysSorted.end());
+
+        for (const std::string & key : allKeysSorted)
+        {
+            (void) key.c_str(); // Guard against log level disabling  error logging which would make `key` unused.
+            ChipLogError(Test, "  -> %s", key.c_str());
+        }
+    }
+
 protected:
     virtual CHIP_ERROR SyncGetKeyValueInternal(const char * key, void * buffer, uint16_t & size)
     {
