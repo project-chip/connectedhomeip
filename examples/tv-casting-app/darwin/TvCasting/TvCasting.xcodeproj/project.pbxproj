@@ -15,6 +15,7 @@
 		3C7507B92853EFF000D7DB3A /* CommissioningViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7507B82853EFF000D7DB3A /* CommissioningViewModel.swift */; };
 		3C7507BC2857A6EE00D7DB3A /* DiscoveredNodeDataConverter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C7507BB2857A6EE00D7DB3A /* DiscoveredNodeDataConverter.mm */; };
 		3C9ACC05284ABF4000718B2D /* libTvCastingCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C9ACC04284ABF2F00718B2D /* libTvCastingCommon.a */; };
+		3C9EE55E2864D88700BA9115 /* OnboardingPayload.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C9EE55D2864D88700BA9115 /* OnboardingPayload.m */; };
 		3CA19435285BA780004768D5 /* ContentLauncherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA19434285BA780004768D5 /* ContentLauncherView.swift */; };
 		3CA19437285BA877004768D5 /* ContentLauncherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA19436285BA877004768D5 /* ContentLauncherViewModel.swift */; };
 		3CC0E8FA2841DD3400EC6A18 /* TvCastingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC0E8F92841DD3400EC6A18 /* TvCastingApp.swift */; };
@@ -36,6 +37,8 @@
 		3C7507BB2857A6EE00D7DB3A /* DiscoveredNodeDataConverter.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DiscoveredNodeDataConverter.mm; sourceTree = "<group>"; };
 		3C7507BD2857A72A00D7DB3A /* DiscoveredNodeDataConverter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DiscoveredNodeDataConverter.hpp; sourceTree = "<group>"; };
 		3C9ACC04284ABF2F00718B2D /* libTvCastingCommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTvCastingCommon.a; path = lib/libTvCastingCommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		3C9EE55C2864D7EB00BA9115 /* OnboardingPayload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OnboardingPayload.h; sourceTree = "<group>"; };
+		3C9EE55D2864D88700BA9115 /* OnboardingPayload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OnboardingPayload.m; sourceTree = "<group>"; };
 		3CA19434285BA780004768D5 /* ContentLauncherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentLauncherView.swift; sourceTree = "<group>"; };
 		3CA19436285BA877004768D5 /* ContentLauncherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentLauncherViewModel.swift; sourceTree = "<group>"; };
 		3CC0E8F62841DD3400EC6A18 /* TvCasting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TvCasting.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -126,6 +129,8 @@
 				3C7507A62851188500D7DB3A /* DiscoveredNodeData.mm */,
 				3C7507BB2857A6EE00D7DB3A /* DiscoveredNodeDataConverter.mm */,
 				3C7507BD2857A72A00D7DB3A /* DiscoveredNodeDataConverter.hpp */,
+				3C9EE55C2864D7EB00BA9115 /* OnboardingPayload.h */,
+				3C9EE55D2864D88700BA9115 /* OnboardingPayload.m */,
 			);
 			path = MatterBridge;
 			sourceTree = "<group>";
@@ -241,6 +246,7 @@
 				3C7507AD285299DF00D7DB3A /* CommissionerDiscoveryView.swift in Sources */,
 				3CC0E8FA2841DD3400EC6A18 /* TvCastingApp.swift in Sources */,
 				3C7507B92853EFF000D7DB3A /* CommissioningViewModel.swift in Sources */,
+				3C9EE55E2864D88700BA9115 /* OnboardingPayload.m in Sources */,
 				3C7507BC2857A6EE00D7DB3A /* DiscoveredNodeDataConverter.mm in Sources */,
 				3C7507A72851188500D7DB3A /* DiscoveredNodeData.mm in Sources */,
 				3CA19437285BA877004768D5 /* ContentLauncherViewModel.swift in Sources */,

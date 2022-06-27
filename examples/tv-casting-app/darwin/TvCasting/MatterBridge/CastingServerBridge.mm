@@ -19,6 +19,7 @@
 #import "CastingServer.h"
 
 #import "DiscoveredNodeDataConverter.hpp"
+#import "OnboardingPayload.h"
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
@@ -26,6 +27,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 
 @interface CastingServerBridge ()
 
@@ -60,6 +62,14 @@
             ChipLogError(AppServer, "InitChipStack failed: %s", ErrorStr(err));
             return nil;
         }
+
+        chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
+        uint32_t defaultTestPasscode = 0;
+        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
+        uint16_t defaultTestSetupDiscriminator = 0;
+        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupDiscriminator(defaultTestSetupDiscriminator) == CHIP_NO_ERROR);
+        _onboardingPayload = [[OnboardingPayload alloc] initWithSetupPasscode:defaultTestPasscode
+                                                           setupDiscriminator:defaultTestSetupDiscriminator];
 
         // Initialize device attestation config
         SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
@@ -167,6 +177,11 @@
             udcRequestSentHandler(udcRequestStatus);
         });
     });
+}
+
+- (OnboardingPayload *)getOnboardingPaylod
+{
+    return _onboardingPayload;
 }
 
 - (void)openBasicCommissioningWindow:(nullable void (^)(bool))commissioningCompleteCallback
