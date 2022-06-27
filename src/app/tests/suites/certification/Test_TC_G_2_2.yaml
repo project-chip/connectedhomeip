@@ -60,7 +60,7 @@ tests:
           : GroupID as 0x0002 GroupName as Gp2"
       PICS: G.S.C00.Rsp && G.S.C00.Tx
       verification: |
-          ./chip-tool groups add-group 0x0002 grp2 1 0 
+          ./chip-tool groups add-group 0x0002 grp2 1 0
 
           [1653484028.897698][11275:11280] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
           [1653484028.897804][11275:11280] CHIP:TOO:   AddGroupResponse: {
@@ -113,7 +113,7 @@ tests:
           from DUT"
       PICS: GRPKEY.S.A0001
       verification: |
-          ./chip-tool groupkeymanagement read group-table 1 0  
+          ./chip-tool groupkeymanagement read group-table 1 0
 
           [1653484156.968253][11299:11304] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1368205390
           [1653484156.968414][11299:11304] CHIP:TOO:   GroupTable: 3 entries
