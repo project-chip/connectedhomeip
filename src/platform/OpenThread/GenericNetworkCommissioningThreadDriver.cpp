@@ -18,6 +18,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/NetworkCommissioning.h>
@@ -54,6 +55,13 @@ CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCa
     VerifyOrReturnError(ThreadStackMgrImpl().IsThreadAttached(), CHIP_NO_ERROR);
     VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork) == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
+    // Try to revert configuration at init, in case we rebooted during fail-safe. If there
+    // was no backup, this is a no-op. Note that it's better for drivers not to touch
+    // persistent configuration until CommitConfiguration(), but some network stacks
+    // like OpenThread do internal storage on connect/attach, so this is why the stateful
+    // approach here is needed.
+    RevertConfiguration();
+
     return CHIP_NO_ERROR;
 }
 
@@ -85,7 +93,15 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     // If no backup could be found, it means that the network configuration has not been modified
     // since the fail-safe was armed, so return with no error.
     ReturnErrorCodeIf(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
-    ReturnErrorOnFailure(error);
+
+    if (error == CHIP_NO_ERROR)
+    {
+        ChipLogError(NetworkProvisioning, "Found Thread configuration backup: reverting configuration");
+    }
+    else
+    {
+        ReturnErrorOnFailure(error);
+    }
 
     // Not all KVS implementations support zero-length values, so handle a special value representing an empty dataset.
     ByteSpan dataset(datasetBytes, datasetLength);
@@ -98,6 +114,7 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     ReturnErrorOnFailure(mStagingNetwork.Init(dataset));
     ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, /* callback */ nullptr));
 
+    // TODO: What happens on errors above? Why do we not remove the failsafe?
     return KeyValueStoreMgr().Delete(DefaultStorageKeyAllocator::FailSafeNetworkConfig());
 }
 

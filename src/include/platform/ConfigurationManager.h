@@ -29,7 +29,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceBuildConfig.h>
-#include <platform/FailSafeContext.h>
 #include <platform/PersistedStorage.h>
 #include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
 

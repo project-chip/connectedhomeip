@@ -23,10 +23,11 @@
 
 #pragma once
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
-namespace DeviceLayer {
+namespace app {
 
 class FailSafeContext
 {
@@ -39,14 +40,21 @@ public:
      *  when the fail-safe timer is currently armed, the currently-running fail-safe timer will
      *  first be cancelled, then the fail-safe timer will be re-armed.
      */
-    CHIP_ERROR ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength);
+    CHIP_ERROR ArmFailSafe(FabricIndex accessingFabricIndex, uint16_t expiryLengthSeconds);
 
     /**
      * @brief Cleanly disarm failsafe timer, such as on CommissioningComplete
      */
     void DisarmFailSafe();
-    CHIP_ERROR SetAddNocCommandInvoked(FabricIndex nocFabricIndex);
-    CHIP_ERROR SetUpdateNocCommandInvoked();
+    void SetAddNocCommandInvoked(FabricIndex nocFabricIndex)
+    {
+        mAddNocCommandHasBeenInvoked = true;
+        mFabricIndex                 = nocFabricIndex;
+    }
+    void SetUpdateNocCommandInvoked()
+    {
+        mUpdateNocCommandHasBeenInvoked = true;
+    }
     void SetAddTrustedRootCertInvoked() { mAddTrustedRootCertHasBeenInvoked = true; }
     void SetCsrRequestForUpdateNoc(bool isForUpdateNoc) { mIsCsrRequestForUpdateNoc = isForUpdateNoc; }
 
@@ -90,9 +98,6 @@ public:
     // If the failsafe is not armed, this is a no-op.
     void ForceFailSafeTimerExpiry();
 
-    static CHIP_ERROR LoadFromStorage(FabricIndex & fabricIndex, bool & addNocCommandInvoked, bool & updateNocCommandInvoked);
-    static CHIP_ERROR DeleteFromStorage();
-
 private:
     bool mFailSafeArmed                    = false;
     bool mFailSafeBusy                     = false;
@@ -102,13 +107,6 @@ private:
     // The fact of whether a CSR occurred at all is stored elsewhere.
     bool mIsCsrRequestForUpdateNoc = false;
     FabricIndex mFabricIndex       = kUndefinedFabricIndex;
-
-    // TODO:: Track the state of what was mutated during fail-safe.
-
-    static constexpr size_t FailSafeContextTLVMaxSize()
-    {
-        return TLV::EstimateStructOverhead(sizeof(FabricIndex), sizeof(bool), sizeof(bool));
-    }
 
     /**
      * @brief
@@ -146,5 +144,5 @@ private:
     CHIP_ERROR CommitToStorage();
 };
 
-} // namespace DeviceLayer
+} // namespace app
 } // namespace chip

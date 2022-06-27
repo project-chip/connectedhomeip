@@ -30,6 +30,7 @@
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/DefaultAclStorage.h>
+#include <app/server/FailSafeContext.h>
 #include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
@@ -327,6 +328,8 @@ public:
 
     PersistentStorageDelegate & GetPersistentStorage() { return *mDeviceStorage; }
 
+    app::FailSafeContext & GetFailSafeContext() { return mFailSafeContext; }
+
     TestEventTriggerDelegate * GetTestEventTriggerDelegate() { return mTestEventTriggerDelegate; }
 
     Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
@@ -500,6 +503,7 @@ private:
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
     Crypto::OperationalKeystore * mOperationalKeystore;
     Credentials::OperationalCertificateStore * mOpCertStore;
+    app::FailSafeContext mFailSafeContext;
 
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;
