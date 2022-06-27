@@ -125,7 +125,6 @@ const uint16_t CHIPoBLEGATTAttrCount = sizeof(CHIPoBLEGATTAttrs) / sizeof(CHIPoB
 } // unnamed namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
-constexpr System::Clock::Timeout BLEManagerImpl::kAdvertiseTimeout;
 constexpr System::Clock::Timeout BLEManagerImpl::kFastAdvertiseTimeout;
 
 CHIP_ERROR BLEManagerImpl::_Init()
@@ -179,7 +178,6 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (val)
     {
         mAdvertiseStartTime = System::SystemClock().GetMonotonicTimestamp();
-        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kAdvertiseTimeout, HandleAdvertisementTimer, this));
         ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
     }
     mFlags.Set(Flags::kFastAdvertisingEnabled, val);
@@ -188,22 +186,6 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 exit:
     return err;
-}
-
-void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void * context)
-{
-    static_cast<BLEManagerImpl *>(context)->HandleAdvertisementTimer();
-}
-
-void BLEManagerImpl::HandleAdvertisementTimer()
-{
-    System::Clock::Timestamp currentTimestamp = System::SystemClock().GetMonotonicTimestamp();
-
-    if (currentTimestamp - mAdvertiseStartTime >= kAdvertiseTimeout)
-    {
-        mFlags.Clear(Flags::kAdvertisingEnabled);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
-    }
 }
 
 void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context)

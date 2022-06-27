@@ -59,12 +59,6 @@ public:
     /// Gets the interface id used for advertising
     Inet::InterfaceId GetInterfaceId() { return mInterfaceId; }
 
-    /// Sets the factory-new state commissionable node discovery timeout
-    void SetDiscoveryTimeoutSecs(int16_t secs) { mDiscoveryTimeoutSecs = secs; }
-
-    /// Gets the factory-new state commissionable node discovery timeout
-    int16_t GetDiscoveryTimeoutSecs() const { return mDiscoveryTimeoutSecs; }
-
     //
     // Override the referenced fabric table from the default that is present
     // in Server::GetInstance().GetFabricTable() to something else.
@@ -147,7 +141,6 @@ private:
 
     void ClearTimeouts()
     {
-        mDiscoveryExpiration = kTimeoutCleared;
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
         mExtendedDiscoveryExpiration = kTimeoutCleared;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -162,11 +155,6 @@ private:
 
     // Ephemeral discriminator to use instead of the default if set
     Optional<uint16_t> mEphemeralDiscriminator;
-
-    /// schedule next discovery expiration
-    CHIP_ERROR ScheduleDiscoveryExpiration();
-    int16_t mDiscoveryTimeoutSecs                 = CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS;
-    System::Clock::Timestamp mDiscoveryExpiration = kTimeoutCleared;
 
     Optional<int32_t> mExtendedDiscoveryTimeoutSecs = NullOptional;
 

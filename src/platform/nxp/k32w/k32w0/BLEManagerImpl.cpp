@@ -885,21 +885,15 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    uint32_t bleAdvTimeoutMs = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     mFlags.Set(Flags::kAdvertising);
     mFlags.Clear(Flags::kRestartAdvertising);
 
     if (mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        bleAdvTimeoutMs = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT;
+        StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT);
     }
-    else
-    {
-        bleAdvTimeoutMs = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT;
-    }
-    StartBleAdvTimeoutTimer(bleAdvTimeoutMs);
 
     err = ConfigureAdvertisingData();
 
@@ -1557,13 +1551,6 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
         // stop advertiser, change interval and restart it;
         sInstance.StopAdvertising();
         sInstance.StartAdvertising();
-        sInstance.StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT); // Slow advertise for 15 Minutes
-    }
-    else if (sInstance._IsAdvertisingEnabled())
-    {
-        // advertisement expired. we stop advertissing
-        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Stop advertisement");
-        sInstance.StopAdvertising();
     }
 
     return;

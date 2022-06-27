@@ -144,8 +144,6 @@ private:
 
     static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context);
     void HandleFastAdvertisementTimer();
-    static void HandleAdvertisementTimer(System::Layer * systemLayer, void * context);
-    void HandleAdvertisementTimer();
 
     void HandleRXCharWrite(uint8_t *, uint16_t, uint8_t);
     void HandleTXCharRead(void * param);

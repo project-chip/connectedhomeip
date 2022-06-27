@@ -515,7 +515,6 @@ exit:
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
     CHIP_ERROR err;
-    uint32_t bleAdvTimeout;
     uint16_t intervalMin;
     uint16_t intervalMax;
 
@@ -537,15 +536,13 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        intervalMin   = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
-        intervalMax   = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
-        bleAdvTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
+        intervalMin = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
+        intervalMax = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
     }
     else
     {
-        intervalMin   = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
-        intervalMax   = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
-        bleAdvTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT - CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
+        intervalMin = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+        intervalMax = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
     }
 
     qvCHIP_BleSetAdvInterval(intervalMin, intervalMax);
@@ -554,7 +551,10 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     SuccessOrExit(err);
 
     mFlags.Set(Flags::kAdvertising);
-    StartBleAdvTimeoutTimer(bleAdvTimeout);
+    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+    }
 
 exit:
     return err;
@@ -935,12 +935,6 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
         sInstance.mFlags.Set(Flags::kRestartAdvertising);
         sInstance.StopAdvertising();
-    }
-    else if (BLEMgrImpl().mFlags.Has(Flags::kAdvertising))
-    {
-        // Advertisement time expired. Stop advertising
-        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Stop advertissement");
-        BLEMgr().SetAdvertisingEnabled(false);
     }
 }
 
