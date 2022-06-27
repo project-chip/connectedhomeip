@@ -34,6 +34,8 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/OperationalCertificateStore.h>
+#include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/OperationalKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <inet/InetConfig.h>
@@ -118,6 +120,9 @@ struct ServerInitParams
     TestEventTriggerDelegate * testEventTriggerDelegate = nullptr;
     // Operational keystore with access to the operational keys: MUST be injected.
     Crypto::OperationalKeystore * operationalKeystore = nullptr;
+    // Operational certificate store with access to the operational certs in persisted storage:
+    // must not be null at timne of Server::Init().
+    Credentials::OperationalCertificateStore * opCertStore = nullptr;
 };
 
 class IgnoreCertificateValidityPolicy : public Credentials::CertificateValidityPolicy
@@ -204,6 +209,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     {
         static chip::KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
         static chip::PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
+        static chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
         static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
         static IgnoreCertificateValidityPolicy sDefaultCertValidityPolicy;
 
@@ -228,6 +234,16 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
             //          for examples and for now.
             ReturnErrorOnFailure(sPersistentStorageOperationalKeystore.Init(this->persistentStorageDelegate));
             this->operationalKeystore = &sPersistentStorageOperationalKeystore;
+        }
+
+        // OpCertStore can be injected but default to persistent storage default
+        // for simplicity of the examples.
+        if (this->opCertStore == nullptr)
+        {
+            // WARNING: PersistentStorageOpCertStore::Finish() is never called. It's fine for
+            //          for examples and for now, since all storage is immediate for that impl.
+            ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(this->persistentStorageDelegate));
+            this->opCertStore = &sPersistentStorageOpCertStore;
         }
 
         // Group Data provider injection
@@ -315,6 +331,8 @@ public:
 
     Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
 
+    Credentials::OperationalCertificateStore * GetOpCertStore() { return mOpCertStore; }
+
     /**
      * This function send the ShutDown event before stopping
      * the event loop.
@@ -391,9 +409,9 @@ private:
 
             mServer = server;
             return CHIP_NO_ERROR;
-        };
+        }
 
-        void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
             (void) fabricTable;
             ClearCASEResumptionStateOnFabricChange(fabricIndex);
@@ -409,21 +427,22 @@ private:
                                  static_cast<unsigned>(fabricIndex), err.Format());
                 }
             }
-        };
 
-        void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
-        {
-            (void) fabricTable;
-            (void) fabricIndex;
+            // Remove access control entries in reverse order (it could be any order, but reverse order
+            // will cause less churn in persistent storage).
+
+            // TODO(#19898): The fabric removal not trigger ACL cluster updates
+            // TODO(#19899): The fabric removal not remove ACL extensions
+
+            CHIP_ERROR aclErr = Access::GetAccessControl().DeleteAllEntriesForFabric(fabricIndex);
+            if (aclErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Warning, failed to delete access control state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                             static_cast<unsigned>(fabricIndex), aclErr.Format());
+            }
         }
 
-        void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
-        {
-            (void) fabricTable;
-            (void) fabricIndex;
-        }
-
-        void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+        void OnFabricUpdated(const FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
         {
             (void) fabricTable;
             ClearCASEResumptionStateOnFabricChange(fabricIndex);
@@ -480,6 +499,7 @@ private:
 
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
     Crypto::OperationalKeystore * mOperationalKeystore;
+    Credentials::OperationalCertificateStore * mOpCertStore;
 
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;

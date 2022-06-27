@@ -579,6 +579,32 @@ public:
     }
 
     /**
+     * @brief Remove all ACL entries for the given fabricIndex
+     *
+     * @param[in] fabricIndex fabric index for which to remove all entries
+     */
+    CHIP_ERROR DeleteAllEntriesForFabric(FabricIndex fabricIndex)
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
+        CHIP_ERROR stickyError = CHIP_NO_ERROR;
+
+        // Remove access control entries in reverse order (it could be any order, but reverse order
+        // will cause less churn in persistent storage).
+        size_t aclCount = 0;
+        if (GetEntryCount(fabricIndex, aclCount) == CHIP_NO_ERROR)
+        {
+            while (aclCount)
+            {
+                CHIP_ERROR err = DeleteEntry(nullptr, fabricIndex, --aclCount);
+                stickyError    = (stickyError == CHIP_NO_ERROR) ? err : stickyError;
+            }
+        }
+
+        return stickyError;
+    }
+
+    /**
      * Iterates over entries in the access control list.
      *
      * @param [in]  fabric   Fabric over which to iterate entries.

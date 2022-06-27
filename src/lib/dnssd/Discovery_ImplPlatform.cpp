@@ -27,7 +27,6 @@
 #include <lib/dnssd/platform/Dnssd.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -375,13 +374,13 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
         CHIP_ERROR error = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
         if (error != CHIP_NO_ERROR)
         {
-            ChipLogError(Discovery, "Posting DNS-SD platform initialized event failed with %s", chip::ErrorStr(error));
+            ChipLogError(Discovery, "Posting DNS-SD platform initialized event failed with %" CHIP_ERROR_FORMAT, error.Format());
         }
 #endif
     }
     else
     {
-        ChipLogError(Discovery, "DNS-SD initialization failed with %s", chip::ErrorStr(initError));
+        ChipLogError(Discovery, "DNS-SD initialization failed with %" CHIP_ERROR_FORMAT, initError.Format());
         publisher->mDnssdInitialized = false;
     }
 }
@@ -410,7 +409,7 @@ void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
     }
     else
     {
-        ChipLogError(Discovery, "DNS-SD error: %s", chip::ErrorStr(error));
+        ChipLogError(Discovery, "DNS-SD error: %" CHIP_ERROR_FORMAT, error.Format());
     }
 }
 
@@ -441,7 +440,7 @@ void DiscoveryImplPlatform::HandleDnssdPublish(void * context, const char * type
     }
     else
     {
-        ChipLogError(Discovery, "mDNS service published error: %s", chip::ErrorStr(error));
+        ChipLogError(Discovery, "mDNS service published error: %" CHIP_ERROR_FORMAT, error.Format());
     }
 }
 

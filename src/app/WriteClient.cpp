@@ -394,7 +394,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement, "Write client failed to SendWriteRequest: %s", ErrorStr(err));
+        ChipLogError(DataManagement, "Write client failed to SendWriteRequest: %" CHIP_ERROR_FORMAT, err.Format());
     }
     else
     {

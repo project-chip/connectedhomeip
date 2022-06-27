@@ -228,7 +228,11 @@ config("warnings_common") {
 
   if (current_os != "mac" && current_os != "ios" && current_os != "linux" &&
       current_os != "win" && current_os != "tizen" && current_os != "webos") {
-    cflags += [ "-Wstack-usage=8192" ]
+    # TODO(#19951): Make this go back to 8192 once unit test contexts are no
+    #               longer on the stack.
+    # cflags += [ "-Wstack-usage=8192" ]
+
+    cflags += [ "-Wstack-usage=8704" ]  # 8192 + 512
   }
 }
 

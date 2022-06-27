@@ -61,6 +61,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mListenPort               = params.listenPort;
     mFabricIndependentStorage = params.fabricIndependentStorage;
     mOperationalKeystore      = params.operationalKeystore;
+    mOpCertStore              = params.opCertStore;
     mEnableServerInteractions = params.enableServerInteractions;
 
     CHIP_ERROR err = InitSystemState(params);
@@ -87,6 +88,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
         params.groupDataProvider        = mSystemState->GetGroupDataProvider();
         params.fabricTable              = mSystemState->Fabrics();
         params.operationalKeystore      = mOperationalKeystore;
+        params.opCertStore              = mOpCertStore;
     }
 
     return InitSystemState(params);
@@ -124,6 +126,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     VerifyOrReturnError(stateParams.systemLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(stateParams.udpEndPointManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    // OperationalCertificateStore needs to be provided to init the fabric table if fabric table is
+    // not provided wholesale.
+    ReturnErrorCodeIf((params.fabricTable == nullptr) && (params.opCertStore == nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+
 #if CONFIG_NETWORK_LAYER_BLE
 #if CONFIG_DEVICE_LAYER
     stateParams.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
@@ -153,6 +159,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
                                                             ));
 
+    // TODO(#16231): All the new'ed state above/below in this method is never properly released or null-checked!
     stateParams.sessionMgr                = chip::Platform::New<SessionManager>();
     stateParams.certificateValidityPolicy = params.certificateValidityPolicy;
     stateParams.unsolicitedStatusHandler  = Platform::New<Protocols::SecureChannel::UnsolicitedStatusHandler>();
@@ -161,12 +168,22 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.groupDataProvider         = params.groupDataProvider;
 
     // if no fabricTable was provided, create one and track it in stateParams for cleanup
+    stateParams.fabricTable = params.fabricTable;
+
     FabricTable * tempFabricTable = nullptr;
-    stateParams.fabricTable       = params.fabricTable;
     if (stateParams.fabricTable == nullptr)
     {
-        stateParams.fabricTable = tempFabricTable = chip::Platform::New<FabricTable>();
-        ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage, params.operationalKeystore));
+        // TODO(#16231): Previously (and still) the objects new-ed in this entire method seem expected to last forever...
+        auto newFabricTable = Platform::MakeUnique<FabricTable>();
+        ReturnErrorCodeIf(!newFabricTable, CHIP_ERROR_NO_MEMORY);
+
+        FabricTable::InitParams fabricTableInitParams;
+        fabricTableInitParams.storage             = params.fabricIndependentStorage;
+        fabricTableInitParams.operationalKeystore = params.operationalKeystore;
+        fabricTableInitParams.opCertStore         = params.opCertStore;
+        ReturnErrorOnFailure(newFabricTable->Init(fabricTableInitParams));
+        stateParams.fabricTable = newFabricTable.release();
+        tempFabricTable         = stateParams.fabricTable;
     }
 
     auto sessionResumptionStorage = chip::Platform::MakeUnique<SimpleSessionResumptionStorage>();
@@ -326,6 +343,7 @@ void DeviceControllerFactory::Shutdown()
     }
     mFabricIndependentStorage = nullptr;
     mOperationalKeystore      = nullptr;
+    mOpCertStore              = nullptr;
 }
 
 void DeviceControllerSystemState::Shutdown()

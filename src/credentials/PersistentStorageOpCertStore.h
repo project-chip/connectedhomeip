@@ -39,8 +39,12 @@ namespace Credentials {
 class PersistentStorageOpCertStore : public OperationalCertificateStore
 {
 public:
-    PersistentStorageOpCertStore() = default;
+    PersistentStorageOpCertStore() {}
     virtual ~PersistentStorageOpCertStore() { Finish(); }
+
+    // Non-copyable
+    PersistentStorageOpCertStore(PersistentStorageOpCertStore const &) = delete;
+    void operator=(PersistentStorageOpCertStore const &) = delete;
 
     /**
      * @brief Initialize the certificate store to map to a given storage delegate.
@@ -58,7 +62,7 @@ public:
     }
 
     /**
-     * @brief Finalize the certificate sotre, so that subsequent operations fail
+     * @brief Finalize the certificate store, so that subsequent operations fail
      */
     void Finish()
     {
@@ -80,12 +84,25 @@ public:
     CHIP_ERROR CommitOpCertsForFabric(FabricIndex fabricIndex) override;
     CHIP_ERROR RemoveOpCertsForFabric(FabricIndex fabricIndex) override;
 
-    void RevertPendingOpCerts() override
+    void RevertPendingOpCertsExceptRoot() override
     {
-        mPendingRcac.Free();
         mPendingIcac.Free();
         mPendingNoc.Free();
 
+        if (mPendingRcac.Get() == nullptr)
+        {
+            mPendingFabricIndex = kUndefinedFabricIndex;
+        }
+        mStateFlags.Clear(StateFlags::kAddNewOpCertsCalled);
+        mStateFlags.Clear(StateFlags::kUpdateOpCertsCalled);
+    }
+
+    void RevertPendingOpCerts() override
+    {
+        RevertPendingOpCertsExceptRoot();
+
+        // Clear the rest statelessly
+        mPendingRcac.Free();
         mPendingFabricIndex = kUndefinedFabricIndex;
         mStateFlags.ClearAll();
     }

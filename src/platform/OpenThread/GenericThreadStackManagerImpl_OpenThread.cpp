@@ -190,7 +190,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
 {
     if (event->Type == DeviceEventType::kThreadStateChange)
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && (OPENTHREAD_API_VERSION < 218)
         if (event->ThreadStateChange.AddressChanged)
         {
             const otSrpClientHostInfo * hostInfo = otSrpClientGetHostInfo(Impl()->OTInstance());
@@ -1492,8 +1492,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            uint64_t activeTimestamp = activeDataset.mPendingTimestamp;
-            err                      = encoder.Encode(activeTimestamp);
+#if OPENTHREAD_API_VERSION >= 219
+            uint64_t activeTimestamp = (activeDataset.mActiveTimestamp.mSeconds << 16) |
+                (activeDataset.mActiveTimestamp.mTicks << 1) | activeDataset.mActiveTimestamp.mAuthoritative;
+#else
+            uint64_t activeTimestamp  = activeDataset.mActiveTimestamp;
+#endif
+            err = encoder.Encode(activeTimestamp);
         }
     }
     break;
@@ -1505,8 +1510,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+#if OPENTHREAD_API_VERSION >= 219
+            uint64_t pendingTimestamp = (activeDataset.mPendingTimestamp.mSeconds << 16) |
+                (activeDataset.mPendingTimestamp.mTicks << 1) | activeDataset.mPendingTimestamp.mAuthoritative;
+#else
             uint64_t pendingTimestamp = activeDataset.mPendingTimestamp;
-            err                       = encoder.Encode(pendingTimestamp);
+#endif
+            err = encoder.Encode(pendingTimestamp);
         }
     }
     break;
@@ -2291,7 +2301,9 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(const char * aHostName)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
+#if OPENTHREAD_API_VERSION < 218
     Inet::IPAddress hostAddress;
+#endif
 
     VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
 
@@ -2306,8 +2318,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
         strcpy(mSrpClient.mHostName, aHostName);
         error = MapOpenThreadError(otSrpClientSetHostName(mOTInst, mSrpClient.mHostName));
         SuccessOrExit(error);
+
+#if OPENTHREAD_API_VERSION >= 218
+        error = MapOpenThreadError(otSrpClientEnableAutoHostAddress(mOTInst));
+#endif
     }
 
+#if OPENTHREAD_API_VERSION < 218
     // Check if device has any external IPv6 assigned. If not, host will be set without IPv6 addresses
     // and updated later on.
     if (ThreadStackMgr().GetExternalIPv6Address(hostAddress) == CHIP_NO_ERROR)
@@ -2315,6 +2332,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
         memcpy(&mSrpClient.mHostAddress.mFields.m32, hostAddress.Addr, sizeof(hostAddress.Addr));
         error = MapOpenThreadError(otSrpClientSetHostAddresses(mOTInst, &mSrpClient.mHostAddress, 1));
     }
+#endif
 
 exit:
     Impl()->UnlockThreadStack();

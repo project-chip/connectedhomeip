@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -112,8 +114,8 @@ public:
 
     FabricIndex GetAliceFabricIndex() { return mAliceFabricIndex; }
     FabricIndex GetBobFabricIndex() { return mBobFabricIndex; }
-    FabricInfo * GetAliceFabric() { return mFabricTable.FindFabricWithIndex(mAliceFabricIndex); }
-    FabricInfo * GetBobFabric() { return mFabricTable.FindFabricWithIndex(mBobFabricIndex); }
+    const FabricInfo * GetAliceFabric() { return mFabricTable.FindFabricWithIndex(mAliceFabricIndex); }
+    const FabricInfo * GetBobFabric() { return mFabricTable.FindFabricWithIndex(mBobFabricIndex); }
 
     CHIP_ERROR CreateSessionBobToAlice();
     CHIP_ERROR CreateSessionAliceToBob();
@@ -146,12 +148,15 @@ private:
     bool mInitializeNodes = true;
     bool mInitialized;
     FabricTable mFabricTable;
+
     SessionManager mSessionManager;
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
     IOContext * mIOContext;
     TransportMgrBase * mTransport;                // Only needed for InitFromExisting.
     chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
+    chip::PersistentStorageOperationalKeystore mOpKeyStore;
+    chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
 
     FabricIndex mAliceFabricIndex = kUndefinedFabricIndex;
     FabricIndex mBobFabricIndex   = kUndefinedFabricIndex;

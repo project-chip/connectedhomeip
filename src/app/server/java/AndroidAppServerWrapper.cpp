@@ -64,7 +64,7 @@ CHIP_ERROR ChipAndroidAppInit(void)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(NotSpecified, "Failed to run ChipAndroidAppInit: %s ", ErrorStr(err));
+        ChipLogProgress(NotSpecified, "Failed to run ChipAndroidAppInit: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
     return err;

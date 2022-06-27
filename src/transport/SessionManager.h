@@ -247,25 +247,10 @@ public:
     CHIP_ERROR ForEachSessionHandle(void * context, SessionHandleCallback callback);
 
     //// FabricTable::Delegate Implementation ////
-    void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         (void) fabricTable;
         this->FabricRemoved(fabricIndex);
-    }
-    void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
-    {
-        (void) fabricTable;
-        (void) fabricIndex;
-    }
-    void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
-    {
-        (void) fabricTable;
-        (void) fabricIndex;
-    }
-    void OnFabricNOCUpdated(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
-    {
-        (void) fabricTable;
-        (void) fabricIndex;
     }
 
 private:

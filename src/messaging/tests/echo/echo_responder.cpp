@@ -81,9 +81,6 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
-    err = gFabricTable.Init(&gStorage);
-    SuccessOrExit(err);
-
     if (useTCP)
     {
         err = gTCPManager.Init(chip::Transport::TcpListenParameters(chip::DeviceLayer::TCPEndPointManager())

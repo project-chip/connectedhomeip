@@ -292,6 +292,8 @@ private:
     void MoveToState(State targetState);
 
     friend class SecureSessionDeleter;
+    friend class TestSecureSessionTable;
+
     SecureSessionTable & mTable;
     State mState;
     const Type mSecureSessionType;

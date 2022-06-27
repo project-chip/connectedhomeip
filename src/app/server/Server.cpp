@@ -35,7 +35,6 @@
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/PersistedCounter.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -115,6 +114,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrExit(initParams.accessDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.aclStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.groupDataProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(initParams.operationalKeystore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(initParams.opCertStore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryInit();
@@ -126,6 +127,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mDeviceStorage            = initParams.persistentStorageDelegate;
     mSessionResumptionStorage = initParams.sessionResumptionStorage;
     mOperationalKeystore      = initParams.operationalKeystore;
+    mOpCertStore              = initParams.opCertStore;
 
     mCertificateValidityPolicy = initParams.certificateValidityPolicy;
 
@@ -134,8 +136,15 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(mAttributePersister.Init(mDeviceStorage));
     SetAttributePersistenceProvider(&mAttributePersister);
 
-    err = mFabrics.Init(mDeviceStorage, mOperationalKeystore);
-    SuccessOrExit(err);
+    {
+        FabricTable::InitParams fabricTableInitParams;
+        fabricTableInitParams.storage             = mDeviceStorage;
+        fabricTableInitParams.operationalKeystore = mOperationalKeystore;
+        fabricTableInitParams.opCertStore         = mOpCertStore;
+
+        err = mFabrics.Init(fabricTableInitParams);
+        SuccessOrExit(err);
+    }
 
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     Access::SetAccessControl(mAccessControl);
@@ -296,7 +305,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "ERROR setting up transport: %s", ErrorStr(err));
+        ChipLogError(AppServer, "ERROR setting up transport: %" CHIP_ERROR_FORMAT, err.Format());
     }
     else
     {
@@ -426,7 +435,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     err = app::DnssdServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed to get mdns instance name error: %s", ErrorStr(err));
+        ChipLogError(AppServer, "Failed to get mdns instance name error: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
     ChipLogDetail(AppServer, "instanceName=%s", nameBuffer);
@@ -445,7 +454,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     }
     else
     {
-        ChipLogError(AppServer, "Send UDC request failed, err: %s\n", chip::ErrorStr(err));
+        ChipLogError(AppServer, "Send UDC request failed, err: %" CHIP_ERROR_FORMAT, err.Format());
     }
     return err;
 }

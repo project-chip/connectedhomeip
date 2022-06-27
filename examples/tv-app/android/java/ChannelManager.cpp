@@ -17,6 +17,7 @@
 
 #include "ChannelManager.h"
 #include "TvApp-JNI.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <cstdlib>
 #include <jni.h>
@@ -406,4 +407,16 @@ void ChannelManager::InitializeWithObjects(jobject managerObject)
         ChipLogError(Zcl, "Failed to access ChannelManager 'skipChannel' method");
         env->ExceptionClear();
     }
+}
+
+uint32_t ChannelManager::GetFeatureMap(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicEndpointFeatureMap;
+    }
+
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
 }

@@ -61,7 +61,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     err = InitEntropy();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Entropy initialization failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Entropy initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     SuccessOrExit(err);
 
@@ -69,7 +69,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     err = SystemLayer().Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "SystemLayer initialization failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "SystemLayer initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     SuccessOrExit(err);
 
@@ -77,7 +77,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     err = ConfigurationMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Configuration Manager initialization failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Configuration Manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     SuccessOrExit(err);
 
@@ -85,7 +85,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     err = UDPEndPointManager()->Init(SystemLayer());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "UDP initialization failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "UDP initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     SuccessOrExit(err);
 
@@ -96,7 +96,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     err = BLEMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "BLEManager initialization failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "BLEManager initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     SuccessOrExit(err);
 #endif
@@ -105,14 +105,15 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     err = ConnectivityMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Connectivity Manager initialization failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Connectivity Manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     SuccessOrExit(err);
 
     // Initialize the NFC Manager.
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC
     err = NFCMgr().Init();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "NFC Manager initialization failed: %s", ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(DeviceLayer, "NFC Manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format()));
 #endif
 
     // TODO Initialize CHIP Event Logging.

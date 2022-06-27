@@ -501,6 +501,7 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.do_build:
+        sw_ver_string = ""
         if options.do_automated_test_stamp:
             branch = ""
             for branch_text in shell.run_cmd("git branch", return_cmd_output=True).split("\n"):
@@ -557,7 +558,8 @@ def main(argv: Sequence[str]) -> None:
                         set(CONFIG_DEVICE_VENDOR_ID {options.vid})
                         set(CONFIG_DEVICE_PRODUCT_ID {options.pid})
                         set(CONFIG_ENABLE_PW_RPC {"1" if options.do_rpc else "0"})
-                        set(SAMPLE_NAME {options.sample_device_type_name})"""))
+                        set(SAMPLE_NAME {options.sample_device_type_name})
+                        set(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING \"{sw_ver_string}\")"""))
 
         if options.build_target == "esp32":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
@@ -592,7 +594,7 @@ def main(argv: Sequence[str]) -> None:
         elif options.build_target == "linux":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/linux")
             with open(f"{_CHEF_SCRIPT_PATH}/linux/args.gni", "w") as f:
-                sw_ver_string_config_text = f"chip_device_config_device_software_version_string = \"{sw_ver_string}\"" if options.do_automated_test_stamp else ""
+                sw_ver_string_config_text = f"chip_device_config_device_software_version_string = \"{sw_ver_string}\"" if sw_ver_string else ""
                 f.write(textwrap.dedent(f"""\
                         import("//build_overrides/chip.gni")
                         import("${{chip_root}}/config/standalone/args.gni")

@@ -132,35 +132,35 @@ bool DnssdServer::OnExpiration(System::Clock::Timestamp expirationMs)
     CHIP_ERROR err = Dnssd::ServiceAdvertiser::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to initialize advertiser: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to initialize advertiser: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // reset advertising
     err = Dnssd::ServiceAdvertiser::Instance().RemoveServices();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to remove advertised services: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to remove advertised services: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // restart operational (if needed)
     err = AdvertiseOperational();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to advertise operational node: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to advertise operational node: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     err = AdvertiseCommissioner();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to advertise commissioner: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to advertise commissioner: %" CHIP_ERROR_FORMAT, err.Format());
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     err = Dnssd::ServiceAdvertiser::Instance().FinalizeServiceUpdate();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to finalize service update: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to finalize service update: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return true;
@@ -183,7 +183,7 @@ void DnssdServer::OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAp
         CHIP_ERROR err = AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode::kDisabled);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Discovery, "Failed to advertise extended commissionable node: %s", chip::ErrorStr(err));
+            ChipLogError(Discovery, "Failed to advertise extended commissionable node: %" CHIP_ERROR_FORMAT, err.Format());
         }
         // set timeout
         ScheduleExtendedDiscoveryExpiration();
@@ -433,19 +433,19 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
     CHIP_ERROR err = Dnssd::ServiceAdvertiser::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to initialize advertiser: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to initialize advertiser: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     err = Dnssd::ServiceAdvertiser::Instance().RemoveServices();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to remove advertised services: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to remove advertised services: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     err = AdvertiseOperational();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to advertise operational node: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to advertise operational node: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     if (mode != chip::Dnssd::CommissioningMode::kDisabled)
@@ -453,7 +453,7 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
         err = AdvertiseCommissionableNode(mode);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Discovery, "Failed to advertise commissionable node: %s", chip::ErrorStr(err));
+            ChipLogError(Discovery, "Failed to advertise commissionable node: %" CHIP_ERROR_FORMAT, err.Format());
         }
 
         // If any fabrics exist, the commissioning window must have been opened by the administrator
@@ -469,7 +469,7 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
         err = AdvertiseCommissionableNode(mode);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Discovery, "Failed to advertise extended commissionable node: %s", chip::ErrorStr(err));
+            ChipLogError(Discovery, "Failed to advertise extended commissionable node: %" CHIP_ERROR_FORMAT, err.Format());
         }
         // set timeout
         ScheduleExtendedDiscoveryExpiration();
@@ -480,14 +480,14 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
     err = AdvertiseCommissioner();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to advertise commissioner: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to advertise commissioner: %" CHIP_ERROR_FORMAT, err.Format());
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     err = Dnssd::ServiceAdvertiser::Instance().FinalizeServiceUpdate();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to finalize service update: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to finalize service update: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 

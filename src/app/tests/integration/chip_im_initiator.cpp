@@ -706,9 +706,6 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
-    err = gFabricTable.Init(&gStorage);
-    SuccessOrExit(err);
-
     err = gTransportManager.Init(chip::Transport::UdpListenParameters(chip::DeviceLayer::UDPEndPointManager())
                                      .SetAddressType(chip::Inet::IPAddressType::kIPv6)
                                      .SetListenPort(IM_CLIENT_PORT));

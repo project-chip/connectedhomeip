@@ -27,6 +27,7 @@
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 
 #pragma once
@@ -121,6 +122,7 @@ protected:
     PersistentStorage mCommissionerStorage;
 #endif // CONFIG_USE_LOCAL_STORAGE
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
+    chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
 
     chip::Credentials::GroupDataProviderImpl mGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
     CredentialIssuerCommands * mCredIssuerCmds;

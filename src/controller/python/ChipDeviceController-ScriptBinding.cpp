@@ -56,6 +56,7 @@
 #include <controller/CommissioningWindowOpener.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <inet/IPAddress.h>
@@ -96,6 +97,7 @@ chip::Controller::CommissioningParameters sCommissioningParameters;
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 chip::Controller::Python::StorageAdapter * sStorageAdapter = nullptr;
 chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
+chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
 
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
@@ -227,8 +229,11 @@ ChipError::StorageType pychip_DeviceController_StackInit()
 
     sGroupDataProvider.SetStorageDelegate(sStorageAdapter);
     ReturnErrorOnFailure(sGroupDataProvider.Init().AsInteger());
+    factoryParams.groupDataProvider = &sGroupDataProvider;
 
-    factoryParams.groupDataProvider        = &sGroupDataProvider;
+    ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(sStorageAdapter).AsInteger());
+    factoryParams.opCertStore = &sPersistentStorageOpCertStore;
+
     factoryParams.enableServerInteractions = true;
 
     ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());

@@ -151,7 +151,7 @@ protected:
         CHIP_ERROR err = exchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg));
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(SecureChannel, "Failed to send status report message. %s", ErrorStr(err));
+            ChipLogError(SecureChannel, "Failed to send status report message: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
 

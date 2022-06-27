@@ -394,22 +394,19 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     // Setup IPK in Group Data Provider for controller after Commissioner init which sets-up the fabric table entry
-    FabricInfo * fabricInfo = devCtrl->GetFabricInfo();
-    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INTERNAL.AsInteger());
-
     uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
     chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
 
-    err = fabricInfo->GetCompressedId(compressedFabricIdSpan);
+    err = devCtrl->GetCompressedFabricIdBytes(compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
-                    static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+                    static_cast<unsigned>(devCtrl->GetFabricIndex()));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
     chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-    err = chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
-                                                  compressedFabricIdSpan);
+    err =
+        chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), defaultIpk, compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     *outDevCtrl = devCtrl.release();

@@ -26,7 +26,7 @@ jobs:
     # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
     esp32:
         name: ESP32
-        timeout-minutes: 90
+        timeout-minutes: 105
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'

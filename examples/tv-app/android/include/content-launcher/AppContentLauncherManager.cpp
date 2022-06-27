@@ -100,3 +100,15 @@ uint32_t AppContentLauncherManager::HandleGetSupportedStreamingProtocols()
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols");
     return mSupportedStreamingProtocols;
 }
+
+uint32_t AppContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicEndpointFeatureMap;
+    }
+
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
+}

@@ -190,6 +190,7 @@ static_library("testing") {
   output_dir = "${root_out_dir}/lib"
 
   sources = [
+    "UnitTestExtendedAssertions.h",
     "UnitTestRegistration.cpp",
     "UnitTestRegistration.h",
     "UnitTestUtils.cpp",

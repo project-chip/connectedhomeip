@@ -155,7 +155,7 @@ void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyE
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
-    ChipLogError(Inet, "CASE Session establishment failed: %s", ErrorStr(err));
+    ChipLogError(Inet, "CASE Session establishment failed: %" CHIP_ERROR_FORMAT, err.Format());
 
     //
     // We're not allowed to call methods that will eventually result in calling SessionManager::AllocateSecureSession
