@@ -78,9 +78,15 @@ class NOCChain:
 def _IssueNOCChainCallbackPythonCallback(devCtrl, status: int, noc: c_void_p, nocLen: int, icac: c_void_p, icacLen: int, rcac: c_void_p, rcacLen: int, ipk: c_void_p, ipkLen: int, adminSubject: int):
     nocChain = NOCChain(None, None, None, None, 0)
     if status == 0:
-        nocBytes = string_at(noc, nocLen)[:]
-        icacBytes = string_at(icac, icacLen)[:]
-        rcacBytes = string_at(rcac, rcacLen)[:]
+        nocBytes = None
+        if nocLen > 0:
+            nocBytes = string_at(noc, nocLen)[:]
+        icacBytes = None
+        if icacLen > 0:
+            icacBytes = string_at(icac, icacLen)[:]
+        rcacBytes = None
+        if rcacLen > 0:
+            rcacBytes = string_at(rcac, rcacLen)[:]
         ipkBytes = None
         if ipkLen > 0:
             ipkBytes = string_at(ipk, ipkLen)[:]

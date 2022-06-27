@@ -87,10 +87,18 @@ void pychip_DeviceController_IssueNOCChainCallback(void * context, CHIP_ERROR st
     SuccessOrExit(err = ConvertX509CertToChipCert(rcac, chipRcacSpan));
 
 exit:
-    pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct(
-        context, err.AsInteger(), chipNocSpan.data(), chipNocSpan.size(), chipIcacSpan.data(), chipIcacSpan.size(),
-        chipRcacSpan.data(), chipRcacSpan.size(), ipkData.data(), ipk.HasValue() ? ipkData.size() : 0,
-        adminSubject.ValueOr(kUndefinedNodeId));
+    if (err == CHIP_NO_ERROR)
+    {
+        pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct(
+            context, err.AsInteger(), chipNocSpan.data(), chipNocSpan.size(), chipIcacSpan.data(), chipIcacSpan.size(),
+            chipRcacSpan.data(), chipRcacSpan.size(), ipkData.data(), ipk.HasValue() ? ipkData.size() : 0,
+            adminSubject.ValueOr(kUndefinedNodeId));
+    }
+    else
+    {
+        pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct(context, err.AsInteger(), nullptr, 0, nullptr, 0, nullptr,
+                                                                         0, nullptr, 0, 0);
+    }
 }
 
 ChipError::StorageType pychip_DeviceController_IssueNOCChain(chip::Controller::DeviceCommissioner * devCtrl,
