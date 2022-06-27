@@ -166,9 +166,19 @@ void PacketParser::ParseResource(const ResourceData & data)
         if (resolver.IsActive())
         {
             CHIP_ERROR err = resolver.OnRecord(mInterfaceId, data, mPacketRange);
+
+            //
+            // CHIP_ERROR_NO_MEMORY usually gets returned when we have no more memory available to hold the
+            // resolved data. This gets emitted fairly frequently in dense environments or when receiving records
+            // from devices with lots of interfaces. Consequently, don't log that unless we have DNS verbosity
+            // logging enabled.
+            //
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Discovery, "DNSSD parse error: %" CHIP_ERROR_FORMAT, err.Format());
+#if !CHIP_MINMDNS_HIGH_VERBOSITY
+                if (err != CHIP_ERROR_NO_MEMORY)
+#endif
+                    ChipLogError(Discovery, "DNSSD parse error: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
     }
@@ -365,7 +375,9 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             }
             else
             {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
                 ChipLogError(Discovery, "No delegate to report commissioning node discovery");
+#endif
             }
         }
         else if (resolver->IsActiveOperationalParse())
@@ -385,7 +397,9 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             }
             else
             {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
                 ChipLogError(Discovery, "No delegate to report operational node discovery");
+#endif
             }
         }
         else

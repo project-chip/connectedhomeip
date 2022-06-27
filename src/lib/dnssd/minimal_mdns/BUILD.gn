@@ -29,10 +29,9 @@ declare_args() {
       current_os == "mac" || current_os == "linux" || current_os == "android" ||
       current_os == "webos"
 
-  # Be very verbose regarding packet communication. Will spend extra RAM and
-  # Time to report mdns traffic in terms of sent and seen data.
-  chip_minmdns_high_verbosity =
-      current_os == "mac" || current_os == "linux" || current_os == "android"
+  # This enables verbose logging of sent/received mDNS messages. However, will incur extra RAM and
+  # time.
+  chip_minmdns_high_verbosity = false
 }
 
 config("config") {
