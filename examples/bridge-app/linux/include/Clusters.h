@@ -47,43 +47,6 @@ public:
     virtual chip::Span<const EmberAfAttributeMetadata> GetAllAttributes()                                                    = 0;
 };
 
-// This provides a wrapper for an arbitrary-sized little-endian value that is Bytes bytes long
-// and represented logically by type T. Code can read/write it as native, or access the little-
-// endian byte array. Byte arrays also eliminate padding bytes.
-template <typename T, size_t Bytes>
-struct LittleEndian
-{
-    LittleEndian(T value = 0) { *this = value; }
-
-#if (BIGENDIAN_CPU)
-    operator T() const
-    {
-        T ret = 0;
-        for (size_t i = 0; i < Bytes; i++)
-            ret |= static_cast<T>(mBytes[i]) << (8u * i);
-        return ret;
-    }
-    void operator=(T v)
-    {
-        for (auto & b : mBytes)
-        {
-            b = v & 0xFF;
-            v >>= 8;
-        }
-    }
-#else
-    operator T() const
-    {
-        T ret = 0;
-        memcpy(&ret, mBytes, Bytes);
-        return ret;
-    }
-    void operator=(T v) { memcpy(mBytes, &v, Bytes); }
-#endif // BIGENDIAN_CPU
-
-    uint8_t mBytes[Bytes];
-};
-
 // *Type classes are used by code generation to specialize storage for a particular underlying type.
 
 // This provides storage for a primitive binary type, eg uintN_t, float, double
@@ -132,8 +95,8 @@ struct PrimitiveType
     uint8_t * GetBytes() { return reinterpret_cast<uint8_t *>(&mValue); }
 
 private:
-    LittleEndian<ValueType, Bytes> mValue;
-    static_assert(std::is_standard_layout<LittleEndian<T, Bytes>>::value, "PrimitiveType not standard layout!");
+    ValueType mValue;
+    static_assert(std::is_standard_layout<ValueType>::value, "PrimitiveType not standard layout!");
 };
 
 // This provides access to a struct. It is similar to PrimitiveType except it is assumed
@@ -242,7 +205,7 @@ struct ArrayType
     static constexpr EmberAfAttributeType kMatterType = ZCL_ARRAY_ATTRIBUTE_TYPE;
     struct Data
     {
-        LittleEndian<uint16_t, 2> length;
+        uint16_t length;
         T array[MaxElements];
     };
     // We need this to be standard layout to get a reliable byte view.
