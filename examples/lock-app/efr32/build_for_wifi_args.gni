@@ -19,4 +19,4 @@ chip_enable_openthread = false
 import("${chip_root}/src/platform/EFR32/wifi_args.gni")
 
 pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
-pw_assert_BACKEND = "$dir_pw_assert_log"
+pw_assert_BACKEND = "$dir_pw_assert_log:check_backend"

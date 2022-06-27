@@ -68,6 +68,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     # Indication that the CHIP data model is included
     chip_enable_data_model = false
+
+    # The string of device software version was built.
+    chip_device_config_device_software_version_string = ""
   }
 
   if (chip_stack_lock_tracking == "auto") {
@@ -248,6 +251,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
       defines -=
           [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}" ]
+    }
+
+    if (chip_device_config_device_software_version_string != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${chip_device_config_device_software_version_string}\"" ]
     }
   }
 } else if (chip_device_platform == "none") {

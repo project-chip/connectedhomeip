@@ -24,36 +24,13 @@ concurrency:
 
 jobs:
 
-    validate_zzz:
-        name: Chef - Validate cached ZAP output
-        runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
-        container:
-            image: connectedhomeip/chip-build:0.5.64
-            options: --user root
-        steps:
-            - uses: Wandalen/wretry.action@v1.0.15
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Chef validate zzz
-              shell: bash
-              run: |
-                cd examples/chef
-                python3 chef.py --validate_zzz
-
     chef_linux:
         name: Chef - Linux CI Examples
-        needs: validate_zzz
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.64
+            image: connectedhomeip/chip-build:0.5.75
             options: --user root
 
         steps:
@@ -72,12 +49,11 @@ jobs:
 
     chef_esp32:
         name: Chef - ESP32 CI Examples
-        needs: validate_zzz
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.5.64
+            image: connectedhomeip/chip-build-esp32:0.5.75
             options: --user root
 
         steps:
@@ -96,12 +72,11 @@ jobs:
 
     chef_nrfconnect:
         name: Chef - NRFConnect CI Examples
-        needs: validate_zzz
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.5.64
+            image: connectedhomeip/chip-build-nrf-platform:0.5.75
             options: --user root
 
         steps:

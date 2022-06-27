@@ -355,7 +355,12 @@
 #define EMBER_AF_PLUGIN_SCENES_SERVER
 #define EMBER_AF_PLUGIN_SCENES
 // User options for server plugin Scenes
-#define EMBER_AF_PLUGIN_SCENES_TABLE_SIZE 3
+// Cluster spec 1.4.8.2
+#ifdef CHIP_CONFIG_MAX_SCENES_PER_FABRIC
+#define MATTER_SCENES_TABLE_SIZE CHIP_CONFIG_MAX_SCENES_PER_FABRIC
+#else
+#define MATTER_SCENES_TABLE_SIZE 16
+#endif
 
 // Use this macro to check if the server side of the Software Diagnostics cluster is included
 #define ZCL_USING_SOFTWARE_DIAGNOSTICS_CLUSTER_SERVER

@@ -82,10 +82,11 @@ if(CONFIG_ENABLE_CHIP_SHELL)
 endif(CONFIG_ENABLE_CHIP_SHELL)
 
 target_sources(app PRIVATE
-  ${CHEF}/nrfconnect/main.cpp
-  ${GEN_DIR}/callback-stub.cpp
-  ${GEN_DIR}/IMClusterCommandHandler.cpp
-  ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
+    ${CHEF}/nrfconnect/main.cpp
+    ${CHEF}/common/stubs.cpp
+    ${GEN_DIR}/callback-stub.cpp
+    ${GEN_DIR}/IMClusterCommandHandler.cpp
+    ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
 )
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
@@ -108,30 +109,31 @@ endif()
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
 
 if(CONFIG_ENABLE_PW_RPC)
-  target_compile_options(app PRIVATE
-    "-DCONFIG_ENABLE_PW_RPC=1"
-  )
+target_compile_options(app PRIVATE
+  "-DCONFIG_ENABLE_PW_RPC=1"
+)
 
-  # Make all targets created below depend on zephyr_interface to inherit MCU-related compilation flags
-  link_libraries($<BUILD_INTERFACE:zephyr_interface>)
+# Make all targets created below depend on zephyr_interface to inherit MCU-related compilation flags
+link_libraries($<BUILD_INTERFACE:zephyr_interface>)
 
-  set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
-  include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
-  include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
+set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
+include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
+include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
 
-  pw_set_module_config(pw_rpc_CONFIG pw_rpc.disable_global_mutex_config)
-  pw_set_backend(pw_log pw_log_basic)
-  pw_set_backend(pw_assert pw_assert_log)
-  pw_set_backend(pw_sys_io pw_sys_io.nrfconnect)
-  pw_set_backend(pw_trace pw_trace_tokenized)
-  set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
+pw_set_module_config(pw_rpc_CONFIG pw_rpc.disable_global_mutex_config)
+pw_set_backend(pw_log pw_log_basic)
+pw_set_backend(pw_assert.check pw_assert_log.check_backend)
+pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
+pw_set_backend(pw_sys_io pw_sys_io.nrfconnect)
+pw_set_backend(pw_trace pw_trace_tokenized)
+set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
-  add_subdirectory(third_party/connectedhomeip/examples/platform/nrfconnect/pw_sys_io)
-  add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
-  add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
+add_subdirectory(third_party/connectedhomeip/examples/platform/nrfconnect/pw_sys_io)
+add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
+add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
 
-  pw_proto_library(attributes_service
-    SOURCES
+pw_proto_library(attributes_service
+  SOURCES
     ${CHIP_ROOT}/examples/common/pigweed/protos/attributes_service.proto
     INPUTS
     ${CHIP_ROOT}/examples/common/pigweed/protos/attributes_service.options
@@ -139,9 +141,9 @@ if(CONFIG_ENABLE_PW_RPC)
     attributes_service
     STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
-    DEPS
-    pw_protobuf.common_protos
-  )
+  DEPS
+    pw_protobuf.common_proto
+)
 
   pw_proto_library(descriptor_service
     SOURCES
@@ -150,9 +152,9 @@ if(CONFIG_ENABLE_PW_RPC)
     descriptor_service
     STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
-    DEPS
-    pw_protobuf.common_protos
-  )
+  DEPS
+    pw_protobuf.common_proto
+)
 
   pw_proto_library(device_service
     SOURCES
@@ -163,9 +165,9 @@ if(CONFIG_ENABLE_PW_RPC)
     device_service
     STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
-    DEPS
-    pw_protobuf.common_protos
-  )
+  DEPS
+    pw_protobuf.common_proto
+)
 
   pw_proto_library(ot_cli_service
     SOURCES
@@ -176,9 +178,9 @@ if(CONFIG_ENABLE_PW_RPC)
     ${CHIP_ROOT}/examples/common/pigweed/protos
     PREFIX
     ot_cli_service
-    DEPS
-    pw_protobuf.common_protos
-  )
+  DEPS
+    pw_protobuf.common_proto
+)
 
   pw_proto_library(thread_service
     SOURCES
@@ -189,9 +191,9 @@ if(CONFIG_ENABLE_PW_RPC)
     ${CHIP_ROOT}/examples/common/pigweed/protos
     PREFIX
     thread_service
-    DEPS
-    pw_protobuf.common_protos
-  )
+  DEPS
+    pw_protobuf.common_proto
+)
 
   target_sources(app PRIVATE
     ../../common/pigweed/RpcService.cpp

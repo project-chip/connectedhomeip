@@ -754,7 +754,7 @@ typedef struct
     chip::EndpointId endpoint; // 0x00 when this record is not in use
     chip::GroupId groupId;     // 0x0000 if not associated with a group
     uint8_t sceneId;
-#ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
+#if defined(MATTER_CLUSTER_SCENE_NAME_SUPPORT) && MATTER_CLUSTER_SCENE_NAME_SUPPORT
     uint8_t name[ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH + 1];
 #endif
     uint16_t transitionTime;     // in seconds
