@@ -35,7 +35,6 @@
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/PersistedCounter.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -306,7 +305,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "ERROR setting up transport: %s", ErrorStr(err));
+        ChipLogError(AppServer, "ERROR setting up transport: %" CHIP_ERROR_FORMAT, err.Format());
     }
     else
     {
@@ -436,7 +435,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     err = app::DnssdServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed to get mdns instance name error: %s", ErrorStr(err));
+        ChipLogError(AppServer, "Failed to get mdns instance name error: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
     ChipLogDetail(AppServer, "instanceName=%s", nameBuffer);
@@ -455,7 +454,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     }
     else
     {
-        ChipLogError(AppServer, "Send UDC request failed, err: %s\n", chip::ErrorStr(err));
+        ChipLogError(AppServer, "Send UDC request failed, err: %" CHIP_ERROR_FORMAT, err.Format());
     }
     return err;
 }
