@@ -67,8 +67,6 @@ static void chip_shell_task(void * args)
 {
 
     cmd_misc_init();
-    cmd_ping_init();
-    cmd_send_init();
 
     Engine::Root().RunMainLoop();
 }

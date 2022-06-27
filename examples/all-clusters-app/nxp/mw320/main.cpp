@@ -1103,8 +1103,6 @@ void ShellCLIMain(void * pvParameter)
 
     cmd_misc_init();
     // cmd_otcli_init();
-    // cmd_ping_init();
-    // cmd_send_init();
 
     ChipLogDetail(Shell, "Run CHIP shell Task: %d", rc);
     PRINTF("call mcuInitPower() \r\n");

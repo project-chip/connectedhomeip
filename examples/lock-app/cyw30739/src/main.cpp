@@ -153,7 +153,6 @@ APPLICATION_START()
     {
         printf("ERROR Shell Init %d\n", ret);
     }
-    cmd_ping_init();
     RegisterAppShellCommands();
     Engine::Root().RunMainLoop();
 

@@ -42,15 +42,13 @@ target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 
 target_include_directories(app PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
-                           ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common                           
+                           ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common
                            ${APP_ROOT}/shell_common/include)
 
 target_sources(app PRIVATE
     ${APP_ROOT}/shell_common/globals.cpp
     ${APP_ROOT}/shell_common/cmd_misc.cpp
     ${APP_ROOT}/shell_common/cmd_otcli.cpp
-    ${APP_ROOT}/shell_common/cmd_ping.cpp
-    ${APP_ROOT}/shell_common/cmd_send.cpp     
     ${APP_ROOT}/standalone/main.cpp
 )
 
