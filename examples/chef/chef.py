@@ -322,6 +322,8 @@ def main(argv: Sequence[str]) -> None:
                       dest="use_zzz", action="store_true")
     parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Uses --use_zzz. Chef exits after completion.",
                       dest="build_all", action="store_true")
+    parser.add_option("-k", "--keep_going", help="For use in CD only. Continues building all sample apps in the event of an error.",
+                      dest="keep_going", action="store_true")
     parser.add_option(
         "", "--ci", help="Builds Chef examples defined in cicd_config. Uses --use_zzz. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
 
@@ -387,13 +389,17 @@ def main(argv: Sequence[str]) -> None:
                 except RuntimeError as build_fail_error:
                     failed_builds.append((device_name, platform, "build"))
                     flush_print(str(build_fail_error))
-                    break
+                    if not options.keep_going:
+                        exit(1)
+                    continue
                 try:
                     bundle(platform, device_name)
                 except FileNotFoundError as bundle_fail_error:
                     failed_builds.append((device_name, platform, "bundle"))
                     flush_print(str(bundle_fail_error))
-                    break
+                    if not options.keep_going:
+                        exit(1)
+                    continue
                 archive_name = f"{label}-{device_name}"
                 archive_full_name = archive_prefix + archive_name + archive_suffix
                 flush_print(f"Adding build output to archive {archive_full_name}")
