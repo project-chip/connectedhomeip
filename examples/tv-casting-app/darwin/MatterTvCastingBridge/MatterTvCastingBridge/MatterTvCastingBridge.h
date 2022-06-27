@@ -15,8 +15,12 @@
  *    limitations under the License.
  */
 
-//
-//  TvCasting's Public headers exposed to Swift
-//
+#import <Foundation/Foundation.h>
+
+//! Project version number for MatterTvCastingBridge.
+FOUNDATION_EXPORT double MatterTvCastingBridgeVersionNumber;
+
+//! Project version string for MatterTvCastingBridge.
+FOUNDATION_EXPORT const unsigned char MatterTvCastingBridgeVersionString[];
 
 #import "CastingServerBridge.h"
