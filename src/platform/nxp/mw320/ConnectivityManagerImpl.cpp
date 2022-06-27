@@ -22,6 +22,11 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
+#endif
 
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
