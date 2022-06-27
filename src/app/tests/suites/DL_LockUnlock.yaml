@@ -134,7 +134,25 @@ tests:
       response:
           value: 1
 
+    - label: "Set OperatingMode to NoRemoteLockUnlock"
+      command: "writeAttribute"
+      attribute: "OperatingMode"
+      arguments:
+          value: 3
+
+    - label: "Try to unlock the door when OperatingMode is NoRemoteLockUnlock"
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+      response:
+          error: FAILURE
+
     # Clean-up
+    - label: "Set OperatingMode to Normal"
+      command: "writeAttribute"
+      attribute: "OperatingMode"
+      arguments:
+          value: 0
+
     - label: "Clean the created credential"
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000
