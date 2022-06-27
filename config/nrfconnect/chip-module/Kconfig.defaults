@@ -177,6 +177,8 @@ config CHIP_NFC_COMMISSIONING
     bool
     default y
 
+if !CHIP_WIFI_NRF # until the Wi-Fi driver is not fixed we must
+                  # live with  OTA support only for Thread
 config CHIP_OTA_REQUESTOR
     bool
     default y
@@ -184,6 +186,8 @@ config CHIP_OTA_REQUESTOR
 config CHIP_QSPI_NOR
     bool
     default y
+
+endif
 
 # Enable extended discovery
 config CHIP_EXTENDED_DISCOVERY
@@ -203,7 +207,94 @@ config IEEE802154_NRF5_RX_STACK_SIZE
 
 config NET_L2_OPENTHREAD
     bool
+    default y if !CHIP_WIFI_NRF
+
+if NET_L2_OPENTHREAD
+
+config OPENTHREAD_PANID
+    int
+    default 4660
+
+config OPENTHREAD_CHANNEL
+    int
+    default 15
+
+config OPENTHREAD_NETWORK_NAME
+    string
+    default "OpenThread"
+
+config OPENTHREAD_XPANID
+    string
+    default "11:11:11:11:22:22:22:22"
+
+endif
+
+if CHIP_WIFI_NRF
+
+config FLASH
+    bool
     default y
+
+config SETTINGS
+    bool
+    default y
+
+config NVS
+    bool
+    default y
+
+config MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG
+    bool
+    default n
+
+# align these numbers to match the OpenThread config
+config NET_IF_UNICAST_IPV6_ADDR_COUNT
+    int
+    default 6
+
+config NET_IF_MCAST_IPV6_ADDR_COUNT
+    int
+    default 8
+
+config NET_PKT_RX_COUNT
+    int
+    default 16
+
+config NET_PKT_TX_COUNT
+    int
+    default 16
+
+config NET_BUF_RX_COUNT
+    int
+    default 80
+
+config NET_BUF_TX_COUNT
+    int
+    default 80
+
+config NET_SOCKETS_POSIX_NAMES
+    bool
+    default n
+
+config MBEDTLS_SSL_OUT_CONTENT_LEN
+    int
+    default 900
+
+# options managed by IP4/IP6 simultaneous support
+# aligned here to match OpenThread config
+config NET_MAX_ROUTERS
+    int
+    default 1
+
+config NET_MAX_CONN
+    int
+    default 4
+
+config SHELL_STACK_SIZE
+    int
+    default 2616
+
+endif
 
 # Enable mbedTLS from nrf_security library
 

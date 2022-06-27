@@ -102,11 +102,6 @@ if (CONFIG_POSIX_API)
         -D_SYS__PTHREADTYPES_H_
         -isystem${ZEPHYR_BASE}/include/zephyr/posix
     )
-# a dirty hack to avoid make_gn_args.py issue with missing parameters (for testing only)
-else()
-    list(APPEND CHIP_CFLAGS
-    anything
-    )
 endif()
 
 if (CONFIG_NORDIC_SECURITY_BACKEND)

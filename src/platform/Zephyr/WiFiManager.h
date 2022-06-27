@@ -45,18 +45,6 @@ public:
 
     CHIP_ERROR Init()
     {
-        // for now just attempt to call anything from Zephyr net_mgmt API (for instance scanning)
-        // struct net_if * iface = net_if_get_default();
-        // auto ret              = net_mgmt(NET_REQUEST_WIFI_SCAN, iface, NULL, 0);
-        // if (ret)
-        // {
-        //     ChipLogDetail(DeviceLayer, "Scan cannot be started. Error: %d", ret);
-        //     return CHIP_ERROR_INCORRECT_STATE;
-        // }
-        // else
-        // {
-        //     ChipLogDetail(DeviceLayer, "Scan started");
-        // }
         return CHIP_NO_ERROR;
     }
 };

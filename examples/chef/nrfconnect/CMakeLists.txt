@@ -86,7 +86,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/stubs.cpp
     ${GEN_DIR}/callback-stub.cpp
     ${GEN_DIR}/IMClusterCommandHandler.cpp
-    ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
+    $<$<BOOL:${CONFIG_NET_L2_OPENTHREAD}>:${NRFCONNECT_COMMON}/util/ThreadUtil.cpp>
 )
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
