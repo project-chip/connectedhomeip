@@ -51,10 +51,7 @@ public:
         mAddNocCommandHasBeenInvoked = true;
         mFabricIndex                 = nocFabricIndex;
     }
-    void SetUpdateNocCommandInvoked()
-    {
-        mUpdateNocCommandHasBeenInvoked = true;
-    }
+    void SetUpdateNocCommandInvoked() { mUpdateNocCommandHasBeenInvoked = true; }
     void SetAddTrustedRootCertInvoked() { mAddTrustedRootCertHasBeenInvoked = true; }
     void SetCsrRequestForUpdateNoc(bool isForUpdateNoc) { mIsCsrRequestForUpdateNoc = isForUpdateNoc; }
 

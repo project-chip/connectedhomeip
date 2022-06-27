@@ -1018,7 +1018,8 @@ CHIP_ERROR FabricTable::Init(const FabricTable::InitParams & initParams)
         err = ReadFabricInfo(reader);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(FabricProvisioning, "Error loading fabric table: %" CHIP_ERROR_FORMAT ", we are in a bad state!", err.Format());
+            ChipLogError(FabricProvisioning, "Error loading fabric table: %" CHIP_ERROR_FORMAT ", we are in a bad state!",
+                         err.Format());
         }
 
         ReturnErrorOnFailure(err);
@@ -1035,12 +1036,13 @@ CHIP_ERROR FabricTable::Init(const FabricTable::InitParams & initParams)
         mDeletedFabricIndexFromInit = commitMarker.fabricIndex;
 
         // Can't do better on error. We just have to hope for the best.
-        (void)Delete(commitMarker.fabricIndex);
+        (void) Delete(commitMarker.fabricIndex);
     }
     else if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // Got an error, but somehow value is not missing altogether: inconsistent state but touch nothing.
-        ChipLogError(FabricProvisioning, "Error loading Table commit marker: %" CHIP_ERROR_FORMAT ", hope for the best!", err.Format());
+        ChipLogError(FabricProvisioning, "Error loading Table commit marker: %" CHIP_ERROR_FORMAT ", hope for the best!",
+                     err.Format());
     }
 
     // Always statelessly revert commit marker in this situation.
@@ -1788,7 +1790,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
     }
 
     // ==== Start of actual commit transaction after pre-flight checks ====
-    CHIP_ERROR stickyError = StoreCommitMarker(CommitMarker{fabricIndexBeingCommitted, isAdding});
+    CHIP_ERROR stickyError  = StoreCommitMarker(CommitMarker{ fabricIndexBeingCommitted, isAdding });
     bool failedCommitMarker = (stickyError != CHIP_NO_ERROR);
     if (failedCommitMarker)
     {

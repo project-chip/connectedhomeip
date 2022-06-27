@@ -306,13 +306,13 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         if (fabricIndexDeletedOnInit != kUndefinedFabricIndex)
         {
             ChipLogError(AppServer, "FabricIndex 0x%x deleted due to restart while fail-safed. Processing a clean-up!",
-                        static_cast<unsigned>(fabricIndexDeletedOnInit));
+                         static_cast<unsigned>(fabricIndexDeletedOnInit));
 
             // Always pretend it was an add, since being in the middle of an update currently breaks
             // the validity of the fabric table. This is expected to be extremely infrequent, so
             // this "harsher" than usual clean-up is more likely to get us in a valid state for whatever
             // remains.
-            const bool addNocCalled = true;
+            const bool addNocCalled    = true;
             const bool updateNocCalled = false;
             GetFailSafeContext().ScheduleFailSafeCleanup(fabricIndexDeletedOnInit, addNocCalled, updateNocCalled);
         }

@@ -837,7 +837,7 @@ public:
     // For test only. See definition of `StateFlags::kAbortCommitForTest`.
     void SetForceAbortCommitForTest(bool abortCommitForTest)
     {
-        (void)abortCommitForTest;
+        (void) abortCommitForTest;
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         if (abortCommitForTest)
         {
@@ -882,10 +882,10 @@ private:
         CommitMarker(FabricIndex fabricIndex_, bool isAddition_)
         {
             this->fabricIndex = fabricIndex_;
-            this->isAddition = isAddition_;
+            this->isAddition  = isAddition_;
         }
         FabricIndex fabricIndex = kUndefinedFabricIndex;
-        bool isAddition = false;
+        bool isAddition         = false;
     };
 
     // Load a FabricInfo metatada item from storage for a given new fabric index. Returns internal error on failure.

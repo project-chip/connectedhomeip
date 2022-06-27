@@ -20,8 +20,8 @@
  *          Provides the implementation of the FailSafeContext object.
  */
 
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/SafeInt.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include "FailSafeContext.h"
 
@@ -95,7 +95,8 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, uint16
         cancelTimersIfError = true;
     }
 
-    SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(expiryLengthSeconds), HandleArmFailSafeTimer, this));
+    SuccessOrExit(
+        err = DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(expiryLengthSeconds), HandleArmFailSafeTimer, this));
 
     mFailSafeArmed = true;
     mFabricIndex   = accessingFabricIndex;
@@ -134,5 +135,5 @@ void FailSafeContext::ForceFailSafeTimerExpiry()
     FailSafeTimerExpired();
 }
 
-} // namespace DeviceLayer
+} // namespace app
 } // namespace chip

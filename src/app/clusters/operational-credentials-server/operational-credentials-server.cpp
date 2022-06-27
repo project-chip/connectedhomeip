@@ -640,7 +640,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     FabricInfo * newFabricInfo = nullptr;
     auto & fabricTable         = Server::GetInstance().GetFabricTable();
 
-    auto * secureSession              = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
+    auto * secureSession   = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
 
     uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
@@ -1015,7 +1015,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
     // logs by the end. We use finalStatus as our overall success marker, not error
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
-    auto & fabricTable                = Server::GetInstance().GetFabricTable();
+    auto & fabricTable     = Server::GetInstance().GetFabricTable();
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
 
     auto & CSRNonce     = commandData.CSRNonce;
@@ -1133,7 +1133,7 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     // logs by the end. We use finalStatus as our overall success marker, not error
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
-    auto & rootCertificate            = commandData.rootCertificate;
+    auto & rootCertificate = commandData.rootCertificate;
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
 
     ChipLogProgress(Zcl, "OpCreds: Received an AddTrustedRootCertificate command");
