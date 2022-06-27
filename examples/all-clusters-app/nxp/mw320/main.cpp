@@ -974,9 +974,6 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
         // uint16_t unsecurePort = CHIP_UDC_PORT;
 
         // PRINTF("==> call chip::Server() \r\n");
-        // PRINTF("Orig DNSS Discovery Timeout: %d sec \r\n", chip::app::DnssdServer::Instance().GetDiscoveryTimeoutSecs());
-        // chip::app::DnssdServer::Instance().SetDiscoveryTimeoutSecs(60);
-        // chip::app::DnssdServer::Instance().SetDiscoveryTimeoutSecs(30);
         // chip::Server::GetInstance().Init(nullptr, securePort, unsecurePort);
 
         static chip::CommonCaseDeviceServerInitParams initParams;

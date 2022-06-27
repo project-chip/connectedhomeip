@@ -107,12 +107,6 @@ void DnssdServer::OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, vo
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
-/// Callback from Discovery Expiration timer
-void HandleDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
-{
-    DnssdServer::Instance().OnDiscoveryExpiration(aSystemLayer, aAppState);
-}
-
 bool DnssdServer::OnExpiration(System::Clock::Timestamp expirationMs)
 {
     if (expirationMs == kTimeoutCleared)
@@ -164,47 +158,6 @@ bool DnssdServer::OnExpiration(System::Clock::Timestamp expirationMs)
     }
 
     return true;
-}
-
-void DnssdServer::OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
-{
-    if (!DnssdServer::OnExpiration(mDiscoveryExpiration))
-    {
-        ChipLogDetail(Discovery, "OnDiscoveryExpiration callback for cleared session");
-        return;
-    }
-
-    ChipLogDetail(Discovery, "OnDiscoveryExpiration callback for valid session");
-
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    int32_t extTimeout = GetExtendedDiscoveryTimeoutSecs();
-    if (extTimeout != CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED)
-    {
-        CHIP_ERROR err = AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode::kDisabled);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Failed to advertise extended commissionable node: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        // set timeout
-        ScheduleExtendedDiscoveryExpiration();
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-
-    mDiscoveryExpiration = kTimeoutCleared;
-}
-
-CHIP_ERROR DnssdServer::ScheduleDiscoveryExpiration()
-{
-    if (mDiscoveryTimeoutSecs == CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT)
-    {
-        return CHIP_NO_ERROR;
-    }
-    ChipLogDetail(Discovery, "Scheduling discovery timeout in %ds", mDiscoveryTimeoutSecs);
-
-    mDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds16(mDiscoveryTimeoutSecs);
-
-    return DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(mDiscoveryTimeoutSecs), HandleDiscoveryExpiration,
-                                                 nullptr);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -454,13 +407,6 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Failed to advertise commissionable node: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-
-        // If any fabrics exist, the commissioning window must have been opened by the administrator
-        // commissioning cluster commands which take care of the timeout.
-        if (!HaveOperationalCredentials())
-        {
-            ScheduleDiscoveryExpiration();
         }
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY

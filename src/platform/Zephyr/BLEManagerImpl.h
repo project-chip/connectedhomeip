@@ -139,7 +139,6 @@ private:
     static void HandleTXIndicated(bt_conn * conn, IndicationAttrType attr, uint8_t err);
     static void HandleConnect(bt_conn * conn, uint8_t err);
     static void HandleDisconnect(bt_conn * conn, uint8_t reason);
-    static void HandleBLEAdvertisementTimeout(System::Layer * layer, void * param);
     static void HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param);
 
     // ===== Members for internal use by the following friends.

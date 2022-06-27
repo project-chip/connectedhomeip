@@ -202,16 +202,12 @@ private:
     CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
 
-    static constexpr System::Clock::Timeout kAdvertiseTimeout =
-        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT);
     static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
         System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
     System::Clock::Timestamp mAdvertiseStartTime;
 
     static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context);
     void HandleFastAdvertisementTimer();
-    static void HandleAdvertisementTimer(System::Layer * systemLayer, void * context);
-    void HandleAdvertisementTimer();
 
 #if CONFIG_BT_BLUEDROID_ENABLED
     void HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);

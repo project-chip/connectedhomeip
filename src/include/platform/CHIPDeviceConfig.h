@@ -584,18 +584,6 @@
 #define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME 30000
 #endif
 
-/**
- * CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
- *
- * The amount of time in miliseconds after which BLE advertisement should be disabled, counting
- * from the moment of advertisement commencement.
- *
- * Defaults to 9000000 (15 minutes).
- */
-#ifndef CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
-#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)
-#endif
-
 // -------------------- Time Sync Configuration --------------------
 
 /**
