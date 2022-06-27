@@ -285,8 +285,8 @@ void ParseValue(std::vector<uint8_t> * data, uint16_t size, const std::string & 
             return;
         data->resize(size);
         memcpy(data->data() + 2, str.data(), str.size());
-        LittleEndian<uint16_t> length = (uint16_t) str.size();
-        memcpy(data->data(), &length, 2);
+        (*data)[0]      = (uint8_t) (size & 0xFF);
+        (*data)[1]      = (uint8_t) ((size >> 8) & 0xFF);
         data->data()[0] = (uint8_t) str.size();
     }
     break;
@@ -294,20 +294,20 @@ void ParseValue(std::vector<uint8_t> * data, uint16_t size, const std::string & 
         // Writing structs not supported yet
         break;
     case ZCL_SINGLE_ATTRIBUTE_TYPE: {
-        LittleEndian<float> v = (float) atof(str.c_str());
+        float v = (float) atof(str.c_str());
         data->resize(size);
         memcpy(data->data(), &v, size);
     }
     break;
     case ZCL_DOUBLE_ATTRIBUTE_TYPE: {
-        LittleEndian<double> v = atof(str.c_str());
+        double v = atof(str.c_str());
         data->resize(size);
         memcpy(data->data(), &v, size);
     }
     break;
     default: {
         // Assume integer
-        LittleEndian<uint64_t> v = strtoull(str.c_str(), nullptr, 10);
+        uint64_t v = strtoull(str.c_str(), nullptr, 10);
         data->resize(size);
         memcpy(data->data(), &v, size);
     }
