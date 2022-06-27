@@ -22,7 +22,11 @@
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
+#ifdef DEVICE_ATTESTATION_CREDENTIALS
+#include <platform/EFR32/DeviceAttestationCredsImpl.h>
+#else
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#endif
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -113,7 +117,11 @@ WindowApp::Cover * WindowApp::GetCover(chip::EndpointId endpoint)
 CHIP_ERROR WindowApp::Init()
 {
     // Initialize device attestation config
+#ifdef DEVICE_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(EFR32::GetDACProvider());
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
 
     ConfigurationMgr().LogDeviceConfig();
 

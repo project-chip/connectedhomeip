@@ -40,7 +40,11 @@
 #include <assert.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
+#ifdef DEVICE_ATTESTATION_CREDENTIALS
+#include <platform/EFR32/DeviceAttestationCredsImpl.h>
+#else
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#endif
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -203,7 +207,11 @@ CHIP_ERROR AppTask::Init()
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
+#ifdef DEVICE_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(EFR32::GetDACProvider());
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Create FreeRTOS sw timer for Function Selection.

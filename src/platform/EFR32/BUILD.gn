@@ -25,6 +25,7 @@ if (chip_enable_openthread) {
 
 static_library("EFR32") {
   sources = [
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
     "../FreeRTOS/SystemTimeSupport.cpp",
     "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
@@ -55,6 +56,13 @@ static_library("EFR32") {
     "gatt_db.c",
     "gatt_db.h",
   ]
+
+  if (chip_device_attestation_credentials) {
+    defines = [ "DEVICE_ATTESTATION_CREDENTIALS=1" ]
+    sources += [
+      "DeviceAttestationCredsImpl.cpp",
+    ]
+  }
 
   if (chip_enable_ota_requestor) {
     sources += [
