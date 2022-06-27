@@ -19,12 +19,11 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
-#include <lib/support/CodeUtils.h>
-#include "psa/crypto.h"
 #include "efr32_certs.h"
-#include "sl_token_manager.h"
+#include "psa/crypto.h"
 #include "sl_token_api.h"
-
+#include "sl_token_manager.h"
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace Credentials {
@@ -71,18 +70,12 @@ public:
         psa_key_id_t key_id = MFG_MATTER_DAC_KEY_ID;
         uint8_t signature[512];
         size_t signature_length = 0;
-        psa_status_t err = psa_sign_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256),
-                digest_to_sign.data(),
-                digest_to_sign.size(),
-                signature,
-                sizeof(signature),
-                &signature_length
-            );
+        psa_status_t err = psa_sign_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), digest_to_sign.data(), digest_to_sign.size(),
+                                            signature, sizeof(signature), &signature_length);
         ChipLogDetail(MessageLayer, "~ SignWithDeviceAttestationKey, err:%ld, size:%zu\n", err, signature_length);
         VerifyOrReturnError(!err, CHIP_ERROR_INTERNAL);
 
         return CopySpanToMutableSpan(ByteSpan{ signature, signature_length }, out_buffer);
-
     }
 };
 

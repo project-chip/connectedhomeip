@@ -31,6 +31,6 @@ namespace EFR32 {
  */
 DeviceAttestationCredentialsProvider * GetDACProvider();
 
-} // namespace Examples
+} // namespace EFR32
 } // namespace Credentials
 } // namespace chip

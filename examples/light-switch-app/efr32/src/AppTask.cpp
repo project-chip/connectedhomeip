@@ -42,7 +42,6 @@
 #include <assert.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
 #ifdef DEVICE_ATTESTATION_CREDENTIALS
 #include <platform/EFR32/DeviceAttestationCredsImpl.h>
 #else
