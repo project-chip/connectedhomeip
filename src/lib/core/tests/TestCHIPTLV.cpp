@@ -36,6 +36,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/Constants.h>
@@ -4455,12 +4456,8 @@ int TestCHIPTLV(void)
         TestCHIPTLV_Teardown
     };
     // clang-format on
-    TestTLVContext context(&theSuite);
 
-    // Run test suit against one context
-    nlTestRunner(&theSuite, &context);
-
-    return (nlTestRunnerStats(&theSuite));
+    return chip::ExecuteTestsWithContext<TestTLVContext>(&theSuite, &theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestCHIPTLV)

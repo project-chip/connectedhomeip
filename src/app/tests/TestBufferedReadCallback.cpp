@@ -26,6 +26,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <vector>
@@ -618,10 +619,8 @@ nlTestSuite theSuite =
 
 int TestBufferedReadCallback()
 {
-    TestContext gContext;
     gSuite = &theSuite;
-    nlTestRunner(&theSuite, &gContext);
-    return (nlTestRunnerStats(&theSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestBufferedReadCallback)

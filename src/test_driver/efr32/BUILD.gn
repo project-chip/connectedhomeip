@@ -87,6 +87,7 @@ efr32_executable("efr32_device_tests") {
     "${chip_root}/examples/common/pigweed:system_rpc_server",
     "${chip_root}/src:tests",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
