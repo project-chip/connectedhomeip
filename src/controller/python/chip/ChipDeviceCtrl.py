@@ -67,10 +67,10 @@ _IssueNOCChainCallbackPythonCallbackFunct = CFUNCTYPE(
 
 @dataclass
 class NOCChain:
-    nocBytes: str
-    icacBytes: str
-    rcacBytes: str
-    ipkBytes: str
+    nocBytes: bytes
+    icacBytes: bytes
+    rcacBytes: bytes
+    ipkBytes: bytes
     adminSubject: int
 
 
