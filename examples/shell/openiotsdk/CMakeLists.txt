@@ -38,6 +38,8 @@ target_include_directories(${APP_TARGET} PRIVATE
 
 target_sources(${APP_TARGET} PRIVATE
                 main/main.cpp
+                ${SHELL_COMMON}/cmd_misc.cpp
+                ${SHELL_COMMON}/globals.cpp
 )
 
 target_link_libraries(${APP_TARGET} 
