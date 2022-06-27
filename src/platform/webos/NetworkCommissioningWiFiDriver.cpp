@@ -78,10 +78,9 @@ CHIP_ERROR LinuxWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * netwo
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LinuxWiFiDriver::Shutdown()
+void LinuxWiFiDriver::Shutdown()
 {
     ConnectivityMgrImpl().SetNetworkStatusChangeCallback(nullptr);
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR LinuxWiFiDriver::CommitConfiguration()

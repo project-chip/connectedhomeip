@@ -76,10 +76,9 @@ CHIP_ERROR BLWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     return err;
 }
 
-CHIP_ERROR BLWiFiDriver::Shutdown()
+void BLWiFiDriver::Shutdown()
 {
     mpStatusChangeCallback = nullptr;
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLWiFiDriver::CommitConfiguration()

@@ -52,7 +52,7 @@ protected:
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack();
-    CHIP_ERROR _Shutdown();
+    void _Shutdown();
     CHIP_ERROR _AddEventHandler(PlatformManager::EventHandlerFunct handler, intptr_t arg);
     void _RemoveEventHandler(PlatformManager::EventHandlerFunct handler, intptr_t arg);
     void _HandleServerStarted();

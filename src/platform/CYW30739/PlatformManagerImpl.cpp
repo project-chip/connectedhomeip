@@ -173,10 +173,7 @@ CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout durationM
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_Shutdown()
-{
-    return CHIP_NO_ERROR;
-}
+void PlatformManagerImpl::_Shutdown() {}
 
 void PlatformManagerImpl::SetEventFlags(uint32_t flags)
 {

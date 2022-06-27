@@ -86,7 +86,7 @@ public:
      * Some other layers hold pointers to System::Layer, so care must be taken
      * to ensure that they are not used after calling Shutdown().
      */
-    virtual CHIP_ERROR Shutdown() = 0;
+    virtual void Shutdown() = 0;
 
     /**
      * True if this Layer is initialized. No method on Layer or its abstract descendants, other than this and `Init()`,

@@ -79,7 +79,7 @@ protected:
     CHIP_ERROR _StartEventLoopTask(void);
     CHIP_ERROR _StopEventLoopTask();
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
-    CHIP_ERROR _Shutdown(void);
+    void _Shutdown(void);
 
     // ===== Methods available to the implementation subclass.
     explicit GenericPlatformManagerImpl_Zephyr(ThreadStack stack) : mChipThreadStack(stack) {}
@@ -92,6 +92,9 @@ private:
     void ProcessDeviceEvents();
 
     volatile bool mShouldRunEventLoop;
+
+    bool mInitialized = false;
+
     static void EventLoopTaskMain(void * thisPtr, void *, void *);
 };
 

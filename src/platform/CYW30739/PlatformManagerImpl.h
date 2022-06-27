@@ -55,7 +55,7 @@ private:
     void _UnlockChipStack(void);
     CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout durationMS);
-    CHIP_ERROR _Shutdown(void);
+    void _Shutdown(void);
 
     void SetEventFlags(uint32_t flags);
     void HandleTimerEvent(void);
