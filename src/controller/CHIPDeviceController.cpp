@@ -1196,8 +1196,8 @@ CHIP_ERROR DeviceCommissioner::IssueNOCChain(const ByteSpan & NOCSRElements, Nod
     }
 
     // Note: attestationSignature, attestationChallenge, DAC, PAI are not used by existing OperationalCredentialsIssuer.
-    return mOperationalCredentialsDelegate->GenerateChipNOCChain(NOCSRElements, ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(),
-                                                                 ByteSpan(), callback);
+    return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(),
+                                                             ByteSpan(), callback);
 }
 
 CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements,
