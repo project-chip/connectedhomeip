@@ -28,7 +28,13 @@
 
 using namespace ::chip;
 
+// Currently up to 10 users are support on the CYW30739 platform
+#define DOOR_LOCK_MAX_USERS 10
 #define DOOR_LOCK_MAX_CREDENTIAL_SIZE 8
+#define MININUM_USER_INDEX 1
+#define MINIMUM_CREDENTIAL_INDEX 1
+#define MAX_CREDENTIAL_PER_USER 10
+#define MAX_CREDENTIALS 50
 
 static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
 
@@ -59,7 +65,7 @@ public:
     } Actor;
 
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
-                    uint8_t maxNumberOfCredentialsPerUser);
+                    uint8_t maxNumberOfCredentialsPerUser, uint16_t numberOfSupportedUsers);
     bool NextState();
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
@@ -71,16 +77,16 @@ public:
     bool Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
     bool Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
 
-    bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const;
-    bool SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,
-                 uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype, DlCredentialRule credentialRule,
-                 const DlCredential * credentials, size_t totalCredentials);
+    bool GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const;
+    bool SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
+                 const chip::CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype,
+                 DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials);
 
     bool GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
                        EmberAfPluginDoorLockCredentialInfo & credential) const;
 
-    bool SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
-                       DlCredentialType credentialType, const chip::ByteSpan & credentialData);
+    bool SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
+                       DlCredentialStatus credentialStatus, DlCredentialType credentialType, const chip::ByteSpan & credentialData);
 
     bool setLockState(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
                       DlOperationError & err);
@@ -102,13 +108,15 @@ private:
     static void TimerEventHandler(WICED_TIMER_PARAM_TYPE cb_params);
     static int ActuatorMovementTimerEventHandler(void * aEvent);
 
-    EmberAfPluginDoorLockUserInfo mLockUser;
-    EmberAfPluginDoorLockCredentialInfo mLockCredentials;
+    EmberAfPluginDoorLockUserInfo mLockUsers[DOOR_LOCK_MAX_USERS];
+    EmberAfPluginDoorLockCredentialInfo mLockCredentials[MAX_CREDENTIALS];
 
-    char mUserName[DOOR_LOCK_MAX_USER_NAME_SIZE];
-    uint8_t mCredentialData[DOOR_LOCK_MAX_CREDENTIAL_SIZE];
-    chip::Platform::ScopedMemoryBuffer<DlCredential> mCredentials;
     uint8_t mMaxCredentialsPerUser;
+    uint16_t mMaxUsers;
+
+    char mUserNames[ArraySize(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
+    uint8_t mCredentialData[MAX_CREDENTIALS][DOOR_LOCK_MAX_CREDENTIAL_SIZE];
+    chip::Platform::ScopedMemoryBuffer<DlCredential> mCredentials[MAX_CREDENTIAL_PER_USER];
 
     static LockManager sLock;
 };

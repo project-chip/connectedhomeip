@@ -194,9 +194,19 @@ void InitApp(intptr_t args)
                      endpointId);
         maxCredentialsPerUser = 5;
     }
+
+    uint16_t numberOfSupportedUsers = 0;
+    if (!DoorLockServer::Instance().GetNumberOfUserSupported(endpointId, numberOfSupportedUsers))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of supported users when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+                     endpointId);
+        numberOfSupportedUsers = 10;
+    }
+
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    CHIP_ERROR err = LockMgr().Init(state, maxCredentialsPerUser);
+    CHIP_ERROR err = LockMgr().Init(state, maxCredentialsPerUser, numberOfSupportedUsers);
     if (err != CHIP_NO_ERROR)
     {
         printf("LockMgr().Init() failed\n");
