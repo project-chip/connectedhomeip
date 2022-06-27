@@ -68,12 +68,12 @@ function getManualTests() {
   const Groups = [
     'TestGroupDemoCommand',
     'TestGroupDemoConfig',
-    'Test_TC_GR_1_1',
-    'Test_TC_GR_2_1',
-    'Test_TC_GR_2_2',
-    'Test_TC_GR_2_3',
-    'Test_TC_GR_3_1',
-    'Test_TC_GR_3_2',
+    'Test_TC_G_1_1',
+    'Test_TC_G_2_1',
+    'Test_TC_G_2_2',
+    'Test_TC_G_2_3',
+    'Test_TC_G_3_1',
+    'Test_TC_G_3_2',
   ];
 
   const BulkDataExchangeProtocol = [

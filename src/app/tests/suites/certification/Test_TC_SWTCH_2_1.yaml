@@ -47,6 +47,7 @@ tests:
               minValue: 0
 
     - label: "Read MultiPressMax attribute"
+      PICS: SWTCH.S.F04
       command: "readAttribute"
       attribute: "multi press max"
       response:

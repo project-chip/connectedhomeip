@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 120.1.1. [TC-GR-1.1] Global Attributes [DUT-Server]
+name: 119.1.1. [TC-G-1.1] Global Attributes [DUT-Server]
 
 config:
     nodeId: 0x12344321

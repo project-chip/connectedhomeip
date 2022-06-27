@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    121.2.3. [TC-GR-2.3] Commands - GetGroupMembership, AddGroupIfIdentifying
+    119.2.3. [TC-G-2.3] Commands - GetGroupMembership, AddGroupIfIdentifying
     [DUT-Server]
 
 config:
@@ -26,6 +26,7 @@ tests:
     - label:
           "TH sends AddGroup command to DUT as unicast with the following fields
           : GroupID as 0x0002 GroupName as Gp2"
+      PICS: G.S.C00.Rsp && G.S.C00.Tx
       verification: |
           ./chip-tool groups add-group 0x0002 gp2 1 0
 
@@ -39,6 +40,7 @@ tests:
     - label:
           "TH reads GroupTable attribute from the GroupKeyManagement cluster
           from DUT"
+      PICS: GRPKEY.S.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
@@ -56,6 +58,7 @@ tests:
     - label:
           "TH sends AddGroup command to DUT as unicast with the following fields
           : GroupID as 0x0003 GroupName as Gp3"
+      PICS: G.S.C00.Rsp && G.S.C00.Tx
       verification: |
           ./chip-tool groups add-group 0x0003 gp3 1 0
 
@@ -69,6 +72,7 @@ tests:
     - label:
           "TH reads GroupTable attribute from the GroupKeyManagement cluster
           from DUT"
+      PICS: GRPKEY.S.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
@@ -93,6 +97,7 @@ tests:
     - label:
           "TH sends GetGroupMembership command to DUT with the following fields
           : GroupList as NULL"
+      PICS: G.S.C02.Rsp && G.S.C02.Tx
       verification: |
           ./chip-tool groups get-group-membership [] 1 0
 
@@ -108,6 +113,7 @@ tests:
     - label:
           "TH sends GetGroupMembership command to DUT with the following fields
           : GroupList as [0x0002]"
+      PICS: G.S.C02.Rsp && G.S.C02.Tx
       verification: |
           ./chip-tool groups get-group-membership [0002] 1 0
 
@@ -121,6 +127,7 @@ tests:
     - label:
           "TH sends GetGroupMembership command to DUT as unicast with the
           following fields : GroupList as [0x0002, 0x0003]"
+      PICS: G.S.C02.Rsp && G.S.C02.Tx
       verification: |
           ./chip-tool groups get-group-membership [0002,0003] 1 0
 
@@ -133,6 +140,7 @@ tests:
       disabled: true
 
     - label: "TH sends RemoveAllGroups command to DUT as unicast method"
+      PICS: G.S.C04.Rsp
       verification: |
           ./chip-tool groups remove-all-groups 1 0
 
@@ -146,6 +154,7 @@ tests:
     - label:
           "TH sends AddGroupIfIdentifying command to DUT as unicast method with
           the following fields: GroupID as 0x0006 GroupName as Gp6"
+      PICS: G.S.C05.Rsp
       verification: |
           ./chip-tool groups  add-group-if-identifying 0x0006 gp6 1 0
 
@@ -158,6 +167,7 @@ tests:
     - label:
           "TH reads GroupTable attribute from the GroupKeyManagement cluster
           from DUT"
+      PICS: GRPKEY.S.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
@@ -180,6 +190,7 @@ tests:
     - label:
           "TH sends AddGroupIfIdentifying command to DUT as unicast method with
           the following fields: GroupID as 0x0000 GroupName as Gp45"
+      PICS: G.S.C05.Rsp
       verification: |
           ./chip-tool groups  add-group-if-identifying 0x0000 gp45 1 0
 
@@ -193,6 +204,7 @@ tests:
     - label:
           "TH sends AddGroupIfIdentifying command to DUT n+1 times as unicast
           method with the following fields: GroupID as 0x0007 GroupName as Gp54"
+      PICS: G.S.C05.Rsp
       verification: |
           ./chip-tool groups  add-group-if-identifying 0x0067 gp31 1 0
 
@@ -205,6 +217,7 @@ tests:
     - label:
           "TH reads GroupTable attribute from the GroupKeyManagement cluster
           from DUT"
+      PICS: GRPKEY.S.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 

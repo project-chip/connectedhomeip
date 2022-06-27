@@ -13,15 +13,15 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 120.3.1. [TC-GR-3.1] Groups Cluster Attributes [DUT-Client]
+name: 119.3.1. [TC-G-3.1] Attributes [DUT-Client]
 
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-
 tests:
     - label: "DUT reads NameSupport attribute from TH"
+      PICS: G.C.A0000
       verification: |
           [1651217683.754603][2825:2825] CHIP:IM: Received Read request
           [1651217683.754677][2825:2825] CHIP:DMG: ReadRequestMessage =
