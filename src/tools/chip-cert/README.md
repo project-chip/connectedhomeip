@@ -468,7 +468,7 @@ COMMAND OPTIONS
    -o, --out
 
        The output printed certificate file name. If not specified
-       or if specified - then output is writen to stdout.
+       or if specified - then output is written to stdout.
 
 HELP OPTIONS
 
