@@ -2,26 +2,26 @@
 
 ## Table of Contents
 
--   [CHIP Certificate Tool](#chip-certificate-tool)
-    -   [Table of Contents](#table-of-contents)
-    -   [Introduction](#introduction)
-    -   [Directory Structure](#directory-structure)
-        -   [<code>/src/tools/chip-cert</code>](#srctoolschip-cert)
-    -   [Usage Examples](#usage-examples)
-    -   [Operational Certificates Usage Examples](#operational-certificates-usage-examples)
-        -   [Attestation Certificates Usage Examples](#attestation-certificates-usage-examples)
-    -   [Command Reference](#command-reference)
-        -   [help](#help)
-        -   [gen-cert](#gen-cert)
-        -   [convert-cert](#convert-cert)
-        -   [convert-key](#convert-key)
-        -   [resign-cert](#resign-cert)
-        -   [validate-cert](#validate-cert)
-        -   [print-cert](#print-cert)
-        -   [gen-att-cert](#gen-att-cert)
-        -   [validate-att-cert](#validate-att-cert)
-        -   [gen-cd](#gen-cd)
-        -   [version](#version)
+- [CHIP Certificate Tool](#chip-certificate-tool)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Directory Structure](#directory-structure)
+    - [<code>/src/tools/chip-cert</code>](#srctoolschip-cert)
+  - [Usage Examples](#usage-examples)
+  - [Operational Certificates Usage Examples](#operational-certificates-usage-examples)
+    - [Attestation Certificates Usage Examples](#attestation-certificates-usage-examples)
+  - [Command Reference](#command-reference)
+    - [help](#help)
+    - [gen-cert](#gen-cert)
+    - [convert-cert](#convert-cert)
+    - [convert-key](#convert-key)
+    - [resign-cert](#resign-cert)
+    - [validate-cert](#validate-cert)
+    - [print-cert](#print-cert)
+    - [gen-att-cert](#gen-att-cert)
+    - [validate-att-cert](#validate-att-cert)
+    - [gen-cd](#gen-cd)
+    - [version](#version)
 
 ## Introduction
 
@@ -468,7 +468,7 @@ COMMAND OPTIONS
    -o, --out
 
        The output printed certificate file name. If not specified
-       or if specified - then output is writen to stdout.
+       or if specified - then output is written to stdout.
 
 HELP OPTIONS
 
