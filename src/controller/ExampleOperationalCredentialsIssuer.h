@@ -59,10 +59,6 @@ public:
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
                                 Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
 
-    CHIP_ERROR GenerateChipNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
-                                    const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
-                                    Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
-
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override
     {
         mNextRequestedNodeId = nodeId;

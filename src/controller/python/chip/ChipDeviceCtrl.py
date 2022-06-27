@@ -29,6 +29,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 import asyncio
 from ctypes import *
+from dataclasses import dataclass
 
 from .ChipStack import *
 from .interaction_model import InteractionModelError, delegate as im
@@ -60,20 +61,37 @@ _DevicePairingDelegate_OnCommissioningStatusUpdateFunct = CFUNCTYPE(
 # else seems to do it.
 _DeviceAvailableFunct = CFUNCTYPE(None, c_void_p, c_uint32)
 
-
 _IssueNOCChainCallbackPythonCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint32, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_uint64)
 
 
+@dataclass
+class NOCChain:
+    nocBytes: bytes
+    icacBytes: bytes
+    rcacBytes: bytes
+    ipkBytes: bytes
+    adminSubject: int
+
+
 @_IssueNOCChainCallbackPythonCallbackFunct
 def _IssueNOCChainCallbackPythonCallback(devCtrl, status: int, noc: c_void_p, nocLen: int, icac: c_void_p, icacLen: int, rcac: c_void_p, rcacLen: int, ipk: c_void_p, ipkLen: int, adminSubject: int):
-    nocBytes = string_at(noc, nocLen)[:]
-    icacBytes = string_at(icac, icacLen)[:]
-    rcacBytes = string_at(rcac, rcacLen)[:]
-    ipkBytes = None
-    if ipkLen > 0:
-        ipkBytes = string_at(ipk, ipkLen)[:]
-    devCtrl.NOCChainCallback(status, nocBytes, icacBytes, rcacBytes, ipkBytes, adminSubject)
+    nocChain = NOCChain(None, None, None, None, 0)
+    if status == 0:
+        nocBytes = None
+        if nocLen > 0:
+            nocBytes = string_at(noc, nocLen)[:]
+        icacBytes = None
+        if icacLen > 0:
+            icacBytes = string_at(icac, icacLen)[:]
+        rcacBytes = None
+        if rcacLen > 0:
+            rcacBytes = string_at(rcac, rcacLen)[:]
+        ipkBytes = None
+        if ipkLen > 0:
+            ipkBytes = string_at(ipk, ipkLen)[:]
+        nocChain = NOCChain(nocBytes, icacBytes, rcacBytes, ipkBytes, adminSubject)
+    devCtrl.NOCChainCallback(nocChain)
 
 # This is a fix for WEAV-429. Jay Logue recommends revisiting this at a later
 # date to allow for truly multiple instances so this is temporary.
@@ -345,8 +363,8 @@ class ChipDeviceController():
             return False
         return self._ChipStack.commissioningEventRes == 0
 
-    def NOCChainCallback(self, status, noc, icac, rcac, ipk, adminSubject):
-        self._ChipStack.callbackRes = (noc, icac, rcac, ipk, adminSubject)
+    def NOCChainCallback(self, nocChain):
+        self._ChipStack.callbackRes = nocChain
         self._ChipStack.completeEvent.set()
         return
 
@@ -978,6 +996,8 @@ class ChipDeviceController():
         self._ChipStack.blockingCB = blockingCB
 
     def IssueNOCChain(self, csr: Clusters.OperationalCredentials.Commands.CSRResponse, nodeId: int):
+        """Issue an NOC chain using the associated OperationalCredentialsDelegate.
+        The NOC chain will be provided in TLV cert format."""
         self.CheckIsActive()
 
         return self._ChipStack.CallAsync(

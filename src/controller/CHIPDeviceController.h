@@ -648,7 +648,8 @@ public:
     // Commissioner will establish new device connections after PASE.
     OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId) override;
 
-    // Issue an NOC chain using the associated OperationalCredentialsDelegate.
+    // Issue an NOC chain using the associated OperationalCredentialsDelegate. The NOC chain will
+    // be provided in X509 DER format.
     // NOTE: This is only valid assuming that `mOperationalCredentialsDelegate` is what is desired
     // to issue the NOC chain.
     CHIP_ERROR IssueNOCChain(const ByteSpan & NOCSRElements, NodeId nodeId,
