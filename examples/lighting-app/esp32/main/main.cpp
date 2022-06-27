@@ -48,7 +48,7 @@ static AppDeviceCallbacks EchoCallbacks;
 
 namespace {
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-ESP32FactoryDataProvider sFactoryDataProvider;
+chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 } // namespace
 
