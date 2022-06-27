@@ -52,23 +52,19 @@ tests:
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 65528, 65529, 65531, 65532, 65533]
           constraints:
               type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
 
-    #Issue 17460
     - label: "Read the global attribute: AcceptedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
-          value: [0, 1]
           constraints:
               type: list
+              contains: [0, 1]
 
-    #Issue 17460
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

@@ -11,74 +11,67 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.1.1. [TC-ACT-1.1] Global attributes with server as DUT
+name: 77.1.1. [TC-ACT-1.1] Global attributes with server as DUT
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Bridged Actions"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
-      verification: |
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
+    - label: "Read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: uint16
 
-    - label: "Read ClusterRevision (global attribute 65533)"
-      verification: |
-          ./chip-tool bridgedactions read cluster-revision 1 1
+    - label: "Read the global attribute: AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1]
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_FFFD DataVersion: 3573360937
-          [1649664569.312693][8655:8660] CHIP:TOO:   ClusterRevision: 1
-      disabled: true
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-    - label: "Read FeatureMap (global attribute 65532)"
-      verification: |
-          ./chip-tool bridgedactions read feature-map 1 1
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-          Need to implement in SDK
-      disabled: true
-
-    - label: "Read AttributeList (global attribute 65531)"
-      verification: |
-          ./chip-tool bridgedactions read attribute-list 1 1
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_FFFB DataVersion: 3573360937
-          [1649664685.946524][8671:8676] CHIP:TOO:   AttributeList: 7 entries
-          [1649664685.946600][8671:8676] CHIP:TOO:     [1]: 0
-          [1649664685.946649][8671:8676] CHIP:TOO:     [2]: 1
-          [1649664685.946696][8671:8676] CHIP:TOO:     [3]: 2
-          [1649664685.946744][8671:8676] CHIP:TOO:     [4]: 65528
-          [1649664685.946790][8671:8676] CHIP:TOO:     [5]: 65529
-          [1649664685.946836][8671:8676] CHIP:TOO:     [6]: 65531
-          [1649664685.946901][8671:8676] CHIP:TOO:     [7]: 65533
-      disabled: true
-
-    - label: "Read EventList (global attribute 65530)"
-      verification: |
-          ./chip-tool bridgedactions read event-list 1 1
-
-          Need to implement in chip-tool
-      disabled: true
-
+    #issue #15011
     - label:
-          "Read AcceptedCommandList (global attribute 65529) ; retain this list
-          for reference in test [TC-ACT-2.2] step 4d"
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
       verification: |
-          ./chip-tool bridgedactions read accepted-command-list 1 1
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_FFF9 DataVersion: 2809940331
-          CHIP:TOO:   AcceptedCommandList: 0 entries
-          CHIP:EM: Sending Standalone Ack for MessageCounter:3357407 on exchange 13031i
-      disabled: true
-
-    - label: "Read GeneratedCommandList (global attribute 65528)"
-      verification: |
-          ./chip-tool bridgedactions read generated-command-list 1 1
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_FFF8 DataVersion: 2809940331
-          CHIP:TOO:   GeneratedCommandList: 0 entries
-          CHIP:EM: Sending Standalone Ack for MessageCounter:14920557 on exchange 16149i
-      disabled: true
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

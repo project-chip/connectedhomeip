@@ -54,9 +54,7 @@ tests:
           constraints:
               type: list
 
-    #issue 17461
     - label: "Read the global attribute: AcceptedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -65,7 +63,6 @@ tests:
               type: list
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

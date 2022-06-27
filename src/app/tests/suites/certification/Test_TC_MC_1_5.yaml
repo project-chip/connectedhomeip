@@ -45,15 +45,13 @@ tests:
           constraints:
               type: map32
 
-    #Testplan issue 1416
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [65528, 65529, 65531, 65531, 65533]
           constraints:
               type: list
+              contains: [65528, 65529, 65531, 65531, 65533]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"

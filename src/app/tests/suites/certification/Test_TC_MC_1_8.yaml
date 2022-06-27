@@ -37,13 +37,35 @@ tests:
           constraints:
               type: uint16
 
-    #Issue 17457
+    - label: "Read the optional global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: map32
+
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           value: [0, 1, 65528, 65529, 65531, 65532, 65533]
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
           constraints:
               type: list
 
@@ -53,44 +75,6 @@ tests:
           response provides a list of supported events."
       verification: |
           Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    #Issue 17457
-    - label: "Read the global attribute: AcceptedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          value: [0]
-          constraints:
-              type: list
-
-    #Issue 17457
-    - label: "Read the global attribute: GeneratedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          value: [1]
-          constraints:
-              type: list
-
-    - label:
-          "Read FeatureMap attribute from the DUT and Verify that the DUT has
-          bit 1 set to 1 if the device supports Name Updates PICS_NAMEUPDATES is
-          true"
-      verification: |
-          ./chip-tool audiooutput read feature-map 1 2
-          [1646116153.890111][8447:8452] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86
-          [1646116153.890132][8447:8452] CHIP:EM: Sending Standalone Ack for MessageCounter:6248385 on exchange 46369i
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
