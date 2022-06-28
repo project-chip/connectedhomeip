@@ -125,7 +125,8 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Operationa
 
     constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
 
-    AdministratorCommissioningCluster cluster(*device->GetExchangeManager(), device->GetSecureSession().Value(), kAdministratorCommissioningClusterEndpoint);
+    AdministratorCommissioningCluster cluster(*device->GetExchangeManager(), device->GetSecureSession().Value(),
+                                              kAdministratorCommissioningClusterEndpoint);
 
     if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {

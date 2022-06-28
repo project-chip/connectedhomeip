@@ -773,7 +773,8 @@ CHIP_ERROR DefaultOTARequestor::SendQueryImageRequest(OperationalDeviceProxy & d
         args.location.SetValue(CharSpan("XX", strlen("XX")));
     }
 
-    Controller::OtaSoftwareUpdateProviderCluster cluster(*deviceProxy.GetExchangeManager(), deviceProxy.GetSecureSession().Value(), mProviderLocation.Value().endpoint);
+    Controller::OtaSoftwareUpdateProviderCluster cluster(*deviceProxy.GetExchangeManager(), deviceProxy.GetSecureSession().Value(),
+                                                         mProviderLocation.Value().endpoint);
 
     return cluster.InvokeCommand(args, this, OnQueryImageResponse, OnQueryImageFailure);
 }
@@ -842,7 +843,8 @@ CHIP_ERROR DefaultOTARequestor::SendApplyUpdateRequest(OperationalDeviceProxy & 
     args.updateToken = mUpdateToken;
     args.newVersion  = mTargetVersion;
 
-    Controller::OtaSoftwareUpdateProviderCluster cluster(*deviceProxy.GetExchangeManager(), deviceProxy.GetSecureSession().Value(), mProviderLocation.Value().endpoint);
+    Controller::OtaSoftwareUpdateProviderCluster cluster(*deviceProxy.GetExchangeManager(), deviceProxy.GetSecureSession().Value(),
+                                                         mProviderLocation.Value().endpoint);
 
     return cluster.InvokeCommand(args, this, OnApplyUpdateResponse, OnApplyUpdateFailure);
 }
@@ -856,7 +858,8 @@ CHIP_ERROR DefaultOTARequestor::SendNotifyUpdateAppliedRequest(OperationalDevice
     args.updateToken     = mUpdateToken;
     args.softwareVersion = mCurrentVersion;
 
-    Controller::OtaSoftwareUpdateProviderCluster cluster(*deviceProxy.GetExchangeManager(), deviceProxy.GetSecureSession().Value(), mProviderLocation.Value().endpoint);
+    Controller::OtaSoftwareUpdateProviderCluster cluster(*deviceProxy.GetExchangeManager(), deviceProxy.GetSecureSession().Value(),
+                                                         mProviderLocation.Value().endpoint);
 
     // There is no response for a notify so consider this OTA complete. Clear the provider location and reset any states to indicate
     // so.
