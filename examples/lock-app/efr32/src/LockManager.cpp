@@ -376,9 +376,9 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
 
         return true;
     }
-    
+
     const auto & credentialInStorage = mLockCredentials[adjustedCredentialIndex];
-    
+
 
     credential.status = credentialInStorage.status;
     ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, adjustedCredentialIndex);
