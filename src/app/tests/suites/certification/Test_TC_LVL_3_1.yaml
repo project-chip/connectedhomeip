@@ -116,7 +116,7 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait10000ms"
+    - label: "Wait 11000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

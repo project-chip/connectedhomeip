@@ -96,12 +96,6 @@ function getManualTests() {
     'Test_TC_BR_3',
   ];
 
-  const BridgedActions = [
-    'Test_TC_BRAC_2_1',
-    'Test_TC_BRAC_2_2',
-    'Test_TC_BRAC_3_1',
-  ];
-
   const DeviceAttestation = [
     'Test_TC_DA_1_1',
     'Test_TC_DA_1_2',
@@ -435,7 +429,6 @@ function getManualTests() {
   ];
 
   const Actions = [
-    'Test_TC_ACT_1_1',
     'Test_TC_ACT_2_1',
     'Test_TC_ACT_2_2',
     'Test_TC_ACT_3_1',
@@ -479,7 +472,6 @@ function getManualTests() {
     Groups,
     BulkDataExchangeProtocol,
     bridge,
-    BridgedActions,
     DeviceAttestation,
     DeviceManagement,
     DiagnosticsLogs,
@@ -543,8 +535,8 @@ function getTests() {
     'Test_TC_BOOL_2_1',
   ];
 
-  const BridgedActions = [
-    'Test_TC_BRAC_1_1',
+  const Actions = [
+    'Test_TC_ACT_1_1',
   ];
 
   const ColorControl = [
@@ -855,7 +847,7 @@ function getTests() {
     AccessControl,
     BinaryInput,
     BooleanState,
-    BridgedActions,
+    Actions,
     ColorControl,
     DeviceManagement,
     Descriptor,
