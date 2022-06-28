@@ -50,9 +50,9 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_signature_buffer) override
+    CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_signature_buffer) override
     {
-        (void) digest_to_sign;
+        (void) message_to_sign;
         (void) out_signature_buffer;
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
