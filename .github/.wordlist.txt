@@ -9,7 +9,6 @@
 22
 AAAA
 aarch
-abba
 abcdef
 abfb
 ABI
@@ -274,7 +273,6 @@ ConnectivityManagerImpl
 ConnectNetwork
 ConnectNetworkRequest
 ConnectNetworkResponse
-Connect's
 connstring
 conntype
 const
@@ -890,7 +888,6 @@ npm
 nRF
 nrfconnect
 nrfdks
-nrfjprog
 nrfutil
 nrfxlib
 NTAG

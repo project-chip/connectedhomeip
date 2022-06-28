@@ -136,7 +136,7 @@ In the factory data set, the following formats are used:
     and `255`(inclusive), without any encoding. Because the JSON format does not
     allow to use of byte strings, the `hex:` prefix is added to a parameter, and
     its representation is converted to a HEX string. For example, an ASCII
-    string _abba_ is represented as _hex:61626261_ in the JSON file and then
+    string _`abba`_ is represented as _`hex:61626261`_ in the JSON file and then
     stored in the HEX file as `0x61626261`. The HEX string length in the JSON
     file is two times greater than the byte string plus the size of the prefix.
 -   ASCII string is a string representation in ASCII encoding without
@@ -155,7 +155,7 @@ In the factory data set, the following formats are used:
 By default, the factory data support is disabled in all nRF Connect examples and
 the nRF Connect device uses predefined parameters from the Matter core, which
 you should not change. To start using factory data stored in the flash memory
-and use nRF Connect's **Factory Data Provider**, build an example with the
+and the **Factory Data Provider** from the nRF Connect platform, build an example with the
 following option (replace _<build_target>_ with your board name, for example,
 `nrf52840dk_nrf52840`):
 
@@ -501,7 +501,7 @@ $ python scripts/tools/nrfconnect/nrfconnect_generate_partition.py -i build/zeph
 As a result, `factory_data.hex` and `factory_data.bin` files are created in the
 `/build/zephyr/` directory. The first file contains the memory offset. For this
 reason, it can be programmed directly to the device using a programmer (for
-example, nrfjprog).
+example, `nrfjprog`).
 
 <hr>
 <a name="Building an example with factory data"></a>
