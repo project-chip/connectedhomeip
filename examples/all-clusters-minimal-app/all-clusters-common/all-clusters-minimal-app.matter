@@ -2082,27 +2082,10 @@ server cluster WindowCovering = 258 {
   }
 
   readonly attribute Type type = 0;
-  readonly attribute int16u physicalClosedLimitLift = 1;
-  readonly attribute int16u physicalClosedLimitTilt = 2;
-  readonly attribute nullable int16u currentPositionLift = 3;
-  readonly attribute nullable int16u currentPositionTilt = 4;
-  readonly attribute int16u numberOfActuationsLift = 5;
-  readonly attribute int16u numberOfActuationsTilt = 6;
   readonly attribute ConfigStatus configStatus = 7;
-  readonly attribute nullable Percent currentPositionLiftPercentage = 8;
-  readonly attribute nullable Percent currentPositionTiltPercentage = 9;
   readonly attribute OperationalStatus operationalStatus = 10;
-  readonly attribute nullable Percent100ths targetPositionLiftPercent100ths = 11;
-  readonly attribute nullable Percent100ths targetPositionTiltPercent100ths = 12;
   readonly attribute EndProductType endProductType = 13;
-  readonly attribute nullable Percent100ths currentPositionLiftPercent100ths = 14;
-  readonly attribute nullable Percent100ths currentPositionTiltPercent100ths = 15;
-  readonly attribute int16u installedOpenLimitLift = 16;
-  readonly attribute int16u installedClosedLimitLift = 17;
-  readonly attribute int16u installedOpenLimitTilt = 18;
-  readonly attribute int16u installedClosedLimitTilt = 19;
   attribute access(write: manage) Mode mode = 23;
-  readonly attribute SafetyStatus safetyStatus = 26;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3605,32 +3588,15 @@ endpoint 1 {
   }
 
   server cluster WindowCovering {
-    ram      attribute type default = 0x08;
-    ram      attribute physicalClosedLimitLift default = 0xFFFF;
-    ram      attribute physicalClosedLimitTilt default = 0xFFFF;
-    persist  attribute currentPositionLift default = 0x7FFF;
-    persist  attribute currentPositionTilt default = 0x7FFF;
-    persist  attribute numberOfActuationsLift;
-    persist  attribute numberOfActuationsTilt;
+    ram      attribute type;
     persist  attribute configStatus default = 0x03;
-    persist  attribute currentPositionLiftPercentage default = 50;
-    persist  attribute currentPositionTiltPercentage default = 50;
     ram      attribute operationalStatus;
-    ram      attribute targetPositionLiftPercent100ths default = 5000;
-    ram      attribute targetPositionTiltPercent100ths default = 5000;
     ram      attribute endProductType;
-    persist  attribute currentPositionLiftPercent100ths default = 5000;
-    persist  attribute currentPositionTiltPercent100ths default = 5000;
-    persist  attribute installedOpenLimitLift;
-    persist  attribute installedClosedLimitLift default = 0xFFFF;
-    persist  attribute installedOpenLimitTilt;
-    persist  attribute installedClosedLimitTilt default = 0xFFFF;
     persist  attribute mode;
-    ram      attribute safetyStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x17;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 5;
   }
 
