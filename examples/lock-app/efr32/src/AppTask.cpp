@@ -284,7 +284,7 @@ CHIP_ERROR AppTask::Init()
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    err = LockMgr().Init(state, maxCredentialsPerUser, numberOfSupportedUsers, numberOfWeekdaySchedulesPerUserSupported, 
+    err = LockMgr().Init(state, maxCredentialsPerUser, numberOfSupportedUsers, numberOfWeekdaySchedulesPerUserSupported,
                          numberOfYeardaySchedulesPerUserSupported, numberOfHolidaySchedulesSupported);
     if (err != CHIP_NO_ERROR)
     {

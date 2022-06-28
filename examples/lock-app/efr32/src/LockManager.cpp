@@ -111,13 +111,13 @@ bool LockManager::ReadConfigValues()
     EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
                                      sizeof(DlCredential) * mMaxUsers * mMaxCredentialsPerUser, outLen);
 
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *> (mWeekdaySchedule), 
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *> (mWeekdaySchedule),
                                     sizeof(EmberAfPluginDoorLockWeekDaySchedule) * mNumberOfWeekdaySchedulesPerUserSupported * mMaxUsers, outLen);
 
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *> (mYeardaySchedule), 
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *> (mYeardaySchedule),
                                         sizeof(EmberAfPluginDoorLockYearDaySchedule) * mNumberOfYeardaySchedulesPerUserSupported * mMaxUsers, outLen);
 
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *> (&(mHolidaySchedule)), 
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *> (&(mHolidaySchedule)),
                                      sizeof(EmberAfPluginDoorLockHolidaySchedule) * mNumberOfHolidaySchedulesSupported, outLen);
 
     return true;
@@ -455,7 +455,7 @@ DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
                      endpointId, userIndex);
         return DlStatus::kFailure;
     }
-    
+
     // doorlock server checks for valid indices
     uint8_t adjustedWeekDayIndex = weekdayIndex - 1;
     uint16_t adjustedUserIndex = userIndex - 1;
@@ -497,7 +497,7 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     scheduleInStorage.endHour = endHour;
     scheduleInStorage.endMinute = endMinute;
 
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *> (mWeekdaySchedule), 
+    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *> (mWeekdaySchedule),
                                      sizeof(EmberAfPluginDoorLockWeekDaySchedule) * mNumberOfWeekdaySchedulesPerUserSupported * mMaxUsers);
 
     return DlStatus::kSuccess;
@@ -528,7 +528,7 @@ DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 
     schedule = scheduleInStorage;
 
-    return DlStatus::kSuccess;    
+    return DlStatus::kSuccess;
 }
 
 DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
@@ -557,7 +557,7 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     scheduleInStorage.localStartTime = localStartTime;
     scheduleInStorage.localEndTime = localEndTime;
 
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *> (mYeardaySchedule), 
+    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *> (mYeardaySchedule),
                                      sizeof(EmberAfPluginDoorLockYearDaySchedule) * mNumberOfYeardaySchedulesPerUserSupported * mMaxUsers);
 
     return DlStatus::kSuccess;
@@ -601,7 +601,7 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
     scheduleInStorage.localEndTime = localEndTime;
     scheduleInStorage.operatingMode = operatingMode;
 
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_HolidaySchedules, reinterpret_cast<const uint8_t *> (&(mHolidaySchedule)), 
+    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_HolidaySchedules, reinterpret_cast<const uint8_t *> (&(mHolidaySchedule)),
                                      sizeof(EmberAfPluginDoorLockHolidaySchedule) * mNumberOfHolidaySchedulesSupported);
 
     return DlStatus::kSuccess;
