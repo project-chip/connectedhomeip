@@ -54,10 +54,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  * @param endpoint   Ver.: always
  *
  */
-void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
-{
-
-}
+void emberAfDoorLockClusterInitCallback(EndpointId endpoint) {}
 
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
 {
@@ -124,7 +121,8 @@ DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t y
     return LockMgr().GetYeardaySchedule(endpointId, yearDayIndex, userIndex, schedule);
 }
 
-DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & holidaySchedule)
+DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex,
+                                          EmberAfPluginDoorLockHolidaySchedule & holidaySchedule)
 {
     return LockMgr().GetHolidaySchedule(endpointId, holidayIndex, holidaySchedule);
 }
@@ -133,14 +131,14 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t w
                                           DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
                                           uint8_t endHour, uint8_t endMinute)
 {
-    return LockMgr().SetWeekdaySchedule(endpointId, weekdayIndex, userIndex, status, daysMask, startHour, startMinute, endHour, endMinute);
+    return LockMgr().SetWeekdaySchedule(endpointId, weekdayIndex, userIndex, status, daysMask, startHour, startMinute, endHour,
+                                        endMinute);
 }
 
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                           DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime)
 {
-    return LockMgr().SetYeardaySchedule(endpointId, yearDayIndex, userIndex,
-                                           status, localStartTime, localEndTime);
+    return LockMgr().SetYeardaySchedule(endpointId, yearDayIndex, userIndex, status, localStartTime, localEndTime);
 }
 
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
