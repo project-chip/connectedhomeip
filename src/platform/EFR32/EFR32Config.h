@@ -126,7 +126,6 @@ public:
     static constexpr Key kConfigKey_YearDaySchedules   = EFR32ConfigKey(kMatterConfig_KeyBase, 0x16);
     static constexpr Key kConfigKey_HolidaySchedules   = EFR32ConfigKey(kMatterConfig_KeyBase, 0x17);
 
-
     static constexpr Key kConfigKey_GroupKeyMax =
         EFR32ConfigKey(kMatterConfig_KeyBase, 0x1E); // Allows 16 Group Keys to be created.
     static constexpr Key kConfigKey_UniqueId = EFR32ConfigKey(kMatterFactory_KeyBase, 0x1F);

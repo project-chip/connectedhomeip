@@ -72,8 +72,9 @@ public:
     } State;
 
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
-                    uint8_t maxNumberOfCredentialsPerUser, uint16_t numberOfSupportedUsers, uint8_t numberOfWeekdaySchedulesPerUserSupported,
-                    uint8_t numberOfYeardaySchedulesPerUserSupported, uint8_t numberOfHolidaySchedulesPerUserSupported);
+                    uint8_t maxNumberOfCredentialsPerUser, uint16_t numberOfSupportedUsers,
+                    uint8_t numberOfWeekdaySchedulesPerUserSupported, uint8_t numberOfYeardaySchedulesPerUserSupported,
+                    uint8_t numberOfHolidaySchedulesPerUserSupported);
     bool NextState();
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
@@ -97,20 +98,21 @@ public:
                        DlCredentialStatus credentialStatus, DlCredentialType credentialType, const chip::ByteSpan & credentialData);
 
     DlStatus GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-                                          EmberAfPluginDoorLockWeekDaySchedule & schedule);
+                                EmberAfPluginDoorLockWeekDaySchedule & schedule);
 
-    DlStatus SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-                                          DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
-                                          uint8_t endHour, uint8_t endMinute);
+    DlStatus SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex, DlScheduleStatus status,
+                                DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
 
     DlStatus GetYeardaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
-                                          EmberAfPluginDoorLockYearDaySchedule & schedule);
+                                EmberAfPluginDoorLockYearDaySchedule & schedule);
 
-    DlStatus SetYeardaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime);
+    DlStatus SetYeardaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status,
+                                uint32_t localStartTime, uint32_t localEndTime);
 
     DlStatus GetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule);
 
-    DlStatus SetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode);
+    DlStatus SetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime,
+                                uint32_t localEndTime, DlOperatingMode operatingMode);
 
     bool setLockState(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
                       DlOperationError & err);
