@@ -257,22 +257,25 @@ CHIP_ERROR InitCredentialSets()
 
 } // anonymous namespace
 
+// Specifically for SimulateUpdateNOCInvalidatePendingEstablishment, we need it to be static so that the class below can
+// be a friend to CASESession so that test can get access to CASESession::State and test method that are not public. To
+// keep the rest of this file consistent we brought all other tests into this class.
 class TestCASESession
 {
 public:
-    static void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext);
-    static void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext);
-    static void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext);
-    static void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext);
-    static void CASE_Sigma1ParsingTest(nlTestSuite * inSuite, void * inContext);
-    static void CASE_DestinationIdTest(nlTestSuite * inSuite, void * inContext);
-    static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContext);
+    static void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext);
+    static void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext);
+    static void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext);
+    static void SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext);
+    static void Sigma1ParsingTest(nlTestSuite * inSuite, void * inContext);
+    static void DestinationIdTest(nlTestSuite * inSuite, void * inContext);
+    static void SessionResumptionStorage(nlTestSuite * inSuite, void * inContext);
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    static void CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext);
+    static void SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext);
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 };
 
-void TestCASESession::CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 {
     SessionManager sessionManager;
 
@@ -302,7 +305,7 @@ void TestCASESession::CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * i
     caseSession.Clear();
 }
 
-void TestCASESession::CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
     SessionManager sessionManager;
@@ -357,7 +360,7 @@ void TestCASESession::CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * 
     loopback.mMessageSendError = CHIP_NO_ERROR;
 }
 
-void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SessionManager & sessionManager,
+void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SessionManager & sessionManager,
                                            CASESession & pairingCommissioner, TestCASESecurePairingDelegate & delegateCommissioner)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
@@ -416,18 +419,18 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
-void TestCASESession::CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
 {
     SessionManager sessionManager;
     TestCASESecurePairingDelegate delegateCommissioner;
     CASESession pairingCommissioner;
     pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
-    CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner, delegateCommissioner);
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner, delegateCommissioner);
 }
 
 CASEServerForTest gPairingServer;
 
-void TestCASESession::CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext)
 {
     // TODO: Add cases for mismatching IPK config between initiator/responder
 
@@ -505,7 +508,7 @@ struct Sigma1Params
     static constexpr bool expectSuccess = true;
 };
 
-void TestCASESession::CASE_DestinationIdTest(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::DestinationIdTest(nlTestSuite * inSuite, void * inContext)
 {
     // Validate example test vector from CASE section of spec
 
@@ -721,7 +724,7 @@ struct Sigma1SessionIdTooBig : public BadSigma1ParamsBase
     static constexpr uint32_t initiatorSessionId = UINT16_MAX + 1;
 };
 
-void TestCASESession::CASE_Sigma1ParsingTest(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::Sigma1ParsingTest(nlTestSuite * inSuite, void * inContext)
 {
     // 1280 bytes must be enough by definition.
     constexpr size_t bufferSize = 1280;
@@ -794,7 +797,7 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
     Crypto::P256ECDHDerivedSecret * mSharedSecret = nullptr;
 };
 
-void TestCASESession::CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::SessionResumptionStorage(nlTestSuite * inSuite, void * inContext)
 {
     // Test the SessionResumptionStorage external interface.
     //
@@ -893,7 +896,7 @@ void TestCASESession::CASE_SessionResumptionStorage(nlTestSuite * inSuite, void 
 }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-void TestCASESession::CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext)
 {
     SessionManager sessionManager;
     TestCASESecurePairingDelegate delegateCommissioner;
@@ -972,17 +975,17 @@ void TestCASESession::CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nlTes
 // clang-format off
 static const nlTest sTests[] =
 {
-    NL_TEST_DEF("WaitInit",    chip::TestCASESession::CASE_SecurePairingWaitTest),
-    NL_TEST_DEF("Start",       chip::TestCASESession::CASE_SecurePairingStartTest),
-    NL_TEST_DEF("Handshake",   chip::TestCASESession::CASE_SecurePairingHandshakeTest),
-    NL_TEST_DEF("ServerHandshake", chip::TestCASESession::CASE_SecurePairingHandshakeServerTest),
-    NL_TEST_DEF("Sigma1Parsing", chip::TestCASESession::CASE_Sigma1ParsingTest),
-    NL_TEST_DEF("DestinationId", chip::TestCASESession::CASE_DestinationIdTest),
-    NL_TEST_DEF("SessionResumptionStorage", chip::TestCASESession::CASE_SessionResumptionStorage),
+    NL_TEST_DEF("WaitInit",    chip::TestCASESession::SecurePairingWaitTest),
+    NL_TEST_DEF("Start",       chip::TestCASESession::SecurePairingStartTest),
+    NL_TEST_DEF("Handshake",   chip::TestCASESession::SecurePairingHandshakeTest),
+    NL_TEST_DEF("ServerHandshake", chip::TestCASESession::SecurePairingHandshakeServerTest),
+    NL_TEST_DEF("Sigma1Parsing", chip::TestCASESession::Sigma1ParsingTest),
+    NL_TEST_DEF("DestinationId", chip::TestCASESession::DestinationIdTest),
+    NL_TEST_DEF("SessionResumptionStorage", chip::TestCASESession::SessionResumptionStorage),
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // This is compiled for host tests which is enough test coverage to ensure updating NOC invalidates
     // CASESession that are in the process of establishing.
-    NL_TEST_DEF("InvalidatePendingSessionEstablishment", chip::TestCASESession::CASE_SimulateUpdateNOCInvalidatePendingEstablishment),
+    NL_TEST_DEF("InvalidatePendingSessionEstablishment", chip::TestCASESession::SimulateUpdateNOCInvalidatePendingEstablishment),
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     NL_TEST_SENTINEL()
