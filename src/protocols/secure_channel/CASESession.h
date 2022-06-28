@@ -33,7 +33,6 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/Base64.h>
-#include <lib/support/CHIPMem.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <protocols/secure_channel/CASEDestinationId.h>

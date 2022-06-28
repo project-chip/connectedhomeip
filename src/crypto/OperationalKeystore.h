@@ -179,13 +179,13 @@ public:
      *          Matter CHIPMem.h does not properly support UniquePtr in a way that would
      *          safely allow classes derived from Crypto::P256Keypair to be released properly.
      *
-     * @return a pointer to a dynamically P256Keypair (or derived class thereof), which may evaluate to nullptr
+     * @return a pointer to a P256Keypair (or derived class thereof), which may evaluate to nullptr
      *         if running out of memory.
      */
     virtual Crypto::P256Keypair * AllocateEphemeralKeypair() = 0;
 
     /**
-     * @brief Release an ephemeral keypair previously created by `AllocateEphemeralKeypair()`
+     * @brief Release an ephemeral keypair previously provided by `AllocateEphemeralKeypair()`
      */
     virtual void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) = 0;
 };

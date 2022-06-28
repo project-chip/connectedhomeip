@@ -1281,10 +1281,8 @@ Crypto::P256Keypair * FabricTable::AllocateEphemeralKeypair()
     {
         return mOperationalKeystore->AllocateEphemeralKeypair();
     }
-    else
-    {
-        return Platform::New<Crypto::P256Keypair>();
-    }
+
+    return Platform::New<Crypto::P256Keypair>();
 }
 
 void FabricTable::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
