@@ -30,6 +30,7 @@ import sys
 import logging
 import time
 import ctypes
+import enum
 import chip.clusters as Clusters
 import chip.clusters.Attribute as Attribute
 from chip.ChipStack import *
@@ -50,6 +51,7 @@ logger.addHandler(sh)
 
 def TestFail(message):
     logger.fatal("Testfail: {}".format(message))
+    test_conclusion()
     os._exit(1)
 
 
@@ -62,6 +64,26 @@ _configurable_tests = set()
 _configurable_test_sets = set()
 _enabled_tests = []
 _disabled_tests = []
+
+
+class TestCaseResultEnum(enum.Enum):
+    SKIPPED = "SKIP"
+    SUCCESS = "PASS"
+    FAILURE = "FAIL"
+    EXCEPTION = "EXC"
+
+
+@dataclass
+class TestCaseResult():
+    name: str
+    duration: float
+    result: TestCaseResultEnum
+
+    def __str__(self):
+        return f"{self.result.value:4s} - {self.duration:3.3f} - {self.name}"
+
+
+_test_results = []
 
 
 def SetTestSet(enabled_tests, disabled_tests):
@@ -98,13 +120,85 @@ def test_case(func):
     test_name = func.__qualname__
     _configurable_tests.add(test_name)
 
-    def CheckEnableBeforeRun(*args, **kwargs):
-        if TestIsEnabled(test_name=test_name):
-            return func(*args, **kwargs)
-        elif inspect.iscoroutinefunction(func):
-            # noop, so users can use await as usual
-            return asyncio.sleep(0)
-    return CheckEnableBeforeRun
+    is_coroutine = inspect.iscoroutinefunction(func)
+
+    if is_coroutine:
+        async def CheckEnableBeforeRunAsync(*args, **kwargs):
+            test_result = TestCaseResultEnum.SKIPPED
+            duration = 0
+            res = None
+            if TestIsEnabled(test_name=test_name):
+                print(f"======== Starting Test: {test_name} ========")
+                test_start = time.time()
+                try:
+                    res = await func(*args, **kwargs)
+                    if (res is None) or res:
+                        test_result = TestCaseResultEnum.SUCCESS
+                    else:
+                        test_result = TestCaseResultEnum.FAILURE
+                except Exception as ex:
+                    print(f"======== Exception ========")
+                    logger.exception(f"Exception raised during testing {test_name}")
+                    test_result = TestCaseResultEnum.EXCEPTION
+                    raise ex
+                duration = time.time() - test_start
+                print(f"======== Finished: {test_name} ({duration:.3f} s) ========")
+            else:
+                # Skipped tests will always be "successful"
+                res = True
+            _test_results.append(TestCaseResult(name=test_name, duration=duration, result=test_result))
+            return res
+        return CheckEnableBeforeRunAsync
+    else:
+        def CheckEnableBeforeRun(*args, **kwargs):
+            test_result = TestCaseResultEnum.SKIPPED
+            duration = 0
+            res = None
+            if TestIsEnabled(test_name=test_name):
+                print(f"======== Starting Test: {test_name} ========")
+                test_start = time.time()
+                try:
+                    res = func(*args, **kwargs)
+                    if (res is None) or res:
+                        test_result = TestCaseResultEnum.SUCCESS
+                    else:
+                        test_result = TestCaseResultEnum.FAILURE
+                except Exception as ex:
+                    print(f"======== Exception ========")
+                    logger.exception(f"Exception raised during testing {test_name}")
+                    test_result = TestCaseResultEnum.EXCEPTION
+                    raise ex
+                duration = time.time() - test_start
+                print(f"======== Finished: {test_name} ({duration:.3f} s) ========")
+            else:
+                # Skipped tests will always be "successful"
+                res = True
+            _test_results.append(TestCaseResult(name=test_name, duration=duration, result=test_result))
+            return res
+        return CheckEnableBeforeRun
+
+
+def test_conclusion():
+    print(f"======== Test Conclusion ========")
+    result_count = dict()
+    result_count[TestCaseResultEnum.SKIPPED] = 0
+    result_count[TestCaseResultEnum.SUCCESS] = 0
+    result_count[TestCaseResultEnum.FAILURE] = 0
+    result_count[TestCaseResultEnum.EXCEPTION] = 0
+    for t in _test_results:
+        result_count[t.result] = result_count[t.result] + 1
+        print(f"\t{t}")
+
+    print(f"SKIP = {result_count[TestCaseResultEnum.SKIPPED]}")
+    print(f"SUCC = {result_count[TestCaseResultEnum.SUCCESS]}")
+    print(f"FAIL = {result_count[TestCaseResultEnum.FAILURE]}")
+    print(f"EXC  = {result_count[TestCaseResultEnum.EXCEPTION]}")
+
+    if result_count[TestCaseResultEnum.FAILURE] + result_count[TestCaseResultEnum.EXCEPTION] > 0:
+        print(f"======== Fail + Exception Test Cases ========")
+        for t in _test_results:
+            if t.result in (TestCaseResultEnum.FAILURE, TestCaseResultEnum.EXCEPTION):
+                print(f"\t{t}")
 
 
 def configurable_tests():
@@ -190,6 +284,7 @@ class BaseTestHelper:
             return None
         return ctypes.string_at(addrStrStorage)
 
+    @test_case
     def TestDiscovery(self, discriminator: int):
         self.logger.info(
             f"Discovering commissionable nodes with discriminator {discriminator}")
@@ -203,6 +298,7 @@ class BaseTestHelper:
         self.logger.info(f"Found device at {res}")
         return res
 
+    @test_case
     def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info(
             "Attempting to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
@@ -215,6 +311,7 @@ class BaseTestHelper:
             "Successfully established PASE session with device id: {} addr: {}".format(str(nodeid), ip))
         return True
 
+    @test_case
     def TestCommissionOnly(self, nodeid: int):
         self.logger.info(
             "Commissioning device with id {}".format(nodeid))
@@ -226,6 +323,7 @@ class BaseTestHelper:
             "Successfully commissioned device with id {}".format(str(nodeid)))
         return True
 
+    @test_case
     def TestKeyExchangeBLE(self, discriminator: int, setuppin: int, nodeid: int):
         self.logger.info(
             "Conducting key exchange with device {}".format(discriminator))
@@ -236,6 +334,7 @@ class BaseTestHelper:
         self.logger.info("Device finished key exchange.")
         return True
 
+    @test_case
     def TestCommissionFailure(self, nodeid: int, failAfter: int):
         self.devCtrl.ResetTestCommissioner()
         a = self.devCtrl.SetTestCommissionerSimulateFailureOnStage(failAfter)
@@ -248,6 +347,7 @@ class BaseTestHelper:
         self.devCtrl.Commission(nodeid)
         return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeid)
 
+    @test_case
     def TestCommissionFailureOnReport(self, nodeid: int, failAfter: int):
         self.devCtrl.ResetTestCommissioner()
         a = self.devCtrl.SetTestCommissionerSimulateFailureOnReport(failAfter)
@@ -259,6 +359,7 @@ class BaseTestHelper:
         self.devCtrl.Commission(nodeid)
         return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeid)
 
+    @test_case
     def TestCommissioning(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Commissioning device {}".format(ip))
         if not self.devCtrl.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
@@ -268,6 +369,7 @@ class BaseTestHelper:
         self.logger.info("Commissioning finished.")
         return True
 
+    @test_case
     def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int):
         self.logger.info("Commissioning device with setup payload {}".format(setupPayload))
         if not self.devCtrl.CommissionWithCode(setupPayload, nodeid):
@@ -277,9 +379,11 @@ class BaseTestHelper:
         self.logger.info("Commissioning finished.")
         return True
 
+    @test_case
     def TestUsedTestCommissioner(self):
         return self.devCtrl.GetTestCommissionerUsed()
 
+    @test_case
     def TestFailsafe(self, nodeid: int):
         self.logger.info("Testing arm failsafe")
 
@@ -357,6 +461,7 @@ class BaseTestHelper:
             return True
         return False
 
+    @test_case
     async def TestCaseEviction(self, nodeid: int):
         self.logger.info("Testing CASE eviction")
 
@@ -470,6 +575,7 @@ class BaseTestHelper:
 
         return True
 
+    @test_case
     async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Opening Commissioning Window")
 
@@ -537,6 +643,7 @@ class BaseTestHelper:
         self.logger.info("Attribute reads completed...")
         return True
 
+    @test_case
     async def TestFabricSensitive(self, nodeid: int):
         expectedDataFabric1 = [
             Clusters.TestCluster.Structs.TestFabricScoped(),
@@ -698,6 +805,7 @@ class BaseTestHelper:
         if (expectedDataFabric1 != readListDataFabric1):
             raise AssertionError("Got back mismatched data")
 
+    @test_case
     def TestCloseSession(self, nodeid: int):
         self.logger.info(f"Closing sessions with device {nodeid}")
         try:
@@ -712,6 +820,7 @@ class BaseTestHelper:
                 f"Failed to close sessions with device {nodeid}: {ex}")
             return False
 
+    @test_case
     def SetNetworkCommissioningParameters(self, dataset: str):
         self.logger.info("Setting network commissioning parameters")
         self.devCtrl.SetThreadOperationalDataset(bytes.fromhex(dataset))
@@ -734,6 +843,7 @@ class BaseTestHelper:
             return False
         return True
 
+    @test_case
     def TestLevelControlCluster(self, nodeid: int, endpoint: int, group: int):
         self.logger.info(
             f"Sending MoveToLevel command to device {nodeid} endpoint {endpoint}")
@@ -767,6 +877,7 @@ class BaseTestHelper:
             self.logger.exception(f"Level cluster test failed: {ex}")
             return False
 
+    @test_case
     def TestResolve(self, nodeid):
         self.logger.info(
             "Resolve: node id = {:08x}".format(nodeid))
@@ -793,6 +904,7 @@ class BaseTestHelper:
             self.logger.exception("Failed to resolve. {}".format(ex))
             return False
 
+    @test_case
     def TestReadBasicAttributes(self, nodeid: int, endpoint: int, group: int):
         basic_cluster_attrs = {
             "VendorName": "TEST_VENDOR",
@@ -823,6 +935,7 @@ class BaseTestHelper:
             return False
         return True
 
+    @test_case
     def TestWriteBasicAttributes(self, nodeid: int, endpoint: int, group: int):
         @dataclass
         class AttributeWriteRequest:
@@ -865,6 +978,7 @@ class BaseTestHelper:
             return False
         return True
 
+    @test_case
     def TestSubscription(self, nodeid: int, endpoint: int):
         desiredPath = None
         receivedUpdate = 0
@@ -939,6 +1053,7 @@ class BaseTestHelper:
 
         return True
 
+    @test_case
     def TestNonControllerAPIs(self):
         '''
         This function validates various APIs provided by chip package which is not related to controller.

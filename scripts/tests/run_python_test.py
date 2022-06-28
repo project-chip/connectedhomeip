@@ -19,7 +19,6 @@ import coloredlogs
 import datetime
 import logging
 import os
-import pathlib
 import pty
 import queue
 import shlex
@@ -27,10 +26,9 @@ import signal
 import subprocess
 import sys
 import threading
-import time
 import typing
 
-from colorama import Fore, Style
+from colorama import Fore, Back, Style
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -38,33 +36,48 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 
 
-def EnqueueLogOutput(fp, tag, q):
-    for line in iter(fp.readline, b''):
-        timestamp = time.time()
-        if len(line) > len('[1646290606.901990]') and line[0:1] == b'[':
-            try:
-                timestamp = float(line[1:18].decode())
-                line = line[19:]
-            except Exception as ex:
-                pass
-        sys.stdout.buffer.write(
-            (f"[{datetime.datetime.fromtimestamp(timestamp).isoformat(sep=' ')}]").encode() + tag + line)
-        sys.stdout.flush()
+def PtyPipePair():
+    fd_read, fd_write = pty.openpty()
+    return (open(fd_read, 'rb'), open(fd_write, errors='ignore'))
+
+
+def EnqueueLogOutput(fp, tag):
+    try:
+        for line in iter(fp.readline, b''):
+            sys.stdout.buffer.write(
+                (f"[{datetime.datetime.now().isoformat(sep=' ')}]").encode() + tag + line)
+            if line == b'':
+                # b'' is EOF on macOS
+                break
+    except OSError:
+        # OSError is EOF on linux
+        pass
+    except:
+        logging.exception("Failed to dump output")
     fp.close()
 
 
-def RedirectQueueThread(fp, tag, queue) -> threading.Thread:
+def RedirectQueueThread(fp, tag) -> threading.Thread:
     log_queue_thread = threading.Thread(target=EnqueueLogOutput, args=(
-        fp, tag, queue))
+        fp, tag))
     log_queue_thread.start()
     return log_queue_thread
 
 
-def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: str, process: subprocess.Popen, queue: queue.Queue):
-    thread_list.append(RedirectQueueThread(process.stdout,
-                                           (f"[{tag}][{Fore.YELLOW}STDOUT{Style.RESET_ALL}]").encode(), queue))
-    thread_list.append(RedirectQueueThread(process.stderr,
-                                           (f"[{tag}][{Fore.RED}STDERR{Style.RESET_ALL}]").encode(), queue))
+def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: str, stdout, stderr):
+    thread_list.append(RedirectQueueThread(stdout,
+                                           (f"[{tag}][{Fore.YELLOW}STDOUT{Style.RESET_ALL}]").encode()))
+    thread_list.append(RedirectQueueThread(stderr,
+                                           (f"[{tag}][{Fore.RED}STDERR{Style.RESET_ALL}]").encode()))
+
+
+def RunAndCookOutput(args: typing.List[str], app_tag: str, log_thread_list: typing.List[threading.Thread]):
+    stdoutPipe = PtyPipePair()
+    stderrPipe = PtyPipePair()
+    process = subprocess.Popen(
+        args, stdout=stdoutPipe[1], stderr=stderrPipe[1])
+    DumpProgramOutputToQueue(log_thread_list, app_tag, stdoutPipe[0], stderrPipe[0])
+    return process
 
 
 @click.command()
@@ -82,7 +95,6 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
 
     coloredlogs.install(level='INFO')
 
-    log_queue = queue.Queue()
     log_cooking_threads = []
 
     app_process = None
@@ -92,10 +104,7 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
                 raise FileNotFoundError(f"{app} not found")
         app_args = [app] + shlex.split(app_args)
         logging.info(f"Execute: {app_args}")
-        app_process = subprocess.Popen(
-            app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
-        DumpProgramOutputToQueue(
-            log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, log_queue)
+        app_process = RunAndCookOutput(app_args, f"{Fore.GREEN}APP {Style.RESET_ALL}", log_cooking_threads)
 
     script_command = [script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
                       '--log-format', '%(message)s'] + shlex.split(script_args)
@@ -106,10 +115,7 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
         script_command = "/usr/bin/env python3".split() + script_command
 
     logging.info(f"Execute: {script_command}")
-    test_script_process = subprocess.Popen(
-        script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    DumpProgramOutputToQueue(log_cooking_threads, Fore.GREEN + "TEST" + Style.RESET_ALL,
-                             test_script_process, log_queue)
+    test_script_process = RunAndCookOutput(script_command, f"{Fore.BLUE}{Back.WHITE}TEST{Style.RESET_ALL}", log_cooking_threads)
 
     test_script_exit_code = test_script_process.wait()
 

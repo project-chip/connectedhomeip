@@ -396,4 +396,5 @@ class NetworkCommissioningTests:
             await self.Test()
             return True
         except Exception as ex:
+            logger.exception(f"Failed to run NetworkCommissioning test: {ex}")
             return False
