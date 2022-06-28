@@ -12,23 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("ti_simplelink_board.gni")
+import("//build_overrides/chip.gni")
 
-if (ti_simplelink_device_family == "cc13x2_26x2" ||
-    ti_simplelink_device_family == "cc13x2x7_26x2x7") {
-  arm_arch = "armv7e-m"
-  arm_abi = "aapcs"
-  arm_cpu = "cortex-m4"
-  arm_float_abi = "hard"
-  arm_fpu = "fpv5-sp-d16"
-  arm_use_thumb = true
-} else if (ti_simplelink_device_family == "cc32xx") {
-  arm_arch = "armv7e-m"
-  arm_abi = ""
-  arm_cpu = "cortex-m4"
-  arm_float_abi = "soft"
-  arm_fpu = ""
-  arm_use_thumb = true
-} else {
-  assert(false, "ti_simplelink_device_family must be specified")
-}
+import("${chip_root}/src/platform/cc32xx/args.gni")
+
+chip_ble_project_config_include = "<CHIPProjectConfig.h>"
+chip_device_project_config_include = "<CHIPProjectConfig.h>"
+chip_project_config_include = "<CHIPProjectConfig.h>"
+chip_inet_project_config_include = "<CHIPProjectConfig.h>"
+chip_system_project_config_include = "<CHIPProjectConfig.h>"

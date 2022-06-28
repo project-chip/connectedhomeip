@@ -156,6 +156,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET_CC13X2_26X2=1",
         "CHIP_DEVICE_LAYER_TARGET=cc13x2_26x2",
       ]
+    } else if (chip_device_platform == "cc32xx") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_CC32XX=1",
+        "CHIP_DEVICE_LAYER_TARGET=cc32xx",
+      ]
     } else if (chip_device_platform == "darwin") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_DARWIN=1",
@@ -390,6 +395,8 @@ if (chip_device_platform != "none") {
 
     if (chip_device_platform == "cc13x2_26x2") {
       _platform_target = "cc13x2_26x2"
+    } else if (chip_device_platform == "cc32xx") {
+      _platform_target = "cc32xx"
     } else if (chip_device_platform == "darwin") {
       _platform_target = "Darwin"
     } else if (chip_device_platform == "efr32") {
