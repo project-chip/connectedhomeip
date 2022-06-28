@@ -41,7 +41,7 @@ static_library("helpers") {
     "TestSetupSignallingPosix.cpp",
   ]
 
-  if (current_os != "mbed") {
+  if (current_os != "mbed" && current_os != "cmsis-rtos") {
     sources += [ "TestInetLayer.cpp" ]
   }
 

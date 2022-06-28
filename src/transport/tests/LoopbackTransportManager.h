@@ -65,7 +65,7 @@ public:
      *    result of message reception, and any messages those async tasks send,
      *    get handled before DrainAndServiceIO returns.
      */
-    void DrainAndServiceIO(System::Clock::Timeout maxWait = chip::System::Clock::Seconds16(5))
+    void DrainAndServiceIO(System::Clock::Timeout maxWait = chip::System::Clock::Seconds16(60))
     {
         auto & impl                        = GetLoopback();
         System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();

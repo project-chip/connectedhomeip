@@ -17,6 +17,7 @@
  */
 
 #include <errno.h>
+#include <iotsdk/ip_network_api.h>
 #include <mbedtls/platform.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,11 +31,47 @@ using namespace ::chip;
 
 static void test_thread(void * argument)
 {
-    ChipLogProgress(NotSpecified, "Open IoT SDK unit-tests run...");
+    ChipLogProgress(Test, "Open IoT SDK unit-tests run...");
     int status = RunRegisteredUnitTests();
-    ChipLogProgress(NotSpecified, "Test status: %d", status);
-    ChipLogProgress(NotSpecified, "Open IoT SDK unit-tests completed");
+    ChipLogProgress(Test, "Test status: %d", status);
+    ChipLogProgress(Test, "Open IoT SDK unit-tests completed");
     exit(status);
+}
+
+static void network_event_callback(network_state_callback_event_t event)
+{
+    static osThreadId_t test_thread_id = NULL;
+    if (event == NETWORK_UP)
+    {
+        ChipLogProgress(Test, "Network up");
+
+        if (test_thread_id)
+        {
+            ChipLogError(Test, "Tests already running");
+            exit(EXIT_FAILURE);
+        }
+
+        static const osThreadAttr_t thread_attr = { .stack_size = 1024 * 20 };
+
+        osThreadId_t test_thread_id = osThreadNew(test_thread, NULL, &thread_attr);
+    }
+    else
+    {
+        ChipLogError(Test, "Network down, aborting tests");
+        exit(EXIT_FAILURE);
+    }
+}
+
+static void init_thread(void * argument)
+{
+    ChipLogProgress(Test, "Initialising network");
+    osStatus_t res = start_network_task(network_event_callback, 10240);
+    if (res != osOK)
+    {
+        ChipLogError(Test, "Failed to start lwip");
+        exit(res);
+    }
+    osThreadTerminate(osThreadGetId());
 }
 
 int main()
@@ -42,7 +79,7 @@ int main()
     osStatus_t ret = osKernelInitialize();
     if (ret != osOK)
     {
-        ChipLogError(NotSpecified, "osKernelInitialize failed: %d", ret);
+        ChipLogError(Test, "osKernelInitialize failed: %d", ret);
         return EXIT_FAILURE;
     }
 
@@ -53,30 +90,28 @@ int main()
 
     nlTestSetLogger(&NlTestLogger::nl_test_logger);
 
-    static const osThreadAttr_t thread_attr = {
-        .stack_size = 10240 // Allocate our threads with enough stack for printf
-    };
-    osThreadId_t thread = osThreadNew(test_thread, NULL, &thread_attr);
+    osThreadId_t thread = osThreadNew(init_thread, NULL, NULL);
+
     if (thread == NULL)
     {
-        ChipLogError(NotSpecified, "Failed to create thread");
+        ChipLogError(Test, "Failed to create thread");
         return EXIT_FAILURE;
     }
 
     osKernelState_t state = osKernelGetState();
     if (state == osKernelReady)
     {
-        ChipLogError(NotSpecified, "Starting kernel");
+        ChipLogProgress(Test, "Starting kernel");
         ret = osKernelStart();
         if (ret != osOK)
         {
-            ChipLogError(NotSpecified, "Failed to start kernel: %d", ret);
+            ChipLogError(Test, "Failed to start kernel: %d", ret);
             return EXIT_FAILURE;
         }
     }
     else
     {
-        ChipLogError(NotSpecified, "Kernel not ready: %d", state);
+        ChipLogError(Test, "Kernel not ready: %d", state);
         return EXIT_FAILURE;
     }
     return 0;

@@ -233,6 +233,19 @@ public:
 
 namespace chip {
 namespace app {
+
+/** Keeps calling ctx.DrainAndServiceIO() until the processedNum variable stops changing. */
+static void DrainAndServiceIOUntilDone(TestContext & ctx, volatile int & processedNum)
+{
+    int lastNum;
+    // keep processing while there are responses coming in
+    do
+    {
+        lastNum = processedNum;
+        ctx.DrainAndServiceIO();
+    } while (lastNum != processedNum);
+}
+
 CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
@@ -420,7 +433,7 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     // synthesize the read response.  But we don't want it hanging around
     // forever either.
     ctx.GetLoopback().mNumMessagesToDrop = 1;
-    ctx.DrainAndServiceIO();
+    DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
     GenerateReportData(apSuite, apContext, buf, false /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
     err = readClient.ProcessReportData(std::move(buf));
@@ -560,7 +573,7 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     // synthesize the read response.  But we don't want it hanging around
     // forever either.
     ctx.GetLoopback().mNumMessagesToDrop = 1;
-    ctx.DrainAndServiceIO();
+    DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
     GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
 
@@ -775,7 +788,7 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mNumDataElementIndex == 1);
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
@@ -795,7 +808,7 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
@@ -857,7 +870,7 @@ void TestReadInteraction::TestReadRoundtripWithDataVersionFilter(nlTestSuite * a
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
 
         delegate.mNumAttributeResponse = 0;
@@ -916,7 +929,7 @@ void TestReadInteraction::TestReadRoundtripWithNoMatchPathDataVersionFilter(nlTe
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
 
@@ -977,7 +990,7 @@ void TestReadInteraction::TestReadRoundtripWithMultiSamePathDifferentDataVersion
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
 
@@ -1038,7 +1051,7 @@ void TestReadInteraction::TestReadRoundtripWithSameDifferentPathsDataVersionFilt
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
 
@@ -1086,7 +1099,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumReadEventFailureStatusReceived > 0);
@@ -1117,7 +1130,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumReadEventFailureStatusReceived == 0);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
@@ -1163,7 +1176,7 @@ void TestReadInteraction::TestReadWildcard(nlTestSuite * apSuite, void * apConte
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 5);
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
@@ -1214,7 +1227,7 @@ void TestReadInteraction::TestReadChunking(nlTestSuite * apSuite, void * apConte
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 7); // One empty string, with 6 array evelemtns.
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
@@ -1351,7 +1364,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         // We should receive another (6 + 1) = 7 attribute reports since the underlying path iterator should be reset to the
         // beginning of the cluster it is currently iterating.
@@ -1403,7 +1416,7 @@ void TestReadInteraction::TestReadInvalidAttributePathRoundtrip(nlTestSuite * ap
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
         // By now we should have closed all exchanges and sent all pending acks, so
@@ -1526,7 +1539,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
     }
@@ -1542,7 +1555,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         err                                                       = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
@@ -1594,7 +1607,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         err = engine->GetReportingEngine().SetDirty(dirtyPath2);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
@@ -1610,7 +1623,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         err = engine->GetReportingEngine().SetDirty(dirtyPath2);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
@@ -1626,7 +1639,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         err = engine->GetReportingEngine().SetDirty(dirtyPath3);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
@@ -1642,7 +1655,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         err = engine->GetReportingEngine().SetDirty(dirtyPath4);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
@@ -1653,7 +1666,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
     }
@@ -1721,7 +1734,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         err                                                       = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
@@ -1737,7 +1750,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty() == true);
         delegate.mGotEventResponse = false;
         delegate.mGotReport        = false;
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
     }
 
@@ -1788,7 +1801,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
         err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
 
@@ -1814,7 +1827,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
             err = engine->GetReportingEngine().SetDirty(dirtyPath);
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-            ctx.DrainAndServiceIO();
+            DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             // We subscribed wildcard path twice, so we will receive two reports here.
@@ -1833,13 +1846,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
             err = engine->GetReportingEngine().SetDirty(dirtyPath);
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-            ctx.DrainAndServiceIO();
-
-            //
-            // Not sure why I had to add this, and didn't have cycles to figure out why.
-            // Tracked in Issue #17528.
-            //
-            ctx.DrainAndServiceIO();
+            DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             // Mock endpoint3 has 13 attributes in total, and we subscribed twice.
@@ -1893,7 +1900,7 @@ void TestReadInteraction::TestSubscribePartialOverlap(nlTestSuite * apSuite, voi
         err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
 
@@ -1915,7 +1922,7 @@ void TestReadInteraction::TestSubscribePartialOverlap(nlTestSuite * apSuite, voi
             err = engine->GetReportingEngine().SetDirty(dirtyPath);
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-            ctx.DrainAndServiceIO();
+            DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
@@ -1969,7 +1976,7 @@ void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap(nlTestSuite * apSuit
         err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
 
@@ -1988,7 +1995,7 @@ void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap(nlTestSuite * apSuit
             err = engine->GetReportingEngine().SetDirty(dirtyPath);
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-            ctx.DrainAndServiceIO();
+            DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
@@ -2037,7 +2044,7 @@ void TestReadInteraction::TestSubscribeEarlyShutdown(nlTestSuite * apSuite, void
 
         NL_TEST_ASSERT(apSuite, readClient.SendRequest(readPrepareParams) == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
@@ -2097,7 +2104,7 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
 
         delegate.mNumAttributeResponse = 0;
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
 
@@ -2106,7 +2113,7 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
 
         delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
     }
@@ -2192,7 +2199,7 @@ void TestReadInteraction::TestSubscribeInvalidInterval(nlTestSuite * apSuite, vo
 
         printf("\nSend subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
     }
 
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
@@ -2256,7 +2263,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         err                 = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
@@ -2290,7 +2297,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         err = engine->GetReportingEngine().SetDirty(dirtyPath2);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
@@ -2306,7 +2313,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         err = engine->GetReportingEngine().SetDirty(dirtyPath2);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         ctx.ExpireSessionAliceToBob();
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);
@@ -2380,7 +2387,7 @@ void TestReadInteraction::TestSubscribeRoundtripStatusReportTimeout(nlTestSuite 
 
         ctx.ExpireSessionAliceToBob();
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         ctx.ExpireSessionBobToAlice();
 
@@ -2437,7 +2444,7 @@ void TestReadInteraction::TestReadChunkingStatusReportTimeout(nlTestSuite * apSu
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         ctx.ExpireSessionAliceToBob();
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
         ctx.ExpireSessionBobToAlice();
 
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);
@@ -2505,7 +2512,7 @@ void TestReadInteraction::TestSubscribeRoundtripChunkStatusReportTimeout(nlTestS
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         ctx.ExpireSessionAliceToBob();
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
         ctx.ExpireSessionBobToAlice();
 
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 0);
@@ -2576,7 +2583,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
         err                 = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
@@ -2604,7 +2611,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         ctx.ExpireSessionBobToAlice();
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
         ctx.ExpireSessionAliceToBob();
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
@@ -2673,7 +2680,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
         err                 = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
@@ -2701,7 +2708,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
 
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
         ctx.ExpireSessionBobToAlice();
 
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);
@@ -2718,7 +2725,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
 
     // Engine shutdown seems to trigger some messages to try to be sent.  Make
     // sure those get flushed out.
-    ctx.DrainAndServiceIO();
+    DrainAndServiceIOUntilDone(ctx, delegate.mNumAttributeResponse);
 
     ctx.CreateSessionBobToAlice();
 }

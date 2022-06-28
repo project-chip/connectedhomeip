@@ -29,6 +29,9 @@ namespace Test {
 
 CHIP_ERROR IOContext::Init()
 {
+    // we must initialise the chip stakc because the tests post events which requires the queue to be initialised
+    ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().InitChipStack());
+
     CHIP_ERROR err = Platform::MemoryInit();
     chip::DeviceLayer::SetConfigurationMgr(&chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
 
@@ -49,6 +52,7 @@ void IOContext::Shutdown()
     ShutdownNetwork();
     ShutdownSystemLayer();
     Platform::MemoryShutdown();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
 }
 
 void IOContext::DriveIO()

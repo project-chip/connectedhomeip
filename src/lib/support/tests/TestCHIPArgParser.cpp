@@ -137,7 +137,7 @@ static size_t sCallbackRecordCount = 0;
 static OptionDef sOptionSetA_Defs[] =
 {
     { "foo",  kNoArgument, '1'  },
-    { "bar",  kNoArgument, 1001 },
+    { "bar",  kNoArgument, 1002 },
     { "baz",  kArgumentRequired, 'Z'  },
     { }
 };
@@ -350,7 +350,7 @@ static void SimpleParseTest_VariousShortAndLongWithArgs()
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
     VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
     VerifyHandleOptionCallback(2, __FUNCTION__, &sOptionSetB, 's', "-s", nullptr);
-    VerifyHandleOptionCallback(3, __FUNCTION__, &sOptionSetA, 1001, "--bar", nullptr);
+    VerifyHandleOptionCallback(3, __FUNCTION__, &sOptionSetA, 1002, "--bar", nullptr);
     VerifyHandleOptionCallback(4, __FUNCTION__, &sOptionSetA, '1', "-1", nullptr);
     VerifyHandleOptionCallback(5, __FUNCTION__, &sOptionSetA, 'Z', "-Z", "baz-value");
     VerifyHandleOptionCallback(6, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value-2");

@@ -37,6 +37,7 @@
 #include "TestInetCommon.h"
 #include "TestInetCommonOptions.h"
 
+#include <assert.h>
 #include <errno.h>
 #include <vector>
 
@@ -286,8 +287,9 @@ void InitNetwork()
         }
     }
 #endif // CHIP_TARGET_STYLE_UNIX
+#if !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
     tcpip_init(OnLwIPInitComplete, NULL);
-
+#endif // !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
@@ -456,6 +458,13 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 
         if (sRemainingSystemLayerEventDelay == 0)
         {
+            // work has already been scheduled, this will be added onto the end of the list of events
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                [](intptr_t) -> void {
+                    // this will allow the RunEventLoop to return
+                    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+                },
+                (intptr_t) nullptr);
             chip::DeviceLayer::PlatformMgr().RunEventLoop();
             sRemainingSystemLayerEventDelay = gNetworkOptions.EventDelay;
         }

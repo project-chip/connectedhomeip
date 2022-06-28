@@ -21,6 +21,7 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemClock.h>
@@ -181,6 +182,8 @@ public:
     /// Initialize the underlying layers.
     virtual CHIP_ERROR Init()
     {
+        // we must initialize the chip stack because the tests post events which requires the queue to be initialized
+        ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().InitChipStack());
         ReturnErrorOnFailure(chip::Platform::MemoryInit());
         ReturnErrorOnFailure(LoopbackTransportManager::Init());
         ReturnErrorOnFailure(MessagingContext::Init(&GetTransportMgr(), &GetIOContext()));
@@ -193,6 +196,7 @@ public:
         MessagingContext::Shutdown();
         LoopbackTransportManager::Shutdown();
         chip::Platform::MemoryShutdown();
+        // LoopbackTransportManager::Shutdown() handles chip::DeviceLayer::PlatformMgr().Shutdown()
     }
 
     // Init/Shutdown Helpers that can be used directly as the nlTestSuite

@@ -1010,7 +1010,9 @@ void CheckToIPv6(nlTestSuite * inSuite, void * inContext)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         ip6_addr_t ip_addr_1, ip_addr_2;
-        ip_addr_1 = *(ip6_addr_t *) addr;
+        memset(&ip_addr_1, 0, sizeof(ip_addr_1));
+        memset(&ip_addr_2, 0, sizeof(ip_addr_2));
+        memcpy(&ip_addr_1, &addr, sizeof(addr));
 #else
         struct in6_addr ip_addr_1, ip_addr_2;
         ip_addr_1 = *reinterpret_cast<struct in6_addr *>(addr);
