@@ -121,7 +121,8 @@ CHIP_ERROR ExampleDACProvider::GetFirmwareInformation(MutableByteSpan & out_firm
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExampleDACProvider::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_signature_buffer)
+CHIP_ERROR ExampleDACProvider::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
+                                                            MutableByteSpan & out_signature_buffer)
 {
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;

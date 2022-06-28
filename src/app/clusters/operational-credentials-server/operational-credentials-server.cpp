@@ -977,7 +977,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 
     // Append attestation challenge in the back of the reserved space for the signature
     memcpy(attestationElements.Get() + attestationElementsSpan.size(), attestationChallenge.data(), attestationChallenge.size());
-    tbsSpan = ByteSpan{attestationElements.Get(), attestationElementsSpan.size() + attestationChallenge.size()};
+    tbsSpan = ByteSpan{ attestationElements.Get(), attestationElementsSpan.size() + attestationChallenge.size() };
 
     {
         Crypto::P256ECDSASignature signature;
@@ -1105,10 +1105,11 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
         // Append attestation challenge in the back of the reserved space for the signature
         memcpy(nocsrElements.Get() + nocsrElementsSpan.size(), attestationChallenge.data(), attestationChallenge.size());
-        tbsSpan = ByteSpan{nocsrElements.Get(), nocsrElementsSpan.size() + attestationChallenge.size()};
+        tbsSpan = ByteSpan{ nocsrElements.Get(), nocsrElementsSpan.size() + attestationChallenge.size() };
 
         {
-            Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
+            Credentials::DeviceAttestationCredentialsProvider * dacProvider =
+                Credentials::GetDeviceAttestationCredentialsProvider();
             Crypto::P256ECDSASignature signature;
             MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
 
