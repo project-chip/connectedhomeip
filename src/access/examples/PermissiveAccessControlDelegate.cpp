@@ -31,7 +31,7 @@ class AccessControlDelegate : public AccessControl::Delegate
 {
 public:
     CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
-    CHIP_ERROR Finish() override { return CHIP_NO_ERROR; }
+    void Finish() override {}
 
     // Capabilities
     CHIP_ERROR GetMaxEntryCount(size_t & value) const override

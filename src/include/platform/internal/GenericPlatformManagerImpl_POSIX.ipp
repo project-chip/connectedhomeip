@@ -298,7 +298,7 @@ exit:
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
+void GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
 {
     pthread_mutex_destroy(&mStateLock);
     pthread_cond_destroy(&mEventQueueStoppedCond);
@@ -307,7 +307,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
     // Call up to the base class _Shutdown() to perform the actual stack de-initialization
     // and clean-up
     //
-    return GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+    GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.

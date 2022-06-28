@@ -70,10 +70,9 @@ CHIP_ERROR Instance::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::Shutdown()
+void Instance::Shutdown()
 {
-    ReturnErrorOnFailure(mpBaseDriver->Shutdown());
-    return CHIP_NO_ERROR;
+    mpBaseDriver->Shutdown();
 }
 
 void Instance::InvokeCommand(HandlerContext & ctxt)

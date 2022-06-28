@@ -58,7 +58,7 @@ public:
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
     CHIP_ERROR _InitChipStack();
-    CHIP_ERROR _Shutdown();
+    void _Shutdown();
 
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout delay) { return CHIP_ERROR_NOT_IMPLEMENTED; };
     CHIP_ERROR _StartEventLoopTask();

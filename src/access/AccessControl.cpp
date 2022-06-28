@@ -184,13 +184,12 @@ CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate, DeviceTypeRes
     return retval;
 }
 
-CHIP_ERROR AccessControl::Finish()
+void AccessControl::Finish()
 {
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(IsInitialized());
     ChipLogProgress(DataManagement, "AccessControl: finishing");
-    CHIP_ERROR retval = mDelegate->Finish();
-    mDelegate         = nullptr;
-    return retval;
+    mDelegate->Finish();
+    mDelegate = nullptr;
 }
 
 CHIP_ERROR AccessControl::CreateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t * index,

@@ -47,7 +47,7 @@ CHIP_ERROR CHIPCommandBridge::Run()
     } else {
         Cleanup();
     }
-    ReturnErrorOnFailure(MaybeTearDownStack());
+    MaybeTearDownStack();
 
     return CHIP_NO_ERROR;
 }
@@ -105,14 +105,12 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPCommandBridge::MaybeTearDownStack()
+void CHIPCommandBridge::MaybeTearDownStack()
 {
-    CHIP_ERROR err;
     if (IsInteractive()) {
-        return CHIP_NO_ERROR;
+        return;
     }
-    err = ShutdownCommissioner();
-    return err;
+    ShutdownCommissioner();
 }
 
 void CHIPCommandBridge::SetIdentity(const char * identity)
@@ -130,7 +128,7 @@ CHIPDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurren
 
 CHIPDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
 
-CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
+void CHIPCommandBridge::ShutdownCommissioner()
 {
     ChipLogProgress(chipTool, "Shutting down controller");
     for (auto & pair : mControllers) {
@@ -140,8 +138,6 @@ CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
     mCurrentController = nil;
 
     [[MatterControllerFactory sharedInstance] shutdown];
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration)

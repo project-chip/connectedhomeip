@@ -112,7 +112,7 @@ public:
     DnssdTizen & operator=(const DnssdTizen &) = delete;
 
     CHIP_ERROR Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);
-    CHIP_ERROR Shutdown();
+    void Shutdown();
 
     CHIP_ERROR RegisterService(const DnssdService & service, DnssdPublishCallback callback, void * context);
     CHIP_ERROR UnregisterAllServices();

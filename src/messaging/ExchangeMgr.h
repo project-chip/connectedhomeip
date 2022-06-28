@@ -81,10 +81,8 @@ public:
      *     there are no active ExchangeContext objects. Furthermore, it is the
      *     onus of the application to de-allocate the ExchangeManager
      *     object after calling ExchangeManager::Shutdown().
-     *
-     *  @return #CHIP_NO_ERROR unconditionally.
      */
-    CHIP_ERROR Shutdown();
+    void Shutdown();
 
     /**
      *  Creates a new ExchangeContext with a given peer CHIP node specified by the peer node identifier.

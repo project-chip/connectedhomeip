@@ -644,7 +644,8 @@ ChipError::StorageType pychip_GetDeviceBeingCommissioned(chip::Controller::Devic
 ChipError::StorageType pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl)
 {
 #if CONFIG_NETWORK_LAYER_BLE
-    return devCtrl->CloseBleConnection().AsInteger();
+    devCtrl->CloseBleConnection();
+    return CHIP_NO_ERROR.AsInteger();
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE.AsInteger();
 #endif

@@ -407,11 +407,7 @@ void Server::Shutdown()
     chip::Dnssd::Resolver::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     mMessageCounterManager.Shutdown();
-    CHIP_ERROR err = mExchangeMgr.Shutdown();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Exchange Mgr shutdown: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    mExchangeMgr.Shutdown();
     mSessions.Shutdown();
     mTransports.Close();
     mAccessControl.Finish();

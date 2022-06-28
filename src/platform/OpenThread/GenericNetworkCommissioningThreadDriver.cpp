@@ -57,10 +57,9 @@ CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GenericThreadDriver::Shutdown()
+void GenericThreadDriver::Shutdown()
 {
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(nullptr);
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR GenericThreadDriver::CommitConfiguration()

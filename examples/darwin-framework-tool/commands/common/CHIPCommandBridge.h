@@ -94,7 +94,7 @@ protected:
 private:
     CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
                                       const chip::Credentials::AttestationTrustStore * trustStore);
-    CHIP_ERROR ShutdownCommissioner();
+    void ShutdownCommissioner();
     uint16_t CurrentCommissionerIndex();
 
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
@@ -103,7 +103,7 @@ private:
     void StopWaiting();
 
     CHIP_ERROR MaybeSetUpStack();
-    CHIP_ERROR MaybeTearDownStack();
+    void MaybeTearDownStack();
 
     // Our three controllers: alpha, beta, gamma.
     static std::map<std::string, CHIPDeviceController *> mControllers;

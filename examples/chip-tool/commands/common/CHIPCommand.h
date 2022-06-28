@@ -139,11 +139,11 @@ protected:
 
 private:
     CHIP_ERROR MaybeSetUpStack();
-    CHIP_ERROR MaybeTearDownStack();
+    void MaybeTearDownStack();
 
     CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
                                       const chip::Credentials::AttestationTrustStore * trustStore);
-    CHIP_ERROR ShutdownCommissioner(std::string key);
+    void ShutdownCommissioner(std::string key);
     chip::FabricId CurrentCommissionerId();
     static std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     static std::set<CHIPCommand *> sDeferredCleanups;

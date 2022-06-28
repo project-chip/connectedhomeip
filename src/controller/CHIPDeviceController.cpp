@@ -280,9 +280,9 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::Shutdown()
+void DeviceController::Shutdown()
 {
-    VerifyOrReturnError((mState == State::Initialized) && (mSystemState != nullptr), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(mState != State::NotInitialized);
 
     ChipLogDetail(Controller, "Shutting down the controller");
 
@@ -312,8 +312,6 @@ CHIP_ERROR DeviceController::Shutdown()
 
     mDNSResolver.Shutdown();
     mDeviceDiscoveryDelegate = nullptr;
-
-    return CHIP_NO_ERROR;
 }
 
 void DeviceController::ReleaseOperationalDevice(NodeId remoteNodeId)
@@ -336,7 +334,7 @@ CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
 
     if (proxy->IsConnected())
     {
-        return proxy->Disconnect();
+        proxy->Disconnect();
     }
 
     if (proxy->IsConnecting())
@@ -456,9 +454,9 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::Shutdown()
+void DeviceCommissioner::Shutdown()
 {
-    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(mState != State::NotInitialized);
 
     ChipLogDetail(Controller, "Shutting down the commissioner");
 
@@ -489,7 +487,6 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     mCommissioneeDevicePool.ReleaseAll();
 
     DeviceController::Shutdown();
-    return CHIP_NO_ERROR;
 }
 
 CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
@@ -1380,12 +1377,12 @@ void DeviceCommissioner::ConnectBleTransportToSelf()
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
-CHIP_ERROR DeviceCommissioner::CloseBleConnection()
+void DeviceCommissioner::CloseBleConnection()
 {
     // It is fine since we can only commission one device at the same time.
     // We should be able to distinguish different BLE connections if we want
     // to commission multiple devices at the same time over BLE.
-    return mSystemState->BleLayer()->CloseAllBleConnections();
+    mSystemState->BleLayer()->CloseAllBleConnections();
 }
 #endif
 

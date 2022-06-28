@@ -204,7 +204,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ShutdownCommissioner()
+void ShutdownCommissioner()
 {
     UserDirectedCommissioningServer * udcServer = gCommissioner.GetUserDirectedCommissioningServer();
     if (udcServer != nullptr)
@@ -213,7 +213,6 @@ CHIP_ERROR ShutdownCommissioner()
     }
 
     gCommissioner.Shutdown();
-    return CHIP_NO_ERROR;
 }
 
 class PairingCommand : public Controller::DevicePairingDelegate
