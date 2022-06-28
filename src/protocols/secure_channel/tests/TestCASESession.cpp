@@ -272,7 +272,6 @@ public:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 };
 
-
 void TestCASESession::CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 {
     SessionManager sessionManager;
@@ -286,17 +285,16 @@ void TestCASESession::CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * i
 
     caseSession.SetGroupDataProvider(&gDeviceGroupDataProvider);
     NL_TEST_ASSERT(inSuite,
-                   caseSession.PrepareForSessionEstablishment(
-                       sessionManager, nullptr, nullptr, nullptr, nullptr, ScopedNodeId(),
-                       Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_ERROR_INVALID_ARGUMENT);
+                   caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, nullptr, ScopedNodeId(),
+                                                              Optional<ReliableMessageProtocolConfig>::Missing()) ==
+                       CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite,
-                   caseSession.PrepareForSessionEstablishment(
-                       sessionManager, nullptr, nullptr, nullptr, &delegate, ScopedNodeId(),
-                       Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(
-        inSuite,
-        caseSession.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate, ScopedNodeId(),
-                                                   Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
+                   caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, &delegate, ScopedNodeId(),
+                                                              Optional<ReliableMessageProtocolConfig>::Missing()) ==
+                       CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite,
+                   caseSession.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate, ScopedNodeId(),
+                                                              Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
 
     // Calling Clear() here since ASAN will have an issue if FabricTable destructor is called before CASESession's
     // destructor. We could reorder FabricTable and CaseSession, but this makes it a little more clear what we are
