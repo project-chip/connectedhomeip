@@ -44,30 +44,14 @@ tests:
           constraints:
               type: map32
 
-    #Issue 17463
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP && A_TEMPERATURE_TOLERANCE
+      PICS: A_TEMPERATURE_TOLERANCE
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 2, 3, 65528, 65529, 65530, 65531, 65532, 65533]
           constraints:
               type: list
-
-    - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
-      verification: |
-          Not supported in SDK yet
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+              contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
 
     - label: "Read AcceptedCommandList attribute from the DUT"
       command: "readAttribute"
@@ -83,3 +67,19 @@ tests:
           value: []
           constraints:
               type: list
+
+    #issue #15011 disabled steps below Global attributes missing from YAML framework
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          Not supported in SDK yet
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

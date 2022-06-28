@@ -48,19 +48,15 @@ tests:
               type: map32
 
     - label: "Read the global attribute: AttributeList"
-      PICS:
-          PICS_SKIP_SAMPLE_APP && MC_APPLAUNCHER.S.A0000 &&
-          MC_APPLAUNCHER.S.A0001
+      PICS: MC_APPLAUNCHER.S.A0000 && MC_APPLAUNCHER.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [65528, 65529, 65531, 65532, 65533]
           constraints:
               type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
 
-    #Issue 19150
     - label: "Read the global attribute: AcceptedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -69,7 +65,6 @@ tests:
               type: list
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

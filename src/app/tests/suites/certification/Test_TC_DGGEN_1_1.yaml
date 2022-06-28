@@ -46,11 +46,26 @@ tests:
               type: map32
 
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 8, 65528, 65529, 65531, 65533]
+          constraints:
+              type: list
+              contains: [0, 1, 8, 65528, 65529, 65531, 65533]
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: [0]
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
           constraints:
               type: list
 
@@ -70,19 +85,3 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
-    - label: "Read the global attribute: AcceptedCommandList"
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          value: [0]
-          constraints:
-              type: list
-
-    - label: "Read the global attribute: GeneratedCommandList"
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          value: []
-          constraints:
-              type: list
