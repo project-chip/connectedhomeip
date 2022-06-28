@@ -267,6 +267,12 @@ pw_python_action("python") {
 
   tags = "cp37-abi3-" + platform_tag
 
+  if (chip_controller) {
+    lib_name = "_ChipDeviceCtrl.so"
+  } else {
+    lib_name = "_ChipServer.so"
+  }
+
   args = [
     "--package_name",
     "chip",
@@ -280,15 +286,9 @@ pw_python_action("python") {
     rebase_path(_py_manifest_file, root_build_dir),
     "--plat-name",
     platform_tag,
+    "--lib-name",
+    lib_name,
   ]
-
-  if (chip_controller) {
-  } else {
-    args += [
-      "--server",
-      "True",
-    ]
-  }
 
   public_deps = [ ":ChipDeviceCtrl" ]
 

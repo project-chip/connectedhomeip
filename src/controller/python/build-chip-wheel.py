@@ -45,7 +45,7 @@ parser.add_argument('--manifest', help='list of files to package')
 parser.add_argument(
     '--plat-name', help='platform name to embed in generated filenames')
 parser.add_argument(
-    '--server', help='build the server variant', default=False, type=bool)
+    '--lib-name', help='the native library to include (if any)', default=None)
 
 args = parser.parse_args()
 
@@ -58,11 +58,8 @@ class InstalledScriptInfo:
         self.installName = os.path.splitext(name)[0]
 
 
-if args.server:
-    chipDLLName = "_ChipServer.so"
-else:
-    chipDLLName = "_ChipDeviceCtrl.so"
 packageName = args.package_name
+libName = args.lib_name
 chipPackageVer = args.build_number
 
 # Record the current directory at the start of execution.
@@ -148,7 +145,7 @@ try:
     packages = manifest['packages']
 
     print("packageName: {}".format(packageName))
-    print("chipDLLName: {}".format(chipDLLName))
+    print("libName: {}".format(libName))
 
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing
     # the CHIP python packages, shared libraries and scripts.
@@ -173,8 +170,7 @@ try:
         },
         package_data={
             packageName: [
-                # Include the wrapper DLL as package data in the "chip" package.
-                chipDLLName
+                libName
             ]
         },
         scripts=[name for name in map(
