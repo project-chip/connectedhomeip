@@ -1885,8 +1885,9 @@ void TestCommitMarker(nlTestSuite * inSuite, void * inContext)
             fabricTable.SetForceAbortCommitForTest(true);
             NL_TEST_ASSERT(inSuite, fabricTable.CommitPendingFabricData() == CHIP_ERROR_INTERNAL);
 
-            // Check that there are more keys now, partially committed.
-            NL_TEST_ASSERT(inSuite, storage.GetNumKeys() > numStorageKeysAfterFirstAdd);
+            // Check that there are more keys now, partially committed: at least a Commit Marker (+1)
+            // and some more keys from the aborted process.
+            NL_TEST_ASSERT(inSuite, storage.GetNumKeys() > (numStorageKeysAfterFirstAdd + 1));
         }
     }
 
@@ -1919,7 +1920,7 @@ void TestCommitMarker(nlTestSuite * inSuite, void * inContext)
         // Make sure that all other pending storage got deleted
         NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == numStorageKeysAfterFirstAdd);
 
-        // Verify we canm only see 1 fabric with the iterator
+        // Verify we can only see 1 fabric with the iterator
         {
             size_t numFabricsIterated = 0;
             bool saw1                 = false;

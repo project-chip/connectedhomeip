@@ -86,15 +86,9 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     // If no backup could be found, it means that the network configuration has not been modified
     // since the fail-safe was armed, so return with no error.
     ReturnErrorCodeIf(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(error);
 
-    if (error == CHIP_NO_ERROR)
-    {
-        ChipLogError(NetworkProvisioning, "Found Thread configuration backup: reverting configuration");
-    }
-    else
-    {
-        ReturnErrorOnFailure(error);
-    }
+    ChipLogError(NetworkProvisioning, "Found Thread configuration backup: reverting configuration");
 
     // Not all KVS implementations support zero-length values, so handle a special value representing an empty dataset.
     ByteSpan dataset(datasetBytes, datasetLength);

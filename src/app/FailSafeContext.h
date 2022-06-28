@@ -26,6 +26,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace app {
@@ -41,7 +42,7 @@ public:
      *  when the fail-safe timer is currently armed, the currently-running fail-safe timer will
      *  first be cancelled, then the fail-safe timer will be re-armed.
      */
-    CHIP_ERROR ArmFailSafe(FabricIndex accessingFabricIndex, uint16_t expiryLengthSeconds);
+    CHIP_ERROR ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Seconds16 expiryLengthSeconds);
 
     /**
      * @brief Cleanly disarm failsafe timer, such as on CommissioningComplete

@@ -84,7 +84,7 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
     PlatformMgr().ScheduleWork(HandleDisarmFailSafe, reinterpret_cast<intptr_t>(this));
 }
 
-CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, uint16_t expiryLengthSeconds)
+CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Seconds16 expiryLengthSeconds)
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     bool cancelTimersIfError = false;

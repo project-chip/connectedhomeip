@@ -1848,7 +1848,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
         {
             if (mStateFlags.Has(StateFlags::kAbortCommitForTest))
             {
-                // Clear state so that shutdown doesn't attemp clean-up
+                // Clear state so that shutdown doesn't attempt clean-up
                 mStateFlags.ClearAll();
                 mFabricIndexWithPendingState = kUndefinedFabricIndex;
                 mPendingFabric.Reset();

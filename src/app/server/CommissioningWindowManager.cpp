@@ -170,7 +170,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
     }
     else
     {
-        err = failSafeContext.ArmFailSafe(kUndefinedFabricId, 60);
+        err = failSafeContext.ArmFailSafe(kUndefinedFabricId, System::Clock::Seconds16(60));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Error arming failsafe on PASE session establishment completion");

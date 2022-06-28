@@ -196,7 +196,9 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
         }
         else
         {
-            CheckSuccess(failSafeContext.ArmFailSafe(accessingFabricIndex, commandData.expiryLengthSeconds), Failure);
+            CheckSuccess(
+                failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+                Failure);
             Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
             response.errorCode = CommissioningError::kOk;
             commandObj->AddResponse(commandPath, response);

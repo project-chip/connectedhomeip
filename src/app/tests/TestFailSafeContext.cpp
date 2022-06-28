@@ -60,7 +60,7 @@ static void TestFailSafeContext_ArmFailSafe(nlTestSuite * inSuite, void * inCont
 
     chip::app::FailSafeContext failSafeContext;
 
-    err = failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, 1);
+    err = failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, failSafeContext.IsFailSafeArmed() == true);
     NL_TEST_ASSERT(inSuite, failSafeContext.GetFabricIndex() == kTestAccessingFabricIndex1);
@@ -77,7 +77,7 @@ static void TestFailSafeContext_NocCommandInvoked(nlTestSuite * inSuite, void * 
 
     chip::app::FailSafeContext failSafeContext;
 
-    err = failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, 1);
+    err = failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, failSafeContext.GetFabricIndex() == kTestAccessingFabricIndex1);
 
