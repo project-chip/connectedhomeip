@@ -203,8 +203,33 @@ pw_python_action("python") {
     ]
   }
 
+  _py_packages = [
+    "chip",
+    "chip.ble",
+    "chip.ble.commissioning",
+    "chip.configuration",
+    "chip.clusters",
+    "chip.discovery",
+    "chip.exceptions",
+    "chip.internal",
+    "chip.interaction_model",
+    "chip.logging",
+    "chip.native",
+    "chip.clusters",
+    "chip.tlv",
+    "chip.setup_payload",
+    "chip.storage",
+  ]
+
+  if (!chip_controller) {
+    _py_packages += [
+      "chip.server",
+    ]
+  }
+
   _py_manifest = {
     files = _py_manifest_files_rebased
+    packages = _py_packages
   }
 
   write_file(_py_manifest_file, _py_manifest, "json")

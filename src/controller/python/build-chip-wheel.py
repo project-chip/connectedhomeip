@@ -152,28 +152,7 @@ try:
     #
     # Build the chip package...
     #
-    packages = [
-        'chip',
-        'chip.ble',
-        'chip.ble.commissioning',
-        'chip.configuration',
-        'chip.clusters',
-        'chip.discovery',
-        'chip.exceptions',
-        'chip.internal',
-        'chip.interaction_model',
-        'chip.logging',
-        'chip.native',
-        'chip.clusters',
-        'chip.tlv',
-        'chip.setup_payload',
-        'chip.storage',
-    ]
-    #print ("Server: {}".format(args.server))
-    if args.server:
-        packages.append('chip.server')
-
-    #print("packages: {}".format(packages))
+    packages = manifest['packages']
 
     print("packageName: {}".format(packageName))
     print("chipDLLName: {}".format(chipDLLName))
