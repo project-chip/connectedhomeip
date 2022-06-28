@@ -154,5 +154,47 @@ CHIP_ERROR ESP32FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
+CHIP_ERROR ESP32FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
+{
+    size_t vendorNameLen = 0; // without counting null-terminator
+    return ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_VendorName, buf, bufSize, vendorNameLen);
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetVendorId(uint16_t & vendorId)
+{
+    ChipError err   = CHIP_NO_ERROR;
+    uint32_t valInt = 0;
+
+    err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_VendorId, valInt);
+    ReturnErrorOnFailure(err);
+    vendorId = static_cast<uint16_t>(valInt);
+    return err;
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
+{
+    size_t productNameLen = 0; // without counting null-terminator
+    return ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_ProductName, buf, bufSize, productNameLen);
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetProductId(uint16_t & productId)
+{
+    ChipError err   = CHIP_NO_ERROR;
+    uint32_t valInt = 0;
+
+    err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_ProductId, valInt);
+    ReturnErrorOnFailure(err);
+    productId = static_cast<uint16_t>(valInt);
+    return err;
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
+{
+    size_t hardwareVersionStringLen = 0; // without counting null-terminator
+    return ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionStringLen);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
+
 } // namespace DeviceLayer
 } // namespace chip
