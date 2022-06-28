@@ -65,14 +65,6 @@ else:
 packageName = args.package_name
 chipPackageVer = args.build_number
 
-if args.server:
-    installScripts = []
-else:
-    installScripts = [
-        InstalledScriptInfo("chip-device-ctrl.py"),
-        InstalledScriptInfo("chip-repl.py"),
-    ]
-
 # Record the current directory at the start of execution.
 curDir = os.curdir
 
@@ -110,6 +102,7 @@ try:
             os.makedirs(os.path.dirname(dstFile), exist_ok=True)
             shutil.copyfile(srcFile, dstFile)
 
+    installScripts = [ InstalledScriptInfo(script) for script in manifest['scripts'] ]
     for script in installScripts:
         os.rename(os.path.join(tmpDir, script.name),
                   os.path.join(tmpDir, script.installName))
