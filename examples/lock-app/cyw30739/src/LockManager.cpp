@@ -48,7 +48,7 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
     if (mMaxUsers > DOOR_LOCK_MAX_USERS)
     {
         printf("Max number of users is greater than %d, the maximum amount of users currently supported on this platform",
-                  DOOR_LOCK_MAX_USERS);
+               DOOR_LOCK_MAX_USERS);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
@@ -74,19 +74,20 @@ bool LockManager::ReadConfigValues()
 {
     size_t outLen;
     CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
-                                    sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
+                                       sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
 
     CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
-                                    sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mLockCredentials), outLen);
+                                       sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mLockCredentials), outLen);
 
     CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
-                                    sizeof(mUserNames), outLen);
+                                       sizeof(mUserNames), outLen);
 
     CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
-                                    sizeof(mCredentialData), outLen);
+                                       sizeof(mCredentialData), outLen);
 
-    CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials[0].Get()),
-                                    sizeof(DlCredential) * mMaxUsers * mMaxCredentialsPerUser, outLen);
+    CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_UserCredentials,
+                                       reinterpret_cast<uint8_t *>(mCredentials[0].Get()),
+                                       sizeof(DlCredential) * mMaxUsers * mMaxCredentialsPerUser, outLen);
 
     return true;
 }
@@ -309,14 +310,14 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 
     // Save user information in NVM flash
     CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
-                                     sizeof(EmberAfPluginDoorLockUserInfo) * mMaxUsers);
+                                        sizeof(EmberAfPluginDoorLockUserInfo) * mMaxUsers);
 
     CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_UserCredentials,
-                                     reinterpret_cast<const uint8_t *>(mCredentials[adjustedUserIndex].Get()),
-                                     sizeof(DlCredential) * totalCredentials);
+                                        reinterpret_cast<const uint8_t *>(mCredentials[adjustedUserIndex].Get()),
+                                        sizeof(DlCredential) * totalCredentials);
 
     CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
-                                     sizeof(mUserNames));
+                                        sizeof(mUserNames));
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, adjustedUserIndex);
 
@@ -389,10 +390,10 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
 
     // Save credential information in NVM flash
     CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
-                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * mMaxCredentialsPerUser);
+                                        sizeof(EmberAfPluginDoorLockCredentialInfo) * mMaxCredentialsPerUser);
 
-    CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
-                                     sizeof(mCredentialData));
+    CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_CredentialData,
+                                        reinterpret_cast<const uint8_t *>(&mCredentialData), sizeof(mCredentialData));
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
 
