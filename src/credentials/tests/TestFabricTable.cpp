@@ -1892,8 +1892,10 @@ void TestCommitMarker(nlTestSuite * inSuite, void * inContext)
             // and some more keys from the aborted process.
             NL_TEST_ASSERT(inSuite, storage.GetNumKeys() > (numStorageKeysAfterFirstAdd + 1));
         }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
     }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     {
         storage.DumpKeys();
 
