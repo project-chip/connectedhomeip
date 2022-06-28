@@ -1832,6 +1832,9 @@ void TestCommitMarker(nlTestSuite * inSuite, void * inContext)
             }
         }
 
+        // The following test requires test methods not available on all builds.
+        // TODO: Debug why some CI jobs don't set it properly.
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         numStorageKeysAfterFirstAdd = storage.GetNumKeys();
 
         // Add Fabric 2222 Node Id 66, no ICAC *** AND ABORT COMMIT ***
@@ -1945,6 +1948,7 @@ void TestCommitMarker(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, saw2 == false);
         }
     }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
 // Test Suite
