@@ -1774,7 +1774,7 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
 
         FabricTable fabricTable;
         FabricTable::InitParams initParams;
-        initParams.storage = &storage;
+        initParams.storage     = &storage;
         initParams.opCertStore = &opCertStore;
 
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.Init(initParams));

@@ -26,10 +26,10 @@
 #pragma once
 
 #include <credentials/CHIPCert.h>
-#include <crypto/CHIPCryptoPAL.h>
 #include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/Base64.h>

@@ -221,8 +221,7 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = { NL_TEST_DEF("Test Basic Lifecycle of PersistentStorageOperationalKeystore", TestBasicLifeCycle),
-                                 NL_TEST_DEF("Test ephemeral key management", TestEphemeralKeys),
-                                 NL_TEST_SENTINEL() };
+                                 NL_TEST_DEF("Test ephemeral key management", TestEphemeralKeys), NL_TEST_SENTINEL() };
 
 /**
  *  Set up the test suite.

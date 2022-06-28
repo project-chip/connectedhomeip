@@ -187,7 +187,7 @@ public:
     /**
      * @brief Release an ephemeral keypair previously created by `AllocateEphemeralKeypair()`
      */
-    virtual void ReleaseEphemeralKeypair(Crypto::P256Keypair *keypair) = 0;
+    virtual void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) = 0;
 };
 
 } // namespace Crypto

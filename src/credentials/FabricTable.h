@@ -581,7 +581,7 @@ public:
     /**
      * @brief Release an ephemeral keypair previously created by `AllocateEphemeralKeypair()`
      */
-    void ReleaseEphemeralKeypair(Crypto::P256Keypair *keypair);
+    void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair);
 
     /**
      * This initializes a new keypair for the given fabric and generates a CSR for it,

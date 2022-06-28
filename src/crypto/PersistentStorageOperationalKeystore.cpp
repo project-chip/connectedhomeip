@@ -304,7 +304,7 @@ Crypto::P256Keypair * PersistentStorageOperationalKeystore::AllocateEphemeralKey
     return Platform::New<Crypto::P256Keypair>();
 }
 
-void PersistentStorageOperationalKeystore::ReleaseEphemeralKeypair(Crypto::P256Keypair *keypair)
+void PersistentStorageOperationalKeystore::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
 {
     // DO NOT CUT AND PASTE without considering the AllocateEphemeralKeypair().
     // This must delete the same concrete class as allocated in `AllocateEphemeralKeypair`
