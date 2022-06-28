@@ -26,7 +26,6 @@
     MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterScenesPluginServerInitCallback();                                                                                        \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
-    MatterBindingPluginServerInitCallback();                                                                                       \
     MatterAccessControlPluginServerInitCallback();                                                                                 \
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \

@@ -38,9 +38,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_BASIC_CLUSTER_ID:
         emberAfBasicClusterInitCallback(endpoint);
         break;
-    case ZCL_BINDING_CLUSTER_ID:
-        emberAfBindingClusterInitCallback(endpoint);
-        break;
     case ZCL_DESCRIPTOR_CLUSTER_ID:
         emberAfDescriptorClusterInitCallback(endpoint);
         break;
@@ -124,11 +121,6 @@ void __attribute__((weak)) emberAfAdministratorCommissioningClusterInitCallback(
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfBindingClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
