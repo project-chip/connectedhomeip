@@ -614,6 +614,8 @@ exit:
     mbedtls_mpi_free(&r);
     _log_mbedTLS_error(result);
     return error;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 

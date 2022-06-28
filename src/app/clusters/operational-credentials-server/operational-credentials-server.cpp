@@ -964,7 +964,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 
     attestationElementsLen = TLV::EstimateStructOverhead(certDeclSpan.size(), attestationNonce.size(), sizeof(uint64_t) * 8);
 
-    if (!attestationElements.Alloc(attestationElementsLen + Crypto::kAES_CCM128_Key_Length))
+    if (!attestationElements.Alloc(attestationElementsLen + attestationChallenge.size()))
     {
         err = CHIP_ERROR_NO_MEMORY;
         VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::ResourceExhausted);
@@ -1091,7 +1091,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
                                                           0u               // no vendor reserved data
         );
 
-        if (!nocsrElements.Alloc(nocsrLengthEstimate + Crypto::kAES_CCM128_Key_Length))
+        if (!nocsrElements.Alloc(nocsrLengthEstimate + attestationChallenge.size()))
         {
             err = CHIP_ERROR_NO_MEMORY;
             VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::ResourceExhausted);
