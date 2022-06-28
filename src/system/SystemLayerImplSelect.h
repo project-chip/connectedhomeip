@@ -45,7 +45,7 @@ public:
 
     // Layer overrides.
     CHIP_ERROR Init() override;
-    CHIP_ERROR Shutdown() override;
+    void Shutdown() override;
     bool IsInitialized() const override { return mLayerState.IsInitialized(); }
     CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;

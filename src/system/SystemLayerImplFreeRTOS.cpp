@@ -44,10 +44,9 @@ CHIP_ERROR LayerImplFreeRTOS::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LayerImplFreeRTOS::Shutdown()
+void LayerImplFreeRTOS::Shutdown()
 {
-    VerifyOrReturnError(mLayerState.ResetFromInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    return CHIP_NO_ERROR;
+    mLayerState.ResetFromInitialized();
 }
 
 CHIP_ERROR LayerImplFreeRTOS::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)

@@ -54,7 +54,7 @@ public:
     using BLEAdvertisingMode  = ConnectivityManager::BLEAdvertisingMode;
 
     CHIP_ERROR Init();
-    CHIP_ERROR Shutdown();
+    void Shutdown();
     CHIPoBLEServiceMode GetCHIPoBLEServiceMode();
     CHIP_ERROR SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool IsAdvertisingEnabled();
@@ -117,12 +117,12 @@ inline CHIP_ERROR BLEManager::Init()
     return static_cast<ImplClass *>(this)->_Init();
 }
 
-inline CHIP_ERROR BLEManager::Shutdown()
+inline void BLEManager::Shutdown()
 {
 #if CONFIG_NETWORK_LAYER_BLE
-    ReturnErrorOnFailure(GetBleLayer()->Shutdown());
+    GetBleLayer()->Shutdown();
 #endif
-    return static_cast<ImplClass *>(this)->_Shutdown();
+    static_cast<ImplClass *>(this)->_Shutdown();
 }
 
 inline BLEManager::CHIPoBLEServiceMode BLEManager::GetCHIPoBLEServiceMode()

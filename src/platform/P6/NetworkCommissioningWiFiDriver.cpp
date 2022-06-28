@@ -69,10 +69,9 @@ CHIP_ERROR P6WiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     return err;
 }
 
-CHIP_ERROR P6WiFiDriver::Shutdown()
+void P6WiFiDriver::Shutdown()
 {
     mpStatusChangeCallback = nullptr;
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR P6WiFiDriver::CommitConfiguration()

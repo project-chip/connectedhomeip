@@ -105,7 +105,7 @@ public:
     MdnsAvahi & operator=(const MdnsAvahi &) = delete;
 
     CHIP_ERROR Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);
-    CHIP_ERROR Shutdown();
+    void Shutdown();
     CHIP_ERROR SetHostname(const char * hostname);
     CHIP_ERROR PublishService(const DnssdService & service, DnssdPublishCallback callback, void * context);
     CHIP_ERROR StopPublish();

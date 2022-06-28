@@ -53,7 +53,6 @@ public:
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
-    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }
@@ -102,7 +101,6 @@ public:
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new ThreadNetworkIterator(this); }
     CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
-    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }

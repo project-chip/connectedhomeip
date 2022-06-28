@@ -231,7 +231,7 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(SubscriptionId aSubscrip
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
+void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
 {
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
@@ -241,8 +241,6 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricInde
             readClient->Close(CHIP_NO_ERROR);
         }
     }
-
-    return CHIP_NO_ERROR;
 }
 
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
