@@ -370,15 +370,15 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     ChipLogProgress(Zcl, "Lock App: LockManager::GetCredential [credentialType=%u], credentialIndex=%d",
                     to_underlying(credentialType), adjustedCredentialIndex);
 
-    if(credentialType == DlCredentialType::kProgrammingPIN)
+    if (credentialType == DlCredentialType::kProgrammingPIN)
     {
-        ChipLogError(Zcl, "Programming user not supported [credentialType=%u], credentialIndex=%d" , to_underlying(credentialType), adjustedCredentialIndex);
+        ChipLogError(Zcl, "Programming user not supported [credentialType=%u], credentialIndex=%d", to_underlying(credentialType),
+                     adjustedCredentialIndex);
 
         return true;
     }
 
     const auto & credentialInStorage = mLockCredentials[adjustedCredentialIndex];
-
 
     credential.status = credentialInStorage.status;
     ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, adjustedCredentialIndex);
