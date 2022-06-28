@@ -244,6 +244,20 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     return CHIP_NO_ERROR;
 }
 
+namespace {
+// We use this when the sender did not actually provide a CommandFields struct,
+// to avoid downstream consumers having to worry about cases when there is or is
+// not a struct available.
+//
+// The encoding here is:
+// Control byte: Struct, anonymous tag (since we can't use a context tag at top
+//               level, and consumers should not care about the tag here).
+// End of container.
+constexpr uint8_t sNoFields[] = {
+    0b00010101 /* struct, anonymous tag */, 0b00011000 /* End of container */
+};
+} // anonymous namespace
+
 CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -308,7 +322,8 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         ChipLogDetail(DataManagement,
                       "Received command without data for Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                       concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
-        err = CHIP_NO_ERROR;
+        commandDataReader.Init(sNoFields);
+        err = commandDataReader.Next();
     }
     if (CHIP_NO_ERROR == err)
     {
@@ -365,7 +380,8 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
         ChipLogDetail(DataManagement,
                       "Received command without data for Group=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI, groupId,
                       ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
-        err = CHIP_NO_ERROR;
+        commandDataReader.Init(sNoFields);
+        err = commandDataReader.Next();
     }
     SuccessOrExit(err);
 
