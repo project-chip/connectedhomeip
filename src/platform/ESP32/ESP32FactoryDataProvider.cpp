@@ -157,16 +157,8 @@ CHIP_ERROR ESP32FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 CHIP_ERROR ESP32FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
-    ChipError err        = CHIP_NO_ERROR;
     size_t vendorNameLen = 0; // without counting null-terminator
-
-    err = ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_VendorName, buf, bufSize, vendorNameLen);
-    ReturnErrorOnFailure(err);
-
-    ReturnErrorCodeIf(vendorNameLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(buf[vendorNameLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
-
-    return err;
+    return ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_VendorName, buf, bufSize, vendorNameLen);
 }
 
 CHIP_ERROR ESP32FactoryDataProvider::GetVendorId(uint16_t & vendorId)
@@ -176,24 +168,14 @@ CHIP_ERROR ESP32FactoryDataProvider::GetVendorId(uint16_t & vendorId)
 
     err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_VendorId, valInt);
     ReturnErrorOnFailure(err);
-
     vendorId = static_cast<uint16_t>(valInt);
-
     return err;
 }
 
 CHIP_ERROR ESP32FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
 {
-    ChipError err         = CHIP_NO_ERROR;
     size_t productNameLen = 0; // without counting null-terminator
-
-    err = ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_ProductName, buf, bufSize, productNameLen);
-    ReturnErrorOnFailure(err);
-
-    ReturnErrorCodeIf(productNameLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(buf[productNameLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
-
-    return err;
+    return ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_ProductName, buf, bufSize, productNameLen);
 }
 
 CHIP_ERROR ESP32FactoryDataProvider::GetProductId(uint16_t & productId)
@@ -203,24 +185,14 @@ CHIP_ERROR ESP32FactoryDataProvider::GetProductId(uint16_t & productId)
 
     err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_ProductId, valInt);
     ReturnErrorOnFailure(err);
-
     productId = static_cast<uint16_t>(valInt);
-
     return err;
 }
 
 CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
 {
-    ChipError err                   = CHIP_NO_ERROR;
     size_t hardwareVersionStringLen = 0; // without counting null-terminator
-
-    err = ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionStringLen);
-    ReturnErrorOnFailure(err);
-
-    ReturnErrorCodeIf(hardwareVersionStringLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(buf[hardwareVersionStringLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
-
-    return err;
+    return ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionStringLen);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 
