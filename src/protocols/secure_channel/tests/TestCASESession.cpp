@@ -134,6 +134,17 @@ public:
         return mKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
     }
 
+    Crypto::P256Keypair * AllocateEphemeralKeypair() override
+    {
+        return Platform::New<Crypto::P256Keypair>();
+    }
+
+    void ReleaseEphemeralKeypair(Crypto::P256Keypair *keypair) override
+    {
+        Platform::Delete<Crypto::P256Keypair>(keypair);
+    }
+
+
 protected:
     Platform::UniquePtr<P256Keypair> mKeypair;
     FabricIndex mSingleFabricIndex = kUndefinedFabricIndex;

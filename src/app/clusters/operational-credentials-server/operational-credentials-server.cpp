@@ -51,9 +51,6 @@
 #include <platform/DeviceControlServer.h>
 #include <string.h>
 #include <trace/trace.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;

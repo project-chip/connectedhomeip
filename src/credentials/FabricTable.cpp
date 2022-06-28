@@ -1275,6 +1275,30 @@ CHIP_ERROR FabricTable::ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
+Crypto::P256Keypair * FabricTable::AllocateEphemeralKeypair()
+{
+    if (mOperationalKeystore != nullptr)
+    {
+        return mOperationalKeystore->AllocateEphemeralKeypair();
+    }
+    else
+    {
+        return Platform::New<Crypto::P256Keypair>();
+    }
+}
+
+void FabricTable::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
+{
+    if (mOperationalKeystore != nullptr)
+    {
+        mOperationalKeystore->ReleaseEphemeralKeypair(keypair);
+    }
+    else
+    {
+        Platform::Delete<Crypto::P256Keypair>(keypair);
+    }
+}
+
 bool FabricTable::HasOperationalKeyForFabric(FabricIndex fabricIndex) const
 {
     const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);

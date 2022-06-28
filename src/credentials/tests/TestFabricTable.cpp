@@ -1742,6 +1742,60 @@ void TestInvalidChaining(nlTestSuite * inSuite, void * inContext)
     // TODO: Write test
 }
 
+void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
+{
+    // Initialize a fabric table with operational keystore
+    {
+        chip::TestPersistentStorageDelegate storage;
+
+        ScopedFabricTable fabricTableHolder;
+        NL_TEST_ASSERT(inSuite, fabricTableHolder.Init(&storage) == CHIP_NO_ERROR);
+        FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+
+        Crypto::P256ECDSASignature sig;
+        uint8_t message[] = { 'm', 's', 'g' };
+
+        Crypto::P256Keypair * ephemeralKeypair = fabricTable.AllocateEphemeralKeypair();
+        NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
+        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
+
+        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig));
+        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig));
+
+        fabricTable.ReleaseEphemeralKeypair(ephemeralKeypair);
+    }
+
+    // Use a fabric table without an operational keystore: should still work
+    {
+        chip::TestPersistentStorageDelegate storage;
+
+        chip::Credentials::PersistentStorageOpCertStore opCertStore;
+        NL_TEST_ASSERT_SUCCESS(inSuite, opCertStore.Init(&storage));
+
+        FabricTable fabricTable;
+        FabricTable::InitParams initParams;
+        initParams.storage = &storage;
+        initParams.opCertStore = &opCertStore;
+
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.Init(initParams));
+
+        Crypto::P256ECDSASignature sig;
+        uint8_t message[] = { 'm', 's', 'g' };
+
+        Crypto::P256Keypair * ephemeralKeypair = fabricTable.AllocateEphemeralKeypair();
+        NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
+        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
+
+        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig));
+        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig));
+
+        fabricTable.ReleaseEphemeralKeypair(ephemeralKeypair);
+
+        fabricTable.Shutdown();
+        opCertStore.Finish();
+    }
+}
+
 // Test Suite
 
 /**
@@ -1763,6 +1817,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Test compressed fabric ID is properly generated", TestCompressedFabricId),
     NL_TEST_DEF("Test AddNOC root collision", TestAddNocRootCollision),
     NL_TEST_DEF("Test invalid chaining in AddNOC and UpdateNOC", TestInvalidChaining),
+    NL_TEST_DEF("Test ephemeral keys allocation", TestEphemeralKeys),
 
     NL_TEST_SENTINEL()
 };
