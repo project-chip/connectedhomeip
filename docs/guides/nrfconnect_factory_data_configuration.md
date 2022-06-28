@@ -155,9 +155,9 @@ In the factory data set, the following formats are used:
 By default, the factory data support is disabled in all nRF Connect examples and
 the nRF Connect device uses predefined parameters from the Matter core, which
 you should not change. To start using factory data stored in the flash memory
-and the **Factory Data Provider** from the nRF Connect platform, build an example with the
-following option (replace _<build_target>_ with your board name, for example,
-`nrf52840dk_nrf52840`):
+and the **Factory Data Provider** from the nRF Connect platform, build an
+example with the following option (replace _<build_target>_ with your board
+name, for example, `nrf52840dk_nrf52840`):
 
 ```
 $ west build -b <build_target> -- -DCONFIG_CHIP_FACTORY_DATA=y
