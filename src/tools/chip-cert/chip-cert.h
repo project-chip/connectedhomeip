@@ -76,9 +76,9 @@ using chip::ASN1::OID;
 #endif
 
 #define COPYRIGHT_STRING                                                                                                           \
-    "Copyright (c) 2021-2022 Project CHIP Authors"                                                                                 \
-    "Copyright (c) 2019 Google LLC."                                                                                               \
-    "Copyright (c) 2013-2017 Nest Labs, Inc."                                                                                      \
+    "Copyright (c) 2021-2022 Project CHIP Authors. "                                                                               \
+    "Copyright (c) 2019 Google LLC. "                                                                                              \
+    "Copyright (c) 2013-2017 Nest Labs, Inc. "                                                                                     \
     "All rights reserved.\n"
 
 enum
