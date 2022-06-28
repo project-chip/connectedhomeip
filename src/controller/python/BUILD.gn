@@ -111,7 +111,7 @@ shared_library("ChipDeviceCtrl") {
   configs += [ ":controller_wno_deprecate" ]
 }
 
-pw_python_action("python") {
+pw_python_action("chip-library") {
   script = "build-chip-wheel.py"
 
   _py_manifest_files = [
@@ -123,7 +123,6 @@ pw_python_action("python") {
         "chip/ChipBluezMgr.py",
         "chip/ChipCommissionableNodeCtrl.py",
         "chip/ChipCoreBluetoothMgr.py",
-        "chip/ChipReplStartup.py",
         "chip/ChipStack.py",
         "chip/ChipUtility.py",
         "chip/FabricAdmin.py",
@@ -229,32 +228,13 @@ pw_python_action("python") {
     ]
   }
 
-  _py_scripts = [ ]
-  if (chip_controller) {
-    _py_scripts += [
-      "chip-device-ctrl.py",
-      "chip-repl.py",
-    ]
-  }
-
   _py_package_reqs = [
     "coloredlogs",
     "construct",
-
-    #
-    # IPython 7.30.0 has a bug which results in the use of await ... failing on some platforms (see https://github.com/ipython/ipython/pull/13269)
-    # For now, let's just avoid that version.
-    #
-    # IPython 8.1.0 has a bug which causes issues: https://github.com/ipython/ipython/issues/13554
-    #
-    #
-    "ipython!=8.1.0",
     "dacite",
     "rich",
-    "stringcase",
     "pyyaml",
     "ipdb",
-    "ipykernel",
     "deprecation"
   ]
 
@@ -267,7 +247,7 @@ pw_python_action("python") {
   _py_manifest = {
     files = _py_manifest_files_rebased
     packages = _py_packages
-    scripts = _py_scripts
+    scripts = [ ]
     package_reqs = _py_package_reqs
   }
 
@@ -303,7 +283,7 @@ pw_python_action("python") {
 
   args = [
     "--package_name",
-    "chip",
+    "chip-library",
     "--build_number",
     "0.0",
     "--build_dir",
@@ -320,6 +300,88 @@ pw_python_action("python") {
 
   public_deps = [ ":ChipDeviceCtrl" ]
 
-  output_name = "chip-0.0-${tags}.whl"
+  output_name = "chip-library-0.0-${tags}.whl"
+  outputs = [ "${_dist_dir}/$output_name" ]
+}
+
+pw_python_action("chip-repl") {
+  script = "build-chip-wheel.py"
+
+  _py_scripts = [
+    "chip-device-ctrl.py",
+    "chip-repl.py",
+  ]
+
+  _py_manifest_files = [
+    {
+      src_dir = "."
+      sources = [
+        "chip/ChipReplStartup.py",
+      ]
+      sources += _py_scripts
+    },
+    {
+      src_dir = "//"
+      sources = [ "//LICENSE" ]
+    },
+  ]
+
+  _py_manifest_file = "${target_gen_dir}/${target_name}.py_manifest.json"
+
+  inputs = []
+  _py_manifest_files_rebased = []
+  foreach(_manifest_entry, _py_manifest_files) {
+    inputs += _manifest_entry.sources
+    _py_manifest_files_rebased += [
+      {
+        src_dir = rebase_path(_manifest_entry.src_dir,
+                              get_path_info(_py_manifest_file, "dir"))
+        sources = rebase_path(_manifest_entry.sources, _manifest_entry.src_dir)
+      },
+    ]
+  }
+
+  _py_package_reqs = [
+    "coloredlogs",
+
+    #
+    # IPython 7.30.0 has a bug which results in the use of await ... failing on some platforms (see https://github.com/ipython/ipython/pull/13269)
+    # For now, let's just avoid that version.
+    #
+    # IPython 8.1.0 has a bug which causes issues: https://github.com/ipython/ipython/issues/13554
+    #
+    #
+    "ipython!=8.1.0",
+    "rich",
+    "ipykernel",
+  ]
+
+  _py_manifest = {
+    files = _py_manifest_files_rebased
+    packages = [ "chip" ]
+    scripts = _py_scripts
+    package_reqs = _py_package_reqs
+  }
+
+  write_file(_py_manifest_file, _py_manifest, "json")
+
+  _dist_dir = "${root_out_dir}/controller/python"
+
+  args = [
+    "--package_name",
+    "chip-repl",
+    "--build_number",
+    "0.0",
+    "--build_dir",
+    rebase_path("${target_gen_dir}/${target_name}.py_build", root_build_dir),
+    "--dist_dir",
+    rebase_path(_dist_dir, root_build_dir),
+    "--manifest",
+    rebase_path(_py_manifest_file, root_build_dir),
+    "--plat-name",
+    "any",
+  ]
+
+  output_name = "chip-repl-0.0-py3-any.whl"
   outputs = [ "${_dist_dir}/$output_name" ]
 }

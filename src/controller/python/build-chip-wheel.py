@@ -142,10 +142,10 @@ try:
             '': tmpDir,
         },
         package_data={
-            packageName: [
+            packages[0]: [
                 libName
             ]
-        },
+        } if libName else { },
         scripts=[name for name in map(
             lambda script: os.path.join(tmpDir, script.installName),
             installScripts
@@ -166,7 +166,7 @@ try:
         },
         cmdclass={
             'bdist_wheel': bdist_wheel_override
-        },
+        } if libName else { },
         script_args=['clean', '--all', 'bdist_wheel']
     )
 
