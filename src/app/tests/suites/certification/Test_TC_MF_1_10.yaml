@@ -63,7 +63,7 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 180
+                value: 900
 
     - label:
           "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
