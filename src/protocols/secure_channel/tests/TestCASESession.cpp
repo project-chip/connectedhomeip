@@ -361,7 +361,7 @@ void TestCASESession::SecurePairingStartTest(nlTestSuite * inSuite, void * inCon
 }
 
 void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SessionManager & sessionManager,
-                                           CASESession & pairingCommissioner, TestCASESecurePairingDelegate & delegateCommissioner)
+                                      CASESession & pairingCommissioner, TestCASESecurePairingDelegate & delegateCommissioner)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
