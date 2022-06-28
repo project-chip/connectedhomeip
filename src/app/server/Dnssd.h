@@ -163,8 +163,10 @@ private:
     Optional<int32_t> mExtendedDiscoveryTimeoutSecs       = NullOptional;
 
     // The commissioning mode we are advertising right now.  Used to detect when
-    // we need to start extended discovery advertisement.
-    Dnssd::CommissioningMode mCurrentCommissioningMode = Dnssd::CommissioningMode::kDisabled;
+    // we need to start extended discovery advertisement.  We start this off as
+    // kEnabledBasic, so that when we first start up we do extended discovery
+    // advertisement if we don't enter commissioning mode.
+    Dnssd::CommissioningMode mCurrentCommissioningMode = Dnssd::CommissioningMode::kEnabledBasic;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 };
 
