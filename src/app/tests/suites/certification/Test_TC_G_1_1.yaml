@@ -1,0 +1,88 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 119.1.1. [TC-G-1.1] Global Attributes [DUT-Server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads the ClusterRevision from DUT"
+      verification: |
+          ./chip-tool groups read cluster-revision 1 0
+
+          [1651216621.203474][2391:2396] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFD DataVersion: 745654550
+          [1651216621.204919][2391:2396] CHIP:TOO:   ClusterRevision: 4
+      disabled: true
+
+    - label: "TH reads the FeatureMap from DUT"
+      verification: |
+          ./chip-tool groups read feature-map 1 0
+
+          [1651216952.185475][2414:2419] CHIP:DMG:
+          [1651216952.185500][2414:2419] CHIP:DMG:        SuppressResponse = true,
+          [1651216952.185525][2414:2419] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216952.185548][2414:2419] CHIP:DMG: }
+          [1651216952.185658][2414:2419] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      disabled: true
+
+    - label: "TH reads AttribubteList from DUT"
+      verification: |
+          ./chip-tool groups read attribute-list 1 0
+
+          [1651217016.772370][2424:2429] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFB DataVersion: 745654550
+          [1651217016.772471][2424:2429] CHIP:TOO:   AttributeList: 5 entries
+          [1651217016.772519][2424:2429] CHIP:TOO:     [1]: 0
+          [1651217016.772558][2424:2429] CHIP:TOO:     [2]: 65528
+          [1651217016.772595][2424:2429] CHIP:TOO:     [3]: 65529
+          [1651217016.772632][2424:2429] CHIP:TOO:     [4]: 65531
+          [1651217016.772667][2424:2429] CHIP:TOO:     [5]: 65533
+      disabled: true
+
+    - label: "TH reads EventList from DUT"
+      verification: |
+          Event List is not implemented
+      disabled: true
+
+    - label: "TH reads AcceptedCommandList from DUT"
+      verification: |
+          ./chip-tool groups read accepted-command-list 1 0
+
+          [1651217107.034926][2435:2440] CHIP:TOO:   AcceptedCommandList: 6 entries
+          [1651217107.034984][2435:2440] CHIP:TOO:     [1]: 0
+          [1651217107.035028][2435:2440] CHIP:TOO:     [2]: 1
+          [1651217107.035070][2435:2440] CHIP:TOO:     [3]: 2
+          [1651217107.035112][2435:2440] CHIP:TOO:     [4]: 3
+          [1651217107.035153][2435:2440] CHIP:TOO:     [5]: 4
+          [1651217107.035194][2435:2440] CHIP:TOO:     [6]: 5
+      disabled: true
+
+    - label: "TH reads GeneratedCommandList from DUT"
+      verification: |
+          ./chip-tool groups read generated-command-list 1 0
+
+          [1651217152.020233][2444:2449] CHIP:TOO:   GeneratedCommandList: 4 entries
+          [1651217152.020276][2444:2449] CHIP:TOO:     [1]: 0
+          [1651217152.020312][2444:2449] CHIP:TOO:     [2]: 1
+          [1651217152.020346][2444:2449] CHIP:TOO:     [3]: 2
+          [1651217152.020380][2444:2449] CHIP:TOO:     [4]: 3
+      disabled: true

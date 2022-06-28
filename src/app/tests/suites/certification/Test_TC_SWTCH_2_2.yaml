@@ -13,11 +13,13 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: "[TC-SWTCH-2.2] Primary functionality with server as DUT"
+name: 73.2.2. [TC-SWTCH-2.2] Primary functionality with server as DUT
+
 config:
-    nodeId: "0x12344321"
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
     - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
       verification: |
@@ -25,6 +27,7 @@ tests:
       disabled: true
 
     - label: "Set up subscription to SwitchLatched event"
+      PICS: SWTCH.S.F00
       verification: |
           ./chip-tool switch subscribe-event switch-latched 1 100 1 1
 
@@ -38,11 +41,13 @@ tests:
       disabled: true
 
     - label: "Operator sets switch to first position"
+      PICS: SWTCH.S.F00
       verification: |
           no Matter messages
       disabled: true
 
     - label: "Read CurrentPosition attribute"
+      PICS: SWTCH.S.F00
       verification: |
           ./chip-tool switch read current-position 1 1
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
@@ -50,11 +55,14 @@ tests:
       disabled: true
 
     - label: "Operator sets switch to second position"
+      PICS: SWTCH.S.F00
       verification: |
-          no Matter messages
+          (no chip-tool message to DUT)
+          DUT sends event message
       disabled: true
 
     - label: "Read CurrentPosition attribute"
+      PICS: SWTCH.S.F00
       verification: |
           ./chip-tool switch read current-position 1 1
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
@@ -64,6 +72,7 @@ tests:
     - label:
           "If NumberOfPositions>2 (see 2c of TC-SWTCH-2.1) : - Operator sets
           switch to next position - Read CurrentPosition attribute"
+      PICS: SWTCH.S.F00
       verification: |
           ./chip-tool switch read current-position 1 1
 
@@ -80,25 +89,27 @@ tests:
           "If NumberOfPositions>3 : - Repeat step 2f for NumberOfPositions-3
           times - After each time Operator has set switch to next position, -
           Read CurrentPosition attribute"
+      PICS: SWTCH.S.F00
       verification: |
-          ./chip-tool switch read current-position 1 1
-          [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
-          [1646209289.746228][2617:2622] CHIP:TOO:   current position: 0
+          2
       disabled: true
 
     - label: "Operator returns switch to first position"
+      PICS: SWTCH.S.F00
       verification: |
           Event (content will vary on the device) [1646209167.923346][2190:2190] CHIP:DMG: StatusResponseMessage = [1646209167.923415][2190:2190] CHIP:DMG: { [1646209167.923472][2190:2190] CHIP:DMG: Status = 0x0, [1646209167.923533][2190:2190] CHIP:DMG: InteractionModelRevision = 1 [1646209167.923583][2190:2190] CHIP:DMG: } [1646209167.923640][2190:2190] CHIP:IM: Received status response, status is 0
       disabled: true
 
     - label: "Read CurrentPosition attribute"
-      verification: |+
+      PICS: SWTCH.S.F00
+      verification: |
           ./chip-tool switch read current-position 1 1
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
           [1646209289.746228][2617:2622] CHIP:TOO:   current position: 0
       disabled: true
 
     - label: "Set up subscription to InitialPress event"
+      PICS: SWTCH.S.F01
       verification: |
           ./chip-tool switch subscribe-event initial-press 1 100 1 1
           [1646209546.313236][2641:2646] CHIP:DMG: SubscribeResponseMessage =
@@ -112,38 +123,45 @@ tests:
       disabled: true
 
     - label: "Operator does not operate switch"
+      PICS: SWTCH.S.F01
       verification: |
           no Matter messages
       disabled: true
 
     - label: "Read CurrentPosition attribute"
-      verification: |+
+      PICS: SWTCH.S.F01
+      verification: |
           ./chip-tool switch read current-position 1 1
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
           [1646209289.746228][2617:2622] CHIP:TOO:   current position: 0
       disabled: true
 
     - label: "Operator operates switch (keep it pressed)"
+      PICS: SWTCH.S.F01
       verification: |
           receive event
       disabled: true
 
     - label: "Read CurrentPosition attribute"
+      PICS: SWTCH.S.F01
       verification: |
-          Read attrbute
+          ./chip-tool switch read current-position 1 1
       disabled: true
 
     - label: "Operator does not operate switch (release switch)"
+      PICS: SWTCH.S.F01
       verification: |
           no Matter messages
       disabled: true
 
     - label: "Read CurrentPosition attribute"
+      PICS: SWTCH.S.F01
       verification: |
           Read attrbute
       disabled: true
 
     - label: "Set up subscription to InitialPress and ShortRelease events"
+      PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
           ./chip-tool switch subscribe-event initial-press 1 100 1 1 1
 
@@ -151,27 +169,32 @@ tests:
       disabled: true
 
     - label: "Operator does not operate switch"
+      PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
           no Matter messages
       disabled: true
 
     - label: "Operator operates switch (press briefly)"
+      PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
           Event (content will vary on the device) [1646209167.923346][2190:2190] CHIP:DMG: StatusResponseMessage = [1646209167.923415][2190:2190] CHIP:DMG: { [1646209167.923472][2190:2190] CHIP:DMG: Status = 0x0, [1646209167.923533][2190:2190] CHIP:DMG: InteractionModelRevision = 1 [1646209167.923583][2190:2190] CHIP:DMG: } [1646209167.923640][2190:2190] CHIP:IM: Received status response, status is 0
       disabled: true
 
     - label: "Operator releases switch"
+      PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
           Event (content will vary on the device) [1646209167.923346][2190:2190] CHIP:DMG: StatusResponseMessage = [1646209167.923415][2190:2190] CHIP:DMG: { [1646209167.923472][2190:2190] CHIP:DMG: Status = 0x0, [1646209167.923533][2190:2190] CHIP:DMG: InteractionModelRevision = 1 [1646209167.923583][2190:2190] CHIP:DMG: } [1646209167.923640][2190:2190] CHIP:IM: Received status response, status is 0
       disabled: true
 
     - label:
           "Operator operates switch (keep pressed for long time, e.g. 5 seconds)"
+      PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
           Event (content will vary on the device) [1646209167.923346][2190:2190] CHIP:DMG: StatusResponseMessage = [1646209167.923415][2190:2190] CHIP:DMG: { [1646209167.923472][2190:2190] CHIP:DMG: Status = 0x0, [1646209167.923533][2190:2190] CHIP:DMG: InteractionModelRevision = 1 [1646209167.923583][2190:2190] CHIP:DMG: } [1646209167.923640][2190:2190] CHIP:IM: Received status response, status is 0
       disabled: true
 
     - label: "Operator releases switch"
+      PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
           Event (content will vary on the device) [1646209167.923346][2190:2190] CHIP:DMG: StatusResponseMessage = [1646209167.923415][2190:2190] CHIP:DMG: { [1646209167.923472][2190:2190] CHIP:DMG: Status = 0x0, [1646209167.923533][2190:2190] CHIP:DMG: InteractionModelRevision = 1 [1646209167.923583][2190:2190] CHIP:DMG: } [1646209167.923640][2190:2190] CHIP:IM: Received status response, status is 0
       disabled: true
@@ -179,38 +202,158 @@ tests:
     - label:
           "Set up subscription to InitialPress, LongPress, ShortRelease,
           LongRelease events"
+      PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          ./chip-tool switch subscribe-event initial-press 1 100 1 1 1
+          ./chip-tool switch subscribe-event initial-press 1 100 1 1
 
-          ./chip-tool switch subscribe-event short-release 1 100 1 1 1
+          ./chip-tool switch subscribe-event short-release 1 100 1 1
 
-          ./chip-tool switch subscribe-event long-press 1 100 1 1 1
+          [1655272080.983330][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.983357][2922:2927] CHIP:TOO:          Event number: 2
+          [1655272080.983380][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.983402][2922:2927] CHIP:TOO:          Timestamp: 1137653
+          [1655272080.983506][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.984432][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.984461][2922:2927] CHIP:TOO:    }
+          [1655272080.984555][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.984580][2922:2927] CHIP:TOO:          Event number: 3
+          [1655272080.984602][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.984624][2922:2927] CHIP:TOO:          Timestamp: 1137671
+          [1655272080.984651][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.984676][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.984699][2922:2927] CHIP:TOO:    }
+          [1655272080.984785][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.984808][2922:2927] CHIP:TOO:          Event number: 4
+          [1655272080.984831][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.984852][2922:2927] CHIP:TOO:          Timestamp: 1137689
+          [1655272080.984879][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.984903][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.984926][2922:2927] CHIP:TOO:    }
+          [1655272080.985009][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.985033][2922:2927] CHIP:TOO:          Event number: 5
+          [1655272080.985055][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.985076][2922:2927] CHIP:TOO:          Timestamp: 1137711
+          [1655272080.985103][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.985127][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.985150][2922:2927] CHIP:TOO:    }
+          [1655272080.985233][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.985257][2922:2927] CHIP:TOO:          Event number: 6
+          [1655272080.985279][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.985300][2922:2927] CHIP:TOO:          Timestamp: 1137723
+          [1655272080.985327][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.985352][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.985374][2922:2927] CHIP:TOO:    }
+          [1655272080.985459][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.985482][2922:2927] CHIP:TOO:          Event number: 7
+          [1655272080.985504][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.985526][2922:2927] CHIP:TOO:          Timestamp: 1137739
+          [1655272080.985552][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.985576][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.985599][2922:2927] CHIP:TOO:    }
+          [1655272080.985681][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.985704][2922:2927] CHIP:TOO:          Event number: 8
+          [1655272080.985726][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.985748][2922:2927] CHIP:TOO:          Timestamp: 1137753
+          [1655272080.985774][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.985798][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.985821][2922:2927] CHIP:TOO:    }
+          [1655272080.985907][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.985931][2922:2927] CHIP:TOO:          Event number: 9
+          [1655272080.985953][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.985974][2922:2927] CHIP:TOO:          Timestamp: 1137773
+          [1655272080.986001][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.986025][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.986047][2922:2927] CHIP:TOO:    }
+          [1655272080.986134][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.986158][2922:2927] CHIP:TOO:          Event number: 10
+          [1655272080.986180][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.986202][2922:2927] CHIP:TOO:          Timestamp: 1137785
+          [1655272080.986228][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.986252][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.986274][2922:2927] CHIP:TOO:    }
+          [1655272080.986361][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.986385][2922:2927] CHIP:TOO:          Event number: 11
+          [1655272080.986407][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.986429][2922:2927] CHIP:TOO:          Timestamp: 1137801
+          [1655272080.986455][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.986479][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.986502][2922:2927] CHIP:TOO:    }
+          [1655272080.986588][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.986612][2922:2927] CHIP:TOO:          Event number: 12
+          [1655272080.986634][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.986655][2922:2927] CHIP:TOO:          Timestamp: 1137816
+          [1655272080.986682][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.986705][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.986728][2922:2927] CHIP:TOO:    }
+          [1655272080.986813][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.986836][2922:2927] CHIP:TOO:          Event number: 13
+          [1655272080.986858][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.986895][2922:2927] CHIP:TOO:          Timestamp: 1137858
+          [1655272080.986923][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.986948][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.986970][2922:2927] CHIP:TOO:    }
+          [1655272080.987056][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.987080][2922:2927] CHIP:TOO:          Event number: 14
+          [1655272080.987102][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.987123][2922:2927] CHIP:TOO:          Timestamp: 1137896
+          [1655272080.987150][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.987174][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.987196][2922:2927] CHIP:TOO:    }
+          [1655272080.987280][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.987304][2922:2927] CHIP:TOO:          Event number: 15
+          [1655272080.987326][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.987347][2922:2927] CHIP:TOO:          Timestamp: 1137899
+          [1655272080.987374][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.987398][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.987421][2922:2927] CHIP:TOO:    }
+          [1655272080.987503][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.987526][2922:2927] CHIP:TOO:          Event number: 16
+          [1655272080.987548][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.987570][2922:2927] CHIP:TOO:          Timestamp: 1137916
+          [1655272080.987597][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.987621][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.987644][2922:2927] CHIP:TOO:    }
+          [1655272080.987729][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655272080.987752][2922:2927] CHIP:TOO:          Event number: 17
+          [1655272080.987774][2922:2927] CHIP:TOO:          Priority: Info
+          [1655272080.987796][2922:2927] CHIP:TOO:          Timestamp: 1137949
+          [1655272080.987822][2922:2927] CHIP:TOO:   ShortRelease: {
+          [1655272080.987846][2922:2927] CHIP:TOO:     PreviousPosition: 10
+          [1655272080.987869][2922:2927] CHIP:TOO:    }
 
-          ./chip-tool switch subscribe-event long-release 1 100 1 1 1
+
+          ./chip-tool switch subscribe-event long-press 1 100 1 1
+
+          ./chip-tool switch subscribe-event long-release 1 100 1 1
       disabled: true
 
     - label: "Operator does not operate switch"
+      PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
           no Matter messages
       disabled: true
 
     - label: "Operator operates switch (press briefly)"
+      PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
           receive event
       disabled: true
 
     - label: "Operator releases switch"
+      PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
           receive event
       disabled: true
 
     - label:
           "Operator operates switch (keep pressed for long time, e.g. 5 seconds)"
+      PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
           receive 2 events
       disabled: true
 
     - label: "Operator releases switch"
+      PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
           receive event
       disabled: true
@@ -218,6 +361,7 @@ tests:
     - label:
           "Set up subscription to InitialPress, ShortRelease, MultiPressOngoing,
           MultiPressComplete events"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           ./chip-tool switch subscribe-event initial-press 1 100 1 1 1
 
@@ -225,75 +369,89 @@ tests:
 
           ./chip-tool switch subscribe-event multi-press-ongoing 1 100 1 1 1
 
-          ./chip-tool switch subscribe-event multi-presscomplete 1 100 1 1 1
+          ./chip-tool switch subscribe-event multi-press-complete 1 100 1 1 1
       disabled: true
 
     - label: "Operator does not operate switch"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           no Matter messages for this step
       disabled: true
 
     - label: "Operator operates switch (press briefly)"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           receive event
       disabled: true
 
     - label: "Operator releases switch"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           receive 2 events
       disabled: true
 
     - label: "Operator operates switch (press briefly)"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           receive event
       disabled: true
 
     - label: "Operator releases switch"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           receive event
       disabled: true
 
     - label: "Briefly after 6f, operator operates switch again (press briefly)"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           receive 2 events
       disabled: true
 
     - label: "Operator releases switch"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           receive 2 events
       disabled: true
 
     - label: "If MultiPressMax == 2, skip steps 6j .. 6o"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           no Matter messages for this step
       disabled: true
 
     - label: "Operator operates switch (press briefly)"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           receive event
       disabled: true
 
     - label: "Operator releases switch"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           receive event
       disabled: true
 
     - label: "Briefly after 6k, operator operates switch again (press briefly)"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           receive 2 events
       disabled: true
 
     - label: "Operator releases switch"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           receive event
       disabled: true
 
     - label: "Briefly after 6m, operator operates switch again (press briefly)"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           receive 2 events
       disabled: true
 
     - label: "Operator releases switch"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           receive 2 events
       disabled: true

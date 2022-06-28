@@ -866,3 +866,214 @@ PICS:
 
     - label: "Does the DUT(server) support the MinLevel attribute?"
       id: LVL.S.A0002
+
+    #Groups Cluster
+    - label: "Does the DUT(Server) support NameSupport attribute?"
+      id: G.S.A0000
+
+    - label: "Does the DUT(Server) support GroupTable attribute?"
+      id: GRPKEY.S.A0001
+
+    - label: "Does the DUT(server) implement receiving AddGroup Command?"
+      id: G.S.C00.Rsp
+
+    - label: "Does the DUT(server) implement receiving ViewGroup Command?"
+      id: G.S.C01.Rsp
+
+    - label:
+          "Does the DUT(server) implement receiving GetGroupMembership Command?"
+      id: G.S.C02.Rsp
+
+    - label: "Does the DUT(server) implement receiving RemoveGroup Command?"
+      id: G.S.C03.Rsp
+
+    - label: "Does the DUT(server) implement receiving RemoveAllGroups Command?"
+      id: G.S.C04.Rsp
+
+    - label:
+          "Does the DUT(server) implement receiving AddGroupIfIdentifying
+          Command?"
+      id: G.S.C05.Rsp
+
+    - label:
+          "Does the DUT(server) invoking/generating AddGroupResponse Command?"
+      id: G.S.C00.Tx
+
+    - label:
+          "Does the DUT(server) invoking/generating ViewGroupResponse Command?"
+      id: G.S.C01.Tx
+
+    - label:
+          "Does the DUT(server) invoking/generating GetGroupMembershipResponse
+          Command?"
+      id: G.S.C02.Tx
+
+    - label:
+          "Does the DUT(server) invoking/generating RemoveGroupResponse Command?"
+      id: G.S.C03.Tx
+
+    - label: "Does the DUT(client) support NameSupport attribute?"
+      id: G.C.A0000
+
+    - label: "Does the DUT(client) implement receiving AddGroup Command?"
+      id: G.C.C00.Rsp
+
+    - label: "Does the DUT(client) implement receiving ViewGroup Command?"
+      id: G.C.C01.Rsp
+
+    - label:
+          "Does the DUT(client) implement receiving GetGroupMembership Command?"
+      id: G.C.C02.Rsp
+
+    - label: "Does the DUT(client) implement receiving RemoveGroup Command?"
+      id: G.C.C03.Rsp
+
+    - label: "Does the DUT(client) implement receiving RemoveAllGroups Command?"
+      id: G.C.C04.Rsp
+
+    - label:
+          "Does the DUT(client) implement receiving AddGroupIfIdentifying
+          Command?"
+      id: G.C.C05.Rsp
+
+    #Identify Cluster
+    - label: "Does the device implement the IdentifyTime attribute?"
+      id: I.S.A0000
+
+    - label: "Does the device implement the IdentifyType attribute?"
+      id: I.S.A0001
+
+    - label: "Does the device implement receiving the Identify command?"
+      id: I.S.C00.Rsp
+
+    - label: "Does the device implement receiving the IdentifyQuery command?"
+      id: I.S.C01.Rsp
+
+    - label: "Does the device implement receiving the TriggerEffect command?"
+      id: I.S.C40.Rsp
+
+    - label:
+          "Does the device implement sending the IdentifyQueryResponse command?"
+      id: I.S.C00.Tx
+
+    - label: "Does the device implement sending the Identify command?"
+      id: I.C.C00.Tx
+
+    - label: "Does the device implement sending the IdentifyQuery command?"
+      id: I.C.C01.Tx
+
+    - label: "Does the device implement sending the TriggerEffect command?"
+      id: I.C.C40.Tx
+
+    - label:
+          "Does the device implement receiving the IdentifyQueryResponse
+          command?"
+      id: I.C.C00.Rsp
+
+    #Scenes Cluster
+    - label: "Does the device implement the SceneCount attribute?"
+      id: S.S.A0000
+
+    - label: "Does the device implement the CurrentScene attribute?"
+      id: S.S.A0001
+
+    - label: "Does the device implement the CurrentGroup attribute?"
+      id: S.S.A0002
+
+    - label: "Does the device implement the SceneValid attribute?"
+      id: S.S.A0003
+
+    - label: "Does the device implement the NameSupport attribute?"
+      id: S.S.A0004
+
+    - label: "Does the device implement the LastConfiguredBy attribute?"
+      id: S.S.A0005
+
+    - label: "Does the device implement receiving the AddScene command?"
+      id: S.S.C00.Rsp
+
+    - label: "Does the device implement receiving the ViewScene command?"
+      id: S.S.C01.Rsp
+
+    - label: "Does the device implement receiving the RemoveScene command?"
+      id: S.S.C02.Rsp
+
+    - label: "Does the device implement receiving the RemoveAllScenes command?"
+      id: S.S.C03.Rsp
+
+    - label: "Does the device implement receiving the StoreScene command?"
+      id: S.S.C04.Rsp
+
+    - label: "Does the device implement receiving the RecallScene command?"
+      id: S.S.C05.Rsp
+
+    - label:
+          "Does the device implement receiving the GetSceneMembership command?"
+      id: S.S.C06.Rsp
+
+    - label: "Does the device implement receiving the EnhancedAddScene command?"
+      id: S.S.C40.Rsp
+
+    - label:
+          "Does the device implement receiving the EnhancedViewScene command?"
+      id: S.S.C41.Rsp
+
+    - label: "Does the device implement receiving the CopyScene command?"
+      id: S.S.C42.Rsp
+
+    - label:
+          "Does the device process the TransitionTime parameter of the
+          RecallScene command?"
+      id: S.S.C05.Rsp
+
+    - label: "Does the device receive the AddGroup Command?"
+      id: G.S.C00.Rsp
+
+    - label: "Does the device receive the RemoveAllGroups Command?"
+      id: G.S.C04.Rsp
+
+    - label: "Does the device implement sending the AddScene command?"
+      id: S.C.C00.Tx
+
+    - label: "Does the device implement sending the ViewScene command?"
+      id: S.C.C01.Tx
+
+    - label: "Does the device implement sending the RemoveScene command?"
+      id: S.C.C02.Tx
+
+    - label: "Does the device implement sending the RemoveAllScenes command?"
+      id: S.C.C03.Tx
+
+    - label: "Does the device implement sending the StoreScene command?"
+      id: S.C.C04.Tx
+
+    - label: "Does the device implement sending the RecallScene command?"
+      id: S.C.C05.Tx
+
+    - label: "Does the device implement sending the GetSceneMembership command?"
+      id: S.C.C06.Tx
+
+    - label: "Does the device implement sending the EnhancedAddScene command?"
+      id: S.C.C40.Tx
+
+    - label: "Does the device implement sending the EnhancedViewScene command?"
+      id: S.C.C41.Tx
+
+    - label: "Does the device implement sending the CopyScene command?"
+      id: S.C.C42.Tx
+
+    #Switch Cluster
+    - label: "Does the device represent a Latching Switch?"
+      id: SWTCH.S.F00
+
+    - label: "Does the device implement the CurrentScene attribute?"
+      id: SWTCH.S.F01
+
+    - label: "Does the MS device support Momentary Switch Release?"
+      id: SWTCH.S.F02
+
+    - label: "Does the MS device support Momentary Switch LongPress?"
+      id: SWTCH.S.F03
+
+    - label: "Does the MS device support Momentary Switch MultiPress?"
+      id: SWTCH.S.F04

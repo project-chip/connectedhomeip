@@ -276,12 +276,12 @@ public:
         printf("Test_TC_DD_3_20\n");
         printf("TestGroupDemoCommand\n");
         printf("TestGroupDemoConfig\n");
-        printf("Test_TC_GR_1_1\n");
-        printf("Test_TC_GR_2_1\n");
-        printf("Test_TC_GR_2_2\n");
-        printf("Test_TC_GR_2_3\n");
-        printf("Test_TC_GR_3_1\n");
-        printf("Test_TC_GR_3_2\n");
+        printf("Test_TC_G_1_1\n");
+        printf("Test_TC_G_2_1\n");
+        printf("Test_TC_G_2_2\n");
+        printf("Test_TC_G_2_3\n");
+        printf("Test_TC_G_3_1\n");
+        printf("Test_TC_G_3_2\n");
         printf("Test_TC_BDX_1_1\n");
         printf("Test_TC_BDX_1_2\n");
         printf("Test_TC_BDX_1_3\n");
@@ -12874,6 +12874,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH sends Identify command to DUT, with the identify time field set to 0x003c (60s).");
+            VerifyOrDo(!ShouldSkip("I.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::Identify::Type value;
             value.identifyTime = 60U;
@@ -12884,6 +12885,7 @@ private:
         }
         case 2: {
             LogStep(2, "TH reads immediately IdentifyTime attribute from DUT1");
+            VerifyOrDo(!ShouldSkip("I.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyTime::Id, true,
                                  chip::NullOptional);
         }
@@ -12896,6 +12898,7 @@ private:
         }
         case 4: {
             LogStep(4, "After 10 seconds, the TH reads IdentifyTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("I.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyTime::Id, true,
                                  chip::NullOptional);
         }
@@ -12913,6 +12916,7 @@ private:
         }
         case 6: {
             LogStep(6, "TH sends Identify command to DUT, with the identify time field set to 0x0000 (stop identifying).");
+            VerifyOrDo(!ShouldSkip("I.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::Identify::Type value;
             value.identifyTime = 0U;
@@ -12923,6 +12927,7 @@ private:
         }
         case 7: {
             LogStep(7, "TH reads immediately IdentifyTime attribute from DUT2");
+            VerifyOrDo(!ShouldSkip("I.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyTime::Id, true,
                                  chip::NullOptional);
         }
@@ -12938,6 +12943,7 @@ private:
         }
         case 9: {
             LogStep(9, "TH writes a value of 0x000f (15s) to IdentifyTime attribute of DUT");
+            VerifyOrDo(!ShouldSkip("I.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint16_t value;
             value = 15U;
@@ -12953,6 +12959,7 @@ private:
         }
         case 11: {
             LogStep(11, "After 5 seconds, the TH reads IdentifyTime attribute from DUT");
+            VerifyOrDo(!ShouldSkip("I.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyTime::Id, true,
                                  chip::NullOptional);
         }
@@ -13097,6 +13104,7 @@ private:
             LogStep(1,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0x00 blink and the effect "
                     "variant field set to 0x00 default");
+            VerifyOrDo(!ShouldSkip("I.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(0);
@@ -13117,6 +13125,7 @@ private:
             LogStep(3,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe and the effect "
                     "variant field set to 0x00 default");
+            VerifyOrDo(!ShouldSkip("I.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(1);
@@ -13137,6 +13146,7 @@ private:
             LogStep(5,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0x02 okay and the effect "
                     "variant field set to 0x00 default");
+            VerifyOrDo(!ShouldSkip("I.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(2);
@@ -13157,6 +13167,7 @@ private:
             LogStep(7,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0x0b channel change and the "
                     "effect variant field set to 0x00 default");
+            VerifyOrDo(!ShouldSkip("I.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(11);
@@ -13177,6 +13188,7 @@ private:
             LogStep(9,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe and the effect "
                     "variant field set to 0x00 default");
+            VerifyOrDo(!ShouldSkip("I.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(1);
@@ -13197,6 +13209,7 @@ private:
             LogStep(11,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0xfe finish effect and the "
                     "effect variant field set to 0x00 default");
+            VerifyOrDo(!ShouldSkip("I.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(254);
@@ -13208,6 +13221,7 @@ private:
         }
         case 12: {
             LogStep(12, "Manually check DUT stops the breathe effect after the current effect sequence");
+            VerifyOrDo(!ShouldSkip("I.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
@@ -13218,6 +13232,7 @@ private:
             LogStep(13,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe and the effect "
                     "variant field set to 0x00 default");
+            VerifyOrDo(!ShouldSkip("I.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(1);
@@ -13238,6 +13253,7 @@ private:
             LogStep(15,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0xff stop effect and the effect "
                     "variant field set to 0x00 default");
+            VerifyOrDo(!ShouldSkip("I.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(255);
@@ -13259,6 +13275,7 @@ private:
             LogStep(17,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0x00 blink and the effect "
                     "variant field set to 0x42 unknown");
+            VerifyOrDo(!ShouldSkip("I.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(0);
@@ -13279,6 +13296,7 @@ private:
             LogStep(19,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0xff stop effect and the effect "
                     "variant field set to 0x00 default");
+            VerifyOrDo(!ShouldSkip("I.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(255);
@@ -27096,6 +27114,7 @@ private:
         }
         case 3: {
             LogStep(3, "Read MultiPressMax attribute");
+            VerifyOrDo(!ShouldSkip("SWTCH.S.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Switch::Id, Switch::Attributes::MultiPressMax::Id, true,
                                  chip::NullOptional);
         }
@@ -66081,10 +66100,10 @@ private:
     }
 };
 
-class Test_TC_GR_1_1Suite : public TestCommand
+class Test_TC_G_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_GR_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GR_1_1", 0, credsIssuerConfig)
+    Test_TC_G_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_G_1_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -66092,7 +66111,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_GR_1_1Suite() {}
+    ~Test_TC_G_1_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -66137,10 +66156,10 @@ private:
     }
 };
 
-class Test_TC_GR_2_1Suite : public TestCommand
+class Test_TC_G_2_1Suite : public TestCommand
 {
 public:
-    Test_TC_GR_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GR_2_1", 0, credsIssuerConfig)
+    Test_TC_G_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_G_2_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -66148,7 +66167,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_GR_2_1Suite() {}
+    ~Test_TC_G_2_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -66193,10 +66212,10 @@ private:
     }
 };
 
-class Test_TC_GR_2_2Suite : public TestCommand
+class Test_TC_G_2_2Suite : public TestCommand
 {
 public:
-    Test_TC_GR_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GR_2_2", 0, credsIssuerConfig)
+    Test_TC_G_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_G_2_2", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -66204,7 +66223,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_GR_2_2Suite() {}
+    ~Test_TC_G_2_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -66249,10 +66268,10 @@ private:
     }
 };
 
-class Test_TC_GR_2_3Suite : public TestCommand
+class Test_TC_G_2_3Suite : public TestCommand
 {
 public:
-    Test_TC_GR_2_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GR_2_3", 0, credsIssuerConfig)
+    Test_TC_G_2_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_G_2_3", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -66260,7 +66279,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_GR_2_3Suite() {}
+    ~Test_TC_G_2_3Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -66305,10 +66324,10 @@ private:
     }
 };
 
-class Test_TC_GR_3_1Suite : public TestCommand
+class Test_TC_G_3_1Suite : public TestCommand
 {
 public:
-    Test_TC_GR_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GR_3_1", 0, credsIssuerConfig)
+    Test_TC_G_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_G_3_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -66316,7 +66335,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_GR_3_1Suite() {}
+    ~Test_TC_G_3_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -66361,10 +66380,10 @@ private:
     }
 };
 
-class Test_TC_GR_3_2Suite : public TestCommand
+class Test_TC_G_3_2Suite : public TestCommand
 {
 public:
-    Test_TC_GR_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GR_3_2", 0, credsIssuerConfig)
+    Test_TC_G_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_G_3_2", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -66372,7 +66391,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_GR_3_2Suite() {}
+    ~Test_TC_G_3_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -87215,12 +87234,12 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_DD_3_20Suite>(credsIssuerConfig),
         make_unique<TestGroupDemoCommandSuite>(credsIssuerConfig),
         make_unique<TestGroupDemoConfigSuite>(credsIssuerConfig),
-        make_unique<Test_TC_GR_1_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_GR_2_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_GR_2_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_GR_2_3Suite>(credsIssuerConfig),
-        make_unique<Test_TC_GR_3_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_GR_3_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_G_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_G_2_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_G_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_G_2_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_G_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_G_3_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_BDX_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_BDX_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_BDX_1_3Suite>(credsIssuerConfig),
