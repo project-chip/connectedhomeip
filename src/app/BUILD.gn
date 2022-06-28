@@ -80,6 +80,8 @@ static_library("app") {
     "DeviceProxy.h",
     "EventManagement.cpp",
     "EventPathParams.h",
+    "FailSafeContext.cpp",
+    "FailSafeContext.h",
     "GlobalAttributes.h",
     "InteractionModelEngine.cpp",
     "InteractionModelRevision.h",

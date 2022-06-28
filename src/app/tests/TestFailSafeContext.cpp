@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <app/server/FailSafeContext.h>
+#include <app/FailSafeContext.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
