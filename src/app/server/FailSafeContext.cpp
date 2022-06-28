@@ -21,7 +21,7 @@
  */
 
 #include <lib/support/SafeInt.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "FailSafeContext.h"
 

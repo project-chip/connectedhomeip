@@ -25,6 +25,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace app {

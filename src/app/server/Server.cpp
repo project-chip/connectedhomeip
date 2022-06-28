@@ -315,6 +315,18 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             const bool addNocCalled    = true;
             const bool updateNocCalled = false;
             GetFailSafeContext().ScheduleFailSafeCleanup(fabricIndexDeletedOnInit, addNocCalled, updateNocCalled);
+
+            // Schedule clearing of the commit marker to only occur after we have processed all fail-safe clean-up.
+            // Because Matter runs a single event loop for all scheduled work, it will occur after the above has
+            // taken place. If a reset occurs before we have cleaned everything up, the next boot will still
+            // see the commit marker.
+            PlatformMgr().ScheduleWork([](intptr_t arg) {
+                Server * server = reinterpret_cast<Server *>(arg);
+                VerifyOrReturn(server != nullptr);
+
+                server->GetFabricTable().ClearCommitMarker();
+                ChipLogProgress(AppServer, "Cleared FabricTable pending commit marker");
+               }, reinterpret_cast<intptr_t>(this));
         }
     }
 

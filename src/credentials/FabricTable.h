@@ -436,6 +436,11 @@ public:
      */
     FabricIndex GetDeletedFabricFromCommitMarker();
 
+    /**
+     * @brief Clear the commit marker when we are sure we have proceeded with any remaining clean-up
+     */
+    void ClearCommitMarker();
+
     // Forget a fabric in memory: doesn't delete any persistent state, just
     // reverts any pending state (blindly) and then resets the fabric table
     // entry.
@@ -996,7 +1001,6 @@ private:
     // Commit management clean-up APIs
     CHIP_ERROR StoreCommitMarker(const CommitMarker & commitMarker);
     CHIP_ERROR GetCommitMarker(CommitMarker & outCommitMarker);
-    void ClearCommitMarker();
 
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     // Used for UpdateNOC pending fabric updates

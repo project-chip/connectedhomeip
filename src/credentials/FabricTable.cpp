@@ -1045,9 +1045,6 @@ CHIP_ERROR FabricTable::Init(const FabricTable::InitParams & initParams)
                      err.Format());
     }
 
-    // Always statelessly revert commit marker in this situation.
-    ClearCommitMarker();
-
     return CHIP_NO_ERROR;
 }
 

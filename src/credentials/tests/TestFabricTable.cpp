@@ -1910,9 +1910,14 @@ void TestCommitMarker(nlTestSuite * inSuite, void * inContext)
         // Second read must return kUndefinedFabricIndex
         NL_TEST_ASSERT(inSuite, fabricTable.GetDeletedFabricFromCommitMarker() == kUndefinedFabricIndex);
 
+        {
+            // Here we would do other clean-ups (e.g. see Server.cpp that uses the above) and then
+            // clear the commit marker after.
+            fabricTable.ClearCommitMarker();
+        }
+
         // Make sure that all other pending storage got deleted
         NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == numStorageKeysAfterFirstAdd);
-        storage.DumpKeys();
 
         // Verify we canm only see 1 fabric with the iterator
         {
