@@ -92,17 +92,19 @@ CHIP_ERROR AppContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEn
     {
         Json::Reader reader;
         Json::Value value;
-        reader.parse(resStr, value);
-        std::string attrId = to_string(chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id).c_str();
-        ChipLogProgress(Zcl,
-                        "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response parsing done. reading attr %s",
-                        attrId.c_str());
-        if (value[attrId].isArray())
+        if (reader.parse(resStr, value))
         {
-            mAcceptHeaderList.clear();
-            for (Json::Value & entry : value[attrId])
+            std::string attrId = to_string(chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id);
+            ChipLogProgress(Zcl,
+                            "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response parsing done. reading attr %s",
+                            attrId.c_str());
+            if (value[attrId].isArray())
             {
-                mAcceptHeaderList.push_back(entry.asString());
+                mAcceptHeaderList.clear();
+                for (Json::Value & entry : value[attrId])
+                {
+                    mAcceptHeaderList.push_back(entry.asString());
+                }
             }
         }
     }
@@ -132,7 +134,10 @@ uint32_t AppContentLauncherManager::HandleGetSupportedStreamingProtocols()
 
     Json::Reader reader;
     Json::Value value;
-    reader.parse(resStr, value);
+    if (!reader.parse(resStr, value))
+    {
+        return mSupportedStreamingProtocols;
+    }
     std::string attrId = to_string(chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id);
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response parsing done. reading attr %s",
                     attrId.c_str());

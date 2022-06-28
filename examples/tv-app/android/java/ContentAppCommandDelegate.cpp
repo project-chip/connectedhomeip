@@ -112,7 +112,11 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
 {
     Json::Reader reader;
     Json::Value value;
-    reader.parse(response, value);
+    if (!reader.parse(response, value))
+    {
+        handlerContext.SetCommandNotHandled();
+        return;
+    }
 
     switch (handlerContext.mRequestPath.mClusterId)
     {
