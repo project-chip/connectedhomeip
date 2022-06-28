@@ -55,13 +55,6 @@ CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCa
     VerifyOrReturnError(ThreadStackMgrImpl().IsThreadAttached(), CHIP_NO_ERROR);
     VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork) == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    // Try to revert configuration at init, in case we rebooted during fail-safe. If there
-    // was no backup, this is a no-op. Note that it's better for drivers not to touch
-    // persistent configuration until CommitConfiguration(), but some network stacks
-    // like OpenThread do internal storage on connect/attach, so this is why the stateful
-    // approach here is needed.
-    RevertConfiguration();
-
     return CHIP_NO_ERROR;
 }
 
