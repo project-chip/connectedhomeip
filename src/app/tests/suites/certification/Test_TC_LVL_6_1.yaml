@@ -102,8 +102,9 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 25
           constraints:
+              minValue: 23
+              maxValue: 27
               notValue: CurrentLevelValue
 
     - label: "Sends a move up command to DUT"
@@ -147,13 +148,12 @@ tests:
                     transitioning."
 
     - label: "Reads CurrentLevel attribute from DUT"
-      disabled: true # https://github.com/project-chip/connectedhomeip/issues/19869
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 50
           constraints:
+              minValue: 48
+              maxValue: 52
               notValue: CurrentLevelValue
 
     - label: "Reset level to 254"
