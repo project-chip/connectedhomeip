@@ -363,18 +363,20 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
                                 EmberAfPluginDoorLockCredentialInfo & credential) const
 {
-    if ((credentialIndex < MIN_CREDENTIAL_INDEX) || (credentialIndex > MAX_CREDENTIAL_PER_USER))
-    {
-        ChipLogError(Zcl, "Cannot get credential - credential index is out of range [endpoint=%d,index=%d]", endpointId,
-                     credentialIndex);
-        return false;
-    }
 
     // door-lock-server checks for valid credential index
     uint16_t adjustedCredentialIndex = credentialIndex - 1;
 
     ChipLogProgress(Zcl, "Lock App: LockManager::GetCredential [credentialType=%u], credentialIndex=%d",
                     to_underlying(credentialType), adjustedCredentialIndex);
+
+    if (credentialType == DlCredentialType::kProgrammingPIN)
+    {
+        ChipLogError(Zcl, "Programming user not supported [credentialType=%u], credentialIndex=%d", to_underlying(credentialType),
+                     adjustedCredentialIndex);
+
+        return true;
+    }
 
     const auto & credentialInStorage = mLockCredentials[adjustedCredentialIndex];
 
