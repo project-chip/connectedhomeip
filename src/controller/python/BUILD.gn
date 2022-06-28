@@ -118,8 +118,6 @@ pw_python_action("python") {
     {
       src_dir = "."
       sources = [
-        "chip-device-ctrl.py",
-        "chip-repl.py",
         "chip/ChipBleBase.py",
         "chip/ChipBleUtility.py",
         "chip/ChipBluezMgr.py",
@@ -166,7 +164,11 @@ pw_python_action("python") {
       ]
 
       if (chip_controller) {
-        sources += [ "chip/ChipDeviceCtrl.py" ]
+        sources += [
+          "chip-device-ctrl.py",
+          "chip-repl.py",
+          "chip/ChipDeviceCtrl.py",
+        ]
       } else {
         sources += [
           "chip/server/__init__.py",
@@ -227,9 +229,18 @@ pw_python_action("python") {
     ]
   }
 
+  _py_scripts = [ ]
+  if (chip_controller) {
+    _py_scripts += [
+      "chip-device-ctrl.py",
+      "chip-repl.py",
+    ]
+  }
+
   _py_manifest = {
     files = _py_manifest_files_rebased
     packages = _py_packages
+    scripts = _py_scripts
   }
 
   write_file(_py_manifest_file, _py_manifest, "json")
