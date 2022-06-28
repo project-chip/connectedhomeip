@@ -29,7 +29,6 @@ from wheel.bdist_wheel import bdist_wheel
 import argparse
 import json
 import os
-import platform
 import shutil
 
 
@@ -111,33 +110,7 @@ try:
             bdist_wheel.finalize_options(self)
             self.root_is_pure = False
 
-    requiredPackages = [
-        "coloredlogs",
-        'construct',
-
-        #
-        # IPython 7.30.0 has a bug which results in the use of await ... failing on some platforms (see https://github.com/ipython/ipython/pull/13269)
-        # For now, let's just avoid that version.
-        #
-        # IPython 8.1.0 has a bug which causes issues: https://github.com/ipython/ipython/issues/13554
-        #
-        #
-        'ipython!=8.1.0',
-        'dacite',
-        'rich',
-        'stringcase',
-        'pyyaml',
-        'ipdb',
-        'ipykernel',
-        'deprecation'
-    ]
-
-    if platform.system() == "Darwin":
-        requiredPackages.append("pyobjc-framework-corebluetooth")
-
-    if platform.system() == "Linux":
-        requiredPackages.append("dbus-python")
-        requiredPackages.append("pygobject")
+    requiredPackages = manifest['package_reqs']
 
     #
     # Build the chip package...
