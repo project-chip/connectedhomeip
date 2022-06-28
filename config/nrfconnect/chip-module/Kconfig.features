@@ -19,6 +19,26 @@
 
 if CHIP
 
+config CHIP_WIFI
+	bool "Enable nrfconnect Wi-Fi support"
+	default n
+	select WIFI_NRF
+	imply NORDIC_SECURITY_BACKEND
+	imply MBEDTLS_ENTROPY_C
+	imply MBEDTLS_PSA_CRYPTO_C
+	imply DHCPV4
+	imply DNS_RESOLVER
+	imply NET_STATISTICS
+	imply NET_L2_ETHERNET
+	imply NET_SHELL
+	imply NET_PKT_TXTIME
+	imply NET_PKT_TIMESTAMP
+	imply MBEDTLS_PROMPTLESS
+	imply BUILD_OUTPUT_META
+	imply USE_DT_CODE_PARTITION # might be removed when the OTA is enabled
+	imply NET_CONFIG_SETTINGS # might be removed when supplicant's KConfig is cleaned up
+	imply NET_IPV4 # needed by the supplicant to compile
+
 config CHIP_QSPI_NOR
 	bool "Enable QSPI NOR feature set"
 	help

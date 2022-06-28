@@ -33,7 +33,7 @@ namespace Internal {
  *
  * This template contains implementations of select features from the ConnectivityManager abstract
  * interface that are suitable for use on all platforms.  It is intended to be inherited (directly
- * or indirectly) by the ConfigurationManagerImpl class, which also appears as the template's ImplClass
+ * or indirectly) by the ConnectivityManagerImpl class, which also appears as the template's ImplClass
  * parameter.
  */
 template <class ImplClass>

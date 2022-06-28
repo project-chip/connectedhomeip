@@ -20,7 +20,9 @@
 #include "AppConfig.h"
 #include "LEDWidget.h"
 #include "LightSwitch.h"
+#ifdef CONFIG_NET_L2_OPENTHREAD
 #include "ThreadUtil.h"
+#endif
 
 #include <DeviceInfoProviderImpl.h>
 #include <app/clusters/identify-server/identify-server.h>
@@ -108,6 +110,7 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
+#if defined(CONFIG_NET_L2_OPENTHREAD)
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -125,6 +128,9 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed: %s", ErrorStr(err));
         return err;
     }
+#elif !defined(CONFIG_CHIP_WIFI)
+    return CHIP_ERROR_INTERNAL;
+#endif
 
     LightSwitch::GetInstance().Init(kLightDimmerSwitchEndpointId, kLightGenericSwitchEndpointId);
 

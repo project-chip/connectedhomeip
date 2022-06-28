@@ -20,7 +20,9 @@
 #include "AppConfig.h"
 #include "BoltLockManager.h"
 #include "LEDWidget.h"
+#ifdef CONFIG_NET_L2_OPENTHREAD
 #include "ThreadUtil.h"
+#endif
 
 #include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attribute-id.h>
@@ -104,6 +106,7 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
+#if defined(CONFIG_NET_L2_OPENTHREAD)
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -121,6 +124,9 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
         return err;
     }
+#elif !defined(CONFIG_CHIP_WIFI)
+    return CHIP_ERROR_INTERNAL;
+#endif
 
     // Initialize LEDs
     LEDWidget::InitGpio();
@@ -241,6 +247,7 @@ void AppTask::ButtonEventHandler(uint32_t button_state, uint32_t has_changed)
         sAppTask.PostEvent(&button_event);
     }
 
+#ifdef CONFIG_NET_L2_OPENTHREAD
     if (THREAD_START_BUTTON_MASK & button_state & has_changed)
     {
         button_event.ButtonEvent.PinNo  = THREAD_START_BUTTON;
@@ -248,6 +255,7 @@ void AppTask::ButtonEventHandler(uint32_t button_state, uint32_t has_changed)
         button_event.Handler            = StartThreadHandler;
         sAppTask.PostEvent(&button_event);
     }
+#endif
 
     if (BLE_ADVERTISEMENT_START_BUTTON_MASK & button_state & has_changed)
     {
@@ -365,6 +373,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     }
 }
 
+#ifdef CONFIG_NET_L2_OPENTHREAD
 void AppTask::StartThreadHandler(AppEvent * aEvent)
 {
     if (aEvent->ButtonEvent.PinNo != THREAD_START_BUTTON)
@@ -380,6 +389,7 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
         LOG_INF("Device is commissioned to a Thread network.");
     }
 }
+#endif
 
 void AppTask::StartBLEAdvertisementHandler(AppEvent *)
 {
