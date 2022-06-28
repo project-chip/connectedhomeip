@@ -237,10 +237,38 @@ pw_python_action("python") {
     ]
   }
 
+  _py_package_reqs = [
+    "coloredlogs",
+    "construct",
+
+    #
+    # IPython 7.30.0 has a bug which results in the use of await ... failing on some platforms (see https://github.com/ipython/ipython/pull/13269)
+    # For now, let's just avoid that version.
+    #
+    # IPython 8.1.0 has a bug which causes issues: https://github.com/ipython/ipython/issues/13554
+    #
+    #
+    "ipython!=8.1.0",
+    "dacite",
+    "rich",
+    "stringcase",
+    "pyyaml",
+    "ipdb",
+    "ipykernel",
+    "deprecation"
+  ]
+
+  if (current_os == "mac") {
+    _py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
+  } else if (current_os == "linux") {
+    _py_package_reqs += [ "dbus-python", "pygobject" ]
+  }
+
   _py_manifest = {
     files = _py_manifest_files_rebased
     packages = _py_packages
     scripts = _py_scripts
+    package_reqs = _py_package_reqs
   }
 
   write_file(_py_manifest_file, _py_manifest, "json")
