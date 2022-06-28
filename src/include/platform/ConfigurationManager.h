@@ -30,6 +30,7 @@
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/PersistedStorage.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
 
 namespace chip {
