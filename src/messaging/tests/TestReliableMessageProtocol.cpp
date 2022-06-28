@@ -1569,6 +1569,9 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
     // We now have just the received message waiting for an ack.
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
+    // And receiver still has no ack pending.
+    NL_TEST_ASSERT(inSuite, !receiverRc->IsAckPending());
+
     // Reset various state so we can measure things again.
     mockReceiver.IsOnMessageReceivedCalled = false;
     mockReceiver.mReceivedPiggybackAck     = false;
@@ -1594,8 +1597,8 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mockReceiver.IsOnMessageReceivedCalled);
     NL_TEST_ASSERT(inSuite, mockReceiver.mReceivedPiggybackAck);
 
-    // And that receiver has no ack pending.
-    NL_TEST_ASSERT(inSuite, !receiverRc->IsAckPending());
+    // At this point all our exchanges and reliable message contexts should be
+    // dead, so we can't test anything about their state.
 
     // And that there are no un-acked messages left.
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);

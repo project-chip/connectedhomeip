@@ -96,6 +96,9 @@ CHIP_ERROR CommandSender::SendGroupCommandRequest(const SessionHandle & session)
 
     ReturnErrorOnFailure(SendInvokeRequest());
 
+    // Exchange is gone now, since it closed itself on successful send.
+    mpExchangeCtx = nullptr;
+
     Close();
     return CHIP_NO_ERROR;
 }
