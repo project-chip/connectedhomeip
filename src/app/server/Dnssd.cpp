@@ -374,7 +374,7 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
         // We do extended discovery advertising in three cases:
         // 1) We don't have a timeout for extended discovery.
         // 2) We are transitioning out of commissioning mode (basic or enhanced)
-        //    and should thherefore start extended discovery.
+        //    and should therefore start extended discovery.
         // 3) We are resetting advertising while we are in the middle of an
         //    existing extended discovery advertising period.
         if (alwaysAdvertiseExtended || mCurrentCommissioningMode != Dnssd::CommissioningMode::kDisabled ||
