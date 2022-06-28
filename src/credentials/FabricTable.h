@@ -423,7 +423,7 @@ public:
     void Shutdown();
 
     /**
-     * @brief If `Init()` caused a Deted due to partial commit, the fabric index at play is returned.
+     * @brief If `Init()` caused a Delete due to partial commit, the fabric index at play is returned.
      *
      * Allows caller to schedule more clean-up. This is because at Init() time, none of the delegates
      * are registered yet, so no other modules would learn of the removal.

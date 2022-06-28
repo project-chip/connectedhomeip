@@ -51,14 +51,15 @@ constexpr TLV::Tag kFabricLabelTag = TLV::ContextTag(1);
 constexpr TLV::Tag kNextAvailableFabricIndexTag = TLV::ContextTag(0);
 constexpr TLV::Tag kFabricIndicesTag            = TLV::ContextTag(1);
 
-// Tagsd for commit marker storage
+// Tags for commit marker storage
 constexpr TLV::Tag kMarkerFabricIndexTag = TLV::ContextTag(0);
 constexpr TLV::Tag kMarkerIsAdditionTag  = TLV::ContextTag(1);
 
 constexpr size_t CommitMarkerContextTLVMaxSize()
 {
-    // Add room for the future
-    return TLV::EstimateStructOverhead(sizeof(FabricIndex), sizeof(bool)) * 2;
+    // Add 2x uncommitted uint64_t to leave space for backwards/forwards
+    // versioning for this critical feature that runs at boot.
+    return TLV::EstimateStructOverhead(sizeof(FabricIndex), sizeof(bool), sizeof(uint64_t), sizeof(uint64_t));
 }
 
 constexpr size_t IndexInfoTLVMaxSize()

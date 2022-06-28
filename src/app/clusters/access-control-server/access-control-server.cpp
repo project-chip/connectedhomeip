@@ -149,7 +149,6 @@ CHIP_ERROR AccessControlAttribute::ReadAcl(AttributeValueEncoder & aEncoder)
 
 CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncoder)
 {
-#if SUPPORT_EXTENSION
     auto & storage = Server::GetInstance().GetPersistentStorage();
     DefaultStorageKeyAllocator key;
 
@@ -175,9 +174,6 @@ CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncode
         }
         return CHIP_NO_ERROR;
     });
-#else
-    return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-#endif
 }
 
 CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
