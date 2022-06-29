@@ -199,6 +199,7 @@ chip_gn_arg_bool  ("chip_build_libshell"                  CONFIG_CHIP_LIB_SHELL)
 if (TARGET cmsis-rtos-api)
     chip_gn_arg_string("target_os"                        "cmsis-rtos")
 endif()
+chip_gn_arg_string("optimize_debug_level"                 "s")
 
 file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/args.tmp" CONTENT ${CHIP_GN_ARGS})
 
