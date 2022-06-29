@@ -247,33 +247,6 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteReadAttributePat
     return CHIP_NO_ERROR;
 }
 
-// Utility to compute Attestation signature for NOCSRResponse and AttestationResponse
-CHIP_ERROR ComputeAttestationSignature(app::CommandHandler * commandObj,
-                                       Credentials::DeviceAttestationCredentialsProvider * dacProvider, const ByteSpan & payload,
-                                       MutableByteSpan & signatureSpan)
-{
-    uint8_t md[Crypto::kSHA256_Hash_Length];
-    MutableByteSpan messageDigestSpan(md);
-
-    VerifyOrReturnError(signatureSpan.size() >= Crypto::P256ECDSASignature::Capacity(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
-    // Retrieve attestation challenge
-    ByteSpan attestationChallenge =
-        commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
-
-    Hash_SHA256_stream hashStream;
-    ReturnErrorOnFailure(hashStream.Begin());
-    ReturnErrorOnFailure(hashStream.AddData(payload));
-    ReturnErrorOnFailure(hashStream.AddData(attestationChallenge));
-    ReturnErrorOnFailure(hashStream.Finish(messageDigestSpan));
-
-    ReturnErrorOnFailure(dacProvider->SignWithDeviceAttestationKey(messageDigestSpan, signatureSpan));
-    VerifyOrReturnError(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), CHIP_ERROR_INTERNAL);
-
-    return CHIP_NO_ERROR;
-}
-
 FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
 {
     FabricIndex index = aCommandHandler->GetAccessingFabricIndex();
@@ -930,6 +903,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 
     auto finalStatus = Status::Failure;
     CHIP_ERROR err   = CHIP_ERROR_INVALID_ARGUMENT;
+    ByteSpan tbsSpan;
 
     Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
     size_t attestationElementsLen = 0;
@@ -937,6 +911,11 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
     uint8_t certDeclBuf[Credentials::kMaxCMSSignedCDMessage]; // Sized to hold the example certificate declaration with 100 PIDs.
                                                               // See DeviceAttestationCredsExample
     MutableByteSpan certDeclSpan(certDeclBuf);
+
+    // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
+    // Retrieve attestation challenge
+    ByteSpan attestationChallenge =
+        commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     // TODO: in future versions, retrieve vendor information to populate the fields below.
     uint32_t timestamp = 0;
@@ -961,7 +940,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 
     attestationElementsLen = TLV::EstimateStructOverhead(certDeclSpan.size(), attestationNonce.size(), sizeof(uint64_t) * 8);
 
-    if (!attestationElements.Alloc(attestationElementsLen))
+    if (!attestationElements.Alloc(attestationElementsLen + attestationChallenge.size()))
     {
         err = CHIP_ERROR_NO_MEMORY;
         VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::ResourceExhausted);
@@ -972,14 +951,21 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
                                                     emptyVendorReserved, attestationElementsSpan);
     VerifyOrExit((err == CHIP_NO_ERROR) && (attestationElementsSpan.size() <= kMaxRspLen), finalStatus = Status::Failure);
 
-    // Prepare response payload with signature
-    {
-        Commands::AttestationResponse::Type response;
+    // Append attestation challenge in the back of the reserved space for the signature
+    memcpy(attestationElements.Get() + attestationElementsSpan.size(), attestationChallenge.data(), attestationChallenge.size());
+    tbsSpan = ByteSpan{ attestationElements.Get(), attestationElementsSpan.size() + attestationChallenge.size() };
 
+    {
         Crypto::P256ECDSASignature signature;
         MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
-        err = ComputeAttestationSignature(commandObj, dacProvider, attestationElementsSpan, signatureSpan);
+
+        // Getnerate attestation signature
+        err = dacProvider->SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
+        ClearSecretData(attestationElements.Get() + attestationElementsSpan.size(), attestationChallenge.size());
         VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+        VerifyOrExit(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), finalStatus = Status::Failure);
+
+        Commands::AttestationResponse::Type response;
 
         response.attestationElements = attestationElementsSpan;
         response.signature           = signatureSpan;
@@ -1010,6 +996,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocsrElements;
     MutableByteSpan nocsrElementsSpan;
     auto finalStatus = Status::Failure;
+    ByteSpan tbsSpan;
 
     // Start with CHIP_ERROR_INVALID_ARGUMENT so that cascading errors yield correct
     // logs by the end. We use finalStatus as our overall success marker, not error
@@ -1020,6 +1007,11 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
     auto & CSRNonce     = commandData.CSRNonce;
     bool isForUpdateNoc = commandData.isForUpdateNOC.ValueOr(false);
+
+    // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
+    // Retrieve attestation challenge
+    ByteSpan attestationChallenge =
+        commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     failSafeContext.SetCsrRequestForUpdateNoc(isForUpdateNoc);
     FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
@@ -1075,7 +1067,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
                                                           0u               // no vendor reserved data
         );
 
-        if (!nocsrElements.Alloc(nocsrLengthEstimate))
+        if (!nocsrElements.Alloc(nocsrLengthEstimate + attestationChallenge.size()))
         {
             err = CHIP_ERROR_NO_MEMORY;
             VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::ResourceExhausted);
@@ -1086,26 +1078,32 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
         err = Credentials::ConstructNOCSRElements(ByteSpan{ csrSpan.data(), csrSpan.size() }, CSRNonce, kNoVendorReserved,
                                                   kNoVendorReserved, kNoVendorReserved, nocsrElementsSpan);
         VerifyOrExit((err == CHIP_NO_ERROR) && (nocsrElementsSpan.size() <= kMaxRspLen), finalStatus = Status::Failure);
-    }
 
-    // Prepare response payload with signature
-    {
-        Commands::CSRResponse::Type response;
+        // Append attestation challenge in the back of the reserved space for the signature
+        memcpy(nocsrElements.Get() + nocsrElementsSpan.size(), attestationChallenge.data(), attestationChallenge.size());
+        tbsSpan = ByteSpan{ nocsrElements.Get(), nocsrElementsSpan.size() + attestationChallenge.size() };
 
-        Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
+        {
+            Credentials::DeviceAttestationCredentialsProvider * dacProvider =
+                Credentials::GetDeviceAttestationCredentialsProvider();
+            Crypto::P256ECDSASignature signature;
+            MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
 
-        Crypto::P256ECDSASignature signature;
-        MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
+            // Getnerate attestation signature
+            err = dacProvider->SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
+            ClearSecretData(nocsrElements.Get() + nocsrElementsSpan.size(), attestationChallenge.size());
+            VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+            VerifyOrExit(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), finalStatus = Status::Failure);
 
-        err = ComputeAttestationSignature(commandObj, dacProvider, nocsrElementsSpan, signatureSpan);
-        VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+            Commands::CSRResponse::Type response;
 
-        response.NOCSRElements        = nocsrElementsSpan;
-        response.attestationSignature = signatureSpan;
+            response.NOCSRElements        = nocsrElementsSpan;
+            response.attestationSignature = signatureSpan;
 
-        ChipLogProgress(Zcl, "OpCreds: CSRRequest successful.");
-        finalStatus = Status::Success;
-        commandObj->AddResponse(commandPath, response);
+            ChipLogProgress(Zcl, "OpCreds: CSRRequest successful.");
+            finalStatus = Status::Success;
+            commandObj->AddResponse(commandPath, response);
+        }
     }
 
 exit:

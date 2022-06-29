@@ -156,7 +156,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetProductAttestationIntermedi
 }
 
 template <class FlashFactoryData>
-CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(const ByteSpan & digestToSign,
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(const ByteSpan & messageToSign,
                                                                                MutableByteSpan & outSignBuffer)
 {
     Crypto::P256ECDSASignature signature;
@@ -174,7 +174,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
     ReturnErrorOnFailure(
         LoadKeypairFromRaw(ByteSpan(reinterpret_cast<uint8_t *>(mFactoryData.dac_priv_key.data), mFactoryData.dac_priv_key.len),
                            ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair));
-    ReturnErrorOnFailure(keypair.ECDSA_sign_hash(digestToSign.data(), digestToSign.size(), signature));
+    ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
 }

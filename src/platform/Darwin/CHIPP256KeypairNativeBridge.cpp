@@ -42,12 +42,6 @@ CHIP_ERROR CHIPP256KeypairNativeBridge::ECDSA_sign_msg(const uint8_t * msg, size
     return mKeypairBase.ECDSA_sign_msg(msg, msg_length, out_signature);
 }
 
-CHIP_ERROR CHIPP256KeypairNativeBridge::ECDSA_sign_hash(const uint8_t * hash, size_t hash_length,
-                                                        P256ECDSASignature & out_signature) const
-{
-    return mKeypairBase.ECDSA_sign_hash(hash, hash_length, out_signature);
-}
-
 CHIP_ERROR CHIPP256KeypairNativeBridge::ECDH_derive_secret(const P256PublicKey & remote_public_key,
                                                            P256ECDHDerivedSecret & out_secret) const
 {
