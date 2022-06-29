@@ -1,11 +1,11 @@
 #include "CHIPCommandStorageDelegate.h"
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 #include <crypto/CHIPCryptoPAL.h>
 
-@interface CHIPToolKeypair : NSObject <CHIPKeypair>
+@interface CHIPToolKeypair : NSObject <MTRKeypair>
 - (BOOL)initialize;
 - (NSData *)ECDSA_sign_message_raw:(NSData *)message;
-- (SecKeyRef)pubkey;
+- (SecKeyRef)publicKey;
 - (CHIP_ERROR)Serialize:(chip::Crypto::P256SerializedKeypair &)output;
 - (CHIP_ERROR)Deserialize:(chip::Crypto::P256SerializedKeypair &)input;
 - (CHIP_ERROR)createOrLoadKeys:(CHIPToolPersistentStorageDelegate *)storage;

@@ -113,12 +113,12 @@
 
 - (void)fillNetworkConfigWithDefaults
 {
-    NSString * networkSSID = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
+    NSString * networkSSID = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey);
     if ([networkSSID length] > 0) {
         self.networkSSID.text = networkSSID;
     }
 
-    NSString * networkPassword = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkPasswordDefaultsKey);
+    NSString * networkPassword = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey);
     if ([networkPassword length] > 0) {
         self.networkPassword.text = networkPassword;
     }
@@ -129,11 +129,11 @@
 - (IBAction)saveCredientials:(id)sender
 {
     if ([self.networkSSID.text length] > 0) {
-        CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey, self.networkSSID.text);
+        CHIPSetDomainValueForKey(MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey, self.networkSSID.text);
     }
 
     if ([self.networkPassword.text length] > 0) {
-        CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkPasswordDefaultsKey, self.networkPassword.text);
+        CHIPSetDomainValueForKey(MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey, self.networkPassword.text);
     }
 
     [self.navigationController popViewControllerAnimated:YES];
@@ -142,11 +142,11 @@
 - (IBAction)clearCredientials:(id)sender
 {
     if ([self.networkSSID.text length] > 0) {
-        CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey, nil);
+        CHIPSetDomainValueForKey(MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey, nil);
     }
 
     if ([self.networkPassword.text length] > 0) {
-        CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkPasswordDefaultsKey, nil);
+        CHIPSetDomainValueForKey(MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey, nil);
     }
 
     self.networkSSID.text = @"";

@@ -146,7 +146,7 @@
     [self resignFirstResponder];
 }
 
-// MARK: CHIPDeviceControllerDelegate
+// MARK: MTRDeviceControllerDelegate
 - (void)deviceControllerOnConnected
 {
     NSLog(@"Status: Device connected");

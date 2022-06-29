@@ -131,7 +131,7 @@ async function asObjectiveCClass(type, cluster, options)
   }
 
   if (isStruct) {
-    return `CHIP${appHelper.asUpperCamelCase(cluster)}Cluster${appHelper.asUpperCamelCase(type)}`;
+    return `MTR${appHelper.asUpperCamelCase(cluster)}Cluster${appHelper.asUpperCamelCase(type)}`;
   }
 
   return 'NSNumber';
@@ -204,7 +204,7 @@ function objCEnumName(clusterName, enumLabel)
     enumLabel = enumLabel.substring(0, enumLabel.length - "Enum".length);
   }
 
-  return "CHIP" + clusterName + enumLabel;
+  return "MTR" + clusterName + enumLabel;
 }
 
 function objCEnumItemLabel(itemLabel)

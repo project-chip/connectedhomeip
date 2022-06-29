@@ -1,0 +1,80 @@
+{{> header}}
+
+#import <Foundation/Foundation.h>
+
+#import <Matter/MTRAttributeCacheContainer.h>
+
+#import <Matter/MTRCluster.h>
+#import <Matter/MTRCommandPayloadsObjc.h>
+
+typedef void (^ResponseHandler)(id _Nullable value, NSError * _Nullable error);
+typedef void (^StatusCompletion)(NSError * _Nullable error);
+typedef void (^SubscriptionEstablishedHandler)(void);
+
+NS_ASSUME_NONNULL_BEGIN
+
+{{#chip_client_clusters includeAll=true}}
+
+
+/**
+ * Cluster {{name}}
+ *    {{description}}
+ */
+@interface MTR{{asUpperCamelCase name}} : MTRCluster
+
+{{#chip_cluster_commands}}
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=.}})completionHandler;
+{{#unless (hasArguments)}}
+- (void){{asLowerCamelCase name}}WithCompletionHandler:({{>command_completion_type command=.}})completionHandler;
+{{/unless}}
+{{/chip_cluster_commands}}
+
+{{#chip_server_cluster_attributes}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
+- (void)read{{>attribute}}With
+{{~#if_is_fabric_scoped_struct type~}}
+  Params:(MTRReadParams * _Nullable)params completionHandler:
+{{~else~}}
+  CompletionHandler:
+{{~/if_is_fabric_scoped_struct~}}
+(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler;
+{{#if isWritableAttribute}}
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler;
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(MTRWriteParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler;
+{{/if}}
+{{#if isReportableAttribute}}
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval
+       params:(MTRSubscribeParams * _Nullable)params
+subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler;
+{{/if}}
+{{/chip_server_cluster_attributes}}
+
+@end
+
+{{/chip_client_clusters}}
+
+{{#zcl_clusters}}
+{{#zcl_enums}}
+typedef NS_ENUM({{asUnderlyingZclType name}}, {{objCEnumName ../name label}}) {
+   {{#zcl_enum_items}}
+   {{objCEnumName ../../name ../label}}{{objCEnumItemLabel label}} = {{asHex value 2}},
+   {{/zcl_enum_items}}
+};
+
+{{/zcl_enums}}
+{{#zcl_bitmaps}}
+typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName ../name label}}) {
+   {{#zcl_bitmap_items}}
+   {{objCEnumName ../../name ../label}}{{objCEnumItemLabel label}} = {{asHex mask}},
+   {{/zcl_bitmap_items}}
+};
+
+{{/zcl_bitmaps}}
+{{/zcl_clusters}}
+
+NS_ASSUME_NONNULL_END
