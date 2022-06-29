@@ -85,7 +85,7 @@ public:
     void RevertPendingKeypair() override;
     CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
                                  Crypto::P256ECDSASignature & outSignature) const override;
-    Crypto::P256Keypair * AllocateEphemeralKeypair() override;
+    Crypto::P256Keypair * AllocateEphemeralKeypairForCASE() override;
     void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) override;
 
 protected:

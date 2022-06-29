@@ -397,7 +397,7 @@ CHIP_ERROR CASESession::SendSigma1()
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
     // Generate an ephemeral keypair
-    mEphemeralKey = mFabricsTable->AllocateEphemeralKeypair();
+    mEphemeralKey = mFabricsTable->AllocateEphemeralKeypairForCASE();
     VerifyOrReturnError(mEphemeralKey != nullptr, CHIP_ERROR_NO_MEMORY);
     ReturnErrorOnFailure(mEphemeralKey->Initialize());
 
@@ -725,7 +725,7 @@ CHIP_ERROR CASESession::SendSigma2()
     ReturnErrorOnFailure(DRBG_get_bytes(&msg_rand[0], sizeof(msg_rand)));
 
     // Generate an ephemeral keypair
-    mEphemeralKey = mFabricsTable->AllocateEphemeralKeypair();
+    mEphemeralKey = mFabricsTable->AllocateEphemeralKeypairForCASE();
     VerifyOrReturnError(mEphemeralKey != nullptr, CHIP_ERROR_NO_MEMORY);
     ReturnErrorOnFailure(mEphemeralKey->Initialize());
 

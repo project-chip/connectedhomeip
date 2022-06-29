@@ -296,7 +296,7 @@ CHIP_ERROR PersistentStorageOperationalKeystore::SignWithOpKeypair(FabricIndex f
     return SignWithStoredOpKey(fabricIndex, mStorage, message, outSignature);
 }
 
-Crypto::P256Keypair * PersistentStorageOperationalKeystore::AllocateEphemeralKeypair()
+Crypto::P256Keypair * PersistentStorageOperationalKeystore::AllocateEphemeralKeypairForCASE()
 {
     // DO NOT CUT AND PASTE without considering the ReleaseEphemeralKeypair().
     // If allocating a derived class, then `ReleaseEphemeralKeypair` MUST
@@ -306,8 +306,8 @@ Crypto::P256Keypair * PersistentStorageOperationalKeystore::AllocateEphemeralKey
 
 void PersistentStorageOperationalKeystore::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
 {
-    // DO NOT CUT AND PASTE without considering the AllocateEphemeralKeypair().
-    // This must delete the same concrete class as allocated in `AllocateEphemeralKeypair`
+    // DO NOT CUT AND PASTE without considering the AllocateEphemeralKeypairForCASE().
+    // This must delete the same concrete class as allocated in `AllocateEphemeralKeypairForCASE`
     Platform::Delete<Crypto::P256Keypair>(keypair);
 }
 

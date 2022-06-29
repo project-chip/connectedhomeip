@@ -1756,7 +1756,7 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
         Crypto::P256ECDSASignature sig;
         uint8_t message[] = { 'm', 's', 'g' };
 
-        Crypto::P256Keypair * ephemeralKeypair = fabricTable.AllocateEphemeralKeypair();
+        Crypto::P256Keypair * ephemeralKeypair = fabricTable.AllocateEphemeralKeypairForCASE();
         NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
         NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
 
@@ -1783,7 +1783,7 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
         Crypto::P256ECDSASignature sig;
         uint8_t message[] = { 'm', 's', 'g' };
 
-        Crypto::P256Keypair * ephemeralKeypair = fabricTable.AllocateEphemeralKeypair();
+        Crypto::P256Keypair * ephemeralKeypair = fabricTable.AllocateEphemeralKeypairForCASE();
         NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
         NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
 

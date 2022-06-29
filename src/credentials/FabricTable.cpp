@@ -1334,11 +1334,11 @@ CHIP_ERROR FabricTable::ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-Crypto::P256Keypair * FabricTable::AllocateEphemeralKeypair()
+Crypto::P256Keypair * FabricTable::AllocateEphemeralKeypairForCASE()
 {
     if (mOperationalKeystore != nullptr)
     {
-        return mOperationalKeystore->AllocateEphemeralKeypair();
+        return mOperationalKeystore->AllocateEphemeralKeypairForCASE();
     }
 
     return Platform::New<Crypto::P256Keypair>();

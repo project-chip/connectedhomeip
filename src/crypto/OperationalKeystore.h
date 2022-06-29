@@ -174,8 +174,12 @@ public:
      *
      * The caller must Initialize() the P256Keypair if needed. It is not done by this method.
      *
-     * NOTE: There may be more than one of these in use concurrently, so implementations have to
-     *       be careful to avoid assuming a single instance.
+     * This method MUST ONLY be used for CASESession ephemeral keys.
+     *
+     * NOTE: The stack will allocate as many of these as there are CASE sessions which
+     *       can be concurrently in the process of establishment. Implementations must
+     *       support more than one such keypair, or be implemented to match the limitations
+     *       enforced by a given product on its concurrent CASE session establishment limits.
      *
      * WARNING: The return value MUST be released by `ReleaseEphemeralKeypair`. This is because
      *          Matter CHIPMem.h does not properly support UniquePtr in a way that would
@@ -184,10 +188,10 @@ public:
      * @return a pointer to a P256Keypair (or derived class thereof), which may evaluate to nullptr
      *         if running out of memory.
      */
-    virtual Crypto::P256Keypair * AllocateEphemeralKeypair() = 0;
+    virtual Crypto::P256Keypair * AllocateEphemeralKeypairForCASE() = 0;
 
     /**
-     * @brief Release an ephemeral keypair previously provided by `AllocateEphemeralKeypair()`
+     * @brief Release an ephemeral keypair previously provided by `AllocateEphemeralKeypairForCASE()`
      */
     virtual void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) = 0;
 };

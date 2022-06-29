@@ -595,10 +595,10 @@ public:
      * @return a pointer to a dynamically P256Keypair (or derived class thereof), which may evaluate to nullptr
      *         if running out of memory.
      */
-    Crypto::P256Keypair * AllocateEphemeralKeypair();
+    Crypto::P256Keypair * AllocateEphemeralKeypairForCASE();
 
     /**
-     * @brief Release an ephemeral keypair previously created by `AllocateEphemeralKeypair()`
+     * @brief Release an ephemeral keypair previously created by `AllocateEphemeralKeypairForCASE()`
      */
     void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair);
 

@@ -205,7 +205,7 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
     Crypto::P256ECDSASignature sig;
     uint8_t message[] = { 'm', 's', 'g' };
 
-    Crypto::P256Keypair * ephemeralKeypair = opKeyStore.AllocateEphemeralKeypair();
+    Crypto::P256Keypair * ephemeralKeypair = opKeyStore.AllocateEphemeralKeypairForCASE();
     NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
     NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
 
