@@ -433,7 +433,7 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
     CHIP_ERROR err = packetHeader.DecodeAndConsume(msg);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Inet, "Malformed message received: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Inet, "Failed to deode packet header: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
 
