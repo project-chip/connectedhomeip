@@ -24,18 +24,21 @@ using namespace chip::app::Clusters;
 - (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
 {
     if (self = [super initWithQueue:queue]) {
-        if (device == nullptr) {
+        if (device == nil) {
             return nil;
         }
 
-        _cppCluster.reset(&[device internalDevice]->GetExchangeManager(), [device internalDevice]->GetSecureSession().Value(), endpoint);
+        *[self cppClusterSlot] = new chip::Controller::{{asUpperCamelCase name}}Cluster(*[device internalDevice]->GetExchangeManager(), [device internalDevice]->GetSecureSession().Value(), endpoint);
+        if (self.cppCluster == nullptr) {
+            return nil;
+        }
     }
     return self;
 }
 
-- (chip::Controller::{{asUpperCamelCase name}}Cluster) cppCluster
+- (chip::Controller::{{asUpperCamelCase name}}Cluster **) cppClusterSlot
 {
-    return *_cppCluster.get();
+    return &_cppCluster;
 }
 
 {{#chip_cluster_commands}}
@@ -91,7 +94,7 @@ using namespace chip::app::Clusters;
       ^(Cancelable * success, Cancelable * failure) {
         auto successFn = Callback<{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+        return self.cppCluster->InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
     });
 }
 {{/chip_cluster_commands}}
@@ -114,7 +117,7 @@ using namespace chip::app::Clusters;
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
           auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-          return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall
+          return self.cppCluster->ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall
           {{~#if_is_fabric_scoped_struct type~}}
           , params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]
           {{~/if_is_fabric_scoped_struct~}}
@@ -156,7 +159,7 @@ using namespace chip::app::Clusters;
         {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
         auto successFn = Callback<{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall, timedWriteTimeout);
+        return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall, timedWriteTimeout);
     });
     
 }
@@ -179,7 +182,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
           auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-          return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [minInterval unsignedShortValue], [maxInterval unsignedShortValue], MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished, nil,
+          return self.cppCluster->SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [minInterval unsignedShortValue], [maxInterval unsignedShortValue], MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished, nil,
               params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
               params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]
           );
@@ -212,6 +215,13 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 {{/if}}
 {{/chip_server_cluster_attributes}}
+
+- (void)dealloc
+{
+    if (self.cppCluster != nullptr) {
+        delete self.cppCluster;
+    }
+}
 
 @end
 
