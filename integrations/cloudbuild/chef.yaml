@@ -17,7 +17,7 @@ steps:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
-              ./examples/chef/chef.py --build_all
+              ./examples/chef/chef.py --build_all --keep_going
       id: CompileAll
       waitFor:
           - Bootstrap
