@@ -328,6 +328,15 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     }
 }
 
+bool emberAfBridgedActionsClusterInstantActionCallback(app::CommandHandler * commandObj,
+                                                       const app::ConcreteCommandPath & commandPath,
+                                                       const BridgedActions::Commands::InstantAction::DecodableType & commandData)
+{
+    // No actions are implemented
+    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
 const EmberAfDeviceType gBridgedRootDeviceTypes[] = { { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT },
                                                       { DEVICE_TYPE_BRIDGE, DEVICE_VERSION_DEFAULT } };
 
