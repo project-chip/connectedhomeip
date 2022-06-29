@@ -241,7 +241,7 @@
 	path = third_party/ti_simplelink_sdk/repo_cc32xx
 	url = https://github.com/TexasInstruments/cc32xx_open_sdk.git
 	branch = main
-	platform = cc32xx
+	platforms = cc32xx
 [submodule "third_party/nxp/mw320_sdk/repo"]
 	path = third_party/nxp/mw320_sdk/repo
 	url = https://github.com/nxptest/mw320_sdk
