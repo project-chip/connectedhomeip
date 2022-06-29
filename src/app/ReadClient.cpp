@@ -33,7 +33,7 @@
 
 namespace chip {
 namespace app {
-
+using Status = Protocols::InteractionModel::Status;
 /**
  * @brief The default resubscribe policy will pick a random timeslot
  * with millisecond resolution over an ever increasing window,
@@ -402,9 +402,11 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
         VerifyOrExit(apExchangeContext == mExchange.Get(), err = CHIP_ERROR_INCORRECT_STATE);
+
+        CHIP_ERROR statusError = CHIP_NO_ERROR;
+        SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
         suppressErrorStatusResponse = true;
-        err                         = StatusResponse::ProcessStatusResponse(std::move(aPayload));
-        SuccessOrExit(err);
+        SuccessOrExit(err = statusError);
     }
     else
     {
@@ -412,10 +414,10 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     }
 
 exit:
-    return NotifyResult(err, apExchangeContext, suppressErrorStatusResponse);
+    return ResponseMessageHandled(err, apExchangeContext, suppressErrorStatusResponse);
 }
 
-CHIP_ERROR ReadClient::NotifyResult(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
+CHIP_ERROR ReadClient::ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
                                     bool aSuppressErrorStatusResponse)
 {
     CHIP_ERROR err = aError;
@@ -423,12 +425,16 @@ CHIP_ERROR ReadClient::NotifyResult(CHIP_ERROR aError, Messaging::ExchangeContex
     {
         if (!aSuppressErrorStatusResponse)
         {
-            err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext,
+            err = StatusResponse::Send(Status::InvalidAction, apExchangeContext,
                                        false /*aExpectResponse*/);
+            if (err == CHIP_NO_ERROR)
+            {
+                mpExchangeCtx = nullptr;
+            }
         }
     }
 
-    if ((!IsSubscriptionType() && !mPendingMoreChunks) || aError != CHIP_NO_ERROR)
+    if ((!IsSubscriptionType() && !mPendingMoreChunks) || err != CHIP_NO_ERROR)
     {
         Close(aError);
     }
@@ -561,9 +567,9 @@ exit:
     if (!suppressResponse)
     {
         bool noResponseExpected = IsSubscriptionActive() && !mPendingMoreChunks;
-        err                     = StatusResponse::Send(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
-                                                        : Protocols::InteractionModel::Status::Failure,
-                                   mExchange.Get(), !noResponseExpected);
+        err                     = StatusResponse::Send(err == CHIP_NO_ERROR ? Status::Success
+                                                        : Status::Failure,
+                                   mExchange.Get(),, !noResponseExpected);
     }
 
     mIsPrimingReports = false;

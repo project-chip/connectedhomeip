@@ -276,20 +276,12 @@ private:
     CHIP_ERROR ProcessInvokeResponse(System::PacketBufferHandle && payload);
     CHIP_ERROR ProcessInvokeResponseIB(InvokeResponseIB::Parser & aInvokeResponse);
 
-    // Handle a message received when we are expecting a status response to a
-    // Timed Request.  The caller is assumed to have already checked that our
-    // exchange context member is the one the message came in on.
-    //
-    // If the server returned an error status, that will be returned as an error
-    // value of CHIP_ERROR.
-    CHIP_ERROR HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-
     // Send our queued-up Invoke Request message.  Assumes the exchange is ready
     // and mPendingInvokeData is populated.
     CHIP_ERROR SendInvokeRequest();
 
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
-    CHIP_ERROR NotifyResult(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext, bool aSuppressErrorStatusResponse);
+    CHIP_ERROR ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext, bool aSuppressErrorStatusResponse);
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback * mpCallback                      = nullptr;
