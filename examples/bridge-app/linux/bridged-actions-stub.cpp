@@ -64,10 +64,12 @@ CHIP_ERROR BridgedActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint
         {
             if (action->getIsVisible())
             {
-                BridgedActions::Structs::ActionStruct::Type actionStruct = {
-                    action->getActionId(),  CharSpan::fromCharString(action->getName().c_str()), action->getType(),
-                    action->getEndpointListId(), action->getSupportedCommands(), action->getStatus()
-                };
+                BridgedActions::Structs::ActionStruct::Type actionStruct = { action->getActionId(),
+                                                                             CharSpan::fromCharString(action->getName().c_str()),
+                                                                             action->getType(),
+                                                                             action->getEndpointListId(),
+                                                                             action->getSupportedCommands(),
+                                                                             action->getStatus() };
                 ReturnErrorOnFailure(encoder.Encode(actionStruct));
             }
         }

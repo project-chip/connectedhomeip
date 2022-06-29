@@ -24,8 +24,8 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <app/chip-zcl-zpro-codec.h>
 #include <app/EventLogging.h>
+#include <app/chip-zcl-zpro-codec.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
@@ -659,7 +659,7 @@ void runOnOffRoomAction(Room * room, bool actionOn, EndpointId endpointId, uint1
 {
     if (hasInvokeID)
     {
-        BridgedActions::Events::StateChanged::Type event { actionID, invokeID, BridgedActions::ActionStateEnum::kActive };
+        BridgedActions::Events::StateChanged::Type event{ actionID, invokeID, BridgedActions::ActionStateEnum::kActive };
         EventNumber eventNumber;
         chip::app::LogEvent(event, endpointId, eventNumber);
     }
@@ -684,7 +684,7 @@ void runOnOffRoomAction(Room * room, bool actionOn, EndpointId endpointId, uint1
 
     if (hasInvokeID)
     {
-        BridgedActions::Events::StateChanged::Type event { actionID, invokeID, BridgedActions::ActionStateEnum::kInactive };
+        BridgedActions::Events::StateChanged::Type event{ actionID, invokeID, BridgedActions::ActionStateEnum::kInactive };
         EventNumber eventNumber;
         chip::app::LogEvent(event, endpointId, eventNumber);
     }
@@ -694,15 +694,15 @@ bool emberAfBridgedActionsClusterInstantActionCallback(app::CommandHandler * com
                                                        const app::ConcreteCommandPath & commandPath,
                                                        const BridgedActions::Commands::InstantAction::DecodableType & commandData)
 {
-    bool hasInvokeID = false;
-    uint32_t invokeID = 0;
+    bool hasInvokeID      = false;
+    uint32_t invokeID     = 0;
     EndpointId endpointID = commandPath.mEndpointId;
-    auto & actionID = commandData.actionID;
+    auto & actionID       = commandData.actionID;
 
     if (commandData.invokeID.HasValue())
     {
         hasInvokeID = true;
-        invokeID = commandData.invokeID.Value();
+        invokeID    = commandData.invokeID.Value();
     }
 
     if (actionID == action1.getActionId() && action1.getIsVisible() && room1.getIsVisible())
