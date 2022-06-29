@@ -32,6 +32,7 @@
 #include <app/RequiredPrivilege.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
+#include <lib/core/CHIPTLVData.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/TypeTraits.h>
 #include <protocols/secure_channel/Constants.h>
@@ -247,14 +248,12 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
 namespace {
 // We use this when the sender did not actually provide a CommandFields struct,
 // to avoid downstream consumers having to worry about cases when there is or is
-// not a struct available.
-//
-// The encoding here is:
-// Control byte: Struct, anonymous tag (since we can't use a context tag at top
-//               level, and consumers should not care about the tag here).
-// End of container.
+// not a struct available.  We use an empty struct with anonymous tag, since we
+// can't use a context tag at top level, and consumers should not care about the
+// tag here).
 constexpr uint8_t sNoFields[] = {
-    0b00010101 /* struct, anonymous tag */, 0b00011000 /* End of container */
+    CHIP_TLV_STRUCTURE(CHIP_TLV_TAG_ANONYMOUS),
+    CHIP_TLV_END_OF_CONTAINER,
 };
 } // anonymous namespace
 
