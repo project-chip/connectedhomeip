@@ -719,7 +719,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         return CHIP_NO_ERROR;
     }
 
-    chip::FabricInfo * otherFabric = fabricTable->FindFabricWithIndex(fabricIndex);
+    const chip::FabricInfo * otherFabric = fabricTable->FindFabricWithIndex(fabricIndex);
     if (!otherFabric) {
         // Should not happen...
         return CHIP_ERROR_INCORRECT_STATE;

@@ -400,22 +400,6 @@ public:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     const FabricInfo * FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId) const;
-
-    /**
-     * @brief Get a mutable FabricInfo entry from the table by FabricIndex.
-     *
-     * NOTE: This is private for use within the FabricTable itself. All mutations have to go through the
-     *       FabricTable public methods that take a FabricIndex so that there are no mutations about which
-     *       the FabricTable is unaware, since this would break expectations regarding shadow/pending
-     *       entries used during fail-safe.
-     *
-     * TODO(#19929): Need to make this const and private, but can't just yet.
-     *
-     * @param fabricIndex - fabric index for which to get the FabricInfo entry/
-     * @return the FabricInfo entry for the fabricIndex if found, or nullptr if not found
-     */
-    FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
-
     const FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex) const;
     const FabricInfo * FindFabricWithCompressedId(CompressedFabricId compressedFabricId) const;
 
@@ -504,6 +488,19 @@ public:
     }
     ConstFabricIterator begin() const { return cbegin(); }
     ConstFabricIterator end() const { return cend(); }
+
+    /**
+     * @brief Get a mutable FabricInfo entry from the table by FabricIndex.
+     *
+     * NOTE: This is private for use within the FabricTable itself. All mutations have to go through the
+     *       FabricTable public methods that take a FabricIndex so that there are no mutations about which
+     *       the FabricTable is unaware, since this would break expectations regarding shadow/pending
+     *       entries used during fail-safe.
+     *
+     * @param fabricIndex - fabric index for which to get a mutable FabricInfo entry
+     * @return the FabricInfo entry for the fabricIndex if found, or nullptr if not found
+     */
+    FabricInfo * GetMutableFabricByIndex(FabricIndex fabricIndex);
 
     /**
      * @brief Get the RCAC (operational root certificate) associated with a fabric.

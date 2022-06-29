@@ -467,7 +467,7 @@ const FabricInfo * FabricTable::FindFabric(const Crypto::P256PublicKey & rootPub
     return nullptr;
 }
 
-FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex)
+FabricInfo * FabricTable::GetMutableFabricByIndex(FabricIndex fabricIndex)
 {
     // Try to match pending fabric first if available
     if (HasPendingFabricUpdate() && (mPendingFabric.GetFabricIndex() == fabricIndex))
@@ -870,13 +870,13 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
 
-    FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
+    FabricInfo * fabricInfo = GetMutableFabricByIndex(fabricIndex);
     if (fabricInfo == &mPendingFabric)
     {
         // Asked to Delete while pending an update: reset the pending state and
         // get back to the underlying fabric data for existing fabric.
         RevertPendingFabricData();
-        fabricInfo = FindFabricWithIndex(fabricIndex);
+        fabricInfo = GetMutableFabricByIndex(fabricIndex);
     }
 
     bool fabricIsInitialized = fabricInfo != nullptr && fabricInfo->IsInitialized();
@@ -1053,7 +1053,7 @@ void FabricTable::Forget(FabricIndex fabricIndex)
 {
     ChipLogProgress(FabricProvisioning, "Forgetting fabric 0x%x", static_cast<unsigned>(fabricIndex));
 
-    auto * fabricInfo = FindFabricWithIndex(fabricIndex);
+    auto * fabricInfo = GetMutableFabricByIndex(fabricIndex);
     VerifyOrReturn(fabricInfo != nullptr);
 
     RevertPendingFabricData();
@@ -1741,7 +1741,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
     }
 
     // Make sure we actually have a pending fabric
-    FabricInfo * pendingFabricEntry = FindFabricWithIndex(fabricIndexBeingCommitted);
+    FabricInfo * pendingFabricEntry = GetMutableFabricByIndex(fabricIndexBeingCommitted);
 
     if (isUpdating && hasPending && !hasInvalidInternalState)
     {
@@ -1828,7 +1828,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
         if (isUpdating)
         {
             // This will get the non-pending fabric
-            FabricInfo * existingFabricToUpdate = FindFabricWithIndex(fabricIndexBeingCommitted);
+            FabricInfo * existingFabricToUpdate = GetMutableFabricByIndex(fabricIndexBeingCommitted);
 
             // Multiple interlocks validated the below, so it's fatal if we are somehow incoherent here
             VerifyOrDie((existingFabricToUpdate != nullptr) && (existingFabricToUpdate != &mPendingFabric));
@@ -1839,7 +1839,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
         }
 
         // Store pending metadata first
-        FabricInfo * liveFabricEntry = FindFabricWithIndex(fabricIndexBeingCommitted);
+        FabricInfo * liveFabricEntry = GetMutableFabricByIndex(fabricIndexBeingCommitted);
         VerifyOrDie(liveFabricEntry != nullptr);
 
         CHIP_ERROR metadataErr = StoreFabricMetadata(liveFabricEntry);
@@ -2000,7 +2000,7 @@ CHIP_ERROR FabricTable::SetFabricLabel(FabricIndex fabricIndex, const CharSpan &
 
     ReturnErrorCodeIf(fabricLabel.size() > kFabricLabelMaxLengthInBytes, CHIP_ERROR_INVALID_ARGUMENT);
 
-    FabricInfo * fabricInfo  = FindFabricWithIndex(fabricIndex);
+    FabricInfo * fabricInfo  = GetMutableFabricByIndex(fabricIndex);
     bool fabricIsInitialized = (fabricInfo != nullptr) && fabricInfo->IsInitialized();
     VerifyOrReturnError(fabricIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 

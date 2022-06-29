@@ -244,7 +244,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteReadAttributePat
     return CHIP_NO_ERROR;
 }
 
-FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
+const FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
 {
     FabricIndex index = aCommandHandler->GetAccessingFabricIndex();
     ChipLogDetail(Zcl, "OpCreds: Finding fabric with fabricIndex 0x%x", static_cast<unsigned>(index));
@@ -282,7 +282,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
         CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
         if (caseSessionManager)
         {
-            FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+            const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
             VerifyOrReturn(fabricInfo != nullptr);
 
             caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetFabricIndex());
@@ -489,7 +489,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
 
     // Fetch current fabric
-    FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
+    const FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
     if (fabric == nullptr)
     {
         SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kInsufficientPrivilege, ourFabricIndex,
@@ -607,8 +607,8 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     CHIP_ERROR err             = CHIP_NO_ERROR;
     FabricIndex newFabricIndex = kUndefinedFabricIndex;
     Credentials::GroupDataProvider::KeySet keyset;
-    FabricInfo * newFabricInfo = nullptr;
-    auto & fabricTable         = Server::GetInstance().GetFabricTable();
+    const FabricInfo * newFabricInfo = nullptr;
+    auto & fabricTable               = Server::GetInstance().GetFabricTable();
 
     auto * secureSession   = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
@@ -781,9 +781,9 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     ChipLogProgress(Zcl, "OpCreds: Received an UpdateNOC command");
 
-    auto & fabricTable      = Server::GetInstance().GetFabricTable();
-    auto & failSafeContext  = Server::GetInstance().GetFailSafeContext();
-    FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
+    auto & fabricTable            = Server::GetInstance().GetFabricTable();
+    auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
+    const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
 
     bool csrWasForUpdateNoc = false; //< Output param of HasPendingOperationalKey
     bool hasPendingKey      = fabricTable.HasPendingOperationalKey(csrWasForUpdateNoc);
@@ -1011,7 +1011,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
         commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     failSafeContext.SetCsrRequestForUpdateNoc(isForUpdateNoc);
-    FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
+    const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
 
     VerifyOrExit(CSRNonce.size() == Credentials::kExpectedAttestationNonceSize, finalStatus = Status::InvalidCommand);
 
