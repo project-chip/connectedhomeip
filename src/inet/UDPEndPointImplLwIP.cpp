@@ -133,7 +133,7 @@ CHIP_ERROR UDPEndPointImplLwIP::LwIPBindInterface(struct udp_pcb * aUDP, Interfa
 InterfaceId UDPEndPointImplLwIP::GetBoundInterface() const
 {
 #if HAVE_LWIP_UDP_BIND_NETIF
-    return InterfaceId(netif_get_by_index(mUDP->netif_idx));
+    return InterfaceId(netif_get_by_index(mUDP->netif_idx + 1));
 #else
     return InterfaceId(mUDP->intf_filter);
 #endif
