@@ -24,6 +24,7 @@
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DefaultAttributePersistenceProvider.h>
+#include <app/FailSafeContext.h>
 #include <app/OperationalDeviceProxyPool.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/server/AclStorage.h>
@@ -327,6 +328,8 @@ public:
 
     PersistentStorageDelegate & GetPersistentStorage() { return *mDeviceStorage; }
 
+    app::FailSafeContext & GetFailSafeContext() { return mFailSafeContext; }
+
     TestEventTriggerDelegate * GetTestEventTriggerDelegate() { return mTestEventTriggerDelegate; }
 
     Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
@@ -500,6 +503,7 @@ private:
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
     Crypto::OperationalKeystore * mOperationalKeystore;
     Credentials::OperationalCertificateStore * mOpCertStore;
+    app::FailSafeContext mFailSafeContext;
 
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;

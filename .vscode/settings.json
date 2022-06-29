@@ -111,7 +111,11 @@
         "ratio": "cpp",
         "set": "cpp",
         "stack": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "condition_variable": "cpp",
+        "numeric": "cpp",
+        "random": "cpp",
+        "thread": "cpp"
     },
     "files.eol": "\n",
     "editor.formatOnSave": true,

@@ -32,6 +32,7 @@ tests:
     - label:
           "TH sends Identify command to DUT, with the identify time field set to
           0x003c (60s)."
+      PICS: I.S.C00.Rsp
       command: "Identify"
       arguments:
           values:
@@ -39,6 +40,7 @@ tests:
                 value: 60
 
     - label: "TH reads immediately IdentifyTime attribute from DUT1"
+      PICS: I.S.A0000
       command: "readAttribute"
       attribute: "identify time"
       response:
@@ -55,6 +57,7 @@ tests:
                 value: 10000
 
     - label: "After 10 seconds, the TH reads IdentifyTime attribute from DUT"
+      PICS: I.S.A0000
       command: "readAttribute"
       attribute: "identify time"
       response:
@@ -81,6 +84,7 @@ tests:
     - label:
           "TH sends Identify command to DUT, with the identify time field set to
           0x0000 (stop identifying)."
+      PICS: I.S.C00.Rsp
       command: "Identify"
       arguments:
           values:
@@ -88,6 +92,7 @@ tests:
                 value: 0
 
     - label: "TH reads immediately IdentifyTime attribute from DUT2"
+      PICS: I.S.A0000
       command: "readAttribute"
       attribute: "identify time"
       response:
@@ -109,6 +114,7 @@ tests:
 
     - label:
           "TH writes a value of 0x000f (15s) to IdentifyTime attribute of DUT"
+      PICS: I.S.A0000
       command: "writeAttribute"
       attribute: "identify time"
       arguments:
@@ -123,6 +129,7 @@ tests:
                 value: 5000
 
     - label: "After 5 seconds, the TH reads IdentifyTime attribute from DUT"
+      PICS: I.S.A0000
       command: "readAttribute"
       attribute: "identify time"
       response:

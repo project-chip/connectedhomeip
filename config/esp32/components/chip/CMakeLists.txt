@@ -157,6 +157,7 @@ endif()
 
 if (CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER)
     chip_gn_arg_append("chip_use_transitional_commissionable_data_provider" "false")
+    chip_gn_arg_append("chip_use_factory_data_provider"                     "true")
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")

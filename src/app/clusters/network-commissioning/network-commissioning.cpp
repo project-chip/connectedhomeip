@@ -23,6 +23,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/general-commissioning-server/general-commissioning-server.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -300,7 +301,7 @@ void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & respon
 
 bool CheckFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
 {
-    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & failSafeContext = chip::Server::GetInstance().GetFailSafeContext();
 
     if (failSafeContext.IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex()))
     {
