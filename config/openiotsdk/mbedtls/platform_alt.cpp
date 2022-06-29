@@ -23,6 +23,7 @@
  */
 
 #include "mbedtls/platform.h"
+#include "mbedtls/threading.h"
 
 #ifdef MBEDTLS_PLATFORM_SETUP_TEARDOWN_ALT
 
@@ -43,7 +44,7 @@ static int mbedtls_platform_nv_seed_write(unsigned char * buf, size_t buf_len)
 {
     return 0;
 }
-#endif /* MBEDTLS_PLATFORM_NV_SEED_ALT*/
+#endif /* MBEDTLS_PLATFORM_NV_SEED_ALT */
 
 int mbedtls_platform_setup(mbedtls_platform_context * ctx)
 {
@@ -56,7 +57,10 @@ int mbedtls_platform_setup(mbedtls_platform_context * ctx)
     {
         return ret;
     }
-#endif
+#endif /* MBEDTLS_PLATFORM_NV_SEED_ALT */
+#ifdef MBEDTLS_THREADING_ALT
+    mbedtls_threading_set_cmsis_rtos();
+#endif /* MBEDTLS_THREADING_ALT */
     return ret;
 }
 
@@ -65,4 +69,4 @@ void mbedtls_platform_teardown(mbedtls_platform_context * ctx)
     (void) ctx;
 }
 
-#endif /* MBEDTLS_PLATFORM_SETUP_TEARDOWN_ALT*/
+#endif /* MBEDTLS_PLATFORM_SETUP_TEARDOWN_ALT */

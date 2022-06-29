@@ -113,6 +113,11 @@ if(TARGET mbedtls-config)
         INTERFACE
             MBEDTLS_CONFIG_FILE="mbedtls_config.h"
     )
+
+    target_link_libraries(mbedtls-config
+        INTERFACE
+            mbedtls-threading-cmsis-rtos
+    )
 endif()
 
 # Declare RTOS interface target
