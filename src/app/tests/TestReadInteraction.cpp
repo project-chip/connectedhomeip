@@ -2833,8 +2833,8 @@ void TestReadInteraction::TestReadInvalidMessage2(nlTestSuite * apSuite, void * 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-// Read Client creates the subscription with server, server sends chunked reports, in the middle of procedure,
-// client sends write request message and fails to process it and send status report, client
+// Read Client creates the subscription with server, server sends chunked reports, after the hander sends out the first chunked report,
+// handle call unknow message function and send status report, client
 // and server would be closed
 void TestReadInteraction::TestSubscribeInvalidMessage1(nlTestSuite * apSuite, void * apContext)
 {
@@ -2878,11 +2878,17 @@ void TestReadInteraction::TestSubscribeInvalidMessage1(nlTestSuite * apSuite, vo
         ReadRequestMessage::Builder request;
         System::PacketBufferTLVWriter writer;
 
+        /*
+         //TODO: Send real unknown message to trigger unknown message flow in handler
         chip::app::InitWriterWithSpaceReserved(writer, 0);
         err = request.Init(&writer);
         err = writer.Finalize(&msgBuf);
         err = readClient.mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+
+        */
+        delegate.mpReadHandler = engine->ActiveHandlerAt(0);
+        delegate.mpReadHandler->OnUnknownMsgType();
         ctx.DeliverOneMessage();
 
         NL_TEST_ASSERT(apSuite, delegate.mError != CHIP_NO_ERROR);
