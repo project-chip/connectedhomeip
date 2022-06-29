@@ -26,9 +26,8 @@ _bootstrap_or_activate() {
 
     local _CONFIG_FILE="scripts/environment.json"
 
-    if [ "$_BOOTSTRAP_NAME" = "no_cipd_bootstrap.sh" ]; then
-        _CONFIG_FILE="scripts/environment_no_cipd.json"
-        _BOOTSTRAP_NAME="bootstrap.sh"
+    if [ ! -z "$2" ]; then
+        _CONFIG_FILE="$2"
     fi
 
     if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ] ||
@@ -88,7 +87,7 @@ EOF
     fi
 }
 
-_bootstrap_or_activate "$0"
+_bootstrap_or_activate "$0" "$1"
 unset -f _bootstrap_or_activate
 
 pw_cleanup
