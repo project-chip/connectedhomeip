@@ -81,7 +81,7 @@ mbedtls_target("mbedtls") {
 
   if (mbedtls_use_tinycrypt) {
     if (!defined(sources)) {
-        sources = []
+      sources = []
     }
     sources += [
       "${mbedtls_repo}/repo/tinycrypt/ecc.c",
