@@ -184,14 +184,14 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
     NSLog(@"Status: Updated temp in UI to %@", _temperatureLabel.text);
 }
 
-// MARK: CHIPTemperatureMeasurement
+// MARK: MTRTemperatureMeasurement
 
 - (void)readCurrentTemperature
 {
-    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (CHIPGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                CHIPTemperatureMeasurement * cluster =
-                    [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
+                MTRTemperatureMeasurement * cluster =
+                    [[MTRTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
 
                 [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                     if (error != nil)
@@ -217,7 +217,7 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
     NSLog(
         @"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds), @(deltaInCelsius));
 
-    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (CHIPGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 // Use a wildcard subscription
                 [chipDevice subscribeWithQueue:dispatch_get_main_queue()
@@ -225,17 +225,17 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
                                    maxInterval:maxIntervalSeconds
                                         params:nil
                                 cacheContainer:nil
-                                 reportHandler:^(NSArray<CHIPAttributeReport *> * _Nullable reports, NSError * _Nullable error) {
+                                 reportHandler:^(NSArray<MTRAttributeReport *> * _Nullable reports, NSError * _Nullable error) {
                                      if (error) {
                                          NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
                                              [error description]);
                                          return;
                                      }
-                                     for (CHIPAttributeReport * report in reports) {
+                                     for (MTRAttributeReport * report in reports) {
                                          // These should be exposed by the SDK
-                                         if ([report.path.cluster isEqualToNumber:@(kMatterClusterTemperatureMeasurementID)] &&
+                                         if ([report.path.cluster isEqualToNumber:@(MTRClusterTemperatureMeasurementID)] &&
                                              [report.path.attribute
-                                                 isEqualToNumber:@(kMatterClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
+                                                 isEqualToNumber:@(MTRClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
                                              if (report.error != nil) {
                                                  NSLog(@"Error reading temperature: %@", report.error);
                                              } else {

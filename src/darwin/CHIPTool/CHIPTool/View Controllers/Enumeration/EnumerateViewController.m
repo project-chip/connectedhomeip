@@ -108,14 +108,14 @@
 // 4. Success?
 - (void)enumerate
 {
-    CHIPGetConnectedDevice(^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+    CHIPGetConnectedDevice(^(MTRDevice * _Nullable device, NSError * _Nullable error) {
         if (error) {
             NSString * resultLog = [[NSString alloc] initWithFormat:@"Unable to get connected device: Error: %@", error];
             [self updateResult:resultLog];
             return;
         }
 
-        CHIPDescriptor * descriptorCluster = [[CHIPDescriptor alloc] initWithDevice:device
+        MTRDescriptor * descriptorCluster = [[MTRDescriptor alloc] initWithDevice:device
                                                                            endpoint:0
                                                                               queue:dispatch_get_main_queue()];
         NSLog(@"Reading parts list to get list of endpoints in use...");
@@ -131,7 +131,7 @@
             [self updateResult:resultLog];
 
             for (NSNumber * endpoint in endpointsInUse) {
-                CHIPDescriptor * descriptorCluster = [[CHIPDescriptor alloc] initWithDevice:device
+                MTRDescriptor * descriptorCluster = [[MTRDescriptor alloc] initWithDevice:device
                                                                                    endpoint:[endpoint unsignedShortValue]
                                                                                       queue:dispatch_get_main_queue()];
                 [descriptorCluster readAttributeDeviceListWithCompletionHandler:^(

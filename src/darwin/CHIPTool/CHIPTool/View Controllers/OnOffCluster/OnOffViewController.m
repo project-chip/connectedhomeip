@@ -19,9 +19,9 @@
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
 #import "DeviceSelector.h"
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 
-NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
+NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 @interface OnOffViewController ()
 @property (nonatomic, strong) UITextField * numLightsTextField;
@@ -102,7 +102,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     _numLightsTextField = [UITextField new];
     _numLightsOptions = @[ @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"10" ];
     _numLightsTextField.text
-        = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNumLightOnOffCluster) ?: [_numLightsOptions objectAtIndex:0];
+        = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, MTRNumLightOnOffCluster) ?: [_numLightsOptions objectAtIndex:0];
     UIPickerView * numLightsPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 100, 0, 0)];
     _numLightsTextField.inputView = numLightsPicker;
     [numLightsPicker setDataSource:self];
@@ -210,7 +210,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 - (IBAction)pickerDoneClicked:(id)sender
 {
-    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNumLightOnOffCluster, _numLightsTextField.text);
+    CHIPSetDomainValueForKey(MTRToolDefaultsDomain, MTRNumLightOnOffCluster, _numLightsTextField.text);
     [_numLightsTextField resignFirstResponder];
     [self setupStackView];
 }
@@ -219,7 +219,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 - (int)numLightClustersToShow
 {
-    NSString * numClusters = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNumLightOnOffCluster);
+    NSString * numClusters = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, MTRNumLightOnOffCluster);
     int numberOfLights = 1;
 
     if (numClusters) {
@@ -237,9 +237,9 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [self updateResult:[NSString stringWithFormat:@"On command sent on endpoint %@", @(endpoint)]];
 
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        if (CHIPGetConnectedDeviceWithID(deviceId, ^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+        if (CHIPGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
-                    CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice
+                    MTROnOff * onOff = [[MTROnOff alloc] initWithDevice:chipDevice
                                                                  endpoint:endpoint
                                                                     queue:dispatch_get_main_queue()];
                     [onOff onWithCompletionHandler:^(NSError * error) {
@@ -266,9 +266,9 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [self updateResult:[NSString stringWithFormat:@"Off command sent on endpoint %@", @(endpoint)]];
 
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        if (CHIPGetConnectedDeviceWithID(deviceId, ^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+        if (CHIPGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
-                    CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice
+                    MTROnOff * onOff = [[MTROnOff alloc] initWithDevice:chipDevice
                                                                  endpoint:endpoint
                                                                     queue:dispatch_get_main_queue()];
                     [onOff offWithCompletionHandler:^(NSError * error) {
@@ -295,9 +295,9 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [self updateResult:[NSString stringWithFormat:@"Toggle command sent on endpoint %@", @(endpoint)]];
 
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        if (CHIPGetConnectedDeviceWithID(deviceId, ^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+        if (CHIPGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
-                    CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice
+                    MTROnOff * onOff = [[MTROnOff alloc] initWithDevice:chipDevice
                                                                  endpoint:endpoint
                                                                     queue:dispatch_get_main_queue()];
                     [onOff toggleWithCompletionHandler:^(NSError * error) {

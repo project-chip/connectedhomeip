@@ -6,7 +6,7 @@
 //  Copyright © 2021 CHIP. All rights reserved.
 //
 
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
