@@ -100,19 +100,19 @@ tests:
           [1651259701990] [18726:35135506] CHIP: [DMG]                                         Cluster = 0x2a,
           [1651259701990] [18726:35135506] CHIP: [DMG]                                         Attribute = 0x0000_0002,
           [1651259701990] [18726:35135506] CHIP: [DMG]                                 }
-          [1651259701990] [18726:35135506] CHIP: [DMG]                                         
-          [1651259701990] [18726:35135506] CHIP: [DMG]                                         Data = 1, 
+          [1651259701990] [18726:35135506] CHIP: [DMG]
+          [1651259701990] [18726:35135506] CHIP: [DMG]                                         Data = 1,
           [1651259701990] [18726:35135506] CHIP: [DMG]                         },
-          [1651259701990] [18726:35135506] CHIP: [DMG]                         
+          [1651259701990] [18726:35135506] CHIP: [DMG]
           [1651259701990] [18726:35135506] CHIP: [DMG]                 },
-          [1651259701990] [18726:35135506] CHIP: [DMG]                 
+          [1651259701990] [18726:35135506] CHIP: [DMG]
           [1651259701990] [18726:35135506] CHIP: [DMG]         ],
-          [1651259701990] [18726:35135506] CHIP: [DMG]         
-          [1651259701990] [18726:35135506] CHIP: [DMG]         SuppressResponse = true, 
+          [1651259701990] [18726:35135506] CHIP: [DMG]
+          [1651259701990] [18726:35135506] CHIP: [DMG]         SuppressResponse = true,
           [1651259701990] [18726:35135506] CHIP: [DMG]         InteractionModelRevision = 1
           [1651259701990] [18726:35135506] CHIP: [DMG] }
 
-          Relaunch the OTA Provider App and initiate another query 
+          Relaunch the OTA Provider App and initiate another query
           chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           Verify that the DUT starts a new transfer of software image when sending another QueryImage request i.e. Start Offset field in ReceiveInit message received on OTA Provider side is 0

@@ -36,7 +36,7 @@ tests:
       verification: |
           On the 2nd controller using chip tool, open commissioning window using ECM
 
-          ./chip-tool  pairing open-commissioning-window 2 1 400 2000 3840 
+          ./chip-tool  pairing open-commissioning-window 2 1 400 2000 3840
 
           Controller:
 
@@ -69,7 +69,7 @@ tests:
           20 times. This can be done using an invalid passcode"
       PICS: PICS_MF
       verification: |
-          1. On 2nd controller using chip-tool connect using wrong manual code. Repeat the step for 20 times. 
+          1. On 2nd controller using chip-tool connect using wrong manual code. Repeat the step for 20 times.
 
           ./chip-tool pairing code 1 36177160938 --timeout 3  (With wrong manual code)
 
@@ -84,7 +84,7 @@ tests:
           timeout of PIXIT_COMM_WIN seconds using ECM"
       PICS: PICS_MF
       verification: |
-          1. On 2nd controller using chip tool connect using correct passcode.  
+          1. On 2nd controller using chip tool connect using correct passcode.
 
           ./chip-tool pairing code 1 36177160937 (correct passcode)
 
@@ -99,7 +99,7 @@ tests:
           PAKEVerifier"
       PICS: PICS_MF
       verification: |
-          1. On 3rdd controller using chip-tool connect using correct passcode 
+          1. On 3rdd controller using chip-tool connect using correct passcode
 
           ./chip-tool pairing code 1 36177160938  (With wrong manual code)
 

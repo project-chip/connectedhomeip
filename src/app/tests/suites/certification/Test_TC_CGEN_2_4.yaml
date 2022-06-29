@@ -68,7 +68,7 @@ tests:
           [1653996461.207140][7229:7234] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0005
           [1653996461.207228][7229:7234] CHIP:TOO:   CommissioningCompleteResponse: {
           [1653996461.207281][7229:7234] CHIP:TOO:     errorCode: 3
-          [1653996461.207319][7229:7234] CHIP:TOO:     debugText: 
+          [1653996461.207319][7229:7234] CHIP:TOO:     debugText:
           [1653996461.207357][7229:7234] CHIP:TOO:    }
           [1653996461.207416][7229:7234] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
