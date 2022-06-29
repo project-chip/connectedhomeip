@@ -30,28 +30,7 @@ The steps in this document were validated on Ubuntu 18.04 and 20.04.
     source ./scripts/activate.sh
     ```
 
-## Build the image
-
--   Build the example application:
-
-    ```
-    connectedhomeip$ ./scripts/build/build_examples.py --target bl602-light build
-    ```
-
-    Generated files
-
-    ```
-    connectedhomeip/out/bl602-light/chip-bl602-lighting-example.bin
-    ```
-
-    To delete generated executable, libraries and object files use:
-
-    ```
-    cd ~/connectedhomeip/
-    rm -rf out/
-    ```
-
-## Flash the board
+## Build the image and flash the board
 
 -   Build the
     [lighting-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/lighting-app/bouffalolab/bl602)
@@ -94,7 +73,7 @@ The steps in this document were validated on Ubuntu 18.04 and 20.04.
 `/dev/ttyACM0`:
 
 ```
-picocom -b 2000000 /dev/ttyACM0
+picocom -b 115200 /dev/ttyACM0
 ```
 
 2.To reset the board, press the RESET button, and you will see the log in the
