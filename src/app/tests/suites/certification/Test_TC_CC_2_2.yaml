@@ -96,7 +96,7 @@ tests:
           ./chip-tool colorcontrol read compensation-text 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0006 DataVersion: 540305990
-          [1651485417.552058][3512:3517] CHIP:TOO:   compensation text: 
+          [1651485417.552058][3512:3517] CHIP:TOO:   compensation text:
           [1651485417.552171][3512:3517] CHIP:EM: Sending Standalone Ack for MessageCounter:354764 on exchange 31359i
       disabled: true
 

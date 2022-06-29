@@ -46,7 +46,7 @@ tests:
       verification: |
           Run the OTA Provider App using the command:
 
-          ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q busy 
+          ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q busy
 
           ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 1 0 0x1234567890 0
 

@@ -30,7 +30,7 @@ tests:
 
     - label: "Scan for DNS-SD commissioner advertisements from TH"
       verification: |
-          if DUT supports discovering UDC, DUT should be able to scan the TV-app 
+          if DUT supports discovering UDC, DUT should be able to scan the TV-app
           ~$ avahi-browse -rt _matterc._udp
 
           =+ wlp3s0 IPv4 DD200C20D25AE5F7                              _matterd._udp        local

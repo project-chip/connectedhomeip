@@ -32,7 +32,7 @@ tests:
     - label: "DUT_CR1 starts a commissioning process with TH_CE"
       PICS: PICS_MF
       verification: |
-          "1. Provision the device using your DUT controller(use above instructions) , 
+          "1. Provision the device using your DUT controller(use above instructions) ,
           "
       disabled: true
 

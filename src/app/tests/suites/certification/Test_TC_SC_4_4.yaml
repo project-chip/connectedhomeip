@@ -75,7 +75,7 @@ tests:
       verification: |
           change the IP address
           1.we have to take two routers
-          2.execute the above steps using the 1st router 
+          2.execute the above steps using the 1st router
           3.switch the connection to 2nd router and execute the below steps and check the ipaddress of the routers.
       disabled: true
 
