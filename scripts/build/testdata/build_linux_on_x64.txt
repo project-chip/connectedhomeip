@@ -142,7 +142,7 @@ PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-casting-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-tv-casting-app-ipv6only'
 
 # Generating linux-fake-tests
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_build_tests=true custom_toolchain="//build/toolchain/fake:fake_x64_gcc" chip_link_tests=true chip_device_platform="fake"' {out}/linux-fake-tests
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_build_tests=true custom_toolchain="//build/toolchain/fake:fake_x64_gcc" chip_link_tests=true chip_device_platform="fake" chip_fake_platform=true' {out}/linux-fake-tests
 
 # Generating linux-x64-address-resolve-tool
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} {out}/linux-x64-address-resolve-tool

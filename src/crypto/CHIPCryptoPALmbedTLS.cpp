@@ -553,7 +553,6 @@ static inline const mbedtls_ecp_keypair * to_const_keypair(const P256KeypairCont
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
-#if defined(MBEDTLS_ECDSA_C)
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -561,25 +560,13 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     memset(&digest[0], 0, sizeof(digest));
     ReturnErrorOnFailure(Hash_SHA256(msg, msg_length, &digest[0]));
 
-    return ECDSA_sign_hash(&digest[0], sizeof(digest), out_signature);
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
-}
-
-CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_length, P256ECDSASignature & out_signature) const
-{
 #if defined(MBEDTLS_USE_TINYCRYPT)
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(hash_length == kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
-
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = UECC_FAILURE;
 
     const mbedtls_uecc_keypair * keypair = to_const_keypair(&mKeypair);
 
-    result = uECC_sign(keypair->private_key, hash, hash_length, out_signature.Bytes());
+    result = uECC_sign(keypair->private_key, digest, sizeof(digest), out_signature.Bytes());
 
     VerifyOrExit(result == UECC_SUCCESS, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
@@ -589,10 +576,6 @@ CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_
 exit:
     return error;
 #elif defined(MBEDTLS_ECDSA_C)
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(hash_length == kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
-
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result = 0;
     mbedtls_mpi r, s;
@@ -608,7 +591,7 @@ exit:
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_ecdsa_sign(&ecdsa_ctxt.CHIP_CRYPTO_PAL_PRIVATE(grp), &r, &s, &ecdsa_ctxt.CHIP_CRYPTO_PAL_PRIVATE(d),
-                                Uint8::to_const_uchar(hash), hash_length, CryptoRNG, nullptr);
+                                Uint8::to_const_uchar(digest), sizeof(digest), CryptoRNG, nullptr);
 
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 

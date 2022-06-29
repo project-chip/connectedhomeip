@@ -205,54 +205,6 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256KeypairHSM::ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) const
-{
-    CHIP_ERROR error                                         = CHIP_ERROR_INTERNAL;
-    sss_asymmetric_t asymm_ctx                               = { 0 };
-    sss_status_t status                                      = kStatus_SSS_Success;
-    sss_object_t keyObject                                   = { 0 };
-    uint8_t signature_se05x[kMax_ECDSA_Signature_Length_Der] = { 0 };
-    size_t signature_se05x_len                               = sizeof(signature_se05x);
-    MutableByteSpan out_raw_sig_span(out_signature.Bytes(), out_signature.Capacity());
-
-    VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(hash_length == kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(out_signature != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(keyid != kKeyId_NotInitialized, CHIP_ERROR_HSM);
-
-    ChipLogDetail(Crypto, "ECDSA_sign_hash: Using SE05X for Ecc Sign!");
-
-    se05x_sessionOpen();
-    VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
-
-    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
-    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
-
-    status = sss_key_object_get_handle(&keyObject, keyid);
-    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
-
-    status = sss_asymmetric_context_init(&asymm_ctx, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_SHA256, kMode_SSS_Sign);
-    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
-
-    status =
-        sss_asymmetric_sign_digest(&asymm_ctx, const_cast<uint8_t *>(hash), hash_length, signature_se05x, &signature_se05x_len);
-    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
-
-    error = EcdsaAsn1SignatureToRaw(kP256_FE_Length, ByteSpan{ signature_se05x, signature_se05x_len }, out_raw_sig_span);
-    SuccessOrExit(error);
-
-    SuccessOrExit(out_signature.SetLength(2 * kP256_FE_Length));
-
-    error = CHIP_NO_ERROR;
-exit:
-    if (asymm_ctx.session != nullptr)
-    {
-        sss_asymmetric_context_free(&asymm_ctx);
-    }
-
-    return error;
-}
-
 CHIP_ERROR P256KeypairHSM::Serialize(P256SerializedKeypair & output) const
 {
     const size_t len = output.Length() == 0 ? output.Capacity() : output.Length();

@@ -209,20 +209,20 @@ CHIP_ERROR TestHarnessDACProvider::GetFirmwareInformation(MutableByteSpan & out_
     return CopySpanToMutableSpan(mFirmwareInformation, out_firmware_info_buffer);
 }
 
-CHIP_ERROR TestHarnessDACProvider::SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign,
+CHIP_ERROR TestHarnessDACProvider::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
                                                                 MutableByteSpan & out_signature_buffer)
 {
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
 
     VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(digest_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_signature_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
     // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
     ReturnErrorOnFailure(LoadKeypairFromRaw(mDacPrivateKey, mDacPublicKey, keypair));
-    ReturnErrorOnFailure(keypair.ECDSA_sign_hash(digest_to_sign.data(), digest_to_sign.size(), signature));
+    ReturnErrorOnFailure(keypair.ECDSA_sign_msg(message_to_sign.data(), message_to_sign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, out_signature_buffer);
 }
