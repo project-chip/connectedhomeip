@@ -35,7 +35,7 @@ tests:
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01
       response:
-           constraints:
+          constraints:
               type: int16
               minValue: 1600
               maxValue: 3200
@@ -683,7 +683,6 @@ tests:
       arguments:
           value: 2950
 
-
     - label: "Writes (sets back) default value of MinCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
@@ -786,12 +785,13 @@ tests:
     - label: "Read it back again to confirm the successful write"
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
-      PICS:  TSTAT.S.F00 || TSTAT.S.F01
+      PICS: TSTAT.S.F00 || TSTAT.S.F01
       response:
           value: 2
 
     - label:
-          "Writes MaxHeatSetpointLimit attribute to default value of 2950 to meet deadband constraint"
+          "Writes MaxHeatSetpointLimit attribute to default value of 2950 to
+          meet deadband constraint"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00 && A_MINHEATSETPOINTLIMIT && TSTAT.S.F05
