@@ -369,5 +369,7 @@ chip_python_wheel_action("chip-repl") {
   py_package_name = "chip-repl"
   py_platform_tag = "any"
 
+  data_deps = [ ":chip-library" ]
+
   output_name = "chip_repl-${chip_python_version}-py3-any.whl"
 }
