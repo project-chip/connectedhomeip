@@ -41,7 +41,14 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err;
+
+    // Initialize the generic implementation base class.
+    err = Internal::GenericConfigurationManagerImpl<OpenIoTSDKConfig>::Init();
+    SuccessOrExit(err);
+
+exit:
+    return err;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan buf)
