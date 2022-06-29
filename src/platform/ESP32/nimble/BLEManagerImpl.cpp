@@ -111,7 +111,7 @@ const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
               {
                   .uuid       = (ble_uuid_t *) (&UUID_CHIPoBLEChar_TX),
                   .access_cb  = gatt_svr_chr_access,
-                  .flags      = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
+                  .flags      = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY | BLE_GATT_CHR_F_INDICATE,
                   .val_handle = &sInstance.mTXCharCCCDAttrHandle,
               },
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
