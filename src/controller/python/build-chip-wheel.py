@@ -98,7 +98,7 @@ try:
             os.makedirs(os.path.dirname(dstFile), exist_ok=True)
             shutil.copyfile(srcFile, dstFile)
 
-    installScripts = [ InstalledScriptInfo(script) for script in manifest['scripts'] ]
+    installScripts = [InstalledScriptInfo(script) for script in manifest['scripts']]
     for script in installScripts:
         os.rename(os.path.join(tmpDir, script.name),
                   os.path.join(tmpDir, script.installName))
@@ -145,7 +145,7 @@ try:
             packages[0]: [
                 libName
             ]
-        } if libName else { },
+        } if libName else {},
         scripts=[name for name in map(
             lambda script: os.path.join(tmpDir, script.installName),
             installScripts
@@ -166,7 +166,7 @@ try:
         },
         cmdclass={
             'bdist_wheel': bdist_wheel_override
-        } if libName else { },
+        } if libName else {},
         script_args=['clean', '--all', 'bdist_wheel']
     )
 
