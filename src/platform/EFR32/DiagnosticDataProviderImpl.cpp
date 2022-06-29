@@ -437,7 +437,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & pa
     if(err ==0){
         packetUnicastRxCount = extra_info.ucast_rx_count;
         return CHIP_NO_ERROR;
-    }    
+    }
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
@@ -448,7 +448,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & pa
     if(err ==0){
         packetUnicastTxCount = extra_info.ucast_tx_count;
         return CHIP_NO_ERROR;
-    }    
+    }
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
@@ -459,7 +459,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
     if(err ==0){
         overrunCount = extra_info.overrun_count;
         return CHIP_NO_ERROR;
-    }    
+    }
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
