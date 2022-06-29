@@ -22,8 +22,8 @@ Configuration options
 
 - ``external_content_contents``: A list of external contents. Each entry is
   a tuple with two fields: the external base directory and a file glob pattern.
-- ``external_content_link_repositories``: A list of base directories out of scope.
-  All links to content within these directories are made external.
+- ``external_content_link_prefixes``: A list of link prefixes out of scope.
+  All links to content with these prefixes are made external.
 - ``external_content_link_extensions``: A list of file extensions in scope of
   the documentation. All links to content without these file extensions are
   made external.
@@ -45,6 +45,9 @@ from sphinx.application import Sphinx
 
 __version__ = "0.1.0"
 
+DIRECTIVES = ("figure", "image", "include", "literalinclude")
+"""Default directives for included content."""
+
 EXTERNAL_LINK_URL_PREFIX = (
     "https://github.com/project-chip/connectedhomeip/blob/master/"
 )
@@ -54,7 +57,7 @@ def adjust_includes(
     fname: Path,
     basepath: Path,
     encoding: str,
-    link_folders: List[str],
+    link_prefixes: List[str],
     extensions: List[str],
     dstpath: Optional[Path] = None,
 ) -> None:
@@ -64,7 +67,7 @@ def adjust_includes(
         fname: File to be processed.
         basepath: Base path to be used to resolve content location.
         encoding: Sources encoding.
-        link_folders: Folders links to which are made external.
+        link_prefixes: Prefixes of links that are made external.
         extensions: Filename extensions links to which are not made external.
         dstpath: Destination path for fname if its path is not the actual destination.
     """
@@ -74,20 +77,20 @@ def adjust_includes(
 
     dstpath = dstpath or fname.parent
 
+    def _adjust_path(path):
+        # ignore absolute paths, section links, hyperlinks and same folder
+        if path.startswith(("/", "#", "http", "www")) or not "/" in path:
+            return path
+        return Path(os.path.relpath(basepath / path, dstpath)).as_posix()
+
     def _adjust_links(m):
         displayed, fpath = m.groups()
-
-        # ignore absolute paths, section links, hyperlinks and same folder
-        if fpath.startswith(("/", "#", "http", "www")) or not "/" in fpath:
-            fpath_adj = fpath
-        else:
-            fpath_adj = Path(os.path.relpath(basepath / fpath, dstpath)).as_posix()
-
+        fpath_adj = _adjust_path(fpath)
         return f"[{displayed}]({fpath_adj})"
 
     def _adjust_external(m):
-        displayed, folder, target = m.groups()
-        return f"[{displayed}]({EXTERNAL_LINK_URL_PREFIX}{folder}/{target})"
+        displayed, target = m.groups()
+        return f"[{displayed}]({EXTERNAL_LINK_URL_PREFIX}{target})"
 
     def _adjust_filetype(m):
         displayed, target, extension = m.groups()
@@ -100,6 +103,11 @@ def adjust_includes(
         (file_link,) = m.groups()
         return file_link + ")"
 
+    def _adjust_image_link(m):
+        prefix, fpath, postfix = m.groups()
+        fpath_adj = _adjust_path(fpath)
+        return f"{prefix}{fpath_adj}{postfix}"
+
     rules = [
         # Find any links and adjust the path
         (r"\[([^\[\]]*)\]\s*\((.*)\)", _adjust_links),
@@ -107,7 +115,7 @@ def adjust_includes(
         # Find links that lead to an external folder and transform it
         # into an external link.
         (
-            r"\[([^\[\]]*)\]\s*\((?:\.\./)*(" + "|".join(link_folders) + r")/(.*)\)",
+            r"\[([^\[\]]*)\]\s*\((?:\.\./)*((?:" + "|".join(link_prefixes) + r")[^)]*)\)",
             _adjust_external,
         ),
 
@@ -121,6 +129,15 @@ def adjust_includes(
             r"\[([^\[\]]*)\]\s*\((?:\.\./)*((?:[^()]+?/)*[^.()]+?(\.[^)/]+))\)",
             _adjust_filetype,
         ),
+
+        # Find links that lead to a folder and transform it into an external link.
+        (
+            r"\[([^\[\]]*)\]\s*\((?:\.\./)*((?:[^()]+?/)+[^).#/]+)(\))",
+            _adjust_filetype,
+        ),
+
+        # Find image links in img tags and adjust them
+        (r"(<img [^>]*src=[\"'])([^ >]+)([\"'][^>]*>)", _adjust_image_link)
     ]
 
     with open(fname, "r+", encoding=encoding) as f:
@@ -181,7 +198,7 @@ def sync_contents(app: Sphinx) -> None:
                 dst,
                 src.parent,
                 app.config.source_encoding,
-                app.config.external_content_link_repositories,
+                app.config.external_content_link_prefixes,
                 app.config.external_content_link_extensions,
             )
         # if origin file is modified only copy if different
@@ -194,7 +211,7 @@ def sync_contents(app: Sphinx) -> None:
                     src_adjusted,
                     src.parent,
                     app.config.source_encoding,
-                    app.config.external_content_link_repositories,
+                    app.config.external_content_link_prefixes,
                     app.config.external_content_link_extensions,
                     dstpath=dst.parent,
                 )
@@ -212,7 +229,7 @@ def sync_contents(app: Sphinx) -> None:
 def setup(app: Sphinx) -> Dict[str, Any]:
     app.add_config_value("external_content_contents", [], "env")
     app.add_config_value("external_content_keep", [], "")
-    app.add_config_value("external_content_link_repositories", [], "env")
+    app.add_config_value("external_content_link_prefixes", [], "env")
     app.add_config_value("external_content_link_extensions", [], "env")
 
     app.connect("builder-inited", sync_contents)

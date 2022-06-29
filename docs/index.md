@@ -3,6 +3,7 @@
 ```{toctree}
 :maxdepth: 2
 :caption: Contents
+:hidden:
 
 QUICK_START
 PROJECT_FLOW
@@ -12,6 +13,10 @@ discussion/index
 guides/index
 style/index
 examples/index
-breathe
 BUG_REPORT
+```
+
+```{include} README.md
+:start-line: 2
+:end-before: Building and Developing in Matter
 ```

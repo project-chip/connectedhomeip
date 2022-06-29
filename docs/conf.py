@@ -19,7 +19,12 @@ version = "1.0.0"
 
 # -- General configuration ---------------------------------------------------
 
-extensions = ["myst_parser", "external_content", "doxyrunner", "breathe"]
+extensions = [
+    "myst_parser",
+    "external_content",
+    # "doxyrunner",
+    # "breathe",
+]
 exclude_patterns = [
     "_build",
     "**/nxp/linux-imx/imx8m/README.md",
@@ -54,13 +59,14 @@ myst_enable_extensions = ["html_image"]
 # -- Options for external_content --------------------------------------------
 
 external_content_contents = [
-    (MATTER_BASE / "docs", "[!_]*"),
+    (MATTER_BASE / "docs", "[!_R]*"),
+    (MATTER_BASE, "README.md"),
     (MATTER_BASE, "examples/**/*.md"),
     (MATTER_BASE, "examples/**/*.png"),
     (MATTER_BASE, "examples/**/*.jpg"),
     (MATTER_BASE, "examples/**/*.JPG"),
 ]
-external_content_link_repositories = ["src", r"\.vscode"]
+external_content_link_prefixes = ["src/", r"\.vscode/", "CONTRIBUTING"]
 external_content_link_extensions = [".md", ".png", ".jpg", ".svg"]
 
 # -- Options for zephyr.doxyrunner plugin ------------------------------------

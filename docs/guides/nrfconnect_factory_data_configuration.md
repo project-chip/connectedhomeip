@@ -28,15 +28,13 @@ data secure by applying hardware write protection.
 > is the hardware flash protection driver, and we used it to ensure write
 > protection of the factory data partition in internal flash memory.
 
-<p align="center">
-  <img src="../../examples/platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
-  <img src="../../examples/platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
-</p>
+<img src="../../examples/platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
+<img src="../../examples/platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
 
 <hr>
 
 -   [Overview](#overview)
-    -   [Factory data components](#factory-data-components)
+    -   [Factory data components](#factory-data-component-table)
     -   [Factory data format](#factory-data-format)
 -   [Enabling factory data support](#enabling-factory-data-support)
 -   [Generating factory data](#generating-factory-data)
@@ -46,7 +44,7 @@ data secure by applying hardware write protection.
         -   [Option 2: Using a website validator](#option-2-using-a-website-validator)
         -   [Option 3: Using the nRF Connect Python script](#option-3-using-the-nrf-connect-python-script)
     -   [Preparing factory data partition on a device](#preparing-factory-data-partition-on-a-device)
-    -   [Creating the factory data partition with the second script](#creating-the-factory-data-partition-with-the-second-script)
+    -   [Creating the factory data partition with the second script](#creating-a-factory-data-partition-with-the-second-script)
 -   [Building an example with factory data](#building-an-example-with-factory-data)
     -   [Providing factory data parameters as a build argument list](#providing-factory-data-parameters-as-a-build-argument-list)
     -   [Setting factory data parameters using interactive Kconfig interfaces](#setting-factory-data-parameters-using-interactive-kconfig-interfaces)
@@ -54,8 +52,6 @@ data secure by applying hardware write protection.
 -   [Using own factory data implementation](#using-own-factory-data-implementation)
 
 <hr>
-
-<a name="overview"></a>
 
 ## Overview
 
@@ -154,7 +150,6 @@ In the factory data set, the following formats are used:
     [X.509](https://www.itu.int/rec/T-REC-X.509-201910-I/en) format.
 
 <hr>
-<a name="Generating factory data"></a>
 
 ## Enabling factory data support
 
@@ -185,7 +180,7 @@ partition into the device's flash memory.
 You can use the second script without invoking the first one by providing a JSON
 file written in another way. To make sure that the JSON file is correct and the
 device is able to read out parameters, verify the file using the
-[JSON schema](#verifying-using-a-json-schema).
+[JSON schema](#verifying-using-the-json-schema-tool).
 
 ### Creating factory data JSON file with the first script
 
@@ -331,7 +326,7 @@ JSON file is verified using the prepared JSON Schema.
 
 If the script finishes successfully, go to the location you provided with the
 `-o` argument. Use the JSON file you find there when
-[generating the factory data partition](#generating_factory_data_partition).
+[generating the factory data partition](#generating-factory-data).
 
 > Note: Generating the SPAKE2+ verifier is optional and requires providing a
 > path to the `spake2p` executable. To get it, complete the following steps:
@@ -536,7 +531,6 @@ reason, it can be programmed directly to the device using a programmer (for
 example, `nrfjprog`).
 
 <hr>
-<a name="Building an example with factory data"></a>
 
 ## Building an example with factory data
 
@@ -616,7 +610,6 @@ snippet:
 > [Kconfig docummentation](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/build/kconfig/menuconfig.html).
 
 <hr>
-<a name="Programming factory data"></a>
 
 ## Programming factory data
 
@@ -680,13 +673,12 @@ $ west flash
 ```
 
 <hr>
-<a name="Using own factory data"></a>
 
 ## Using own factory data implementation
 
 The [factory data generation process](#generating-factory-data) described above
 is only an example valid for the nRF Connect platform. You can well create a HEX
-file containing all [factory data components](#factory-data-components) in any
+file containing all [factory data components](#factory-data-component-table) in any
 format and then implement a parser to read out all parameters and pass them to a
 provider. Each manufacturer can implement a factory data set on its own by
 implementing a parser and a factory data accessor inside the Matter stack. Use
