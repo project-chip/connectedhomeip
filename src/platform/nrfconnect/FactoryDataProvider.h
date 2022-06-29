@@ -23,6 +23,7 @@
 
 #include <drivers/flash.h>
 #include <pm_config.h>
+#include <fprotect.h>
 
 #include "FactoryDataParser.h"
 
@@ -36,6 +37,12 @@ struct InternalFlashFactoryData
         data     = reinterpret_cast<uint8_t *>(PM_FACTORY_DATA_ADDRESS);
         dataSize = PM_FACTORY_DATA_SIZE;
         return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite()
+    {
+        int ret = fprotect_area(PM_FACTORY_DATA_ADDRESS, PM_FACTORY_DATA_SIZE);
+        return System::MapErrorZephyr(ret);
     }
 };
 
@@ -55,6 +62,8 @@ struct ExternalFlashFactoryData
 
         return CHIP_NO_ERROR;
     }
+
+    CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
     uint8_t mFactoryDataBuffer[PM_FACTORY_DATA_SIZE];
