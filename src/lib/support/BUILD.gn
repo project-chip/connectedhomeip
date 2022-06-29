@@ -24,11 +24,11 @@ import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
 declare_args() {
-    # Set to true to run the PersistentStorageDelegate API compliance audit
-    chip_support_enable_storage_api_audit = false
+  # Set to true to run the PersistentStorageDelegate API compliance audit
+  chip_support_enable_storage_api_audit = false
 
-    # Set to true to run the PersistentStorageDelegate load test audit
-    chip_support_enable_storage_load_test_audit = false
+  # Set to true to run the PersistentStorageDelegate load test audit
+  chip_support_enable_storage_load_test_audit = false
 }
 
 config("storage_audit_config") {
