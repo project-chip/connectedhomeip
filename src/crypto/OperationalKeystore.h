@@ -172,8 +172,10 @@ public:
     /**
      * @brief Create an ephemeral keypair for use in session establishment.
      *
-     * WARNING: There may be more than one of these in use concurrently, so implementations have to
-     *          be careful to avoid assuming a single instance.
+     * The caller must Initialize() the P256Keypair if needed. It is not done by this method.
+     *
+     * NOTE: There may be more than one of these in use concurrently, so implementations have to
+     *       be careful to avoid assuming a single instance.
      *
      * WARNING: The return value MUST be released by `ReleaseEphemeralKeypair`. This is because
      *          Matter CHIPMem.h does not properly support UniquePtr in a way that would
