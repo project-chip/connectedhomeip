@@ -270,6 +270,12 @@ list(APPEND CHIP_INCLUDES
     ${CHIP_ROOT}/config/openiotsdk/mbedtls
 )
 
+if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    list(APPEND CHIP_DEFINES
+        NDEBUG
+    )
+endif()
+
 target_include_directories(${APP_TARGET} PRIVATE
                            ${CHIP_INCLUDES}
 )
