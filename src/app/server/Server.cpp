@@ -50,6 +50,11 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
+
+#if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT) || defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
+#include <lib/support/PersistentStorageAudit.h>
+#endif // defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT) || defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
+
 using namespace chip::DeviceLayer;
 
 using chip::kMinValidFabricIndex;
@@ -130,6 +135,14 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mOpCertStore              = initParams.opCertStore;
 
     mCertificateValidityPolicy = initParams.certificateValidityPolicy;
+
+#if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT)
+    VerifyOrDie(chip::audit::ExecutePersistentStorageApiAudit(*mDeviceStorage));
+#endif
+
+#if defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
+    VerifyOrDie(chip::audit::ExecutePersistentStorageLoadTestAudit(*mDeviceStorage));
+#endif
 
     // Set up attribute persistence before we try to bring up the data model
     // handler.
