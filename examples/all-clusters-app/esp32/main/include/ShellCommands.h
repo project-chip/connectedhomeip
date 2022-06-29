@@ -125,7 +125,7 @@ public:
     // Register the CASESession commands
     void Register();
 
-    void SetFabricInfo(FabricInfo * fabricInfo) { mFabricInfo = fabricInfo; }
+    void SetFabricInfo(const FabricInfo * fabricInfo) { mFabricInfo = fabricInfo; }
     void SetNodeId(NodeId nodeId) { mNodeId = nodeId; }
     void SetOnConnecting(bool onConnecting) { mOnConnecting = onConnecting; }
     const FabricInfo * GetFabricInfo(void) { return mFabricInfo; }
