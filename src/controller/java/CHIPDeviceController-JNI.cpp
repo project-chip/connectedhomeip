@@ -168,13 +168,12 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     SuccessOrExit(err);
 
     jmethodID getKeypairDelegate;
-    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getKeypairDelegate", "()Lchip/devicecontroller/KeypairDelegate;",
-                                                        &getKeypairDelegate);
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getKeypairDelegate",
+                                                        "()Lchip/devicecontroller/KeypairDelegate;", &getKeypairDelegate);
     SuccessOrExit(err);
 
     jmethodID getRootCertificate;
-    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getRootCertificate", "()[B",
-                                                        &getRootCertificate);
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getRootCertificate", "()[B", &getRootCertificate);
     SuccessOrExit(err);
 
     jmethodID getIntermediateCertificate;
