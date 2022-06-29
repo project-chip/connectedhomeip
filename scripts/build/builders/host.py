@@ -285,6 +285,7 @@ class HostBuilder(GnBuilder):
                     'custom_toolchain="//build/toolchain/fake:fake_x64_gcc"',
                     'chip_link_tests=true',
                     'chip_device_platform="fake"',
+                    'chip_fake_platform=true',
                 ]
             )
             return self.extra_gn_options
