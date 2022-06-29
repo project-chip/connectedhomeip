@@ -50,6 +50,7 @@ using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::Platform;
 using namespace ::chip::Credentials;
+using namespace ::chip::app::Clusters;
 
 static AppDeviceCallbacks AppCallback;
 
