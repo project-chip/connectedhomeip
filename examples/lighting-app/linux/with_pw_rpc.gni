@@ -41,3 +41,4 @@ pw_build_LINK_DEPS = [
 
 chip_enable_pw_rpc = true
 chip_build_pw_trace_lib = true
+chip_use_pw_logging = true
