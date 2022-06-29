@@ -129,7 +129,8 @@ template("chip_python_wheel_action") {
         {
           src_dir = rebase_path(_manifest_entry.src_dir,
                                 get_path_info(_py_manifest_file, "dir"))
-          sources = rebase_path(_manifest_entry.sources, _manifest_entry.src_dir)
+          sources =
+              rebase_path(_manifest_entry.sources, _manifest_entry.src_dir)
         },
       ]
     }
@@ -137,7 +138,7 @@ template("chip_python_wheel_action") {
     if (defined(invoker.py_scripts)) {
       _py_scripts = invoker.py_scripts
     } else {
-      _py_scripts = [ ]
+      _py_scripts = []
     }
 
     _py_manifest = {
@@ -176,7 +177,6 @@ template("chip_python_wheel_action") {
 }
 
 chip_python_wheel_action("chip-core") {
-
   py_manifest_files = [
     {
       src_dir = "."
@@ -265,9 +265,7 @@ chip_python_wheel_action("chip-core") {
   ]
 
   if (!chip_controller) {
-    py_packages += [
-      "chip.server",
-    ]
+    py_packages += [ "chip.server" ]
   }
 
   py_package_reqs = [
@@ -277,13 +275,16 @@ chip_python_wheel_action("chip-core") {
     "rich",
     "pyyaml",
     "ipdb",
-    "deprecation"
+    "deprecation",
   ]
 
   if (current_os == "mac") {
     py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
   } else if (current_os == "linux") {
-    py_package_reqs += [ "dbus-python", "pygobject" ]
+    py_package_reqs += [
+      "dbus-python",
+      "pygobject",
+    ]
   }
 
   if (current_cpu == "x64") {
@@ -297,7 +298,8 @@ chip_python_wheel_action("chip-core") {
   }
 
   if (current_os == "mac") {
-    py_platform_tag = "macosx_" + string_replace(mac_deployment_target, ".", "_")
+    py_platform_tag =
+        "macosx_" + string_replace(mac_deployment_target, ".", "_")
   } else {
     py_platform_tag = current_os
   }
@@ -347,9 +349,7 @@ chip_python_wheel_action("chip-clusters") {
     "chip.tlv",
   ]
 
-  py_package_reqs = [
-    "dacite",
-  ]
+  py_package_reqs = [ "dacite" ]
 
   py_package_name = "chip-clusters"
   py_platform_tag = "any"
@@ -366,9 +366,7 @@ chip_python_wheel_action("chip-repl") {
   py_manifest_files = [
     {
       src_dir = "."
-      sources = [
-        "chip/ChipReplStartup.py",
-      ]
+      sources = [ "chip/ChipReplStartup.py" ]
       sources += py_scripts
     },
     {
@@ -399,7 +397,10 @@ chip_python_wheel_action("chip-repl") {
   py_package_name = "chip-repl"
   py_platform_tag = "any"
 
-  data_deps = [ ":chip-core", ":chip-clusters" ]
+  data_deps = [
+    ":chip-clusters",
+    ":chip-core",
+  ]
 
   output_name = "chip_repl-${chip_python_version}-py3-any.whl"
 }
