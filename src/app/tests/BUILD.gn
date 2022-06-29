@@ -83,7 +83,6 @@ chip_test_suite("tests") {
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
-    "TestFailSafeContext.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
@@ -95,6 +94,10 @@ chip_test_suite("tests") {
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
   ]
+
+  if (!chip_fake_platform) {
+    test_sources += [ "TestFailSafeContext.cpp" ]
+  }
 
   #
   # On NRF platforms, the allocation of a large number of pbufs in this test
