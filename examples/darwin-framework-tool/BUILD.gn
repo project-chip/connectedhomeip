@@ -32,10 +32,8 @@ config("config") {
     "/tmp/macos_framework_output",
   ]
 
-  framework_dirs = [
-    "/tmp/macos_framework_output",
-  ]
-  
+  framework_dirs = [ "/tmp/macos_framework_output" ]
+
   defines = [
     "CONFIG_ENABLE_YAML_TESTS=${config_enable_yaml_tests}",
     "CONFIG_USE_INTERACTIVE_MODE=${config_use_interactive_mode}",
@@ -66,10 +64,10 @@ executable("darwin-framework-tool") {
     "commands/clusters/WriteAttributeCommandBridge.h",
     "commands/common/CHIPCommandBridge.mm",
     "commands/common/CHIPCommandStorageDelegate.mm",
-    "commands/common/MTRLogging.h",
-    "commands/common/MTRError_Utils.h",
-    "commands/common/MTRError.mm",
     "commands/common/CHIPToolKeypair.mm",
+    "commands/common/MTRError.mm",
+    "commands/common/MTRError_Utils.h",
+    "commands/common/MTRLogging.h",
     "commands/pairing/Commands.h",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.mm",
@@ -98,7 +96,10 @@ executable("darwin-framework-tool") {
     "${chip_root}/third_party/jsoncpp",
   ]
 
-  frameworks = [ "Matter.framework", "Security.framework" ]
+  frameworks = [
+    "Matter.framework",
+    "Security.framework",
+  ]
 
   public_configs = [ ":config" ]
 

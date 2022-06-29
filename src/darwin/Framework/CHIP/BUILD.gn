@@ -15,9 +15,7 @@
 import("//build_overrides/chip.gni")
 
 config("darwin_config") {
-  include_dirs = [
-    ".",
-  ]
+  include_dirs = [ "." ]
 
   cflags = [
     "-Wconversion",
