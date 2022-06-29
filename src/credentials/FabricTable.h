@@ -583,6 +583,26 @@ public:
     CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, ByteSpan message, Crypto::P256ECDSASignature & outSignature) const;
 
     /**
+     * @brief Create an ephemeral keypair for use in session establishment.
+     *
+     * WARNING: The return value MUST be released by `ReleaseEphemeralKeypair`. This is because
+     *          Matter CHIPMem.h does not properly support UniquePtr in a way that would
+     *          safely allow classes derived from Crypto::P256Keypair to be released properly.
+     *
+     * This delegates to the OperationalKeystore if one exists, otherwise it directly allocates a base
+     * Crypto::P256Keypair instance
+     *
+     * @return a pointer to a dynamically P256Keypair (or derived class thereof), which may evaluate to nullptr
+     *         if running out of memory.
+     */
+    Crypto::P256Keypair * AllocateEphemeralKeypairForCASE();
+
+    /**
+     * @brief Release an ephemeral keypair previously created by `AllocateEphemeralKeypairForCASE()`
+     */
+    void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair);
+
+    /**
      * This initializes a new keypair for the given fabric and generates a CSR for it,
      * so that it can be passed in a CSRResponse.
      *

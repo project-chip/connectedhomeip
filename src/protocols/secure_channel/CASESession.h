@@ -26,13 +26,10 @@
 #pragma once
 
 #include <credentials/CHIPCert.h>
-#include <crypto/CHIPCryptoPAL.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 #include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/Base64.h>
@@ -49,10 +46,6 @@
 #include <transport/raw/PeerAddress.h>
 
 namespace chip {
-
-#ifdef ENABLE_HSM_CASE_EPHEMERAL_KEY
-#define CASE_EPHEMERAL_KEY 0xCA5EECD0
-#endif
 
 // TODO: temporary derive from Messaging::UnsolicitedMessageHandler, actually the CASEServer should be the umh, it will be fixed
 // when implementing concurrent CASE session.
@@ -269,11 +262,7 @@ private:
 
     Crypto::Hash_SHA256_stream mCommissioningHash;
     Crypto::P256PublicKey mRemotePubKey;
-#ifdef ENABLE_HSM_CASE_EPHEMERAL_KEY
-    Crypto::P256KeypairHSM mEphemeralKey;
-#else
-    Crypto::P256Keypair mEphemeralKey;
-#endif
+    Crypto::P256Keypair * mEphemeralKey = nullptr;
     Crypto::P256ECDHDerivedSecret mSharedSecret;
     Credentials::ValidationContext mValidContext;
     Credentials::GroupDataProvider * mGroupDataProvider = nullptr;

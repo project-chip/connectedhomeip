@@ -1334,6 +1334,28 @@ CHIP_ERROR FabricTable::ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
+Crypto::P256Keypair * FabricTable::AllocateEphemeralKeypairForCASE()
+{
+    if (mOperationalKeystore != nullptr)
+    {
+        return mOperationalKeystore->AllocateEphemeralKeypairForCASE();
+    }
+
+    return Platform::New<Crypto::P256Keypair>();
+}
+
+void FabricTable::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
+{
+    if (mOperationalKeystore != nullptr)
+    {
+        mOperationalKeystore->ReleaseEphemeralKeypair(keypair);
+    }
+    else
+    {
+        Platform::Delete<Crypto::P256Keypair>(keypair);
+    }
+}
+
 CHIP_ERROR FabricTable::StoreCommitMarker(const CommitMarker & commitMarker)
 {
     DefaultStorageKeyAllocator keyAlloc;
