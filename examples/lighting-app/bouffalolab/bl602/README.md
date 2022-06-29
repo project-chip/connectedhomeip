@@ -84,10 +84,9 @@ The steps in this document were validated on Ubuntu 18.04 and 20.04.
     ./bflb_iot_tool-ubuntu18 --chipname=BL602 --baudrate=115200  --port=/dev/ttyACM0 --pt=chips/bl602/partition/partition_cfg_4M.toml --dts=chips/bl602/device_tree/bl_factory_params_IoTKitA_40M.dts --firmware=../../../../../../out/bl602-light/chip-bl602-lighting-example.bin
     ```
 
-    If you want to erase previous network information in flash, you can add
-    --erase parameters to the bflb_iot_tool-ubuntu18 command. For Windows and
-    MacOS, replace bflb_iot_tool-ubuntu18 with bflb_iot_tool.exe and
-    bflb_iot_tool-macos, respectively.
+    ```
+    If you want to erase previous network information in flash, you can add --erase parameters to the bflb_iot_tool-ubuntu18 command. For Windows and MacOS, replace bflb_iot_tool-ubuntu18 with bflb_iot_tool.exe and bflb_iot_tool-macos, respectively.
+    ```
 
 ## Validate the example
 
@@ -99,7 +98,7 @@ picocom -b 2000000 /dev/ttyACM0
 ```
 
 2.To reset the board, press the RESET button, and you will see the log in the
-picocom terminal.
+`picocom terminal`.
 
 ## Commission a device using chip-tool
 
