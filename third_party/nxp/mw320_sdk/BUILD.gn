@@ -78,6 +78,17 @@ config("mbedtls_mw320_config") {
 
 mbedtls_target("mbedtls") {
   import("${mw320_sdk_build_root}/mw320_sdk.gni")
+
+  if (mbedtls_use_tinycrypt) {
+    if (!defined(sources)) {
+        sources = []
+    }
+    sources += [
+      "${mbedtls_repo}/repo/tinycrypt/ecc.c",
+      "${mbedtls_repo}/repo/tinycrypt/ecc_dh.c",
+      "${mbedtls_repo}/repo/tinycrypt/ecc_dsa.c",
+    ]
+  }
   public_configs = [ ":mbedtls_mw320_config" ]
 
   public_deps = [ ":mw320_sdk" ]
