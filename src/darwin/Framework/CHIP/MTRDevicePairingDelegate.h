@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM(NSUInteger, MTRPairingStatus) {
     MTRPairingStatusUnknown = 0,
     MTRPairingStatusSuccess = 1,
-    MTRPairingStatusFailed  = 2
+    MTRPairingStatusFailed = 2
 };
 
 /**

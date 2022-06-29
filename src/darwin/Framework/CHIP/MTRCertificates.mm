@@ -16,9 +16,9 @@
 
 #import "MTRCertificates.h"
 #import "MTRError_Internal.h"
+#import "MTRMemory.h"
 #import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
-#import "MTRMemory.h"
 #import "NSDataSpanConversion.h"
 
 #include <credentials/CHIPCert.h>

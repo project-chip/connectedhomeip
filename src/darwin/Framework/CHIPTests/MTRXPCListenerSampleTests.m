@@ -19,8 +19,8 @@
  */
 
 // module headers
-#import <Matter/Matter.h>
 #import <Matter/MTRDevice.h>
+#import <Matter/Matter.h>
 
 #import "MTRErrorTestUtils.h"
 #import "MTRTestKeys.h"
@@ -112,7 +112,7 @@ static MTRDeviceController * sController = nil;
     newConnection.exportedInterface = _serviceInterface;
     newConnection.remoteObjectInterface = _clientInterface;
     __auto_type newServer = [[MTRDeviceControllerServerSample alloc] initWithClientProxy:[newConnection remoteObjectProxy]
-                                                                 attributeCacheDictionary:_attributeCacheDictionary];
+                                                                attributeCacheDictionary:_attributeCacheDictionary];
     newConnection.exportedObject = newServer;
     [_servers setObject:newServer forKey:newServer.identifier];
     newConnection.invalidationHandler = ^{
@@ -170,25 +170,25 @@ static NSString * const MTRDeviceControllerId = @"CHIPController";
     (void) controller;
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController
-            getConnectedDevice:nodeId
-                         queue:dispatch_get_main_queue()
-             completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
-                 if (error) {
-                     NSLog(@"Failed to get connected device");
-                     completion(nil, error);
-                 } else {
-                     [device readAttributeWithEndpointId:endpointId
-                                               clusterId:clusterId
-                                             attributeId:attributeId
-                                                  params:[MTRDeviceController decodeXPCReadParams:params]
-                                             clientQueue:dispatch_get_main_queue()
-                                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                                  NSError * _Nullable error) {
-                                                  completion([MTRDeviceController encodeXPCResponseValues:values], error);
-                                              }];
-                 }
-             }];
+        [sharedController getConnectedDevice:nodeId
+                                       queue:dispatch_get_main_queue()
+                           completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                               if (error) {
+                                   NSLog(@"Failed to get connected device");
+                                   completion(nil, error);
+                               } else {
+                                   [device
+                                       readAttributeWithEndpointId:endpointId
+                                                         clusterId:clusterId
+                                                       attributeId:attributeId
+                                                            params:[MTRDeviceController decodeXPCReadParams:params]
+                                                       clientQueue:dispatch_get_main_queue()
+                                                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
+                                                            NSError * _Nullable error) {
+                                                            completion([MTRDeviceController encodeXPCResponseValues:values], error);
+                                                        }];
+                               }
+                           }];
     } else {
         NSLog(@"Failed to get shared controller");
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
@@ -245,26 +245,26 @@ static NSString * const MTRDeviceControllerId = @"CHIPController";
     (void) controller;
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController
-            getConnectedDevice:nodeId
-                         queue:dispatch_get_main_queue()
-             completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
-                 if (error) {
-                     NSLog(@"Failed to get connected device");
-                     completion(nil, error);
-                 } else {
-                     [device invokeCommandWithEndpointId:endpointId
-                                               clusterId:clusterId
-                                               commandId:commandId
-                                           commandFields:fields
-                                      timedInvokeTimeout:nil
-                                             clientQueue:dispatch_get_main_queue()
-                                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                                  NSError * _Nullable error) {
-                                                  completion([MTRDeviceController encodeXPCResponseValues:values], error);
-                                              }];
-                 }
-             }];
+        [sharedController getConnectedDevice:nodeId
+                                       queue:dispatch_get_main_queue()
+                           completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                               if (error) {
+                                   NSLog(@"Failed to get connected device");
+                                   completion(nil, error);
+                               } else {
+                                   [device
+                                       invokeCommandWithEndpointId:endpointId
+                                                         clusterId:clusterId
+                                                         commandId:commandId
+                                                     commandFields:fields
+                                                timedInvokeTimeout:nil
+                                                       clientQueue:dispatch_get_main_queue()
+                                                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
+                                                            NSError * _Nullable error) {
+                                                            completion([MTRDeviceController encodeXPCResponseValues:values], error);
+                                                        }];
+                               }
+                           }];
     } else {
         NSLog(@"Failed to get shared controller");
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);

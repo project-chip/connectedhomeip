@@ -32,8 +32,8 @@
 
 #import <Matter/Matter.h>
 
-#import "MTRError_Utils.h"
 #import "MTRDevice_Externs.h"
+#import "MTRError_Utils.h"
 
 class TestCommandBridge;
 

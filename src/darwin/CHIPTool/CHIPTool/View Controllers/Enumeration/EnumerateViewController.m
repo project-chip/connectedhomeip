@@ -116,8 +116,8 @@
         }
 
         MTRDescriptor * descriptorCluster = [[MTRDescriptor alloc] initWithDevice:device
-                                                                           endpoint:0
-                                                                              queue:dispatch_get_main_queue()];
+                                                                         endpoint:0
+                                                                            queue:dispatch_get_main_queue()];
         NSLog(@"Reading parts list to get list of endpoints in use...");
         [descriptorCluster readAttributePartsListWithCompletionHandler:^(
             NSArray<NSNumber *> * _Nullable endpointsInUse, NSError * _Nullable error) {
@@ -132,8 +132,8 @@
 
             for (NSNumber * endpoint in endpointsInUse) {
                 MTRDescriptor * descriptorCluster = [[MTRDescriptor alloc] initWithDevice:device
-                                                                                   endpoint:[endpoint unsignedShortValue]
-                                                                                      queue:dispatch_get_main_queue()];
+                                                                                 endpoint:[endpoint unsignedShortValue]
+                                                                                    queue:dispatch_get_main_queue()];
                 [descriptorCluster readAttributeDeviceListWithCompletionHandler:^(
                     NSArray * _Nullable value, NSError * _Nullable error) {
                     if (error) {

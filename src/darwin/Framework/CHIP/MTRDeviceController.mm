@@ -17,6 +17,7 @@
 #import "MTRDeviceController.h"
 
 #import "MTRCommissioningParameters.h"
+#import "MTRControllerFactory_Internal.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDevicePairingDelegateBridge.h"
@@ -28,7 +29,6 @@
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRSetupPayload.h"
-#import "MTRControllerFactory_Internal.h"
 #import "NSDataSpanConversion.h"
 #import <setup_payload/ManualSetupPayloadGenerator.h>
 #import <setup_payload/SetupPayload.h>
@@ -39,9 +39,9 @@
 
 #include <platform/CHIPDeviceBuildConfig.h>
 
+#include <controller/CommissioningWindowOpener.h>
 #include <controller/MTRDeviceController.h>
 #include <controller/MTRDeviceControllerFactory.h>
-#include <controller/CommissioningWindowOpener.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>

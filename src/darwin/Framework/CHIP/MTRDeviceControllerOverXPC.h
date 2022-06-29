@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  * connect to an XPC listener.
  */
 + (MTRDeviceControllerOverXPC *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerId
-                                        xpcConnectBlock:(NSXPCConnection * (^)(void) )connectBlock;
+                                       xpcConnectBlock:(NSXPCConnection * (^)(void) )connectBlock;
 
 @end
 

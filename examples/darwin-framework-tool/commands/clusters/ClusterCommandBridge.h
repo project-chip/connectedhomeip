@@ -18,9 +18,8 @@
 
 #pragma once
 
-
-#import <Matter/Matter.h>
 #import "MTRError_Utils.h"
+#import <Matter/Matter.h>
 
 #include <lib/support/UnitTestUtils.h>
 

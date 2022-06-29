@@ -15,10 +15,10 @@
  */
 
 #import "MTRDeviceControllerStartupParams.h"
+#import "MTRCertificates.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRLogging.h"
 #import "MTRP256KeypairBridge.h"
-#import "MTRCertificates.h"
 #import "NSDataSpanConversion.h"
 
 #include <controller/OperationalCredentialsDelegate.h>

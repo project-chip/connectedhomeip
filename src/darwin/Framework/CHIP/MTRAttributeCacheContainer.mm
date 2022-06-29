@@ -100,24 +100,24 @@ static CHIP_ERROR AppendAttibuteValueToArray(
         }
         __auto_type controllerId = self.xpcControllerId;
         uint64_t nodeId = self.deviceId;
-        [xpcConnection getProxyHandleWithCompletion:^(
-            dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
-            if (handle) {
-                [handle.proxy readAttributeCacheWithController:controllerId
-                                                        nodeId:nodeId
-                                                    endpointId:endpointId
-                                                     clusterId:clusterId
-                                                   attributeId:attributeId
-                                                    completion:^(id _Nullable values, NSError * _Nullable error) {
-                                                        completion([MTRDeviceController decodeXPCResponseValues:values], error);
-                                                        __auto_type handleRetainer = handle;
-                                                        (void) handleRetainer;
-                                                    }];
-            } else {
-                CHIP_LOG_ERROR("Attribute cache read failed due to XPC connection failure");
-                completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
-            }
-        }];
+        [xpcConnection
+            getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
+                if (handle) {
+                    [handle.proxy readAttributeCacheWithController:controllerId
+                                                            nodeId:nodeId
+                                                        endpointId:endpointId
+                                                         clusterId:clusterId
+                                                       attributeId:attributeId
+                                                        completion:^(id _Nullable values, NSError * _Nullable error) {
+                                                            completion([MTRDeviceController decodeXPCResponseValues:values], error);
+                                                            __auto_type handleRetainer = handle;
+                                                            (void) handleRetainer;
+                                                        }];
+                } else {
+                    CHIP_LOG_ERROR("Attribute cache read failed due to XPC connection failure");
+                    completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+                }
+            }];
         return;
     }
 

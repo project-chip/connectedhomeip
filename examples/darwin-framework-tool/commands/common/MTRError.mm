@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#import <Matter/Matter.h>
 #import "MTRError_Utils.h"
 #import "MTRLogging.h"
+#import <Matter/Matter.h>
 
 #import <app/MessageDef/StatusIB.h>
 #import <app/util/af-enums.h>
@@ -50,7 +50,7 @@ CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
 
     if (error.userInfo != nil) {
         id underlyingError = error.userInfo[@"underlyingError"];
-        if (underlyingError != nil && [underlyingError isKindOfClass: [MTRErrorHolder class]]) {
+        if (underlyingError != nil && [underlyingError isKindOfClass:[MTRErrorHolder class]]) {
             return ((MTRErrorHolder *) underlyingError).error;
         }
     }
@@ -93,7 +93,6 @@ CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
     return chip::ChipError(code);
 }
 
-
 // Convert TLV data into NSObject
 id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
 {
@@ -106,8 +105,8 @@ id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             CHIP_LOG_ERROR("Error(%s): TLV signed integer decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:MTRSignedIntegerValueType, MTRTypeKey,
-                             [NSNumber numberWithLongLong:val], MTRValueKey, nil];
+        return [NSDictionary dictionaryWithObjectsAndKeys:MTRSignedIntegerValueType, MTRTypeKey, [NSNumber numberWithLongLong:val],
+                             MTRValueKey, nil];
     }
     case chip::TLV::kTLVType_UnsignedInteger: {
         uint64_t val;

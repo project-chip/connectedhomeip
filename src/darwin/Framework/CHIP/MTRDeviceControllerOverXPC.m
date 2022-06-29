@@ -38,12 +38,12 @@ static void SetupXPCQueue(void)
 @implementation MTRDeviceControllerOverXPC
 
 + (MTRDeviceControllerOverXPC *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerId
-                                        xpcConnectBlock:(NSXPCConnection * (^)(void) )connectBlock
+                                       xpcConnectBlock:(NSXPCConnection * (^)(void) )connectBlock
 {
     SetupXPCQueue();
     return [[MTRDeviceControllerOverXPC alloc] initWithControllerId:controllerId
-                                                           workQueue:globalWorkQueue
-                                                        connectBlock:connectBlock];
+                                                          workQueue:globalWorkQueue
+                                                       connectBlock:connectBlock];
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID
@@ -133,8 +133,8 @@ static void SetupXPCQueue(void)
         dispatch_group_notify(group, queue, ^{
             if (self.controllerId) {
                 MTRDeviceOverXPC * device = [[MTRDeviceOverXPC alloc] initWithController:self.controllerId
-                                                                                  deviceId:deviceID
-                                                                             xpcConnection:self.xpcConnection];
+                                                                                deviceId:deviceID
+                                                                           xpcConnection:self.xpcConnection];
                 completionHandler(device, nil);
             } else {
                 completionHandler(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);

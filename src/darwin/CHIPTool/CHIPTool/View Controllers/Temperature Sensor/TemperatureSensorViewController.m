@@ -190,8 +190,9 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
 {
     if (CHIPGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                MTRTemperatureMeasurement * cluster =
-                    [[MTRTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
+                MTRTemperatureMeasurement * cluster = [[MTRTemperatureMeasurement alloc] initWithDevice:chipDevice
+                                                                                               endpoint:1
+                                                                                                  queue:dispatch_get_main_queue()];
 
                 [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                     if (error != nil)

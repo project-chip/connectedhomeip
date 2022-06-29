@@ -18,8 +18,8 @@
 #import "MTRQRCodeSetupPayloadParser.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging.h"
-#import "MTRSetupPayload_Internal.h"
 #import "MTRMemory.h"
+#import "MTRSetupPayload_Internal.h"
 
 #import <setup_payload/QRCodeSetupPayloadParser.h>
 #import <setup_payload/SetupPayload.h>

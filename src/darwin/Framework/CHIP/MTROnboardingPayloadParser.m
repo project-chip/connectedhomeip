@@ -23,8 +23,8 @@
 @implementation MTROnboardingPayloadParser
 
 + (nullable MTRSetupPayload *)setupPayloadForOnboardingPayload:(NSString *)onboardingPayload
-                                                         ofType:(MTROnboardingPayloadType)type
-                                                          error:(NSError * __autoreleasing *)error
+                                                        ofType:(MTROnboardingPayloadType)type
+                                                         error:(NSError * __autoreleasing *)error
 {
     MTRSetupPayload * payload;
     switch (type) {
@@ -43,7 +43,7 @@
 }
 
 + (nullable MTRSetupPayload *)setupPayloadForQRCodeOnboardingPayload:(NSString *)onboardingPayload
-                                                                error:(NSError * __autoreleasing *)error
+                                                               error:(NSError * __autoreleasing *)error
 {
     MTRQRCodeSetupPayloadParser * qrCodeParser =
         [[MTRQRCodeSetupPayloadParser alloc] initWithBase38Representation:onboardingPayload];
@@ -51,7 +51,7 @@
 }
 
 + (nullable MTRSetupPayload *)setupPayloadForManualCodeOnboardingPayload:(NSString *)onboardingPayload
-                                                                    error:(NSError * __autoreleasing *)error
+                                                                   error:(NSError * __autoreleasing *)error
 {
     MTRManualSetupPayloadParser * manualParser =
         [[MTRManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:onboardingPayload];

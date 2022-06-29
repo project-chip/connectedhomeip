@@ -25,7 +25,8 @@ typedef NS_ENUM(NSUInteger, MTRRendezvousInformationFlags) {
     MTRRendezvousInformationBLE = 1 << 1, // Device supports BLE
     MTRRendezvousInformationOnNetwork = 1 << 2, // Device supports On Network setup
 
-    MTRRendezvousInformationAllMask = MTRRendezvousInformationSoftAP | MTRRendezvousInformationBLE | MTRRendezvousInformationOnNetwork,
+    MTRRendezvousInformationAllMask
+    = MTRRendezvousInformationSoftAP | MTRRendezvousInformationBLE | MTRRendezvousInformationOnNetwork,
 };
 
 typedef NS_ENUM(NSUInteger, MTRCommissioningFlow) {

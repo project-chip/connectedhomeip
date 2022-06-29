@@ -455,8 +455,8 @@ id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             CHIP_LOG_ERROR("Error(%s): TLV signed integer decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:MTRSignedIntegerValueType, MTRTypeKey,
-                             [NSNumber numberWithLongLong:val], MTRValueKey, nil];
+        return [NSDictionary dictionaryWithObjectsAndKeys:MTRSignedIntegerValueType, MTRTypeKey, [NSNumber numberWithLongLong:val],
+                             MTRValueKey, nil];
     }
     case chip::TLV::kTLVType_UnsignedInteger: {
         uint64_t val;
@@ -1148,9 +1148,7 @@ exit:
             app::ConcreteAttributePath pathCopy = attribPath;
             dispatch_async(clientQueue, ^{
                 reportHandler(
-                    @[
-                        @ { MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy], MTRDataKey : valueObject }
-                    ],
+                    @[ @ { MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy], MTRDataKey : valueObject } ],
                     nil);
             });
         };
@@ -1444,11 +1442,11 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
     }
 
     [mEventReports addObject:[[MTREventReport alloc] initWithPath:aEventHeader.mPath
-                                                       eventNumber:@(aEventHeader.mEventNumber)
-                                                          priority:@((uint8_t) aEventHeader.mPriorityLevel)
-                                                         timestamp:@(aEventHeader.mTimestamp.mValue)
-                                                             value:value
-                                                             error:error]];
+                                                      eventNumber:@(aEventHeader.mEventNumber)
+                                                         priority:@((uint8_t) aEventHeader.mPriorityLevel)
+                                                        timestamp:@(aEventHeader.mTimestamp.mValue)
+                                                            value:value
+                                                            error:error]];
 }
 
 void SubscriptionCallback::OnAttributeData(

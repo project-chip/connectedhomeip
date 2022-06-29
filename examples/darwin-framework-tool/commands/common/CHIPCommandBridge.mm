@@ -84,8 +84,8 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     for (size_t i = 0; i < ArraySize(identities); ++i) {
         auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:nocSigner
-                                                                                         fabricId:(i + 1)
-                                                                                              ipk:ipk];
+                                                                                        fabricId:(i + 1)
+                                                                                             ipk:ipk];
 
         // We're not sure whether we're creating a new fabric or using an
         // existing one, so just try both.

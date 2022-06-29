@@ -180,15 +180,15 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
         }
         NSLog(@"Attempting to unpair device %llu", deviceId);
         MTROperationalCredentials * opCredsCluster = [[MTROperationalCredentials alloc] initWithDevice:device
-                                                                                                endpoint:0
-                                                                                                   queue:dispatch_get_main_queue()];
+                                                                                              endpoint:0
+                                                                                                 queue:dispatch_get_main_queue()];
         [opCredsCluster
             readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                 if (error) {
                     NSLog(@"Failed to get current fabric index for device %llu still removing from CHIPTool. %@", deviceId, error);
                     return;
                 }
-            MTROperationalCredentialsClusterRemoveFabricParams * params =
+                MTROperationalCredentialsClusterRemoveFabricParams * params =
                     [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
                 params.fabricIndex = value;
                 [opCredsCluster removeFabricWithParams:params

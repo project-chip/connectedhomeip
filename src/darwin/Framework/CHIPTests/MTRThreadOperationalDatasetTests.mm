@@ -65,11 +65,11 @@
     const uint16_t panID = 0x0;
     MTRThreadOperationalDataset * dataset =
         [[MTRThreadOperationalDataset alloc] initWithNetworkName:@"TestNetwork"
-                                                    extendedPANID:[NSData dataWithBytes:&extendedPANID length:sizeof(extendedPANID)]
-                                                        masterKey:[NSData dataWithBytes:&masterKey length:sizeof(masterKey)]
-                                                             PSKc:[NSData dataWithBytes:&PKSc length:sizeof(PKSc)]
-                                                          channel:25
-                                                            panID:[NSData dataWithBytes:&panID length:sizeof(panID)]];
+                                                   extendedPANID:[NSData dataWithBytes:&extendedPANID length:sizeof(extendedPANID)]
+                                                       masterKey:[NSData dataWithBytes:&masterKey length:sizeof(masterKey)]
+                                                            PSKc:[NSData dataWithBytes:&PKSc length:sizeof(PKSc)]
+                                                         channel:25
+                                                           panID:[NSData dataWithBytes:&panID length:sizeof(panID)]];
 
     XCTAssertNil(dataset);
 }

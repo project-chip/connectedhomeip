@@ -21,9 +21,9 @@
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
 #import "DeviceSelector.h"
-#import <Matter/Matter.h>
 #import <Matter/MTRDeviceAttestationDelegate.h>
 #import <Matter/MTRSetupPayload.h>
+#import <Matter/Matter.h>
 
 // system imports
 #import <AVFoundation/AVFoundation.h>
@@ -640,8 +640,8 @@
                                                  }
 
                                                  if ([networkPassword.text length] > 0) {
-                                                     CHIPSetDomainValueForKey(MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey,
-                                                         networkPassword.text);
+                                                     CHIPSetDomainValueForKey(
+                                                         MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey, networkPassword.text);
                                                  }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
 
@@ -929,8 +929,7 @@
     NSString * decimalString = _manualCodeTextField.text;
     [self manualCodeEnteredStartState];
 
-    MTRManualSetupPayloadParser * parser =
-        [[MTRManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:decimalString];
+    MTRManualSetupPayloadParser * parser = [[MTRManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:decimalString];
     NSError * error;
     _setupPayload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^{

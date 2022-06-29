@@ -39,8 +39,8 @@
 {
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
-                                                                                        ofType:MTROnboardingPayloadTypeManualCode
-                                                                                         error:&error];
+                                                                                      ofType:MTROnboardingPayloadTypeManualCode
+                                                                                       error:&error];
 
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
@@ -58,8 +58,8 @@
 {
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
-                                                                                        ofType:MTROnboardingPayloadTypeQRCode
-                                                                                         error:&error];
+                                                                                      ofType:MTROnboardingPayloadTypeQRCode
+                                                                                       error:&error];
 
     XCTAssertNil(payload);
     XCTAssertEqual(error.code, MTRErrorCodeInvalidArgument);
@@ -69,8 +69,8 @@
 {
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
-                                                                                        ofType:MTROnboardingPayloadTypeAdmin
-                                                                                         error:&error];
+                                                                                      ofType:MTROnboardingPayloadTypeAdmin
+                                                                                       error:&error];
 
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
@@ -88,8 +88,8 @@
 {
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
-                                                                                        ofType:MTROnboardingPayloadTypeQRCode
-                                                                                         error:&error];
+                                                                                      ofType:MTROnboardingPayloadTypeQRCode
+                                                                                       error:&error];
 
     XCTAssertNil(payload);
     XCTAssertEqual(error.code, MTRErrorCodeInvalidArgument);
@@ -99,8 +99,8 @@
 {
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"MT:R5L90MP500K64J00000"
-                                                                                        ofType:MTROnboardingPayloadTypeQRCode
-                                                                                         error:&error];
+                                                                                      ofType:MTROnboardingPayloadTypeQRCode
+                                                                                       error:&error];
 
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
@@ -118,8 +118,8 @@
 {
     NSError * error;
     MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:@"MT:R5L90MP500K64J00000"
-                                                                                        ofType:MTROnboardingPayloadTypeAdmin
-                                                                                         error:&error];
+                                                                                      ofType:MTROnboardingPayloadTypeAdmin
+                                                                                       error:&error];
 
     XCTAssertNil(payload);
     XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);

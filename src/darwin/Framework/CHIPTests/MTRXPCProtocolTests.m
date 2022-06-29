@@ -159,8 +159,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void));
 @property (readwrite, strong) void (^handleStopReports)(id controller, uint64_t nodeId, void (^completion)(void));
 @property (readwrite, strong) void (^handleSubscribeAll)(id controller, uint64_t nodeId, NSNumber * minInterval,
-    NSNumber * maxInterval, MTRSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error))
-    ;
+    NSNumber * maxInterval, MTRSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error));
 @property (readwrite, strong) void (^handleReadAttributeCache)
     (id controller, uint64_t nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
         NSNumber * _Nullable attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error));
@@ -287,8 +286,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         XCTAssertNotNil(self.handleSubscribeAll);
-        self.handleSubscribeAll(controller, nodeId, minInterval, maxInterval,
-            [MTRDeviceController decodeXPCSubscribeParams:params], shouldCache, completion);
+        self.handleSubscribeAll(controller, nodeId, minInterval, maxInterval, [MTRDeviceController decodeXPCSubscribeParams:params],
+            shouldCache, completion);
     });
 }
 
@@ -317,9 +316,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     _controllerUUID = [[NSUUID UUID] UUIDString];
     _remoteDeviceController =
         [MTRDeviceController sharedControllerWithId:_controllerUUID
-                                     xpcConnectBlock:^NSXPCConnection * {
-                                         return [[NSXPCConnection alloc] initWithListenerEndpoint:self.xpcListener.endpoint];
-                                     }];
+                                    xpcConnectBlock:^NSXPCConnection * {
+                                        return [[NSXPCConnection alloc] initWithListenerEndpoint:self.xpcListener.endpoint];
+                                    }];
 }
 
 - (void)tearDown
@@ -338,8 +337,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myAttributeId = @300;
     NSArray * myValues = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
 
@@ -397,8 +396,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myAttributeId = @300;
     NSArray * myValues = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     MTRReadParams * myParams = [[MTRReadParams alloc] init];
@@ -513,8 +512,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithInteger:654321], @"value", nil];
     NSArray * myResults = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId]
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId]
     } ];
 
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -575,8 +574,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myTimedWriteTimeout = @1234;
     NSArray * myResults = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId]
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId]
     } ];
 
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -874,8 +873,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -942,8 +941,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -992,8 +991,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     myParams.keepPreviousSubscriptions = @NO;
     __block NSArray * myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1062,8 +1061,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1174,8 +1173,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     reportExpectation = [self expectationWithDescription:@"Report sent"];
     myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1222,8 +1221,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:@([myEndpointId unsignedShortValue] + 1)
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1291,8 +1290,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1338,8 +1337,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:@([myClusterId unsignedLongValue] + 1)
-                                                              attributeId:myAttributeId],
+                                                               clusterId:@([myClusterId unsignedLongValue] + 1)
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1407,8 +1406,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1454,8 +1453,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:@([myAttributeId unsignedLongValue] + 1)],
+                                                               clusterId:myClusterId
+                                                             attributeId:@([myAttributeId unsignedLongValue] + 1)],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1523,8 +1522,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1570,8 +1569,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1639,8 +1638,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1686,8 +1685,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1754,8 +1753,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1801,8 +1800,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1869,8 +1868,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1916,8 +1915,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1984,8 +1983,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -2108,14 +2107,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         myReports = @[
             @[ @{
                 @"attributePath" : [MTRAttributePath attributePathWithEndpointId:endpointIds[0]
-                                                                        clusterId:clusterIds[0]
-                                                                      attributeId:attributeIds[0]],
+                                                                       clusterId:clusterIds[0]
+                                                                     attributeId:attributeIds[0]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:123456 + count * 100] }
             } ],
             @[ @{
                 @"attributePath" : [MTRAttributePath attributePathWithEndpointId:endpointIds[1]
-                                                                        clusterId:clusterIds[1]
-                                                                      attributeId:attributeIds[1]],
+                                                                       clusterId:clusterIds[1]
+                                                                     attributeId:attributeIds[1]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:123457 + count * 100] }
             } ]
         ];
@@ -2166,14 +2165,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         myReports = @[
             @[ @{
                 @"attributePath" : [MTRAttributePath attributePathWithEndpointId:endpointIds[0]
-                                                                        clusterId:clusterIds[0]
-                                                                      attributeId:attributeIds[0]],
+                                                                       clusterId:clusterIds[0]
+                                                                     attributeId:attributeIds[0]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:223456 + count * 100] }
             } ],
             @[ @{
                 @"attributePath" : [MTRAttributePath attributePathWithEndpointId:endpointIds[1]
-                                                                        clusterId:clusterIds[1]
-                                                                      attributeId:attributeIds[1]],
+                                                                       clusterId:clusterIds[1]
+                                                                     attributeId:attributeIds[1]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:223457 + count * 100] }
             } ]
         ];
@@ -2228,14 +2227,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         myReports = @[
             @[ @{
                 @"attributePath" : [MTRAttributePath attributePathWithEndpointId:endpointIds[0]
-                                                                        clusterId:clusterIds[0]
-                                                                      attributeId:attributeIds[0]],
+                                                                       clusterId:clusterIds[0]
+                                                                     attributeId:attributeIds[0]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:223456 + count * 100] }
             } ],
             @[ @{
                 @"attributePath" : [MTRAttributePath attributePathWithEndpointId:endpointIds[1]
-                                                                        clusterId:clusterIds[1]
-                                                                      attributeId:attributeIds[1]],
+                                                                       clusterId:clusterIds[1]
+                                                                     attributeId:attributeIds[1]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:223457 + count * 100] }
             } ]
         ];
@@ -2259,9 +2258,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type unspecifiedRemoteDeviceController =
         [MTRDeviceController sharedControllerWithId:nil
-                                     xpcConnectBlock:^NSXPCConnection * {
-                                         return [[NSXPCConnection alloc] initWithListenerEndpoint:self.xpcListener.endpoint];
-                                     }];
+                                    xpcConnectBlock:^NSXPCConnection * {
+                                        return [[NSXPCConnection alloc] initWithListenerEndpoint:self.xpcListener.endpoint];
+                                    }];
 
     __auto_type anySharedRemoteControllerCallExpectation =
         [self expectationWithDescription:@"getAnySharedRemoteController was called"];
@@ -2396,8 +2395,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myAttributeId = @300;
     NSArray * myValues = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                                clusterId:myClusterId
-                                                              attributeId:myAttributeId],
+                                                               clusterId:myClusterId
+                                                             attributeId:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
 
@@ -2527,9 +2526,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     // Test with a device controller which wouldn't connect to XPC listener successfully
     __auto_type failingDeviceController = [MTRDeviceController sharedControllerWithId:_controllerUUID
-                                                                       xpcConnectBlock:^NSXPCConnection * {
-                                                                           return nil;
-                                                                       }];
+                                                                      xpcConnectBlock:^NSXPCConnection * {
+                                                                          return nil;
+                                                                      }];
 
     [failingDeviceController getConnectedDevice:myNodeId
                                           queue:dispatch_get_main_queue()

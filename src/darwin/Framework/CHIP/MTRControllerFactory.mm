@@ -18,16 +18,16 @@
 #import "MTRControllerFactory_Internal.h"
 
 #import "MTRAttestationTrustStoreBridge.h"
+#import "MTRCertificates.h"
 #import "MTRControllerAccessControl.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRLogging.h"
+#import "MTRMemory.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
-#import "MTRCertificates.h"
-#import "MTRMemory.h"
 #import "NSDataSpanConversion.h"
 
 #include <controller/CHIPDeviceControllerFactory.h>

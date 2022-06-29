@@ -16,8 +16,8 @@
  */
 
 #import <AVFoundation/AVFoundation.h>
-#import <Matter/Matter.h>
 #import <CoreNFC/CoreNFC.h>
+#import <Matter/Matter.h>
 #import <UIKit/UIKit.h>
 
 @interface QRCodeViewController

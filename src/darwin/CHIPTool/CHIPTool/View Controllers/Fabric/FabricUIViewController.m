@@ -219,8 +219,9 @@
     NSLog(@"Fetching the commissioned fabrics attribute");
     if (CHIPGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                MTROperationalCredentials * cluster =
-                    [[MTROperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
+                MTROperationalCredentials * cluster = [[MTROperationalCredentials alloc] initWithDevice:chipDevice
+                                                                                               endpoint:0
+                                                                                                  queue:dispatch_get_main_queue()];
                 [cluster
                     readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                         if (!error) {
@@ -266,8 +267,9 @@
     NSLog(@"Request to fetchFabricsList");
     if (CHIPGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                MTROperationalCredentials * cluster =
-                    [[MTROperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
+                MTROperationalCredentials * cluster = [[MTROperationalCredentials alloc] initWithDevice:chipDevice
+                                                                                               endpoint:0
+                                                                                                  queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"readAttributeFabrics command sent."] isError:NO];
                 MTRReadParams * params = [[MTRReadParams alloc] init];
                 params.fabricFiltered = @NO;
@@ -328,8 +330,8 @@
 
                             MTROperationalCredentials * opCredsCluster =
                                 [[MTROperationalCredentials alloc] initWithDevice:chipDevice
-                                                                          endpoint:0
-                                                                             queue:dispatch_get_main_queue()];
+                                                                         endpoint:0
+                                                                            queue:dispatch_get_main_queue()];
 
                             dispatch_group_t removeGroup = dispatch_group_create();
                             // Loop over the list of all fabrics and for each, call remove
@@ -398,8 +400,9 @@
 
     if (CHIPGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                MTROperationalCredentials * cluster =
-                    [[MTROperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
+                MTROperationalCredentials * cluster = [[MTROperationalCredentials alloc] initWithDevice:chipDevice
+                                                                                               endpoint:0
+                                                                                                  queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"updateFabricLabel command sent."] isError:NO];
                 __auto_type * params = [[MTROperationalCredentialsClusterUpdateFabricLabelParams alloc] init];
                 params.label = label;
@@ -460,7 +463,7 @@
                 [opCredsCluster
                     removeFabricWithParams:params
                          completionHandler:^(
-                                             MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error) {
+                             MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error) {
                              if (!error) {
                                  if (fabricIndex == self.currentFabricIndex) {
                                      CHIPSetDevicePaired(CHIPGetLastPairedDeviceId(), NO);

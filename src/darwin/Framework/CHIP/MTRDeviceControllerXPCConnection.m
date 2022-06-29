@@ -83,8 +83,8 @@
     return [[MTRDeviceControllerXPCConnection alloc] initWithWorkQueue:workQueue connectBlock:connectBlock];
 }
 
-- (void)getProxyHandleWithCompletion:(void (^)(dispatch_queue_t queue,
-                                         MTRDeviceControllerXPCProxyHandle * _Nullable container))completion
+- (void)getProxyHandleWithCompletion:(void (^)(
+                                         dispatch_queue_t queue, MTRDeviceControllerXPCProxyHandle * _Nullable container))completion
 {
     dispatch_async(_workQueue, ^{
         MTRDeviceControllerXPCProxyHandle * container = self.proxyHandle;

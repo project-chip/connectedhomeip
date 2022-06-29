@@ -240,8 +240,8 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
         if (CHIPGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
                     MTROnOff * onOff = [[MTROnOff alloc] initWithDevice:chipDevice
-                                                                 endpoint:endpoint
-                                                                    queue:dispatch_get_main_queue()];
+                                                               endpoint:endpoint
+                                                                  queue:dispatch_get_main_queue()];
                     [onOff onWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)
                             ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
@@ -269,8 +269,8 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
         if (CHIPGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
                     MTROnOff * onOff = [[MTROnOff alloc] initWithDevice:chipDevice
-                                                                 endpoint:endpoint
-                                                                    queue:dispatch_get_main_queue()];
+                                                               endpoint:endpoint
+                                                                  queue:dispatch_get_main_queue()];
                     [onOff offWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)
                             ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
@@ -298,8 +298,8 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
         if (CHIPGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
                     MTROnOff * onOff = [[MTROnOff alloc] initWithDevice:chipDevice
-                                                                 endpoint:endpoint
-                                                                    queue:dispatch_get_main_queue()];
+                                                               endpoint:endpoint
+                                                                  queue:dispatch_get_main_queue()];
                     [onOff toggleWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)
                             ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]

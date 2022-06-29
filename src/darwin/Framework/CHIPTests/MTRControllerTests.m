@@ -448,9 +448,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
     XCTAssertNotNil(root);
 
-    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:signerKeys
-                                                                                    fabricId:1
-                                                                                         ipk:rootKeys.ipk];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:signerKeys fabricId:1 ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
     params.vendorId = @(kTestVendorId);
@@ -795,8 +793,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(intermediate);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys
-                                                                                    fabricId:1
-                                                                                         ipk:rootKeys.ipk];
+                                                                                   fabricId:1
+                                                                                        ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
     params.vendorId = @(kTestVendorId);
@@ -870,8 +868,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(intermediate2);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys1
-                                                                                    fabricId:1
-                                                                                         ipk:rootKeys.ipk];
+                                                                                   fabricId:1
+                                                                                        ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
     params.vendorId = @(kTestVendorId);
@@ -934,8 +932,8 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(intermediate);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys
-                                                                                    fabricId:1
-                                                                                         ipk:rootKeys.ipk];
+                                                                                   fabricId:1
+                                                                                        ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
     params.vendorId = @(kTestVendorId);
@@ -989,10 +987,10 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(operational);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithOperationalKeypair:operationalKeys
-                                                                          operationalCertificate:operational
-                                                                         intermediateCertificate:intermediate
-                                                                                 rootCertificate:root
-                                                                                             ipk:rootKeys.ipk];
+                                                                         operationalCertificate:operational
+                                                                        intermediateCertificate:intermediate
+                                                                                rootCertificate:root
+                                                                                            ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
     params.vendorId = @(kTestVendorId);
@@ -1053,10 +1051,10 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(operational);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithOperationalKeypair:operationalKeys
-                                                                          operationalCertificate:operational
-                                                                         intermediateCertificate:nil
-                                                                                 rootCertificate:root
-                                                                                             ipk:rootKeys.ipk];
+                                                                         operationalCertificate:operational
+                                                                        intermediateCertificate:nil
+                                                                                rootCertificate:root
+                                                                                            ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
     params.vendorId = @(kTestVendorId);
@@ -1103,10 +1101,10 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(operational);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithOperationalKeypair:operationalKeys
-                                                                          operationalCertificate:operational
-                                                                         intermediateCertificate:nil
-                                                                                 rootCertificate:root
-                                                                                             ipk:rootKeys.ipk];
+                                                                         operationalCertificate:operational
+                                                                        intermediateCertificate:nil
+                                                                                rootCertificate:root
+                                                                                            ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
     params.vendorId = @(kTestVendorId);
@@ -1158,10 +1156,10 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(operational);
 
     __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithOperationalKeypair:operationalKeys
-                                                                          operationalCertificate:operational
-                                                                         intermediateCertificate:intermediate
-                                                                                 rootCertificate:root
-                                                                                             ipk:rootKeys.ipk];
+                                                                         operationalCertificate:operational
+                                                                        intermediateCertificate:intermediate
+                                                                                rootCertificate:root
+                                                                                            ipk:rootKeys.ipk];
     XCTAssertNotNil(params);
 
     params.vendorId = @(kTestVendorId);

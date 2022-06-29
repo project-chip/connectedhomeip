@@ -58,33 +58,33 @@ NS_ASSUME_NONNULL_BEGIN
     if (attributeCacheContainer) {
         [attributeCacheContainer setXPCConnection:_xpcConnection controllerId:self.controller deviceId:self.nodeId];
     }
-    [_xpcConnection getProxyHandleWithCompletion:^(
-        dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
-        if (handle) {
-            [handle.proxy subscribeWithController:self.controller
-                                           nodeId:self.nodeId
-                                      minInterval:@(minInterval)
-                                      maxInterval:@(maxInterval)
-                                           params:[MTRDeviceController encodeXPCSubscribeParams:params]
-                                      shouldCache:(attributeCacheContainer != nil)
-                                       completion:^(NSError * _Nullable error) {
-                                           dispatch_async(queue, ^{
-                                               if (error) {
-                                                   reportHandler(nil, error);
-                                               } else {
-                                                   subscriptionEstablishedHandler();
-                                               }
-                                           });
-                                           __auto_type handleRetainer = handle;
-                                           (void) handleRetainer;
-                                       }];
-        } else {
-            CHIP_LOG_ERROR("Failed to obtain XPC connection to write attribute");
-            dispatch_async(queue, ^{
-                reportHandler(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
-            });
-        }
-    }];
+    [_xpcConnection
+        getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
+            if (handle) {
+                [handle.proxy subscribeWithController:self.controller
+                                               nodeId:self.nodeId
+                                          minInterval:@(minInterval)
+                                          maxInterval:@(maxInterval)
+                                               params:[MTRDeviceController encodeXPCSubscribeParams:params]
+                                          shouldCache:(attributeCacheContainer != nil)
+                                           completion:^(NSError * _Nullable error) {
+                                               dispatch_async(queue, ^{
+                                                   if (error) {
+                                                       reportHandler(nil, error);
+                                                   } else {
+                                                       subscriptionEstablishedHandler();
+                                                   }
+                                               });
+                                               __auto_type handleRetainer = handle;
+                                               (void) handleRetainer;
+                                           }];
+            } else {
+                CHIP_LOG_ERROR("Failed to obtain XPC connection to write attribute");
+                dispatch_async(queue, ^{
+                    reportHandler(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+                });
+            }
+        }];
 }
 
 - (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId

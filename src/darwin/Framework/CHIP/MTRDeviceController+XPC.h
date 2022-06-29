@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param connectBlock  block to connect to an XPC listener serving the shared device controllers in an implementation specific way
  */
 + (MTRDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerId
-                                 xpcConnectBlock:(NSXPCConnection * (^)(void) )connectBlock;
+                                xpcConnectBlock:(NSXPCConnection * (^)(void) )connectBlock;
 
 /**
  * Returns an encoded values object to send over XPC for read, write and command interactions

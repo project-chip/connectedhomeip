@@ -23,8 +23,8 @@
 
 #include <Security/SecKey.h>
 
-#import "MTRLogging.h"
 #import "MTRCertificates.h"
+#import "MTRLogging.h"
 #import "NSDataSpanConversion.h"
 
 #include <credentials/CHIPCert.h>
@@ -234,8 +234,8 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateRootCertificate(id<MTRKeyp
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MTROperationalCredentialsDelegate::GenerateIntermediateCertificate(id<MTRKeypair> rootKeypair,
-    NSData * rootCertificate, SecKeyRef intermediatePublicKey, NSNumber * _Nullable issuerId, NSNumber * _Nullable fabricId,
+CHIP_ERROR MTROperationalCredentialsDelegate::GenerateIntermediateCertificate(id<MTRKeypair> rootKeypair, NSData * rootCertificate,
+    SecKeyRef intermediatePublicKey, NSNumber * _Nullable issuerId, NSNumber * _Nullable fabricId,
     NSData * _Nullable __autoreleasing * _Nonnull intermediateCert)
 {
     *intermediateCert = nil;

@@ -19,10 +19,10 @@
  */
 
 // module headers
-#import <Matter/Matter.h>
 #import <Matter/MTRAttributeCacheContainer.h>
 #import <Matter/MTRClustersObjc.h>
 #import <Matter/MTRDevice.h>
+#import <Matter/Matter.h>
 
 #import "MTRErrorTestUtils.h"
 #import "MTRTestKeys.h"
@@ -532,21 +532,21 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     NSDictionary * writeValue = [NSDictionary
         dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithUnsignedInteger:200], @"value", nil];
-    [device writeAttributeWithEndpointId:@1
-                               clusterId:@8
-                             attributeId:@10000
-                                   value:writeValue
-                       timedWriteTimeout:nil
-                             clientQueue:queue
-                              completion:^(id _Nullable values, NSError * _Nullable error) {
-                                  NSLog(@"write attribute: Brightness values: %@, error: %@", values, error);
+    [device
+        writeAttributeWithEndpointId:@1
+                           clusterId:@8
+                         attributeId:@10000
+                               value:writeValue
+                   timedWriteTimeout:nil
+                         clientQueue:queue
+                          completion:^(id _Nullable values, NSError * _Nullable error) {
+                              NSLog(@"write attribute: Brightness values: %@, error: %@", values, error);
 
-                                  XCTAssertNil(values);
-                                  XCTAssertEqual(
-                                      [MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE);
+                              XCTAssertNil(values);
+                              XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE);
 
-                                  [expectation fulfill];
-                              }];
+                              [expectation fulfill];
+                          }];
 
     [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:kTimeoutInSeconds];
 }
@@ -749,14 +749,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Reading from cache...");
     XCTestExpectation * cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
     [MTROnOff readAttributeOnOffWithAttributeCache:attributeCacheContainer
-                                           endpoint:@1
-                                              queue:queue
-                                  completionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-                                      NSLog(@"Read attribute cache value: %@, error: %@", value, err);
-                                      XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
-                                      XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:YES]]);
-                                      [cacheExpectation fulfill];
-                                  }];
+                                          endpoint:@1
+                                             queue:queue
+                                 completionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                                     NSLog(@"Read attribute cache value: %@, error: %@", value, err);
+                                     XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
+                                     XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:YES]]);
+                                     [cacheExpectation fulfill];
+                                 }];
     [self waitForExpectations:[NSArray arrayWithObject:cacheExpectation] timeout:kTimeoutInSeconds];
 
     // Add another subscriber of the attribute to verify that attribute cache still works when there are other subscribers.
@@ -814,14 +814,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Reading from cache...");
     cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
     [MTROnOff readAttributeOnOffWithAttributeCache:attributeCacheContainer
-                                           endpoint:@1
-                                              queue:queue
-                                  completionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-                                      NSLog(@"Read attribute cache value: %@, error: %@", value, err);
-                                      XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
-                                      XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:NO]]);
-                                      [cacheExpectation fulfill];
-                                  }];
+                                          endpoint:@1
+                                             queue:queue
+                                 completionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                                     NSLog(@"Read attribute cache value: %@, error: %@", value, err);
+                                     XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
+                                     XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:NO]]);
+                                     [cacheExpectation fulfill];
+                                 }];
     [self waitForExpectations:[NSArray arrayWithObject:cacheExpectation] timeout:kTimeoutInSeconds];
 
     // Read from cache using generic path

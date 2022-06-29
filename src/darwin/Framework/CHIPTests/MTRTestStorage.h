@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#import <Matter/Matter.h>
 #import <Foundation/Foundation.h>
+#import <Matter/Matter.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
