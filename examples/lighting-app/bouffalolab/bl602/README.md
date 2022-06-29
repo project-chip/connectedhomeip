@@ -10,7 +10,8 @@ BL602 development board:
 
 The steps in this document were validated on Ubuntu 18.04 and 20.04.
 
--   Install dependencies as specified in the connectedhomeip repository: [Building Matter](https://github.com/project-chip/connectedhomeip/blob/interop_testing_te9/docs/guides/BUILDING.md).
+-   Install dependencies as specified in the connectedhomeip repository:
+    [Building Matter](https://github.com/project-chip/connectedhomeip/blob/interop_testing_te9/docs/guides/BUILDING.md).
 -   Install other dependencies:
 
     ```
@@ -52,44 +53,53 @@ The steps in this document were validated on Ubuntu 18.04 and 20.04.
 
 ## Flash the board
 
--   Build the [lighting-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/lighting-app/bouffalolab/bl602)
+-   Build the
+    [lighting-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/lighting-app/bouffalolab/bl602)
 
     ```
     ./scripts/build/build_examples.py --target bl602-light build
     ```
 
-- Connect the board to your flashing station (MacOS, Ubuntu, Windows).
+-   Connect the board to your flashing station (MacOS, Ubuntu, Windows).
 
-- Set the board to the download mode:
+-   Set the board to the download mode:
 
-  -   Press and hold the BOOT button.
-  -   Press the RESET button and release it.
-  -   Release the BOOT button.
+    -   Press and hold the BOOT button.
+    -   Press the RESET button and release it.
+    -   Release the BOOT button.
 
-- The device should present itself as a USB serial device on your computer. You may look it up in /dev/ttyACM0
-  
+-   The device should present itself as a USB serial device on your computer.
+    You may look it up in /dev/ttyACM0
+
     ```
     ls -la /dev/tty*
     ```
-    If the device is at /dev/ttyACM0, flash the board using the following commands:
+
+    If the device is at /dev/ttyACM0, flash the board using the following
+    commands:
 
     ```
     cd third_party/bouffalolab/bl602_sdk/repo/tools/flash_tool
-    
+
     ./bflb_iot_tool-ubuntu18 --chipname=BL602 --baudrate=115200  --port=/dev/ttyACM0 --pt=chips/bl602/partition/partition_cfg_4M.toml --dts=chips/bl602/device_tree/bl_factory_params_IoTKitA_40M.dts --firmware=../../../../../../out/bl602-light/chip-bl602-lighting-example.bin
     ```
-    If you want to erase previous network information in flash, you can add --erase parameters to the bflb_iot_tool-ubuntu18 command.
-    For Windows and MacOS, replace bflb_iot_tool-ubuntu18 with bflb_iot_tool.exe and bflb_iot_tool-macos, respectively.
+
+    If you want to erase previous network information in flash, you can add
+    --erase parameters to the bflb_iot_tool-ubuntu18 command. For Windows and
+    MacOS, replace bflb_iot_tool-ubuntu18 with bflb_iot_tool.exe and
+    bflb_iot_tool-macos, respectively.
 
 ## Validate the example
 
-1.You can open the serial console. For example, if the device is at `/dev/ttyACM0`:
+1.You can open the serial console. For example, if the device is at
+`/dev/ttyACM0`:
 
 ```
 picocom -b 2000000 /dev/ttyACM0
 ```
 
-2.To reset the board, press the RESET button, and you will see the log in the picocom terminal.
+2.To reset the board, press the RESET button, and you will see the log in the
+picocom terminal.
 
 ## Commission a device using chip-tool
 
