@@ -26,9 +26,8 @@ _bootstrap_or_activate() {
 
     local _CONFIG_FILE="scripts/environment.json"
 
-    if [ "$_BOOTSTRAP_NAME" = "no_cipd_bootstrap.sh" ]; then
-        _CONFIG_FILE="scripts/environment_no_cipd.json"
-        _BOOTSTRAP_NAME="bootstrap.sh"
+    if [ ! -z "$PW_CONFIG_FILE" ]; then
+        _CONFIG_FILE="$PW_CONFIG_FILE"
     fi
 
     if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ] ||
