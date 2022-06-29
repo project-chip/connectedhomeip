@@ -175,7 +175,7 @@ template("chip_python_wheel_action") {
   }
 }
 
-chip_python_wheel_action("chip-library") {
+chip_python_wheel_action("chip-core") {
 
   py_manifest_files = [
     {
@@ -187,7 +187,6 @@ chip_python_wheel_action("chip-library") {
         "chip/ChipCommissionableNodeCtrl.py",
         "chip/ChipCoreBluetoothMgr.py",
         "chip/ChipStack.py",
-        "chip/ChipUtility.py",
         "chip/FabricAdmin.py",
         "chip/__init__.py",
         "chip/ble/__init__.py",
@@ -197,12 +196,7 @@ chip_python_wheel_action("chip-library") {
         "chip/ble/scan_devices.py",
         "chip/ble/types.py",
         "chip/clusters/Attribute.py",
-        "chip/clusters/CHIPClusters.py",
-        "chip/clusters/ClusterObjects.py",
         "chip/clusters/Command.py",
-        "chip/clusters/Objects.py",
-        "chip/clusters/TestObjects.py",
-        "chip/clusters/Types.py",
         "chip/clusters/__init__.py",
         "chip/configuration/__init__.py",
         "chip/discovery/__init__.py",
@@ -222,7 +216,6 @@ chip_python_wheel_action("chip-library") {
         "chip/setup_payload/__init__.py",
         "chip/setup_payload/setup_payload.py",
         "chip/storage/__init__.py",
-        "chip/tlv/__init__.py",
       ]
 
       if (chip_controller) {
@@ -267,7 +260,6 @@ chip_python_wheel_action("chip-library") {
     "chip.logging",
     "chip.native",
     "chip.clusters",
-    "chip.tlv",
     "chip.setup_payload",
     "chip.storage",
   ]
@@ -320,11 +312,49 @@ chip_python_wheel_action("chip-library") {
     lib_name = "_ChipServer.so"
   }
 
-  py_package_name = "chip-library"
+  py_package_name = "chip-core"
 
   public_deps = [ ":ChipDeviceCtrl" ]
 
-  output_name = "chip_library-${chip_python_version}-${tags}.whl"
+  output_name = "chip_core-${chip_python_version}-${tags}.whl"
+}
+
+chip_python_wheel_action("chip-clusters") {
+  py_manifest_files = [
+    {
+      src_dir = "."
+      sources = [
+        "chip/ChipUtility.py",
+        "chip/clusters/CHIPClusters.py",
+        "chip/clusters/ClusterObjects.py",
+        "chip/clusters/Objects.py",
+        "chip/clusters/TestObjects.py",
+        "chip/clusters/Types.py",
+        "chip/tlv/__init__.py",
+      ]
+    },
+    {
+      src_dir = "//"
+      sources = [ "//LICENSE" ]
+    },
+  ]
+
+  inputs = []
+
+  py_packages = [
+    "chip",
+    "chip.clusters",
+    "chip.tlv",
+  ]
+
+  py_package_reqs = [
+    "dacite",
+  ]
+
+  py_package_name = "chip-clusters"
+  py_platform_tag = "any"
+
+  output_name = "chip_clusters-${chip_python_version}-py3-any.whl"
 }
 
 chip_python_wheel_action("chip-repl") {
@@ -369,7 +399,7 @@ chip_python_wheel_action("chip-repl") {
   py_package_name = "chip-repl"
   py_platform_tag = "any"
 
-  data_deps = [ ":chip-library" ]
+  data_deps = [ ":chip-core", ":chip-clusters" ]
 
   output_name = "chip_repl-${chip_python_version}-py3-any.whl"
 }
