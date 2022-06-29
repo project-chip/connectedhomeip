@@ -26,14 +26,14 @@ namespace audit {
 
 bool ExecutePersistentStorageApiAudit(PersistentStorageDelegate & storage)
 {
-    (void)storage;
+    (void) storage;
     ChipLogError(Automation, "==== PersistentStorageDelegate API audit: SUCCESS ====");
     return true;
 }
 
 bool ExecutePersistentStorageLoadTestAudit(PersistentStorageDelegate & storage)
 {
-    (void)storage;
+    (void) storage;
     ChipLogError(Automation, "==== PersistentStorageDelegate load test audit: SUCCESS ====");
     return true;
 }
