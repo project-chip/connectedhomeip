@@ -89,6 +89,8 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint3
     CircularEventBuffer * prev    = nullptr;
     CircularEventBuffer * next    = nullptr;
 
+    ChipLogError(Zcl, "//is: EventManagement::Init");
+
     if (aNumBuffers == 0)
     {
         ChipLogError(EventLogging, "Invalid aNumBuffers");
@@ -339,6 +341,7 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
 void EventManagement::DestroyEventManagement()
 {
     sInstance.mState        = EventManagementStates::Shutdown;
+    ChipLogError(Zcl, "//is: EventManagement::DestroyEventManagement mState=EventManagementStates::Shutdown");
     sInstance.mpEventBuffer = nullptr;
     sInstance.mpExchangeMgr = nullptr;
 }
@@ -396,6 +399,8 @@ void EventManagement::VendEventNumber()
 CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions,
                                      EventNumber & aEventNumber)
 {
+    ChipLogError(Zcl, "//is: EventManagement::LogEvent mState=%u", static_cast<uint8_t>(mState));
+
     VerifyOrReturnError(mState != EventManagementStates::Shutdown, CHIP_ERROR_INCORRECT_STATE);
     return LogEventPrivate(apDelegate, aEventOptions, aEventNumber);
 }

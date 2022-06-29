@@ -245,6 +245,7 @@ GeneralDiagnosticsServer & GeneralDiagnosticsServer::Instance()
 void GeneralDiagnosticsServer::OnDeviceReboot(BootReasonType bootReason)
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnDeviceReboot");
+    ChipLogError(Zcl, "//is: GeneralDiagnostics: OnDeviceReboot bootReason = %u", static_cast<uint8_t>(bootReason));
 
     ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReasons::Id);
 

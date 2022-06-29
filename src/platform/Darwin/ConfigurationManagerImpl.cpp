@@ -300,8 +300,10 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
 {
 #if CHIP_DISABLE_PLATFORM_KVS
+    ChipLogDetail(Zcl, "//is: ConfigurationManagerImpl::StoreBootReason CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE");
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #else  // CHIP_DISABLE_PLATFORM_KVS
+    ChipLogDetail(Zcl, "//is: ConfigurationManagerImpl::StoreBootReason bootReason=%u", static_cast<uint8_t>(bootReason));
     return WriteConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
 #endif // CHIP_DISABLE_PLATFORM_KVS
 }
