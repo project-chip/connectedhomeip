@@ -42,7 +42,15 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
     uint8_t * factoryData = nullptr;
     size_t factoryDataSize;
 
-    CHIP_ERROR error = mFlashFactoryData.GetFactoryDataPartition(factoryData, factoryDataSize);
+    CHIP_ERROR error = mFlashFactoryData.ProtectFactoryDataPartitionAgainstWrite();
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to protect the factory data partition");
+        return error;
+    }
+
+    error = mFlashFactoryData.GetFactoryDataPartition(factoryData, factoryDataSize);
 
     if (error != CHIP_NO_ERROR)
     {
