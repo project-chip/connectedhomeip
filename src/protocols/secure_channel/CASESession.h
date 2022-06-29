@@ -263,7 +263,6 @@ private:
     Crypto::Hash_SHA256_stream mCommissioningHash;
     Crypto::P256PublicKey mRemotePubKey;
     Crypto::P256Keypair * mEphemeralKey = nullptr;
-    Crypto::P256Keypair mEphemeralKey2;
     Crypto::P256ECDHDerivedSecret mSharedSecret;
     Credentials::ValidationContext mValidContext;
     Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
