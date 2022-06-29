@@ -177,6 +177,7 @@ CaseAdminNode
 CatalogVendorId
 CBB
 cbd
+CBOR
 ccf
 CCMP
 CCS
@@ -459,6 +460,7 @@ emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
 EnableNetwork
 EnableWiFiNetwork
+endian
 EndpointId
 endpointName
 endsWith
@@ -1177,6 +1179,7 @@ smoketest
 SMP
 socat
 socio
+SoCs
 SodiumConcentrationMeasurement
 softap
 SoftDevice
@@ -1365,6 +1368,7 @@ utils
 UUID
 ux
 VCP
+validator
 Vectorcall
 VendorID
 VendorName
