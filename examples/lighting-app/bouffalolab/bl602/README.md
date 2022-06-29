@@ -92,16 +92,16 @@ remote device, as well as the network credentials to use.
 The command below uses the default values hard-coded into the debug versions of
 the BL602 lighting-app to commission it onto a Wi-Fi network:
 
-```
-$ sudo ./chip-tool pairing ble-wifi 1 ${SSID} ${PASSWORD} 20202021 3840
+    ```
+    $ sudo ./chip-tool pairing ble-wifi 1 ${SSID} ${PASSWORD} 20202021 3840
 
- Parameters:
- 1. Discriminator: 3840
- 2. Setup-pin-code: 20202021
- 3. Node ID: 1
- 4. SSID : Wi-Fi SSID
- 5. PASSWORD : Wi-Fi Password
-```
+    Parameters:
+    1. Discriminator: 3840
+    2. Setup-pin-code: 20202021
+    3. Node ID: 1
+    4. SSID : Wi-Fi SSID
+    5. PASSWORD : Wi-Fi Password
+    ```
 
 ### Cluster control
 
