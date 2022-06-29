@@ -96,7 +96,7 @@ chip_test_suite("tests") {
   ]
 
   if (!chip_fake_platform) {
-    test_sources += ["TestFailSafeContext.cpp"]
+    test_sources += [ "TestFailSafeContext.cpp" ]
   }
 
   #
