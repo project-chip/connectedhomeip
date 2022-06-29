@@ -11662,8 +11662,6 @@ private:
                 chip::app::DataModel::Nullable<uint16_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
             }
             break;
         case 2:
@@ -11672,8 +11670,6 @@ private:
                 chip::app::DataModel::Nullable<uint16_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
             }
             break;
         case 3:
@@ -11682,8 +11678,6 @@ private:
                 chip::app::DataModel::Nullable<uint16_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
             }
             break;
         case 4:
@@ -74138,7 +74132,7 @@ private:
             LogStep(2, "TH_CR1 opens a new commissioning window on DUT_CE");
             ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
-            value.commissioningTimeout = 900U;
+            value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
                 chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
                                              "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
@@ -75430,7 +75424,7 @@ private:
             LogStep(2, "TH_CR1 opens a commissioning window on DUT_CE");
             ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
-            value.commissioningTimeout = 900U;
+            value.commissioningTimeout = 180U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
@@ -79055,6 +79049,62 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_OCC_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_OCC_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_3_1", 4, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_OCC_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
     uint8_t OccupancyValue;
 
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
@@ -79137,62 +79187,6 @@ private:
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id, OccupancySensing::Attributes::Occupancy::Id,
                                  true, chip::NullOptional);
         }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_OCC_3_1Suite : public TestCommand
-{
-public:
-    Test_TC_OCC_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_3_1", 4, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_OCC_3_1Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
         }
         return CHIP_NO_ERROR;
     }
