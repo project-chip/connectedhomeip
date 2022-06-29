@@ -30,6 +30,13 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
+#endif
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 
@@ -61,6 +68,26 @@ static Button_Handle sAppRightHandle;
 AppTask AppTask::sAppTask;
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+static DefaultOTARequestor sRequestorCore;
+static DefaultOTARequestorStorage sRequestorStorage;
+static DefaultOTARequestorDriver sRequestorUser;
+static BDXDownloader sDownloader;
+static OTAImageProcessorImpl sImageProcessor;
+
+void InitializeOTARequestor(void)
+{
+    // Initialize and interconnect the Requestor and Image Processor objects
+    SetRequestorInstance(&sRequestorCore);
+
+    sRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+    sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
+    sImageProcessor.SetOTADownloader(&sDownloader);
+    sDownloader.SetImageProcessorDelegate(&sImageProcessor);
+    sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
+}
+#endif
 
 #ifdef AUTO_PRINT_METRICS
 static void printMetrics(void)
@@ -238,6 +265,9 @@ int AppTask::Init()
     // this function will happen on the CHIP event loop thread, not the app_main thread.
     PlatformMgr().AddEventHandler(DeviceEventCallback, reinterpret_cast<intptr_t>(nullptr));
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    InitializeOTARequestor();
+#endif
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
