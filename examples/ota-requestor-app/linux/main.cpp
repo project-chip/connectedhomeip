@@ -347,7 +347,7 @@ int main(int argc, char * argv[])
         argv[0] = kImageExecPath;
         execv(argv[0], argv);
 
-        // If successfully executing the new iamge, execv should not return
+        // If successfully executing the new image, execv should not return
         ChipLogError(SoftwareUpdate, "The OTA image is invalid");
     }
     return 0;

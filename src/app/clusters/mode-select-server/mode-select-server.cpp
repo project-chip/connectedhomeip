@@ -33,6 +33,7 @@
 #include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/DiagnosticDataProvider.h>
 
 using namespace std;
 using namespace chip;
@@ -40,6 +41,10 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;
 using namespace chip::Protocols;
+
+using chip::DeviceLayer::DiagnosticDataProvider;
+using chip::DeviceLayer::GetDiagnosticDataProvider;
+using BootReasonType = app::Clusters::GeneralDiagnostics::BootReasonType;
 
 static InteractionModel::Status verifyModeValue(const EndpointId endpointId, const uint8_t newMode);
 
@@ -119,6 +124,17 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
  */
 void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
 {
+    ChipLogError(Zcl, "//is: emberAfModeSelectClusterServerInitCallback");
+
+    BootReasonType bootReason = BootReasonType::kUnspecified;
+    CHIP_ERROR error = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "//is: GetBootReason() error %" CHIP_ERROR_FORMAT, error.Format());
+    }
+    ChipLogError(Zcl, "//is: bootReason = %u, endpointId = %u", static_cast<uint8_t>(bootReason), static_cast<uint8_t>(endpointId));
+
     // StartUp behavior relies on CurrentMode StartUpMode attributes being non-volatile.
     if (areStartUpModeAndCurrentModeNonVolatile(endpointId))
     {
@@ -136,6 +152,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
             uint8_t currentMode = 0;
             status              = Attributes::CurrentMode::Get(endpointId, &currentMode);
 #ifdef EMBER_AF_PLUGIN_ON_OFF
+            ChipLogError(Zcl, "//is: emberAfModeSelectClusterServerInitCallback EMBER_AF_PLUGIN_ON_OFF");
             // OnMode with Power Up
             // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
             // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
@@ -158,7 +175,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                 }
             }
 #endif // EMBER_AF_PLUGIN_ON_OFF
-            if (status == EMBER_ZCL_STATUS_SUCCESS && startUpMode.Value() != currentMode)
+            if ((bootReason != BootReasonType::kSoftwareUpdateCompleted) && (status == EMBER_ZCL_STATUS_SUCCESS) && (startUpMode.Value() != currentMode))
             {
                 status = Attributes::CurrentMode::Set(endpointId, startUpMode.Value());
                 if (status != EMBER_ZCL_STATUS_SUCCESS)

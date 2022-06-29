@@ -68,6 +68,21 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     return CHIP_ERROR_INVALID_TIME;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
+{
+    uint32_t reason = 0;
+
+    CHIP_ERROR err = ConfigurationMgr().GetBootReason(reason);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        bootReason = static_cast<BootReasonType>(reason);
+    }
+
+    return err;
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
 {
     // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
