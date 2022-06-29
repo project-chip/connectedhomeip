@@ -217,3 +217,28 @@ private:
     uint16_t mEndpointListId;
     chip::app::Clusters::BridgedActions::EndpointListTypeEnum mType;
 };
+
+class Action
+{
+public:
+    Action(uint16_t actionId, std::string name, chip::app::Clusters::BridgedActions::ActionTypeEnum type, uint16_t endpointListId,
+           uint16_t supportedCommands, chip::app::Clusters::BridgedActions::ActionStateEnum status, bool isVisible);
+    inline void setName(std::string name) { mName = name; };
+    inline std::string getName() { return mName; };
+    inline chip::app::Clusters::BridgedActions::ActionTypeEnum getType() { return mType; };
+    inline chip::app::Clusters::BridgedActions::ActionStateEnum getStatus() { return mStatus; };
+    inline uint16_t getActionId() { return mActionId; };
+    inline uint16_t getEndpointListId() { return mEndpointListId; };
+    inline uint16_t getSupportedCommands() { return mSupportedCommands; };
+    inline void setIsVisible(bool isVisible) { mIsVisible = isVisible; };
+    inline bool getIsVisible() { return mIsVisible; };
+
+private:
+    std::string mName;
+    chip::app::Clusters::BridgedActions::ActionTypeEnum mType;
+    chip::app::Clusters::BridgedActions::ActionStateEnum mStatus;
+    uint16_t mActionId;
+    uint16_t mEndpointListId;
+    uint16_t mSupportedCommands;
+    bool mIsVisible;
+};

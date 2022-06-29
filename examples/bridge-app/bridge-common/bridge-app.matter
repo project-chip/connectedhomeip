@@ -420,11 +420,19 @@ server cluster BridgedActions = 37 {
 
   readonly attribute ActionStruct actionList[] = 0;
   readonly attribute EndpointListStruct endpointList[] = 1;
+  readonly attribute long_char_string<512> setupUrl = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct InstantActionRequest {
+    INT16U actionID = 0;
+    optional INT32U invokeID = 1;
+  }
+
+  command InstantAction(InstantActionRequest): DefaultSuccess = 0;
 }
 
 server cluster Basic = 40 {
@@ -1723,6 +1731,7 @@ endpoint 1 {
   server cluster BridgedActions {
     callback attribute actionList;
     callback attribute endpointList;
+    ram      attribute setupUrl default = "https://example.com";
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
