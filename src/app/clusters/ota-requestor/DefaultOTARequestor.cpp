@@ -363,7 +363,7 @@ void DefaultOTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
         return;
     }
 
-    FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderLocation.Value().fabricIndex);
+    const FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderLocation.Value().fabricIndex);
 
     if (fabricInfo == nullptr)
     {
@@ -393,7 +393,7 @@ void DefaultOTARequestor::DisconnectFromProvider()
         return;
     }
 
-    FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderLocation.Value().fabricIndex);
+    const FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderLocation.Value().fabricIndex);
     if (fabricInfo == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Cannot find fabric");
@@ -726,7 +726,7 @@ CHIP_ERROR DefaultOTARequestor::GenerateUpdateToken()
         VerifyOrReturnError(mServer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mProviderLocation.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
-        FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderLocation.Value().fabricIndex);
+        const FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderLocation.Value().fabricIndex);
         VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         static_assert(sizeof(NodeId) == sizeof(uint64_t), "Unexpected NodeId size");

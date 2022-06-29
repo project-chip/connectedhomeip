@@ -204,7 +204,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
         return nil;
     }
 
-    FabricInfo * fabric = fabricTable->FindFabricWithIndex(fabricIndex);
+    const FabricInfo * fabric = fabricTable->FindFabricWithIndex(fabricIndex);
 
     if (self.vendorId == nil) {
         self.vendorId = @(fabric->GetVendorId());

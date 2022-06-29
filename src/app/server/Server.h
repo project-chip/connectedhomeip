@@ -370,7 +370,7 @@ private:
 
         void OnGroupAdded(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group) override
         {
-            FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
+            const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
             if (fabric == nullptr)
             {
                 ChipLogError(AppServer, "Group added to nonexistent fabric?");
@@ -386,7 +386,7 @@ private:
 
         void OnGroupRemoved(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override
         {
-            FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
+            const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
             if (fabric == nullptr)
             {
                 ChipLogError(AppServer, "Group added to nonexistent fabric?");
