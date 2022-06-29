@@ -1,0 +1,238 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    119.2.3. [TC-G-2.3] Commands - GetGroupMembership, AddGroupIfIdentifying
+    [DUT-Server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "TH sends AddGroup command to DUT as unicast with the following fields
+          : GroupID as 0x0002 GroupName as Gp2"
+      PICS: G.S.C00.Rsp && G.S.C00.Tx
+      verification: |
+          ./chip-tool groups add-group 0x0002 gp2 1 0
+
+          [1653552285.195099][2464:2469] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
+          [1653552285.197783][2464:2469] CHIP:TOO:   AddGroupResponse: {
+          [1653552285.197849][2464:2469] CHIP:TOO:     status: 0
+          [1653552285.197877][2464:2469] CHIP:TOO:     groupId: 2
+          [1653552285.197933][2464:2469] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "TH reads GroupTable attribute from the GroupKeyManagement cluster
+          from DUT"
+      PICS: GRPKEY.S.A0001
+      verification: |
+          ./chip-tool groupkeymanagement read group-table 1 0
+
+          [1653552351.250570][2474:2479] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1424397362
+          [1653552351.253012][2474:2479] CHIP:TOO:   GroupTable: 1 entries
+          [1653552351.255507][2474:2479] CHIP:TOO:     [1]: {
+          [1653552351.255546][2474:2479] CHIP:TOO:       GroupId: 2
+          [1653552351.255579][2474:2479] CHIP:TOO:       Endpoints: 1 entries
+          [1653552351.255628][2474:2479] CHIP:TOO:         [1]: 0
+          [1653552351.255664][2474:2479] CHIP:TOO:       GroupName: gp2
+          [1653552351.255695][2474:2479] CHIP:TOO:       FabricIndex: 1
+          [1653552351.255725][2474:2479] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "TH sends AddGroup command to DUT as unicast with the following fields
+          : GroupID as 0x0003 GroupName as Gp3"
+      PICS: G.S.C00.Rsp && G.S.C00.Tx
+      verification: |
+          ./chip-tool groups add-group 0x0003 gp3 1 0
+
+          [1653552417.870291][2482:2487] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
+          [1653552417.870407][2482:2487] CHIP:TOO:   AddGroupResponse: {
+          [1653552417.870462][2482:2487] CHIP:TOO:     status: 0
+          [1653552417.870500][2482:2487] CHIP:TOO:     groupId: 3
+          [1653552417.870539][2482:2487] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "TH reads GroupTable attribute from the GroupKeyManagement cluster
+          from DUT"
+      PICS: GRPKEY.S.A0001
+      verification: |
+          ./chip-tool groupkeymanagement read group-table 1 0
+
+          [1653552448.373558][2491:2496] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1424397362
+          [1653552448.373710][2491:2496] CHIP:TOO:   GroupTable: 2 entries
+          [1653552448.373856][2491:2496] CHIP:TOO:     [1]: {
+          [1653552448.373905][2491:2496] CHIP:TOO:       GroupId: 2
+          [1653552448.373951][2491:2496] CHIP:TOO:       Endpoints: 1 entries
+          [1653552448.374022][2491:2496] CHIP:TOO:         [1]: 0
+          [1653552448.374141][2491:2496] CHIP:TOO:       GroupName: gp2
+          [1653552448.374186][2491:2496] CHIP:TOO:       FabricIndex: 1
+          [1653552448.374228][2491:2496] CHIP:TOO:      }
+          [1653552448.374287][2491:2496] CHIP:TOO:     [2]: {
+          [1653552448.374331][2491:2496] CHIP:TOO:       GroupId: 3
+          [1653552448.374374][2491:2496] CHIP:TOO:       Endpoints: 1 entries
+          [1653552448.374421][2491:2496] CHIP:TOO:         [1]: 0
+          [1653552448.374467][2491:2496] CHIP:TOO:       GroupName: gp3
+          [1653552448.374508][2491:2496] CHIP:TOO:       FabricIndex: 1
+          [1653552448.374547][2491:2496] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "TH sends GetGroupMembership command to DUT with the following fields
+          : GroupList as NULL"
+      PICS: G.S.C02.Rsp && G.S.C02.Tx
+      verification: |
+          ./chip-tool groups get-group-membership [] 1 0
+
+          [1653552493.052711][2501:2506] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0002
+          [1653552493.052792][2501:2506] CHIP:TOO:   GetGroupMembershipResponse: {
+          [1653552493.052819][2501:2506] CHIP:TOO:     capacity: null
+          [1653552493.052870][2501:2506] CHIP:TOO:     groupList: 2 entries
+          [1653552493.052922][2501:2506] CHIP:TOO:       [1]: 2
+          [1653552493.052950][2501:2506] CHIP:TOO:       [2]: 3
+          [1653552493.052978][2501:2506] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "TH sends GetGroupMembership command to DUT with the following fields
+          : GroupList as [0x0002]"
+      PICS: G.S.C02.Rsp && G.S.C02.Tx
+      verification: |
+          ./chip-tool groups get-group-membership [0002] 1 0
+
+          [1653294426.515523][3638:3643] CHIP:TOO:   GetGroupMembershipResponse: {
+          [1653294426.515571][3638:3643] CHIP:TOO:     capacity: null
+          [1653294426.515649][3638:3643] CHIP:TOO:     groupList: 1 entries
+          [1653294426.515737][3638:3643] CHIP:TOO:       [1]: 2
+          [1653294426.515916][3638:3643] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "TH sends GetGroupMembership command to DUT as unicast with the
+          following fields : GroupList as [0x0002, 0x0003]"
+      PICS: G.S.C02.Rsp && G.S.C02.Tx
+      verification: |
+          ./chip-tool groups get-group-membership [0002,0003] 1 0
+
+          [1653294490.030740][3646:3651] CHIP:TOO:   GetGroupMembershipResponse: {
+          [1653294490.030775][3646:3651] CHIP:TOO:     capacity: null
+          [1653294490.030838][3646:3651] CHIP:TOO:     groupList: 2 entries
+          [1653294490.030907][3646:3651] CHIP:TOO:       [1]: 2
+          [1653294490.030943][3646:3651] CHIP:TOO:       [2]: 3
+          [1653294490.030979][3646:3651] CHIP:TOO:    }
+      disabled: true
+
+    - label: "TH sends RemoveAllGroups command to DUT as unicast method"
+      PICS: G.S.C04.Rsp
+      verification: |
+          ./chip-tool groups remove-all-groups 1 0
+
+          [1651224377.831704][2989:2994] CHIP:DMG:                                StatusIB =
+          [1651224377.831757][2989:2994] CHIP:DMG:                                {
+          [1651224377.831812][2989:2994] CHIP:DMG:                                      status = 0x00 (SUCCESS),
+          [1651224377.831866][2989:2994] CHIP:DMG:                                },
+          [1651224377.832439][2989:2994] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0004 Command=0x0000_0004 Status=0x0
+      disabled: true
+
+    - label:
+          "TH sends AddGroupIfIdentifying command to DUT as unicast method with
+          the following fields: GroupID as 0x0006 GroupName as Gp6"
+      PICS: G.S.C05.Rsp
+      verification: |
+          ./chip-tool groups  add-group-if-identifying 0x0006 gp6 1 0
+
+          [1653552667.307794][2571:2576] CHIP:DMG:                                StatusIB =
+          [1653552667.307831][2571:2576] CHIP:DMG:                                {
+          [1653552667.307881][2571:2576] CHIP:DMG:                                   status = 0x00 (SUCCESS),
+          [1653552667.307922][2571:2576] CHIP:DMG:                                },
+      disabled: true
+
+    - label:
+          "TH reads GroupTable attribute from the GroupKeyManagement cluster
+          from DUT"
+      PICS: GRPKEY.S.A0001
+      verification: |
+          ./chip-tool groupkeymanagement read group-table 1 0
+
+          [1653560429.549196][3373:3378] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 55663962
+          [1653560429.549335][3373:3378] CHIP:TOO:   GroupTable: 2 entries
+          [1653560429.549432][3373:3378] CHIP:TOO:     [1]: {
+          [1653560429.549484][3373:3378] CHIP:TOO:       GroupId: 2
+          [1653560429.549522][3373:3378] CHIP:TOO:       Endpoints: 0 entries
+          [1653560429.549562][3373:3378] CHIP:TOO:       GroupName: gp2
+          [1653560429.549598][3373:3378] CHIP:TOO:       FabricIndex: 1
+          [1653560429.549632][3373:3378] CHIP:TOO:      }
+          [1653560429.549678][3373:3378] CHIP:TOO:     [2]: {
+          [1653560429.549712][3373:3378] CHIP:TOO:       GroupId: 3
+          [1653560429.549746][3373:3378] CHIP:TOO:       Endpoints: 0 entries
+          [1653560429.549783][3373:3378] CHIP:TOO:       GroupName: gp3
+          [1653560429.549817][3373:3378] CHIP:TOO:       FabricIndex: 1
+          [1653560429.549849][3373:3378] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "TH sends AddGroupIfIdentifying command to DUT as unicast method with
+          the following fields: GroupID as 0x0000 GroupName as Gp45"
+      PICS: G.S.C05.Rsp
+      verification: |
+          ./chip-tool groups  add-group-if-identifying 0x0000 gp45 1 0
+
+
+          [1653552769.643278][2589:2594] CHIP:DMG:                                StatusIB =
+          [1653552769.643330][2589:2594] CHIP:DMG:                                {
+          [1653552769.643400][2589:2594] CHIP:DMG:                                   status = 0x00 (SUCCESS),
+          [1653552769.643459][2589:2594] CHIP:DMG:                                },
+      disabled: true
+
+    - label:
+          "TH sends AddGroupIfIdentifying command to DUT n+1 times as unicast
+          method with the following fields: GroupID as 0x0007 GroupName as Gp54"
+      PICS: G.S.C05.Rsp
+      verification: |
+          ./chip-tool groups  add-group-if-identifying 0x0067 gp31 1 0
+
+          [1651224746.146005][3038:3043] CHIP:DMG:                                StatusIB =
+          [1651224746.146038][3038:3043] CHIP:DMG:                                {
+          [1651224746.146073][3038:3043] CHIP:DMG:                                      status = 0x00 (SUCCESS),
+          [1651224746.146106][3038:3043] CHIP:DMG:                                },
+      disabled: true
+
+    - label:
+          "TH reads GroupTable attribute from the GroupKeyManagement cluster
+          from DUT"
+      PICS: GRPKEY.S.A0001
+      verification: |
+          ./chip-tool groupkeymanagement read group-table 1 0
+
+          [1653552886.221667][2625:2630] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1424397362
+          [1653552886.221787][2625:2630] CHIP:TOO:   GroupTable: 2 entries
+          [1653552886.221925][2625:2630] CHIP:TOO:     [1]: {
+          [1653552886.221966][2625:2630] CHIP:TOO:       GroupId: 2
+          [1653552886.222002][2625:2630] CHIP:TOO:       Endpoints: 0 entries
+          [1653552886.222057][2625:2630] CHIP:TOO:       GroupName: gp2
+          [1653552886.222103][2625:2630] CHIP:TOO:       FabricIndex: 1
+          [1653552886.222135][2625:2630] CHIP:TOO:      }
+          [1653552886.222177][2625:2630] CHIP:TOO:     [2]: {
+          [1653552886.222222][2625:2630] CHIP:TOO:       GroupId: 3
+          [1653552886.222255][2625:2630] CHIP:TOO:       Endpoints: 0 entries
+          [1653552886.222288][2625:2630] CHIP:TOO:       GroupName: gp3
+          [1653552886.222330][2625:2630] CHIP:TOO:       FabricIndex: 1
+          [1653552886.222361][2625:2630] CHIP:TOO:      }
+      disabled: true

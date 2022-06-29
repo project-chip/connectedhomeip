@@ -256,7 +256,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes" client="false" server="true" clientLocked="false" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -342,7 +342,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -428,7 +428,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -563,7 +563,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -708,7 +708,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -793,7 +793,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -878,7 +878,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -1256,42 +1256,6 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
-                <requireAttribute>BINDING</requireAttribute>
-            </include>
-            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
-                <requireCommand>AddGroup</requireCommand>
-                <requireCommand>AddGroupResponse</requireCommand>
-                <requireCommand>ViewGroup</requireCommand>
-                <requireCommand>ViewGroupResponse</requireCommand>
-                <requireCommand>GetGroupMembership</requireCommand>
-                <requireCommand>GetGroupMembershipResponse</requireCommand>
-                <requireCommand>RemoveGroup</requireCommand>
-                <requireCommand>RemoveGroupResponse</requireCommand>
-                <requireCommand>RemoveAllGroups</requireCommand>
-                <requireCommand>AddGroupIfIdentifying</requireCommand>
-            </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>SCENE_COUNT</requireAttribute>
-                <requireAttribute>CURRENT_SCENE</requireAttribute>
-                <requireAttribute>CURRENT_GROUP</requireAttribute>
-                <requireAttribute>SCENE_VALID</requireAttribute>
-                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
-                <requireCommand>AddScene</requireCommand>
-                <requireCommand>AddSceneResponse</requireCommand>
-                <requireCommand>ViewScene</requireCommand>
-                <requireCommand>ViewSceneResponse</requireCommand>
-                <requireCommand>RemoveScene</requireCommand>
-                <requireCommand>RemoveSceneResponse</requireCommand>
-                <requireCommand>RemoveAllScenes</requireCommand>
-                <requireCommand>RemoveAllScenesResponse</requireCommand>
-                <requireCommand>StoreScene</requireCommand>
-                <requireCommand>StoreSceneResponse</requireCommand>
-                <requireCommand>RecallScene</requireCommand>
-                <requireCommand>GetSceneMembership</requireCommand>
-                <requireCommand>GetSceneMembershipResponse</requireCommand>
-            </include>
             <include cluster="Switch" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Fixed Label" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="User Label" client="false" server="false" clientLocked="true" serverLocked="false"></include>
@@ -1613,7 +1577,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes" client="true" server="false" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -1661,7 +1625,7 @@ limitations under the License.
             <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -1725,7 +1689,7 @@ limitations under the License.
             <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes" client="true" server="false" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -1785,7 +1749,7 @@ limitations under the License.
             <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -1844,7 +1808,7 @@ limitations under the License.
             <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes" client="true" server="false" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -1946,7 +1910,7 @@ limitations under the License.
             <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>

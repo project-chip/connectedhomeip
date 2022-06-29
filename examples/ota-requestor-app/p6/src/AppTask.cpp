@@ -121,6 +121,7 @@ static void InitServer(intptr_t context)
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    GetAppTask().InitOTARequestor();
 }
 
 CHIP_ERROR AppTask::StartAppTask()
@@ -187,36 +188,6 @@ CHIP_ERROR AppTask::Init()
     sStatusLED.Init(SYSTEM_STATE_LED);
 
     ConfigurationMgr().LogDeviceConfig();
-
-    SetRequestorInstance(&gRequestorCore);
-    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
-    gImageProcessor.SetOTADownloader(&gDownloader);
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-
-    uint32_t savedSoftwareVersion;
-    err = ConfigurationMgr().GetSoftwareVersion(savedSoftwareVersion);
-    if (err != CHIP_NO_ERROR)
-    {
-        P6_LOG("Can't get saved software version");
-        appError(err);
-    }
-
-    if (savedSoftwareVersion != CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION)
-    {
-        ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
-
-        P6_LOG("Confirming update to version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
-        chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
-        if (requestor != nullptr)
-        {
-            requestor->NotifyUpdateApplied();
-        }
-    }
-
-    P6_LOG("Current Software Version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
-    P6_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
 
     // Print setup info
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
@@ -470,6 +441,39 @@ void OnTriggerUpdateTimerHandler(Layer * systemLayer, void * appState)
 {
     P6_LOG("Triggering immediate OTA update query");
 
-    DefaultOTARequestor * req = static_cast<DefaultOTARequestor *>(GetRequestorInstance());
-    req->TriggerImmediateQuery();
+    GetRequestorInstance()->TriggerImmediateQuery();
+}
+
+void AppTask::InitOTARequestor()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SetRequestorInstance(&gRequestorCore);
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
+    uint32_t savedSoftwareVersion;
+    err = ConfigurationMgr().GetSoftwareVersion(savedSoftwareVersion);
+    if (err != CHIP_NO_ERROR)
+    {
+        P6_LOG("Can't get saved software version");
+        appError(err);
+    }
+
+    if (savedSoftwareVersion != CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION)
+    {
+        ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+
+        P6_LOG("Confirming update to version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+        chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
+        if (requestor != nullptr)
+        {
+            requestor->NotifyUpdateApplied();
+        }
+    }
+
+    P6_LOG("Current Software Version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    P6_LOG("Current Firmware Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 }

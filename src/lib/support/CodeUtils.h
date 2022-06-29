@@ -285,12 +285,29 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @param[in]  expr        A Boolean expression to be evaluated.
  *  @param[in]  code        A value to return if @a expr is false.
  */
-#define VerifyOrReturnError(expr, code)                                                                                            \
+#define VerifyOrReturnError(expr, code) VerifyOrReturnValue(expr, code)
+
+/**
+ *  @def VerifyOrReturnValue(expr, value)
+ *
+ *  @brief
+ *    Returns a specified value if expression evaluates to false
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    VerifyOrReturnError(param != nullptr, Foo());
+ *  @endcode
+ *
+ *  @param[in]  expr        A Boolean expression to be evaluated.
+ *  @param[in]  value       A value to return if @a expr is false.
+ */
+#define VerifyOrReturnValue(expr, value)                                                                                           \
     do                                                                                                                             \
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
-            return code;                                                                                                           \
+            return (value);                                                                                                        \
         }                                                                                                                          \
     } while (false)
 

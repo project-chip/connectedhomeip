@@ -19,6 +19,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Pool.h>
+#include <lib/support/SortUtils.h>
 #include <system/TimeSource.h>
 #include <transport/SecureSession.h>
 
@@ -63,36 +64,7 @@ public:
     Optional<SessionHandle> CreateNewSecureSessionForTest(SecureSession::Type secureSessionType, uint16_t localSessionId,
                                                           NodeId localNodeId, NodeId peerNodeId, CATValues peerCATs,
                                                           uint16_t peerSessionId, FabricIndex fabricIndex,
-                                                          const ReliableMessageProtocolConfig & config)
-    {
-        if (secureSessionType == SecureSession::Type::kCASE)
-        {
-            if ((fabricIndex == kUndefinedFabricIndex) || (localNodeId == kUndefinedNodeId) || (peerNodeId == kUndefinedNodeId))
-            {
-                return Optional<SessionHandle>::Missing();
-            }
-        }
-        else if (secureSessionType == SecureSession::Type::kPASE)
-        {
-            if ((fabricIndex != kUndefinedFabricIndex) || (localNodeId != kUndefinedNodeId) || (peerNodeId != kUndefinedNodeId))
-            {
-                // TODO: This secure session type is infeasible! We must fix the tests
-                if (false)
-                {
-                    return Optional<SessionHandle>::Missing();
-                }
-                else
-                {
-                    (void) fabricIndex;
-                }
-            }
-        }
-
-        SecureSession * result = mEntries.CreateObject(*this, secureSessionType, localSessionId, localNodeId, peerNodeId, peerCATs,
-                                                       peerSessionId, fabricIndex, config);
-        return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
-    }
-
+                                                          const ReliableMessageProtocolConfig & config);
     /**
      * Allocate a new secure session out of the internal resource pool with a
      * non-colliding session ID and increments mNextSessionId to give a clue to
@@ -102,20 +74,7 @@ public:
      * @returns allocated session, or NullOptional on failure
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> CreateNewSecureSession(SecureSession::Type secureSessionType)
-    {
-        Optional<SessionHandle> rv = Optional<SessionHandle>::Missing();
-        auto sessionId             = FindUnusedSessionId();
-        SecureSession * allocated  = nullptr;
-        VerifyOrExit(sessionId.HasValue(), rv = Optional<SessionHandle>::Missing());
-        allocated = mEntries.CreateObject(*this, secureSessionType, sessionId.Value());
-        VerifyOrExit(allocated != nullptr, rv = Optional<SessionHandle>::Missing());
-        rv             = MakeOptional<SessionHandle>(*allocated);
-        mNextSessionId = sessionId.Value() == kMaxSessionID ? static_cast<uint16_t>(kUnsecuredSessionId + 1)
-                                                            : static_cast<uint16_t>(sessionId.Value() + 1);
-    exit:
-        return rv;
-    }
+    Optional<SessionHandle> CreateNewSecureSession(SecureSession::Type secureSessionType, ScopedNodeId sessionEvictionHint);
 
     void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }
 
@@ -133,21 +92,154 @@ public:
      * @return the session if found, NullOptional if not found
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> FindSecureSessionByLocalKey(uint16_t localSessionId)
+    Optional<SessionHandle> FindSecureSessionByLocalKey(uint16_t localSessionId);
+
+    // Select SessionHolders which are pointing to a session with the same peer as the given session. Shift them to the given
+    // session.
+    // This is an internal API, using raw pointer to a session is allowed here.
+    void NewerSessionAvailable(SecureSession * session)
     {
-        SecureSession * result = nullptr;
-        mEntries.ForEachActiveObject([&](auto session) {
-            if (session->GetLocalSessionId() == localSessionId)
+        VerifyOrDie(session->GetSecureSessionType() == SecureSession::Type::kCASE);
+        mEntries.ForEachActiveObject([&](SecureSession * oldSession) {
+            if (session == oldSession)
+                return Loop::Continue;
+
+            SessionHandle ref(*oldSession);
+
+            // This will give all SessionHolders pointing to oldSession a chance to switch to the provided session
+            //
+            // See documentation for SessionDelegate::GetNewSessionHandlingPolicy about how session auto-shifting works, and how
+            // to disable it for a specific SessionHolder in a specific scenario.
+            if (oldSession->GetSecureSessionType() == SecureSession::Type::kCASE && oldSession->GetPeer() == session->GetPeer() &&
+                oldSession->GetPeerCATs() == session->GetPeerCATs())
             {
-                result = session;
-                return Loop::Break;
+                oldSession->NewerSessionAvailable(SessionHandle(*session));
             }
+
             return Loop::Continue;
         });
-        return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
     }
 
 private:
+    friend class TestSecureSessionTable;
+
+    /**
+     * This provides a sortable wrapper for a SecureSession object. A SecureSession
+     * isn't directly sortable since it is not swappable (i.e meet criteria for ValueSwappable).
+     *
+     * However, this wrapper has a stable pointer to a SecureSession while being swappable with
+     * another instance of it.
+     *
+     */
+    struct SortableSession
+    {
+    public:
+        void swap(SortableSession & other)
+        {
+            SortableSession tmp(other);
+            other.mSession = mSession;
+            mSession       = tmp.mSession;
+        }
+
+        const Transport::SecureSession * operator->() const { return mSession; }
+        auto GetNumMatchingOnFabric() { return mNumMatchingOnFabric; }
+        auto GetNumMatchingOnPeer() { return mNumMatchingOnPeer; }
+
+    private:
+        SecureSession * mSession;
+        uint16_t mNumMatchingOnFabric;
+        uint16_t mNumMatchingOnPeer;
+
+        static_assert(CHIP_CONFIG_SECURE_SESSION_POOL_SIZE <= std::numeric_limits<decltype(mNumMatchingOnFabric)>::max(),
+                      "mNumMatchingOnFabric must be able to count up to CHIP_CONFIG_SECURE_SESSION_POOL_SIZE!");
+        static_assert(CHIP_CONFIG_SECURE_SESSION_POOL_SIZE <= std::numeric_limits<decltype(mNumMatchingOnPeer)>::max(),
+                      "mNumMatchingOnPeer must be able to count up to CHIP_CONFIG_SECURE_SESSION_POOL_SIZE!");
+
+        friend class SecureSessionTable;
+    };
+
+    /**
+     *
+     * Encapsulates all the necessary context for an eviction policy callback
+     * to implement its specific policy. The context is provided to the callee
+     * with the expectation that it'll call Sort() with a comparator function provided
+     * to get the list of sessions sorted in the desired order.
+     *
+     */
+    class EvictionPolicyContext
+    {
+    public:
+        /*
+         * Called by the policy implementor to sort the list of sessions given a comparator
+         * function. The provided function shall have the following signature:
+         *
+         * bool CompareFunc(const SortableSession &a, const SortableSession &b);
+         *
+         * If a is a better candidate than b, true should be returned. Else, return false.
+         *
+         * NOTE: Sort() can be called multiple times.
+         *
+         */
+        template <typename CompareFunc>
+        void Sort(CompareFunc func)
+        {
+            Sorting::BubbleSort(mSessionList.begin(), mSessionList.size(), func);
+        }
+
+        const ScopedNodeId & GetSessionEvictionHint() const { return mSessionEvictionHint; }
+
+    private:
+        EvictionPolicyContext(Span<SortableSession> sessionList, ScopedNodeId sessionEvictionHint)
+        {
+            mSessionList         = sessionList;
+            mSessionEvictionHint = sessionEvictionHint;
+        }
+
+        friend class SecureSessionTable;
+        Span<SortableSession> mSessionList;
+        ScopedNodeId mSessionEvictionHint;
+    };
+
+    /**
+     *
+     * This implements an eviction policy by sorting sessions using the following sorting keys and selecting
+     * the session that is most ahead as the best candidate for eviction:
+     *
+     *  - Key1:  Sessions on fabrics that have more sessions in the table are placed ahead of sessions on fabrics
+     *           with lesser sessions. We conclusively know that if a particular fabric has more sessions in the table
+     *           than another, then that fabric is definitely over minimas (assuming a minimally sized session table
+     *           conformant to spec minimas).
+     *
+     *    Key2:  Sessions that match the eviction hint's fabric are placed ahead of those that don't. This ensures that
+     *           if Key1 is even (i.e two fabrics are tied in count), that you attempt to select sessions that match
+     *           the eviction hint's fabric to ensure we evict sessions within the fabric that a new session might be about
+     *           to be created within. This is essential to preventing cross-fabric denial of service possibilities.
+     *
+     *    Key3:  Sessions with a higher mNumMatchingOnPeer are placed ahead of those with a lower one. This ensures
+     *           we pick sessions that have a higher number of duplicated sessions to a peer over those with lower since
+     *           evicting a duplicated session will have less of an impact to that peer.
+     *
+     *    Key4:  Sessions whose target peer's ScopedNodeId matches the eviction hint are placed ahead of those who don't. This
+     * ensures that all things equal, a session that already exists to the peer is refreshed ahead of another to another peer.
+     *
+     *    Key5:  Sessions that are in defunct state are placed ahead of those in the active state, ahead of any other state.
+     *           This ensures that we prioritize evicting defunct sessions (since they have been deemed non-functional anyways)
+     *           over active, healthy ones, over those are currently in the process of establishment.
+     *
+     *    Key6:  Sessions that have a less recent activity time are placed ahead of those with a more recent activity time. This
+     *           is the canonical sorting criteria for basic LRU.
+     *
+     */
+    void DefaultEvictionPolicy(EvictionPolicyContext & evictionContext);
+
+    /**
+     *
+     * Evicts a session from the session table using the DefaultEvictionPolicy implementation.
+     *
+     */
+    SecureSession * EvictAndAllocate(uint16_t localSessionId, SecureSession::Type secureSessionType,
+                                     const ScopedNodeId & sessionEvictionHint);
+
     /**
      * Find an available session ID that is unused in the secure session table.
      *
@@ -162,59 +254,25 @@ private:
      * @return an unused session ID if any is found, else NullOptional
      */
     CHECK_RETURN_VALUE
-    Optional<uint16_t> FindUnusedSessionId()
-    {
-        uint16_t candidate_base = 0;
-        uint64_t candidate_mask = 0;
-        for (uint32_t i = 0; i <= kMaxSessionID; i += 64)
-        {
-            // candidate_base is the base session ID we are searching from.
-            // We have a 64-bit mask anchored at this ID and iterate over the
-            // whole session table, setting bits in the mask for in-use IDs.
-            // If we can iterate through the entire session table and have
-            // any bits clear in the mask, we have available session IDs.
-            candidate_base = static_cast<uint16_t>(i + mNextSessionId);
-            candidate_mask = 0;
-            {
-                uint16_t shift = static_cast<uint16_t>(kUnsecuredSessionId - candidate_base);
-                if (shift <= 63)
-                {
-                    candidate_mask |= (1ULL << shift); // kUnsecuredSessionId is never available
-                }
-            }
-            mEntries.ForEachActiveObject([&](auto session) {
-                uint16_t shift = static_cast<uint16_t>(session->GetLocalSessionId() - candidate_base);
-                if (shift <= 63)
-                {
-                    candidate_mask |= (1ULL << shift);
-                }
-                if (candidate_mask == UINT64_MAX)
-                {
-                    return Loop::Break; // No bits clear means this bucket is full.
-                }
-                return Loop::Continue;
-            });
-            if (candidate_mask != UINT64_MAX)
-            {
-                break; // Any bit clear means we have an available ID in this bucket.
-            }
-        }
-        if (candidate_mask != UINT64_MAX)
-        {
-            uint16_t offset = 0;
-            while (candidate_mask & 1)
-            {
-                candidate_mask >>= 1;
-                ++offset;
-            }
-            uint16_t available = static_cast<uint16_t>(candidate_base + offset);
-            return MakeOptional<uint16_t>(available);
-        }
+    Optional<uint16_t> FindUnusedSessionId();
 
-        return NullOptional;
+    bool mRunningEvictionLogic = false;
+    ObjectPool<SecureSession, CHIP_CONFIG_SECURE_SESSION_POOL_SIZE> mEntries;
+
+    size_t GetMaxSessionTableSize() const
+    {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        return mMaxSessionTableSize;
+#else
+        return CHIP_CONFIG_SECURE_SESSION_POOL_SIZE;
+#endif
     }
 
-    BitMapObjectPool<SecureSession, CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mEntries;
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    size_t mMaxSessionTableSize = CHIP_CONFIG_SECURE_SESSION_POOL_SIZE;
+    void SetMaxSessionTableSize(size_t size) { mMaxSessionTableSize = size; }
+#endif
+
     uint16_t mNextSessionId = 0;
 };
 

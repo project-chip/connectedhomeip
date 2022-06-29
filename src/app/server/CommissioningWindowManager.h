@@ -35,10 +35,12 @@ enum class CommissioningWindowAdvertisement
 
 class Server;
 
-class CommissioningWindowManager : public SessionEstablishmentDelegate, public app::CommissioningModeProvider
+class CommissioningWindowManager : public SessionEstablishmentDelegate,
+                                   public app::CommissioningModeProvider,
+                                   public SessionDelegate
 {
 public:
-    CommissioningWindowManager() {}
+    CommissioningWindowManager() : mPASESession(*this) {}
 
     CHIP_ERROR Init(Server * server)
     {
@@ -88,7 +90,6 @@ public:
     void OnSessionEstablished(const SessionHandle & session) override;
 
     void Shutdown();
-    void Cleanup();
 
     void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event);
 
@@ -97,6 +98,9 @@ public:
     void OverrideMinCommissioningTimeout(System::Clock::Seconds16 timeout) { mMinCommissioningTimeoutOverride.SetValue(timeout); }
 
 private:
+    //////////// SessionDelegate Implementation ///////////////
+    void OnSessionReleased() override;
+
     void SetBLE(bool ble) { mIsBLE = ble; }
 
     CHIP_ERROR SetTemporaryDiscriminator(uint16_t discriminator);
@@ -125,6 +129,8 @@ private:
     // differently.
     void ResetState();
 
+    void Cleanup();
+
     /**
      * Function that gets called when our commissioning window timeout timer
      * fires.
@@ -139,6 +145,11 @@ private:
      * OpenBasicCommissioningWindow.
      */
     static void HandleCommissioningWindowTimeout(chip::System::Layer * aSystemLayer, void * aAppState);
+
+    /**
+     * Helper to immediately expire the fail-safe if it's currently armed.
+     */
+    void ExpireFailSafeIfArmed();
 
     AppDelegate * mAppDelegate = nullptr;
     Server * mServer           = nullptr;
@@ -167,6 +178,9 @@ private:
     // For tests only, so that we can test the commissioning window timeout
     // without having to wait 3 minutes.
     Optional<System::Clock::Seconds16> mMinCommissioningTimeoutOverride;
+
+    // The PASE session we are using, so we can handle CloseSession properly.
+    SessionHolderWithDelegate mPASESession;
 };
 
 } // namespace chip

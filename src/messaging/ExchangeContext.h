@@ -66,7 +66,7 @@ public:
     typedef System::Clock::Timeout Timeout; // Type used to express the timeout in this ExchangeContext
 
     ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
-                    ExchangeDelegate * delegate);
+                    ExchangeDelegate * delegate, bool isEphemeralExchange = false);
 
     ~ExchangeContext() override;
 
@@ -154,8 +154,6 @@ public:
 
     ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
 
-    ExchangeMessageDispatch & GetMessageDispatch() { return mDispatch; }
-
     SessionHandle GetSessionHandle() const
     {
         VerifyOrDie(mSession);
@@ -186,15 +184,33 @@ public:
     // using this function is recommended.
     void SetResponseTimeout(Timeout timeout);
 
+    // This API is used by commands that need to shut down all existing
+    // sessions/exchanges on a fabric but need to make sure the response to the
+    // command still goes out on the exchange the command came in on.  This API
+    // will ensure that all secure sessions for the fabric this exchanges is on
+    // are released except the one this exchange is using, and will release
+    // that session once this exchange is done sending the response.
+    //
+    // This API is a no-op if called on an exchange that is not using a
+    // SecureSession.
+    void AbortAllOtherCommunicationOnFabric();
+
 private:
+    class ExchangeSessionHolder : public SessionHolderWithDelegate
+    {
+    public:
+        ExchangeSessionHolder(ExchangeContext & exchange) : SessionHolderWithDelegate(exchange) {}
+        void GrabExpiredSession(const SessionHandle & session);
+    };
+
     Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
 
     ExchangeMessageDispatch & mDispatch;
 
-    SessionHolderWithDelegate mSession; // The connection state
-    uint16_t mExchangeId;               // Assigned exchange ID.
+    ExchangeSessionHolder mSession; // The connection state
+    uint16_t mExchangeId;           // Assigned exchange ID.
 
     /**
      *  Determine whether a response is currently expected for a message that was sent over
@@ -238,9 +254,10 @@ private:
 
     /**
      * Notify our delegate, if any, that we have timed out waiting for a
-     * response.
+     * response.  If aCloseIfNeeded is true, check whether the exchange needs to
+     * be closed.
      */
-    void NotifyResponseTimeout();
+    void NotifyResponseTimeout(bool aCloseIfNeeded);
 
     CHIP_ERROR StartResponseTimer();
 
@@ -273,7 +290,24 @@ private:
      * exchange nor other component requests the active mode.
      */
     void UpdateSEDIntervalMode(bool activeMode);
+
+    static ExchangeMessageDispatch & GetMessageDispatch(bool isEphemeralExchange, ExchangeDelegate * delegate);
+
+    // If SetAutoReleaseSession() is called, this exchange must be using a SecureSession, and should
+    // evict it when the exchange is done with all its work (including any MRP traffic).
+    inline void SetIgnoreSessionRelease(bool ignore);
+    inline bool ShouldIgnoreSessionRelease();
 };
+
+inline void ExchangeContext::SetIgnoreSessionRelease(bool ignore)
+{
+    mFlags.Set(Flags::kFlagIgnoreSessionRelease, ignore);
+}
+
+inline bool ExchangeContext::ShouldIgnoreSessionRelease()
+{
+    return mFlags.Has(Flags::kFlagIgnoreSessionRelease);
+}
 
 } // namespace Messaging
 } // namespace chip

@@ -23,7 +23,6 @@
 #pragma once
 
 #include <lib/support/Span.h>
-#include <platform/FailSafeContext.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
@@ -34,18 +33,15 @@ class DeviceControlServer final
 public:
     // ===== Members for internal use by other Device Layer components.
 
-    CHIP_ERROR CommissioningComplete(NodeId peerNodeId, FabricIndex accessingFabricIndex);
+    CHIP_ERROR PostCommissioningCompleteEvent(NodeId peerNodeId, FabricIndex accessingFabricIndex);
     CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode);
-    CHIP_ERROR ConnectNetworkForOperational(ByteSpan networkID);
-
-    FailSafeContext & GetFailSafeContext() { return mFailSafeContext; }
+    CHIP_ERROR PostConnectedToOperationalNetworkEvent(ByteSpan networkID);
 
     static DeviceControlServer & DeviceControlSvr();
 
 private:
     // ===== Members for internal use by the following friends.
     static DeviceControlServer sInstance;
-    FailSafeContext mFailSafeContext;
 
     // ===== Private members reserved for use by this class only.
 

@@ -46,13 +46,7 @@ void BindingHandler::OnInvokeCommandFailure(DeviceProxy * aDevice, BindingData &
             return;
 
         // Release current CASE session.
-        error = aDevice->Disconnect();
-
-        if (CHIP_NO_ERROR != error)
-        {
-            LOG_ERR("Disconnecting from CASE session failed due to: %" CHIP_ERROR_FORMAT, error.Format());
-            return;
-        }
+        aDevice->Disconnect();
 
         // Set flag to not try recover session multiple times.
         BindingHandler::GetInstance().mCaseSessionRecovered = true;
@@ -64,6 +58,12 @@ void BindingHandler::OnInvokeCommandFailure(DeviceProxy * aDevice, BindingData &
         // Establish new CASE session and retrasmit command that was not applied.
         error = BindingManager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId,
                                                                         static_cast<void *>(data));
+
+        if (CHIP_NO_ERROR != error)
+        {
+            LOG_ERR("NotifyBoundClusterChanged failed due to: %" CHIP_ERROR_FORMAT, error.Format());
+            return;
+        }
     }
     else
     {

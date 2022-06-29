@@ -45,7 +45,7 @@ private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack() { return CHIP_NO_ERROR; }
-    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
+    void _Shutdown() {}
 
     CHIP_ERROR _AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     void _RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0) {}

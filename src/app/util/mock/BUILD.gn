@@ -25,6 +25,7 @@ source_set("mock_ember") {
     "${chip_root}/src/app",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:testing",
   ]
 
   public_configs = [ ":mock_include" ]

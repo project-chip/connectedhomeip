@@ -1,0 +1,185 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    11.4.4. [TC-CNET-4.4] [Wi-Fi]Verification for ScanNetworks command
+    [DUT-Server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "TH sends ScanNetworks command to the DUT with the SSID argument value
+          as 'null' and Breadcrumb argument value as 1"
+      verification: |
+          ubuntu@ubuntu:~/connectedhomeip$ sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning scan-networks null 0 1 0 --paa-trust-store-path ./credentials/development/paa-root-certs
+
+          [1648124672.377157][9331:9336] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
+          [1648124672.377274][9331:9336] CHIP:TOO:   ScanNetworksResponse: {
+          [1648124672.377301][9331:9336] CHIP:TOO:     networkingStatus: 0
+          [1648124672.377325][9331:9336] CHIP:TOO:     debugText:
+          [1648124672.377403][9331:9336] CHIP:TOO:     wiFiScanResults: 15 entries
+          [1648124672.377472][9331:9336] CHIP:TOO:       [1]: {
+          [1648124672.377496][9331:9336] CHIP:TOO:         Security: 8
+          [1648124672.377520][9331:9336] CHIP:TOO:         Ssid: 47524C507269766174655F455854
+          [1648124672.377543][9331:9336] CHIP:TOO:         Bssid: E01CFCE4B236
+          [1648124672.377565][9331:9336] CHIP:TOO:         Channel: 11
+          [1648124672.377586][9331:9336] CHIP:TOO:         WiFiBand: 0
+          [1648124672.377608][9331:9336] CHIP:TOO:         Rssi: -7
+          [1648124672.377631][9331:9336] CHIP:TOO:        }
+          [1648124672.377663][9331:9336] CHIP:TOO:       [2]: {
+          [1648124672.377686][9331:9336] CHIP:TOO:         Security: 8
+          [1648124672.377709][9331:9336] CHIP:TOO:         Ssid: 47524C50726976617465
+          [1648124672.377731][9331:9336] CHIP:TOO:         Bssid: 6032B197B89F
+          [1648124672.377753][9331:9336] CHIP:TOO:         Channel: 153
+          [1648124672.377774][9331:9336] CHIP:TOO:         WiFiBand: 2
+          [1648124672.377795][9331:9336] CHIP:TOO:         Rssi: -47
+          [1648124672.377816][9331:9336] CHIP:TOO:        }
+          [1648124672.377847][9331:9336] CHIP:TOO:       [3]: {
+          [1648124672.377870][9331:9336] CHIP:TOO:         Security: 8
+          [1648124672.377891][9331:9336] CHIP:TOO:         Ssid:
+          [1648124672.377913][9331:9336] CHIP:TOO:         Bssid: 6632B197B89F
+          [1648124672.377934][9331:9336] CHIP:TOO:         Channel: 153
+          [1648124672.377955][9331:9336] CHIP:TOO:         WiFiBand: 2
+          [1648124672.377976][9331:9336] CHIP:TOO:         Rssi: -47
+          [1648124672.377997][9331:9336] CHIP:TOO:        }
+          [1648124672.378027][9331:9336] CHIP:TOO:       [4]: {
+          [1648124672.378050][9331:9336] CHIP:TOO:         Security: 8
+          [1648124672.378071][9331:9336] CHIP:TOO:         Ssid:
+          [1648124672.378093][9331:9336] CHIP:TOO:         Bssid: C606C3F95EEB
+          [1648124672.378114][9331:9336] CHIP:TOO:         Channel: 153
+          [1648124672.378135][9331:9336] CHIP:TOO:         WiFiBand: 2
+          [1648124672.378157][9331:9336] CHIP:TOO:         Rssi: -71
+          [1648124672.378178][9331:9336] CHIP:TOO:        }
+          [1648124672.378208][9331:9336] CHIP:TOO:       [5]: {
+          [1648124672.378231][9331:9336] CHIP:TOO:         Security: 8
+          [1648124672.378253][9331:9336] CHIP:TOO:         Ssid: 47524C50726976617465
+          [1648124672.378276][9331:9336] CHIP:TOO:         Bssid: C006C3F95F31
+          [1648124672.378297][9331:9336] CHIP:TOO:         Channel: 44
+          [1648124672.378318][9331:9336] CHIP:TOO:         WiFiBand: 2
+          [1648124672.378339][9331:9336] CHIP:TOO:         Rssi: -67
+          [1648124672.378360][9331:9336] CHIP:TOO:        }
+          [1648124672.378390][9331:9336] CHIP:TOO:       [6]: {
+          [1648124672.378412][9331:9336] CHIP:TOO:         Security: 8
+          [1648124672.378434][9331:9336] CHIP:TOO:         Ssid: 7A696762656531
+          [1648124672.378456][9331:9336] CHIP:TOO:         Bssid: E848B8C2123B
+          [1648124672.378477][9331:9336] CHIP:TOO:         Channel: 3
+          [1648124672.378497][9331:9336] CHIP:TOO:         WiFiBand: 0
+          [1648124672.378518][9331:9336] CHIP:TOO:         Rssi: -64
+          [1648124672.378539][9331:9336] CHIP:TOO:        }
+          [1648124672.378569][9331:9336] CHIP:TOO:       [7]: {
+          [1648124672.378592][9331:9336] CHIP:TOO:         Security: 12
+          [1648124672.378614][9331:9336] CHIP:TOO:         Ssid: 7A6967626565686F6D65
+          [1648124672.378636][9331:9336] CHIP:TOO:         Bssid: 0C0E764CB140
+          [1648124672.378657][9331:9336] CHIP:TOO:         Channel: 6
+          [1648124672.378678][9331:9336] CHIP:TOO:         WiFiBand: 0
+          [1648124672.378699][9331:9336] CHIP:TOO:         Rssi: -64
+          [1648124672.378720][9331:9336] CHIP:TOO:        }
+          [1648124672.378750][9331:9336] CHIP:TOO:       [8]: {
+          [1648124672.378772][9331:9336] CHIP:TOO:         Security: 8
+          [1648124672.378794][9331:9336] CHIP:TOO:         Ssid: 47524C50726976617465
+          [1648124672.378816][9331:9336] CHIP:TOO:         Bssid: 6032B197B89E
+          [1648124672.378837][9331:9336] CHIP:TOO:         Channel: 11
+          [1648124672.378858][9331:9336] CHIP:TOO:         WiFiBand: 0
+          [1648124672.378879][9331:9336] CHIP:TOO:         Rssi: -36
+          [1648124672.378900][9331:9336] CHIP:TOO:        }
+          [1648124672.378930][9331:9336] CHIP:TOO:       [9]: {
+          [1648124672.378952][9331:9336] CHIP:TOO:         Security: 8
+          [1648124672.378974][9331:9336] CHIP:TOO:         Ssid: 47524C50726976617465
+          [1648124672.378996][9331:9336] CHIP:TOO:         Bssid: 1027F5374EC6
+          [1648124672.379017][9331:9336] CHIP:TOO:         Channel: 6
+          [1648124672.379038][9331:9336] CHIP:TOO:         WiFiBand: 0
+          [1648124672.379059][9331:9336] CHIP:TOO:         Rssi: -46
+          [1648124672.379080][9331:9336] CHIP:TOO:        }
+          [1648124672.379110][9331:9336] CHIP:TOO:       [10]: {
+          [1648124672.379133][9331:9336] CHIP:TOO:         Security: 8
+          [1648124672.379155][9331:9336] CHIP:TOO:         Ssid: 47524C50726976617465
+          [1648124672.379177][9331:9336] CHIP:TOO:         Bssid: C006C3F95EEA
+          [1648124672.379198][9331:9336] CHIP:TOO:         Channel: 11
+          [1648124672.379219][9331:9336] CHIP:TOO:         WiFiBand: 0
+          [1648124672.379239][9331:9336] CHIP:TOO:         Rssi: -47
+          [1648124672.379261][9331:9336] CHIP:TOO:        }
+          [1648124672.379290][9331:9336] CHIP:TOO:       [11]: {
+          [1648124672.379313][9331:9336] CHIP:TOO:         Security: 8
+          [1648124672.379335][9331:9336] CHIP:TOO:         Ssid: 47524C50726976617465
+          [1648124672.379357][9331:9336] CHIP:TOO:         Bssid: B0BE7653B01A
+          [1648124672.379378][9331:9336] CHIP:TOO:         Channel: 6
+          [1648124672.379399][9331:9336] CHIP:TOO:         WiFiBand: 0
+          [1648124672.379420][9331:9336] CHIP:TOO:         Rssi: -67
+          [1648124672.379440][9331:9336] CHIP:TOO:        }
+          [1648124672.379471][9331:9336] CHIP:TOO:       [12]: {
+          [1648124672.379493][9331:9336] CHIP:TOO:         Security: 8
+          [1648124672.379515][9331:9336] CHIP:TOO:         Ssid: 47524C50726976617465
+          [1648124672.379537][9331:9336] CHIP:TOO:         Bssid: C006C3F95F30
+          [1648124672.379558][9331:9336] CHIP:TOO:         Channel: 6
+          [1648124672.379579][9331:9336] CHIP:TOO:         WiFiBand: 0
+          [1648124672.379600][9331:9336] CHIP:TOO:         Rssi: -55
+          [1648124672.379621][9331:9336] CHIP:TOO:        }
+          [1648124672.379651][9331:9336] CHIP:TOO:       [13]: {
+          [1648124672.379689][9331:9336] CHIP:TOO:         Security: 8
+          [1648124672.379712][9331:9336] CHIP:TOO:         Ssid: 47524C50726976617465
+          [1648124672.379734][9331:9336] CHIP:TOO:         Bssid: C006C3F95ECE
+          [1648124672.379755][9331:9336] CHIP:TOO:         Channel: 6
+          [1648124672.379776][9331:9336] CHIP:TOO:         WiFiBand: 0
+          [1648124672.379797][9331:9336] CHIP:TOO:         Rssi: -56
+          [1648124672.379818][9331:9336] CHIP:TOO:        }
+          [1648124672.379849][9331:9336] CHIP:TOO:       [14]: {
+          [1648124672.379872][9331:9336] CHIP:TOO:         Security: 12
+          [1648124672.379893][9331:9336] CHIP:TOO:         Ssid: 7A69676265652D746872656164
+          [1648124672.379916][9331:9336] CHIP:TOO:         Bssid: 6C198FC83ABC
+          [1648124672.379936][9331:9336] CHIP:TOO:         Channel: 2
+          [1648124672.379957][9331:9336] CHIP:TOO:         WiFiBand: 0
+          [1648124672.379978][9331:9336] CHIP:TOO:         Rssi: -52
+          [1648124672.379999][9331:9336] CHIP:TOO:        }
+          [1648124672.380029][9331:9336] CHIP:TOO:       [15]: {
+          [1648124672.380052][9331:9336] CHIP:TOO:         Security: 8
+          [1648124672.380073][9331:9336] CHIP:TOO:         Ssid: 5547432D4775657374
+          [1648124672.380096][9331:9336] CHIP:TOO:         Bssid: FA92BF518BB2
+          [1648124672.380117][9331:9336] CHIP:TOO:         Channel: 11
+          [1648124672.380137][9331:9336] CHIP:TOO:         WiFiBand: 0
+          [1648124672.380158][9331:9336] CHIP:TOO:         Rssi: -64
+          [1648124672.380179][9331:9336] CHIP:TOO:        }
+          [1648124672.380203][9331:9336] CHIP:TOO:    }
+          [1648124672.380331][9331:9336] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1648124672.380389][9331:9336] CHIP:EM: Sending Standalone Ack for MessageCounter:3026423 on exchange 22723i
+      disabled: true
+
+    - label:
+          "TH sends ScanNetworks Command to the DUT with SSID argument value as
+          'Userwifi_ssid' and Breadcrumb argument value 1"
+      verification: |
+          ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning scan-networks 47524C507269766174655F455854 0 1 0
+
+
+          [1649689140.896541][4322:4327] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
+          [1649689140.896856][4322:4327] CHIP:TOO:   ScanNetworksResponse: {
+          [1649689140.896924][4322:4327] CHIP:TOO:     networkingStatus: 0
+          [1649689140.896981][4322:4327] CHIP:TOO:     debugText:
+          [1649689140.897053][4322:4327] CHIP:TOO:     wiFiScanResults: 1 entries
+          [1649689140.897271][4322:4327] CHIP:TOO:       [1]: {
+          [1649689140.897331][4322:4327] CHIP:TOO:         Security: 8
+          [1649689140.897389][4322:4327] CHIP:TOO:         Ssid: 47524C507269766174655F455854
+          [1649689140.897447][4322:4327] CHIP:TOO:         Bssid: E01CFCE4B236
+          [1649689140.897502][4322:4327] CHIP:TOO:         Channel: 1
+          [1649689140.897557][4322:4327] CHIP:TOO:         WiFiBand: 0
+          [1649689140.897610][4322:4327] CHIP:TOO:         Rssi: -15
+          [1649689140.897667][4322:4327] CHIP:TOO:        }
+          [1649689140.897728][4322:4327] CHIP:TOO:    }
+          [1649689140.897836][4322:4327] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1649689140.897942][4322:4327] CHIP:EM: Sending Standalone Ack for MessageCounter:10817619 on exchange 12440i
+      disabled: true

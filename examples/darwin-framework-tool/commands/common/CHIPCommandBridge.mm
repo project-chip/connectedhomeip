@@ -27,10 +27,36 @@
 
 const uint16_t kListenPort = 5541;
 static CHIPToolPersistentStorageDelegate * storage = nil;
+std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
+std::map<std::string, CHIPDeviceController *> CHIPCommandBridge::mControllers;
 
 CHIP_ERROR CHIPCommandBridge::Run()
 {
     ChipLogProgress(chipTool, "Running Command");
+    ReturnErrorOnFailure(MaybeSetUpStack());
+    SetIdentity(mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha);
+    ReturnLogErrorOnFailure(RunCommand());
+    ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
+
+    bool deferCleanup = (IsInteractive() && DeferInteractiveCleanup());
+
+    Shutdown();
+
+    if (deferCleanup) {
+        sDeferredCleanups.insert(this);
+    } else {
+        Cleanup();
+    }
+    MaybeTearDownStack();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
+{
+    if (IsInteractive()) {
+        return CHIP_NO_ERROR;
+    }
     NSData * ipk;
     CHIPToolKeypair * nocSigner = [[CHIPToolKeypair alloc] init];
     storage = [[CHIPToolPersistentStorageDelegate alloc] init];
@@ -76,13 +102,15 @@ CHIP_ERROR CHIPCommandBridge::Run()
         mControllers[identities[i]] = controller;
     }
 
-    // If no commissioner name passed in, default to alpha.
-    SetIdentity(mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha);
-
-    ReturnLogErrorOnFailure(RunCommand());
-    ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
-
     return CHIP_NO_ERROR;
+}
+
+void CHIPCommandBridge::MaybeTearDownStack()
+{
+    if (IsInteractive()) {
+        return;
+    }
+    ShutdownCommissioner();
 }
 
 void CHIPCommandBridge::SetIdentity(const char * identity)
@@ -100,7 +128,7 @@ CHIPDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurren
 
 CHIPDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
 
-CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
+void CHIPCommandBridge::ShutdownCommissioner()
 {
     ChipLogProgress(chipTool, "Shutting down controller");
     for (auto & pair : mControllers) {
@@ -110,13 +138,10 @@ CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
     mCurrentController = nil;
 
     [[MatterControllerFactory sharedInstance] shutdown];
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration)
 {
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
     auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
     {
         std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
@@ -124,7 +149,6 @@ CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration
             mCommandExitStatus = CHIP_ERROR_TIMEOUT;
         }
     }
-    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
 
     return mCommandExitStatus;
 }
@@ -133,7 +157,7 @@ void CHIPCommandBridge::StopWaiting()
 {
     {
         std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
-        mWaitingForResponse = false;
+        mWaitingForResponse = NO;
     }
     cvWaitingForResponse.notify_all();
 }
@@ -155,4 +179,12 @@ void CHIPCommandBridge::LogNSError(const char * logString, NSError * error)
     } else {
         ChipLogError(chipTool, "%s: %s", logString, chip::ErrorStr(err));
     }
+}
+
+void CHIPCommandBridge::ExecuteDeferredCleanups()
+{
+    for (auto * cmd : sDeferredCleanups) {
+        cmd->Cleanup();
+    }
+    sDeferredCleanups.clear();
 }

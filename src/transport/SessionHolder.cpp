@@ -81,11 +81,10 @@ bool SessionHolder::GrabPairingSession(const SessionHandle & session)
     if (!session->IsSecureSession())
         return false;
 
-    if (!session->AsSecureSession()->IsPairing())
+    if (!session->AsSecureSession()->IsEstablishing())
         return false;
 
-    mSession.Emplace(session.mSession);
-    session->AddHolder(*this);
+    GrabUnchecked(session);
     return true;
 }
 
@@ -96,9 +95,15 @@ bool SessionHolder::Grab(const SessionHandle & session)
     if (!session->IsActiveSession())
         return false;
 
+    GrabUnchecked(session);
+    return true;
+}
+
+void SessionHolder::GrabUnchecked(const SessionHandle & session)
+{
+    VerifyOrDie(!mSession.HasValue());
     mSession.Emplace(session.mSession);
     session->AddHolder(*this);
-    return true;
 }
 
 void SessionHolder::Release()

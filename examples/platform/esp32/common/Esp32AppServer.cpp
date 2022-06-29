@@ -19,27 +19,20 @@
 #include "Esp32AppServer.h"
 #include "CHIPDeviceManager.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
-
-#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-#include <platform/ESP32/ESP32FactoryDataProvider.h>
-#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
 using namespace chip;
 using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
+
 namespace {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
 #endif
 
-#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-ESP32FactoryDataProvider sFactoryDataProvider;
-#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 } // namespace
 
 void Esp32AppServer::Init(AppDelegate * sAppDelegate)
@@ -53,13 +46,6 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     }
     chip::Server::GetInstance().Init(initParams);
 
-    // Initialize device attestation config
-#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
-#else
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     sWiFiNetworkCommissioningInstance.Init();
 #endif
@@ -67,7 +53,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
         (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0))
     {
-        ESP_LOGI(TAG, "Thread has been provisioned, publish the dns service now");
+        ESP_LOGI("ESP32AppServer", "Thread has been provisioned, publish the dns service now");
         chip::app::DnssdServer::Instance().StartServer();
     }
 #endif

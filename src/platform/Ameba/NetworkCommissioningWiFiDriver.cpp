@@ -56,10 +56,9 @@ CHIP_ERROR AmebaWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChan
     return err;
 }
 
-CHIP_ERROR AmebaWiFiDriver::Shutdown()
+void AmebaWiFiDriver::Shutdown()
 {
     mpStatusChangeCallback = nullptr;
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AmebaWiFiDriver::CommitConfiguration()

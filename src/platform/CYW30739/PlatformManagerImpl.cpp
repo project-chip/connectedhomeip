@@ -42,14 +42,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     wiced_result_t result;
 
     // Initialize the configuration system.
-    err = Internal::CYW30739Config::Init();
+    err = PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-
-    /* Initialize LwIP. */
-    lwip_init();
 
     /* Create the thread object. */
     mThread = wiced_rtos_create_thread();
@@ -176,10 +173,7 @@ CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout durationM
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_Shutdown()
-{
-    return CHIP_NO_ERROR;
-}
+void PlatformManagerImpl::_Shutdown() {}
 
 void PlatformManagerImpl::SetEventFlags(uint32_t flags)
 {

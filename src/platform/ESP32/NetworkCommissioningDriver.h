@@ -88,7 +88,7 @@ public:
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
-    CHIP_ERROR Shutdown() override;
+    void Shutdown() override;
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return kMaxWiFiNetworks; }
@@ -109,6 +109,8 @@ public:
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
     void OnConnectWiFiNetwork();
+    void OnConnectWiFiNetworkFailed();
+    static void OnConnectWiFiNetworkFailed(chip::System::Layer * aLayer, void * aAppState);
     void OnScanWiFiNetworkDone();
     void OnNetworkStatusChange();
 

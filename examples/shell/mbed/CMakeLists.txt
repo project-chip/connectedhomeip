@@ -28,7 +28,7 @@ if(APP_TYPE STREQUAL "boot" OR APP_TYPE STREQUAL "upgrade")
 endif()
 
 include(${MBED_PATH}/tools/cmake/app.cmake)
-if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W" AND BOOT_ENABLED)   
+if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W" AND BOOT_ENABLED)
     list(REMOVE_ITEM MBED_TARGET_LABELS CM0P_SLEEP)
     list(REMOVE_ITEM MBED_TARGET_DEFINITIONS COMPONENT_CM0P_SLEEP=1)
 endif()
@@ -57,8 +57,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${SHELL_COMMON}/cmd_misc.cpp
                ${SHELL_COMMON}/cmd_otcli.cpp
-               ${SHELL_COMMON}/cmd_ping.cpp
-               ${SHELL_COMMON}/cmd_send.cpp
                ${SHELL_COMMON}/cmd_server.cpp
                ${SHELL_COMMON}/globals.cpp
                ${MBED_COMMON}/util/DFUManager.cpp

@@ -36,7 +36,6 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemLayer.h>
 
@@ -314,16 +313,24 @@ void OperationalDeviceProxy::OnSessionEstablished(const SessionHandle & session)
     // Do not touch this instance anymore; it might have been destroyed by a callback.
 }
 
-CHIP_ERROR OperationalDeviceProxy::Disconnect()
+void OperationalDeviceProxy::Disconnect()
 {
-    ReturnErrorCodeIf(mState != State::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(mState == State::SecureConnected);
+
     if (mSecureSession)
     {
-        mInitParams.sessionManager->ExpirePairing(mSecureSession.Get().Value());
+        //
+        // Mark the session as defunct to signal that we no longer want to use this
+        // session anymore for further interactions to this peer. However, if we receive
+        // messages back from that peer on the defunct session, it will bring it back into an active
+        // state again.
+        //
+        mSecureSession.Get().Value()->AsSecureSession()->MarkAsDefunct();
     }
-    MoveToState(State::HasAddress);
 
-    return CHIP_NO_ERROR;
+    mSecureSession.Release();
+
+    MoveToState(State::HasAddress);
 }
 
 void OperationalDeviceProxy::CleanupCASEClient()
@@ -350,9 +357,9 @@ void OperationalDeviceProxy::OnSessionHang()
     // TODO: establish a new session
 }
 
-CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
+void OperationalDeviceProxy::ShutdownSubscriptions()
 {
-    return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricIndex, GetDeviceId());
+    app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricIndex, GetDeviceId());
 }
 
 OperationalDeviceProxy::~OperationalDeviceProxy()
@@ -395,7 +402,7 @@ CHIP_ERROR OperationalDeviceProxy::LookupPeerAddress()
 
 void OperationalDeviceProxy::OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result)
 {
-    UpdateDeviceData(result.address, result.mrpConfig);
+    UpdateDeviceData(result.address, result.mrpRemoteConfig);
 }
 
 void OperationalDeviceProxy::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason)

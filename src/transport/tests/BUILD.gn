@@ -40,6 +40,11 @@ chip_test_suite("tests") {
     "TestSessionManager.cpp",
   ]
 
+  if (chip_device_platform != "mbed" && chip_device_platform != "efr32" &&
+      chip_device_platform != "esp32" && chip_device_platform != "nrfconnect") {
+    test_sources += [ "TestSecureSessionTable.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
@@ -48,6 +53,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/tests:helpers",

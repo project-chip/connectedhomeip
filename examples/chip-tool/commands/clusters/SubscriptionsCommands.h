@@ -18,6 +18,11 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
+
+#include <commands/common/CHIPCommand.h>
+#include <commands/common/Commands.h>
+
 class ShutdownSubscription : public CHIPCommand
 {
 public:
@@ -51,7 +56,10 @@ public:
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override
     {
-        CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricIndex, mNodeId);
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        chip::app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricIndex, mNodeId);
+
         SetCommandExitStatus(err);
         return CHIP_NO_ERROR;
     }

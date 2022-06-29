@@ -22,6 +22,7 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
+#include "Button.h"
 #include "freertos/FreeRTOS.h"
 #include <platform/CHIPDeviceLayer.h>
 
@@ -33,6 +34,8 @@
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
 
+extern Button AppButton;
+
 class AppTask
 {
 
@@ -40,8 +43,7 @@ public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
     void PostEvent(const AppEvent * event);
-
-    void ButtonEventHandler(const uint8_t buttonHandle, uint8_t btnAction);
+    static void ButtonPressCallback();
 
 private:
     friend AppTask & GetAppTask(void);

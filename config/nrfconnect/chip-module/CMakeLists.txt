@@ -30,6 +30,7 @@ if (CONFIG_CHIP)
 include(ExternalProject)
 include(../../zephyr/ota-image.cmake)
 include(../../zephyr/zephyr-util.cmake)
+include(generate_factory_data.cmake)
 
 # ==============================================================================
 # Declare configuration variables and define constants
@@ -219,6 +220,13 @@ chip_gn_arg_bool  ("chip_detail_logging"                    CONFIG_MATTER_LOG_LE
 chip_gn_arg_bool  ("chip_automation_logging"                "false")
 chip_gn_arg_bool  ("chip_malloc_sys_heap"                   CONFIG_CHIP_MALLOC_SYS_HEAP)
 
+if (CONFIG_CHIP_FACTORY_DATA)
+    chip_gn_arg_bool  ("chip_use_transitional_commissionable_data_provider"  "false")
+    chip_gn_arg_bool  ("chip_enable_factory_data"                            "true")
+elseif (CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
+    chip_gn_arg_bool  ("chip_use_transitional_commissionable_data_provider"  "false")
+endif()
+
 if (CONFIG_CHIP_ROTATING_DEVICE_ID)
     chip_gn_arg_bool("chip_enable_rotating_device_id"          "true")
     chip_gn_arg_bool("chip_enable_additional_data_advertising" "true")
@@ -256,7 +264,7 @@ if (CONFIG_CHIP_PW_RPC)
     set(PIGWEED_DIR "//third_party/pigweed/repo")
     chip_gn_arg_bool("chip_build_pw_trace_lib" "true")
     chip_gn_arg_string("pw_trace_BACKEND" ${PIGWEED_DIR}/pw_trace_tokenized)
-    chip_gn_arg_string("pw_assert_BACKEND" ${PIGWEED_DIR}/pw_assert_log)
+    chip_gn_arg_string("pw_assert_BACKEND" ${PIGWEED_DIR}/pw_assert_log:check_backend)
     chip_gn_arg_string("pw_log_BACKEND" ${PIGWEED_DIR}/pw_log_basic)
     chip_gn_arg("pw_build_LINK_DEPS" [\"${PIGWEED_DIR}/pw_assert:impl\",\ \"${PIGWEED_DIR}/pw_log:impl\"])
 endif()
@@ -348,6 +356,14 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     )
 
     add_dependencies(chip-ota-image dfu_multi_image_pkg)
+endif()
+
+# ==============================================================================
+# Define 'factory_data' target for generating a factory data partition
+# ==============================================================================
+
+if(CONFIG_CHIP_FACTORY_DATA_BUILD)
+    nrfconnect_generate_factory_data()
 endif()
 
 endif() # CONFIG_CHIP

@@ -39,7 +39,7 @@
 #include "../include/target-navigator/TargetNavigatorManager.h"
 #include "ChannelManager.h"
 #include "CommissionerMain.h"
-#include "ContentAppCommandDelegate.h"
+#include "ContentAppAttributeDelegate.h"
 #include "KeypadInputManager.h"
 #include "MediaPlaybackManager.h"
 #include "MyUserPrompter-JNI.h"
@@ -52,7 +52,7 @@
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 
-CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter);
+CHIP_ERROR InitVideoPlayerPlatform(JNIMyUserPrompter * userPrompter, jobject contentAppEndpointManager);
 CHIP_ERROR PreServerInit();
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
                          const char * szApplicationVersion, jobject manager);
@@ -72,7 +72,7 @@ using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
 using SupportedStreamingProtocol  = app::Clusters::ContentLauncher::SupportedStreamingProtocol;
-using ContentAppCommandDelegate   = chip::AppPlatform::ContentAppCommandDelegate;
+using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
 static const int kCatalogVendorId = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
 
@@ -86,7 +86,7 @@ public:
                    const char * szApplicationVersion, const char * setupPIN, jobject manager) :
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
-        mAccountLoginDelegate(setupPIN), mContentLauncherDelegate(ContentAppCommandDelegate(manager), { "image/*", "video/*" },
+        mAccountLoginDelegate(setupPIN), mContentLauncherDelegate(ContentAppAttributeDelegate(manager), { "image/*", "video/*" },
                                                                   to_underlying(SupportedStreamingProtocol::kDash) |
                                                                       to_underlying(SupportedStreamingProtocol::kHls)),
         mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
@@ -131,7 +131,7 @@ public:
     // Lookup ContentApp for this catalog id / app id and load it
     ContentApp * LoadContentApp(const CatalogVendorApp & vendorApp) override;
 
-    EndpointId AddContentApp(ContentAppImpl & app);
+    EndpointId AddContentApp(ContentAppImpl * app, jobject contentAppEndpointManager);
 
     void SendTestMessage(EndpointId epID, const char * message);
 
@@ -143,11 +143,11 @@ public:
     CHIP_ERROR ConvertToPlatformCatalogVendorApp(const CatalogVendorApp & sourceApp, CatalogVendorApp * destinationApp) override;
 
 protected:
-    std::vector<ContentAppImpl> mContentApps{
-        ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "34567890", nullptr),
-        ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021", nullptr),
-        ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021", nullptr),
-        ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021", nullptr)
+    std::vector<ContentAppImpl *> mContentApps{
+        new ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "20202021", nullptr),
+        new ContentAppImpl("Vendor2", 65520, "exampleString", 32768, "Version2", "20202021", nullptr),
+        new ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021", nullptr),
+        new ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021", nullptr)
     };
 };
 

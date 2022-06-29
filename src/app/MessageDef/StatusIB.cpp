@@ -31,7 +31,6 @@
 
 #include <app/AppBuildConfig.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/support/ErrorStr.h>
 
 using namespace chip;
 using namespace chip::TLV;

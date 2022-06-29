@@ -516,7 +516,7 @@ CHIP_ERROR TransferSession::HandleStatusReportMessage(const PayloadHeader & head
 
     Protocols::SecureChannel::StatusReport report;
     ReturnErrorOnFailure(report.Parse(std::move(msg)));
-    VerifyOrReturnError((report.GetProtocolId() == Protocols::BDX::Id.ToFullyQualifiedSpecForm()), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrReturnError((report.GetProtocolId() == Protocols::BDX::Id), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     mStatusReportData.statusCode = static_cast<StatusCode>(report.GetProtocolCode());
 
@@ -871,8 +871,8 @@ void TransferSession::PrepareStatusReport(StatusCode code)
 {
     mStatusReportData.statusCode = code;
 
-    Protocols::SecureChannel::StatusReport report(Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                                  Protocols::BDX::Id.ToFullyQualifiedSpecForm(), to_underlying(code));
+    Protocols::SecureChannel::StatusReport report(Protocols::SecureChannel::GeneralStatusCode::kFailure, Protocols::BDX::Id,
+                                                  to_underlying(code));
     size_t msgSize = report.Size();
     Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(msgSize), msgSize);
     VerifyOrExit(!bbuf.IsNull(), mPendingOutput = OutputEventType::kInternalError);
@@ -881,7 +881,7 @@ void TransferSession::PrepareStatusReport(StatusCode code)
     mPendingMsgHandle = bbuf.Finalize();
     if (mPendingMsgHandle.IsNull())
     {
-        ChipLogError(BDX, "%s: error preparing message: %s", __FUNCTION__, ErrorStr(CHIP_ERROR_NO_MEMORY));
+        ChipLogError(BDX, "%s: error preparing message: %" CHIP_ERROR_FORMAT, __FUNCTION__, CHIP_ERROR_NO_MEMORY.Format());
         mPendingOutput = OutputEventType::kInternalError;
     }
     else

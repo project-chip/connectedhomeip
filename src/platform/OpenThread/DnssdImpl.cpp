@@ -39,10 +39,7 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
     return ThreadStackMgr().ClearSrpHost(hostname);
 }
 
-CHIP_ERROR ChipDnssdShutdown()
-{
-    return CHIP_NO_ERROR;
-}
+void ChipDnssdShutdown() {}
 
 const char * GetProtocolString(DnssdServiceProtocol protocol)
 {

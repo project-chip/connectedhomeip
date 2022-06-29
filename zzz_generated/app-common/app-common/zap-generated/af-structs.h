@@ -230,6 +230,7 @@ typedef struct _ApplicationBasicApplication
 typedef struct _BasicCommissioningInfo
 {
     uint16_t FailSafeExpiryLengthSeconds;
+    uint16_t MaxCumulativeFailsafeSeconds;
 } BasicCommissioningInfo;
 
 // Struct for BatChargeFaultChangeType
@@ -333,13 +334,6 @@ typedef struct _GroupKeySetStruct
     chip::ByteSpan EpochKey2;
     uint64_t EpochStartTime2;
 } GroupKeySetStruct;
-
-// Struct for IasAceZoneStatusResult
-typedef struct _IasAceZoneStatusResult
-{
-    uint8_t zoneId;
-    uint16_t zoneStatus;
-} IasAceZoneStatusResult;
 
 // Struct for InputInfo
 typedef struct _InputInfo
@@ -515,14 +509,6 @@ typedef struct _SecurityPolicy
     uint16_t Flags;
 } SecurityPolicy;
 
-// Struct for SoftwareFaultStruct
-typedef struct _SoftwareFaultStruct
-{
-    uint64_t Id;
-    chip::CharSpan Name;
-    chip::ByteSpan FaultRecording;
-} SoftwareFaultStruct;
-
 // Struct for TargetInfo
 typedef struct _TargetInfo
 {
@@ -543,8 +529,8 @@ typedef struct _TargetStruct
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet
 {
-    uint64_t fabricIndex;
-    chip::ByteSpan operationalCert;
+    uint64_t member1;
+    chip::ByteSpan member2;
 } TestListStructOctet;
 
 // Struct for ThermostatScheduleTransition

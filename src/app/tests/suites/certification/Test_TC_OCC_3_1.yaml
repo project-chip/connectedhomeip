@@ -11,38 +11,44 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.5. [TC-OCC-3.1] Primary functionality with server as DUT
+name: 27.3.3. [TC-OCC-3.1] Primary functionality with server as DUT
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Occupancy Sensing"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
-
-    - label: "TH reads Occupancy attribute from DUT"
-      verification: |
-          ./chip-tool occupancysensing read occupancy  1 1
-
-           Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000DataVersion: 289401399
-          [1646130536.783615][3045:3050] CHIP:TOO:   occupancy: 0
-      disabled: true
+    - label: "Reads Occupancy attribute from DUT"
+      command: "readAttribute"
+      attribute: "occupancy"
+      PICS: A_OCCUPANCY
+      response:
+          value: 0
+          saveAs: OccupancyValue
 
     - label: "Operate on DUT to change the occupancy status"
-      verification: |
+      PICS: MANUAL_OCCUPANCY_CHANGE
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Operate on DUT to change the occupancy status"
 
-      disabled: true
-
-    - label: "after a few seconds, TH reads Occupancy attribute from DUT"
-      verification: |
-          ./chip-tool occupancysensing read occupancy  1 1
-
-           Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000DataVersion: 289401399
-          [1646130536.783615][3045:3050] CHIP:TOO:   occupancy: 1
-      disabled: true
+    - label: "Reads back Occupancy attribute from DUT after few seconds"
+      command: "readAttribute"
+      attribute: "occupancy"
+      PICS: A_OCCUPANCY
+      response:
+          constraints:
+              notvalue: OccupancyValue

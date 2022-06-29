@@ -30,60 +30,11 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT AccountLoginCluster : public ClusterBase
+class DLL_EXPORT OnOffCluster : public ClusterBase
 {
 public:
-    AccountLoginCluster() : ClusterBase(app::Clusters::AccountLogin::Id) {}
-    ~AccountLoginCluster() {}
-};
-
-class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
-{
-public:
-    ApplicationBasicCluster() : ClusterBase(app::Clusters::ApplicationBasic::Id) {}
-    ~ApplicationBasicCluster() {}
-};
-
-class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
-{
-public:
-    ApplicationLauncherCluster() : ClusterBase(app::Clusters::ApplicationLauncher::Id) {}
-    ~ApplicationLauncherCluster() {}
-};
-
-class DLL_EXPORT AudioOutputCluster : public ClusterBase
-{
-public:
-    AudioOutputCluster() : ClusterBase(app::Clusters::AudioOutput::Id) {}
-    ~AudioOutputCluster() {}
-};
-
-class DLL_EXPORT ChannelCluster : public ClusterBase
-{
-public:
-    ChannelCluster() : ClusterBase(app::Clusters::Channel::Id) {}
-    ~ChannelCluster() {}
-};
-
-class DLL_EXPORT ContentLauncherCluster : public ClusterBase
-{
-public:
-    ContentLauncherCluster() : ClusterBase(app::Clusters::ContentLauncher::Id) {}
-    ~ContentLauncherCluster() {}
-};
-
-class DLL_EXPORT DescriptorCluster : public ClusterBase
-{
-public:
-    DescriptorCluster() : ClusterBase(app::Clusters::Descriptor::Id) {}
-    ~DescriptorCluster() {}
-};
-
-class DLL_EXPORT KeypadInputCluster : public ClusterBase
-{
-public:
-    KeypadInputCluster() : ClusterBase(app::Clusters::KeypadInput::Id) {}
-    ~KeypadInputCluster() {}
+    OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
+    ~OnOffCluster() {}
 };
 
 class DLL_EXPORT LevelControlCluster : public ClusterBase
@@ -93,11 +44,25 @@ public:
     ~LevelControlCluster() {}
 };
 
-class DLL_EXPORT MediaInputCluster : public ClusterBase
+class DLL_EXPORT DescriptorCluster : public ClusterBase
 {
 public:
-    MediaInputCluster() : ClusterBase(app::Clusters::MediaInput::Id) {}
-    ~MediaInputCluster() {}
+    DescriptorCluster() : ClusterBase(app::Clusters::Descriptor::Id) {}
+    ~DescriptorCluster() {}
+};
+
+class DLL_EXPORT ChannelCluster : public ClusterBase
+{
+public:
+    ChannelCluster() : ClusterBase(app::Clusters::Channel::Id) {}
+    ~ChannelCluster() {}
+};
+
+class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
+{
+public:
+    TargetNavigatorCluster() : ClusterBase(app::Clusters::TargetNavigator::Id) {}
+    ~TargetNavigatorCluster() {}
 };
 
 class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
@@ -107,18 +72,53 @@ public:
     ~MediaPlaybackCluster() {}
 };
 
-class DLL_EXPORT OnOffCluster : public ClusterBase
+class DLL_EXPORT MediaInputCluster : public ClusterBase
 {
 public:
-    OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
-    ~OnOffCluster() {}
+    MediaInputCluster() : ClusterBase(app::Clusters::MediaInput::Id) {}
+    ~MediaInputCluster() {}
 };
 
-class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
+class DLL_EXPORT KeypadInputCluster : public ClusterBase
 {
 public:
-    TargetNavigatorCluster() : ClusterBase(app::Clusters::TargetNavigator::Id) {}
-    ~TargetNavigatorCluster() {}
+    KeypadInputCluster() : ClusterBase(app::Clusters::KeypadInput::Id) {}
+    ~KeypadInputCluster() {}
+};
+
+class DLL_EXPORT ContentLauncherCluster : public ClusterBase
+{
+public:
+    ContentLauncherCluster() : ClusterBase(app::Clusters::ContentLauncher::Id) {}
+    ~ContentLauncherCluster() {}
+};
+
+class DLL_EXPORT AudioOutputCluster : public ClusterBase
+{
+public:
+    AudioOutputCluster() : ClusterBase(app::Clusters::AudioOutput::Id) {}
+    ~AudioOutputCluster() {}
+};
+
+class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
+{
+public:
+    ApplicationLauncherCluster() : ClusterBase(app::Clusters::ApplicationLauncher::Id) {}
+    ~ApplicationLauncherCluster() {}
+};
+
+class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
+{
+public:
+    ApplicationBasicCluster() : ClusterBase(app::Clusters::ApplicationBasic::Id) {}
+    ~ApplicationBasicCluster() {}
+};
+
+class DLL_EXPORT AccountLoginCluster : public ClusterBase
+{
+public:
+    AccountLoginCluster() : ClusterBase(app::Clusters::AccountLogin::Id) {}
+    ~AccountLoginCluster() {}
 };
 
 } // namespace Controller

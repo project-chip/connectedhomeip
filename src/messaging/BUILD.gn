@@ -22,9 +22,8 @@ declare_args() {
 defines = []
 
 if (chip_case_retry_delta != "") {
-  defines += [
-    "CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL=${chip_case_retry_delta}",
-  ]
+  defines +=
+      [ "CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL=${chip_case_retry_delta}" ]
 }
 
 source_set("messaging_mrp_config") {

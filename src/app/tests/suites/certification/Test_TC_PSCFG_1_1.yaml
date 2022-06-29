@@ -33,31 +33,24 @@ tests:
       attribute: "ClusterRevision"
       response:
           value: 1
+          constraints:
+              type: uint16
 
-    #Disabled due to issue #17483
     - label: "TH reads the FeatureMap attribute from the DUT"
-      verification: |
-          ./chip-tool powersourceconfiguration read feature-map 1 0
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
 
-    #Issue 17970
     - label: "TH reads the AttributeList attribute from the DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 65528, 65529, 65530, 65531, 65532, 65533]
           constraints:
               type: list
+              contains: [0, 65528, 65529, 65531, 65532, 65533]
 
     - label: "TH reads the AcceptedCommandList attribute from the DUT"
       command: "readAttribute"

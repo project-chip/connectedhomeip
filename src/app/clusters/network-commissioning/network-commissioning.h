@@ -46,7 +46,7 @@ public:
      * Register will register the network commissioning instance to the attribute and command dispatching route.
      */
     CHIP_ERROR Init();
-    CHIP_ERROR Shutdown();
+    void Shutdown();
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;

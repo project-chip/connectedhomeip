@@ -22,8 +22,10 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
+#include <app/InteractionModelEngine.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
@@ -52,7 +54,20 @@ private:
     CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & aEncoder);
 };
 
+class SoftwareDiagnosticsCommandHandler : public CommandHandlerInterface
+{
+public:
+    // Register for the SoftwareDiagnostics cluster on all endpoints.
+    SoftwareDiagnosticsCommandHandler() : CommandHandlerInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
+
+    void InvokeCommand(HandlerContext & handlerContext) override;
+
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+};
+
 SoftwareDiagosticsAttrAccess gAttrAccess;
+
+SoftwareDiagnosticsCommandHandler gCommandHandler;
 
 CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -131,6 +146,42 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadThreadMetrics(AttributeValueEncoder
     return err;
 }
 
+void SoftwareDiagnosticsCommandHandler::InvokeCommand(HandlerContext & handlerContext)
+{
+    using Protocols::InteractionModel::Status;
+    if (handlerContext.mRequestPath.mCommandId != Commands::ResetWatermarks::Id)
+    {
+        // Normal error handling
+        return;
+    }
+
+    handlerContext.SetCommandHandled();
+    Status status = Status::Success;
+    if (!DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
+    {
+        status = Status::UnsupportedCommand;
+    }
+    else if (DeviceLayer::GetDiagnosticDataProvider().ResetWatermarks() != CHIP_NO_ERROR)
+    {
+        status = Status::Failure;
+    }
+    handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
+}
+
+CHIP_ERROR SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                                        CommandIdCallback callback, void * context)
+{
+    if (!DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
+    {
+        // No commmands.
+        return CHIP_NO_ERROR;
+    }
+
+    callback(Commands::ResetWatermarks::Id, context);
+
+    return CHIP_NO_ERROR;
+}
+
 } // anonymous namespace
 
 namespace chip {
@@ -149,7 +200,7 @@ SoftwareDiagnosticsServer & SoftwareDiagnosticsServer::Instance()
 }
 
 // Gets called when a software fault that has taken place on the Node.
-void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault)
+void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault)
 {
     ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
 
@@ -157,9 +208,8 @@ void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics:
     {
         // If Software Diagnostics cluster is implemented on this endpoint
         EventNumber eventNumber;
-        Events::SoftwareFault::Type event{ softwareFault };
 
-        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+        if (CHIP_NO_ERROR != LogEvent(softwareFault, endpoint, eventNumber))
         {
             ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
         }
@@ -174,21 +224,12 @@ bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandle
                                                               const app::ConcreteCommandPath & commandPath,
                                                               const Commands::ResetWatermarks::DecodableType & commandData)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-
-    // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
-    // value of the CurrentHeapUsed.
-    if (DeviceLayer::GetDiagnosticDataProvider().ResetWatermarks() != CHIP_NO_ERROR)
-    {
-        status = EMBER_ZCL_STATUS_FAILURE;
-    }
-
-    emberAfSendImmediateDefaultResponse(status);
-
-    return true;
+    // Shouldn't be called at all.
+    return false;
 }
 
 void MatterSoftwareDiagnosticsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
+    InteractionModelEngine::GetInstance()->RegisterCommandHandler(&gCommandHandler);
 }

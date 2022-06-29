@@ -56,6 +56,9 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_InitChipStack(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    if (mInitialized)
+      return err;
+
     k_mutex_init(&mChipStackLock);
 
     k_msgq_init(&mChipEventQueue, reinterpret_cast<char *>(&mChipEventRingBuffer), sizeof(ChipDeviceEvent),
@@ -66,6 +69,8 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_InitChipStack(void)
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
     SuccessOrExit(err);
+
+    mInitialized = true;
 
 exit:
     return err;
@@ -104,13 +109,12 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StopEventLoopTask(void
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
+void GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
 {
 #if CONFIG_REBOOT
     sys_reboot(SYS_REBOOT_WARM);
-    return CHIP_NO_ERROR;
 #else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    // NB: When this is implemented, |mInitialized| can be removed.
 #endif
 }
 

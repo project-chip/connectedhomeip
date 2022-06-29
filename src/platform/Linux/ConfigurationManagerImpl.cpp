@@ -327,16 +327,6 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     // TODO(#742): restart CHIP exe
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetVendorId(uint16_t & vendorId)
-{
-    return ReadConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetProductId(uint16_t & productId)
-{
-    return ReadConfigValue(PosixConfig::kConfigKey_ProductId, productId);
-}
-
 CHIP_ERROR ConfigurationManagerImpl::StoreVendorId(uint16_t vendorId)
 {
     return WriteConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);

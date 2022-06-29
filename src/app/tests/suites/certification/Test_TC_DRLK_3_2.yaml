@@ -1,0 +1,433 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 111.3.2. [TC-DRLK-3.2] Commands [DUT - Client]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "DUT sends Lock Door command to TH."
+      verification: |
+          ./chip-tool doorlock lock-door 2 1 --timedInteractionTimeoutMs 1000
+
+          [1653565713556] [97626:2816537] CHIP: [DMG]                                 StatusIB =
+          [1653565713556] [97626:2816537] CHIP: [DMG]                                 {
+          [1653565713556] [97626:2816537] CHIP: [DMG]                                         status = 0x00 (SUCCESS),
+          [1653565713556] [97626:2816537] CHIP: [DMG]                                 },
+          [1653565713556] [97626:2816537] CHIP: [DMG]                                 
+          [1653565713556] [97626:2816537] CHIP: [DMG]                         },
+          [1653565713556] [97626:2816537] CHIP: [DMG]                         
+          [1653565713556] [97626:2816537] CHIP: [DMG]                 },
+          [1653565713556] [97626:2816537] CHIP: [DMG]                 
+          [1653565713556] [97626:2816537] CHIP: [DMG]         ],
+          [1653565713556] [97626:2816537] CHIP: [DMG]         
+          [1653565713556] [97626:2816537] CHIP: [DMG]         InteractionModelRevision = 1
+          [1653565713556] [97626:2816537] CHIP: [DMG] },
+          [1653565713556] [97626:2816537] CHIP: [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0000 Status=0x0
+      disabled: true
+
+    - label: "DUT sends Unlock Door command to TH."
+      verification: |
+          ./chip-tool doorlock unlock-door 2 1 --timedInteractionTimeoutMs 1000
+
+
+
+          [1653565812529] [97638:2817194] CHIP: [DMG]                                 StatusIB =
+          [1653565812529] [97638:2817194] CHIP: [DMG]                                 {
+          [1653565812529] [97638:2817194] CHIP: [DMG]                                         status = 0x00 (SUCCESS),
+          [1653565812529] [97638:2817194] CHIP: [DMG]                                 },
+          [1653565812529] [97638:2817194] CHIP: [DMG]                                 
+          [1653565812529] [97638:2817194] CHIP: [DMG]                         },
+          [1653565812529] [97638:2817194] CHIP: [DMG]                         
+          [1653565812529] [97638:2817194] CHIP: [DMG]                 },
+          [1653565812529] [97638:2817194] CHIP: [DMG]                 
+          [1653565812529] [97638:2817194] CHIP: [DMG]         ],
+          [1653565812529] [97638:2817194] CHIP: [DMG]         
+          [1653565812529] [97638:2817194] CHIP: [DMG]         InteractionModelRevision = 1
+          [1653565812530] [97638:2817194] CHIP: [DMG] },
+          [1653565812530] [97638:2817194] CHIP: [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0001 Status=0x0
+      disabled: true
+
+    - label: "DUT sends Unlock with Timeout command to TH."
+      verification: |
+          ./chip-tool doorlock unlock-with-timeout 60 2 1 --timedInteractionTimeoutMs 1000
+
+          [1653570206475] [98169:2839194] CHIP: [DMG] 				StatusIB =
+          [1653570206475] [98169:2839194] CHIP: [DMG] 				{
+          [1653570206475] [98169:2839194] CHIP: [DMG] 					status = 0x00 (SUCCESS),
+          [1653570206475] [98169:2839194] CHIP: [DMG] 				},
+          [1653570206475] [98169:2839194] CHIP: [DMG] 				
+          [1653570206475] [98169:2839194] CHIP: [DMG] 			},
+          [1653570206475] [98169:2839194] CHIP: [DMG] 			
+          [1653570206475] [98169:2839194] CHIP: [DMG] 		},
+          [1653570206475] [98169:2839194] CHIP: [DMG] 		
+          [1653570206475] [98169:2839194] CHIP: [DMG] 	],
+          [1653570206475] [98169:2839194] CHIP: [DMG] 	
+          [1653570206475] [98169:2839194] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653570206475] [98169:2839194] CHIP: [DMG] },
+          [1653570206475] [98169:2839194] CHIP: [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0003 Status=0x0
+      disabled: true
+
+    - label: "DUT sends Set Week Day Schedule command to TH."
+      verification: |
+          ./chip-tool doorlock set-week-day-schedule 3 2 2 8 15 9 15 2 1
+
+          [1653574623277] [98633:2860387] CHIP: [DMG] {
+          [1653574623277] [98633:2860387] CHIP: [DMG] 	suppressResponse = false, 
+          [1653574623277] [98633:2860387] CHIP: [DMG] 	InvokeResponseIBs =
+          [1653574623277] [98633:2860387] CHIP: [DMG] 	[
+          [1653574623277] [98633:2860387] CHIP: [DMG] 		InvokeResponseIB =
+          [1653574623277] [98633:2860387] CHIP: [DMG] 		{
+          [1653574623277] [98633:2860387] CHIP: [DMG] 			CommandStatusIB =
+          [1653574623277] [98633:2860387] CHIP: [DMG] 			{
+          [1653574623277] [98633:2860387] CHIP: [DMG] 				CommandPathIB =
+          [1653574623277] [98633:2860387] CHIP: [DMG] 				{
+          [1653574623277] [98633:2860387] CHIP: [DMG] 					EndpointId = 0x1,
+          [1653574623277] [98633:2860387] CHIP: [DMG] 					ClusterId = 0x101,
+          [1653574623277] [98633:2860387] CHIP: [DMG] 					CommandId = 0xb,
+          [1653574623277] [98633:2860387] CHIP: [DMG] 				},
+          [1653574623277] [98633:2860387] CHIP: [DMG] 				
+          [1653574623277] [98633:2860387] CHIP: [DMG] 				StatusIB =
+          [1653574623277] [98633:2860387] CHIP: [DMG] 				{
+          [1653574623277] [98633:2860387] CHIP: [DMG] 					status = 0x8b (NOT_FOUND),
+          [1653574623277] [98633:2860387] CHIP: [DMG] 				},
+          [1653574623277] [98633:2860387] CHIP: [DMG] 				
+          [1653574623277] [98633:2860387] CHIP: [DMG] 			},
+          [1653574623277] [98633:2860387] CHIP: [DMG] 			
+          [1653574623277] [98633:2860387] CHIP: [DMG] 		},
+          [1653574623277] [98633:2860387] CHIP: [DMG] 		
+          [1653574623277] [98633:2860387] CHIP: [DMG] 	],
+          [1653574623277] [98633:2860387] CHIP: [DMG] 	
+          [1653574623277] [98633:2860387] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653574623278] [98633:2860387] CHIP: [DMG] },
+          [1653574623278] [98633:2860387] CHIP: [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_000B Status=0x8b
+          [1653574623278] [98633:2860387] CHIP: [TOO] Error: IM Error 0x0000058B: General error: 0x8b (NOT_FOUND)
+      disabled: true
+
+    - label: "DUT sends Get Week Day Schedule command to TH."
+      verification: |
+          ./chip-tool doorlock get-week-day-schedule 1 1 2 1
+
+          [1653570513049] [98210:2841024] CHIP: [DMG] Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_000C
+          [1653570513049] [98210:2841024] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_000C
+          [1653570513050] [98210:2841024] CHIP: [TOO]   GetWeekDayScheduleResponse: {
+          [1653570513050] [98210:2841024] CHIP: [TOO]     weekDayIndex: 1
+          [1653570513050] [98210:2841024] CHIP: [TOO]     userIndex: 1
+          [1653570513050] [98210:2841024] CHIP: [TOO]     status: 139
+          [1653570513050] [98210:2841024] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "DUT sends Clear Week Day Schedule command to TH."
+      verification: |
+          ./chip-tool doorlock clear-week-day-schedule 1 1 2 1
+
+
+          [1653574836808] [98658:2861574] CHIP: [DMG] {
+          [1653574836808] [98658:2861574] CHIP: [DMG] 	suppressResponse = false, 
+          [1653574836808] [98658:2861574] CHIP: [DMG] 	InvokeResponseIBs =
+          [1653574836808] [98658:2861574] CHIP: [DMG] 	[
+          [1653574836808] [98658:2861574] CHIP: [DMG] 		InvokeResponseIB =
+          [1653574836808] [98658:2861574] CHIP: [DMG] 		{
+          [1653574836808] [98658:2861574] CHIP: [DMG] 			CommandStatusIB =
+          [1653574836808] [98658:2861574] CHIP: [DMG] 			{
+          [1653574836808] [98658:2861574] CHIP: [DMG] 				CommandPathIB =
+          [1653574836808] [98658:2861574] CHIP: [DMG] 				{
+          [1653574836808] [98658:2861574] CHIP: [DMG] 					EndpointId = 0x1,
+          [1653574836808] [98658:2861574] CHIP: [DMG] 					ClusterId = 0x101,
+          [1653574836808] [98658:2861574] CHIP: [DMG] 					CommandId = 0xd,
+          [1653574836808] [98658:2861574] CHIP: [DMG] 				},
+          [1653574836808] [98658:2861574] CHIP: [DMG] 				
+          [1653574836808] [98658:2861574] CHIP: [DMG] 				StatusIB =
+          [1653574836808] [98658:2861574] CHIP: [DMG] 				{
+          [1653574836808] [98658:2861574] CHIP: [DMG] 					status = 0x8b (NOT_FOUND),
+          [1653574836808] [98658:2861574] CHIP: [DMG] 				},
+          [1653574836808] [98658:2861574] CHIP: [DMG] 				
+          [1653574836808] [98658:2861574] CHIP: [DMG] 			},
+          [1653574836808] [98658:2861574] CHIP: [DMG] 			
+          [1653574836808] [98658:2861574] CHIP: [DMG] 		},
+          [1653574836808] [98658:2861574] CHIP: [DMG] 		
+          [1653574836808] [98658:2861574] CHIP: [DMG] 	],
+          [1653574836808] [98658:2861574] CHIP: [DMG] 	
+          [1653574836808] [98658:2861574] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653574836808] [98658:2861574] CHIP: [DMG] },
+          [1653574836808] [98658:2861574] CHIP: [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_000D Status=0x8b
+          [1653574836809] [98658:2861574] CHIP: [TOO] Error: IM Error 0x0000058B: General error: 0x8b (NOT_FOUND)
+      disabled: true
+
+    - label: "DUT sends Set Year Day Schedule command to TH."
+      verification: |
+          ./chip-tool doorlock set-year-day-schedule 3 3 6 21 2 1
+
+
+          [1653570399532] [98193:2840338] CHIP: [DMG] 	suppressResponse = false, 
+          [1653570399532] [98193:2840338] CHIP: [DMG] 	InvokeResponseIBs =
+          [1653570399532] [98193:2840338] CHIP: [DMG] 	[
+          [1653570399532] [98193:2840338] CHIP: [DMG] 		InvokeResponseIB =
+          [1653570399532] [98193:2840338] CHIP: [DMG] 		{
+          [1653570399532] [98193:2840338] CHIP: [DMG] 			CommandStatusIB =
+          [1653570399532] [98193:2840338] CHIP: [DMG] 			{
+          [1653570399532] [98193:2840338] CHIP: [DMG] 				CommandPathIB =
+          [1653570399532] [98193:2840338] CHIP: [DMG] 				{
+          [1653570399532] [98193:2840338] CHIP: [DMG] 					EndpointId = 0x1,
+          [1653570399532] [98193:2840338] CHIP: [DMG] 					ClusterId = 0x101,
+          [1653570399532] [98193:2840338] CHIP: [DMG] 					CommandId = 0xe,
+          [1653570399532] [98193:2840338] CHIP: [DMG] 				},
+          [1653570399532] [98193:2840338] CHIP: [DMG] 				
+          [1653570399532] [98193:2840338] CHIP: [DMG] 				StatusIB =
+          [1653570399532] [98193:2840338] CHIP: [DMG] 				{
+          [1653570399532] [98193:2840338] CHIP: [DMG] 					status = 0x8b (NOT_FOUND),
+          [1653570399532] [98193:2840338] CHIP: [DMG] 				},
+          [1653570399532] [98193:2840338] CHIP: [DMG] 				
+          [1653570399532] [98193:2840338] CHIP: [DMG] 			},
+          [1653570399532] [98193:2840338] CHIP: [DMG] 			
+          [1653570399532] [98193:2840338] CHIP: [DMG] 		},
+          [1653570399532] [98193:2840338] CHIP: [DMG] 		
+          [1653570399532] [98193:2840338] CHIP: [DMG] 	],
+          [1653570399532] [98193:2840338] CHIP: [DMG] 	
+          [1653570399532] [98193:2840338] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653570399532] [98193:2840338] CHIP: [DMG] },
+          [1653570399533] [98193:2840338] CHIP: [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_000E Status=0x8b
+          [1653570399533] [98193:2840338] CHIP: [TOO] Error: IM Error 0x0000058B: General error: 0x8b (NOT_FOUND)
+      disabled: true
+
+    - label: "DUT sends Get Year Day Schedule command to TH."
+      verification: |
+          ./chip-tool doorlock get-year-day-schedule 1 1 2 1
+
+          [1653571215196] [98290:2844606] CHIP: [DMG] },
+          [1653571215196] [98290:2844606] CHIP: [DMG] Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_000F
+          [1653571215196] [98290:2844606] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_000F
+          [1653571215197] [98290:2844606] CHIP: [TOO]   GetYearDayScheduleResponse: {
+          [1653571215197] [98290:2844606] CHIP: [TOO]     yearDayIndex: 1
+          [1653571215197] [98290:2844606] CHIP: [TOO]     userIndex: 1
+          [1653571215197] [98290:2844606] CHIP: [TOO]     status: 139
+          [1653571215197] [98290:2844606] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "DUT sends Clear Year Day Schedule command to TH."
+      verification: |
+          ./chip-tool doorlock clear-year-day-schedule 1 1 2 1
+
+          [1653571338968] [98305:2845475] CHIP: [DMG] {
+          [1653571338968] [98305:2845475] CHIP: [DMG] 	suppressResponse = false, 
+          [1653571338968] [98305:2845475] CHIP: [DMG] 	InvokeResponseIBs =
+          [1653571338968] [98305:2845475] CHIP: [DMG] 	[
+          [1653571338968] [98305:2845475] CHIP: [DMG] 		InvokeResponseIB =
+          [1653571338968] [98305:2845475] CHIP: [DMG] 		{
+          [1653571338968] [98305:2845475] CHIP: [DMG] 			CommandStatusIB =
+          [1653571338968] [98305:2845475] CHIP: [DMG] 			{
+          [1653571338968] [98305:2845475] CHIP: [DMG] 				CommandPathIB =
+          [1653571338968] [98305:2845475] CHIP: [DMG] 				{
+          [1653571338968] [98305:2845475] CHIP: [DMG] 					EndpointId = 0x1,
+          [1653571338968] [98305:2845475] CHIP: [DMG] 					ClusterId = 0x101,
+          [1653571338968] [98305:2845475] CHIP: [DMG] 					CommandId = 0x10,
+          [1653571338968] [98305:2845475] CHIP: [DMG] 				},
+          [1653571338968] [98305:2845475] CHIP: [DMG] 				
+          [1653571338968] [98305:2845475] CHIP: [DMG] 				StatusIB =
+          [1653571338968] [98305:2845475] CHIP: [DMG] 				{
+          [1653571338968] [98305:2845475] CHIP: [DMG] 					status = 0x8b (NOT_FOUND),
+          [1653571338968] [98305:2845475] CHIP: [DMG] 				},
+          [1653571338968] [98305:2845475] CHIP: [DMG] 				
+          [1653571338968] [98305:2845475] CHIP: [DMG] 			},
+          [1653571338968] [98305:2845475] CHIP: [DMG] 			
+          [1653571338968] [98305:2845475] CHIP: [DMG] 		},
+          [1653571338968] [98305:2845475] CHIP: [DMG] 		
+          [1653571338968] [98305:2845475] CHIP: [DMG] 	],
+          [1653571338968] [98305:2845475] CHIP: [DMG] 	
+          [1653571338968] [98305:2845475] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653571338968] [98305:2845475] CHIP: [DMG] },
+          [1653571338968] [98305:2845475] CHIP: [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0010 Status=0x8b
+          [1653571338969] [98305:2845475] CHIP: [TOO] Error: IM Error 0x0000058B: General error: 0x8b (NOT_FOUND)
+      disabled: true
+
+    - label: "DUT sends Set Holiday Day Schedule command to TH."
+      verification: |
+          ./chip-tool doorlock set-holiday-schedule 1 20 30 0 2 1
+
+
+          [1653571428686] [98317:2846062] CHIP: [DMG] 				StatusIB =
+          [1653571428686] [98317:2846062] CHIP: [DMG] 				{
+          [1653571428686] [98317:2846062] CHIP: [DMG] 					status = 0x81 (UNSUPPORTED_COMMAND),
+          [1653571428686] [98317:2846062] CHIP: [DMG] 				},
+          [1653571428686] [98317:2846062] CHIP: [DMG] 				
+          [1653571428686] [98317:2846062] CHIP: [DMG] 			},
+          [1653571428686] [98317:2846062] CHIP: [DMG] 			
+          [1653571428686] [98317:2846062] CHIP: [DMG] 		},
+          [1653571428686] [98317:2846062] CHIP: [DMG] 		
+          [1653571428686] [98317:2846062] CHIP: [DMG] 	],
+          [1653571428687] [98317:2846062] CHIP: [DMG] 	
+          [1653571428687] [98317:2846062] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653571428687] [98317:2846062] CHIP: [DMG] },
+          [1653571428687] [98317:2846062] CHIP: [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0011 Status=0x81
+          [1653571428687] [98317:2846062] CHIP: [TOO] Error: IM Error 0x00000581: General error: 0x81 (UNSUPPORTED_COMMAND)
+      disabled: true
+
+    - label: "DUT sends Get Holiday Day Schedule command to TH."
+      verification: |
+          ./chip-tool doorlock get-holiday-schedule 1 2 1
+
+          [1653571509242] [98327:2846565] CHIP: [DMG] 				StatusIB =
+          [1653571509242] [98327:2846565] CHIP: [DMG] 				{
+          [1653571509242] [98327:2846565] CHIP: [DMG] 					status = 0x81 (UNSUPPORTED_COMMAND),
+          [1653571509242] [98327:2846565] CHIP: [DMG] 				},
+          [1653571509242] [98327:2846565] CHIP: [DMG] 				
+          [1653571509242] [98327:2846565] CHIP: [DMG] 			},
+          [1653571509242] [98327:2846565] CHIP: [DMG] 			
+          [1653571509242] [98327:2846565] CHIP: [DMG] 		},
+          [1653571509242] [98327:2846565] CHIP: [DMG] 		
+          [1653571509242] [98327:2846565] CHIP: [DMG] 	],
+          [1653571509242] [98327:2846565] CHIP: [DMG] 	
+          [1653571509242] [98327:2846565] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653571509242] [98327:2846565] CHIP: [DMG] },
+          [1653571509242] [98327:2846565] CHIP: [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0012 Status=0x81
+          [1653571509242] [98327:2846565] CHIP: [TOO] Error: IM Error 0x00000581: General error: 0x81 (UNSUPPORTED_COMMAND)
+      disabled: true
+
+    - label: "DUT sends Clear Holiday Day Schedule command to TH."
+      verification: |
+          ./chip-tool doorlock clear-holiday-schedule 1 2 1
+
+          [1653571579201] [98335:2847019] CHIP: [DMG] 				
+          [1653571579201] [98335:2847019] CHIP: [DMG] 				StatusIB =
+          [1653571579201] [98335:2847019] CHIP: [DMG] 				{
+          [1653571579201] [98335:2847019] CHIP: [DMG] 					status = 0x81 (UNSUPPORTED_COMMAND),
+          [1653571579201] [98335:2847019] CHIP: [DMG] 				},
+          [1653571579201] [98335:2847019] CHIP: [DMG] 				
+          [1653571579201] [98335:2847019] CHIP: [DMG] 			},
+          [1653571579201] [98335:2847019] CHIP: [DMG] 			
+          [1653571579201] [98335:2847019] CHIP: [DMG] 		},
+          [1653571579201] [98335:2847019] CHIP: [DMG] 		
+          [1653571579201] [98335:2847019] CHIP: [DMG] 	],
+          [1653571579201] [98335:2847019] CHIP: [DMG] 	
+          [1653571579201] [98335:2847019] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653571579201] [98335:2847019] CHIP: [DMG] },
+          [1653571579201] [98335:2847019] CHIP: [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0013 Status=0x81
+          [1653571579201] [98335:2847019] CHIP: [TOO] Error: IM Error 0x00000581: General error: 0x81 (UNSUPPORTED_COMMAND)
+      disabled: true
+
+    - label: "DUT sends Set USer command to TH."
+      verification: |
+          ./chip-tool doorlock set-user 0 1 xxx 6452 1 0 0 2 1 --timedInteractionTimeoutMs 1000
+
+          [1653569395226] [98073:2834901] CHIP: [DMG] 				StatusIB =
+          [1653569395226] [98073:2834901] CHIP: [DMG] 				{
+          [1653569395226] [98073:2834901] CHIP: [DMG] 					status = 0x00 (SUCCESS),
+          [1653569395226] [98073:2834901] CHIP: [DMG] 				},
+          [1653569395226] [98073:2834901] CHIP: [DMG] 				
+          [1653569395226] [98073:2834901] CHIP: [DMG] 			},
+          [1653569395226] [98073:2834901] CHIP: [DMG] 			
+          [1653569395226] [98073:2834901] CHIP: [DMG] 		},
+          [1653569395226] [98073:2834901] CHIP: [DMG] 		
+          [1653569395226] [98073:2834901] CHIP: [DMG] 	],
+          [1653569395226] [98073:2834901] CHIP: [DMG] 	
+          [1653569395226] [98073:2834901] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653569395226] [98073:2834901] CHIP: [DMG] },
+          [1653569395226] [98073:2834901] CHIP: [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001A Status=0x0
+      disabled: true
+
+    - label: "DUT sends Get User to TH."
+      verification: |
+          ./chip-tool doorlock get-user 1 2 1 --timedInteractionTimeoutMs 1000
+
+          [1653569533887] [98089:2835720] CHIP: [DMG] Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001C
+          [1653569533888] [98089:2835720] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_001C
+          [1653569533888] [98089:2835720] CHIP: [TOO]   GetUserResponse: {
+          [1653569533888] [98089:2835720] CHIP: [TOO]     userIndex: 1
+          [1653569533888] [98089:2835720] CHIP: [TOO]     userName: xxx
+          [1653569533888] [98089:2835720] CHIP: [TOO]     userUniqueId: 6452
+          [1653569533888] [98089:2835720] CHIP: [TOO]     userStatus: 1
+          [1653569533888] [98089:2835720] CHIP: [TOO]     userType: 0
+          [1653569533888] [98089:2835720] CHIP: [TOO]     credentialRule: 0
+          [1653569533888] [98089:2835720] CHIP: [TOO]     credentials: null
+          [1653569533888] [98089:2835720] CHIP: [TOO]     creatorFabricIndex: 1
+          [1653569533888] [98089:2835720] CHIP: [TOO]     lastModifiedFabricIndex: 1
+          [1653569533888] [98089:2835720] CHIP: [TOO]     nextUserIndex: 2
+          [1653569533888] [98089:2835720] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "DUT sends Clear User command to TH."
+      verification: |
+          ./chip-tool doorlock clear-user 1 2 1 --timedInteractionTimeoutMs 1000
+
+          [1653569601813] [98098:2836198] CHIP: [DMG] 				StatusIB =
+          [1653569601813] [98098:2836198] CHIP: [DMG] 				{
+          [1653569601813] [98098:2836198] CHIP: [DMG] 					status = 0x00 (SUCCESS),
+          [1653569601813] [98098:2836198] CHIP: [DMG] 				},
+          [1653569601813] [98098:2836198] CHIP: [DMG] 				
+          [1653569601813] [98098:2836198] CHIP: [DMG] 			},
+          [1653569601813] [98098:2836198] CHIP: [DMG] 			
+          [1653569601813] [98098:2836198] CHIP: [DMG] 		},
+          [1653569601813] [98098:2836198] CHIP: [DMG] 		
+          [1653569601813] [98098:2836198] CHIP: [DMG] 	],
+          [1653569601813] [98098:2836198] CHIP: [DMG] 	
+          [1653569601813] [98098:2836198] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653569601813] [98098:2836198] CHIP: [DMG] },
+          [1653569601813] [98098:2836198] CHIP: [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001D Status=0x0
+      disabled: true
+
+    - label: "DUT sends Set Credential command to TH."
+      verification: |
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 0 0 2 1 --timedInteractionTimeoutMs 1000
+
+
+          [1653568770797] [97999:2831494] CHIP: [DMG] Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
+          [1653568770797] [97999:2831494] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
+          [1653568770799] [97999:2831494] CHIP: [TOO]   SetCredentialResponse: {
+          [1653568770799] [97999:2831494] CHIP: [TOO]     status: 133
+          [1653568770799] [97999:2831494] CHIP: [TOO]     userIndex: null
+          [1653568770799] [97999:2831494] CHIP: [TOO]     nextCredentialIndex: 2
+          [1653568770799] [97999:2831494] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "DUT sends Get Credential to TH."
+      verification: |
+          ./chip-tool doorlock get-credential-status  '{ "credentialType" : 1 , "credentialIndex" : 1 }' 2 1 --timedInteractionTimeoutMs 1000
+
+          [1653568987537] [98026:2832630] CHIP: [DMG] },
+          [1653568987537] [98026:2832630] CHIP: [DMG] Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0025
+          [1653568987538] [98026:2832630] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0025
+          [1653568987538] [98026:2832630] CHIP: [TOO]   GetCredentialStatusResponse: {
+          [1653568987538] [98026:2832630] CHIP: [TOO]     credentialExists: FALSE
+          [1653568987538] [98026:2832630] CHIP: [TOO]     userIndex: null
+          [1653568987538] [98026:2832630] CHIP: [TOO]     creatorFabricIndex: null
+          [1653568987538] [98026:2832630] CHIP: [TOO]     lastModifiedFabricIndex: null
+          [1653568987538] [98026:2832630] CHIP: [TOO]     nextCredentialIndex: 2
+          [1653568987538] [98026:2832630] CHIP: [TOO]    }
+      disabled: true
+
+    - label: "DUT sends Clear Credential command to TH."
+      verification: |
+          ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }' 2 1 --timedInteractionTimeoutMs 1000
+
+          [1653569124023] [98041:2833531] CHIP: [DMG] 				},
+          [1653569124023] [98041:2833531] CHIP: [DMG] 				
+          [1653569124023] [98041:2833531] CHIP: [DMG] 				StatusIB =
+          [1653569124023] [98041:2833531] CHIP: [DMG] 				{
+          [1653569124023] [98041:2833531] CHIP: [DMG] 					status = 0x00 (SUCCESS),
+          [1653569124023] [98041:2833531] CHIP: [DMG] 				},
+          [1653569124023] [98041:2833531] CHIP: [DMG] 				
+          [1653569124023] [98041:2833531] CHIP: [DMG] 			},
+          [1653569124023] [98041:2833531] CHIP: [DMG] 			
+          [1653569124023] [98041:2833531] CHIP: [DMG] 		},
+          [1653569124023] [98041:2833531] CHIP: [DMG] 		
+          [1653569124023] [98041:2833531] CHIP: [DMG] 	],
+          [1653569124023] [98041:2833531] CHIP: [DMG] 	
+          [1653569124023] [98041:2833531] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653569124023] [98041:2833531] CHIP: [DMG] },
+          [1653569124023] [98041:2833531] CHIP: [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0026 Status=0x0
+      disabled: true

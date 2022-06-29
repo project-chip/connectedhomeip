@@ -16,6 +16,7 @@
  */
 
 #include "MediaPlaybackManager.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 
 using namespace std;
 using namespace chip::app::DataModel;
@@ -98,8 +99,23 @@ void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackRe
 void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    if (mPlaybackSpeed == kPlaybackMaxForwardSpeed)
+    {
+        // if already at max speed, return error
+        Commands::PlaybackResponse::Type response;
+        response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+        response.status = MediaPlaybackStatusEnum::kSpeedOutOfRange;
+        helper.Success(response);
+        return;
+    }
+
     mCurrentState  = PlaybackStateEnum::kPlaying;
     mPlaybackSpeed = (mPlaybackSpeed <= 0 ? 1 : mPlaybackSpeed * 2);
+    if (mPlaybackSpeed > kPlaybackMaxForwardSpeed)
+    {
+        // don't exceed max speed
+        mPlaybackSpeed = kPlaybackMaxForwardSpeed;
+    }
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -123,8 +139,23 @@ void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::Playba
 void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    if (mPlaybackSpeed == kPlaybackMaxRewindSpeed)
+    {
+        // if already at max speed in reverse, return error
+        Commands::PlaybackResponse::Type response;
+        response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+        response.status = MediaPlaybackStatusEnum::kSpeedOutOfRange;
+        helper.Success(response);
+        return;
+    }
+
     mCurrentState  = PlaybackStateEnum::kPlaying;
     mPlaybackSpeed = (mPlaybackSpeed >= 0 ? -1 : mPlaybackSpeed * 2);
+    if (mPlaybackSpeed < kPlaybackMaxRewindSpeed)
+    {
+        // don't exceed max rewind speed
+        mPlaybackSpeed = kPlaybackMaxRewindSpeed;
+    }
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -205,4 +236,16 @@ void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::Playb
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = MediaPlaybackStatusEnum::kSuccess;
     helper.Success(response);
+}
+
+uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicEndpointFeatureMap;
+    }
+
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
 }

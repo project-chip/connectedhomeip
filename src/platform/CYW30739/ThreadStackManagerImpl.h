@@ -24,7 +24,8 @@
 
 #pragma once
 
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <wiced_rtos.h>
 
 namespace chip {
@@ -34,7 +35,7 @@ namespace DeviceLayer {
  * Concrete implementation of the ThreadStackManager singleton object for the platform.
  */
 class ThreadStackManagerImpl final : public ThreadStackManager,
-                                     public Internal::GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>
+                                     public Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>
 {
     // Allow the ThreadStackManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -100,5 +101,3 @@ inline ThreadStackManagerImpl & ThreadStackMgrImpl(void)
 
 } // namespace DeviceLayer
 } // namespace chip
-
-err_t tcpip_input(struct pbuf * p, struct netif * inp);

@@ -21,6 +21,7 @@
 #include <AppShellCommands.h>
 #include <ButtonHandler.h>
 #include <ChipShellCollection.h>
+#include <DeviceInfoProviderImpl.h>
 #include <LightingManager.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <OTAConfig.h>
@@ -28,6 +29,7 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <inet/EndPointStateOpenThread.h>
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <mbedtls/platform.h>
@@ -42,6 +44,7 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Shell;
 
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 static void InitApp(intptr_t args);
 static void EventHandler(const ChipDeviceEvent * event, intptr_t arg);
 static void HandleThreadStateChangeEvent(const ChipDeviceEvent * event);
@@ -134,7 +137,6 @@ APPLICATION_START()
     {
         printf("ERROR Shell Init %d\n", ret);
     }
-    cmd_ping_init();
     RegisterAppShellCommands();
     Engine::Root().RunMainLoop();
 
@@ -150,12 +152,19 @@ void InitApp(intptr_t args)
     /* Start CHIP datamodel server */
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = [] { ThreadStackMgr().LockThreadStack(); };
+    nativeParams.unlockCb              = [] { ThreadStackMgr().UnlockThreadStack(); };
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     chip::Server::GetInstance().Init(initParams);
 
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     LightMgr().Init();
-    LightMgr().SetCallbacks(LightManagerCallback, NULL);
+    LightMgr().SetCallbacks(LightManagerCallback, nullptr);
     LightMgr().WriteClusterLevel(254);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR

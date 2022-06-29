@@ -119,10 +119,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagem
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaInput::Structs::InputInfo::Type & request,
                         Json::Value & value);
 
@@ -211,10 +207,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TestCluster::St
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::StyleInformation::Type & request,
                         Json::Value & value);
 

@@ -34,8 +34,10 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/PlatformManager.h>
 
@@ -44,10 +46,13 @@ using namespace chip::Controller;
 
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
 static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
+static NSString * const kErrorDACVerifierInit = @"Init failure while creating the device attestation verifier";
 static NSString * const kInfoFactoryShutdown = @"Shutting down the Matter controller factory";
 static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
 static NSString * const kErrorControllersInit = @"Init controllers array failure";
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
+static NSString * const kErrorKeystoreInit = @"Init failure while initializing persistent storage keystore";
+static NSString * const kErrorCertStoreInit = @"Init failure while initializing persistent storage operational certificate store";
 
 @interface MatterControllerFactory ()
 
@@ -58,13 +63,16 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 // We use TestPersistentStorageDelegate just to get an in-memory store to back
 // our group data provider impl.  We initialize this store correctly on every
 // controller startup, so don't need to actually persist it.
-@property (readonly) chip::TestPersistentStorageDelegate * groupStorageDelegate;
-@property (readonly) chip::Credentials::GroupDataProviderImpl * groupDataProvider;
+@property (readonly) TestPersistentStorageDelegate * groupStorageDelegate;
+@property (readonly) Credentials::GroupDataProviderImpl * groupDataProvider;
 @property (readonly) NSMutableArray<CHIPDeviceController *> * controllers;
+@property (readonly) PersistentStorageOperationalKeystore * keystore;
+@property (readonly) Credentials::PersistentStorageOpCertStore * opCertStore;
+@property () chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier;
 
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
                     params:(CHIPDeviceControllerStartupParams *)params
-                    fabric:(FabricInfo * _Nullable * _Nonnull)fabric;
+                    fabric:(const FabricInfo * _Nullable * _Nonnull)fabric;
 @end
 
 @implementation MatterControllerFactory
@@ -153,9 +161,26 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 
 - (void)cleanupStartupObjects
 {
+    if (_deviceAttestationVerifier) {
+        delete _deviceAttestationVerifier;
+        _deviceAttestationVerifier = nullptr;
+    }
+
     if (_attestationTrustStoreBridge) {
         delete _attestationTrustStoreBridge;
         _attestationTrustStoreBridge = nullptr;
+    }
+
+    if (_keystore) {
+        _keystore->Finish();
+        delete _keystore;
+        _keystore = nullptr;
+    }
+
+    if (_opCertStore) {
+        _opCertStore->Finish();
+        delete _opCertStore;
+        _opCertStore = nullptr;
     }
 
     if (_persistentStorageDelegateBridge) {
@@ -186,18 +211,49 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
             return;
         }
 
+        // TODO: Allow passing a different keystore implementation via startupParams.
+        _keystore = new PersistentStorageOperationalKeystore();
+        if (_keystore == nullptr) {
+            CHIP_LOG_ERROR("Error: %@", kErrorKeystoreInit);
+            return;
+        }
+
+        CHIP_ERROR errorCode = _keystore->Init(_persistentStorageDelegateBridge);
+        if (errorCode != CHIP_NO_ERROR) {
+            CHIP_LOG_ERROR("Error: %@", kErrorKeystoreInit);
+            return;
+        }
+
+        // TODO Allow passing a different opcert store implementation via startupParams.
+        _opCertStore = new Credentials::PersistentStorageOpCertStore();
+        if (_opCertStore == nullptr) {
+            CHIP_LOG_ERROR("Error: %@", kErrorCertStoreInit);
+            return;
+        }
+
+        errorCode = _opCertStore->Init(_persistentStorageDelegateBridge);
+        if (errorCode != CHIP_NO_ERROR) {
+            CHIP_LOG_ERROR("Error: %@", kErrorCertStoreInit);
+            return;
+        }
+
         // Initialize device attestation verifier
+        const Credentials::AttestationTrustStore * trustStore;
         if (startupParams.paaCerts) {
             _attestationTrustStoreBridge = new CHIPAttestationTrustStoreBridge(startupParams.paaCerts);
             if (_attestationTrustStoreBridge == nullptr) {
                 CHIP_LOG_ERROR("Error: %@", kErrorAttestationTrustStoreInit);
                 return;
             }
-            chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(_attestationTrustStoreBridge));
+            trustStore = _attestationTrustStoreBridge;
         } else {
             // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-            const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-            chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
+            trustStore = Credentials::GetTestAttestationTrustStore();
+        }
+        _deviceAttestationVerifier = new Credentials::DefaultDACVerifier(trustStore);
+        if (_deviceAttestationVerifier == nullptr) {
+            CHIP_LOG_ERROR("Error: %@", kErrorDACVerifierInit);
+            return;
         }
 
         chip::Controller::FactoryInitParams params;
@@ -210,7 +266,9 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 
         params.groupDataProvider = _groupDataProvider;
         params.fabricIndependentStorage = _persistentStorageDelegateBridge;
-        CHIP_ERROR errorCode = _controllerFactory->Init(params);
+        params.operationalKeystore = _keystore;
+        params.opCertStore = _opCertStore;
+        errorCode = _controllerFactory->Init(params);
         if (errorCode != CHIP_NO_ERROR) {
             CHIP_LOG_ERROR("Error: %@", kErrorControllerFactoryInit);
             return;
@@ -266,10 +324,13 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     }
 
     __block CHIPDeviceControllerStartupParamsInternal * params = nil;
+    // We want the block to end up with just a pointer to the fabric table,
+    // since we know our on-stack instance will outlive the block.
+    FabricTable fabricTableInstance;
+    FabricTable * fabricTable = &fabricTableInstance;
     dispatch_sync(_chipWorkQueue, ^{
-        FabricTable fabricTable;
-        FabricInfo * fabric = nullptr;
-        BOOL ok = [self findMatchingFabric:fabricTable params:startupParams fabric:&fabric];
+        const FabricInfo * fabric = nullptr;
+        BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
         if (!ok) {
             CHIP_LOG_ERROR("Can't start on existing fabric: fabric matching failed");
             return;
@@ -282,7 +343,8 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 
         for (CHIPDeviceController * existing in _controllers) {
             BOOL isRunning = YES; // assume the worst
-            if ([existing isRunningOnFabric:fabric isRunning:&isRunning] != CHIP_NO_ERROR) {
+            if ([existing isRunningOnFabric:fabricTable fabricIndex:fabric->GetFabricIndex() isRunning:&isRunning]
+                != CHIP_NO_ERROR) {
                 CHIP_LOG_ERROR("Can't tell what fabric a controller is running on.  Not safe to start.");
                 return;
             }
@@ -293,7 +355,10 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
             }
         }
 
-        params = [[CHIPDeviceControllerStartupParamsInternal alloc] initForExistingFabric:fabric params:startupParams];
+        params = [[CHIPDeviceControllerStartupParamsInternal alloc] initForExistingFabric:fabricTable
+                                                                              fabricIndex:fabric->GetFabricIndex()
+                                                                                 keystore:_keystore
+                                                                                   params:startupParams];
     });
 
     if (params == nil) {
@@ -334,10 +399,13 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     }
 
     __block CHIPDeviceControllerStartupParamsInternal * params = nil;
+    // We want the block to end up with just a pointer to the fabric table,
+    // since we know our on-stack instance will outlive the block.
+    FabricTable fabricTableInstance;
+    FabricTable * fabricTable = &fabricTableInstance;
     dispatch_sync(_chipWorkQueue, ^{
-        FabricTable fabricTable;
-        FabricInfo * fabric = nullptr;
-        BOOL ok = [self findMatchingFabric:fabricTable params:startupParams fabric:&fabric];
+        const FabricInfo * fabric = nullptr;
+        BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
         if (!ok) {
             CHIP_LOG_ERROR("Can't start on new fabric: fabric matching failed");
             return;
@@ -348,7 +416,9 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
             return;
         }
 
-        params = [[CHIPDeviceControllerStartupParamsInternal alloc] initForNewFabric:startupParams];
+        params = [[CHIPDeviceControllerStartupParamsInternal alloc] initForNewFabric:fabricTable
+                                                                            keystore:_keystore
+                                                                              params:startupParams];
     });
 
     if (params == nil) {
@@ -395,9 +465,10 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 // why it's provided by the caller.
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
                     params:(CHIPDeviceControllerStartupParams *)params
-                    fabric:(FabricInfo * _Nullable * _Nonnull)fabric
+                    fabric:(const FabricInfo * _Nullable * _Nonnull)fabric
 {
-    CHIP_ERROR err = fabricTable.Init(_persistentStorageDelegateBridge);
+    CHIP_ERROR err = fabricTable.Init(
+        { .storage = _persistentStorageDelegateBridge, .operationalKeystore = _keystore, .opCertStore = _opCertStore });
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Can't initialize fabric table: %s", ErrorStr(err));
         return NO;
@@ -420,7 +491,7 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         }
     }
 
-    *fabric = fabricTable.FindFabric(Credentials::P256PublicKeySpan(pubKey.ConstBytes()), params.fabricId);
+    *fabric = fabricTable.FindFabric(pubKey, params.fabricId);
     return YES;
 }
 

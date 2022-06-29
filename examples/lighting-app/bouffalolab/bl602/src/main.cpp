@@ -18,6 +18,7 @@
 #include "AppTask.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
+#include <DeviceInfoProviderImpl.h>
 #include <FreeRTOS.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -87,7 +88,8 @@ extern "C" int main()
     log_info("------------------------Starting App Task---------------------------\r\n");
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
-    CHIP_ERROR error              = deviceMgr.Init(&EchoCallbacks);
+    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
+    CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
     if (error != CHIP_NO_ERROR)
     {
         log_info("device init failed: %s", ErrorStr(error));

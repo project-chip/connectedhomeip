@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 74.3.1. [TC-SWTCH-3.1] Attributes with client as DUT
+name: 73.3.2. [TC-SWTCH-3.1] Global attributes with client as DUT
 
 config:
     nodeId: 0x12344321
@@ -22,49 +22,51 @@ config:
 
 tests:
     - label:
-          "DUT reads all supported mandatory attributes from TH once at a time
-          in a manufacturer specific order"
+          "DUT reads all supported mandatory attributes from TH one at a time in
+          a manufacturer specific order"
       verification: |
           ./chip-tool switch read number-of-positions 1 1
-          [1646209806.545525][2190:2190] CHIP:DMG: ReadRequestMessage =
-          [1646209806.545648][2190:2190] CHIP:DMG: {
-          [1646209806.545672][2190:2190] CHIP:DMG:        AttributePathIBs =
-          [1646209806.545702][2190:2190] CHIP:DMG:        [
-          [1646209806.545746][2190:2190] CHIP:DMG:                AttributePathIB =
-          [1646209806.545783][2190:2190] CHIP:DMG:                {
-          [1646209806.545815][2190:2190] CHIP:DMG:                        Endpoint = 0x1,
-          [1646209806.545852][2190:2190] CHIP:DMG:                        Cluster = 0x3b,
-          [1646209806.545886][2190:2190] CHIP:DMG:                        Attribute = 0x0000_0000,
-          [1646209806.545946][2190:2190] CHIP:DMG:                }
-          [1646209806.545980][2190:2190] CHIP:DMG:
-          [1646209806.546025][2190:2190] CHIP:DMG:        ],
-          [1646209806.546070][2190:2190] CHIP:DMG:
-          [1646209806.546117][2190:2190] CHIP:DMG:        isFabricFiltered = false,
-          [1646209806.546156][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
-          [1646209806.546180][2190:2190] CHIP:DMG: },
+
+          [1650539419.579618][3678:3678] CHIP:IM: Received Read request
+          [1650539419.579683][3678:3678] CHIP:DMG: ReadRequestMessage =
+          [1650539419.579718][3678:3678] CHIP:DMG: {
+          [1650539419.579748][3678:3678] CHIP:DMG:         AttributePathIBs =
+          [1650539419.579783][3678:3678] CHIP:DMG:         [
+          [1650539419.579816][3678:3678] CHIP:DMG:                 AttributePathIB =
+          [1650539419.579857][3678:3678] CHIP:DMG:                 {
+          [1650539419.579895][3678:3678] CHIP:DMG:                         Endpoint = 0x1,
+          [1650539419.579943][3678:3678] CHIP:DMG:                         Cluster = 0x3b,
+          [1650539419.579990][3678:3678] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1650539419.580034][3678:3678] CHIP:DMG:                 }
+          [1650539419.580075][3678:3678] CHIP:DMG:
+          [1650539419.580111][3678:3678] CHIP:DMG:         ],
+          [1650539419.580150][3678:3678] CHIP:DMG:
+          [1650539419.580184][3678:3678] CHIP:DMG:         isFabricFiltered = true,
+          [1650539419.580218][3678:3678] CHIP:DMG:         InteractionModelRevision = 1
+          [1650539419.580250][3678:3678] CHIP:DMG: },
 
           ./chip-tool switch read current-position 1 1
-          [1646209852.886417][2190:2190] CHIP:DMG: ReadRequestMessage =
-          [1646209852.886459][2190:2190] CHIP:DMG: {
-          [1646209852.886489][2190:2190] CHIP:DMG:        AttributePathIBs =
-          [1646209852.886521][2190:2190] CHIP:DMG:        [
-          [1646209852.886551][2190:2190] CHIP:DMG:                AttributePathIB =
-          [1646209852.886589][2190:2190] CHIP:DMG:                {
-          [1646209852.886624][2190:2190] CHIP:DMG:                        Endpoint = 0x1,
-          [1646209852.886660][2190:2190] CHIP:DMG:                        Cluster = 0x3b,
-          [1646209852.886703][2190:2190] CHIP:DMG:                        Attribute = 0x0000_0001,
-          [1646209852.886741][2190:2190] CHIP:DMG:                }
-          [1646209852.886776][2190:2190] CHIP:DMG:
-          [1646209852.886807][2190:2190] CHIP:DMG:        ],
-          [1646209852.886841][2190:2190] CHIP:DMG:
-          [1646209852.886870][2190:2190] CHIP:DMG:        isFabricFiltered = false,
-          [1646209852.886900][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
-          [1646209852.886927][2190:2190] CHIP:DMG: },
-          [1646209852.887004][2190:2190] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+          [1650539484.199120][3678:3678] CHIP:DMG: ReadRequestMessage =
+          [1650539484.199188][3678:3678] CHIP:DMG: {
+          [1650539484.199243][3678:3678] CHIP:DMG:         AttributePathIBs =
+          [1650539484.199308][3678:3678] CHIP:DMG:         [
+          [1650539484.199368][3678:3678] CHIP:DMG:                 AttributePathIB =
+          [1650539484.199442][3678:3678] CHIP:DMG:                 {
+          [1650539484.199515][3678:3678] CHIP:DMG:                         Endpoint = 0x1,
+          [1650539484.199600][3678:3678] CHIP:DMG:                         Cluster = 0x3b,
+          [1650539484.199685][3678:3678] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1650539484.199760][3678:3678] CHIP:DMG:                 }
+          [1650539484.199835][3678:3678] CHIP:DMG:
+          [1650539484.199901][3678:3678] CHIP:DMG:         ],
+          [1650539484.199971][3678:3678] CHIP:DMG:
+          [1650539484.200035][3678:3678] CHIP:DMG:         isFabricFiltered = true,
+          [1650539484.200098][3678:3678] CHIP:DMG:         InteractionModelRevision = 1
+          [1650539484.200156][3678:3678] CHIP:DMG: },
       disabled: true
 
     - label:
-          "DUT reads all supported optional attributes from TH once at a time in
+          "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
           ./chip-tool switch read multi-press-max 1 1
@@ -90,14 +92,74 @@ tests:
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
-          the TH once at a time in a manufacturer specific order"
+          the TH one at a time in a manufacturer specific order"
       verification: |
           no writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
-          the TH once at a time in a manufacturer specific order"
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          no writable attributes
+      disabled: true
+
+    - label:
+          "Configure TH such that it implements mandatory and none of the
+          optional attributes of the server-side of the cluster, and that it
+          also reflects this in global attributes such as FeatureMap and
+          AttributeList. Commission DUT to TH again"
+      verification: |
+          ./chip-tool switch read number-of-positions 1 1
+
+          [1650539419.579618][3678:3678] CHIP:IM: Received Read request
+          [1650539419.579683][3678:3678] CHIP:DMG: ReadRequestMessage =
+          [1650539419.579718][3678:3678] CHIP:DMG: {
+          [1650539419.579748][3678:3678] CHIP:DMG:         AttributePathIBs =
+          [1650539419.579783][3678:3678] CHIP:DMG:         [
+          [1650539419.579816][3678:3678] CHIP:DMG:                 AttributePathIB =
+          [1650539419.579857][3678:3678] CHIP:DMG:                 {
+          [1650539419.579895][3678:3678] CHIP:DMG:                         Endpoint = 0x1,
+          [1650539419.579943][3678:3678] CHIP:DMG:                         Cluster = 0x3b,
+          [1650539419.579990][3678:3678] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1650539419.580034][3678:3678] CHIP:DMG:                 }
+          [1650539419.580075][3678:3678] CHIP:DMG:
+          [1650539419.580111][3678:3678] CHIP:DMG:         ],
+          [1650539419.580150][3678:3678] CHIP:DMG:
+          [1650539419.580184][3678:3678] CHIP:DMG:         isFabricFiltered = true,
+          [1650539419.580218][3678:3678] CHIP:DMG:         InteractionModelRevision = 1
+          [1650539419.580250][3678:3678] CHIP:DMG: },
+
+          ./chip-tool switch read current-position 1 1
+
+          [1650539484.199120][3678:3678] CHIP:DMG: ReadRequestMessage =
+          [1650539484.199188][3678:3678] CHIP:DMG: {
+          [1650539484.199243][3678:3678] CHIP:DMG:         AttributePathIBs =
+          [1650539484.199308][3678:3678] CHIP:DMG:         [
+          [1650539484.199368][3678:3678] CHIP:DMG:                 AttributePathIB =
+          [1650539484.199442][3678:3678] CHIP:DMG:                 {
+          [1650539484.199515][3678:3678] CHIP:DMG:                         Endpoint = 0x1,
+          [1650539484.199600][3678:3678] CHIP:DMG:                         Cluster = 0x3b,
+          [1650539484.199685][3678:3678] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1650539484.199760][3678:3678] CHIP:DMG:                 }
+          [1650539484.199835][3678:3678] CHIP:DMG:
+          [1650539484.199901][3678:3678] CHIP:DMG:         ],
+          [1650539484.199971][3678:3678] CHIP:DMG:
+          [1650539484.200035][3678:3678] CHIP:DMG:         isFabricFiltered = true,
+          [1650539484.200098][3678:3678] CHIP:DMG:         InteractionModelRevision = 1
+          [1650539484.200156][3678:3678] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          ./chip-tool switch read multi-press-max 1 1
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
       verification: |
           no writable attributes
       disabled: true

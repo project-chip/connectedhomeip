@@ -1,0 +1,93 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 55.3.1. [TC-DLOG-3.1] Diagnostic Logs Cluster Commands Checks[DUT-Client]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "DUT sends RetrieveLogsRequest Command to TH"
+      verification: |
+          ./chip-tool diagnosticlogs retrieve-logs-request 0 0 "test.txt" 1 0
+
+
+          [1646215088531] [15387:2221674] CHIP: [DMG]
+          [1646215088531] [15387:2221674] CHIP: [DMG]                                 StatusIB =
+          [1646215088531] [15387:2221674] CHIP: [DMG]                                 {
+          [1646215088531] [15387:2221674] CHIP: [DMG]                                         status = 0x0,
+          [1646215088531] [15387:2221674] CHIP: [DMG]                                 },
+          [1646215088531] [15387:2221674] CHIP: [DMG]
+          [1646215088531] [15387:2221674] CHIP: [DMG]                         },
+          [1646215088531] [15387:2221674] CHIP: [DMG]
+          [1646215088531] [15387:2221674] CHIP: [DMG]                 },
+          [1646215088531] [15387:2221674] CHIP: [DMG]
+          [1646215088531] [15387:2221674] CHIP: [DMG]         ],
+          [1646215088532] [15387:2221674] CHIP: [DMG]
+          [1646215088532] [15387:2221674] CHIP: [DMG]         InteractionModelRevision = 1
+          [1646215088532] [15387:2221674] CHIP: [DMG] },
+          [1646215088532] [15387:2221674] CHIP: [DMG] Received Command Response Status for Endpoint=0 Cluster=0x0000_0032 Command=0x0000_0000 Status=0x0
+      disabled: true
+
+    - label: "In case TH initiates a BDX Transfer"
+      verification: |
+          grl_matter@GRL-Matters-MacBook-Air debug % sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 1 "test.txt" 1 0
+
+
+          [1646208340.192138][3171:3176] CHIP:DMG:
+          [1646208340.192177][3171:3176] CHIP:DMG:                                StatusIB =
+          [1646208340.192224][3171:3176] CHIP:DMG:                                {
+          [1646208340.192271][3171:3176] CHIP:DMG:                                   status = 0x0,
+          [1646208340.192319][3171:3176] CHIP:DMG:                                },
+          [1646208340.192362][3171:3176] CHIP:DMG:
+          [1646208340.192401][3171:3176] CHIP:DMG:                        },
+          [1646208340.192450][3171:3176] CHIP:DMG:
+          [1646208340.192486][3171:3176] CHIP:DMG:                },
+          [1646208340.192530][3171:3176] CHIP:DMG:
+          [1646208340.192562][3171:3176] CHIP:DMG:        ],
+          [1646208340.192602][3171:3176] CHIP:DMG:
+          [1646208340.192634][3171:3176] CHIP:DMG:        InteractionModelRevision = 1
+          [1646208340.192665][3171:3176] CHIP:DMG: },
+          [1646208340.192744][3171:3176] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0032 Command=0x0000_0000 Status=0x0
+      disabled: true
+
+    - label: "In case TH does not initiate BDX Transfer"
+      verification: |
+          ./chip-tool diagnosticlogs retrieve-logs-request 0 0 "test.txt" 1 0
+
+
+          [1646215088531] [15387:2221674] CHIP: [DMG]
+          [1646215088531] [15387:2221674] CHIP: [DMG]                                 StatusIB =
+          [1646215088531] [15387:2221674] CHIP: [DMG]                                 {
+          [1646215088531] [15387:2221674] CHIP: [DMG]                                         status = 0x0,
+          [1646215088531] [15387:2221674] CHIP: [DMG]                                 },
+          [1646215088531] [15387:2221674] CHIP: [DMG]
+          [1646215088531] [15387:2221674] CHIP: [DMG]                         },
+          [1646215088531] [15387:2221674] CHIP: [DMG]
+          [1646215088531] [15387:2221674] CHIP: [DMG]                 },
+          [1646215088531] [15387:2221674] CHIP: [DMG]
+          [1646215088531] [15387:2221674] CHIP: [DMG]         ],
+          [1646215088532] [15387:2221674] CHIP: [DMG]
+          [1646215088532] [15387:2221674] CHIP: [DMG]         InteractionModelRevision = 1
+          [1646215088532] [15387:2221674] CHIP: [DMG] },
+          [1646215088532] [15387:2221674] CHIP: [DMG] Received Command Response Status for Endpoint=0 Cluster=0x0000_0032 Command=0x0000_0000 Status=0x0
+      disabled: true

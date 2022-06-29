@@ -27,7 +27,7 @@ namespace {
 
 using namespace chip;
 
-class ListNode : public IntrusiveListNodeBase
+class ListNode : public IntrusiveListNodeBase<>
 {
 };
 
@@ -191,6 +191,35 @@ void TestMoveList(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+class ListNodeAutoUnlink : public IntrusiveListNodeBase<IntrusiveMode::AutoUnlink>
+{
+};
+
+void TestAutoUnlink(nlTestSuite * inSuite, void * inContext)
+{
+    IntrusiveList<ListNodeAutoUnlink, IntrusiveMode::AutoUnlink> list;
+
+    // Test case 1: Test node->Unlink()
+    {
+        ListNodeAutoUnlink a;
+        NL_TEST_ASSERT(inSuite, !list.Contains(&a));
+        list.PushBack(&a);
+        NL_TEST_ASSERT(inSuite, list.Contains(&a));
+        a.Unlink();
+        NL_TEST_ASSERT(inSuite, !list.Contains(&a));
+        NL_TEST_ASSERT(inSuite, list.Empty());
+    }
+
+    // Test case 2: The node is automatically removed when goes out of scope
+    {
+        ListNodeAutoUnlink a;
+        NL_TEST_ASSERT(inSuite, !list.Contains(&a));
+        list.PushBack(&a);
+        NL_TEST_ASSERT(inSuite, list.Contains(&a));
+    }
+    NL_TEST_ASSERT(inSuite, list.Empty());
+}
+
 int Setup(void * inContext)
 {
     return SUCCESS;
@@ -212,6 +241,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF_FN(TestContains),            //
     NL_TEST_DEF_FN(TestReplaceNode),         //
     NL_TEST_DEF_FN(TestMoveList),            //
+    NL_TEST_DEF_FN(TestAutoUnlink),          //
     NL_TEST_SENTINEL(),                      //
 };
 

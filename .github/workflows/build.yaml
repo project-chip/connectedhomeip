@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.77
+            image: connectedhomeip/chip-build:0.5.79
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -107,7 +107,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.77
+            image: connectedhomeip/chip-build:0.5.79
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -181,7 +181,7 @@ jobs:
             - name: Run Tests with sanitizers
               timeout-minutes: 60
               env:
-                  LSAN_OPTIONS: detect_leaks=0
+                  LSAN_OPTIONS: detect_leaks=1
               run: |
                   # for BUILD_TYPE in asan msan tsan ubsan; do
                     for BUILD_TYPE in asan tsan ubsan; do
@@ -237,7 +237,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.77
+            image: connectedhomeip/chip-build:0.5.79
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0

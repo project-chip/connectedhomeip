@@ -32,10 +32,10 @@ namespace AddressResolve {
 struct ResolveResult
 {
     Transport::PeerAddress address;
-    ReliableMessageProtocolConfig mrpConfig;
+    ReliableMessageProtocolConfig mrpRemoteConfig;
     bool supportsTcp = false;
 
-    ResolveResult() : address(Transport::Type::kUdp), mrpConfig(GetLocalMRPConfig()) {}
+    ResolveResult() : address(Transport::Type::kUdp), mrpRemoteConfig(GetDefaultMRPConfig()) {}
 };
 
 /// Represents an object interested in callbacks for a resolve operation.
@@ -66,7 +66,7 @@ public:
 /// Implementations extend this class with implementation-specific data like
 /// storing the 'last known good address' and 'scores' or any additional data
 /// required to figure out when a resolve is ok.
-class NodeLookupHandleBase : public IntrusiveListNodeBase
+class NodeLookupHandleBase : public IntrusiveListNodeBase<>
 {
 public:
     NodeLookupHandleBase() {}

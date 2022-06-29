@@ -107,7 +107,7 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
 
     FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
     FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-    auto & failSafeContext  = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & failSafeContext  = Server::GetInstance().GetFailSafeContext();
     auto & commissionMgr    = Server::GetInstance().GetCommissioningWindowManager();
 
     VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
@@ -169,7 +169,7 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
 
     FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
     FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-    auto & failSafeContext  = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & failSafeContext  = Server::GetInstance().GetFailSafeContext();
     auto & commissionMgr    = Server::GetInstance().GetCommissioningWindowManager();
 
     VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));

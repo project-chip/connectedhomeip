@@ -35,21 +35,40 @@ tests:
       attribute: "ClusterRevision"
       response:
           value: 1
-
-    - label: "Read the global attribute constraints: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
           constraints:
               type: uint16
 
-    #Issue 10988
+    - label: "Read the optional global attribute: FeatureMap"
+      PICS: MC_APPLAUNCHER.S.AP
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: map32
+
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: MC_APPLAUNCHER.S.A0000 && MC_APPLAUNCHER.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 65528, 65529, 65531, 65532, 65533]
+          constraints:
+              type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: [0, 1, 2]
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: [3]
           constraints:
               type: list
 
@@ -59,45 +78,6 @@ tests:
           response provides a list of supported events."
       verification: |
           Not implemented in chip-tool
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    #Issue 17454
-    - label: "Read the global attribute: AcceptedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          value: [0, 1, 2]
-          constraints:
-              type: list
-
-    #Issue 17454
-    - label: "Read the global attribute: GeneratedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          value: [3]
-          constraints:
-              type: list
-
-    - label:
-          "Read attribute Feature map and verify that DUT response indicates
-          that the FeatureMap attribute has bit 0 set to 1 if the DUT supports
-          the Application Platform feature (PICS_AP_S is true)."
-      verification: |
-          ./chip-tool  applicationlauncher  read feature-map 1 1
-          Verify we are getting feature-map values based on features or pic supported sent in the above command
-          [1649661177918] [67258:746649] CHIP: [TOO] Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-          [1649661177918] [67258:746649] CHIP: [EM] Sending Standalone Ack for MessageCounter:16467393 on exchange 63291i
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT

@@ -305,6 +305,23 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         return true;
     }
 
+    case ArgumentType::VectorCustom: {
+        auto vectorArgument = static_cast<std::vector<CustomArgument *> *>(arg.value);
+
+        std::stringstream ss(argValue);
+        while (ss.good())
+        {
+            std::string valueAsString;
+            getline(ss, valueAsString, ',');
+
+            CustomArgument * customArgument = new CustomArgument();
+            vectorArgument->push_back(customArgument);
+            VerifyOrReturnError(CHIP_NO_ERROR == vectorArgument->back()->Parse(arg.name, valueAsString.c_str()), false);
+        }
+
+        return true;
+    }
+
     case ArgumentType::Attribute: {
         if (arg.isOptional() || arg.isNullable())
         {
@@ -695,6 +712,18 @@ size_t Command::AddArgument(const char * name, CustomArgument * value, const cha
     return AddArgumentToList(std::move(arg));
 }
 
+size_t Command::AddArgument(const char * name, std::vector<CustomArgument *> * value, const char * desc)
+{
+    Argument arg;
+    arg.type  = ArgumentType::VectorCustom;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.flags = 0;
+    arg.desc  = desc;
+
+    return AddArgumentToList(std::move(arg));
+}
+
 size_t Command::AddArgument(const char * name, float min, float max, float * out, const char * desc, uint8_t flags)
 {
     Argument arg;
@@ -854,6 +883,15 @@ void Command::ResetArguments()
             {
                 optionalArgument->Value().clear();
             }
+        }
+        else if (type == ArgumentType::VectorCustom && flags != Argument::kOptional)
+        {
+            auto vectorArgument = static_cast<std::vector<CustomArgument *> *>(arg.value);
+            for (auto & customArgument : *vectorArgument)
+            {
+                delete customArgument;
+            }
+            vectorArgument->clear();
         }
     }
 }

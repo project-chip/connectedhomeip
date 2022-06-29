@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 74.1.1. [TC-SWTCH-1.1] Global attributes with server as DUT
+name: 73.1.1. [TC-SWTCH-1.1] Global attributes with server as DUT
 
 config:
     nodeId: 0x12344321
@@ -30,31 +30,84 @@ tests:
       verification: |
           ./chip-tool switch read feature-map 1 1
 
-          [1646208136.241983][2390:2395] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFFCDataVersion: 1206711661
-          [1646208136.242043][2390:2395] CHIP:TOO:   FeatureMap: 0
+          [1655271856.827371][2855:2860] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFFC DataVersion: 4291766665
+          [1655271856.827493][2855:2860] CHIP:TOO:   FeatureMap: 1
       disabled: true
 
     - label: "Check values of flags in this FeatureMap"
+      PICS: SWTCH.S.F00
       verification: |
           no Matter messages, but TH internal checking
       disabled: true
 
     - label: "Check values of flags in this FeatureMap"
+      PICS: SWTCH.S.F01
       verification: |
           no Matter messages, but TH internal checking
       disabled: true
 
     - label: "Check values of flags in this FeatureMap"
+      PICS: SWTCH.S.F02
       verification: |
           no Matter messages, but TH internal checking
       disabled: true
 
     - label: "Check values of flags in this FeatureMap"
+      PICS: SWTCH.S.F03
       verification: |
           no Matter messages, but TH internal checking
       disabled: true
 
     - label: "Check values of flags in this FeatureMap"
+      PICS: SWTCH.S.F04
       verification: |
           no Matter messages, but TH internal checking
+      disabled: true
+
+    - label: "Read ClusterRevision (global attribute 65533)"
+      verification: |
+          ./chip-tool switch read cluster-revision 1 1
+
+
+          [1651563714.073979][8331:8336] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFFD DataVersion: 3331396879
+          [1651563714.074140][8331:8336] CHIP:TOO:   ClusterRevision: 1
+      disabled: true
+
+    - label: "Read AttributeList (global attribute 65531)"
+      verification: |
+          ./chip-tool switch read attribute-list 1 1
+
+
+          [1651563753.140074][8338:8343] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFFB DataVersion: 3331396879
+          [1651563753.140200][8338:8343] CHIP:TOO:   AttributeList: 8 entries
+          [1651563753.140246][8338:8343] CHIP:TOO:     [1]: 0
+          [1651563753.140283][8338:8343] CHIP:TOO:     [2]: 1
+          [1651563753.140319][8338:8343] CHIP:TOO:     [3]: 2
+          [1651563753.140355][8338:8343] CHIP:TOO:     [4]: 65528
+          [1651563753.140389][8338:8343] CHIP:TOO:     [5]: 65529
+          [1651563753.140425][8338:8343] CHIP:TOO:     [6]: 65531
+          [1651563753.140460][8338:8343] CHIP:TOO:     [7]: 65532
+          [1651563753.140495][8338:8343] CHIP:TOO:     [8]: 65533
+      disabled: true
+
+    - label: "Read EventList (global attribute 65530)"
+      verification: |
+          OUT OF SCOPE FOR V1.0
+      disabled: true
+
+    - label: "Read AcceptedCommandList (global attribute 65529)"
+      verification: |
+          ./chip-tool switch read  accepted-command-list 1 1
+
+
+          [1651563822.164319][8348:8353] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFF9 DataVersion: 3331396879
+          [1651563822.164424][8348:8353] CHIP:TOO:   AcceptedCommandList: 0 entries
+      disabled: true
+
+    - label: "Read GeneratedCommandList (global attribute 65528)"
+      verification: |
+          ./chip-tool switch read  generated-command-list   1 1
+
+          [1651563849.608873][8355:8361] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFF8 DataVersion: 3331396879
+          [1651563849.608977][8355:8361] CHIP:TOO:   GeneratedCommandList: 0 entries
       disabled: true

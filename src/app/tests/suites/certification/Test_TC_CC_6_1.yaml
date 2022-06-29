@@ -42,6 +42,7 @@ tests:
           value: 1
 
     - label: "Read current color temprature"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -51,6 +52,7 @@ tests:
               maxValue: 65279
 
     - label: "Move To Color Temperature command"
+      PICS: CC.S.C0A.Rsp
       command: "MoveToColorTemperature"
       arguments:
           values:
@@ -72,6 +74,7 @@ tests:
                 value: 10
 
     - label: "Read current color temprature"
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:

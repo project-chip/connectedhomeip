@@ -44,6 +44,7 @@
 #include <controller/CommissioningWindowOpener.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
@@ -62,6 +63,9 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
 static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
 static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code failed";
+static NSString * const kErrorGenerateNOC = @"Generating operational certificate failed";
+static NSString * const kErrorKeyAllocation = @"Generating new operational key failed";
+static NSString * const kErrorCSRValidation = @"Extracting public key from CSR failed";
 
 @interface CHIPDeviceController ()
 
@@ -173,7 +177,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         }
 
         if (startupParams.operationalCertificate != nil && startupParams.operationalKeypair == nil
-            && startupParams.serializedOperationalKeypair == nullptr) {
+            && (!startupParams.fabricIndex.HasValue()
+                || !startupParams.keystore->HasOpKeypairForFabric(startupParams.fabricIndex.Value()))) {
             CHIP_LOG_ERROR("Have no operational keypair for our operational certificate");
             return;
         }
@@ -200,10 +205,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             return;
         }
 
-        // internallyCreatedOperationalKeypair might not be used, but
-        // if it is it needs to live long enough (until after we are
-        // done using commissionerParams).
-        chip::Crypto::P256Keypair internallyCreatedOperationalKeypair;
         // nocBuffer might not be used, but if it is it needs to live
         // long enough (until after we are done using
         // commissionerParams).
@@ -226,16 +227,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             _operationalKeypairNativeBridge.Emplace(_operationalKeypairBridge);
             commissionerParams.operationalKeypair = &_operationalKeypairNativeBridge.Value();
             commissionerParams.hasExternallyOwnedOperationalKeypair = true;
-        } else {
-            if (startupParams.serializedOperationalKeypair != nullptr) {
-                errorCode = internallyCreatedOperationalKeypair.Deserialize(*startupParams.serializedOperationalKeypair);
-            } else {
-                errorCode = internallyCreatedOperationalKeypair.Initialize();
-            }
-            if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
-                return;
-            }
-            commissionerParams.operationalKeypair = &internallyCreatedOperationalKeypair;
         }
 
         if (startupParams.operationalCertificate) {
@@ -243,14 +234,39 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         } else {
             chip::MutableByteSpan noc(nocBuffer);
 
-            errorCode = _operationalCredentialsDelegate->GenerateNOC([startupParams.nodeId unsignedLongLongValue],
-                startupParams.fabricId, chip::kUndefinedCATs, commissionerParams.operationalKeypair->Pubkey(), noc);
-            if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
-                return;
+            if (commissionerParams.operationalKeypair != nullptr) {
+                errorCode = _operationalCredentialsDelegate->GenerateNOC([startupParams.nodeId unsignedLongLongValue],
+                    startupParams.fabricId, chip::kUndefinedCATs, commissionerParams.operationalKeypair->Pubkey(), noc);
+
+                if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorGenerateNOC]) {
+                    return;
+                }
+            } else {
+                // Generate a new random keypair.
+                uint8_t csrBuffer[chip::Crypto::kMAX_CSR_Length];
+                chip::MutableByteSpan csr(csrBuffer);
+                errorCode = startupParams.fabricTable->AllocatePendingOperationalKey(startupParams.fabricIndex, csr);
+                if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorKeyAllocation]) {
+                    return;
+                }
+
+                chip::Crypto::P256PublicKey pubKey;
+                errorCode = VerifyCertificateSigningRequest(csr.data(), csr.size(), pubKey);
+                if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCSRValidation]) {
+                    return;
+                }
+
+                errorCode = _operationalCredentialsDelegate->GenerateNOC(
+                    [startupParams.nodeId unsignedLongLongValue], startupParams.fabricId, chip::kUndefinedCATs, pubKey, noc);
+
+                if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorGenerateNOC]) {
+                    return;
+                }
             }
             commissionerParams.controllerNOC = noc;
         }
         commissionerParams.controllerVendorId = static_cast<chip::VendorId>([startupParams.vendorId unsignedShortValue]);
+        commissionerParams.deviceAttestationVerifier = _factory.deviceAttestationVerifier;
 
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
 
@@ -259,15 +275,11 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             return;
         }
 
-        chip::FabricIndex fabricIdx = 0;
-        errorCode = _cppCommissioner->GetFabricIndex(&fabricIdx);
-        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
-            return;
-        }
+        chip::FabricIndex fabricIdx = _cppCommissioner->GetFabricIndex();
 
         uint8_t compressedIdBuffer[sizeof(uint64_t)];
         chip::MutableByteSpan compressedId(compressedIdBuffer);
-        errorCode = _cppCommissioner->GetFabricInfo()->GetCompressedId(compressedId);
+        errorCode = _cppCommissioner->GetCompressedFabricIdBytes(compressedId);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
             return;
         }
@@ -695,38 +707,34 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         return chip::kUndefinedFabricIndex;
     }
 
-    chip::FabricIndex fabricIdx;
-    CHIP_ERROR err = _cppCommissioner->GetFabricIndex(&fabricIdx);
-    if (err != CHIP_NO_ERROR) {
-        return chip::kUndefinedFabricIndex;
-    }
-
-    return fabricIdx;
+    return _cppCommissioner->GetFabricIndex();
 }
 
-- (CHIP_ERROR)isRunningOnFabric:(chip::FabricInfo *)fabric isRunning:(BOOL *)isRunning
+- (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
+                    fabricIndex:(chip::FabricIndex)fabricIndex
+                      isRunning:(BOOL *)isRunning
 {
     if (![self isRunning]) {
         *isRunning = NO;
         return CHIP_NO_ERROR;
     }
 
-    chip::FabricInfo * ourFabric = _cppCommissioner->GetFabricInfo();
-    if (!ourFabric) {
-        // Surprising!
+    chip::FabricInfo * otherFabric = fabricTable->FindFabricWithIndex(fabricIndex);
+    if (!otherFabric) {
+        // Should not happen...
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    if (ourFabric->GetFabricId() != fabric->GetFabricId()) {
+    if (_cppCommissioner->GetFabricId() != otherFabric->GetFabricId()) {
         *isRunning = NO;
         return CHIP_NO_ERROR;
     }
 
-    chip::Credentials::P256PublicKeySpan ourRootPublicKey, otherRootPublicKey;
-    ReturnErrorOnFailure(ourFabric->GetRootPubkey(ourRootPublicKey));
-    ReturnErrorOnFailure(fabric->GetRootPubkey(otherRootPublicKey));
+    chip::Crypto::P256PublicKey ourRootPublicKey, otherRootPublicKey;
+    ReturnErrorOnFailure(_cppCommissioner->GetRootPublicKey(ourRootPublicKey));
+    ReturnErrorOnFailure(fabricTable->FetchRootPubkey(otherFabric->GetFabricIndex(), otherRootPublicKey));
 
-    *isRunning = (ourRootPublicKey.data_equal(otherRootPublicKey));
+    *isRunning = (ourRootPublicKey.Matches(otherRootPublicKey));
     return CHIP_NO_ERROR;
 }
 

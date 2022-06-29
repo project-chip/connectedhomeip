@@ -155,7 +155,6 @@ enum ClusterType {
     ZCL_CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0427;
     ZCL_CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0428;
     ZCL_SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0429;
-    ZCL_IAS_ZONE_CLUSTER_ID = 0x0500;
     ZCL_IAS_ACE_CLUSTER_ID = 0x0501;
     ZCL_IAS_WD_CLUSTER_ID = 0x0502;
     ZCL_WAKE_ON_LAN_CLUSTER_ID = 0x0503;
@@ -170,7 +169,6 @@ enum ClusterType {
     ZCL_APPLICATION_LAUNCHER_CLUSTER_ID = 0x050C;
     ZCL_APPLICATION_BASIC_CLUSTER_ID = 0x050D;
     ZCL_ACCOUNT_LOGIN_CLUSTER_ID = 0x050E;
-    ZCL_TEST_CLUSTER_ID = 0x050F;
     ZCL_MESSAGING_CLUSTER_ID = 0x0703;
     ZCL_APPLIANCE_IDENTIFICATION_CLUSTER_ID = 0x0B00;
     ZCL_METER_IDENTIFICATION_CLUSTER_ID = 0x0B01;
@@ -180,6 +178,13 @@ enum ClusterType {
     ZCL_BINDING_CLUSTER_ID = 0xF000;
     ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID = 0xF004;
     ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID = 0xFC00;
+
+    // NOTE: This is a large number that becomes negative as a 32-bit integer.
+    //
+    // Protobuf documentation states:
+    //   Enumerator constants must be in the range of a 32-bit integer. Since enum values
+    //   use varint encoding on the wire, negative values are inefficient and thus not recommended.
+    ZCL_TEST_CLUSTER_ID = -918523; // 0xFFF1FC05;
 }
 
 
@@ -201,6 +206,7 @@ message AttributeData {
     int32 data_int16 = 7;
     int32 data_int32 = 8;
   };
+  optional bytes tlv_data = 9;
 }
 
 message AttributeWrite {

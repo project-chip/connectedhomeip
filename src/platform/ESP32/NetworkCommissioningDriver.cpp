@@ -66,10 +66,9 @@ CHIP_ERROR ESPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     return err;
 }
 
-CHIP_ERROR ESPWiFiDriver::Shutdown()
+void ESPWiFiDriver::Shutdown()
 {
     mpStatusChangeCallback = nullptr;
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESPWiFiDriver::CommitConfiguration()
@@ -177,23 +176,47 @@ void ESPWiFiDriver::OnConnectWiFiNetwork()
 {
     if (mpConnectCallback)
     {
+        DeviceLayer::SystemLayer().CancelTimer(OnConnectWiFiNetworkFailed, NULL);
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
 }
 
+void ESPWiFiDriver::OnConnectWiFiNetworkFailed()
+{
+    if (mpConnectCallback)
+    {
+        mpConnectCallback->OnResult(Status::kNetworkNotFound, CharSpan(), 0);
+        mpConnectCallback = nullptr;
+    }
+}
+
+void ESPWiFiDriver::OnConnectWiFiNetworkFailed(chip::System::Layer * aLayer, void * aAppState)
+{
+    CHIP_ERROR error = chip::DeviceLayer::Internal::ESP32Utils::ClearWiFiStationProvision();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %s", chip::ErrorStr(error));
+    }
+    ESPWiFiDriver::GetInstance().OnConnectWiFiNetworkFailed();
+}
+
 void ESPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    Status networkingStatus = Status::kSuccess;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    Status networkingStatus     = Status::kSuccess;
+    const uint32_t secToMiliSec = 1000;
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
     ChipLogProgress(NetworkProvisioning, "ESP NetworkCommissioningDelegate: SSID: %.*s", static_cast<int>(networkId.size()),
                     networkId.data());
 
-    err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
+    err = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
                              reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
+
+    err = DeviceLayer::SystemLayer().StartTimer(
+        static_cast<System::Clock::Timeout>(kWiFiConnectNetworkTimeoutSeconds * secToMiliSec), OnConnectWiFiNetworkFailed, NULL);
     mpConnectCallback = callback;
 exit:
     if (err != CHIP_NO_ERROR)

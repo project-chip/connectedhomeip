@@ -45,7 +45,7 @@ KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
 uint16_t GetStringKeyId(const char * key, uint16_t * freeId)
 {
-    CHIP_ERROR err                    = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    CHIP_ERROR err                    = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     uint8_t keyId                     = 0;
     uint8_t pdmIdKvsKey               = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVSKey;
     bool bFreeIdxFound                = false;
@@ -100,6 +100,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     }
 
 exit:
+    ConvertError(err);
     return err;
 }
 
@@ -159,12 +160,13 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     }
 
 exit:
+    ConvertError(err);
     return err;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    CHIP_ERROR err         = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    CHIP_ERROR err         = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     uint8_t pdmIdKvsKey    = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVSKey;
     uint8_t pdmIdKvsValue  = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVSValue;
     uint8_t keyId          = 0;
@@ -205,7 +207,16 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
         }
     }
 exit:
+    ConvertError(err);
     return err;
+}
+
+void KeyValueStoreManagerImpl::ConvertError(CHIP_ERROR & err)
+{
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
 }
 
 } // namespace PersistedStorage

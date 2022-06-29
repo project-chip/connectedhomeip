@@ -44,6 +44,8 @@ chip_test_suite("tests") {
     "TestCryptoLayer.h",
   ]
 
+  test_sources = [ "TestPersistentStorageOpKeyStore.cpp" ]
+
   if (chip_device_platform == "esp32" || chip_device_platform == "nrfconnect" ||
       chip_device_platform == "efr32") {
     defines = [ "CURRENT_TIME_NOT_IMPLEMENTED=1" ]
@@ -55,6 +57,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/platform",
     "${nlunit_test_root}:nlunit-test",
   ]

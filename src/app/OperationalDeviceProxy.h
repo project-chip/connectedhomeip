@@ -167,13 +167,13 @@ public:
     /**
      *  Mark any open session with the device as expired.
      */
-    CHIP_ERROR Disconnect() override;
+    void Disconnect() override;
 
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
 
     PeerId GetPeerId() const { return mPeerId; }
 
-    CHIP_ERROR ShutdownSubscriptions() override;
+    void ShutdownSubscriptions() override;
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
 
@@ -199,7 +199,7 @@ public:
     }
 
     /**
-     * @brief Get the raw Fabric ID assigned to the device.
+     * @brief Get the fabricIndex
      */
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
