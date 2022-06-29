@@ -43,7 +43,7 @@ class AppTask
 public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
-    static void LightActionEventHandler(AppEvent * aEvent);
+    static void LightActionEventHandler(AppEvent * event);
     void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
     void PostEvent(const AppEvent * event);
     void InitOTARequestor();
