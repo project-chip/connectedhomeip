@@ -69,14 +69,26 @@ static uint32_t ms2tick(uint32_t ms)
 
 static uint32_t us2tick(uint32_t usec)
 {
-    uint32_t tick_freq = osKernelGetTickFreq();
     if (usec == 0U) {
         return osWaitForever;
     }
-    if (tick_freq != 0U) {
-        usec = (uint32_t)(((uint64_t)usec * osKernelGetTickFreq()) / 1000000);
+
+    uint32_t tick_freq = osKernelGetTickFreq();
+
+    if (tick_freq == 0U) {
+        return usec;
     }
-    return usec;
+    
+    // round division up
+    uint32_t ticks = (uint32_t)(((uint64_t)usec * tick_freq + (1000000 / 2)) / 1000000);
+
+    // because our tick is so long this might become 0
+    // we need the timer to sleep at least one tick as it otherwise breaks expectations
+    if (!ticks) {
+        ticks = 1;
+    }
+
+    return ticks;
 }
 
 void sleep(uint32_t sec)
