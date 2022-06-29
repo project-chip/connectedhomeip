@@ -554,7 +554,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     engine->Shutdown();
 }
 
-// Write Client sends the write request, and process the unknown message error and invoke NotifyResult to close the client.
+// Write Client sends the write request, and process the unknown message error via OnMessageReceived to close the client.
 void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -580,7 +580,15 @@ void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void 
     err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     writeClient.MoveToState(WriteClient::State::ResponseReceived);
-    writeClient.NotifyResult(CHIP_ERROR_INVALID_MESSAGE_TYPE, nullptr, true);
+
+    char PAYLOAD[] = "Hello!";
+    uint16_t payload_len = sizeof(PAYLOAD);
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
+    chip::System::PacketBufferHandle payload = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
+    NL_TEST_ASSERT(apSuite, !payload.IsNull());
+    writeClient.OnMessageReceived(writeClient.mpExchangeCtx, payloadHeader, std::move(payload));
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
     ctx.DrainAndServiceIO();
@@ -609,8 +617,6 @@ void TestWriteInteraction::TestWriteInvalidMessage2(nlTestSuite * apSuite, void 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
-
-    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
     writeClient.StartNewMessage();

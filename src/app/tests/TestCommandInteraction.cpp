@@ -44,7 +44,7 @@
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-
+#include <app/InteractionModelHelper.h>
 #include <nlunit-test.h>
 
 using TestContext = chip::Test::AppContext;
@@ -664,7 +664,7 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     err          = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    ctx.StepDrainAndServiceIO();
+    ctx.DeliverOneMessage();
 
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 0 &&
@@ -673,7 +673,21 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 1);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
     commandSender.MoveToState(app::CommandSender::State::ResponseReceived);
-    commandSender.NotifyResult(CHIP_ERROR_INVALID_MESSAGE_TYPE, nullptr, true);
+
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(msgBuf));
+    StatusResponseMessage::Builder response;
+    response.Init(&writer);
+    response.Status(Protocols::InteractionModel::Status::InvalidAction);
+    NL_TEST_ASSERT(apSuite, writer.Finalize(&msgBuf) == CHIP_NO_ERROR);
+
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
+
+    commandSender.OnMessageReceived(commandSender.mpExchangeCtx, payloadHeader, std::move(msgBuf));
 
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
@@ -702,7 +716,7 @@ void TestCommandInteraction::TestCommandInvalidMessage2(nlTestSuite * apSuite, v
     err          = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    ctx.StepDrainAndServiceIO();
+    ctx.DeliverOneMessage();
 
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 0 &&
@@ -711,16 +725,19 @@ void TestCommandInteraction::TestCommandInvalidMessage2(nlTestSuite * apSuite, v
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 1);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
 
-    chip::app::InteractionModelEngine::GetInstance()->ActiveCommandHandlerAt(0)->OnUnknownMsgType();
-    ctx.StepDrainAndServiceIO();
+    System::PacketBufferHandle msgBuf;
+    WriteRequestMessage::Builder request;
+    System::PacketBufferTLVWriter writer;
 
-    NL_TEST_ASSERT(apSuite,
-                   mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
-                       mockCommandSenderDelegate.onErrorCalledTimes == 1);
+    chip::app::InitWriterWithSpaceReserved(writer, 0);
+    err = request.Init(&writer);
+    err = writer.Finalize(&msgBuf);
+    err = commandSender.mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(msgBuf),
+                                                Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+    ctx.DrainAndServiceIO();
 
     asyncCommandHandle = nullptr;
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 // Command Sender sends the  malformed invoke request, handler fails to process it and send status report with invalid action

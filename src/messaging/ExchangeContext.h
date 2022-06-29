@@ -195,13 +195,6 @@ public:
     // SecureSession.
     void AbortAllOtherCommunicationOnFabric();
 
-    /**
-     * Determine whether we are expecting our consumer to send a message on
-     * this exchange (i.e. WillSendMessage was called and the message has not
-     * yet been sent).
-     */
-    bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
-
 private:
     class ExchangeSessionHolder : public SessionHolderWithDelegate
     {
@@ -227,6 +220,13 @@ private:
      *  @return Returns 'true' if response expected, else 'false'.
      */
     bool IsResponseExpected() const;
+
+    /**
+     * Determine whether we are expecting our consumer to send a message on
+     * this exchange (i.e. WillSendMessage was called and the message has not
+     * yet been sent).
+     */
+    bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
 
     /**
      *  Track whether we are now expecting a response to a message sent via this exchange (because that

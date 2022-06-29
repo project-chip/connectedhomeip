@@ -39,6 +39,7 @@
 
 namespace chip {
 namespace app {
+using Status = Protocols::InteractionModel::Status;
 
 CommandHandler::CommandHandler(Callback * apCallback) : mpCallback(apCallback), mSuppressResponse(false) {}
 
@@ -65,16 +66,16 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
-Protocols::InteractionModel::Status CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
+Status CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
                                                                            const PayloadHeader & payloadHeader,
                                                                            System::PacketBufferHandle && payload,
                                                                            bool isTimedInvoke)
 {
-    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
+    Status status = Status::Success;
     System::PacketBufferHandle response;
 
-    VerifyOrReturnError(apExchangeContext != nullptr, Protocols::InteractionModel::Status::Failure);
-    VerifyOrReturnError(mState == State::Idle, Protocols::InteractionModel::Status::Failure);
+    VerifyOrReturnError(apExchangeContext != nullptr, Status::Failure);
+    VerifyOrReturnError(mState == State::Idle, Status::Failure);
 
     // NOTE: we already know this is an InvokeCommand Request message because we explicitly registered with the
     // Exchange Manager for unsolicited InvokeCommand Requests.
@@ -91,15 +92,30 @@ Protocols::InteractionModel::Status CommandHandler::OnInvokeCommandRequest(Messa
     // handler errors vs our caller's.
     Handle workHandle(this);
 
+    mpExchangeCtx->WillSendMessage();
     status = ProcessInvokeRequest(std::move(payload), isTimedInvoke);
-    if (status == Protocols::InteractionModel::Status::Success && mPendingWork > 1)
+    if (status != Status::Success)
     {
-        mpExchangeCtx->WillSendMessage();
+        CHIP_ERROR err = StatusResponse::Send(status, mpExchangeCtx,
+                /* aExpectResponse = */ false);
+
+        if (err != CHIP_NO_ERROR)
+        {
+            // We have to manually close the exchange, because we called
+            // WillSendMessage already.
+            mpExchangeCtx->Close();
+        }
+
+        // Null out the (now-closed) exchange, so that when we try to
+        // SendCommandResponse() later (when our holdoff count drops to 0) it
+        // just fails and we don't double-respond.
+        mpExchangeCtx = nullptr;
+        status = Status::Success;
     }
     return status;
 }
 
-Protocols::InteractionModel::Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke)
+Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
@@ -107,19 +123,19 @@ Protocols::InteractionModel::Status CommandHandler::ProcessInvokeRequest(System:
     InvokeRequestMessage::Parser invokeRequestMessage;
     InvokeRequests::Parser invokeRequests;
     reader.Init(std::move(payload));
-    VerifyOrReturnError(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::InvalidAction);
+    VerifyOrReturnError(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     VerifyOrReturnError(invokeRequestMessage.CheckSchemaValidity() == CHIP_NO_ERROR,
-                        Protocols::InteractionModel::Status::InvalidAction);
+                        Status::InvalidAction);
 #endif
 
     VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR,
-                        Protocols::InteractionModel::Status::InvalidAction);
+                        Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR,
-                        Protocols::InteractionModel::Status::InvalidAction);
+                        Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR,
-                        Protocols::InteractionModel::Status::InvalidAction);
-    VerifyOrReturnError(mTimedRequest == isTimedInvoke, Protocols::InteractionModel::Status::UnsupportedAccess);
+                        Status::InvalidAction);
+    VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::UnsupportedAccess);
     invokeRequests.GetReader(&invokeRequestsReader);
 
     {
@@ -127,25 +143,25 @@ Protocols::InteractionModel::Status CommandHandler::ProcessInvokeRequest(System:
         // IM Engine will send a status response.
         size_t commandCount = 0;
         TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */);
-        VerifyOrReturnError(commandCount == 1, Protocols::InteractionModel::Status::Failure);
+        VerifyOrReturnError(commandCount == 1, Status::Failure);
     }
 
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
         VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(),
-                            Protocols::InteractionModel::Status::InvalidAction);
+                            Status::InvalidAction);
         CommandDataIB::Parser commandData;
         VerifyOrReturnError(commandData.Init(invokeRequestsReader) == CHIP_NO_ERROR,
-                            Protocols::InteractionModel::Status::InvalidAction);
+                            Status::InvalidAction);
 
         if (mpExchangeCtx->IsGroupExchangeContext())
         {
             VerifyOrReturnError(ProcessGroupCommandDataIB(commandData) == CHIP_NO_ERROR,
-                                Protocols::InteractionModel::Status::Failure);
+                                Status::Failure);
         }
         else
         {
-            VerifyOrReturnError(ProcessCommandDataIB(commandData) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::Failure);
+            VerifyOrReturnError(ProcessCommandDataIB(commandData) == CHIP_NO_ERROR, Status::Failure);
         }
     }
 
@@ -154,9 +170,9 @@ Protocols::InteractionModel::Status CommandHandler::ProcessInvokeRequest(System:
     {
         err = CHIP_NO_ERROR;
     }
-    VerifyOrReturnError(err == CHIP_NO_ERROR, Protocols::InteractionModel::Status::InvalidAction);
-    VerifyOrReturnError(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, Protocols::InteractionModel::Status::InvalidAction);
-    return Protocols::InteractionModel::Status::Success;
+    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
+    VerifyOrReturnError(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);
+    return Status::Success;
 }
 
 CHIP_ERROR CommandHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -170,8 +186,8 @@ CHIP_ERROR CommandHandler::OnUnknownMsgType()
 {
     VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR err =
-        StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, mpExchangeCtx, false /*aExpectResponse*/);
-    if (mpExchangeCtx != nullptr && mpExchangeCtx->IsSendExpected() && err != CHIP_NO_ERROR)
+        StatusResponse::Send(Status::InvalidAction, mpExchangeCtx, false /*aExpectResponse*/);
+    if (err != CHIP_NO_ERROR)
     {
         // We have to manually close the exchange, because we called
         // WillSendMessage already.
@@ -234,6 +250,7 @@ void CommandHandler::DecrementHoldOff()
         Close();
         return;
     }
+
     if (mpExchangeCtx->IsGroupExchangeContext())
     {
         mpExchangeCtx->Close();
@@ -307,7 +324,6 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     err = commandPath.GetEndpointId(&concretePath.mEndpointId);
     SuccessOrExit(err);
 
-    using Protocols::InteractionModel::Status;
     {
         Status commandExists = mpCallback->CommandExists(concretePath);
         if (commandExists != Status::Success)
@@ -341,7 +357,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     {
         // TODO: when wildcard invokes are supported, discard a
         // wildcard-expanded path instead of returning a status.
-        return AddStatus(concretePath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+        return AddStatus(concretePath, Status::NeedsTimedInteraction);
     }
 
     err = aCommandElement.GetFields(&commandDataReader);
@@ -440,7 +456,7 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
 
-        if (mpCallback->CommandExists(concretePath) != Protocols::InteractionModel::Status::Success)
+        if (mpCallback->CommandExists(concretePath) != Status::Success)
         {
             ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%x",
                           ChipLogValueMEI(commandId), ChipLogValueMEI(clusterId), mapping.endpoint_id);
@@ -494,20 +510,18 @@ CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aComman
     return FinishStatus();
 }
 
-CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus)
+CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, const Status aStatus)
 {
     return AddStatusInternal(aCommandPath, StatusIB(aStatus));
 }
 
 CHIP_ERROR CommandHandler::AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
 {
-    using Protocols::InteractionModel::Status;
     return AddStatusInternal(aCommandPath, StatusIB(Status::Success, aClusterStatus));
 }
 
 CHIP_ERROR CommandHandler::AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
 {
-    using Protocols::InteractionModel::Status;
     return AddStatusInternal(aCommandPath, StatusIB(Status::Failure, aClusterStatus));
 }
 

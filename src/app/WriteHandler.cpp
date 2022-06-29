@@ -31,7 +31,7 @@ namespace chip {
 namespace app {
 
 using namespace Protocols::InteractionModel;
-
+using Status = Protocols::InteractionModel::Status;
 constexpr uint8_t kListAttributeType = 0x48;
 
 CHIP_ERROR WriteHandler::Init()
@@ -134,6 +134,8 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    VerifyOrDieWithMsg(apExchangeContext == mpExchangeCtx, DataManagement,
+                       "Incoming exchange context should be same as the initial request.");
     VerifyOrDieWithMsg(!apExchangeContext->IsGroupExchangeContext(), DataManagement,
                        "OnMessageReceived should not be called on GroupExchangeContext");
 
@@ -142,7 +144,7 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
         ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
         if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
         {
-            err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext,
+            err = StatusResponse::Send(Status::InvalidAction, apExchangeContext,
                                        false /*aExpectResponse*/);
         }
         Close();
@@ -162,7 +164,12 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
     else
     {
         err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        if (err == CHIP_NO_ERROR)
+        {
+            mpExchangeCtx = nullptr;
+        }
         Close();
+
     }
     return err;
 }
@@ -338,7 +345,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             // it with Busy status code.
             (dataAttributePath.IsListItemOperation() && !IsSameAttribute(mProcessingAttributePath, dataAttributePath)))
         {
-            err = AddStatus(dataAttributePath, StatusIB(Protocols::InteractionModel::Status::Busy));
+            err = AddStatus(dataAttributePath, StatusIB(Status::Busy));
             continue;
         }
 
@@ -638,20 +645,18 @@ exit:
     return status;
 }
 
-CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::Status aStatus)
+CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, const Status aStatus)
 {
     return AddStatus(aPath, StatusIB(aStatus));
 }
 
 CHIP_ERROR WriteHandler::AddClusterSpecificSuccess(const ConcreteDataAttributePath & aPath, ClusterStatus aClusterStatus)
 {
-    using Protocols::InteractionModel::Status;
     return AddStatus(aPath, StatusIB(Status::Success, aClusterStatus));
 }
 
 CHIP_ERROR WriteHandler::AddClusterSpecificFailure(const ConcreteDataAttributePath & aPath, ClusterStatus aClusterStatus)
 {
-    using Protocols::InteractionModel::Status;
     return AddStatus(aPath, StatusIB(Status::Failure, aClusterStatus));
 }
 

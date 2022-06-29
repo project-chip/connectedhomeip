@@ -237,7 +237,6 @@ private:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override {}
-    CHIP_ERROR OnUnknownMsgType();
 
     enum class State
     {
@@ -329,6 +328,8 @@ private:
 
         return FinishCommand(/* aEndDataStruct = */ false);
     }
+
+    CHIP_ERROR OnUnknownMsgType();
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback * mpCallback                      = nullptr;

@@ -36,6 +36,7 @@
 
 namespace chip {
 namespace app {
+using Status = Protocols::InteractionModel::Status;
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType) :
@@ -151,8 +152,11 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
 CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = StatusResponse::ProcessStatusResponse(std::move(aPayload));
-    SuccessOrExit(err);
+    bool suppressErrorStatusResponse = false;
+    CHIP_ERROR statusError = CHIP_NO_ERROR;
+    SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
+    suppressErrorStatusResponse = true;
+    SuccessOrExit(err = statusError);
     switch (mState)
     {
     case HandlerState::AwaitingReportResponse:
@@ -204,6 +208,15 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        if (!suppressErrorStatusResponse)
+        {
+            err = StatusResponse::Send(Status::InvalidAction, apExchangeContext,
+                                       false /*aExpectResponse*/);
+            if (err == CHIP_NO_ERROR)
+            {
+                mpExchangeCtx = nullptr;
+            }
+        }
         Close();
     }
 
@@ -311,7 +324,7 @@ CHIP_ERROR ReadHandler::OnUnknownMsgType()
     VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR err =
         StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, mpExchangeCtx, false /*aExpectResponse*/);
-    if (mpExchangeCtx != nullptr && mpExchangeCtx->IsSendExpected() && err != CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         // We have to manually close the exchange, because we called
         // WillSendMessage already.
