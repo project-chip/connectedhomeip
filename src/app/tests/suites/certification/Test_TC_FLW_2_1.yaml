@@ -34,8 +34,6 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: 0
-              maxValue: 65535
 
     - label: "Read the mandatory attribute: MinMeasuredValue"
       command: "readAttribute"
@@ -43,8 +41,6 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: 0
-              maxValue: 65535
 
     - label: "Read the mandatory attribute: MaxMeasuredValue"
       command: "readAttribute"
@@ -52,8 +48,6 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: 0
-              maxValue: 65535
 
     - label: "read the optional attribute: Tolerance"
       optional: true
