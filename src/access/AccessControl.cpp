@@ -598,7 +598,9 @@ bool AccessControl::IsValid(const Entry & entry)
     return true;
 
 exit:
+#if CHIP_CONFIG_TEST == 0
     ChipLogError(DataManagement, "AccessControl: %s", log);
+#endif // CHIP_CONFIG_TEST
     return false;
 }
 
