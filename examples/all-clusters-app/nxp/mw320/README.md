@@ -48,7 +48,7 @@ Note:
    order to download MW320 SDK for Matter.
 2. "source third_party/connectedhomeip/scripts/activate.sh" can be omitted if
    your environment is already setup without issues.
-   
+
 Tinycrypt ECC operations:
 
 Note: This solution is temporary.
