@@ -335,6 +335,7 @@ CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
     if (proxy->IsConnected())
     {
         proxy->Disconnect();
+        return CHIP_NO_ERROR;
     }
 
     if (proxy->IsConnecting())
