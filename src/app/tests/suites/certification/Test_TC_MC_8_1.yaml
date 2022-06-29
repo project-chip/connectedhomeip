@@ -18,12 +18,9 @@ config:
     nodeId: 0x12344321
     cluster: "Target Navigator"
     endpoint: 1
-    targetvalue1:
+    targetvalue:
         type: INT8U
         defaultValue: 1
-    targetvalue2:
-        type: INT8U
-        defaultValue: 2
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -54,30 +51,10 @@ tests:
       arguments:
           values:
               - name: "Target"
-                value: targetvalue1
+                value: targetvalue
 
     - label: "Reads the CurrentTarget attribute"
       command: "readAttribute"
       attribute: "CurrentTarget"
       response:
-          value: targetvalue1
-
-    - label: "Reads the TargetList attribute"
-      command: "readAttribute"
-      attribute: "TargetList"
-      response:
-          constraints:
-              type: list
-
-    - label: "Sends a NavigateTarget command"
-      command: "NavigateTarget"
-      arguments:
-          values:
-              - name: "Target"
-                value: targetvalue2
-
-    - label: "Reads the CurrentTarget attribute"
-      command: "readAttribute"
-      attribute: "CurrentTarget"
-      response:
-          value: targetvalue2
+          value: targetvalue

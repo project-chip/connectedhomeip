@@ -28,7 +28,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    # Issue 13029
+    # Issue 10988
     - label:
           "TH reads CurrentApp attribute from the DUT and Verify the in-focus
           application attributes, which should include the display Application

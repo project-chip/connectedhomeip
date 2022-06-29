@@ -29,6 +29,13 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Read attribute media input list"
+      command: "readAttribute"
+      attribute: "InputList"
+      response:
+          constraints:
+              type: list
+
     - label: "Hide Input Status Command"
       command: "HideInputStatus"
       response:

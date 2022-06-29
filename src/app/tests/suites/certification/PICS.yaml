@@ -1077,3 +1077,7 @@ PICS:
 
     - label: "Does the MS device support Momentary Switch MultiPress?"
       id: SWTCH.S.F04
+    - label:
+          "Does the DUT(server) support the Behavior that supports lighting
+          applications feature?"
+      id: LVL.S.F01
