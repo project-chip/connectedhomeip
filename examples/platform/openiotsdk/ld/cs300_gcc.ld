@@ -2,11 +2,10 @@
 MEMORY
 {
   ITCM (rx)       : ORIGIN = 0x00000000, LENGTH = 32K
-  CODE_SRAM (rx)  : ORIGIN = 0x01000000, LENGTH = 1M
   /* Vector table is copied to RAM, so RAM address needs to be adjusted */
   DTCM (rwx)      : ORIGIN = 0x20000000, LENGTH = 32K
   DATA_SRAM (rwx) : ORIGIN = 0x21000000, LENGTH = 2M
-  QSPI_RAM (rw)   : ORIGIN = 0x28000000, LENGTH = 8M
+  QSPI_RAM (rx)   : ORIGIN = 0x28000000, LENGTH = 8M
 }
 
 __stack_size__ = 0x1000;
@@ -48,19 +47,19 @@ SECTIONS
         *(.rodata*)
 
         KEEP(*(.eh_frame*))
-    } > CODE_SRAM
+    } > QSPI_RAM
 
     .ARM.extab :
     {
         *(.ARM.extab* .gnu.linkonce.armextab.*)
-    } > CODE_SRAM
+    } > QSPI_RAM
 
     __exidx_start = .;
 
     .ARM.exidx :
     {
         *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-    } > CODE_SRAM
+    } > QSPI_RAM
 
     __exidx_end = .;
 
@@ -77,7 +76,7 @@ SECTIONS
         LONG (DEFINED(__data2_start__) ? __data2_start__ : 0)
         LONG (DEFINED(__data2_start__) ? __data2_end__ - __data2_start__ : 0)
         __copy_table_end__ = .;
-    } > CODE_SRAM
+    } > QSPI_RAM
 
     .zero.table :
     {
@@ -88,7 +87,7 @@ SECTIONS
         LONG (DEFINED(__bss2_start__) ? __bss2_start__ : 0)
         LONG (DEFINED(__bss2_start__) ? __bss2_end__ - __bss2_start__ : 0)
         __zero_table_end__ = .;
-    } > CODE_SRAM
+    } > QSPI_RAM
 
     __etext = .;
 
