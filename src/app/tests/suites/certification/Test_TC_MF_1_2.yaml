@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 22.1.2. [TC-MF-1.2] Administrator Behavior using BCM [DUT - Commissioner]
+name: 24.1.2. [TC-MF-1.2] Administrator Behavior using BCM [DUT - Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -33,13 +33,13 @@ tests:
       verification: |
           On first controller, usinadministratorcommissioningg chip tool open commissioning window.
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000 
 
 
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
+          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false, 
           [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
           [1650278416.248570][11064:11069] CHIP:DMG:         [
           [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
@@ -52,18 +52,18 @@ tests:
           [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
           [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
+          [1650278416.249430][11064:11069] CHIP:DMG:                                 
           [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
           [1650278416.249581][11064:11069] CHIP:DMG:                                 {
           [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
+          [1650278416.249823][11064:11069] CHIP:DMG:                                 
           [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:
+          [1650278416.249969][11064:11069] CHIP:DMG:                         
           [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:
+          [1650278416.250113][11064:11069] CHIP:DMG:                 
           [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:
+          [1650278416.250241][11064:11069] CHIP:DMG:         
           [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
           [1650278416.250355][11064:11069] CHIP:DMG: },
           [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
@@ -74,7 +74,7 @@ tests:
       verification: |
           On first controller, using chip tool read fabricList
 
-          ./chip-tool operationalcredentials read fabrics 1234 0 --fabric-filtered 0
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
 
 
            CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 3621507058
@@ -84,10 +84,21 @@ tests:
           [1649245801.244400][10091:10096] CHIP:TOO:       VendorId: 65521
           [1649245801.244431][10091:10096] CHIP:TOO:       FabricId: 1
           [1649245801.244461][10091:10096] CHIP:TOO:       NodeId: 1
-          [1649245801.244491][10091:10096] CHIP:TOO:       Label:
+          [1649245801.244491][10091:10096] CHIP:TOO:       Label: 
           [1649245801.244521][10091:10096] CHIP:TOO:       FabricIndex: 1
           [1649245801.244552][10091:10096] CHIP:TOO:      }
           [1649245801.244671][10091:10096] CHIP:EM: Sending Standalone Ack for MessageCounter:8407998 on exchange 12989i
+      disabled: true
+
+    - label: "DUT_CR2 starts a commissioning process with TH_CE"
+      verification: |
+          Using your DUT Controller connect to the accessory.
+
+          Below is the example when using chip tool as controller 
+          ./chip-tool pairing onnetwork 1 20202021
+
+          Verify you got below message
+          Device commissioning completed with success
       disabled: true
 
     - label:
@@ -96,7 +107,7 @@ tests:
       verification: |
           Using your DUT controller write attribute and read attribute to and from TH_CE
 
-          Below is the example while using chip tool on second controller,
+          Below is the example while using chip tool on second controller, 
           ./chip-tool basic write  node-label te5new 2 0
 
           CHIP:DMG: WriteResponseMessage =
@@ -111,16 +122,16 @@ tests:
           [1649245940.789143][10110:10115] CHIP:DMG:                                 Cluster = 0x28,
           [1649245940.789228][10110:10115] CHIP:DMG:                                 Attribute = 0x0000_0005,
           [1649245940.789313][10110:10115] CHIP:DMG:                         }
-          [1649245940.789388][10110:10115] CHIP:DMG:
+          [1649245940.789388][10110:10115] CHIP:DMG:                                 
           [1649245940.789454][10110:10115] CHIP:DMG:                         StatusIB =
           [1649245940.789519][10110:10115] CHIP:DMG:                         {
           [1649245940.789588][10110:10115] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1649245940.789654][10110:10115] CHIP:DMG:                         },
-          [1649245940.789719][10110:10115] CHIP:DMG:
+          [1649245940.789719][10110:10115] CHIP:DMG:                         
           [1649245940.789778][10110:10115] CHIP:DMG:                 },
-          [1649245940.789841][10110:10115] CHIP:DMG:
+          [1649245940.789841][10110:10115] CHIP:DMG:                 
           [1649245940.789885][10110:10115] CHIP:DMG:         ],
-          [1649245940.789941][10110:10115] CHIP:DMG:
+          [1649245940.789941][10110:10115] CHIP:DMG:         
           [1649245940.789984][10110:10115] CHIP:DMG:         InteractionModelRevision = 1
           [1649245940.790033][10110:10115] CHIP:DMG: }
           [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -136,9 +147,9 @@ tests:
       verification: |
           On your DUT controller read fabricList
 
-          Below is the example while using chip tool on second controller,
+          Below is the example while using chip tool on second controller, 
           ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0
-
+           
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 3229397217
           [1650277071.834099][40790:40795] CHIP:TOO:   Fabrics: 2 entries
           [1650277071.834120][40790:40795] CHIP:TOO:     [1]: {
@@ -146,7 +157,7 @@ tests:
           [1650277071.834134][40790:40795] CHIP:TOO:       VendorId: 65521
           [1650277071.834137][40790:40795] CHIP:TOO:       FabricId: 1
           [1650277071.834141][40790:40795] CHIP:TOO:       NodeId: 1
-          [1650277071.834147][40790:40795] CHIP:TOO:       Label:
+          [1650277071.834147][40790:40795] CHIP:TOO:       Label: 
           [1650277071.834151][40790:40795] CHIP:TOO:       FabricIndex: 1
           [1650277071.834155][40790:40795] CHIP:TOO:      }
           [1650277071.834161][40790:40795] CHIP:TOO:     [2]: {
@@ -154,7 +165,7 @@ tests:
           [1650277071.834169][40790:40795] CHIP:TOO:       VendorId: 65521
           [1650277071.834173][40790:40795] CHIP:TOO:       FabricId: 1
           [1650277071.834176][40790:40795] CHIP:TOO:       NodeId: 2
-          [1650277071.834179][40790:40795] CHIP:TOO:       Label:
+          [1650277071.834179][40790:40795] CHIP:TOO:       Label: 
           [1650277071.834182][40790:40795] CHIP:TOO:       FabricIndex: 2
           [1650277071.834186][40790:40795] CHIP:TOO:      }
           [1650277071.834215][40790:40795] CHIP:EM: Sending Standalone Ack for MessageCounter:15057119 on exchange 50631i
@@ -166,7 +177,7 @@ tests:
       verification: |
           On first controller, using chip-tool write attribute, Verify read attribute returns the updated value written.
 
-          ./chip-tool basic write node-label te8 1 0
+          ./chip-tool basic write node-label te8 1 0 
 
           CHIP:DMG: WriteResponseMessage =
           [1649245940.788522][10110:10115] CHIP:DMG: {
@@ -180,16 +191,16 @@ tests:
           [1649245940.789143][10110:10115] CHIP:DMG:                                 Cluster = 0x28,
           [1649245940.789228][10110:10115] CHIP:DMG:                                 Attribute = 0x0000_0005,
           [1649245940.789313][10110:10115] CHIP:DMG:                         }
-          [1649245940.789388][10110:10115] CHIP:DMG:
+          [1649245940.789388][10110:10115] CHIP:DMG:                                 
           [1649245940.789454][10110:10115] CHIP:DMG:                         StatusIB =
           [1649245940.789519][10110:10115] CHIP:DMG:                         {
           [1649245940.789588][10110:10115] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1649245940.789654][10110:10115] CHIP:DMG:                         },
-          [1649245940.789719][10110:10115] CHIP:DMG:
+          [1649245940.789719][10110:10115] CHIP:DMG:                         
           [1649245940.789778][10110:10115] CHIP:DMG:                 },
-          [1649245940.789841][10110:10115] CHIP:DMG:
+          [1649245940.789841][10110:10115] CHIP:DMG:                 
           [1649245940.789885][10110:10115] CHIP:DMG:         ],
-          [1649245940.789941][10110:10115] CHIP:DMG:
+          [1649245940.789941][10110:10115] CHIP:DMG:         
           [1649245940.789984][10110:10115] CHIP:DMG:         InteractionModelRevision = 1
           [1649245940.790033][10110:10115] CHIP:DMG: }
           [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -208,7 +219,7 @@ tests:
 
 
 
-          Below is the example while using chip tool on second controller,
+          Below is the example while using chip tool on second controller, 
           ./chip-tool basic write node-label te5new 2 0
 
           CHIP:DMG: WriteResponseMessage =
@@ -223,22 +234,22 @@ tests:
           [1649245940.789143][10110:10115] CHIP:DMG:                                 Cluster = 0x28,
           [1649245940.789228][10110:10115] CHIP:DMG:                                 Attribute = 0x0000_0005,
           [1649245940.789313][10110:10115] CHIP:DMG:                         }
-          [1649245940.789388][10110:10115] CHIP:DMG:
+          [1649245940.789388][10110:10115] CHIP:DMG:                                 
           [1649245940.789454][10110:10115] CHIP:DMG:                         StatusIB =
           [1649245940.789519][10110:10115] CHIP:DMG:                         {
           [1649245940.789588][10110:10115] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1649245940.789654][10110:10115] CHIP:DMG:                         },
-          [1649245940.789719][10110:10115] CHIP:DMG:
+          [1649245940.789719][10110:10115] CHIP:DMG:                         
           [1649245940.789778][10110:10115] CHIP:DMG:                 },
-          [1649245940.789841][10110:10115] CHIP:DMG:
+          [1649245940.789841][10110:10115] CHIP:DMG:                 
           [1649245940.789885][10110:10115] CHIP:DMG:         ],
-          [1649245940.789941][10110:10115] CHIP:DMG:
+          [1649245940.789941][10110:10115] CHIP:DMG:         
           [1649245940.789984][10110:10115] CHIP:DMG:         InteractionModelRevision = 1
           [1649245940.790033][10110:10115] CHIP:DMG: }
           [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
 
-          ./chip-tool basic read node-label 1 0
+          ./chip-tool basic read node-label 2 0
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3061847068
           [1649245950.006849][10116:10121] CHIP:TOO:   NodeLabel: te5new
           [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
@@ -256,56 +267,13 @@ tests:
       verification: |
           On your DUT controller using chip-tool open commissioning widow using BCM.
 
-          Below is the example while using chip tool on second controller,
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+          Below is the example while using chip tool on second controller, 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000 
 
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG: 	suppressResponse = false,
-          [1650278416.248495][11064:11069] CHIP:DMG: 	InvokeResponseIBs =
-          [1650278416.248570][11064:11069] CHIP:DMG: 	[
-          [1650278416.248630][11064:11069] CHIP:DMG: 		InvokeResponseIB =
-          [1650278416.248718][11064:11069] CHIP:DMG: 		{
-          [1650278416.248783][11064:11069] CHIP:DMG: 			CommandStatusIB =
-          [1650278416.248860][11064:11069] CHIP:DMG: 			{
-          [1650278416.248931][11064:11069] CHIP:DMG: 				CommandPathIB =
-          [1650278416.249011][11064:11069] CHIP:DMG: 				{
-          [1650278416.249100][11064:11069] CHIP:DMG: 					EndpointId = 0x0,
-          [1650278416.249186][11064:11069] CHIP:DMG: 					ClusterId = 0x3c,
-          [1650278416.249268][11064:11069] CHIP:DMG: 					CommandId = 0x1,
-          [1650278416.249347][11064:11069] CHIP:DMG: 				},
-          [1650278416.249430][11064:11069] CHIP:DMG:
-          [1650278416.249501][11064:11069] CHIP:DMG: 				StatusIB =
-          [1650278416.249581][11064:11069] CHIP:DMG: 				{
-          [1650278416.249664][11064:11069] CHIP:DMG: 					status = 0x00 (SUCCESS),
-          [1650278416.249738][11064:11069] CHIP:DMG: 				},
-          [1650278416.249823][11064:11069] CHIP:DMG:
-          [1650278416.249889][11064:11069] CHIP:DMG: 			},
-          [1650278416.249969][11064:11069] CHIP:DMG:
-          [1650278416.250035][11064:11069] CHIP:DMG: 		},
-          [1650278416.250113][11064:11069] CHIP:DMG:
-          [1650278416.250169][11064:11069] CHIP:DMG: 	],
-          [1650278416.250241][11064:11069] CHIP:DMG:
-          [1650278416.250298][11064:11069] CHIP:DMG: 	InteractionModelRevision = 1
-          [1650278416.250355][11064:11069] CHIP:DMG: },
-          [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
-          [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
-
-    - label:
-          "DUT_CR2 revokes the commissioning window on TH_CE using the Revoke
-          Commissioning command"
-      verification: |
-          On your DUT controller using chip-tool run revoke command
-
-          Below is the example while using chip tool on second controller,
-          ./chip-tool administratorcommissioning revoke-commissioning 2 0 --timedInteractionTimeoutMs 1000
-
-
-          CHIP:DMG: InvokeResponseMessage =
-          [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
+          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false, 
           [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
           [1650278416.248570][11064:11069] CHIP:DMG:         [
           [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
@@ -318,18 +286,61 @@ tests:
           [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
           [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
+          [1650278416.249430][11064:11069] CHIP:DMG:                                 
           [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
           [1650278416.249581][11064:11069] CHIP:DMG:                                 {
           [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
+          [1650278416.249823][11064:11069] CHIP:DMG:                                 
           [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:
+          [1650278416.249969][11064:11069] CHIP:DMG:                         
           [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:
+          [1650278416.250113][11064:11069] CHIP:DMG:                 
           [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:
+          [1650278416.250241][11064:11069] CHIP:DMG:         
+          [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
+          [1650278416.250355][11064:11069] CHIP:DMG: },
+          [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
+          [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "DUT_CR2 revokes the commissioning window on TH_CE using the Revoke
+          Commissioning command"
+      verification: |
+          On your DUT controller using chip-tool run revoke command
+
+          Below is the example while using chip tool on second controller, 
+          ./chip-tool administratorcommissioning revoke-commissioning 2 0 --timedInteractionTimeoutMs 1000
+
+
+          CHIP:DMG: InvokeResponseMessage =
+          [1650278416.248379][11064:11069] CHIP:DMG: {
+          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false, 
+          [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
+          [1650278416.248570][11064:11069] CHIP:DMG:         [
+          [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
+          [1650278416.248718][11064:11069] CHIP:DMG:                 {
+          [1650278416.248783][11064:11069] CHIP:DMG:                         CommandStatusIB =
+          [1650278416.248860][11064:11069] CHIP:DMG:                         {
+          [1650278416.248931][11064:11069] CHIP:DMG:                                 CommandPathIB =
+          [1650278416.249011][11064:11069] CHIP:DMG:                                 {
+          [1650278416.249100][11064:11069] CHIP:DMG:                                         EndpointId = 0x0,
+          [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
+          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
+          [1650278416.249430][11064:11069] CHIP:DMG:                                 
+          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
+          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
+          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
+          [1650278416.249823][11064:11069] CHIP:DMG:                                 
+          [1650278416.249889][11064:11069] CHIP:DMG:                         },
+          [1650278416.249969][11064:11069] CHIP:DMG:                         
+          [1650278416.250035][11064:11069] CHIP:DMG:                 },
+          [1650278416.250113][11064:11069] CHIP:DMG:                 
+          [1650278416.250169][11064:11069] CHIP:DMG:         ],
+          [1650278416.250241][11064:11069] CHIP:DMG:         
           [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
           [1650278416.250355][11064:11069] CHIP:DMG: },
           [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
@@ -340,8 +351,8 @@ tests:
           "TH_CR3 attempts to execute a PASE to starts a commissioning process
           with TH_CE"
       verification: |
-          1. On third controller, using chip-tool connect to the accessory. Connect attempt should fail, i.e
-          ./chip-tool pairing onnetwork 1 20202021
+          1. On third controller, using chip-tool connect to the accessory. Connect attempt should fail, i.e 
+          ./chip-tool pairing onnetwork 3 20202021
 
           verify you got the following message in the TH log
           CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
@@ -355,7 +366,7 @@ tests:
       verification: |
           Using your DUT controller, write attribute and read attribute to and from TH_CE
 
-          Below is the example while using chip tool on second controller,
+          Below is the example while using chip tool on second controller, 
           ./chip-tool basic write node-label te5new 2 0
 
           CHIP:DMG: WriteResponseMessage =
@@ -370,16 +381,16 @@ tests:
           [1649245940.789143][10110:10115] CHIP:DMG:                                 Cluster = 0x28,
           [1649245940.789228][10110:10115] CHIP:DMG:                                 Attribute = 0x0000_0005,
           [1649245940.789313][10110:10115] CHIP:DMG:                         }
-          [1649245940.789388][10110:10115] CHIP:DMG:
+          [1649245940.789388][10110:10115] CHIP:DMG:                                 
           [1649245940.789454][10110:10115] CHIP:DMG:                         StatusIB =
           [1649245940.789519][10110:10115] CHIP:DMG:                         {
           [1649245940.789588][10110:10115] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1649245940.789654][10110:10115] CHIP:DMG:                         },
-          [1649245940.789719][10110:10115] CHIP:DMG:
+          [1649245940.789719][10110:10115] CHIP:DMG:                         
           [1649245940.789778][10110:10115] CHIP:DMG:                 },
-          [1649245940.789841][10110:10115] CHIP:DMG:
+          [1649245940.789841][10110:10115] CHIP:DMG:                 
           [1649245940.789885][10110:10115] CHIP:DMG:         ],
-          [1649245940.789941][10110:10115] CHIP:DMG:
+          [1649245940.789941][10110:10115] CHIP:DMG:         
           [1649245940.789984][10110:10115] CHIP:DMG:         InteractionModelRevision = 1
           [1649245940.790033][10110:10115] CHIP:DMG: }
           [1649245940.790167][10110:10115] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -394,13 +405,13 @@ tests:
       verification: |
           On your DUT controller using chip-tool open commissioning widow using BCM.
 
-          Below is the example while using chip tool on second controller,
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+          Below is the example while using chip tool on second controller, 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 180 2 0 --timedInteractionTimeoutMs 1000 
 
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
+          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false, 
           [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
           [1650278416.248570][11064:11069] CHIP:DMG:         [
           [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
@@ -413,18 +424,18 @@ tests:
           [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
           [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
+          [1650278416.249430][11064:11069] CHIP:DMG:                                 
           [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
           [1650278416.249581][11064:11069] CHIP:DMG:                                 {
           [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
+          [1650278416.249823][11064:11069] CHIP:DMG:                                 
           [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:
+          [1650278416.249969][11064:11069] CHIP:DMG:                         
           [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:
+          [1650278416.250113][11064:11069] CHIP:DMG:                 
           [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:
+          [1650278416.250241][11064:11069] CHIP:DMG:         
           [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
           [1650278416.250355][11064:11069] CHIP:DMG: },
           [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
@@ -441,13 +452,13 @@ tests:
       verification: |
           On your DUT controller using chip-tool open commissioning widow using BCM.
 
-          Below is the example while using chip tool on second controller,
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+          Below is the example while using chip tool on second controller, 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000 
 
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
+          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false, 
           [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
           [1650278416.248570][11064:11069] CHIP:DMG:         [
           [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
@@ -460,18 +471,18 @@ tests:
           [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
           [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
+          [1650278416.249430][11064:11069] CHIP:DMG:                                 
           [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
           [1650278416.249581][11064:11069] CHIP:DMG:                                 {
           [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
+          [1650278416.249823][11064:11069] CHIP:DMG:                                 
           [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:
+          [1650278416.249969][11064:11069] CHIP:DMG:                         
           [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:
+          [1650278416.250113][11064:11069] CHIP:DMG:                 
           [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:
+          [1650278416.250241][11064:11069] CHIP:DMG:         
           [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
           [1650278416.250355][11064:11069] CHIP:DMG: },
           [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
@@ -484,7 +495,7 @@ tests:
       verification: |
           Using your 1st Controller connect to the accessory.
 
-          Below is the example when using chip tool as controller
+          Below is the example when using chip tool as controller 
           ./chip-tool pairing onnetwork 1 20202021
 
           [1651786200275] [36301:315544] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008

@@ -248,7 +248,6 @@ tests:
 
     - label: "Read the optional attribute: CoupleColorTempToLevelMinMireds"
       PICS: CC.S.A400d
-      optional: true
       command: "readAttribute"
       attribute: "CoupleColorTempToLevelMinMireds"
       response:
@@ -259,7 +258,6 @@ tests:
 
     - label: "Read the optional attribute: StartUpColorTemperatureMireds"
       PICS: CC.S.A4010
-      optional: true
       command: "readAttribute"
       attribute: "StartUpColorTemperatureMireds"
       response:
@@ -270,7 +268,6 @@ tests:
 
     - label: "Validate constraints of attribute: RemainingTime"
       PICS: CC.S.A0002
-      optional: true
       command: "readAttribute"
       attribute: "RemainingTime"
       response:
@@ -280,7 +277,6 @@ tests:
 
     - label: "Read the optional attribute: DriftCompensation"
       PICS: CC.S.A0005
-      optional: true
       command: "readAttribute"
       attribute: "DriftCompensation"
       response:
@@ -291,7 +287,6 @@ tests:
 
     - label: "Read the optional attribute: CompensationText"
       PICS: CC.S.A0005
-      optional: true
       command: "readAttribute"
       attribute: "CompensationText"
       response:
@@ -482,7 +477,6 @@ tests:
     #Defined Color Points Settings Attribute Set
     - label: "Read the optional attribute: WhitePointX"
       PICS: CC.S.A0030
-      optional: true
       command: "readAttribute"
       attribute: "WhitePointX"
       response:
@@ -493,7 +487,6 @@ tests:
 
     - label: "Read the optional attribute: WhitePointY"
       PICS: CC.S.A0031
-      optional: true
       command: "readAttribute"
       attribute: "WhitePointY"
       response:
@@ -504,7 +497,6 @@ tests:
 
     - label: "Read the optional attribute: ColorPointRX"
       PICS: CC.S.A0032
-      optional: true
       command: "readAttribute"
       attribute: "ColorPointRX"
       response:
@@ -515,7 +507,6 @@ tests:
 
     - label: "Read the optional attribute: ColorPointRY"
       PICS: CC.S.A0033
-      optional: true
       command: "readAttribute"
       attribute: "ColorPointRY"
       response:
@@ -526,7 +517,6 @@ tests:
 
     - label: "Read the optional attribute: ColorPointRIntensity"
       PICS: CC.S.A0034
-      optional: true
       command: "readAttribute"
       attribute: "ColorPointRIntensity"
       response:
@@ -535,7 +525,6 @@ tests:
 
     - label: "Read the optional attribute: ColorPointGX"
       PICS: CC.S.A0036
-      optional: true
       command: "readAttribute"
       attribute: "ColorPointGX"
       response:
@@ -546,7 +535,6 @@ tests:
 
     - label: "Read the optional attribute: ColorPointGY"
       PICS: CC.S.A0037
-      optional: true
       command: "readAttribute"
       attribute: "ColorPointGY"
       response:
@@ -557,7 +545,6 @@ tests:
 
     - label: "Read the optional attribute: ColorPointGIntensity"
       PICS: CC.S.A0038
-      optional: true
       command: "readAttribute"
       attribute: "ColorPointGIntensity"
       response:
@@ -566,7 +553,6 @@ tests:
 
     - label: "Read the optional attribute: ColorPointBX"
       PICS: CC.S.A003a
-      optional: true
       command: "readAttribute"
       attribute: "ColorPointBX"
       response:
@@ -577,7 +563,6 @@ tests:
 
     - label: "Read the optional attribute: ColorPointBY"
       PICS: CC.S.A003b
-      optional: true
       command: "readAttribute"
       attribute: "ColorPointBY"
       response:
@@ -588,7 +573,6 @@ tests:
 
     - label: "Read the optional attribute: ColorPointBIntensity"
       PICS: CC.S.A003c
-      optional: true
       command: "readAttribute"
       attribute: "ColorPointBIntensity"
       response:
