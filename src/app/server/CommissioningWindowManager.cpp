@@ -160,7 +160,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
 
     StopAdvertisement(/* aShuttingDown = */ false);
 
-    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     // This should never be armed because we don't allow CASE sessions to arm the failsafe when the commissioning window is open and
     // we check that the failsafe is not armed before opening the commissioning window. None the less, it is good to double-check.
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -194,7 +194,7 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commiss
 {
     VerifyOrReturnError(commissioningTimeout <= MaxCommissioningTimeout() && commissioningTimeout >= MinCommissioningTimeout(),
                         CHIP_ERROR_INVALID_ARGUMENT);
-    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     VerifyOrReturnError(!failSafeContext.IsFailSafeArmed(), CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(Dnssd::ServiceAdvertiser::Instance().UpdateCommissionableInstanceName());
@@ -471,7 +471,7 @@ void CommissioningWindowManager::OnSessionReleased()
 
 void CommissioningWindowManager::ExpireFailSafeIfArmed()
 {
-    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     if (failSafeContext.IsFailSafeArmed())
     {
         failSafeContext.ForceFailSafeTimerExpiry();

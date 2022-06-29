@@ -23,7 +23,6 @@
 #pragma once
 
 #include <lib/support/Span.h>
-#include <platform/FailSafeContext.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
@@ -38,14 +37,11 @@ public:
     CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode);
     CHIP_ERROR PostConnectedToOperationalNetworkEvent(ByteSpan networkID);
 
-    FailSafeContext & GetFailSafeContext() { return mFailSafeContext; }
-
     static DeviceControlServer & DeviceControlSvr();
 
 private:
     // ===== Members for internal use by the following friends.
     static DeviceControlServer sInstance;
-    FailSafeContext mFailSafeContext;
 
     // ===== Private members reserved for use by this class only.
 

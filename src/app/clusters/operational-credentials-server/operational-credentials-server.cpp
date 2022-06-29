@@ -48,7 +48,6 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/DeviceControlServer.h>
 #include <string.h>
 #include <trace/trace.h>
 #if CHIP_CRYPTO_HSM
@@ -56,7 +55,6 @@
 #endif
 
 using namespace chip;
-using namespace ::chip::DeviceLayer;
 using namespace ::chip::Transport;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -338,14 +336,6 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
         {
             ChipLogError(Zcl, "OpCreds: failed to delete fabric at index %u: %" CHIP_ERROR_FORMAT, fabricIndex, err.Format());
         }
-    }
-
-    // If an UpdateNOC command had been successfully invoked, revert the state of operational key pair, NOC and ICAC for that
-    // Fabric to the state prior to the Fail-Safe timer being armed, for the Fabric Index that was the subject of the UpdateNOC
-    // command.
-    if (event->FailSafeTimerExpired.updateNocCommandHasBeenInvoked)
-    {
-        // TODO: Revert the state of operational key pair, NOC and ICAC
     }
 }
 
@@ -650,8 +640,8 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     FabricInfo * newFabricInfo = nullptr;
     auto & fabricTable         = Server::GetInstance().GetFabricTable();
 
-    auto * secureSession              = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
-    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto * secureSession   = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
 
     uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
     MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
@@ -737,8 +727,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
     // Index just allocated.
-    err = failSafeContext.SetAddNocCommandInvoked(newFabricIndex);
-    VerifyOrExit(err == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
+    failSafeContext.SetAddNocCommandInvoked(newFabricIndex);
 
     // Done all intermediate steps, we are now successful
     needRevert = false;
@@ -816,16 +805,15 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     auto nocResponse      = OperationalCertStatus::kSuccess;
     auto nonDefaultStatus = Status::Success;
-    bool needRevert       = false;
 
     CHIP_ERROR err          = CHIP_NO_ERROR;
     FabricIndex fabricIndex = 0;
 
     ChipLogProgress(Zcl, "OpCreds: Received an UpdateNOC command");
 
-    auto & fabricTable                = Server::GetInstance().GetFabricTable();
-    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
-    FabricInfo * fabricInfo           = RetrieveCurrentFabric(commandObj);
+    auto & fabricTable      = Server::GetInstance().GetFabricTable();
+    auto & failSafeContext  = Server::GetInstance().GetFailSafeContext();
+    FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
 
     bool csrWasForUpdateNoc = false; //< Output param of HasPendingOperationalKey
     bool hasPendingKey      = fabricTable.HasPendingOperationalKey(csrWasForUpdateNoc);
@@ -849,15 +837,8 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     err = fabricTable.UpdatePendingFabricWithOperationalKeystore(fabricIndex, NOCValue, ICACValue.ValueOr(ByteSpan{}));
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    // From here if we error-out, we should revert the fabric table pending updates
-    needRevert = true;
-
     // Flag on the fail-safe context that the UpdateNOC command was invoked.
-    err = failSafeContext.SetUpdateNocCommandInvoked();
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
-    // Done all intermediate steps, we are now successful
-    needRevert = false;
+    failSafeContext.SetUpdateNocCommandInvoked();
 
     // We might have a new operational identity, so we should start advertising
     // it right away.  Also, we need to withdraw our old operational identity.
@@ -866,11 +847,6 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     // Attribute notification was already done by fabric table
 exit:
-    if (needRevert)
-    {
-        fabricTable.RevertPendingOpCertsExceptRoot();
-    }
-
     // We have an NOC response
     if (nonDefaultStatus == Status::Success)
     {
@@ -1039,8 +1015,8 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
     // logs by the end. We use finalStatus as our overall success marker, not error
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
-    auto & fabricTable                = Server::GetInstance().GetFabricTable();
-    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & fabricTable     = Server::GetInstance().GetFabricTable();
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
 
     auto & CSRNonce     = commandData.CSRNonce;
     bool isForUpdateNoc = commandData.isForUpdateNOC.ValueOr(false);
@@ -1157,8 +1133,8 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     // logs by the end. We use finalStatus as our overall success marker, not error
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
-    auto & rootCertificate            = commandData.rootCertificate;
-    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & rootCertificate = commandData.rootCertificate;
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
 
     ChipLogProgress(Zcl, "OpCreds: Received an AddTrustedRootCertificate command");
 

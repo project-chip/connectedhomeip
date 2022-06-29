@@ -28,12 +28,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <app/FailSafeContext.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/DeviceControlServer.h>
 
 using namespace chip;
 using namespace chip::Logging;
@@ -58,7 +58,7 @@ static void TestFailSafeContext_ArmFailSafe(nlTestSuite * inSuite, void * inCont
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    chip::app::FailSafeContext failSafeContext;
 
     err = failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -75,53 +75,20 @@ static void TestFailSafeContext_NocCommandInvoked(nlTestSuite * inSuite, void * 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    chip::app::FailSafeContext failSafeContext;
 
     err = failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, failSafeContext.GetFabricIndex() == kTestAccessingFabricIndex1);
 
-    err = failSafeContext.SetAddNocCommandInvoked(kTestAccessingFabricIndex2);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    failSafeContext.SetAddNocCommandInvoked(kTestAccessingFabricIndex2);
     NL_TEST_ASSERT(inSuite, failSafeContext.NocCommandHasBeenInvoked() == true);
     NL_TEST_ASSERT(inSuite, failSafeContext.AddNocCommandHasBeenInvoked() == true);
     NL_TEST_ASSERT(inSuite, failSafeContext.GetFabricIndex() == kTestAccessingFabricIndex2);
 
-    err = failSafeContext.SetUpdateNocCommandInvoked();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    failSafeContext.SetUpdateNocCommandInvoked();
     NL_TEST_ASSERT(inSuite, failSafeContext.NocCommandHasBeenInvoked() == true);
     NL_TEST_ASSERT(inSuite, failSafeContext.UpdateNocCommandHasBeenInvoked() == true);
-
-    failSafeContext.DisarmFailSafe();
-}
-
-static void TestFailSafeContext_CommitToStorage(nlTestSuite * inSuite, void * inContext)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
-
-    err = failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, failSafeContext.GetFabricIndex() == kTestAccessingFabricIndex1);
-
-    err = failSafeContext.SetAddNocCommandInvoked(kTestAccessingFabricIndex1);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, failSafeContext.AddNocCommandHasBeenInvoked() == true);
-
-    err = failSafeContext.SetUpdateNocCommandInvoked();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, failSafeContext.UpdateNocCommandHasBeenInvoked() == true);
-
-    FabricIndex fabricIndex;
-    bool addNocCommandInvoked;
-    bool updateNocCommandInvoked;
-
-    err = FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, fabricIndex == kTestAccessingFabricIndex1);
-    NL_TEST_ASSERT(inSuite, addNocCommandInvoked == true);
-    NL_TEST_ASSERT(inSuite, updateNocCommandInvoked == true);
 
     failSafeContext.DisarmFailSafe();
 }
@@ -134,7 +101,6 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test PlatformMgr::Init", TestPlatformMgr_Init),
     NL_TEST_DEF("Test FailSafeContext::ArmFailSafe", TestFailSafeContext_ArmFailSafe),
     NL_TEST_DEF("Test FailSafeContext::NocCommandInvoked", TestFailSafeContext_NocCommandInvoked),
-    NL_TEST_DEF("Test FailSafeContext::CommitToStorage", TestFailSafeContext_CommitToStorage),
 
     NL_TEST_SENTINEL()
 };

@@ -20,20 +20,15 @@
  *          Provides the implementation of the FailSafeContext object.
  */
 
-#include <platform/FailSafeContext.h>
-
-#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
-#include <platform/ConfigurationManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+
+#include "FailSafeContext.h"
+
+using namespace chip::DeviceLayer;
 
 namespace chip {
-namespace DeviceLayer {
-
-namespace {
-constexpr TLV::Tag kFabricIndexTag      = TLV::ContextTag(0);
-constexpr TLV::Tag kAddNocCommandTag    = TLV::ContextTag(1);
-constexpr TLV::Tag kUpdateNocCommandTag = TLV::ContextTag(2);
-} // anonymous namespace
+namespace app {
 
 void FailSafeContext::HandleArmFailSafeTimer(System::Layer * layer, void * aAppState)
 {
@@ -89,7 +84,7 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
     PlatformMgr().ScheduleWork(HandleDisarmFailSafe, reinterpret_cast<intptr_t>(this));
 }
 
-CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength)
+CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Seconds16 expiryLengthSeconds)
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     bool cancelTimersIfError = false;
@@ -100,9 +95,8 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System
         cancelTimersIfError = true;
     }
 
-    SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafeTimer, this));
-    SuccessOrExit(err = CommitToStorage());
-    SuccessOrExit(err = ConfigurationMgr().SetFailSafeArmed(true));
+    SuccessOrExit(
+        err = DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(expiryLengthSeconds), HandleArmFailSafeTimer, this));
 
     mFailSafeArmed = true;
     mFabricIndex   = accessingFabricIndex;
@@ -124,94 +118,7 @@ void FailSafeContext::DisarmFailSafe()
 
     ResetState();
 
-    if (ConfigurationMgr().SetFailSafeArmed(false) != CHIP_NO_ERROR)
-    {
-        ChipLogError(FailSafe, "Failed to set FailSafeArmed config to false");
-    }
-
-    if (DeleteFromStorage() != CHIP_NO_ERROR)
-    {
-        ChipLogError(FailSafe, "Failed to delete FailSafeContext from configuration");
-    }
-
     ChipLogProgress(FailSafe, "Fail-safe cleanly disarmed");
-}
-
-CHIP_ERROR FailSafeContext::SetAddNocCommandInvoked(FabricIndex nocFabricIndex)
-{
-    mAddNocCommandHasBeenInvoked = true;
-    mFabricIndex                 = nocFabricIndex;
-
-    ReturnErrorOnFailure(CommitToStorage());
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR FailSafeContext::SetUpdateNocCommandInvoked()
-{
-    mUpdateNocCommandHasBeenInvoked = true;
-
-    ReturnErrorOnFailure(CommitToStorage());
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR FailSafeContext::CommitToStorage()
-{
-    DefaultStorageKeyAllocator keyAlloc;
-    uint8_t buf[FailSafeContextTLVMaxSize()];
-    TLV::TLVWriter writer;
-    writer.Init(buf);
-
-    TLV::TLVType outerType;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
-    ReturnErrorOnFailure(writer.Put(kFabricIndexTag, mFabricIndex));
-
-    // TODO: Stop storing this, and just make the fail-safe context volatile and sweep-up stale data next boot on partial commits
-    ReturnErrorOnFailure(writer.Put(kAddNocCommandTag, mAddNocCommandHasBeenInvoked));
-    ReturnErrorOnFailure(writer.Put(kUpdateNocCommandTag, mUpdateNocCommandHasBeenInvoked));
-    ReturnErrorOnFailure(writer.EndContainer(outerType));
-
-    const auto failSafeContextTLVLength = writer.GetLengthWritten();
-    VerifyOrReturnError(CanCastTo<uint16_t>(failSafeContextTLVLength), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    return PersistedStorage::KeyValueStoreMgr().Put(keyAlloc.FailSafeContextKey(), buf,
-                                                    static_cast<uint16_t>(failSafeContextTLVLength));
-}
-
-CHIP_ERROR FailSafeContext::LoadFromStorage(FabricIndex & fabricIndex, bool & addNocCommandInvoked, bool & updateNocCommandInvoked)
-{
-    DefaultStorageKeyAllocator keyAlloc;
-    uint8_t buf[FailSafeContextTLVMaxSize()];
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(keyAlloc.FailSafeContextKey(), buf, sizeof(buf)));
-
-    TLV::ContiguousBufferTLVReader reader;
-    reader.Init(buf, sizeof(buf));
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-
-    TLV::TLVType containerType;
-    ReturnErrorOnFailure(reader.EnterContainer(containerType));
-
-    ReturnErrorOnFailure(reader.Next(kFabricIndexTag));
-    ReturnErrorOnFailure(reader.Get(fabricIndex));
-
-    ReturnErrorOnFailure(reader.Next(kAddNocCommandTag));
-    ReturnErrorOnFailure(reader.Get(addNocCommandInvoked));
-
-    ReturnErrorOnFailure(reader.Next(kUpdateNocCommandTag));
-    ReturnErrorOnFailure(reader.Get(updateNocCommandInvoked));
-
-    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
-    ReturnErrorOnFailure(reader.ExitContainer(containerType));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR FailSafeContext::DeleteFromStorage()
-{
-    DefaultStorageKeyAllocator keyAlloc;
-
-    return PersistedStorage::KeyValueStoreMgr().Delete(keyAlloc.FailSafeContextKey());
 }
 
 void FailSafeContext::ForceFailSafeTimerExpiry()
@@ -228,5 +135,5 @@ void FailSafeContext::ForceFailSafeTimerExpiry()
     FailSafeTimerExpired();
 }
 
-} // namespace DeviceLayer
+} // namespace app
 } // namespace chip
