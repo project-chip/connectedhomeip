@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#include <credentials/CHIPCert.h>
-
 #include <lib/core/CHIPError.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -252,8 +250,8 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !storage.SyncDoesKeyExist(longKeyString));
 
-    // Test to see that we can buffer for largest size currentl known to be stored in PersistentStorageDelegate.
-    uint8_t largeBuffer[chip::Credentials::kMaxCHIPCertLength];
+    constexpr size_t kMaxCHIPCertLength = 400; // From credentials/CHIPCert.h and spec
+    uint8_t largeBuffer[kMaxCHIPCertLength];
     memset(&largeBuffer, 'X', sizeof(largeBuffer));
     uint8_t largeBufferForCheck[sizeof(largeBuffer)];
     memcpy(largeBufferForCheck, largeBuffer, sizeof(largeBuffer));
