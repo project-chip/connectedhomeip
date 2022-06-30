@@ -27,17 +27,17 @@
 #undef NL_TEST_ASSERT
 #endif
 
-#define NL_TEST_ASSERT(inSuite, inCondition)                              \
-    do {                                                                  \
-        (inSuite)->performedAssertions += 1;                              \
-                                                                          \
-        if (!(inCondition))                                               \
-        {                                                                 \
-            ChipLogError(Automation, "%s:%u: assertion failed: \"%s\"\n", \
-                         __FILE__, __LINE__, #inCondition);               \
-            (inSuite)->failedAssertions += 1;                             \
-            (inSuite)->flagError = true;                                  \
-        }                                                                 \
+#define NL_TEST_ASSERT(inSuite, inCondition)                                                                                       \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        (inSuite)->performedAssertions += 1;                                                                                       \
+                                                                                                                                   \
+        if (!(inCondition))                                                                                                        \
+        {                                                                                                                          \
+            ChipLogError(Automation, "%s:%u: assertion failed: \"%s\"\n", __FILE__, __LINE__, #inCondition);                       \
+            (inSuite)->failedAssertions += 1;                                                                                      \
+            (inSuite)->flagError = true;                                                                                           \
+        }                                                                                                                          \
     } while (0)
 
 namespace chip {
@@ -51,19 +51,19 @@ bool ExecutePersistentStorageApiAudit(PersistentStorageDelegate & storage)
     struct fakeTestSuite
     {
         int performedAssertions = 0;
-        int failedAssertions = 0;
-        bool flagError = false;
+        int failedAssertions    = 0;
+        bool flagError          = false;
     } theSuite;
     auto * inSuite = &theSuite;
 
     const char * kLongKeyString = "aKeyThatIsExactlyMaxKeyLengthhhh";
     // Start fresh.
-    (void)storage.SyncDeleteKeyValue("roboto");
-    (void)storage.SyncDeleteKeyValue("key2");
-    (void)storage.SyncDeleteKeyValue("key3");
-    (void)storage.SyncDeleteKeyValue("key4");
-    (void)storage.SyncDeleteKeyValue("keyDOES_NOT_EXIST");
-    (void)storage.SyncDeleteKeyValue(kLongKeyString);
+    (void) storage.SyncDeleteKeyValue("roboto");
+    (void) storage.SyncDeleteKeyValue("key2");
+    (void) storage.SyncDeleteKeyValue("key3");
+    (void) storage.SyncDeleteKeyValue("key4");
+    (void) storage.SyncDeleteKeyValue("keyDOES_NOT_EXIST");
+    (void) storage.SyncDeleteKeyValue(kLongKeyString);
 
     // ========== Start of actual audit from TestTestPersistentStorageDelegate.cpp =========
 
@@ -281,7 +281,9 @@ bool ExecutePersistentStorageApiAudit(PersistentStorageDelegate & storage)
     // ========== End of code from TestTestPersistentStorageDelegate.cpp =========
     if (inSuite->flagError)
     {
-        ChipLogError(Automation, "==== PersistentStorageDelegate API audit: FAILED: %d/%d failed assertions ====", inSuite->failedAssertions, inSuite->performedAssertions);
+        ChipLogError(Automation,
+                     "==== PersistentStorageDelegate API audit: FAILED: %d/%d failed assertions ====", inSuite->failedAssertions,
+                     inSuite->performedAssertions);
         return false;
     }
 
