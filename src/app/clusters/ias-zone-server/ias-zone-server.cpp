@@ -590,10 +590,10 @@ uint8_t emberAfPluginIasZoneServerGetZoneId(EndpointId endpoint)
 //------------------------------------------------------------------------------
 static bool areZoneServerAttributesNonVolatile(EndpointId endpoint)
 {
-    if (!emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::IasCieAddress::Id) ||
-        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneState::Id) ||
-        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneType::Id) ||
-        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneId::Id))
+    if (emberAfIsKnownVolatileAttribute(endpoint, IasZone::Id, Attributes::IasCieAddress::Id) ||
+        emberAfIsKnownVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneState::Id) ||
+        emberAfIsKnownVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneType::Id) ||
+        emberAfIsKnownVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneId::Id))
     {
         return false;
     }

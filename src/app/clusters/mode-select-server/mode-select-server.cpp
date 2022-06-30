@@ -147,7 +147,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                 Attributes::OnMode::TypeInfo::Type onMode;
                 bool onOffValueForStartUp = 0;
                 if (Attributes::OnMode::Get(endpointId, onMode) == EMBER_ZCL_STATUS_SUCCESS &&
-                    emberAfIsNonVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
+                    !emberAfIsKnownVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
                     OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
                 {
                     if (onOffValueForStartUp && !onMode.IsNull())
@@ -189,8 +189,8 @@ namespace {
  */
 inline bool areStartUpModeAndCurrentModeNonVolatile(EndpointId endpointId)
 {
-    return emberAfIsNonVolatileAttribute(endpointId, ModeSelect::Id, Attributes::CurrentMode::Id) &&
-        emberAfIsNonVolatileAttribute(endpointId, ModeSelect::Id, Attributes::StartUpMode::Id);
+    return !emberAfIsKnownVolatileAttribute(endpointId, ModeSelect::Id, Attributes::CurrentMode::Id) &&
+        !emberAfIsKnownVolatileAttribute(endpointId, ModeSelect::Id, Attributes::StartUpMode::Id);
 }
 
 } // namespace
