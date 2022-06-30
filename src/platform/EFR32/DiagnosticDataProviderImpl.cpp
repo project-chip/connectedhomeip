@@ -349,7 +349,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
     static uint8_t bssid[6];
     if (err == 0)
     {
-        memcpy(bssid,ap.bssid,6);
+        memcpy(bssid, ap.bssid, 6);
         BssId = ByteSpan(bssid, 6);
         return CHIP_NO_ERROR;
     }
