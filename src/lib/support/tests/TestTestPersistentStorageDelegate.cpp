@@ -225,6 +225,25 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, size == actualSizeOfBuf);
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], size));
 
+    // Using key and value with base64 symbols
+    const char * kBase64SymbolsKey   = "key+/=";
+    const char * kBase64SymbolValues = "value+/=";
+    err = storage.SyncSetKeyValue(kBase64SymbolsKey, kBase64SymbolValues, static_cast<uint16_t>(strlen(kBase64SymbolValues)));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    memset(&buf[0], 0, sizeof(buf));
+    size = actualSizeOfBuf;
+    err  = storage.SyncGetKeyValue(kBase64SymbolsKey, &buf[0], size);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, size == strlen(kBase64SymbolValues));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], kBase64SymbolValues, strlen(kBase64SymbolValues)));
+    // Make sure that there was no buffer overflow during SyncGetKeyValue
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[size], &all_zeroes[0], sizeof(buf) - size));
+
+    err = storage.SyncDeleteKeyValue(kBase64SymbolsKey);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, !storage.SyncDoesKeyExist(kBase64SymbolsKey));
+
     // Try using key that is a size that equals PersistentStorageDelegate::kKeyLengthMax
     char longKeyString[PersistentStorageDelegate::kKeyLengthMax + 1];
     memset(&longKeyString, 'X', PersistentStorageDelegate::kKeyLengthMax);
