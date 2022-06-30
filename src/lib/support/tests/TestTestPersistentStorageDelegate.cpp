@@ -56,7 +56,7 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
 
     uint8_t buf[16];
     const uint16_t actualSizeOfBuf = static_cast<uint16_t>(sizeof(buf));
-    uint16_t size = actualSizeOfBuf;
+    uint16_t size                  = actualSizeOfBuf;
 
     // Key not there
     CHIP_ERROR err;

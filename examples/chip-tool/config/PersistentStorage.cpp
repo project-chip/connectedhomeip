@@ -121,7 +121,7 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    uint16_t dataSize = static_cast<uint16_t>(iniValue.size());
+    uint16_t dataSize   = static_cast<uint16_t>(iniValue.size());
     uint16_t sizeToCopy = std::min(size, dataSize);
 
     memcpy(value, iniValue.data(), sizeToCopy);
