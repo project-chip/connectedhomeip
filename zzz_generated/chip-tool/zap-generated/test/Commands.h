@@ -531,11 +531,11 @@ public:
         printf("Test_TC_TFL_1_1\n");
         printf("Test_TC_TFL_1_2\n");
         printf("Test_TC_TFL_2_1\n");
-        printf("Test_TC_TFL_2_2\n");
+        printf("Test_TC_TFL_3_1\n");
         printf("Test_TC_UL_1_1\n");
         printf("Test_TC_UL_1_2\n");
         printf("Test_TC_UL_2_1\n");
-        printf("Test_TC_UL_2_2\n");
+        printf("Test_TC_UL_3_1\n");
         printf("Test_TC_FLABEL_1_1\n");
         printf("Test_TC_FLABEL_2_1\n");
         printf("Test_TC_FLABEL_2_2\n");
@@ -2694,10 +2694,6 @@ private:
             }
             break;
         case 26:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -2708,10 +2704,6 @@ private:
             }
             break;
         case 27:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -2722,10 +2714,6 @@ private:
             }
             break;
         case 28:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -2735,10 +2723,6 @@ private:
             }
             break;
         case 29:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint8_t value;
@@ -2749,10 +2733,6 @@ private:
             }
             break;
         case 30:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::CharSpan value;
@@ -2940,10 +2920,6 @@ private:
             }
             break;
         case 50:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -2954,10 +2930,6 @@ private:
             }
             break;
         case 51:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -2968,10 +2940,6 @@ private:
             }
             break;
         case 52:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -2982,10 +2950,6 @@ private:
             }
             break;
         case 53:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -2996,10 +2960,6 @@ private:
             }
             break;
         case 54:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -3008,10 +2968,6 @@ private:
             }
             break;
         case 55:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -3022,10 +2978,6 @@ private:
             }
             break;
         case 56:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -3036,10 +2988,6 @@ private:
             }
             break;
         case 57:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -3048,10 +2996,6 @@ private:
             }
             break;
         case 58:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -3062,10 +3006,6 @@ private:
             }
             break;
         case 59:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -3076,10 +3016,6 @@ private:
             }
             break;
         case 60:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -11373,11 +11309,13 @@ private:
         }
         case 1: {
             LogStep(1, "TH1 reads the BreadCrumb Attribute from the DUT");
+            VerifyOrDo(!ShouldSkip("CGEN.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                  GeneralCommissioning::Attributes::Breadcrumb::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "TH1 writes the BreadCrumb attribute as 1 to the DUT");
+            VerifyOrDo(!ShouldSkip("CGEN.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint64_t value;
             value = 1ULL;
@@ -11386,16 +11324,19 @@ private:
         }
         case 3: {
             LogStep(3, "TH1 reads the BreadCrumb attribute from the DUT");
+            VerifyOrDo(!ShouldSkip("CGEN.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                  GeneralCommissioning::Attributes::Breadcrumb::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "TH1 reads the RegulatoryConfig attribute from the DUT");
+            VerifyOrDo(!ShouldSkip("CGEN.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                  GeneralCommissioning::Attributes::RegulatoryConfig::Id, true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "TH1 reads the LocationCapability attribute from the DUT");
+            VerifyOrDo(!ShouldSkip("CGEN.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                  GeneralCommissioning::Attributes::LocationCapability::Id, true, chip::NullOptional);
         }
@@ -11403,6 +11344,7 @@ private:
             LogStep(6,
                     "TH1 reads BasicCommissioningInfo attribute from DUT and Verify that the BasicCommissioningInfo attribute has "
                     "the following field: FailSafeExpiryLengthSeconds field value is within a duration range of 0 to 65535");
+            VerifyOrDo(!ShouldSkip("CGEN.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                  GeneralCommissioning::Attributes::BasicCommissioningInfo::Id, true, chip::NullOptional);
         }
@@ -11418,6 +11360,7 @@ private:
         }
         case 8: {
             LogStep(8, "TH1 reads SupportsConcurrentConnection attribute from the DUT");
+            VerifyOrDo(!ShouldSkip("CGEN.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                  GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id, true, chip::NullOptional);
         }
@@ -72770,9 +72713,9 @@ class Test_TC_MF_1_19Suite : public TestCommand
 public:
     Test_TC_MF_1_19Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_19", 0, credsIssuerConfig)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
@@ -72784,9 +72727,9 @@ public:
     }
 
 private:
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<uint16_t> mTimeout;
 
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
@@ -85743,10 +85686,10 @@ private:
     }
 };
 
-class Test_TC_TFL_2_2Suite : public TestCommand
+class Test_TC_TFL_3_1Suite : public TestCommand
 {
 public:
-    Test_TC_TFL_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TFL_2_2", 0, credsIssuerConfig)
+    Test_TC_TFL_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TFL_3_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -85754,7 +85697,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_TFL_2_2Suite() {}
+    ~Test_TC_TFL_3_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -85967,10 +85910,10 @@ private:
     }
 };
 
-class Test_TC_UL_2_2Suite : public TestCommand
+class Test_TC_UL_3_1Suite : public TestCommand
 {
 public:
-    Test_TC_UL_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_UL_2_2", 0, credsIssuerConfig)
+    Test_TC_UL_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_UL_3_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -85978,7 +85921,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_UL_2_2Suite() {}
+    ~Test_TC_UL_3_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -87135,11 +87078,11 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_TFL_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_TFL_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_TFL_2_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_TFL_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TFL_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_UL_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_UL_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_UL_2_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_UL_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_UL_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_FLABEL_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_FLABEL_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_FLABEL_2_2Suite>(credsIssuerConfig),

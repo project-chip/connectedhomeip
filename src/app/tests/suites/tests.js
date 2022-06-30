@@ -446,14 +446,14 @@ function getManualTests() {
     'Test_TC_TFL_1_1',
     'Test_TC_TFL_1_2',
     'Test_TC_TFL_2_1',
-    'Test_TC_TFL_2_2',
+    'Test_TC_TFL_3_1',
   ];
 
   const UnitLocalization = [
     'Test_TC_UL_1_1',
     'Test_TC_UL_1_2',
     'Test_TC_UL_2_1',
-    'Test_TC_UL_2_2',
+    'Test_TC_UL_3_1',
   ];
 
   const FixedLabel = [

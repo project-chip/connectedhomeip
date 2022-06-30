@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.4. [TC-UL-2.2]Read and Write Unit Localization Cluster Attributes [DUT as
-    Server]
+    103.3.1. [TC-UL-3.1] Read and Write Unit Localization Cluster Attributes
+    [DUT as Server]
 
 config:
     nodeId: 0x12344321
@@ -24,6 +24,7 @@ config:
 
 tests:
     - label: "TH reads TemperatureUnit attribute from DUT"
+      PICS: LUNIT.S.A0000
       verification: |
           ./chip-tool unitlocalization read temperature-unit 1 0
           [1651186538224] [11210:117238] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_0000 DataVersion: 486381485
@@ -31,6 +32,7 @@ tests:
       disabled: true
 
     - label: "TH writes 0 to TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000.Fahrenheit
       verification: |
           ./chip-tool unitlocalization write temperature-unit 0 1 0
           [1651191017267] [13215:170815] CHIP: [DMG] WriteResponseMessage =
@@ -59,6 +61,7 @@ tests:
       disabled: true
 
     - label: "TH reads TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000
       verification: |
           ./chip-tool unitlocalization read temperature-unit 1 0
           [1651190135534] [12868:159849] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_0000 DataVersion: 486381486
@@ -66,6 +69,7 @@ tests:
       disabled: true
 
     - label: "TH writes 1 to TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000.Celsius
       verification: |
           ./chip-tool unitlocalization write temperature-unit 1 1 0
 
@@ -96,6 +100,7 @@ tests:
       disabled: true
 
     - label: "TH reads TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000
       verification: |
           ./chip-tool unitlocalization read temperature-unit 1 0
           [1651190800434] [13122:167909] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_0000 DataVersion: 486381489
@@ -103,6 +108,7 @@ tests:
       disabled: true
 
     - label: "TH writes 2 to TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000.Kelvin
       verification: |
           ./chip-tool unitlocalization write temperature-unit 2 1 0
           [1651190829573] [13133:168303] CHIP: [DMG] WriteResponseMessage =
@@ -132,8 +138,15 @@ tests:
       disabled: true
 
     - label: "TH reads TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000
       verification: |
           ./chip-tool unitlocalization read temperature-unit 1 0
           [1651190908005] [13164:169492] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_0000 DataVersion: 486381490
           [1651190908005] [13164:169492] CHIP: [TOO]   TemperatureUnit: 2
+      disabled: true
+
+    - label: "TH writes 5 to TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000
+      verification: |
+          Verify that the write request fails with 0x87 (Constraint Error)
       disabled: true

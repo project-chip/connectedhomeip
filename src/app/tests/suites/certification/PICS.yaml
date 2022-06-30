@@ -289,6 +289,251 @@ PICS:
     - label: "Does the device implement receiving the ColorLoopSet command?"
       id: CC.S.C44.Rsp
 
+    - label: "Does the DUT(server) support the Hue/Saturation feature?"
+      id: CC.S.F00
+
+    - label: "Does the DUT(server) support the Enhanced Hue feature?"
+      id: CC.S.F01
+
+    - label: "Does the DUT(server) support the Color Loop feature?"
+      id: CC.S.F02
+
+    - label: "Does the DUT(server) support the Color XY feature?"
+      id: CC.S.F03
+
+    - label: "Does the DUT(server) support the Color Temperature feature?"
+      id: CC.S.F04
+
+    - label: "Does the device implement the CurrentHue attribute?"
+      id: CC.C.A0000
+
+    - label: "Does the device implement the CurrentSaturation attribute?"
+      id: CC.C.A0001
+
+    - label: "Does the device implement the REMAININGTime attribute?"
+      id: CC.C.A0002
+
+    - label: "Does the device implement the CurrentX attribute?"
+      id: CC.C.A0003
+
+    - label: "Does the device implement the CurrentY attribute?"
+      id: CC.C.A0004
+
+    - label: "Does the device implement the DriftCompensation attribute?"
+      id: CC.C.A0005
+
+    - label: "Does the device implement the CompensationText attribute?"
+      id: CC.C.A0006
+
+    - label: "Does the device implement the ColorTemperatureMireds attribute?"
+      id: CC.C.A0007
+
+    - label: "Does the device implement the ColorMode attribute?"
+      id: CC.C.A0008
+
+    - label: "Does the device implement the Options attribute?"
+      id: CC.C.A000f
+
+    - label: "Does the device implement the EnhancedCurrentHue attribute?"
+      id: CC.C.A4000
+
+    - label: "Does the device implement the EnhancedColorMode attribute?"
+      id: CC.C.A4001
+
+    - label: "Does the device implement the ColorLoopActive attribute?"
+      id: CC.C.A4002
+
+    - label: "Does the device implement the ColorLoopDirection attribute?"
+      id: CC.C.A4003
+
+    - label: "Does the device implement the ColorLoopTime attribute?"
+      id: CC.C.A4004
+
+    - label:
+          "Does the device implement the ColorLoopStartEnhancedHue attribute?"
+      id: CC.C.A4005
+
+    - label:
+          "Does the device implement the ColorLoopStoredEnhancedHue attribute?"
+      id: CC.C.A4006
+
+    - label: "Does the device implement the ColorCapabilities attribute?"
+      id: CC.C.A400a
+
+    - label:
+          "Does the device implement the ColorTempPhysicalMinMireds attribute?"
+      id: CC.C.A400b
+
+    - label:
+          "Does the device implement the ColorTempPhysicalMaxMireds attribute?"
+      id: CC.C.A400c
+
+    - label:
+          "Does the device implement the CoupleColorTempToLevelMinMireds
+          attribute?"
+      id: CC.C.A400d
+
+    - label:
+          "Does the device implement the StartUPColorTemperatureMireds
+          attribute?"
+      id: CC.C.A4010
+
+    - label: "Does the device implement the NumberOfPrimaries attribute?"
+      id: CC.C.A0010
+
+    - label: "Does the device implement the Primary1X attribute?"
+      id: CC.C.A0011
+
+    - label: "Does the device implement the Primary1Y attribute?"
+      id: CC.C.A0012
+
+    - label: "Does the device implement the Primary1Intensity attribute?"
+      id: CC.C.A0013
+
+    - label: "Does the device implement the Primary2X attribute?"
+      id: CC.C.A0015
+
+    - label: "Does the device implement the Primary2Y attribute?"
+      id: CC.C.A0016
+
+    - label: "Does the device implement the Primary2Intensity attribute?"
+      id: CC.C.A0017
+
+    - label: "Does the device implement the Primary3X attribute?"
+      id: CC.C.A0019
+
+    - label: "Does the device implement the Primary3Y attribute?"
+      id: CC.C.A001a
+
+    - label: "Does the device implement the Primary3Intensity attribute?"
+      id: CC.C.A001b
+
+    - label: "Does the device implement the Primary4X attribute?"
+      id: CC.C.A0020
+
+    - label: "Does the device implement the Primary4Y attribute?"
+      id: CC.C.A0021
+
+    - label: "Does the device implement the PRIMAR41Intensity attribute?"
+      id: CC.C.A0022
+
+    - label: "Does the device implement the Primary5X attribute?"
+      id: CC.C.A0024
+
+    - label: "Does the device implement the Primary5Y attribute?"
+      id: CC.C.A0025
+
+    - label: "Does the device implement the Primary5Intensity attribute?"
+      id: CC.C.A0026
+
+    - label: "Does the device implement the Primary6X attribute?"
+      id: CC.C.A0028
+
+    - label: "Does the device implement the Primary6Y attribute?"
+      id: CC.C.A0029
+
+    - label: "Does the device implement the Primary6Intensity attribute?"
+      id: CC.C.A002a
+
+    - label: "Does the device implement the WhitePointX attribute?"
+      id: CC.C.A0030
+
+    - label: "Does the device implement the WhitePointY attribute?"
+      id: CC.C.A0031
+
+    - label: "Does the device implement the ColorPointRX attribute?"
+      id: CC.C.A0032
+
+    - label: "Does the device implement the ColorPointRY attribute?"
+      id: CC.C.A0033
+
+    - label: "Does the device implement the ColorPointRIntensity attribute?"
+      id: CC.C.A0034
+
+    - label: "Does the device implement the ColorPointGX attribute?"
+      id: CC.C.A0036
+
+    - label: "Does the device implement the ColorPointGY attribute?"
+      id: CC.C.A0037
+
+    - label: "Does the device implement the ColorPointGIntensity attribute?"
+      id: CC.C.A0038
+
+    - label: "Does the device implement the ColorPointBX attribute?"
+      id: CC.C.A003a
+
+    - label: "Does the device implement the ColorPointBY attribute?"
+      id: CC.C.A003b
+
+    - label: "Does the device implement the ColorPointBIntensity attribute?"
+      id: CC.C.A003c
+
+    - label: "Does the device implement receiving the MoveToHue command?"
+      id: CC.C.C00.Rsp
+
+    - label: "Does the device implement receiving the MoveHue command?"
+      id: CC.C.C01.Rsp
+
+    - label: "Does the device implement receiving the MoveToHue command?"
+      id: CC.C.C02.Rsp
+
+    - label: "Does the device implement receiving the MoveToSaturation command?"
+      id: CC.C.C03.Rsp
+
+    - label: "Does the device implement receiving the MoveSaturation command?"
+      id: CC.C.C04.Rsp
+
+    - label: "Does the device implement receiving the StepSaturation command?"
+      id: CC.C.C05.Rsp
+
+    - label:
+          "Does the device implement receiving the MoveToHueAndSaturation
+          command?"
+      id: CC.C.C06.Rsp
+
+    - label: "Does the device implement receiving the MoveToColor command?"
+      id: CC.C.C07.Rsp
+
+    - label: "Does the device implement receiving the MoveColor command?"
+      id: CC.C.C08.Rsp
+
+    - label: "Does the device implement receiving the StopMoveStep command?"
+      id: CC.C.C47.Rsp
+
+    - label: "Does the device implement receiving the StepColor command?"
+      id: CC.C.C09.Rsp
+
+    - label:
+          "Does the device implement receiving the MoveToColorTemperature
+          command?"
+      id: CC.C.C0A.Rsp
+
+    - label:
+          "Does the device implement receiving the MoveColorTemperature command?"
+      id: CC.C.C4B.Rsp
+
+    - label:
+          "Does the device implement receiving the StepColorTemperature command?"
+      id: CC.C.C4C.Rsp
+
+    - label:
+          "Does the device implement receiving the EnhancedMoveToHue command?"
+      id: CC.C.C40.Rsp
+
+    - label: "Does the device implement receiving the EnhancedMoveHue command?"
+      id: CC.C.C41.Rsp
+
+    - label: "Does the device implement receiving the EnhancedStepHue command?"
+      id: CC.C.C42.Rsp
+
+    - label:
+          "Does the device implement receiving the
+          EnhancedMoveToHueAndSaturation command?"
+      id: CC.C.C43.Rsp
+
+    - label: "Does the device implement receiving the ColorLoopSet command?"
+      id: CC.C.C44.Rsp
+
       # Relative Humidity cluster
     - label: "Does the device implement the MeasuredValue attribute?"
       id: A_RELATIVEHUMIDITY
@@ -838,21 +1083,6 @@ PICS:
     - label: "Does the device implement the Tolerance attribute?"
       id: FLW.S.A0003
 
-    - label: "Does the DUT(server) support the Hue/Saturation feature?"
-      id: CC.S.F00
-
-    - label: "Does the DUT(server) support the Enhanced Hue feature?"
-      id: CC.S.F01
-
-    - label: "Does the DUT(server) support the Color Loop feature?"
-      id: CC.S.F02
-
-    - label: "Does the DUT(server) support the Color XY feature?"
-      id: CC.S.F03
-
-    - label: "Does the DUT(server) support the Color Temperature feature?"
-      id: CC.S.F04
-
     - label: "Does the device support extended range and resolution?"
       id: PRS.S.F00
 
@@ -1077,7 +1307,166 @@ PICS:
 
     - label: "Does the MS device support Momentary Switch MultiPress?"
       id: SWTCH.S.F04
+
     - label:
           "Does the DUT(server) support the Behavior that supports lighting
           applications feature?"
       id: LVL.S.F01
+
+    #General Commissioning Cluster
+    - label: "Does the device(Server) support Breadcrumb attribute?"
+      id: CGEN.S.A0000
+
+    - label: "Does the device(Server) support BasicCommissioningInfo attribute?"
+      id: CGEN.S.A0001
+
+    - label: "Does the device(Server) support RegulatoryConfig attribute?"
+      id: CGEN.S.A0002
+
+    - label: "Does the device(Server) support LocationCapability attribute?"
+      id: CGEN.S.A0003
+
+    - label:
+          "Does the device(Server) support SupportsConcurrentConnection
+          attribute?"
+      id: CGEN.S.A0004
+
+    - label:
+          "Does the Device(Server) implement receiving the ArmFailSafe command?"
+      id: CGEN.S.C00.Rsp
+
+    - label:
+          "Does the Device(Server) invoking/generating the ArmFailSafeResponse
+          command?"
+      id: CGEN.S.C01.Tx
+
+    - label:
+          "Does the Device(Server) implement receiving the SetRegulatoryConfig
+          command?"
+      id: CGEN.S.C02.Rsp
+
+    - label:
+          "Does the Device(Server) invoking/generating the
+          SetRegulatoryConfigResponse command?"
+      id: CGEN.S.C03.Tx
+
+    - label:
+          "Does the Device(Server) implement receiving the CommissioningComplete
+          command?"
+      id: CGEN.S.C04.Rsp
+
+    - label:
+          "Does the Device(Server) invoking/generating the
+          CommissioningCompleteResponse command?"
+      id: CGEN.S.C05.Tx
+
+    #OTA Software Update
+    - label: "Does the DUT implement the OTA Requestor Device Type?"
+      id: MCORE.OTA.Requestor
+
+    - label: "Does the DUT implement the OTA Provider Device Type?"
+      id: MCORE.OTA.Provider
+
+    - label: "Does the DUT support the HTTPS Protocol for OTA image download?"
+      id: MCORE.OTA.HTTPS
+
+    - label:
+          "Does the DUT support obtaining user consent for OTA application by
+          virtue of built-in user interface capabilities?"
+      id: MCORE.OTA.RequestorConsent
+
+    - label: "Does the DUT support resumption of a transfer previously aborted?"
+      id: MCORE.OTA.Resume
+
+    - label: "Does the DUT support Vendor specific OTA implementation?"
+      id: MCORE.OTA.VendorSpecific
+
+    - label:
+          "Does the DUT have Administer privilege over the Access Control of
+          another node?"
+      id: MCORE.ACL.Administrator
+
+    - label:
+          "Does the DUT support sending the DelayedActionTime field in
+          QueryImageResponse Command?"
+      id: OTAS.S.M.DelayedActionTime
+
+    - label:
+          "Does the DUT support sending the UserConsentNeeded field in
+          QueryImageResponse Command?"
+      id: OTAS.S.M.UserConsentNeeded
+
+    - label: "Does the DUT support sending the AnnounceOTAProvider Command?"
+      id: OTAC.C.M.AnnounceOTAProvider
+
+    - label: "Does the DUT support sending the NotifyUpdateApplied Command?"
+      id: OTAC.C.M.NotifyUpdateApplied
+
+    #Time Format Localization Cluster
+    - label: "Does the DUT (Server) support HourFormat attribute?"
+      id: LTIME.S.A0000
+
+    - label: "Does the DUT (Server) support ActiveCalendarType attribute?"
+      id: LTIME.S.A0001
+
+    - label: "Does the DUT (Server) support SupportedCalendarTypes attribute?"
+      id: LTIME.S.A0002
+
+    - label: "PIXIT of the list of DUT SupportedCalendarTypes"
+      id: LTIME.S.A0002.SCT
+
+    - label: "Does the DUT (Server) support 12 Hr Hour Format"
+      id: LTIME.S.A0000.12HR
+
+    - label: "Does the DUT (Server) support 24 Hr Hour Format"
+      id: LTIME.S.A0000.24HR
+
+    - label: "Does the DUT (Client) support HourFormat attribute?"
+      id: LTIME.C.A0000
+
+    - label: "Does the DUT (Client) supportActiveCalendarType attribute?"
+      id: LTIME.C.A0001
+
+    - label: "Does the DUT (Client) support SupportedCalendarTypes attribute?"
+      id: LTIME.C.A0002
+
+    - label: "PIXIT of the list of DUT SupportedCalendarTypes"
+      id: LTIME.C.A0002.SCT
+
+    - label: "Does the DUT (Client) support 12 Hr Hour Format"
+      id: LTIME.C.A0000.12HR
+
+    - label: "Does the DUT (Client) support 24 Hr Hour Format"
+      id: LTIME.C.A0000.24HR
+
+    #Unit Localization Cluster
+    - label: "Does the DUT (Server) support TemperatureUnit attribute?"
+      id: LUNIT.S.A0000
+
+    - label: "Does the DUT (Server) support Fahrenheit TemperatureUnit?"
+      id: LUNIT.S.A0000.Fahrenheit
+
+    - label: "Does the DUT (Server) support Celsius TemperatureUnit?"
+      id: LUNIT.S.A0000.Celsius
+
+    - label: "Does the DUT (Server) support Kelvin TemperatureUnit?"
+      id: LUNIT.S.A0000.Kelvin
+
+    - label: "Does the DUT (Client) support TemperatureUnit attribute?"
+      id: LUNIT.C.A0000
+
+    - label: "Does the DUT (Client) support Fahrenheit TemperatureUnit?"
+      id: LUNIT.C.A0000.Fahrenheit
+
+    - label: "Does the DUT (Client) support Celsius TemperatureUnit?"
+      id: LUNIT.C.A0000.Celsius
+
+    - label: "Does the DUT (Client) support Kelvin TemperatureUnit?"
+      id: LUNIT.C.A0000.Kelvin
+
+    #Multiple Fabrics
+    - label: "Does the DUT support Multiple Fabrics?"
+      id: PICS_MF
+
+    - label: "Does the DUT support Basic Commissioning Method (BCM)?"
+      id: PICS_MF_BCM
