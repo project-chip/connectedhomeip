@@ -98,6 +98,7 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = storage.SyncSetKeyValue("key3", kStringValue3, static_cast<uint16_t>(strlen(kStringValue3)));
+    NL_TEST_ASSERT(inSuite, storage.SyncDoesKeyExist("key3"));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == 2);
@@ -107,59 +108,64 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
 
     // Read them back
 
+    uint8_t all_zeroes[sizeof(buf)];
+    memset(&all_zeroes[0], 0, sizeof(all_zeroes));
+
     memset(&buf[0], 0, sizeof(buf));
     size = sizeof(buf);
     err  = storage.SyncGetKeyValue("key2", &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, size == strlen(kStringValue2));
+    NL_TEST_ASSERT(inSuite, size < sizeof(buf));
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], kStringValue2, strlen(kStringValue2)));
+    // Make sure that there was no buffer overflow during SyncGetKeyValue
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[size], &all_zeroes[0], sizeof(buf) - size));
 
     memset(&buf[0], 0, sizeof(buf));
     size = sizeof(buf);
     err  = storage.SyncGetKeyValue("key3", &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, size == strlen(kStringValue3));
+    NL_TEST_ASSERT(inSuite, size < sizeof(buf));
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], kStringValue3, strlen(kStringValue3)));
-
-    memset(&buf[0], 0, sizeof(buf));
-    size = sizeof(buf);
-    err  = storage.SyncGetKeyValue("key2", &buf[0], size);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, size == strlen(kStringValue2));
-    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], kStringValue2, strlen(kStringValue2)));
+    // Make sure that there was no buffer overflow during SyncGetKeyValue
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[size], &all_zeroes[0], sizeof(buf) - size));
 
     // Pre-clear buffer to make sure next operations don't change contents
-    uint8_t all_zeroes[sizeof(buf)];
     memset(&buf[0], 0, sizeof(buf));
-    memset(&all_zeroes[0], 0, sizeof(all_zeroes));
 
-    // Read in too small a buffer: no data read, but correct size given
+    // Read providing too small a buffer. Data read up to `size` and nothing more.
     memset(&buf[0], 0, sizeof(buf));
     size = static_cast<uint16_t>(strlen(kStringValue2) - 1);
+    uint16_t sizeBeforeGetKeyValueCall = size;
     err  = storage.SyncGetKeyValue("key2", &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
-    NL_TEST_ASSERT(inSuite, size == strlen(kStringValue2));
-    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], sizeof(buf)));
+    NL_TEST_ASSERT(inSuite, size != strlen(kStringValue2));
+    NL_TEST_ASSERT(inSuite, size == sizeBeforeGetKeyValueCall);
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], kStringValue2, size));
+    // Make sure that there was no buffer overflow during SyncGetKeyValue
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[size], &all_zeroes[0], sizeof(buf) - size));
 
     // Read in too small a buffer, which is nullptr and size == 0: check correct size given
+    memset(&buf[0], 0, sizeof(buf));
     size = 0;
+    sizeBeforeGetKeyValueCall = size;
     err  = storage.SyncGetKeyValue("key2", nullptr, size);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
-    NL_TEST_ASSERT(inSuite, size == strlen(kStringValue2));
+    NL_TEST_ASSERT(inSuite, size != strlen(kStringValue2));
+    NL_TEST_ASSERT(inSuite, size == sizeBeforeGetKeyValueCall);
+    // Just making sure that implementation doesn't hold onto reference of previous destination buffer when
+    // nullptr is provided.
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], sizeof(buf)));
 
     // Read in too small a buffer, which is nullptr and size != 0: error
     size = static_cast<uint16_t>(strlen(kStringValue2) - 1);
+    sizeBeforeGetKeyValueCall = size;
     err  = storage.SyncGetKeyValue("key2", nullptr, size);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], sizeof(buf)));
-
-    // Read in zero size buffer, which is also nullptr (i.e. just try to find if key exists without
-    // using a buffer).
-    size = 0;
-    err  = storage.SyncGetKeyValue("key2", nullptr, size);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
-    NL_TEST_ASSERT(inSuite, size == strlen(kStringValue2));
+    NL_TEST_ASSERT(inSuite, size == sizeBeforeGetKeyValueCall);
+    // Just making sure that implementation doesn't hold onto reference of previous destination buffer when
+    // nullptr is provided.
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], sizeof(buf)));
 
     // When key not found, size is not touched.
@@ -185,16 +191,28 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     // Attempt an empty key write with either nullptr or zero size works
     err = storage.SyncSetKeyValue("key2", kStringValue2, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, storage.SyncDoesKeyExist("key2"));
 
     size = 0;
     err  = storage.SyncGetKeyValue("key2", &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, size == 0);
 
+    size = static_cast<uint16_t>(sizeof(buf));
+    err  = storage.SyncGetKeyValue("key2", &buf[0], size);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, size == 0);
+
     err = storage.SyncSetKeyValue("key2", nullptr, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, storage.SyncDoesKeyExist("key2"));
 
     size = 0;
+    err  = storage.SyncGetKeyValue("key2", &buf[0], size);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, size == 0);
+
+    size = static_cast<uint16_t>(sizeof(buf));
     err  = storage.SyncGetKeyValue("key2", &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, size == 0);
@@ -203,15 +221,50 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     size = 10;
     err  = storage.SyncSetKeyValue("key4", nullptr, size);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, !storage.SyncDoesKeyExist("key4"));
 
     // Can delete empty key
     err = storage.SyncDeleteKeyValue("key2");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    NL_TEST_ASSERT(inSuite, !storage.SyncDoesKeyExist("key2"));
+
     size = static_cast<uint16_t>(sizeof(buf));
     err  = storage.SyncGetKeyValue("key2", &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     NL_TEST_ASSERT(inSuite, size == sizeof(buf));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], size));
+
+    // Try using key that is a size that equals PersistentStorageDelegate::kKeyLengthMax
+    const char * kLongKeyString = "aKeyThatIsExactlyMaxKeyLengthhhh";
+    // strlen() is not compile time so we just have this runtime assert that should aways pass as a sanity check.
+    NL_TEST_ASSERT(inSuite, strlen(kLongKeyString) == PersistentStorageDelegate::kKeyLengthMax);
+    // TODO is what we have above what we are looking for of when strlen including null terminated character is
+    // PersistentStorageDelegate::kKeyLengthMax static_assert(sizeof(kLongKeyString) == PersistentStorageDelegate::kKeyLengthMax,
+    // "testing for");
+
+    err = storage.SyncSetKeyValue(kLongKeyString, kStringValue2, static_cast<uint16_t>(strlen(kStringValue2)));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    memset(&buf[0], 0, sizeof(buf));
+    size = sizeof(buf);
+    err  = storage.SyncGetKeyValue(kLongKeyString, &buf[0], size);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, size == strlen(kStringValue2));
+    NL_TEST_ASSERT(inSuite, size < sizeof(buf));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], kStringValue2, strlen(kStringValue2)));
+    // Make sure that there was no buffer overflow during SyncGetKeyValue
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[size], &all_zeroes[0], sizeof(buf) - size));
+
+    NL_TEST_ASSERT(inSuite, storage.SyncDoesKeyExist(kLongKeyString));
+
+    err = storage.SyncDeleteKeyValue(kLongKeyString);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, !storage.SyncDoesKeyExist(kLongKeyString));
+
+    // Cleaning up
+    err = storage.SyncDeleteKeyValue("key3");
+    NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == 0);
 }
 
 // ClearStorage is not a PersistentStorageDelegate base class method, it only

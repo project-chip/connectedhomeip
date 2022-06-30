@@ -213,15 +213,22 @@ protected:
 
         std::vector<uint8_t> & value = mStorage[key];
         size_t valueSize             = value.size();
-        if (size < valueSize)
+        if (!CanCastTo<uint16_t>(valueSize))
         {
-            size = CanCastTo<uint16_t>(valueSize) ? static_cast<uint16_t>(valueSize) : 0;
+            return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+        }
+
+        if ((buffer == nullptr) && (size == 0))
+        {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
 
-        size = static_cast<uint16_t>(valueSize);
+        uint16_t valueSizeUint16 = static_cast<uint16_t>(valueSize);
+        uint16_t sizeToCopy      = std::min(size, valueSizeUint16);
+
+        size = static_cast<uint16_t>(sizeToCopy);
         memcpy(buffer, value.data(), size);
-        return CHIP_NO_ERROR;
+        return size < valueSizeUint16 ? CHIP_ERROR_BUFFER_TOO_SMALL : CHIP_NO_ERROR;
     }
 
     virtual CHIP_ERROR SyncSetKeyValueInternal(const char * key, const void * value, uint16_t size)
