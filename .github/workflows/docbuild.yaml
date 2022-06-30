@@ -48,6 +48,8 @@ jobs:
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          deploy_key: ${{ secrets.DOXYGEN_DEPLOY_KEY }}
+          external_repository: project-chip/connectedhomeip-doc
           publish_dir: matter/docs/_build/html
-          destination_dir: docs
+          # Keep only the latest version of the documentation
+          force_orphan: true
