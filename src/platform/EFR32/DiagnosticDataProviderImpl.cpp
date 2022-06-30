@@ -346,9 +346,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
 {
     wfx_wifi_scan_result_t ap;
     int32_t err = wfx_get_ap_info(&ap);
+    static uint8_t bssid[6];
     if (err == 0)
     {
-        BssId = ByteSpan(ap.bssid, 6);
+        memcpy(bssid,ap.bssid,6);
+        BssId = ByteSpan(bssid, 6);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
