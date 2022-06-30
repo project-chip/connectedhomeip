@@ -103,10 +103,7 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 {
     std::string iniValue;
 
-    if ((value == nullptr) && (size != 0))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    ReturnErrorCodeIf((value == nullptr) && (size != 0)), CHIP_ERROR_INVALID_ARGUMENT);
 
     auto section = mConfig.sections[kDefaultSectionName];
     auto it      = section.find(key);

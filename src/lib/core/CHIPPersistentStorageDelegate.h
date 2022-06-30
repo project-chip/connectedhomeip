@@ -49,9 +49,11 @@ public:
      *   If a key is found and the `buffer`'s `size` is large enough, then the value will
      *   be copied to `buffer` and `size` will be updated to the actual size used.
      *
-     *   Whenever the passed `size` is smaller than needed and the key exists in storage,
-     *   the error CHIP_ERROR_BUFFER_TOO_SMALL will be given. The `buffer` will be filled
-     *   up to`size`. It is legal to use `nullptr` for `buffer` if `size` is 0.
+     *   Whenever the passed `size` is smaller than the value for which the key exists in storage,
+     *   CHIP_ERROR_BUFFER_TOO_SMALL will be given, but the `buffer` will still be filled `size`
+     *   bytes of the stored value.
+     *
+     *   It is legal to use `nullptr` for `buffer` if `size` is 0.
      *
      * @param[in]      key Key to lookup
      * @param[out]     buffer Pointer to a buffer where the place the read value.
@@ -91,20 +93,18 @@ public:
     /**
      * @brief
      *   Helper function that identifies if a key exists.
+     * 
+     *   This may be overridden to provide an implementation that is simpler or more direct.
      *
      * @param[in] key Key to check if it exist
      *
-     * @return true if key exists in storage, false if key does not exist in storage.
+     * @return true if key exists in storage. It returns false if key does not exist in storage or an internal error arises.
      */
-    bool SyncDoesKeyExist(const char * key)
+    virtual bool SyncDoesKeyExist(const char * key)
     {
         uint16_t size  = 0;
         CHIP_ERROR err = SyncGetKeyValue(key, nullptr, size);
-        if (err == CHIP_ERROR_BUFFER_TOO_SMALL || err == CHIP_NO_ERROR)
-        {
-            return true;
-        }
-        return false;
+        return (err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_NO_ERROR);
     }
 };
 

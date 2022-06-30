@@ -52,14 +52,10 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key
         uint16_t valueSize = static_cast<uint16_t>([value length]);
         if (valueSize > size) {
             error = CHIP_ERROR_BUFFER_TOO_SMALL;
-            if (size != 0) {
-                // buffer is known to be non-null here.
-                memcpy(buffer, [value bytes], size);
-            }
-            return error;
+        } else {
+            size = valueSize;
         }
 
-        size = valueSize;
         if (size != 0) {
             // buffer is known to be non-null here.
             memcpy(buffer, [value bytes], size);
