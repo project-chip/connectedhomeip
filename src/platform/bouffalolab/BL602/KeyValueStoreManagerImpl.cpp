@@ -111,7 +111,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 //                                           size_t offset_bytes) const
 // {
 //     assert(CHIP_KVS_AVAILABLE);
-//     auto status_and_size = mKvs.Get(key, std::span<std::byte>(reinterpret_cast<std::byte *>(value), value_size), offset_bytes);
+//     auto status_and_size = mKvs.Get(key, pw::span<std::byte>(reinterpret_cast<std::byte *>(value), value_size), offset_bytes);
 //     if (read_bytes_size)
 //     {
 //         *read_bytes_size = status_and_size.size();
@@ -139,7 +139,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 // CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 // {
 //     assert(CHIP_KVS_AVAILABLE);
-//     auto status = mKvs.Put(key, std::span<const std::byte>(reinterpret_cast<const std::byte *>(value), value_size));
+//     auto status = mKvs.Put(key, pw::span<const std::byte>(reinterpret_cast<const std::byte *>(value), value_size));
 //     switch (status.code())
 //     {
 //     case pw::OkStatus().code():
