@@ -27,9 +27,7 @@
 #include <app/OperationalDeviceProxy.h>
 
 #include <app/CASEClient.h>
-#include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
-#include <app/ReadPrepareParams.h>
 #include <transport/SecureSession.h>
 
 #include <lib/address_resolve/AddressResolve.h>

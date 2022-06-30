@@ -184,7 +184,7 @@ public:
          *      - Always be called exactly *once* for a given ReadClient instance.
          *      - Be called even in error circumstances.
          *      - Only be called after a successful call to SendRequest has been
-         *        made, when the read completes or the subscription is shut down.  *
+         *        made, when the read completes or the subscription is shut down.
          * @param[in] apReadClient the ReadClient for the completed interaction.
          */
         virtual void OnDone(ReadClient * apReadClient) = 0;
@@ -343,7 +343,7 @@ public:
 
     //
     // Computes the time till the next re-subscription with millisecond resolution over
-    // an even increasing window following a fibonacci sequence with the current retry count
+    // an ever increasing window following a fibonacci sequence with the current retry count
     // used as input to the fibonacci algorithm.
     //
     // CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX is used as the maximum ceiling for that input.

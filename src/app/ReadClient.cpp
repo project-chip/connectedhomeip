@@ -775,7 +775,7 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
     ChipLogProgress(
         DataManagement,
         "Refresh LivenessCheckTime for %lu milliseconds with SubscriptionId = 0x%08" PRIx32 " Peer = %02x:" ChipLogFormatX64,
-        static_cast<long unsigned>(timeout.count()), mSubscriptionId, mPeer.GetFabricIndex(), ChipLogValueX64(mPeer.GetNodeId()));
+        static_cast<long unsigned>(timeout.count()), mSubscriptionId, GetFabricIndex(), ChipLogValueX64(GetPeerNodeId()));
     err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
         timeout, OnLivenessTimeoutCallback, this);
 
@@ -812,7 +812,7 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
 
     ChipLogError(DataManagement,
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
-                 _this->mSubscriptionId, _this->mPeer.GetFabricIndex(), ChipLogValueX64(_this->mPeer.GetNodeId()));
+                 _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
     // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
     // response timeouts).
@@ -839,8 +839,7 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     ChipLogProgress(DataManagement,
                     "Subscription established with SubscriptionID = 0x%08" PRIx32 " MinInterval = %u"
                     "s MaxInterval = %us Peer = %02x:" ChipLogFormatX64,
-                    mSubscriptionId, mMinIntervalFloorSeconds, mMaxInterval, mPeer.GetFabricIndex(),
-                    ChipLogValueX64(mPeer.GetNodeId()));
+                    mSubscriptionId, mMinIntervalFloorSeconds, mMaxInterval, GetFabricIndex(), ChipLogValueX64(GetPeerNodeId()));
 
     ReturnErrorOnFailure(subscribeResponse.ExitContainer());
 
@@ -990,7 +989,6 @@ void ReadClient::HandleDeviceConnected(void * context, OperationalDeviceProxy * 
     ReadClient * const _this = static_cast<ReadClient *>(context);
     VerifyOrDie(_this != nullptr);
 
-    _this->mReadPrepareParams.mSessionHolder.Release();
     _this->mReadPrepareParams.mSessionHolder.Grab(device->GetSecureSession().Value());
 
     auto err = _this->SendSubscribeRequest(_this->mReadPrepareParams);
@@ -1005,19 +1003,18 @@ void ReadClient::HandleDeviceConnectionFailure(void * context, PeerId peerId, CH
     ReadClient * const _this = static_cast<ReadClient *>(context);
     VerifyOrDie(_this != nullptr);
 
-    ChipLogError(DataManagement, "Failed connecting to device with error '%s'", err.AsString());
+    ChipLogError(DataManagement, "Failed to establish CASE for re-subscription with error '%" CHIP_ERROR_FORMAT "'", err.Format());
 
     auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
     VerifyOrDie(caseSessionManager != nullptr);
 
-    caseSessionManager->ReleaseSession(peerId);
     _this->Close(err);
 }
 
 void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState)
 {
     ReadClient * const _this = static_cast<ReadClient *>(apAppState);
-    assert(_this != nullptr);
+    VerifyOrDie(_this != nullptr);
 
     CHIP_ERROR err;
 
@@ -1027,15 +1024,18 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
     if (_this->mDoCaseOnNextResub)
     {
         auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
-        VerifyOrDie(caseSessionManager != nullptr);
+        VerifyOrExit(caseSessionManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-        auto fabric =
-            InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->GetFabricTable()->FindFabricWithIndex(
-                _this->mPeer.GetFabricIndex());
+        auto fabric = InteractionModelEngine::GetInstance()->GetFabricTable()->FindFabricWithIndex(_this->GetFabricIndex());
+
+        //
+        // Temporary until #21084 is addressed. This object would have been synchronously cleaned-up
+        // when a fabric has gone away, and this condition should never arise.
+        //
         VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_FABRIC_INDEX;
                      ChipLogError(DataManagement, "Underlying fabric has gone away, stopping re-subscriptions!"););
 
-        PeerId peerId(fabric->GetCompressedFabricId(), _this->mPeer.GetNodeId());
+        PeerId peerId(fabric->GetCompressedFabricId(), _this->GetPeerNodeId());
 
         auto proxy = caseSessionManager->FindExistingSession(peerId);
         if (proxy != nullptr)
@@ -1053,10 +1053,12 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         //
-        // Call Close (which should trigger re-subscription again) EXCEPT if we got here because we didn't have a valid fabric.
+        // Call Close (which should trigger re-subscription again) EXCEPT if we got here because we didn't have a valid fabric,
+        // or an invalid CASESessionManager pointer when mDoCaseOnNextResub was true.
+        //
         // In that case, don't permit re-subscription to occur.
         //
-        _this->Close(err, err != CHIP_ERROR_INVALID_FABRIC_INDEX);
+        _this->Close(err, err != CHIP_ERROR_INVALID_FABRIC_INDEX && err != CHIP_ERROR_INCORRECT_STATE);
     }
 }
 

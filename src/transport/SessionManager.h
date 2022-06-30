@@ -126,8 +126,6 @@ public:
     SessionManager();
     ~SessionManager() override;
 
-    FabricTable * GetFabricTable() const { return mFabricTable; }
-
     /**
      * @brief
      *   This function takes the payload and returns an encrypted message which can be sent multiple times.

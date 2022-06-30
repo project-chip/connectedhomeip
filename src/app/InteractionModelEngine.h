@@ -118,7 +118,14 @@ public:
     void Shutdown();
 
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; }
+
+    /**
+     * Returns a pointer to the CASESessionManager. This can return nullptr if one wasn't
+     * provided in the call to Init().
+     */
     CASESessionManager * GetCASESessionManager() const { return mpCASESessionMgr; }
+
+    FabricTable * GetFabricTable() const { return mpFabricTable; }
 
     /**
      * Tears down an active subscription.
