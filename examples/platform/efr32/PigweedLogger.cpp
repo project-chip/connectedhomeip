@@ -52,7 +52,7 @@ static char sWriteBuffer[kWriteBufferSize];
 
 static void send(void)
 {
-    pw::hdlc::WriteUIFrame(kLogHdlcAddress, pw::as_bytes(std::span(sWriteBuffer, sWriteBufferPos)), sWriter);
+    pw::hdlc::WriteUIFrame(kLogHdlcAddress, pw::as_bytes(pw::span(sWriteBuffer, sWriteBufferPos)), sWriter);
     sWriteBufferPos = 0;
 }
 
