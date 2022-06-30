@@ -12,6 +12,7 @@
 #import "MTRCommandPayloadsObjc.h"
 
 #include <lib/support/CHIPListUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <type_traits>
 
 using chip::Callback::Callback;
@@ -28,7 +29,10 @@ using namespace chip::app::Clusters;
             return nil;
         }
 
-        *[self cppClusterSlot] = new chip::Controller::{{asUpperCamelCase name}}Cluster(*[device internalDevice]->GetExchangeManager(), [device internalDevice]->GetSecureSession().Value(), endpoint);
+        // Must allocate cppCluster on the Matter queue.
+        dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+          *[self cppClusterSlot] = new chip::Controller::{{asUpperCamelCase name}}Cluster(*[device internalDevice]->GetExchangeManager(), [device internalDevice]->GetSecureSession().Value(), endpoint);
+        });
         if (self.cppCluster == nullptr) {
             return nil;
         }
@@ -218,9 +222,12 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 - (void)dealloc
 {
-    if (self.cppCluster != nullptr) {
-        delete self.cppCluster;
-    }
+    // Must delete cppCluster on the Matter queue.
+    dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+        if (self.cppCluster != nullptr) {
+            delete self.cppCluster;
+        }
+    });
 }
 
 @end

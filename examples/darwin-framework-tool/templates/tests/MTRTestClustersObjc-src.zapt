@@ -26,6 +26,7 @@ using namespace chip::app::Clusters;
 {{#chip_client_clusters includeAll=true}}
 
 @interface MTRTest{{asUpperCamelCase name}} ()
+// Must only touch cppCluster on the Matter queue.
 @property (readonly) chip::Controller::{{asUpperCamelCase name}}Cluster * cppCluster;
 @end
 
