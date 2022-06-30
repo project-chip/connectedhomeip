@@ -201,8 +201,8 @@ limitations under the License.
     <item value="0xA2" name="BatteryCoverRemoved"/>
     <item value="0xA3" name="BatteryCoverClosed"/>
     <item value="0xA4" name="ExcessFlow"/>
-    <item value="0xC0" name="CreditOk"/>
-    <item value="0xC1" name="LowCredit"/>
+    <item value="0xB0" name="CreditOk"/>
+    <item value="0xB1" name="LowCredit"/>
     <item value="0xC0" name="EmergencyCreditInUse"/>
     <item value="0xC1" name="EmergencyCreditExhausted"/>
     <item value="0xC2" name="ZeroCreditEcNotSelected"/>

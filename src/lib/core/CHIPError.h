@@ -1394,13 +1394,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_LISTENER_ALREADY_STOPPED                    CHIP_CORE_ERROR(0x6a)
 
 /**
- *  @def CHIP_ERROR_UNKNOWN_TOPIC
+ *  @def CHIP_ERROR_UNKNOWN_ENUM_VALUE
  *
  *  @brief
- *    A topic ID was unknown to the recipient.
+ *    A enum value was unknown to the recipient.
  *
  */
-#define CHIP_ERROR_UNKNOWN_TOPIC                               CHIP_CORE_ERROR(0x6b)
+#define CHIP_ERROR_UNKNOWN_ENUM_VALUE                               CHIP_CORE_ERROR(0x6b)
 
 /**
  *  @def CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
