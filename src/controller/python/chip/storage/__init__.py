@@ -46,23 +46,29 @@ def _OnSyncSetKeyValueCb(storageObj, key: str, value, size):
 
 @_SyncGetKeyValueCbFunct
 def _OnSyncGetKeyValueCb(storageObj, key: str, value, size):
+    ''' This does not adhear API requirement of
+    PersistentStorageDelegate::SyncGetKeyValue, but that is okay since
+    the caller to is capable of converting results from calling this
+    to the requirements of PersistentStorageDelegate::SyncGetKeyValue.
+    '''
     try:
         keyValue = storageObj.GetSdkKey(key.decode("utf-8"))
     except Exception as ex:
         keyValue = None
 
     if (keyValue):
-        if (size[0] < len(keyValue)):
-            size[0] = len(keyValue)
-            return
+        sizeOfValue = size[0]
+        sizeToCopy = min(sizeOfValue, len(keyValue))
 
         count = 0
 
         for idx, val in enumerate(keyValue):
+            if sizeToCopy == count:
+                break
             value[idx] = val
             count = count + 1
 
-        size[0] = count
+        size[0] = len(keyValue)
     else:
         size[0] = 0
 

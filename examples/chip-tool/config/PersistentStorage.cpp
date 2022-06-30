@@ -103,6 +103,11 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 {
     std::string iniValue;
 
+    if ((buffer == nullptr) && (size != 0))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     auto section = mConfig.sections[kDefaultSectionName];
     auto it      = section.find(key);
     ReturnErrorCodeIf(it == section.end(), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
@@ -111,17 +116,17 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 
     iniValue = Base64ToString(iniValue);
 
-    uint16_t dataSize = static_cast<uint16_t>(iniValue.size());
-    if (dataSize > size)
+    if ((buffer == nullptr) && (size == 0))
     {
-        size = dataSize;
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    size = dataSize;
-    memcpy(value, iniValue.data(), dataSize);
+    uint16_t dataSize = static_cast<uint16_t>(iniValue.size());
+    uint16_t sizeToCopy = std::min(size, dataSize);
 
-    return CHIP_NO_ERROR;
+    memcpy(value, iniValue.data(), sizeToCopy);
+    size = sizeToCopy;
+    return size < dataSize ? CHIP_ERROR_BUFFER_TOO_SMALL : CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PersistentStorage::SyncSetKeyValue(const char * key, const void * value, uint16_t size)

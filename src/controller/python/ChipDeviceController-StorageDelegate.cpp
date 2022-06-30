@@ -31,28 +31,26 @@ namespace Controller {
 
 CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
+    if ((value == nullptr) && (size != 0))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     auto val = mStorage.find(key);
     if (val == mStorage.end())
     {
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
-    if (value == nullptr)
-    {
-        size = 0;
-    }
-
     uint16_t neededSize = val->second.size();
-    if (size == 0)
+    if ((value == nullptr) && (size == 0))
     {
-        size = neededSize;
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
     if (size < neededSize)
     {
         memcpy(value, val->second.data(), size);
-        size = neededSize;
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
@@ -86,6 +84,10 @@ namespace Python {
 CHIP_ERROR StorageAdapter::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
     ChipLogDetail(Controller, "StorageAdapter::GetKeyValue: Key = %s, Value = %p (%u)", key, value, size);
+    if ((value == nullptr) && (size != 0))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     uint16_t tmpSize = size;
 
@@ -99,7 +101,6 @@ CHIP_ERROR StorageAdapter::SyncGetKeyValue(const char * key, void * value, uint1
     if (size < tmpSize)
     {
         ChipLogDetail(Controller, "Buf not big enough\n");
-        size = tmpSize;
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 

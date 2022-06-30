@@ -226,7 +226,7 @@ protected:
         uint16_t valueSizeUint16 = static_cast<uint16_t>(valueSize);
         uint16_t sizeToCopy      = std::min(size, valueSizeUint16);
 
-        size = static_cast<uint16_t>(sizeToCopy);
+        size = sizeToCopy;
         memcpy(buffer, value.data(), size);
         return size < valueSizeUint16 ? CHIP_ERROR_BUFFER_TOO_SMALL : CHIP_NO_ERROR;
     }
