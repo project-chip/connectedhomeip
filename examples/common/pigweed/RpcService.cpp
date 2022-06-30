@@ -18,8 +18,8 @@
 
 #include "RpcService.h"
 
-#include <array>
 #include "pw_span/span.h"
+#include <array>
 #include <string_view>
 
 #include "pw_hdlc/rpc_channel.h"

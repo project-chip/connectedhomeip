@@ -32,9 +32,9 @@
 #include <pw_stream/sys_io_stream.h>
 #include <pw_sys_io_qpg/init.h>
 
+#include "pw_span/span.h"
 #include <cassert>
 #include <cstdint>
-#include "pw_span/span.h"
 #include <string_view>
 
 namespace PigweedLogger {
