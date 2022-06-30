@@ -189,6 +189,7 @@ CHIP_ERROR DefaultSessionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
         err = DeleteState(index.mNodes[cur]);
         if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
+            stickyErr = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
             ChipLogError(SecureChannel,
                          "Session resumption cache is in an inconsistent state!  "
                          "Unable to delete node state during attempted deletion of fabric index %u: %" CHIP_ERROR_FORMAT,
