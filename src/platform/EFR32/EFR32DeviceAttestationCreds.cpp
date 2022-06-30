@@ -14,35 +14,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include "EFR32DeviceAttestationCreds.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
-#include "efr32_certs.h"
+#include "efr32_creds.h"
 #include "psa/crypto.h"
 #include "sl_token_api.h"
-#include "sl_token_manager.h"
 
 namespace chip {
 namespace Credentials {
-namespace Examples {
+namespace EFR32 {
 
 namespace {
 
-class DeviceAttestationCredsImpl : public DeviceAttestationCredentialsProvider
+class DeviceAttestationCredsEFR32 : public DeviceAttestationCredentialsProvider
 {
 public:
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & out_buffer) override
     {
-        uint8_t cd_buf[MFG_MATTER_CD_SIZE];
-        ByteSpan cd_span(cd_buf);
-
-        int err = sl_token_get_data(CREATOR_MFG_MATTER_CD, 0, cd_buf, sizeof(cd_buf));
-        ChipLogProgress(DeviceLayer, "~ GetCertificationDeclaration-1.2, size:%u, err:%d\r\n", sizeof(cd_buf), err);
-        VerifyOrReturnError(!err, CHIP_ERROR_INTERNAL);
-        ChipLogByteSpan(DeviceLayer, cd_span);
+        ByteSpan cd_span(kCertificationDeclaration);
         return CopySpanToMutableSpan(cd_span, out_buffer);
     }
 
@@ -59,7 +52,6 @@ public:
         ByteSpan cert_span(cert_buf);
 
         int err = sl_token_get_data(CREATOR_MFG_MATTER_DAC, 0, cert_buf, sizeof(cert_buf));
-        ChipLogProgress(DeviceLayer, "~ GetDeviceAttestationCert, size:%u, err:%d\r\n", sizeof(cert_buf), err);
         VerifyOrReturnError(!err, CHIP_ERROR_INTERNAL);
         ChipLogByteSpan(DeviceLayer, cert_span);
         return CopySpanToMutableSpan(cert_span, out_buffer);
@@ -71,7 +63,6 @@ public:
         ByteSpan cert_span(cert_buf);
 
         int err = sl_token_get_data(CREATOR_MFG_MATTER_PAI, 0, cert_buf, sizeof(cert_buf));
-        ChipLogProgress(DeviceLayer, "~ GetProductAttestationIntermediateCert, size:%u, err:%d\r\n", sizeof(cert_buf), err);
         VerifyOrReturnError(!err, CHIP_ERROR_INTERNAL);
         ChipLogByteSpan(DeviceLayer, cert_span);
         return CopySpanToMutableSpan(cert_span, out_pai_buffer);
@@ -93,12 +84,12 @@ public:
 
 } // namespace
 
-DeviceAttestationCredentialsProvider * GetExampleDACProvider()
+DeviceAttestationCredentialsProvider * GetDACProvider()
 {
-    static DeviceAttestationCredsImpl dac_provider;
+    static DeviceAttestationCredsEFR32 dac_provider;
     return &dac_provider;
 }
 
-} // namespace Examples
+} // namespace EFR32
 } // namespace Credentials
 } // namespace chip

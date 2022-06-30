@@ -23,9 +23,6 @@ declare_args() {
 
   # Substitute fake platform when building with chip_device_platform=auto.
   chip_fake_platform = false
-
-  # Set to true to use actual device attestation credentials
-  chip_device_attestation_credentials = false
 }
 
 if (chip_device_platform == "auto") {
