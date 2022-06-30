@@ -27,16 +27,10 @@ jobs:
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-doc-pip
-      - name: Install packages
-        run: |
-          sudo apt update
-          DOXYGEN_VERSION=1.9.4
-          wget --no-verbose https://downloads.sourceforge.net/project/doxygen/rel-${DOXYGEN_VERSION}/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz
-          tar xf doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz
-          echo "${PWD}/doxygen-${DOXYGEN_VERSION}/bin" >> $GITHUB_PATH
       - name: Install base dependencies
         working-directory: matter
         run: |
+          sudo apt update
           sudo pip3 install -U pip
           pip3 install -r docs/requirements.txt
       - name: Build documentation
@@ -46,6 +40,7 @@ jobs:
           make html
           touch _build/html/.nojekyll
       - name: Deploy to gh-pages
+        if: github.repository == 'project-chip/connectedhomeip'
         uses: peaceiris/actions-gh-pages@v3
         with:
           deploy_key: ${{ secrets.DOXYGEN_DEPLOY_KEY }}

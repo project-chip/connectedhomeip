@@ -17,6 +17,13 @@ BUG_REPORT
 ```
 
 ```{include} README.md
-:start-line: 2
+:start-line: 21
 :end-before: Building and Developing in Matter
+```
+
+# Matter build status
+
+```{include} README.md
+:start-line: 2
+:end-before: What is Matter?
 ```

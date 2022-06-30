@@ -1,6 +1,5 @@
 # Configuration file for the Sphinx documentation builder.
 
-import os
 from pathlib import Path
 import sys
 
@@ -13,7 +12,7 @@ sys.path.insert(0, str(MATTER_BASE / "docs" / "_extensions"))
 # -- Project information -----------------------------------------------------
 
 project = "Matter"
-copyright = "2021, Matter Contributors"
+copyright = "2022, Matter Contributors"
 author = "Matter Contributors"
 version = "1.0.0"
 
@@ -22,8 +21,6 @@ version = "1.0.0"
 extensions = [
     "myst_parser",
     "external_content",
-    # "doxyrunner",
-    # "breathe",
 ]
 exclude_patterns = [
     "_build",
@@ -68,21 +65,3 @@ external_content_contents = [
 ]
 external_content_link_prefixes = ["src/", r"\.vscode/", "CONTRIBUTING"]
 external_content_link_extensions = [".md", ".png", ".jpg", ".svg"]
-
-# -- Options for zephyr.doxyrunner plugin ------------------------------------
-
-doxyrunner_doxygen = os.environ.get("DOXYGEN_EXECUTABLE", "doxygen")
-doxyrunner_doxyfile = MATTER_BASE / "docs" / "matter.doxyfile.in"
-doxyrunner_outdir = MATTER_BASE / "docs" / "_build" / "doxygen"
-doxyrunner_fmt = True
-doxyrunner_fmt_vars = {"MATTER_BASE": str(MATTER_BASE), "MATTER_VERSION": version}
-
-# -- Options for Breathe plugin -------------------------------------------
-
-breathe_projects = {"Matter": str(doxyrunner_outdir / "xml")}
-breathe_default_project = "Matter"
-breathe_domain_by_extension = {
-    "h": "cpp",
-    "cpp": "cpp",
-    "c": "c",
-}

@@ -34,7 +34,6 @@ Done
 -   [exit](#exit)
 -   [help](#help)
 -   [otcli](README_OTCLI.md)
--   ping
 -   [rand](#rand)
 -   server
 -   [version](#version)
