@@ -162,35 +162,37 @@ CHIP_ERROR DefaultSessionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
         {
             continue;
         }
-        err       = LoadState(index.mNodes[cur], resumptionId, sharedSecret, peerCATs);
-        stickyErr = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
+        err = LoadState(index.mNodes[cur], resumptionId, sharedSecret, peerCATs);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(SecureChannel,
-                         "Session resumption cache deletion partially failed for fabric index %u, "
-                         "unable to load node state: %" CHIP_ERROR_FORMAT,
-                         fabricIndex, err.Format());
+            if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+            {
+                stickyErr = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
+
+                ChipLogError(SecureChannel,
+                             "Session resumption cache deletion partially failed for fabric index %u, "
+                             "unable to load node state: %" CHIP_ERROR_FORMAT,
+                             fabricIndex, err.Format());
+            }
             continue;
         }
-        err       = DeleteLink(resumptionId);
-        stickyErr = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
-        if (err != CHIP_NO_ERROR)
+        err = DeleteLink(resumptionId);
+        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
+            stickyErr = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
+
             ChipLogError(SecureChannel,
                          "Session resumption cache deletion partially failed for fabric index %u, "
                          "unable to delete node link: %" CHIP_ERROR_FORMAT,
                          fabricIndex, err.Format());
-            continue;
         }
-        err       = DeleteState(index.mNodes[cur]);
-        stickyErr = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
-        if (err != CHIP_NO_ERROR)
+        err = DeleteState(index.mNodes[cur]);
+        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
             ChipLogError(SecureChannel,
                          "Session resumption cache is in an inconsistent state!  "
                          "Unable to delete node state during attempted deletion of fabric index %u: %" CHIP_ERROR_FORMAT,
                          fabricIndex, err.Format());
-            continue;
         }
         ++found;
         --remain;
@@ -203,9 +205,10 @@ CHIP_ERROR DefaultSessionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
     {
         index.mSize -= found;
         CHIP_ERROR err = SaveIndex(index);
-        stickyErr      = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
         if (err != CHIP_NO_ERROR)
         {
+            stickyErr = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
+
             ChipLogError(
                 SecureChannel,
                 "Session resumption cache is in an inconsistent state!  "
