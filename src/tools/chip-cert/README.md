@@ -317,7 +317,7 @@ COMMAND OPTIONS
 
   -x, --chip-hex
 
-       Output certificate in CHIP TLV hexidecimal format.
+       Output certificate in CHIP TLV hexadecimal format.
 
   -b --chip-b64
 
