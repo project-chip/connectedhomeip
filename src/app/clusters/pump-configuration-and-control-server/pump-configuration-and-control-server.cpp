@@ -389,7 +389,7 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
         }
     }
     break;
-    
+
     case Attributes::OperationMode::Id:
         PumpOperationMode operationMode;
         NumericAttributeTraits<PumpOperationMode>::StorageType tmp;
