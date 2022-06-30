@@ -93,7 +93,7 @@ public:
     /**
      * @brief
      *   Helper function that identifies if a key exists.
-     * 
+     *
      *   This may be overridden to provide an implementation that is simpler or more direct.
      *
      * @param[in] key Key to check if it exist
