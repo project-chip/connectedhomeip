@@ -525,6 +525,13 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
         // shuts down, because shutdown of the last controller will tear
         // down most of the world.
         DeviceLayer::PlatformMgrImpl().StopEventLoopTask();
+
+        [controller shutDownCppController];
+    } else {
+        // Do the controller shutdown on the Matter work queue.
+        dispatch_sync(_chipWorkQueue, ^{
+            [controller shutDownCppController];
+        });
     }
 }
 
