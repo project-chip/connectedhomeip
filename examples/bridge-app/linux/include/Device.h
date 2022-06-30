@@ -40,6 +40,7 @@
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1
 
+// This represents a single logical device occupying one endpoint
 class Device
 {
 public:

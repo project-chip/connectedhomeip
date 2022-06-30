@@ -243,11 +243,27 @@ DynamicDeviceImpl * FindDevice(int32_t index)
     }
 }
 
-ClusterImpl * FindCluster(DynamicDeviceImpl * dev, uint32_t clusterId)
+ClusterImpl * FindCluster(DynamicDeviceImpl * dev, const std::string& clusterId)
 {
+    uint32_t id;
+    const char *start = clusterId.data();
+    const char *end = start + clusterId.size();
+    if (std::from_chars(start, end, id).ptr != end) {
+        id = 0;
+        for (auto * c : dev->clusters())
+        {
+            if (clusterId == c->name) {
+                id = c->id;
+                break;
+            }
+        }
+        if (!id)
+            return nullptr;
+    }
+
     for (auto * c : dev->clusters())
     {
-        if (c->GetClusterId() == clusterId)
+        if (c->GetClusterId() == id)
         {
             return c;
         }
@@ -317,8 +333,9 @@ void ParseValue(std::vector<uint8_t> * data, uint16_t size, const std::string & 
 
 void SetValue(const std::vector<std::string> & tokens)
 {
-    uint32_t clusterId, attrId;
+    uint32_t attrId;
     int32_t index;
+    std::string clusterId;
     std::string value;
     const char * err = Parse(tokens, 0, &index, &clusterId, &attrId, &value);
     if (err)
@@ -337,7 +354,7 @@ void SetValue(const std::vector<std::string> & tokens)
     ClusterImpl * cluster = FindCluster(dev, clusterId);
     if (!cluster)
     {
-        printf("Device does not implement cluster %d\nSupported clusters: ", clusterId);
+        printf("Device does not implement cluster %s\nSupported clusters: ", clusterId.c_str());
         for (auto * c : dev->clusters())
         {
             printf("%d ", c->GetClusterId());
