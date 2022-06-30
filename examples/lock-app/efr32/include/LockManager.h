@@ -50,11 +50,11 @@ namespace LockInitParams {
 struct LockParam
 {
     // Read from zap attributes
-    uint16_t numberOfUsers = 0;
-    uint8_t numberOfCredentialsPerUser = 0;
+    uint16_t numberOfUsers                  = 0;
+    uint8_t numberOfCredentialsPerUser      = 0;
     uint8_t numberOfWeekdaySchedulesPerUser = 0;
     uint8_t numberOfYeardaySchedulesPerUser = 0;
-    uint8_t numberOfHolidaySchedules = 0;
+    uint8_t numberOfHolidaySchedules        = 0;
 };
 
 class ParamBuilder
