@@ -37,7 +37,6 @@ const char * Device::GetName()
     return mDeviceName;
 }
 
-
 void Device::SetName(const char * name)
 {
     mDeviceName = name;
