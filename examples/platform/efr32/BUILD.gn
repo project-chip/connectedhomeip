@@ -37,6 +37,11 @@ config("chip_examples_project_config") {
     "-Wl,--wrap=_free_r",
     "-Wl,--wrap=_calloc_r",
   ]
+
+  defines = [
+    # Set to 1 to enable EFR32 attestation credentials
+    "EFR32_ATTESTATION_CREDENTIALS=0",
+  ]
 }
 
 source_set("openthread_core_config_efr32_chip_examples") {
