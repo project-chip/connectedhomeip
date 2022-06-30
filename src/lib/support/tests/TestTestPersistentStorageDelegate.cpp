@@ -134,9 +134,9 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
 
     // Read providing too small a buffer. Data read up to `size` and nothing more.
     memset(&buf[0], 0, sizeof(buf));
-    size = static_cast<uint16_t>(strlen(kStringValue2) - 1);
+    size                               = static_cast<uint16_t>(strlen(kStringValue2) - 1);
     uint16_t sizeBeforeGetKeyValueCall = size;
-    err  = storage.SyncGetKeyValue("key2", &buf[0], size);
+    err                                = storage.SyncGetKeyValue("key2", &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
     NL_TEST_ASSERT(inSuite, size != strlen(kStringValue2));
     NL_TEST_ASSERT(inSuite, size == sizeBeforeGetKeyValueCall);
@@ -146,9 +146,9 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
 
     // Read in too small a buffer, which is nullptr and size == 0: check correct size given
     memset(&buf[0], 0, sizeof(buf));
-    size = 0;
+    size                      = 0;
     sizeBeforeGetKeyValueCall = size;
-    err  = storage.SyncGetKeyValue("key2", nullptr, size);
+    err                       = storage.SyncGetKeyValue("key2", nullptr, size);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
     NL_TEST_ASSERT(inSuite, size != strlen(kStringValue2));
     NL_TEST_ASSERT(inSuite, size == sizeBeforeGetKeyValueCall);
@@ -157,9 +157,9 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], sizeof(buf)));
 
     // Read in too small a buffer, which is nullptr and size != 0: error
-    size = static_cast<uint16_t>(strlen(kStringValue2) - 1);
+    size                      = static_cast<uint16_t>(strlen(kStringValue2) - 1);
     sizeBeforeGetKeyValueCall = size;
-    err  = storage.SyncGetKeyValue("key2", nullptr, size);
+    err                       = storage.SyncGetKeyValue("key2", nullptr, size);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite, size == sizeBeforeGetKeyValueCall);
     // Just making sure that implementation doesn't hold onto reference of previous destination buffer when
