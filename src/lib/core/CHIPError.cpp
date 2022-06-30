@@ -242,7 +242,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_LISTENER_ALREADY_STOPPED.AsInteger():
         desc = "Listener already stopped";
         break;
-    case CHIP_ERROR_UNKNOWN_TOPIC.AsInteger():
+    case CHIP_ERROR_UNKNOWN_ENUM_VALUE.AsInteger():
         desc = "Unknown Topic";
         break;
     case CHIP_ERROR_TIMEOUT.AsInteger():
