@@ -105,7 +105,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01 
+      PICS: TSTAT.S.F01
       arguments:
           value: 3200
 
@@ -254,7 +254,7 @@ tests:
 
     - label:
           "Writes the limit of MinCoolSetpointLimit to UnoccupiedCoolingSetpoint
-          attribute"  
+          attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01
@@ -286,7 +286,7 @@ tests:
     - label:
           "Writes a value back that is different but valid for
           UnoccupiedHeatingSetpoint attribute"
-      
+
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00
@@ -295,7 +295,7 @@ tests:
 
     - label:
           "Reads it back again to confirm the successful write of
-          UnoccupiedHeatingSetpoint attribute"  
+          UnoccupiedHeatingSetpoint attribute"
       command: "readAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00
@@ -304,7 +304,7 @@ tests:
 
     - label:
           "Writes UnoccupiedHeatingSetpoint to value below the
-          MinHeatSetpointLimit"      
+          MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00
@@ -682,7 +682,7 @@ tests:
       PICS: TSTAT.S.F01 && A_MAXHEATSETPOINTLIMIT &&!TSTAT.S.F05
       arguments:
           value: 2950
-        
+
 
     - label: "Writes (sets back) default value of MinCoolSetpointLimit"
       command: "writeAttribute"
@@ -796,8 +796,8 @@ tests:
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00 && A_MINHEATSETPOINTLIMIT && TSTAT.S.F05
       arguments:
-          value: 2950      
-  
+          value: 2950
+
     - label: "Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"

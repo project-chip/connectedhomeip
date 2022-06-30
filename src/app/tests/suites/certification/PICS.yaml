@@ -371,7 +371,7 @@ PICS:
 
     - label: "Does the device implement the Auto feature"
       id: TSTAT.S.F05
-    
+
     - label: "Does the device implement the MinHeatSetpointLimit attribute"
       id: A_MINHEATSETPOINTLIMIT
 
