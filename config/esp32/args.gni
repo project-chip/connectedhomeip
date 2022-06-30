@@ -16,7 +16,6 @@
 # options are used from examples/.
 import("//build_overrides/pigweed.gni")
 import("$dir_pw_span/polyfill.gni")
-
 chip_device_platform = "esp32"
 
 chip_project_config_include = ""
