@@ -16,67 +16,69 @@
 name: 14.4.9. [TC-SC-4.9] Operational Discovery - RIO support
 
 config:
-  nodeId: 0x12344321
-  cluster: "Basic"
-  endpoint: 0
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
 
 tests:
-  - label: "Starts a commissioning process with DUT_CE including an access
-      control list entry on DUT_CE that gives Operate Privilege to TH_CR2
-      against every endpoint of DUT_CE"
-    verification: |
-      ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{"cluster": null, "endpoint": 0, "deviceType": null}]}, {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects": null, "targets": [{"cluster": null, "endpoint": 1, "deviceType": null}]}]' 77 0
+    - label:
+          "Starts a commissioning process with DUT_CE including an access
+          control list entry on DUT_CE that gives Operate Privilege to TH_CR2
+          against every endpoint of DUT_CE"
+      verification: |
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{"cluster": null, "endpoint": 0, "deviceType": null}]}, {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects": null, "targets": [{"cluster": null, "endpoint": 1, "deviceType": null}]}]' 77 0
 
-      [1652330385.328196][3240:3245] CHIP:DMG:                        StatusIB =
-      [1652330385.328229][3240:3245] CHIP:DMG:                        {
-      [1652330385.328264][3240:3245] CHIP:DMG:                                status = 0x00 (SUCCESS),
-      [1652330385.328298][3240:3245] CHIP:DMG:                        },
-    disabled: true
+          [1652330385.328196][3240:3245] CHIP:DMG:                        StatusIB =
+          [1652330385.328229][3240:3245] CHIP:DMG:                        {
+          [1652330385.328264][3240:3245] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1652330385.328298][3240:3245] CHIP:DMG:                        },
+      disabled: true
 
-  - label: "Reads Basic Information Cluster NodeLabel attribute as
-      PreviousNodeLabel"
-    verification: |
-      ./chip-tool basic read node-label 77 0
+    - label:
+          "Reads Basic Information Cluster NodeLabel attribute as
+          PreviousNodeLabel"
+      verification: |
+          ./chip-tool basic read node-label 77 0
 
-      [1652420234.342201][2403:2408] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 2144347768
-      [1652420234.342277][2403:2408] CHIP:TOO:   NodeLabel:
-      [1652420234.342452][2403:2408] CHIP:EM: Sending Standalone Ack for MessageCounter:123718 on exchange 57159i
-    disabled: true
+          [1652420234.342201][2403:2408] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 2144347768
+          [1652420234.342277][2403:2408] CHIP:TOO:   NodeLabel:
+          [1652420234.342452][2403:2408] CHIP:EM: Sending Standalone Ack for MessageCounter:123718 on exchange 57159i
+      disabled: true
 
-  - label: 'Writes "TestRIO" to the NodeLabel attribute'
-    verification: |
-      ./chip-tool basic write node-label testrio 77 0
+    - label: 'Writes "TestRIO" to the NodeLabel attribute'
+      verification: |
+          ./chip-tool basic write node-label testrio 77 0
 
-      StatusIB =
-      [1652421063.833937][2454:2459] CHIP:DMG:                         {
-      [1652421063.834016][2454:2459] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-      [1652421063.834118][2454:2459] CHIP:DMG:                         },
-    disabled: true
+          StatusIB =
+          [1652421063.833937][2454:2459] CHIP:DMG:                         {
+          [1652421063.834016][2454:2459] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1652421063.834118][2454:2459] CHIP:DMG:                         },
+      disabled: true
 
-  - label: "Reads NodeLabel attribute"
-    verification: |
-      ./chip-tool basic read node-label 77 0
+    - label: "Reads NodeLabel attribute"
+      verification: |
+          ./chip-tool basic read node-label 77 0
 
-      [1652421068.143200][2460:2465] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 2144347769
-      [1652421068.143276][2460:2465] CHIP:TOO:   NodeLabel: testrio
-      [1652421068.143457][2460:2465] CHIP:EM: Sending Standalone Ack for MessageCounter:2274062 on exchange 46531i
-    disabled: true
+          [1652421068.143200][2460:2465] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 2144347769
+          [1652421068.143276][2460:2465] CHIP:TOO:   NodeLabel: testrio
+          [1652421068.143457][2460:2465] CHIP:EM: Sending Standalone Ack for MessageCounter:2274062 on exchange 46531i
+      disabled: true
 
-  - label: 'Writes "TestRIO2" to the NodeLabel attribute'
-    verification: |
-      ./chip-tool basic write node-label testrio2 77 0
+    - label: 'Writes "TestRIO2" to the NodeLabel attribute'
+      verification: |
+          ./chip-tool basic write node-label testrio2 77 0
 
-      StatusIB =
-      [1652421082.185625][2467:2473] CHIP:DMG:                         {
-      [1652421082.185696][2467:2473] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-      [1652421082.185766][2467:2473] CHIP:DMG:                         },
-    disabled: true
+          StatusIB =
+          [1652421082.185625][2467:2473] CHIP:DMG:                         {
+          [1652421082.185696][2467:2473] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1652421082.185766][2467:2473] CHIP:DMG:                         },
+      disabled: true
 
-  - label: "Reads NodeLabel attribute"
-    verification: |
-      ./chip-tool basic read node-label 77 0
+    - label: "Reads NodeLabel attribute"
+      verification: |
+          ./chip-tool basic read node-label 77 0
 
-      [1652421088.232903][2474:2479] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 2144347770
-      [1652421088.232983][2474:2479] CHIP:TOO:   NodeLabel: testrio2
-      [1652421088.233169][2474:2479] CHIP:EM: Sending Standalone Ack for MessageCounter:4743745 on exchange 61019i
-    disabled: true
+          [1652421088.232903][2474:2479] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 2144347770
+          [1652421088.232983][2474:2479] CHIP:TOO:   NodeLabel: testrio2
+          [1652421088.233169][2474:2479] CHIP:EM: Sending Standalone Ack for MessageCounter:4743745 on exchange 61019i
+      disabled: true

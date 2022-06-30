@@ -16,82 +16,83 @@
 name: 79.3.1. [TC-MOD-3.1] OnMode Verification (DUT as Server)
 
 config:
-  nodeId: 0x12344321
-  cluster: "Basic"
-  endpoint: 0
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
 
 tests:
-  - label: "TH reads the OnMode attribute from the DUT"
-    verification: |
-      ./chip-tool modeselect read on-mode 1 1
+    - label: "TH reads the OnMode attribute from the DUT"
+      verification: |
+          ./chip-tool modeselect read on-mode 1 1
 
-      [1649678983.679893][10871:10876] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065073
-      [1649678983.680002][10871:10876] CHIP:TOO:   OnMode: null
-    disabled: true
+          [1649678983.679893][10871:10876] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065073
+          [1649678983.680002][10871:10876] CHIP:TOO:   OnMode: null
+      disabled: true
 
-  - label: "TH reads the CurrentMode attribute from the DUT"
-    verification: |
-      ./chip-tool modeselect read current-mode 1 1
+    - label: "TH reads the CurrentMode attribute from the DUT"
+      verification: |
+          ./chip-tool modeselect read current-mode 1 1
 
-      [1649679034.895848][10879:10884] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
-      [1649679034.895972][10879:10884] CHIP:TOO:   CurrentMode: 4
-    disabled: true
+          [1649679034.895848][10879:10884] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
+          [1649679034.895972][10879:10884] CHIP:TOO:   CurrentMode: 4
+      disabled: true
 
-  - label:
-      "If the OnMode and CurrentMode attributes have the same value, proceed
-      to step 2c, Otherwise proceed to step 3a."
-    verification: |
+    - label:
+          "If the OnMode and CurrentMode attributes have the same value, proceed
+          to step 2c, Otherwise proceed to step 3a."
+      verification: |
 
-    disabled: true
+      disabled: true
 
-  - label: "TH reads the SupportedModes attribute from the DUT"
-    verification: |
-      ./chip-tool modeselect read supported-modes 1 1
-      [1645776884.203383][4698:4703] CHIP:TOO:   SupportedModes: 3 entries
-      [1645776884.203448][4698:4703] CHIP:TOO:     [1]: {
-      [1645776884.203473][4698:4703] CHIP:TOO:       Label: Black
-      [1645776884.203497][4698:4703] CHIP:TOO:       Mode: 0
-      [1645776884.203520][4698:4703] CHIP:TOO:       SemanticTag: 0
-      [1645776884.203544][4698:4703] CHIP:TOO:      }
-      [1645776884.203574][4698:4703] CHIP:TOO:     [2]: {
-      [1645776884.203597][4698:4703] CHIP:TOO:       Label: Cappuccino
-      [1645776884.203619][4698:4703] CHIP:TOO:       Mode: 4
-      [1645776884.203641][4698:4703] CHIP:TOO:       SemanticTag: 0
-      [1645776884.203663][4698:4703] CHIP:TOO:      }
-      [1645776884.203691][4698:4703] CHIP:TOO:     [3]: {
-      [1645776884.203714][4698:4703] CHIP:TOO:       Label: Espresso
-      [1645776884.203735][4698:4703] CHIP:TOO:       Mode: 7
-      [1645776884.203757][4698:4703] CHIP:TOO:       SemanticTag: 0
-      [1645776884.203779][4698:4703] CHIP:TOO:      }
-    disabled: true
+    - label: "TH reads the SupportedModes attribute from the DUT"
+      verification: |
+          ./chip-tool modeselect read supported-modes 1 1
+          [1645776884.203383][4698:4703] CHIP:TOO:   SupportedModes: 3 entries
+          [1645776884.203448][4698:4703] CHIP:TOO:     [1]: {
+          [1645776884.203473][4698:4703] CHIP:TOO:       Label: Black
+          [1645776884.203497][4698:4703] CHIP:TOO:       Mode: 0
+          [1645776884.203520][4698:4703] CHIP:TOO:       SemanticTag: 0
+          [1645776884.203544][4698:4703] CHIP:TOO:      }
+          [1645776884.203574][4698:4703] CHIP:TOO:     [2]: {
+          [1645776884.203597][4698:4703] CHIP:TOO:       Label: Cappuccino
+          [1645776884.203619][4698:4703] CHIP:TOO:       Mode: 4
+          [1645776884.203641][4698:4703] CHIP:TOO:       SemanticTag: 0
+          [1645776884.203663][4698:4703] CHIP:TOO:      }
+          [1645776884.203691][4698:4703] CHIP:TOO:     [3]: {
+          [1645776884.203714][4698:4703] CHIP:TOO:       Label: Espresso
+          [1645776884.203735][4698:4703] CHIP:TOO:       Mode: 7
+          [1645776884.203757][4698:4703] CHIP:TOO:       SemanticTag: 0
+          [1645776884.203779][4698:4703] CHIP:TOO:      }
+      disabled: true
 
-  - label: "Select a value from the list in step 2c with a different value than
-      the StartUpMode value read in step 1. TH sends a ChangeToMode command
-      to the TH with the selected value."
-    verification: |
-      ./chip-tool modeselect change-to-mode 7 1 1
+    - label:
+          "Select a value from the list in step 2c with a different value than
+          the StartUpMode value read in step 1. TH sends a ChangeToMode command
+          to the TH with the selected value."
+      verification: |
+          ./chip-tool modeselect change-to-mode 7 1 1
 
-      [1645777419.711572][4798:4803] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
-    disabled: true
+          [1645777419.711572][4798:4803] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
+      disabled: true
 
-  - label: "TH reads sends an Off command to the DUT"
-    verification: |
-      ./chip-tool onoff off 1 1
+    - label: "TH reads sends an Off command to the DUT"
+      verification: |
+          ./chip-tool onoff off 1 1
 
-      [1649679101.658594][10886:10891] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0000 Status=0x0
-    disabled: true
+          [1649679101.658594][10886:10891] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0000 Status=0x0
+      disabled: true
 
-  - label: "TH reads sends an On command to the DUT"
-    verification: |
-      ./chip-tool onoff on 1 1
+    - label: "TH reads sends an On command to the DUT"
+      verification: |
+          ./chip-tool onoff on 1 1
 
-      [1649679156.146015][10893:10898] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
-    disabled: true
+          [1649679156.146015][10893:10898] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
+      disabled: true
 
-  - label: "TH reads the CurrentMode attribute from the DUT"
-    verification: |
-      ./chip-tool modeselect read current-mode 1 1
+    - label: "TH reads the CurrentMode attribute from the DUT"
+      verification: |
+          ./chip-tool modeselect read current-mode 1 1
 
-      [1649679202.069163][10899:10904] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
-      [1649679202.069278][10899:10904] CHIP:TOO:   CurrentMode: 4
-    disabled: true
+          [1649679202.069163][10899:10904] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
+          [1649679202.069278][10899:10904] CHIP:TOO:   CurrentMode: 4
+      disabled: true

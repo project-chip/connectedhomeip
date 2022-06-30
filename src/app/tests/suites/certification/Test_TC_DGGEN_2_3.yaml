@@ -16,17 +16,17 @@
 name: 3.2.3. [TC-DGGEN-2.3] Command received at server as DUT
 
 config:
-  nodeId: 0x12344321
-  cluster: "Basic"
-  endpoint: 0
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
 
 tests:
-  - label:
-      "Provision TH with EnableKey with 128 bit value provided and matched a
-      value chosen by the manufacturer and configured on the DUT using
-      manufacturer-specific means. EventTrigger value is configured and
-      SHALL indicate the test or test mode which TH wants to trigger the
-      testing use by manufacturers."
-    verification: |
-      NOT AVAILABLE
-    disabled: true
+    - label:
+          "Provision TH with EnableKey with 128 bit value provided and matched a
+          value chosen by the manufacturer and configured on the DUT using
+          manufacturer-specific means. EventTrigger value is configured and
+          SHALL indicate the test or test mode which TH wants to trigger the
+          testing use by manufacturers."
+      verification: |
+          NOT AVAILABLE
+      disabled: true
