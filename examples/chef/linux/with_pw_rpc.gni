@@ -32,6 +32,7 @@ pw_rpc_system_server_BACKEND = "${chip_root}/config/linux/lib/pw_rpc:pw_rpc"
 dir_pw_third_party_nanopb = "${chip_root}/third_party/nanopb/repo"
 pw_chrono_SYSTEM_CLOCK_BACKEND = "$dir_pw_chrono_stl:system_clock"
 pw_sync_MUTEX_BACKEND = "$dir_pw_sync_stl:mutex_backend"
+pw_span_ENABLE_STD_SPAN_POLYFILL = false
 
 pw_build_LINK_DEPS = [
   "$dir_pw_assert:impl",
