@@ -163,7 +163,10 @@ function getManualTests() {
   ];
 
   const GeneralDiagnostics = [
-    'Test_TC_GENDIAG_1_2',
+    'Test_TC_DGGEN_2_2',
+    'Test_TC_DGGEN_2_3',
+    'Test_TC_DGGEN_3_1',
+    'Test_TC_DGGEN_3_2',
   ];
 
   const Identify = [
@@ -260,6 +263,7 @@ function getManualTests() {
     'Test_TC_MOD_3_1',
     'Test_TC_MOD_3_2',
     'Test_TC_MOD_3_3',
+    'Test_TC_MOD_3_4',
   ];
 
   const OTASoftwareUpdate = [
@@ -405,6 +409,7 @@ function getManualTests() {
     'Test_TC_SWTCH_1_1',
     'Test_TC_SWTCH_2_2',
     'Test_TC_SWTCH_3_1',
+    'Test_TC_SWTCH_3_2',
   ];
 
   const TemperatureMeasurement = [
@@ -422,10 +427,13 @@ function getManualTests() {
   ];
 
   const ThreadNetworkDiagnostics = [
-    'Test_TC_DIAG_TH_NW_2_6',
-    'Test_TC_DIAG_TH_NW_2_7',
-    'Test_TC_DIAG_TH_NW_2_8',
-    'Test_TC_DIAG_TH_NW_2_9',
+    'Test_TC_DIAG_TH_NW_1_1',
+    'Test_TC_DIAG_TH_NW_2_5',
+    'Test_TC_DIAG_TH_NW_3_1',
+    'Test_TC_DIAG_TH_NW_3_2',
+    'Test_TC_DIAG_TH_NW_3_3',
+    'Test_TC_DIAG_TH_NW_3_4',
+    'Test_TC_DIAG_TH_NW_3_5',
   ];
 
   const Actions = [
@@ -465,6 +473,10 @@ function getManualTests() {
     'Test_TC_S_2_2',
     'Test_TC_S_2_3',
     'Test_TC_S_3_1',
+  ];
+
+  const PumpConfigurationControl = [
+    'Test_TC_PCC_3_1',
   ];
 
   const tests = [
@@ -513,6 +525,7 @@ function getManualTests() {
     FixedLabel,
     Binding,
     Scenes,
+    PumpConfigurationControl,
   ].flat(1);
 
   tests.disable = disable.bind(tests);
@@ -522,12 +535,6 @@ function getManualTests() {
 function getTests() {
   const AccessControl = [
     'TestAccessControlCluster',
-  ];
-
-  const BinaryInput = [
-    'Test_TC_BI_1_1',
-    'Test_TC_BI_2_1',
-    'Test_TC_BI_2_2',
   ];
 
   const BooleanState = [
@@ -568,11 +575,6 @@ function getTests() {
 
   const Descriptor = [
     'Test_TC_DESC_1_1',
-  ];
-
-
-  const ElectricalMeasurement = [
-    'Test_TC_EMR_1_1',
   ];
 
   const EthernetNetworkDiagnostics = [
@@ -742,10 +744,10 @@ function getTests() {
   ];
 
   const ThreadNetworkDiagnostics = [
-    'Test_TC_DIAG_TH_NW_1_1',
-    'Test_TC_DIAG_TH_NW_1_2',
+    'Test_TC_DIAG_TH_NW_2_1',
     'Test_TC_DIAG_TH_NW_2_2',
     'Test_TC_DIAG_TH_NW_2_3',
+    'Test_TC_DIAG_TH_NW_2_4',
   ];
 
   const WiFiNetworkDiagnostics = [
@@ -845,13 +847,11 @@ function getTests() {
 
   const tests = [
     AccessControl,
-    BinaryInput,
     BooleanState,
     Actions,
     ColorControl,
     DeviceManagement,
     Descriptor,
-    ElectricalMeasurement,
     EthernetNetworkDiagnostics,
     FlowMeasurement,
     GeneralCommissioning,

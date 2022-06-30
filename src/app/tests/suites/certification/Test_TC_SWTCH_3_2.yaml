@@ -1,0 +1,132 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 73.3.3. [TC-SWTCH-3.2] Primary functionality with client as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH checks consistency of PICS flags"
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label: "TH checks consistency of PICS flags"
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label: "TH checks consistency of PICS flags"
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label: "TH checks consistency of PICS flags"
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label: "TH checks consistency of PICS flags"
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label: "TH checks consistency of PICS flags"
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label: "TH checks consistency of PICS flags"
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label:
+          "Commission DUT to TH. Use client mechanism to set it up so switch
+          state can be observed (e.g. UI shows state of switch) and/or other
+          device is controlled (e.g. light on same fabric gets controlled by the
+          switch  TH has to simulate that light). While commissioning and
+          configuring, TH records and reacts to the messages relating to the
+          switch functionality detailed in the steps below. The order of the
+          messages received may be different from the order of the sub-steps
+          1b..1d below."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH simulates operation of the switch by changing state (attribute
+          CurrentPosition) from 0 to 1 and back every 10 seconds"
+      verification: |
+          add messages for this exchange: DUT needs to read the attribute, TH provides value of simulated switch
+          DUT also shows results in UI or via controlled device
+      disabled: true
+
+    - label:
+          "TH simulates operation of the switch by changing state (attribute
+          CurrentPosition) from 0 to 1 and back every 10 seconds, and sending
+          the event SwitchLatched (with field NewPosition reflecting the new
+          state) on every change"
+      verification: |
+          TH sends event messages, DUT consumes them, DUT shows results in UI or via controlled device
+      disabled: true
+
+    - label:
+          "Commission DUT to TH. Use client mechanism to set it up so switch
+          state can be observed (e.g. UI shows state of switch) and/or other
+          device is controlled (e.g. light on same fabric gets controlled by the
+          switch  TH has to simulate that light). While commissioning and
+          configuring, TH records and reacts to the messages relating to the
+          switch functionality detailed in the steps below. The order of the
+          messages received may be different from the order of the sub-steps
+          3b..3d below."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH simulates operation of the switch by repeating these steps (over a
+          1 minute period) * change state (attribute CurrentPosition) from 0 to
+          1 * wait 0.2 seconds * change state (attribute CurrentPosition) from 1
+          to 0 * wait 10 seconds"
+      verification: |
+          add messages for this exchange: DUT needs to read the attribute, TH provides value of simulated switch
+          DUT also shows results in UI or via controlled device
+      disabled: true
+
+    - label:
+          "TH simulates operation of the switch by repeating these steps (over a
+          1 minute period) change state (attribute CurrentPosition) from 0 to 1,
+          and send the event InitialPress (with field NewPosition=1)  * wait 0.2
+          seconds * change state (attribute CurrentPosition) from 1 to 0, and
+          send the event ShortRelease (with field PreviousPosition=1) * wait 10
+          seconds"
+      verification: |
+          TH sends event messages, DUT consumes them, DUT shows results in UI or via controlled device
+      disabled: true
+
+    - label:
+          "TH simulates operation of the switch by repeating these steps (over a
+          1 minute period) change state (field CurrentPosition) from 0 to 1, and
+          send the event InitialPress (with field NewPosition=1) wait 0.75
+          seconds * send the event LongPress (field NewPosition=1) wait 2
+          seconds * change state (field CurrentPosition) from 1 to 0, and send
+          the event LongRelease (with field PreviousPosition=1)* wait 8 seconds"
+      verification: |
+          TH sends event messages, DUT consumes them, DUT shows results in UI or via controlled device
+      disabled: true

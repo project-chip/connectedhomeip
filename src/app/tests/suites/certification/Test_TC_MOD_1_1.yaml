@@ -42,7 +42,7 @@ tests:
       response:
           value: 1
           constraints:
-              type: map32
+              type: map8
 
     - label: "TH reads the AttributeList attribute from the DUT"
       command: "readAttribute"

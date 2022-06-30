@@ -25,19 +25,140 @@ tests:
           "TH sends a Timed Request Message with the timeout value set. (Example
           - 200 milliseconds)."
       verification: |
-          for below example command is verified by using write interaction
           ./chip-tool onoff on 1 1 --timedInteractionTimeoutMs 200
+
+          On TH
+          [1652944460.867007][34730:34735] CHIP:DMG: StatusResponseMessage =
+          [1652944460.867025][34730:34735] CHIP:DMG: {
+          [1652944460.867041][34730:34735] CHIP:DMG:         Status = 0x00 (SUCCESS),
+          [1652944460.867058][34730:34735] CHIP:DMG:         InteractionModelRevision = 1
+          [1652944460.867073][34730:34735] CHIP:DMG: }
+
+          On DUT
+          [1652944460.839395][8499:8499] CHIP:DMG: TimedRequestMessage =
+          [1652944460.839450][8499:8499] CHIP:DMG: {
+          [1652944460.839518][8499:8499] CHIP:DMG:         TimeoutMs = 0x190,
+          [1652944460.839573][8499:8499] CHIP:DMG:         InteractionModelRevision = 1
+          [1652944460.839623][8499:8499] CHIP:DMG: }
+
+          [1652944460.863502][8499:8499] CHIP:DMG: InvokeRequestMessage =
+          [1652944460.863587][8499:8499] CHIP:DMG: {
+          [1652944460.863644][8499:8499] CHIP:DMG:         suppressResponse = false,
+          [1652944460.863729][8499:8499] CHIP:DMG:         timedRequest = true,
+          [1652944460.863791][8499:8499] CHIP:DMG:         InvokeRequests =
+          [1652944460.863883][8499:8499] CHIP:DMG:         [
+          [1652944460.863945][8499:8499] CHIP:DMG:                 CommandDataIB =
+          [1652944460.864038][8499:8499] CHIP:DMG:                 {
+          [1652944460.864108][8499:8499] CHIP:DMG:                         CommandPathIB =
+          [1652944460.864202][8499:8499] CHIP:DMG:                         {
+          [1652944460.864282][8499:8499] CHIP:DMG:                                 EndpointId = 0x1,
+          [1652944460.864386][8499:8499] CHIP:DMG:                                 ClusterId = 0x6,
+          [1652944460.864486][8499:8499] CHIP:DMG:                                 CommandId = 0x1,
+          [1652944460.864564][8499:8499] CHIP:DMG:                         },
+          [1652944460.864660][8499:8499] CHIP:DMG:
+          [1652944460.864729][8499:8499] CHIP:DMG:                         CommandData =
+          [1652944460.864948][8499:8499] CHIP:DMG:                         {
+          [1652944460.865032][8499:8499] CHIP:DMG:                         },
+          [1652944460.865131][8499:8499] CHIP:DMG:                 },
+          [1652944460.865346][8499:8499] CHIP:DMG:
+          [1652944460.865434][8499:8499] CHIP:DMG:         ],
+          [1652944460.865509][8499:8499] CHIP:DMG:
+          [1652944460.865568][8499:8499] CHIP:DMG:         InteractionModelRevision = 1
+          [1652944460.865648][8499:8499] CHIP:DMG: },
       disabled: true
 
     - label:
-          "TH sends a Timed Request Message with the timeout value set. (Example
-          - 200 milliseconds). Wait for the status response message to be
-          received. Wait for 5 seconds(Timer has expired) and then send a Write
-          Request Message to the DUT."
+          "TH sends a Timed Request Message(Timed Write Transaction) with the
+          timeout value set. (Example - 200 milliseconds). Wait for the status
+          response message to be received. Send the Write Request Message to the
+          DUT."
+      verification: |
+          ./chip-tool levelcontrol write on-level 1 1 1 --timedInteractionTimeoutMs 500
+          On TH
+          [1652944714.550110][34757:34762] CHIP:DMG: StatusResponseMessage =
+          [1652944714.550129][34757:34762] CHIP:DMG: {
+          [1652944714.550144][34757:34762] CHIP:DMG:         Status = 0x00 (SUCCESS),
+          [1652944714.550160][34757:34762] CHIP:DMG:         InteractionModelRevision = 1
+          [1652944714.550173][34757:34762] CHIP:DMG: }
+
+
+          [1652944714.558166][34757:34762] CHIP:DMG: WriteResponseMessage =
+          [1652944714.558183][34757:34762] CHIP:DMG: {
+          [1652944714.558198][34757:34762] CHIP:DMG:         AttributeStatusIBs =
+          [1652944714.558225][34757:34762] CHIP:DMG:         [
+          [1652944714.558240][34757:34762] CHIP:DMG:                 AttributeStatusIB =
+          [1652944714.558259][34757:34762] CHIP:DMG:                 {
+          [1652944714.558274][34757:34762] CHIP:DMG:                         AttributePathIB =
+          [1652944714.558292][34757:34762] CHIP:DMG:                         {
+          [1652944714.558311][34757:34762] CHIP:DMG:                                 Endpoint = 0x1,
+          [1652944714.558328][34757:34762] CHIP:DMG:                                 Cluster = 0x8,
+          [1652944714.558347][34757:34762] CHIP:DMG:                                 Attribute = 0x0000_0011,
+          [1652944714.558364][34757:34762] CHIP:DMG:                         }
+          [1652944714.558386][34757:34762] CHIP:DMG:
+          [1652944714.558404][34757:34762] CHIP:DMG:                         StatusIB =
+          [1652944714.558421][34757:34762] CHIP:DMG:                         {
+          [1652944714.558439][34757:34762] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1652944714.558452][34757:34762] CHIP:DMG:                         },
+
+
+          On DUT
+          [1652944714.526970][8499:8499] CHIP:DMG: WriteRequestMessage =
+          [1652944714.527020][8499:8499] CHIP:DMG: {
+          [1652944714.527053][8499:8499] CHIP:DMG:         suppressResponse = false,
+          [1652944714.527092][8499:8499] CHIP:DMG:         timedRequest = true,
+          [1652944714.527140][8499:8499] CHIP:DMG:         AttributeDataIBs =
+          [1652944714.527185][8499:8499] CHIP:DMG:         [
+          [1652944714.527234][8499:8499] CHIP:DMG:                 AttributeDataIB =
+          [1652944714.527286][8499:8499] CHIP:DMG:                 {
+          [1652944714.527341][8499:8499] CHIP:DMG:                         AttributePathIB =
+          [1652944714.527411][8499:8499] CHIP:DMG:                         {
+          [1652944714.527463][8499:8499] CHIP:DMG:                                 Endpoint = 0x1,
+          [1652944714.527525][8499:8499] CHIP:DMG:                                 Cluster = 0x8,
+          [1652944714.527576][8499:8499] CHIP:DMG:                                 Attribute = 0x0000_0011,
+          [1652944714.527636][8499:8499] CHIP:DMG:                         }
+          [1652944714.527701][8499:8499] CHIP:DMG:
+          [1652944714.527751][8499:8499] CHIP:DMG:                                 Data = 1,
+          [1652944714.527801][8499:8499] CHIP:DMG:                 },
+          [1652944714.527839][8499:8499] CHIP:DMG:
+          [1652944714.527950][8499:8499] CHIP:DMG:         ],
+          [1652944714.527992][8499:8499] CHIP:DMG:
+          [1652944714.528033][8499:8499] CHIP:DMG:         moreChunkedMessages = false,
+          [1652944714.528065][8499:8499] CHIP:DMG:         InteractionModelRevision = 1
+          [1652944714.528104][8499:8499] CHIP:DMG: },
+
+
+
+          ./chip-tool levelcontrol write on-level 1 1 1
+          [1652945083.826161][34821:34826] CHIP:DMG:                         AttributePathIB =
+          [1652945083.826181][34821:34826] CHIP:DMG:                         {
+          [1652945083.826196][34821:34826] CHIP:DMG:                                 Endpoint = 0x1,
+          [1652945083.826216][34821:34826] CHIP:DMG:                                 Cluster = 0x8,
+          [1652945083.826233][34821:34826] CHIP:DMG:                                 Attribute = 0x0000_0011,
+          [1652945083.826256][34821:34826] CHIP:DMG:                         }
+          [1652945083.826281][34821:34826] CHIP:DMG:
+          [1652945083.826297][34821:34826] CHIP:DMG:                         StatusIB =
+          [1652945083.826315][34821:34826] CHIP:DMG:                         {
+          [1652945083.826330][34821:34826] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1652945083.826347][34821:34826] CHIP:DMG:                         },
+
+
+          ./chip-tool levelcontrol read on-level 1 1
+          [1652944956.222032][34790:34795] CHIP:DMG:         SuppressResponse = true,
+          [1652944956.222047][34790:34795] CHIP:DMG:         InteractionModelRevision = 1
+          [1652944956.222061][34790:34795] CHIP:DMG: }
+          [1652944956.222195][34790:34795] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 2105467261
+          [1652944956.222235][34790:34795] CHIP:TOO:   on level: 1
+      disabled: true
+
+    - label:
+          "TH sends a Timed Request Message(Timed Invoke Transaction) with the
+          timeout value set. (Example - 200 milliseconds). Wait for the status
+          response message to be received. Wait for 5 seconds(Timer has expired)
+          and then send the Invoke Request Message to the DUT."
       verification: |
           here is the example command you can use
 
-          '' ./chip-tool onoff on 1 1 --repeat-delay-ms 5000  --timedInteractionTimeoutMs 200
+           sudo ./chip-tool onoff on 1 1 --repeat-delay-ms 5000  --timedInteractionTimeoutMs 200
 
           Verify we are getting status response and UNSUPPORTED_ACCESS from TH to DUT for above command
 
@@ -63,4 +184,35 @@ tests:
           [1649686333.699528][3252:3257] CHIP:DMG: }
           [1649686333.699585][3252:3257] CHIP:IM: Received status response, status is 0x7e (UNSUPPORTED_ACCESS)
           [1649686333.699661][3252:3257] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+
+
+          On DUT--
+
+          [1653567025.194641][29848:29848] CHIP:EM: Handling via exchange: 9429r, Delegate: 0xaaaac09d1548
+          [1653567025.194740][29848:29848] CHIP:DMG: TimedRequestMessage =
+          [1653567025.194789][29848:29848] CHIP:DMG: {
+          [1653567025.194832][29848:29848] CHIP:DMG:         TimeoutMs = 0xc8,
+          [1653567025.194876][29848:29848] CHIP:DMG:         InteractionModelRevision = 1
+          [1653567025.194918][29848:29848] CHIP:DMG: }
+          [1653567025.194965][29848:29848] CHIP:DMG: Got Timed Request with timeout 200: handler 0xaaaaf627ce40 exchange 9429r
+          [1653567025.195037][29848:29848] CHIP:EM: Piggybacking Ack for MessageCounter:15941998 on exchange: 9429r
+      disabled: true
+
+    - label:
+          "TH sends a Timed Request Message(Timed Write Transaction) with the
+          timeout value set. (Example - 200 milliseconds). Wait for the status
+          response message to be received. Wait for 5 seconds(Timer has expired)
+          and then send the Write Request Message to the DUT."
+      verification: |
+          ./chip-tool modeselect write on-mode 0 1 1 --repeat-delay-ms 1000 --timedInteractionTimeoutMs 500
+
+          [1654771611.106067][28715:28720] CHIP:DMG: WriteClient moving to [ResponseRe]
+          [1654771611.106112][28715:28720] CHIP:DMG: StatusResponseMessage =
+          [1654771611.106140][28715:28720] CHIP:DMG: {
+          [1654771611.106165][28715:28720] CHIP:DMG:         Status = 0x7e (UNSUPPORTED_ACCESS),
+          [1654771611.106192][28715:28720] CHIP:DMG:         InteractionModelRevision = 1
+          [1654771611.106216][28715:28720] CHIP:DMG: }
+          [1654771611.106244][28715:28720] CHIP:IM: Received status response, status is 0x7e (UNSUPPORTED_ACCESS)
+          [1654771611.106280][28715:28720] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1654771611.106303][28715:28720] CHIP:DMG: WriteClient moving to [AwaitingDe]
       disabled: true
