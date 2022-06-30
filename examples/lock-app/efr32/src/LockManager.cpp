@@ -31,47 +31,49 @@ LockManager LockManager::sLock;
 TimerHandle_t sLockTimer;
 
 using namespace ::chip::DeviceLayer::Internal;
+using namespace EFR32DoorLock::LockInitParams;
 
-CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
-                             uint8_t maxNumberOfCredentialsPerUser, uint16_t numberOfSupportedUsers,
-                             uint8_t numberOfWeekdaySchedulesPerUserSupported, uint8_t numberOfYeardaySchedulesPerUserSupported,
-                             uint8_t numberOfHolidaySchedulesSupported)
+CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state, LockParam lockParam)
 {
 
-    mMaxCredentialsPerUser = maxNumberOfCredentialsPerUser;
+    LockParams = lockParam;
 
-    mMaxUsers = numberOfSupportedUsers;
-    if (mMaxUsers > DOOR_LOCK_MAX_USERS)
+    if (LockParams.numberOfUsers > kMaxUsers)
     {
         EFR32_LOG("Max number of users is greater than %d, the maximum amount of users currently supported on this platform",
-                  DOOR_LOCK_MAX_USERS);
+                  kMaxUsers);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
-    mNumberOfWeekdaySchedulesPerUserSupported = numberOfWeekdaySchedulesPerUserSupported;
-    if (mNumberOfWeekdaySchedulesPerUserSupported > MAX_SCHEDULE_PER_USER)
+    if (LockParams.numberOfCredentialsPerUser > kMaxCredentialsPerUser)
     {
-        EFR32_LOG(
-            "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
-            MAX_SCHEDULE_PER_USER);
+        EFR32_LOG("Max number of credentials per user is greater than %d, the maximum amount of users currently supported on this "
+                  "platform",
+                  kMaxCredentialsPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
-    mNumberOfYeardaySchedulesPerUserSupported = numberOfYeardaySchedulesPerUserSupported;
-    if (mNumberOfYeardaySchedulesPerUserSupported > MAX_SCHEDULE_PER_USER)
+    if (LockParams.numberOfWeekdaySchedulesPerUser > kMaxWeekdaySchedulesPerUser)
     {
         EFR32_LOG(
             "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
-            MAX_SCHEDULE_PER_USER);
+            kMaxWeekdaySchedulesPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
-    mNumberOfHolidaySchedulesSupported = numberOfHolidaySchedulesSupported;
-    if (mNumberOfHolidaySchedulesSupported > MAX_SCHEDULE_PER_USER)
+    if (LockParams.numberOfYeardaySchedulesPerUser > kMaxYeardaySchedulesPerUser)
     {
         EFR32_LOG(
             "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
-            MAX_SCHEDULE_PER_USER);
+            kMaxYeardaySchedulesPerUser);
+        return APP_ERROR_ALLOCATION_FAILED;
+    }
+
+    if (LockParams.numberOfHolidaySchedules > kMaxHolidaySchedules)
+    {
+        EFR32_LOG(
+            "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
+            kMaxHolidaySchedules);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
@@ -97,6 +99,64 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
     return CHIP_NO_ERROR;
 }
 
+bool LockManager::IsValidUserIndex(uint16_t userIndex)
+{
+    if (userIndex > kMaxUsers)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool LockManager::IsValidCredentialIndex(uint16_t credentialIndex, DlCredentialType type)
+{
+    // appclusters, 5.2.6.3.1: 0 is allowed index for Programming PIN credential only
+    if (DlCredentialType::kProgrammingPIN == type)
+    {
+        return (0 == credentialIndex);
+    }
+
+    if (credentialIndex > kMaxCredentialsPerUser)
+    {
+        return false;
+    }
+
+    // Check programming pin
+
+    return true;
+}
+
+bool LockManager::IsValidWeekdayScheduleIndex(uint8_t scheduleIndex)
+{
+    if (scheduleIndex > kMaxWeekdaySchedulesPerUser)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool LockManager::IsValidYeardayScheduleIndex(uint8_t scheduleIndex)
+{
+    if (scheduleIndex > kMaxYeardaySchedulesPerUser)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool LockManager::IsValidHolidayScheduleIndex(uint8_t scheduleIndex)
+{
+    if (scheduleIndex > kMaxHolidaySchedules)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool LockManager::ReadConfigValues()
 {
     size_t outLen;
@@ -113,18 +173,21 @@ bool LockManager::ReadConfigValues()
                                     sizeof(mCredentialData), outLen);
 
     EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
-                                    sizeof(DlCredential) * mMaxUsers * mMaxCredentialsPerUser, outLen);
+                                    sizeof(DlCredential) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser,
+                                    outLen);
 
-    EFR32Config::ReadConfigValueBin(
-        EFR32Config::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
-        sizeof(EmberAfPluginDoorLockWeekDaySchedule) * mNumberOfWeekdaySchedulesPerUserSupported * mMaxUsers, outLen);
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
+                                    sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
+                                        LockParams.numberOfUsers,
+                                    outLen);
 
-    EFR32Config::ReadConfigValueBin(
-        EFR32Config::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
-        sizeof(EmberAfPluginDoorLockYearDaySchedule) * mNumberOfYeardaySchedulesPerUserSupported * mMaxUsers, outLen);
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
+                                    sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
+                                        LockParams.numberOfUsers,
+                                    outLen);
 
     EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
-                                    sizeof(EmberAfPluginDoorLockHolidaySchedule) * mNumberOfHolidaySchedulesSupported, outLen);
+                                    sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, outLen);
 
     return true;
 }
@@ -259,14 +322,17 @@ bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteS
     return setLockState(endpointId, DlLockState::kUnlocked, pin, err);
 }
 
-bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
+bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
 {
-    // door-lock-server checks for valid credential index
-    uint16_t adjustedUserIndex = userIndex - 1;
+    VerifyOrReturnValue(userIndex > 0, false); // indices are one-indexed
 
-    ChipLogProgress(Zcl, "Door Lock App: LockManager::GetUser [endpoint=%d,userIndex=%hu]", endpointId, adjustedUserIndex);
+    userIndex--;
 
-    const auto & userInDb = mLockUsers[adjustedUserIndex];
+    VerifyOrReturnValue(IsValidUserIndex(userIndex), false);
+
+    ChipLogProgress(Zcl, "Door Lock App: LockManager::GetUser [endpoint=%d,userIndex=%hu]", endpointId, userIndex);
+
+    const auto & userInDb = mLockUsers[userIndex];
 
     user.userStatus = userInDb.userStatus;
     if (DlUserStatus::kAvailable == user.userStatus)
@@ -276,7 +342,7 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     }
 
     user.userName       = chip::CharSpan(userInDb.userName.data(), userInDb.userName.size());
-    user.credentials    = chip::Span<const DlCredential>(mCredentials[adjustedUserIndex], userInDb.credentials.size());
+    user.credentials    = chip::Span<const DlCredential>(mCredentials[userIndex], userInDb.credentials.size());
     user.userUniqueId   = userInDb.userUniqueId;
     user.userType       = userInDb.userType;
     user.credentialRule = userInDb.credentialRule;
@@ -309,26 +375,29 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
                     endpointId, userIndex, creator, modifier, userName.data(), uniqueId, to_underlying(userStatus),
                     to_underlying(usertype), to_underlying(credentialRule), credentials, totalCredentials);
 
-    // door-lock-server checks for valid credential index
-    uint16_t adjustedUserIndex = userIndex - 1;
+    VerifyOrReturnValue(userIndex > 0, false); // indices are one-indexed
 
-    auto & userInStorage = mLockUsers[adjustedUserIndex];
+    userIndex--;
+
+    VerifyOrReturnValue(IsValidUserIndex(userIndex), false);
+
+    auto & userInStorage = mLockUsers[userIndex];
 
     if (userName.size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
     {
-        ChipLogError(Zcl, "Cannot set user - user name is too long [endpoint=%d,index=%d]", endpointId, adjustedUserIndex);
+        ChipLogError(Zcl, "Cannot set user - user name is too long [endpoint=%d,index=%d]", endpointId, userIndex);
         return false;
     }
 
-    if (totalCredentials > mMaxCredentialsPerUser)
+    if (totalCredentials > LockParams.numberOfCredentialsPerUser)
     {
         ChipLogError(Zcl, "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,totalCredentials=%u]",
-                     endpointId, adjustedUserIndex, totalCredentials);
+                     endpointId, userIndex, totalCredentials);
         return false;
     }
 
-    chip::Platform::CopyString(mUserNames[adjustedUserIndex], userName);
-    userInStorage.userName       = chip::CharSpan(mUserNames[adjustedUserIndex], userName.size());
+    chip::Platform::CopyString(mUserNames[userIndex], userName);
+    userInStorage.userName       = chip::CharSpan(mUserNames[userIndex], userName.size());
     userInStorage.userUniqueId   = uniqueId;
     userInStorage.userStatus     = userStatus;
     userInStorage.userType       = usertype;
@@ -338,50 +407,53 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 
     for (size_t i = 0; i < totalCredentials; ++i)
     {
-        mCredentials[adjustedUserIndex][i]                 = credentials[i];
-        mCredentials[adjustedUserIndex][i].CredentialType  = 1;
-        mCredentials[adjustedUserIndex][i].CredentialIndex = i + 1;
+        mCredentials[userIndex][i]                 = credentials[i];
+        mCredentials[userIndex][i].CredentialType  = 1;
+        mCredentials[userIndex][i].CredentialIndex = i + 1;
     }
 
-    userInStorage.credentials = chip::Span<const DlCredential>(mCredentials[adjustedUserIndex], totalCredentials);
+    userInStorage.credentials = chip::Span<const DlCredential>(mCredentials[userIndex], totalCredentials);
 
     // Save user information in NVM flash
     EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
-                                     sizeof(EmberAfPluginDoorLockUserInfo) * mMaxUsers);
+                                     sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
 
     EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
-                                     sizeof(DlCredential) * mMaxUsers * mMaxCredentialsPerUser);
+                                     sizeof(DlCredential) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser);
 
     EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
                                      sizeof(mUserNames));
 
-    ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, adjustedUserIndex);
+    ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
 
     return true;
 }
 
 bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
-                                EmberAfPluginDoorLockCredentialInfo & credential) const
+                                EmberAfPluginDoorLockCredentialInfo & credential)
 {
 
-    // door-lock-server checks for valid credential index
-    uint16_t adjustedCredentialIndex = credentialIndex - 1;
+    VerifyOrReturnValue(credentialIndex > 0, false); // indices are one-indexed
+
+    credentialIndex--;
+
+    VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType), false);
 
     ChipLogProgress(Zcl, "Lock App: LockManager::GetCredential [credentialType=%u], credentialIndex=%d",
-                    to_underlying(credentialType), adjustedCredentialIndex);
+                    to_underlying(credentialType), credentialIndex);
 
     if (credentialType == DlCredentialType::kProgrammingPIN)
     {
         ChipLogError(Zcl, "Programming user not supported [credentialType=%u], credentialIndex=%d", to_underlying(credentialType),
-                     adjustedCredentialIndex);
+                     credentialIndex);
 
         return true;
     }
 
-    const auto & credentialInStorage = mLockCredentials[adjustedCredentialIndex];
+    const auto & credentialInStorage = mLockCredentials[credentialIndex];
 
     credential.status = credentialInStorage.status;
-    ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, adjustedCredentialIndex);
+    ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
 
     if (DlCredentialStatus::kAvailable == credential.status)
     {
@@ -408,34 +480,30 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                                 const chip::ByteSpan & credentialData)
 {
 
-    if ((credentialIndex < MIN_CREDENTIAL_INDEX) || (credentialIndex > MAX_CREDENTIAL_PER_USER))
-    {
-        ChipLogError(Zcl, "Cannot set credential - credential index is out of range [endpoint=%d,index=%d]", endpointId,
-                     credentialIndex);
-        return false;
-    }
+    VerifyOrReturnValue(credentialIndex > 0, false); // indices are one-indexed
+
+    credentialIndex--;
+
+    VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType), false);
 
     ChipLogProgress(Zcl,
                     "Door Lock App: LockManager::SetCredential "
                     "[credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%d,modifier=%d]",
                     to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size(), creator, modifier);
 
-    // door-lock-server checks for valid credential index
-    uint16_t adjustedCredentialIndex = credentialIndex - 1;
-
-    auto & credentialInStorage = mLockCredentials[adjustedCredentialIndex];
+    auto & credentialInStorage = mLockCredentials[credentialIndex];
 
     credentialInStorage.status         = credentialStatus;
     credentialInStorage.credentialType = credentialType;
     credentialInStorage.createdBy      = creator;
     credentialInStorage.lastModifiedBy = modifier;
 
-    memcpy(mCredentialData[adjustedCredentialIndex], credentialData.data(), credentialData.size());
-    credentialInStorage.credentialData = chip::ByteSpan{ mCredentialData[adjustedCredentialIndex], credentialData.size() };
+    memcpy(mCredentialData[credentialIndex], credentialData.data(), credentialData.size());
+    credentialInStorage.credentialData = chip::ByteSpan{ mCredentialData[credentialIndex], credentialData.size() };
 
     // Save credential information in NVM flash
     EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
-                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * mMaxCredentialsPerUser);
+                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser);
 
     EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
                                      sizeof(mCredentialData));
@@ -448,24 +516,17 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
 DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                          EmberAfPluginDoorLockWeekDaySchedule & schedule)
 {
-    if ((weekdayIndex < MIN_SCHEDULE_INDEX) || (weekdayIndex > MAX_SCHEDULE_PER_USER))
-    {
-        ChipLogError(Zcl, "Cannot get schedule - schedule index is out of range [endpoint=%d,index=%d]", endpointId, weekdayIndex);
-        return DlStatus::kFailure;
-    }
-    if ((userIndex < MIN_USER_INDEX) || (userIndex > DOOR_LOCK_MAX_USERS))
-    {
-        ChipLogError(Zcl, "Cannot get schedule - user index is out of range [endpoint=%d,index=%d]", endpointId, userIndex);
-        return DlStatus::kFailure;
-    }
 
-    // doorlock server checks for valid indices
-    uint8_t adjustedWeekDayIndex = weekdayIndex - 1;
-    uint16_t adjustedUserIndex   = userIndex - 1;
+    VerifyOrReturnValue(weekdayIndex > 0, DlStatus::kFailure); // indices are one-indexed
+    VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
 
-    auto & scheduleInStorage = mWeekdaySchedule[adjustedUserIndex][adjustedWeekDayIndex];
+    weekdayIndex--;
+    userIndex--;
 
-    schedule = scheduleInStorage;
+    VerifyOrReturnValue(IsValidWeekdayScheduleIndex(weekdayIndex), DlStatus::kFailure);
+    VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
+
+    schedule = mWeekdaySchedule[userIndex][weekdayIndex];
 
     return DlStatus::kSuccess;
 }
@@ -474,22 +535,17 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
                                          DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
                                          uint8_t endHour, uint8_t endMinute)
 {
-    if ((weekdayIndex < MIN_SCHEDULE_INDEX) || (weekdayIndex > MAX_SCHEDULE_PER_USER))
-    {
-        ChipLogError(Zcl, "Cannot set schedule - schedule index is out of range [endpoint=%d,index=%d]", endpointId, weekdayIndex);
-        return DlStatus::kFailure;
-    }
-    if ((userIndex < MIN_USER_INDEX) || (userIndex > DOOR_LOCK_MAX_USERS))
-    {
-        ChipLogError(Zcl, "Cannot get schedule - user index is out of range [endpoint=%d,index=%d]", endpointId, userIndex);
-        return DlStatus::kFailure;
-    }
 
-    // doorlock server checks for valid indices
-    uint8_t adjustedWeekDayIndex = weekdayIndex - 1;
-    uint16_t adjustedUserIndex   = userIndex - 1;
+    VerifyOrReturnValue(weekdayIndex > 0, DlStatus::kFailure); // indices are one-indexed
+    VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
 
-    auto & scheduleInStorage = mWeekdaySchedule[adjustedUserIndex][adjustedWeekDayIndex];
+    weekdayIndex--;
+    userIndex--;
+
+    VerifyOrReturnValue(IsValidWeekdayScheduleIndex(weekdayIndex), DlStatus::kFailure);
+    VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
+
+    auto & scheduleInStorage = mWeekdaySchedule[userIndex][weekdayIndex];
 
     scheduleInStorage.daysMask    = daysMask;
     scheduleInStorage.startHour   = startHour;
@@ -497,9 +553,10 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     scheduleInStorage.endHour     = endHour;
     scheduleInStorage.endMinute   = endMinute;
 
+    // Save schedule information in NVM flash
     EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
-                                     sizeof(EmberAfPluginDoorLockWeekDaySchedule) * mNumberOfWeekdaySchedulesPerUserSupported *
-                                         mMaxUsers);
+                                     sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
+                                         LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
 }
@@ -507,22 +564,16 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
 DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                          EmberAfPluginDoorLockYearDaySchedule & schedule)
 {
-    if ((yearDayIndex < MIN_SCHEDULE_INDEX) || (yearDayIndex > MAX_SCHEDULE_PER_USER))
-    {
-        ChipLogError(Zcl, "Cannot set schedule - schedule index is out of range [endpoint=%d,index=%d]", endpointId, yearDayIndex);
-        return DlStatus::kFailure;
-    }
-    if ((userIndex < MIN_USER_INDEX) || (userIndex > DOOR_LOCK_MAX_USERS))
-    {
-        ChipLogError(Zcl, "Cannot get schedule - user index is out of range [endpoint=%d,index=%d]", endpointId, userIndex);
-        return DlStatus::kFailure;
-    }
+    VerifyOrReturnValue(yearDayIndex > 0, DlStatus::kFailure); // indices are one-indexed
+    VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
 
-    // doorlock server checks for valid indices
-    uint8_t adjustedYearDayIndex = yearDayIndex - 1;
-    uint16_t adjustedUserIndex   = userIndex - 1;
+    yearDayIndex--;
+    userIndex--;
 
-    auto & scheduleInStorage = mYeardaySchedule[adjustedUserIndex][adjustedYearDayIndex];
+    VerifyOrReturnValue(IsValidYeardayScheduleIndex(yearDayIndex), DlStatus::kFailure);
+    VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
+
+    auto & scheduleInStorage = mYeardaySchedule[userIndex][yearDayIndex];
 
     schedule = scheduleInStorage;
 
@@ -532,30 +583,24 @@ DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                          DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime)
 {
-    if ((yearDayIndex < MIN_SCHEDULE_INDEX) || (yearDayIndex > MAX_SCHEDULE_PER_USER))
-    {
-        ChipLogError(Zcl, "Cannot set schedule - schedule index is out of range [endpoint=%d,index=%d]", endpointId, yearDayIndex);
-        return DlStatus::kFailure;
-    }
-    if ((userIndex < MIN_USER_INDEX) || (userIndex > DOOR_LOCK_MAX_USERS))
-    {
-        ChipLogError(Zcl, "Cannot get schedule - user index is out of range [endpoint=%d,index=%d]", endpointId, userIndex);
-        return DlStatus::kFailure;
-    }
+    VerifyOrReturnValue(yearDayIndex > 0, DlStatus::kFailure); // indices are one-indexed
+    VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
 
-    // doorlock server checks for valid indices
-    uint8_t adjustedYearDayIndex = yearDayIndex - 1;
-    uint16_t adjustedUserIndex   = userIndex - 1;
+    yearDayIndex--;
+    userIndex--;
 
-    auto & scheduleInStorage = mYeardaySchedule[adjustedUserIndex][adjustedYearDayIndex];
+    VerifyOrReturnValue(IsValidYeardayScheduleIndex(yearDayIndex), DlStatus::kFailure);
+    VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
 
-    // scheduleInStorage.status = status;
+    auto & scheduleInStorage = mYeardaySchedule[userIndex][yearDayIndex];
+
     scheduleInStorage.localStartTime = localStartTime;
     scheduleInStorage.localEndTime   = localEndTime;
 
+    // Save schedule information in NVM flash
     EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
-                                     sizeof(EmberAfPluginDoorLockYearDaySchedule) * mNumberOfYeardaySchedulesPerUserSupported *
-                                         mMaxUsers);
+                                     sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
+                                         LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
 }
@@ -563,16 +608,13 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex,
                                          EmberAfPluginDoorLockHolidaySchedule & schedule)
 {
-    if ((holidayIndex < MIN_SCHEDULE_INDEX) || (holidayIndex > MAX_SCHEDULE_PER_USER))
-    {
-        ChipLogError(Zcl, "Cannot set schedule - schedule index is out of range [endpoint=%d,index=%d]", endpointId, holidayIndex);
-        return DlStatus::kFailure;
-    }
+    VerifyOrReturnValue(holidayIndex > 0, DlStatus::kFailure); // indices are one-indexed
 
-    // door-lock server checks for valid indices
-    uint8_t adjustedHolidayIndex = holidayIndex - 1;
+    holidayIndex--;
 
-    auto & scheduleInStorage = mHolidaySchedule[adjustedHolidayIndex];
+    VerifyOrReturnValue(IsValidHolidayScheduleIndex(holidayIndex), DlStatus::kFailure);
+
+    auto & scheduleInStorage = mHolidaySchedule[holidayIndex];
 
     schedule = scheduleInStorage;
 
@@ -582,24 +624,22 @@ DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
 DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
                                          uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode)
 {
-    if ((holidayIndex < MIN_SCHEDULE_INDEX) || (holidayIndex > MAX_SCHEDULE_PER_USER))
-    {
-        ChipLogError(Zcl, "Cannot set schedule - schedule index is out of range [endpoint=%d,index=%d]", endpointId, holidayIndex);
-        return DlStatus::kFailure;
-    }
+    VerifyOrReturnValue(holidayIndex > 0, DlStatus::kFailure); // indices are one-indexed
 
-    // door-lock server checks for valid indices
-    uint8_t adjustedHolidayIndex = holidayIndex - 1;
+    holidayIndex--;
 
-    auto & scheduleInStorage = mHolidaySchedule[adjustedHolidayIndex];
+    VerifyOrReturnValue(IsValidHolidayScheduleIndex(holidayIndex), DlStatus::kFailure);
+
+    auto & scheduleInStorage = mHolidaySchedule[holidayIndex];
 
     scheduleInStorage.localStartTime = localStartTime;
     scheduleInStorage.localEndTime   = localEndTime;
     scheduleInStorage.operatingMode  = operatingMode;
 
+    // Save schedule information in NVM flash
     EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_HolidaySchedules,
                                      reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
-                                     sizeof(EmberAfPluginDoorLockHolidaySchedule) * mNumberOfHolidaySchedulesSupported);
+                                     sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
 
     return DlStatus::kSuccess;
 }
@@ -640,8 +680,8 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
         return true;
     }
 
-    // Check the RequirePINforRemoteOperation attribute
-    bool requirePin = false;
+    // Assume pin is required until told otherwise
+    bool requirePin = true;
     chip::app::Clusters::DoorLock::Attributes::RequirePINforRemoteOperation::Get(endpointId, &requirePin);
 
     // If a pin code is not given
@@ -663,7 +703,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     }
 
     // Check the PIN code
-    for (uint8_t i = 0; i < MAX_CREDENTIALS; i++)
+    for (uint8_t i = 0; i < kMaxCredentials; i++)
     {
         if (mLockCredentials[i].credentialType != DlCredentialType::kPin ||
             mLockCredentials[i].status == DlCredentialStatus::kAvailable)
