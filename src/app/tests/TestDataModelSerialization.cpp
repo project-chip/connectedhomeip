@@ -222,7 +222,8 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
     }
 }
 
-void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStructNegativeEnum(nlTestSuite * apSuite, void * apContext)
+void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStructNegativeEnum(nlTestSuite * apSuite,
+                                                                                              void * apContext)
 {
     CHIP_ERROR err;
     auto * _this = static_cast<TestDataModelSerialization *>(apContext);
