@@ -37,7 +37,7 @@ _bootstrap_or_activate() {
     fi
 
     local _MATTER_BANNER="$(
-        cat <<- EOF
+        cat <<-EOF
 
         █
         █
