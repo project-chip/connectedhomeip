@@ -15,6 +15,9 @@
 # Options from standalone-chip.mk that differ from configure defaults. These
 # options are used from examples/.
 
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_span/polyfill.gni")
+
 chip_device_platform = "ameba"
 
 chip_project_config_include = ""
