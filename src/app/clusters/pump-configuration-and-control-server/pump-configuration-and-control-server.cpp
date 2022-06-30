@@ -385,7 +385,7 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
             }
             break;
         default:
-            status = Protocols::InteractionModel::Status::ConstraintError;
+            status = Protocols::InteractionModel::Status::Success;
         }
     }
     break;
@@ -398,9 +398,6 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
 
         switch (operationMode)
         {
-        case PumpOperationMode::kNormal:
-            // No constraint
-            break;
         case PumpOperationMode::kMinimum:
             if (!IsFeatureSupported(attributePath.mEndpointId, Attributes::MinConstSpeed::Get, Attributes::MaxConstSpeed::Get))
             {
@@ -413,11 +410,8 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
-        case PumpOperationMode::kLocal:
-            // No constraint
-            break;
         default:
-            status = Protocols::InteractionModel::Status::ConstraintError;
+            status = Protocols::InteractionModel::Status::Success;
         }
 
         break;
