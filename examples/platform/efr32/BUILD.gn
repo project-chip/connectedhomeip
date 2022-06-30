@@ -37,11 +37,6 @@ config("chip_examples_project_config") {
     "-Wl,--wrap=_free_r",
     "-Wl,--wrap=_calloc_r",
   ]
-
-  defines = [
-    # Set to 1 to enable EFR32 attestation credentials
-    "EFR32_ATTESTATION_CREDENTIALS=0",
-  ]
 }
 
 source_set("openthread_core_config_efr32_chip_examples") {
@@ -68,4 +63,27 @@ source_set("efr-matter-shell") {
       "${chip_root}/src/lib/shell:shell_core",
     ]
   }
+}
+
+config("attestation-credentials-config") {
+  include_dirs = [ "${chip_root}" ]
+
+  defines = [
+    # Set to 1 to enable EFR32 attestation credentials
+    "EFR32_ATTESTATION_CREDENTIALS",
+  ]
+}
+
+source_set("efr32-attestation-credentials") {
+  sources = [
+    "EFR32DeviceAttestationCreds.cpp",
+    "EFR32DeviceAttestationCreds.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/platform:platform_base",
+  ]
+
+  public_configs = [ ":attestation-credentials-config" ]
 }

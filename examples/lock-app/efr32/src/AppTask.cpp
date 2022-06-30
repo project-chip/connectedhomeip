@@ -43,13 +43,6 @@
 
 #include <assert.h>
 
-#include <credentials/DeviceAttestationCredsProvider.h>
-#ifdef EFR32_ATTESTATION_CREDENTIALS
-#include <platform/EFR32/EFR32DeviceAttestationCreds.h>
-#else
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#endif
-
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -177,7 +170,6 @@ Identify gIdentify = {
 } // namespace
 
 using namespace chip::TLV;
-using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -214,15 +206,6 @@ CHIP_ERROR AppTask::Init()
 
     sWiFiNetworkCommissioningInstance.Init();
 #endif
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    // Initialize device attestation config
-#ifdef EFR32_ATTESTATION_CREDENTIALS
-    SetDeviceAttestationCredentialsProvider(EFR32::GetDACProvider());
-#else
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-#endif
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel

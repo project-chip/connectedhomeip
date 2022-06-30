@@ -32,7 +32,7 @@ namespace EFR32 {
  * @returns a singleton DeviceAttestationCredentialsProvider that relies on no
  *          storage abstractions.
  */
-DeviceAttestationCredentialsProvider * GetDACProvider();
+DeviceAttestationCredentialsProvider * GetEFR32DacProvider();
 
 } // namespace EFR32
 } // namespace Credentials

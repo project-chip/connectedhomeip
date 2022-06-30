@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -70,9 +70,9 @@ public:
 
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_buffer) override
     {
-        psa_key_id_t key_id                                  = MFG_MATTER_DAC_KEY_ID;
-        uint8_t signature[chip::Crypto::kSHA256_Hash_Length] = { 0 };
-        size_t signature_size                                = sizeof(signature);
+        psa_key_id_t key_id   = MFG_MATTER_DAC_KEY_ID;
+        uint8_t signature[64] = { 0 };
+        size_t signature_size = sizeof(signature);
 
         psa_status_t err = psa_sign_hash(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), digest_to_sign.data(), digest_to_sign.size(),
                                          signature, signature_size, &signature_size);
@@ -84,7 +84,7 @@ public:
 
 } // namespace
 
-DeviceAttestationCredentialsProvider * GetDACProvider()
+DeviceAttestationCredentialsProvider * GetEFR32DacProvider()
 {
     static DeviceAttestationCredsEFR32 dac_provider;
     return &dac_provider;
