@@ -2,26 +2,26 @@
 
 ## Table of Contents
 
--   [CHIP Certificate Tool](#chip-certificate-tool)
-    -   [Table of Contents](#table-of-contents)
-    -   [Introduction](#introduction)
-    -   [Directory Structure](#directory-structure)
-        -   [<code>/src/tools/chip-cert</code>](#srctoolschip-cert)
-    -   [Usage Examples](#usage-examples)
-    -   [Operational Certificates Usage Examples](#operational-certificates-usage-examples)
-        -   [Attestation Certificates Usage Examples](#attestation-certificates-usage-examples)
-    -   [Command Reference](#command-reference)
-        -   [help](#help)
-        -   [gen-cert](#gen-cert)
-        -   [convert-cert](#convert-cert)
-        -   [convert-key](#convert-key)
-        -   [resign-cert](#resign-cert)
-        -   [validate-cert](#validate-cert)
-        -   [print-cert](#print-cert)
-        -   [gen-att-cert](#gen-att-cert)
-        -   [validate-att-cert](#validate-att-cert)
-        -   [gen-cd](#gen-cd)
-        -   [version](#version)
+- [CHIP Certificate Tool](#chip-certificate-tool)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Directory Structure](#directory-structure)
+    - [<code>/src/tools/chip-cert</code>](#srctoolschip-cert)
+  - [Usage Examples](#usage-examples)
+  - [Operational Certificates Usage Examples](#operational-certificates-usage-examples)
+    - [Attestation Certificates Usage Examples](#attestation-certificates-usage-examples)
+  - [Command Reference](#command-reference)
+    - [help](#help)
+    - [gen-cert](#gen-cert)
+    - [convert-cert](#convert-cert)
+    - [convert-key](#convert-key)
+    - [resign-cert](#resign-cert)
+    - [validate-cert](#validate-cert)
+    - [print-cert](#print-cert)
+    - [gen-att-cert](#gen-att-cert)
+    - [validate-att-cert](#validate-att-cert)
+    - [gen-cd](#gen-cd)
+    - [version](#version)
 
 ## Introduction
 
@@ -258,6 +258,7 @@ COMMAND OPTIONS
            x509-pem  - X.509 PEM format
            x509-der  - X.509 DER format
            chip      - raw CHIP TLV format
+           chip-hex  - hex encoded CHIP TLV format
            chip-b64  - base-64 encoded CHIP TLV format (default)
 
    -V, --valid-from <YYYY>-<MM>-<DD> [ <HH>:<MM>:<SS> ]
@@ -306,13 +307,17 @@ COMMAND OPTIONS
 
        Output certificate in X.509 PEM format.
 
-  -x, --x509-der
+  -d, --x509-der
 
        Output certificate in X.509 DER format.
 
   -c, --chip
 
        Output certificate in raw CHIP TLV format.
+
+  -x, --chip-hex
+
+       Output certificate in CHIP TLV hexidecimal format.
 
   -b --chip-b64
 
@@ -353,13 +358,16 @@ COMMAND OPTIONS
 
        Output the private key in SEC1/RFC-5915 PEM format.
 
-   -x, --x509-der
+   -d, --x509-der
 
        Output the private key in SEC1/RFC-5915 DER format.
 
    -c, --chip
 
        Output the private key in raw CHIP serialized format.
+   -x, --chip-hex
+
+       Output the private key in hex encoded CHIP serialized format.
 
    -b, --chip-b64
 

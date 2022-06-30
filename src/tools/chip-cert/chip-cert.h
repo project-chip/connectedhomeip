@@ -105,7 +105,8 @@ enum KeyFormat
     kKeyFormat_X509_PEM,
     kKeyFormat_X509_PUBKEY_PEM,
     kKeyFormat_Chip_Raw,
-    kKeyFormat_Chip_Base64
+    kKeyFormat_Chip_Base64,
+    kKeyFormat_Chip_Hex
 };
 
 enum AttCertType
