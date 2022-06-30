@@ -215,14 +215,6 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
             eventReceived = xQueueReceive(mChipEventQueue, &event, 0);
         }
     }
-
-#if defined(INCLUDE_vTaskDelete) && INCLUDE_vTaskDelete
-    if (mEventLoopTask)
-    {
-        vTaskDelete(mEventLoopTask);
-        mEventLoopTask = nullptr;
-    }
-#endif // INCLUDE_vTaskDelete
 }
 
 template <class ImplClass>
