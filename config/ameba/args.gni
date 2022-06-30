@@ -35,4 +35,5 @@ custom_toolchain = "//third_party/connectedhomeip/config/ameba/toolchain:ameba"
 
 pw_build_PIP_CONSTRAINTS =
     [ "//third_party/connectedhomeip/scripts/constraints.txt" ]
+pw_span_ENABLE_STD_SPAN_POLYFILL = false
 cpp_standard = "c++17"
