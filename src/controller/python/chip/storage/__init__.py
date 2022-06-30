@@ -48,8 +48,9 @@ def _OnSyncSetKeyValueCb(storageObj, key: str, value, size):
 def _OnSyncGetKeyValueCb(storageObj, key: str, value, size):
     ''' This does not adhere API requirement of
     PersistentStorageDelegate::SyncGetKeyValue, but that is okay since
-    the callers are capable of adapting results from this method
-    to the requirements of PersistentStorageDelegate::SyncGetKeyValue.
+    the C++ storage binding layer is capable of adapting results from
+    this method to the requirements of
+    PersistentStorageDelegate::SyncGetKeyValue.
     '''
     try:
         keyValue = storageObj.GetSdkKey(key.decode("utf-8"))

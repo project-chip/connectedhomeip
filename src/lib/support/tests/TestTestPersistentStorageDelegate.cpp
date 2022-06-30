@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <credentials/CHIPCert.h>
+
 #include <lib/core/CHIPError.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -117,7 +119,6 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     err  = storage.SyncGetKeyValue("key2", &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, size == strlen(kStringValue2));
-    NL_TEST_ASSERT(inSuite, size < actualSizeOfBuf);
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], kStringValue2, strlen(kStringValue2)));
     // Make sure that there was no buffer overflow during SyncGetKeyValue
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[size], &all_zeroes[0], sizeof(buf) - size));
@@ -127,7 +128,6 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     err  = storage.SyncGetKeyValue("key3", &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, size == strlen(kStringValue3));
-    NL_TEST_ASSERT(inSuite, size < actualSizeOfBuf);
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], kStringValue3, strlen(kStringValue3)));
     // Make sure that there was no buffer overflow during SyncGetKeyValue
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[size], &all_zeroes[0], sizeof(buf) - size));
@@ -138,7 +138,6 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     uint16_t sizeBeforeGetKeyValueCall = size;
     err                                = storage.SyncGetKeyValue("key2", &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
-    NL_TEST_ASSERT(inSuite, size != strlen(kStringValue2));
     NL_TEST_ASSERT(inSuite, size == sizeBeforeGetKeyValueCall);
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], kStringValue2, size));
     // Make sure that there was no buffer overflow during SyncGetKeyValue
@@ -243,7 +242,6 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     err  = storage.SyncGetKeyValue(longKeyString, &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, size == strlen(kStringValue2));
-    NL_TEST_ASSERT(inSuite, size < actualSizeOfBuf);
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], kStringValue2, strlen(kStringValue2)));
     // Make sure that there was no buffer overflow during SyncGetKeyValue
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[size], &all_zeroes[0], sizeof(buf) - size));
@@ -253,6 +251,25 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     err = storage.SyncDeleteKeyValue(longKeyString);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !storage.SyncDoesKeyExist(longKeyString));
+
+    // Test to see that we can buffer for largest size currentl known to be stored in PersistentStorageDelegate.
+    uint8_t largeBuffer[chip::Credentials::kMaxCHIPCertLength];
+    memset(&largeBuffer, 'X', sizeof(largeBuffer));
+    uint8_t largeBufferForCheck[sizeof(largeBuffer)];
+    memcpy(largeBufferForCheck, largeBuffer, sizeof(largeBuffer));
+
+    err = storage.SyncSetKeyValue(longKeyString, largeBuffer, static_cast<uint16_t>(sizeof(largeBuffer)));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    memset(&largeBuffer, 0, sizeof(largeBuffer));
+    size = static_cast<uint16_t>(sizeof(largeBuffer));
+    err  = storage.SyncGetKeyValue(longKeyString, &largeBuffer[0], size);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, size == static_cast<uint16_t>(sizeof(largeBuffer)));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&largeBuffer, largeBufferForCheck, sizeof(largeBuffer)));
+
+    err = storage.SyncDeleteKeyValue(longKeyString);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Cleaning up
     err = storage.SyncDeleteKeyValue("key3");

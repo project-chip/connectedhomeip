@@ -53,6 +53,10 @@ public:
      *   CHIP_ERROR_BUFFER_TOO_SMALL will be given, but the `buffer` will still be filled `size`
      *   bytes of the stored value.
      *
+     *   A way to determine if the key exists is to pass `size` of 0, which is always valid to do,
+     *   and check if CHIP_ERROR_BUFFER_TOO_SMALL is returned. Alternativelt you can use the helper
+     *   function SyncDoesKeyExist(key).
+     *
      *   It is legal to use `nullptr` for `buffer` if `size` is 0.
      *
      * @param[in]      key Key to lookup
