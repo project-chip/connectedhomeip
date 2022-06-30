@@ -16,20 +16,19 @@
 name: 3.3.2. [TC-DGGEN-3.2] Command generated at client as DUT
 
 config:
-    nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+  nodeId: 0x12344321
+  cluster: "Basic"
+  endpoint: 0
 
 tests:
-    - label:
-          "Provision TH and DUT with EnableKey of octstr data type and
-          EventTrigger of unint64 data type specified by the manufacturer. a.
-          DUT checks if TestEventTriggersEnabled attribute is set to true. If
-          not, stop the command execution. b. DUT checks if TH sent Enablekey
-          matches. If not, UNSUPPORED_ACCESS is sent and stops the command
-          execution. c. DUT checks TH sent EventTrigger mode if it is a DUT
-          supported test mode. If not, INVALID_COMMAND is sent and stops the
-          command execution."
-      verification: |
-          Need SDK implementation
-      disabled: true
+  - label: "Provision TH and DUT with EnableKey of octstr data type and
+      EventTrigger of unint64 data type specified by the manufacturer. a.
+      DUT checks if TestEventTriggersEnabled attribute is set to true. If
+      not, stop the command execution. b. DUT checks if TH sent Enablekey
+      matches. If not, UNSUPPORED_ACCESS is sent and stops the command
+      execution. c. DUT checks TH sent EventTrigger mode if it is a DUT
+      supported test mode. If not, INVALID_COMMAND is sent and stops the
+      command execution."
+    verification: |
+      Need SDK implementation
+    disabled: true
