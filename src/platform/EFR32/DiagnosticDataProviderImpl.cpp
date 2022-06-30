@@ -253,12 +253,79 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
     ifp->type = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
-#else
-    /* TODO */
-#endif
     uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
     ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
     ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
+#else
+    NetworkInterface * head = NULL;
+    for (Inet::InterfaceIterator interfaceIterator; interfaceIterator.HasCurrent(); interfaceIterator.Next())
+    {
+        interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
+        ifp->name          = CharSpan::fromCharString(ifp->Name);
+        ifp->isOperational = true;
+        Inet::InterfaceType interfaceType;
+        if (interfaceIterator.GetInterfaceType(interfaceType) == CHIP_NO_ERROR)
+        {
+            switch (interfaceType)
+            {
+            case Inet::InterfaceType::Unknown:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
+                break;
+            case Inet::InterfaceType::WiFi:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+                break;
+            case Inet::InterfaceType::Ethernet:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
+                break;
+            case Inet::InterfaceType::Thread:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_THREAD;
+                break;
+            case Inet::InterfaceType::Cellular:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_CELLULAR;
+                break;
+            }
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to get interface type");
+        }
+
+        ifp->offPremiseServicesReachableIPv4.SetNull();
+        ifp->offPremiseServicesReachableIPv6.SetNull();
+
+        uint8_t addressSize;
+        if (interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress)) != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to get network hardware address");
+        }
+        else
+        {
+            ifp->hardwareAddress = ByteSpan(ifp->MacAddress, addressSize);
+        }
+
+        // Assuming IPv6-only support
+        Inet::InterfaceAddressIterator interfaceAddressIterator;
+        uint8_t ipv6AddressesCount = 0;
+        while (interfaceAddressIterator.HasCurrent() && ipv6AddressesCount < kMaxIPv6AddrCount)
+        {
+            if (interfaceAddressIterator.GetInterfaceId() == interfaceIterator.GetInterfaceId())
+            {
+                chip::Inet::IPAddress ipv6Address;
+                if (interfaceAddressIterator.GetAddress(ipv6Address) == CHIP_NO_ERROR)
+                {
+                    memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipv6Address.Addr, kMaxIPv6AddrSize);
+                    ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
+                    ipv6AddressesCount++;
+                }
+            }
+            interfaceAddressIterator.Next();
+        }
+
+        ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
+        head               = ifp;
+    }
+    *netifpp = head;
+#endif
 
     *netifpp = ifp;
     return CHIP_NO_ERROR;
