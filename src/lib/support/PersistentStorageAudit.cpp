@@ -276,7 +276,11 @@ bool ExecutePersistentStorageApiAudit(PersistentStorageDelegate & storage)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Cleaning up
-    err = storage.SyncDeleteKeyValue("key3");
+    (void) storage.SyncDeleteKeyValue("roboto");
+    (void) storage.SyncDeleteKeyValue("key2");
+    (void) storage.SyncDeleteKeyValue("key3");
+    (void) storage.SyncDeleteKeyValue("key4");
+    (void) storage.SyncDeleteKeyValue(kLongKeyString);
 
     // ========== End of code from TestTestPersistentStorageDelegate.cpp =========
     if (inSuite->flagError)
