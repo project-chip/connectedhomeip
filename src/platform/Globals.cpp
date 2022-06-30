@@ -19,30 +19,10 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <inet/TCPEndPointImpl.h>
-#include <inet/UDPEndPointImpl.h>
 #include <system/SystemLayerImpl.h>
 
 namespace chip {
 namespace DeviceLayer {
-
-chip::Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager()
-{
-    static chip::Inet::UDPEndPointManagerImpl gUDPEndPointManager;
-    return &gUDPEndPointManager;
-}
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-chip::Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager()
-{
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    static chip::Inet::TCPEndPointManagerImpl gTCPEndPointManager;
-    return &gTCPEndPointManager;
-#else  // INET_CONFIG_ENABLE_TCP_ENDPOINT
-    return nullptr;
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-}
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 chip::System::LayerImpl * gMockedSystemLayer = nullptr;
 

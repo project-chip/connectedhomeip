@@ -405,6 +405,46 @@ static void TestConfigurationMgr_GetFailSafeArmed(nlTestSuite * inSuite, void * 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
+static void TestConfigurationMgr_GetVendorName(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    char buf[64];
+
+    err = GetDeviceInstanceInfoProvider()->GetVendorName(buf, 64);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, strlen(buf) > 0 && strlen(buf) <= ConfigurationManager::kMaxVendorNameLength);
+}
+
+static void TestConfigurationMgr_GetVendorId(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint16_t vendorId;
+
+    err = GetDeviceInstanceInfoProvider()->GetVendorId(vendorId);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, vendorId >= 0 && vendorId <= 0xfff4);
+}
+
+static void TestConfigurationMgr_GetProductName(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    char buf[64];
+
+    err = GetDeviceInstanceInfoProvider()->GetProductName(buf, 64);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, strlen(buf) > 0 && strlen(buf) <= ConfigurationManager::kMaxProductNameLength);
+}
+
+static void TestConfigurationMgr_GetProductId(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint16_t productId;
+
+    err = GetDeviceInstanceInfoProvider()->GetProductId(productId);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, productId >= 1 && productId <= 0xffff);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -422,8 +462,12 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ConfigurationMgr::CountryCode", TestConfigurationMgr_CountryCode),
     NL_TEST_DEF("Test ConfigurationMgr::GetPrimaryMACAddress", TestConfigurationMgr_GetPrimaryMACAddress),
     NL_TEST_DEF("Test ConfigurationMgr::GetFailSafeArmed", TestConfigurationMgr_GetFailSafeArmed),
+    NL_TEST_DEF("Test ConfigurationMgr::GetVendorName", TestConfigurationMgr_GetVendorName),
+    NL_TEST_DEF("Test ConfigurationMgr::GetVendorId", TestConfigurationMgr_GetVendorId),
+    NL_TEST_DEF("Test ConfigurationMgr::GetProductName", TestConfigurationMgr_GetProductName),
+    NL_TEST_DEF("Test ConfigurationMgr::GetProductId", TestConfigurationMgr_GetProductId),
     NL_TEST_SENTINEL()
-};
+}; // namespace
 
 /**
  *  Set up the test suite.

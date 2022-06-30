@@ -21,11 +21,10 @@
  *      This file implements unit tests for the ExchangeManager implementation.
  */
 
-#include "TestMessagingLayer.h"
-
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -120,7 +119,7 @@ void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * ec1 = ctx.NewExchangeToBob(&sendDelegate);
 
     // Expire the session this exchange is supposedly on.
-    ctx.GetSecureSessionManager().ExpirePairing(ec1->GetSessionHandle());
+    ec1->GetSessionHandle()->AsSecureSession()->MarkForEviction();
 
     MockAppDelegate receiveDelegate;
     CHIP_ERROR err =
@@ -156,7 +155,7 @@ void CheckSessionExpirationTimeout(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
 
     // Expire the session this exchange is supposedly on.  This should close the exchange.
-    ctx.GetSecureSessionManager().ExpirePairing(ec1->GetSessionHandle());
+    ec1->GetSessionHandle()->AsSecureSession()->MarkForEviction();
     NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
 
     // recreate closed session.
@@ -260,12 +259,7 @@ nlTestSuite sSuite =
  */
 int TestExchangeMgr()
 {
-    TestContext sContext;
-
-    // Run test suit against one context
-    nlTestRunner(&sSuite, &sContext);
-
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestExchangeMgr);

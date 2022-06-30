@@ -30,7 +30,7 @@ tests:
           mode. Ensure the Version bit string follows the current Matter spec.
           documentation."
       verification: |
-          $ ./out/ble/all-clusters-app/chip-all-clusters-app --capabilities 2 --custom-flow 1
+          $ ./out/ble/all-clusters-app/chip-all-clusters-app --capabilities 1 --custom-flow 1
           ...
           [1651101726.415743][23212:23212] CHIP:DL: Device Configuration:
           [1651101726.415810][23212:23212] CHIP:DL:   Serial Number: TEST_SN
@@ -43,6 +43,17 @@ tests:
           [1651101726.416004][23212:23212] CHIP:DL:   Device Type: 65535 (0xFFFF)
           [1651101726.416046][23212:23212] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
           [1651101726.416115][23212:23212] CHIP:SVR: SetupQRCode: [MT:-24J00ID00KA0648G00]
+
+
+          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload MT:-24J00ID00KA0648G00
+          [1653992397.769301][2532:2532] CHIP:SPL: Parsing base38Representation: MT:-24J00ID00KA0648G00
+          [1653992397.769449][2532:2532] CHIP:SPL: Version:       0
+          [1653992397.769476][2532:2532] CHIP:SPL: VendorID:      65521
+          [1653992397.769496][2532:2532] CHIP:SPL: ProductID:     32769
+          [1653992397.769515][2532:2532] CHIP:SPL: Custom flow:   1    (USER ACTION REQUIRED)
+          [1653992397.769537][2532:2532] CHIP:SPL: Capabilities:  0x02 (BLE)
+          [1653992397.769558][2532:2532] CHIP:SPL: Discriminator: 3840
+          [1653992397.769577][2532:2532] CHIP:SPL: Passcode:      20202021
       disabled: true
 
     - label:
@@ -57,6 +68,12 @@ tests:
           pairing hint."
       verification: |
           1. Follow the steps given in the TH's pairing hint to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
+
+          ./chip-tool pairing code 1 MT:-24J00ID00KA0648G00
+
+          [1653992449.765427][2535:2540] CHIP:-: ../../third_party/connectedhomeip/src/platform/Linux/BLEManagerImpl.cpp:748: CHIP Error 0x0000002D: Not Implemented at ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:450
+          [1653992449.765485][2535:2540] CHIP:CTL: Stopping commissioning discovery over DNS-SD
+          [1653992449.765541][2535:2540] CHIP:TOO: Secure Pairing Failed
       disabled: true
 
     - label:
@@ -70,7 +87,9 @@ tests:
 
 
           DUT Commissioner:
-          $ ./out/chip-tool/chip-tool pairing qrcode 1  MT:-24J00ID00KA0648G00
+          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3840
+
+
 
           [1651101988809] [94439:65564515] CHIP: [CTL] Received CommissioningComplete response
           [1651101988809] [94439:65564515] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
@@ -82,8 +101,8 @@ tests:
 
     - label:
           "If (PICS_DT_IP), User-Intent Commissioning Flow: Use a Commissionee
-          with a QR code that has the Custom Flow field set to 1 and supports IP
-          Network for its Discovery Capability. Commissionee is NOT in
+          with a QR code that has the Custom Flow field set to 1 and supporttwos
+          IP Nerk for its Discovery Capability. Commissionee is NOT in
           commissioning mode. Ensure the Version bit string follows the current
           Matter spec. documentation."
       verification: |
@@ -99,6 +118,17 @@ tests:
           [1651105004.719133][27096:27096] CHIP:DL:   Device Type: 65535 (0xFFFF)
           [1651105004.719153][27096:27096] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
           [1651105004.719209][27096:27096] CHIP:SVR: SetupQRCode: [MT:-24J06VO00KA0648G00]
+
+          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload MT:-24J06VO00KA0648G00
+          [1653996764.810698][2819:2819] CHIP:SPL: Parsing base38Representation: MT:-24J06VO00KA0648G00
+          [1653996764.810876][2819:2819] CHIP:SPL: Version:       0
+          [1653996764.810903][2819:2819] CHIP:SPL: VendorID:      65521
+          [1653996764.810923][2819:2819] CHIP:SPL: ProductID:     32769
+          [1653996764.810943][2819:2819] CHIP:SPL: Custom flow:   1    (USER ACTION REQUIRED)
+          [1653996764.810966][2819:2819] CHIP:SPL: Capabilities:  0x04 (On IP network)
+          [1653996764.810987][2819:2819] CHIP:SPL: Discriminator: 3840
+          [1653996764.811006][2819:2819] CHIP:SPL: Passcode:      20202021
+          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$
       disabled: true
 
     - label:

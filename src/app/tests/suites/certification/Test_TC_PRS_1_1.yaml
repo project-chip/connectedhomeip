@@ -33,34 +33,39 @@ tests:
       attribute: "ClusterRevision"
       response:
           value: 3
-
-    - label: "Read the global attribute constraints: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
           constraints:
               type: uint16
 
-    - label:
-          "Write the default values to mandatory global attribute:
-          ClusterRevision"
-      command: "writeAttribute"
-      attribute: "ClusterRevision"
-      arguments:
-          value: 3
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back global attribute: ClusterRevision"
+    - label: "Read the global attribute constraints: FeatureMap"
+      PICS: PRS.S.F00
       command: "readAttribute"
-      attribute: "ClusterRevision"
+      attribute: "FeatureMap"
       response:
-          value: 3
+          value: 1
+          constraints:
+              type: map32
 
     - label: "Read the global mandatory attribute constraints: AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
           constraints:
               type: list
 
@@ -79,62 +84,3 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
-    #issue #17484
-    - label:
-          "Read AcceptedCommandList attribute from the DUT and Verify that the
-          DUT response"
-      verification: |
-          ./chip-tool pressuremeasurement read accepted-command-list 1 1
-
-            Verify response:
-            [1650367843.973086][4114:4119] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0403 Attribute 0x0000_FFF9 DataVersion: 2248280323
-            [1650367843.973242][4114:4119] CHIP:TOO:   AcceptedCommandList: 0 entries
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label:
-          "Read GeneratedCommandList attribute from the DUT and Verify that the
-          DUT response"
-      verification: |
-          ./chip-tool pressuremeasurement read generated-command-list 1 1
-
-            Verify response:
-            [1650367913.285053][4120:4125] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0403 Attribute 0x0000_FFF8 DataVersion: 2248280323
-            [1650367913.285193][4120:4125] CHIP:TOO:   GeneratedCommandList: 0 entries
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    #issue #17483
-    - label:
-          "Read FeatureMap attribute from the DUT and Verify that the DUT
-          response"
-      verification: |
-          ./chip-tool pressuremeasurement read feature-map 1 1
-          Verify response:
-          cluster id: 0x0403
-          Attribute: 0xFFFC
-          PressureMeasurement.FeatureMap response: 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter '0' for success"
-              - name: "expectedValue"
-                value: 0

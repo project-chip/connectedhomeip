@@ -23,6 +23,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/general-commissioning-server/general-commissioning-server.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -70,10 +71,9 @@ CHIP_ERROR Instance::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::Shutdown()
+void Instance::Shutdown()
 {
-    ReturnErrorOnFailure(mpBaseDriver->Shutdown());
-    return CHIP_NO_ERROR;
+    mpBaseDriver->Shutdown();
 }
 
 void Instance::InvokeCommand(HandlerContext & ctxt)
@@ -301,14 +301,14 @@ void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & respon
 
 bool CheckFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
 {
-    DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & failSafeContext = chip::Server::GetInstance().GetFailSafeContext();
 
     if (failSafeContext.IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex()))
     {
         return true;
     }
 
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::UnsupportedAccess);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::FailsafeRequired);
     return false;
 }
 
@@ -486,7 +486,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     }
     if (commissioningError == Status::kSuccess)
     {
-        DeviceLayer::DeviceControlServer::DeviceControlSvr().ConnectNetworkForOperational(
+        DeviceLayer::DeviceControlServer::DeviceControlSvr().PostConnectedToOperationalNetworkEvent(
             ByteSpan(mLastNetworkID, mLastNetworkIDLen));
         mLastConnectErrorValue.SetNull();
     }

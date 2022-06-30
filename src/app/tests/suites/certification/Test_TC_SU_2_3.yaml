@@ -13,7 +13,8 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.4.1. [TC-SU-2.3] Tests the transfer of images between DUT and TH/OTA-P
+name:
+    3.3.1.[TC-SU-2.3]Transfer of Software Update images between DUT and TH/OTA-P
 
 config:
     nodeId: 0x12344321
@@ -22,14 +23,16 @@ config:
 
 tests:
     - label:
-          "IF (PICS_DT_RequestorCanConsent_True) DUT sends a QueryImage command
-          to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT.
-          QueryStatus is set to Available, UserConsentNeeded is set to True"
+          "DUT sends a QueryImage command to the TH/OTA-P. RequestorCanConsent
+          is set to True by DUT. OTA-P/TH responds with a QueryImageResponse
+          with UserConsentNeeded field set to True."
+      PICS: MCORE.OTA.RequestorConsent
       verification: |
           Run the OTA Provider App using the command:
+
           ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -c
 
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -37,19 +40,31 @@ tests:
       disabled: true
 
     - label:
-          "IF (PICS_DT_BDX_Supported) DUT sends a QueryImage command to the
-          TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus
-          is set to Available. Set ImageURI to the location where the image is
-          located."
+          'IF DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
+          QueryImageResponse back to DUT. QueryStatus is set to
+          "UpdateAvailable". Set ImageURI to the location where the image is
+          located.'
       verification: |
-          Same as 3.3.1. [TC-SU-2.2]  #1
+          "Run the OTA Provider App using the command:
+
+          ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q updateAvailable
+
+          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+
+          where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
+
+          Verify that the transfer of the software image happens all the way until the last Block is acknowledged on the OTA Provider logs:
+
+          [1645748688025] [99779:20370762] CHIP: [BDX] OutputEvent type: AckEOFReceived
+          [1645748688025] [99779:20370762] CHIP: [BDX] Transfer completed, got AckEOF"
       disabled: true
 
     - label:
-          'IF (PICS_DT_HTTPS_Supported) DUT sends a QueryImage command to the
-          TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus
-          is set to "UpdateAvailable". Set ImageURI with the https url of the
-          software image.'
+          'DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
+          QueryImageResponse back to DUT. QueryStatus is set to
+          "UpdateAvailable". Set ImageURI with the https url of the software
+          image.'
+      PICS: MCORE.OTA.HTTPS
       verification: |
           Out of scope for V1.0
       disabled: true
@@ -113,19 +128,18 @@ tests:
       disabled: true
 
     - label:
-          "IF (PICS_DT_RC_STARTOFS_BIT_SET) During the transfer of the image to
-          the DUT, force fail the transfer before it completely transfers the
-          image. Initiate another QueryImage Command from DUT to the TH/OTA-P.
-          Set the RC[STARTOFS] bit and associated STARTOFS field in the
-          ReceiveInit Message to indicate the resumption of a transfer
-          previously aborted."
+          "During the transfer of the image to the DUT, force fail the transfer
+          before it completely transfers the image. Initiate another QueryImage
+          Command from DUT to the TH/OTA-P. Set the RC[STARTOFS] bit and
+          associated STARTOFS field in the ReceiveInit Message to indicate the
+          resumption of a transfer previously aborted."
+      PICS: MCORE.OTA.Resume
       verification: |
           Out of scope for V1.0
       disabled: true
 
-    - label:
-          "IF (PICS_DT_Vendor_Specific) Perform the OTA Update on DUT using
-          vendor specific mechanism."
+    - label: "Perform the OTA Update on DUT using vendor specific mechanism."
+      PICS: MCORE.OTA.VendorSpecific
       verification: |
           Use vendor specific steps to initiate OTA Update and verify that the software image is transferred to the DUT
       disabled: true

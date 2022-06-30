@@ -994,9 +994,9 @@ static void TestECDSA_Signing_SHA256_Msg(nlTestSuite * inSuite, void * inContext
 static void TestECDSA_Signing_SHA256_Hash(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
-    const uint8_t hash[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-                             0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
-    size_t hash_length   = sizeof(hash);
+    const uint8_t msg[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+                            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
+    size_t msg_length   = sizeof(msg);
 
     Test_P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
@@ -1010,10 +1010,14 @@ static void TestECDSA_Signing_SHA256_Hash(nlTestSuite * inSuite, void * inContex
     for (int i = 0; i < kNumSigningIterations; ++i)
     {
         P256ECDSASignature signature;
-        CHIP_ERROR signing_error = keypair.ECDSA_sign_hash(hash, hash_length, signature);
+
+        uint8_t hash[Crypto::kSHA256_Hash_Length];
+        NL_TEST_ASSERT(inSuite, Hash_SHA256(&msg[0], msg_length, &hash[0]) == CHIP_NO_ERROR);
+
+        CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(msg, msg_length, signature);
         NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
-        CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_hash_signature(hash, hash_length, signature);
+        CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_hash_signature(hash, sizeof(hash), signature);
         NL_TEST_ASSERT(inSuite, validation_error == CHIP_NO_ERROR);
 
         if ((signing_error != CHIP_NO_ERROR) || (validation_error != CHIP_NO_ERROR))
@@ -1044,28 +1048,6 @@ static void TestECDSA_ValidationFailsDifferentMessage(nlTestSuite * inSuite, voi
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_SIGNATURE);
 }
 
-static void TestECDSA_ValidationFailsDifferentHash(nlTestSuite * inSuite, void * inContext)
-{
-    HeapChecker heapChecker(inSuite);
-    const uint8_t hash[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-                             0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
-    size_t hash_length   = sizeof(hash);
-
-    P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
-
-    P256ECDSASignature signature;
-    CHIP_ERROR signing_error = keypair.ECDSA_sign_hash(hash, hash_length, signature);
-    NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
-
-    const uint8_t diff_hash[] = { 0x1F, 0x1E, 0x1D, 0x1C, 0x1B, 0x1A, 0x19, 0x18, 0x17, 0x16, 0x15, 0x14, 0x13, 0x12, 0x11, 0x10,
-                                  0x0F, 0x0E, 0x0D, 0x0C, 0x0B, 0x0A, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x02, 0x00 };
-    size_t diff_hash_length   = sizeof(diff_hash);
-
-    CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_hash_signature(diff_hash, diff_hash_length, signature);
-    NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_SIGNATURE);
-}
-
 static void TestECDSA_ValidationFailIncorrectMsgSignature(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
@@ -1088,19 +1070,22 @@ static void TestECDSA_ValidationFailIncorrectMsgSignature(nlTestSuite * inSuite,
 static void TestECDSA_ValidationFailIncorrectHashSignature(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
-    const uint8_t hash[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-                             0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
-    size_t hash_length   = sizeof(hash);
+    const uint8_t msg[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+                            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
+    size_t msg_length   = sizeof(msg);
+
+    uint8_t hash[Crypto::kSHA256_Hash_Length];
+    NL_TEST_ASSERT(inSuite, Hash_SHA256(&msg[0], msg_length, &hash[0]) == CHIP_NO_ERROR);
 
     P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
-    CHIP_ERROR signing_error = keypair.ECDSA_sign_hash(hash, hash_length, signature);
+    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
     signature[0] = static_cast<uint8_t>(~signature[0]); // Flipping bits should invalidate the signature.
 
-    CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_hash_signature(hash, hash_length, signature);
+    CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_hash_signature(hash, sizeof(hash), signature);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_SIGNATURE);
 }
 
@@ -1119,26 +1104,6 @@ static void TestECDSA_SigningMsgInvalidParams(nlTestSuite * inSuite, void * inCo
     signing_error = CHIP_NO_ERROR;
 
     signing_error = keypair.ECDSA_sign_msg(msg, 0, signature);
-    NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
-    signing_error = CHIP_NO_ERROR;
-}
-
-static void TestECDSA_SigningHashInvalidParams(nlTestSuite * inSuite, void * inContext)
-{
-    HeapChecker heapChecker(inSuite);
-    const uint8_t hash[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-                             0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
-    size_t hash_length   = sizeof(hash);
-
-    P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
-
-    P256ECDSASignature signature;
-    CHIP_ERROR signing_error = keypair.ECDSA_sign_hash(nullptr, hash_length, signature);
-    NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
-    signing_error = CHIP_NO_ERROR;
-
-    signing_error = keypair.ECDSA_sign_hash(hash, hash_length - 5, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
     signing_error = CHIP_NO_ERROR;
 }
@@ -1168,22 +1133,25 @@ static void TestECDSA_ValidationMsgInvalidParam(nlTestSuite * inSuite, void * in
 static void TestECDSA_ValidationHashInvalidParam(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
-    const uint8_t hash[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-                             0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
-    size_t hash_length   = sizeof(hash);
+    const uint8_t msg[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+                            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
+    size_t msg_length   = sizeof(msg);
+
+    uint8_t hash[Crypto::kSHA256_Hash_Length];
+    NL_TEST_ASSERT(inSuite, Hash_SHA256(&msg[0], msg_length, &hash[0]) == CHIP_NO_ERROR);
 
     P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
-    CHIP_ERROR signing_error = keypair.ECDSA_sign_hash(hash, hash_length, signature);
+    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(msg, msg_length, signature);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
-    CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_hash_signature(nullptr, hash_length, signature);
+    CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_hash_signature(nullptr, sizeof(hash), signature);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     signing_error = CHIP_NO_ERROR;
 
-    validation_error = keypair.Pubkey().ECDSA_validate_hash_signature(hash, hash_length - 5, signature);
+    validation_error = keypair.Pubkey().ECDSA_validate_hash_signature(hash, sizeof(hash) - 5, signature);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     signing_error = CHIP_NO_ERROR;
 }
@@ -2365,11 +2333,9 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ECDSA signing and validation message using SHA256", TestECDSA_Signing_SHA256_Msg),
     NL_TEST_DEF("Test ECDSA signing and validation SHA256 Hash", TestECDSA_Signing_SHA256_Hash),
     NL_TEST_DEF("Test ECDSA signature validation fail - Different msg", TestECDSA_ValidationFailsDifferentMessage),
-    NL_TEST_DEF("Test ECDSA signature validation fail - Different hash", TestECDSA_ValidationFailsDifferentHash),
     NL_TEST_DEF("Test ECDSA signature validation fail - Different msg signature", TestECDSA_ValidationFailIncorrectMsgSignature),
     NL_TEST_DEF("Test ECDSA signature validation fail - Different hash signature", TestECDSA_ValidationFailIncorrectHashSignature),
     NL_TEST_DEF("Test ECDSA sign msg invalid parameters", TestECDSA_SigningMsgInvalidParams),
-    NL_TEST_DEF("Test ECDSA sign hash invalid parameters", TestECDSA_SigningHashInvalidParams),
     NL_TEST_DEF("Test ECDSA msg signature validation invalid parameters", TestECDSA_ValidationMsgInvalidParam),
     NL_TEST_DEF("Test ECDSA hash signature validation invalid parameters", TestECDSA_ValidationHashInvalidParam),
     NL_TEST_DEF("Test Hash SHA 256", TestHash_SHA256),

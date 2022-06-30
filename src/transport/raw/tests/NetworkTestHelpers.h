@@ -40,7 +40,7 @@ public:
     CHIP_ERROR Init();
 
     // Shutdown all layers, finalize operations
-    CHIP_ERROR Shutdown();
+    void Shutdown();
 
     /// Perform a single short IO Loop
     void DriveIO();

@@ -210,6 +210,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPGeneralCommissioningClusterBasicCommissioningInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull failSafeExpiryLengthSeconds;
+@property (strong, nonatomic) NSNumber * _Nonnull maxCumulativeFailsafeSeconds;
 - (instancetype)init;
 @end
 
@@ -272,13 +273,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull bootReason;
 @end
 
-@interface CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull id;
-@property (strong, nonatomic) NSString * _Nonnull name;
-@property (strong, nonatomic) NSData * _Nonnull faultRecording;
-- (instancetype)init;
-@end
-
 @interface CHIPSoftwareDiagnosticsClusterThreadMetrics : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull id;
 @property (strong, nonatomic) NSString * _Nullable name;
@@ -289,7 +283,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPSoftwareDiagnosticsClusterSoftwareFaultEvent : NSObject
-@property (strong, nonatomic) CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct * _Nonnull softwareFault;
+@property (strong, nonatomic) NSNumber * _Nonnull id;
+@property (strong, nonatomic) NSString * _Nullable name;
+@property (strong, nonatomic) NSData * _Nullable faultRecording;
 @end
 
 @interface CHIPThreadNetworkDiagnosticsClusterNeighborTable : NSObject
@@ -581,12 +577,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPIasAceClusterIasAceZoneStatusResult : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull zoneId;
-@property (strong, nonatomic) NSNumber * _Nonnull zoneStatus;
-- (instancetype)init;
-@end
-
 @interface CHIPChannelClusterChannelInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull majorNumber;
 @property (strong, nonatomic) NSNumber * _Nonnull minorNumber;
@@ -755,8 +745,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPTestClusterClusterTestListStructOctet : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
-@property (strong, nonatomic) NSData * _Nonnull operationalCert;
+@property (strong, nonatomic) NSNumber * _Nonnull member1;
+@property (strong, nonatomic) NSData * _Nonnull member2;
 - (instancetype)init;
 @end
 

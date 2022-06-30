@@ -259,8 +259,8 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
 
         result.address.SetPort(nodeData.resolutionData.port);
         result.address.SetInterface(nodeData.resolutionData.interfaceId);
-        result.mrpConfig   = nodeData.resolutionData.GetMRPConfig();
-        result.supportsTcp = nodeData.resolutionData.supportsTcp;
+        result.mrpRemoteConfig = nodeData.resolutionData.GetRemoteMRPConfig();
+        result.supportsTcp     = nodeData.resolutionData.supportsTcp;
 
         for (size_t i = 0; i < nodeData.resolutionData.numIPs; i++)
         {
@@ -369,8 +369,10 @@ void Resolver::ReArmTimer()
 
     if (nextTimeout == kInvalidTimeout)
     {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
         // Generally this is only expected when no active lookups exist
         ChipLogProgress(Discovery, "Discovery does not require any more timeouts");
+#endif
         return;
     }
 

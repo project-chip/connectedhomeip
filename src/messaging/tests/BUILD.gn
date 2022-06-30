@@ -43,11 +43,13 @@ static_library("helpers") {
 chip_test_suite("tests") {
   output_name = "libMessagingLayerTests"
 
-  sources = [ "TestMessagingLayer.h" ]
+  test_sources = []
 
   if (chip_device_platform != "efr32") {
     # TODO(#10447): ReliableMessage Test has HF, and ExchangeMgr hangs on EFR32.
-    sources += [
+    # And TestAbortExchangesForFabric does not link on EFR32 for some reason.
+    test_sources += [
+      "TestAbortExchangesForFabric.cpp",
       "TestExchangeMgr.cpp",
       "TestReliableMessageProtocol.cpp",
     ]
@@ -60,16 +62,12 @@ chip_test_suite("tests") {
     "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/raw/tests:helpers",
     "${nlio_root}:nlio",
     "${nlunit_test_root}:nlunit-test",
-  ]
-
-  tests = [
-    "TestExchangeMgr",
-    "TestReliableMessageProtocol",
   ]
 }

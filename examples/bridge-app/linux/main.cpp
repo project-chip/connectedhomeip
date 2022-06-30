@@ -40,20 +40,24 @@
 #include <setup_payload/SetupPayload.h>
 
 #include "Backend.h"
+
 #include "CommissionableInit.h"
 #include "Device.h"
+#include "main.h"
 #include <app/server/Server.h>
 
 #include "AppMain.h"
 
 #include <cassert>
 #include <iostream>
+#include <vector>
 
 using namespace chip;
 using namespace chip::Credentials;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
+using namespace chip::app::Clusters;
 
 static EndpointId gCurrentEndpointId;
 static EndpointId gFirstDynamicEndpointId;
@@ -71,6 +75,7 @@ int AddDeviceEndpoint(Device * dev)
             while (1)
             {
                 dev->SetEndpointId(gCurrentEndpointId);
+                dev->SetParentEndpointId(parentEndpointId);
                 ret =
                     emberAfSetDynamicEndpoint(index, gCurrentEndpointId, dev->endpointType(), dev->versions(), dev->deviceTypes());
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)

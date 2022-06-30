@@ -91,12 +91,12 @@ ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeM
 
 void ReadClient::ClearActiveSubscriptionState()
 {
-    mIsInitialReport           = true;
-    mIsPrimingReports          = true;
-    mPendingMoreChunks         = false;
-    mMinIntervalFloorSeconds   = 0;
-    mMaxIntervalCeilingSeconds = 0;
-    mSubscriptionId            = 0;
+    mIsReporting             = false;
+    mIsPrimingReports        = true;
+    mPendingMoreChunks       = false;
+    mMinIntervalFloorSeconds = 0;
+    mMaxInterval             = 0;
+    mSubscriptionId          = 0;
     MoveToState(ClientState::Idle);
 }
 
@@ -407,12 +407,14 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     {
         VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
         err = ProcessSubscribeResponse(std::move(aPayload));
-
-        // Forget the context as SUBSCRIBE RESPONSE is the last message in SUBSCRIBE transaction and
-        // ExchangeContext::HandleMessage automatically closes a context if no other messages need to
-        // be sent or received.
-        mpExchangeCtx = nullptr;
         SuccessOrExit(err);
+
+        //
+        // Null out the delegate and context as SubscribeResponse is the last message the Subscribe transaction and
+        // the exchange layer will automatically close the exchange.
+        //
+        mpExchangeCtx->SetDelegate(nullptr);
+        mpExchangeCtx = nullptr;
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
@@ -558,24 +560,15 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     else if (err == CHIP_NO_ERROR)
     {
         TLV::TLVReader attributeReportIBsReader;
-        mSawAttributeReportsInCurrentReport = true;
         attributeReportIBs.GetReader(&attributeReportIBsReader);
-
-        if (mIsInitialReport)
-        {
-            mpCallback.OnReportBegin();
-            mIsInitialReport = false;
-        }
-
         err = ProcessAttributeReportIBs(attributeReportIBsReader);
     }
     SuccessOrExit(err);
 
-    if (mSawAttributeReportsInCurrentReport && !mPendingMoreChunks)
+    if (mIsReporting && !mPendingMoreChunks)
     {
         mpCallback.OnReportEnd();
-        mIsInitialReport                    = true;
-        mSawAttributeReportsInCurrentReport = false;
+        mIsReporting = false;
     }
 
     SuccessOrExit(err = report.ExitContainer());
@@ -633,6 +626,15 @@ CHIP_ERROR ReadClient::ProcessAttributePath(AttributePathIB::Parser & aAttribute
     return CHIP_NO_ERROR;
 }
 
+void ReadClient::NoteReportingData()
+{
+    if (!mIsReporting)
+    {
+        mpCallback.OnReportBegin();
+        mIsReporting = true;
+    }
+}
+
 CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeReportIBsReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -657,6 +659,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             ReturnErrorOnFailure(ProcessAttributePath(path, attributePath));
             ReturnErrorOnFailure(status.GetErrorStatus(&errorStatus));
             ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
+            NoteReportingData();
             mpCallback.OnAttributeData(attributePath, nullptr, statusIB);
         }
         else if (CHIP_END_OF_TLV == err)
@@ -681,6 +684,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
                 attributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             }
 
+            NoteReportingData();
             mpCallback.OnAttributeData(attributePath, &dataReader, statusIB);
         }
     }
@@ -722,6 +726,7 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
                 mReadPrepareParams.mEventNumber.SetValue(header.mEventNumber + 1);
             }
 
+            NoteReportingData();
             mpCallback.OnEventData(header, &dataReader, nullptr);
         }
         else if (err == CHIP_END_OF_TLV)
@@ -735,6 +740,7 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
             ReturnErrorOnFailure(status.GetErrorStatus(&statusIBParser));
             ReturnErrorOnFailure(statusIBParser.DecodeStatusIB(statusIB));
 
+            NoteReportingData();
             mpCallback.OnEventData(header, nullptr, &statusIB);
         }
     }
@@ -754,8 +760,7 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
     VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mpExchangeCtx->HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
 
-    System::Clock::Timeout timeout =
-        System::Clock::Seconds16(mMaxIntervalCeilingSeconds) + mpExchangeCtx->GetSessionHandle()->GetAckTimeout();
+    System::Clock::Timeout timeout = System::Clock::Seconds16(mMaxInterval) + mpExchangeCtx->GetSessionHandle()->GetAckTimeout();
     // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
     ChipLogProgress(DataManagement,
                     "Refresh LivenessCheckTime for %lu milliseconds with SubscriptionId = 0x%08" PRIx32
@@ -819,14 +824,12 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     SubscriptionId subscriptionId = 0;
     ReturnErrorOnFailure(subscribeResponse.GetSubscriptionId(&subscriptionId));
     VerifyOrReturnError(IsMatchingClient(subscriptionId), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(subscribeResponse.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
-    ReturnErrorOnFailure(subscribeResponse.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
+    ReturnErrorOnFailure(subscribeResponse.GetMaxInterval(&mMaxInterval));
 
     ChipLogProgress(DataManagement,
                     "Subscription established with SubscriptionID = 0x%08" PRIx32 " MinInterval = %u"
                     "s MaxInterval = %us Peer = %02x:" ChipLogFormatX64,
-                    mSubscriptionId, mMinIntervalFloorSeconds, mMaxIntervalCeilingSeconds, mFabricIndex,
-                    ChipLogValueX64(mPeerNodeId));
+                    mSubscriptionId, mMinIntervalFloorSeconds, mMaxInterval, mFabricIndex, ChipLogValueX64(mPeerNodeId));
 
     ReturnErrorOnFailure(subscribeResponse.ExitContainer());
 
@@ -870,6 +873,8 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(const ReadPrepareParams & aReadPrepa
 CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadPrepareParams)
 {
     VerifyOrReturnError(ClientState::Idle == mState, CHIP_ERROR_INCORRECT_STATE);
+
+    mMinIntervalFloorSeconds = aReadPrepareParams.mMinIntervalFloorSeconds;
 
     // Todo: Remove the below, Update span in ReadPrepareParams
     Span<AttributePathParams> attributePaths(aReadPrepareParams.mpAttributePathParamsList,

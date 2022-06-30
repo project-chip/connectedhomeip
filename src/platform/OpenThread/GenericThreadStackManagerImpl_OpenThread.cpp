@@ -190,7 +190,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
 {
     if (event->Type == DeviceEventType::kThreadStateChange)
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && (OPENTHREAD_API_VERSION < 218)
         if (event->ThreadStateChange.AddressChanged)
         {
             const otSrpClientHostInfo * hostInfo = otSrpClientGetHostInfo(Impl()->OTInstance());
@@ -200,41 +200,38 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
             }
         }
 #endif
-        Impl()->LockThreadStack();
 
-#if CHIP_DETAIL_LOGGING
-
-        LogOpenThreadStateChange(mOTInst, event->ThreadStateChange.OpenThread.Flags);
-
-#endif // CHIP_DETAIL_LOGGING
-
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-        if (event->ThreadStateChange.RoleChanged || event->ThreadStateChange.AddressChanged)
+        bool isThreadAttached = Impl()->_IsThreadAttached();
+        // Avoid sending muliple events if the attachement state didn't change (Child->router or disable->Detached)
+        if (event->ThreadStateChange.RoleChanged && (isThreadAttached != mIsAttached))
         {
-            bool isInterfaceUp;
-            isInterfaceUp = GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoLock();
-            // Post an event signaling the change in Thread interface connectivity state.
+            ChipDeviceEvent attachEvent;
+            attachEvent.Clear();
+            attachEvent.Type                            = DeviceEventType::kThreadConnectivityChange;
+            attachEvent.ThreadConnectivityChange.Result = (isThreadAttached) ? kConnectivity_Established : kConnectivity_Lost;
+            CHIP_ERROR status                           = PlatformMgr().PostEvent(&attachEvent);
+            if (status == CHIP_NO_ERROR)
             {
-                ChipDeviceEvent event;
-                event.Clear();
-                event.Type                            = DeviceEventType::kThreadConnectivityChange;
-                event.ThreadConnectivityChange.Result = (isInterfaceUp) ? kConnectivity_Established : kConnectivity_Lost;
-                CHIP_ERROR status                     = PlatformMgr().PostEvent(&event);
-                if (status != CHIP_NO_ERROR)
-                {
-                    ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
-                }
+                mIsAttached = isThreadAttached;
             }
-
-            // Refresh Multicast listening
-            if (GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock())
+            else
             {
-                ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
-                Server::GetInstance().RejoinExistingMulticastGroups();
+                ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
             }
         }
+
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+        if (event->ThreadStateChange.AddressChanged && isThreadAttached)
+        {
+            // Refresh Multicast listening
+            ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
+            Server::GetInstance().RejoinExistingMulticastGroups();
+        }
 #endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-        Impl()->UnlockThreadStack();
+
+#if CHIP_DETAIL_LOGGING
+        LogOpenThreadStateChange(mOTInst, event->ThreadStateChange.OpenThread.Flags);
+#endif // CHIP_DETAIL_LOGGING
     }
 }
 
@@ -388,17 +385,34 @@ template <class ImplClass>
 CHIP_ERROR
 GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
     // If there is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     mpScanCallback = callback;
-    CHIP_ERROR err = MapOpenThreadError(otLinkActiveScan(mOTInst, 0, /* all channels */
-                                                         0,          /* default value `kScanDurationDefault` = 300 ms. */
-                                                         _OnNetworkScanFinished, this));
-    if (err != CHIP_NO_ERROR)
+
+    Impl()->LockThreadStack();
+
+    // Ensure that IPv6 interface is up when MLE Discovery is performed.
+    if (!otIp6IsEnabled(mOTInst))
+    {
+        SuccessOrExit(error = MapOpenThreadError(otIp6SetEnabled(mOTInst, true)));
+    }
+
+    error = MapOpenThreadError(otThreadDiscover(mOTInst, 0,                       /* all channels */
+                                                OT_PANID_BROADCAST, false, false, /* disable PAN ID, EUI64 and Joiner filtering */
+                                                _OnNetworkScanFinished, this));
+
+exit:
+    Impl()->UnlockThreadStack();
+
+    if (error != CHIP_NO_ERROR)
     {
         mpScanCallback = nullptr;
     }
-    return err;
+
+    return error;
 }
 
 template <class ImplClass>
@@ -412,6 +426,12 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
 {
     if (aResult == nullptr) // scan completed
     {
+        // If Thread scanning was done before commissioning, turn off the IPv6 interface.
+        if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && !otDatasetIsCommissioned(mOTInst))
+        {
+            otIp6SetEnabled(mOTInst, false);
+        }
+
         if (mpScanCallback != nullptr)
         {
             DeviceLayer::SystemLayer().ScheduleLambda([this]() {
@@ -1092,6 +1112,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
 
     case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id: {
         err = encoder.EncodeList([this](const auto & aEncoder) -> CHIP_ERROR {
+            constexpr uint16_t kFrameErrorRate100Percent   = 0xffff;
+            constexpr uint16_t kMessageErrorRate100Percent = 0xffff;
+
             otNeighborInfo neighInfo;
             otNeighborInfoIterator iterator = OT_NEIGHBOR_INFO_ITERATOR_INIT;
 
@@ -1112,8 +1135,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
                 neighborTable.linkFrameCounter = neighInfo.mLinkFrameCounter;
                 neighborTable.mleFrameCounter  = neighInfo.mMleFrameCounter;
                 neighborTable.lqi              = neighInfo.mLinkQualityIn;
-                neighborTable.frameErrorRate   = neighInfo.mFrameErrorRate;
-                neighborTable.messageErrorRate = neighInfo.mMessageErrorRate;
+                neighborTable.frameErrorRate =
+                    static_cast<uint8_t>((static_cast<uint32_t>(neighInfo.mFrameErrorRate) * 100) / kFrameErrorRate100Percent);
+                neighborTable.messageErrorRate =
+                    static_cast<uint8_t>((static_cast<uint32_t>(neighInfo.mMessageErrorRate) * 100) / kMessageErrorRate100Percent);
                 neighborTable.rxOnWhenIdle     = neighInfo.mRxOnWhenIdle;
                 neighborTable.fullThreadDevice = neighInfo.mFullThreadDevice;
                 neighborTable.fullNetworkData  = neighInfo.mFullNetworkData;
@@ -1472,8 +1497,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            uint64_t activeTimestamp = activeDataset.mPendingTimestamp;
-            err                      = encoder.Encode(activeTimestamp);
+#if OPENTHREAD_API_VERSION >= 219
+            uint64_t activeTimestamp = (activeDataset.mActiveTimestamp.mSeconds << 16) |
+                (activeDataset.mActiveTimestamp.mTicks << 1) | activeDataset.mActiveTimestamp.mAuthoritative;
+#else
+            uint64_t activeTimestamp  = activeDataset.mActiveTimestamp;
+#endif
+            err = encoder.Encode(activeTimestamp);
         }
     }
     break;
@@ -1485,8 +1515,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+#if OPENTHREAD_API_VERSION >= 219
+            uint64_t pendingTimestamp = (activeDataset.mPendingTimestamp.mSeconds << 16) |
+                (activeDataset.mPendingTimestamp.mTicks << 1) | activeDataset.mPendingTimestamp.mAuthoritative;
+#else
             uint64_t pendingTimestamp = activeDataset.mPendingTimestamp;
-            err                       = encoder.Encode(pendingTimestamp);
+#endif
+            err = encoder.Encode(pendingTimestamp);
         }
     }
     break;
@@ -1939,10 +1974,12 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotificatio
                                                                                   const otSrpClientService * aRemovedServices,
                                                                                   void * aContext)
 {
+    const char * errorStr = nullptr;
+
     switch (aError)
     {
     case OT_ERROR_NONE: {
-        ChipLogDetail(DeviceLayer, "OnSrpClientNotification: Last requested operation completed successfully");
+        ChipLogDetail(DeviceLayer, "SRP update succeeded");
 
         if (aHostInfo)
         {
@@ -1975,35 +2012,40 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotificatio
         break;
     }
     case OT_ERROR_PARSE:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Parsing operaton failed");
+        errorStr = "parsing operation failed";
         break;
     case OT_ERROR_NOT_FOUND:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Domain name or RRset does not exist");
+        errorStr = "domain name or RRset does not exist";
         break;
     case OT_ERROR_NOT_IMPLEMENTED:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Server does not support query type");
+        errorStr = "server does not support query type";
         break;
     case OT_ERROR_SECURITY:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Operation refused for security reasons");
+        errorStr = "operation refused for security reasons";
         break;
     case OT_ERROR_DUPLICATED:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Domain name or RRset is duplicated");
+        errorStr = "domain name or RRset is duplicated";
         break;
     case OT_ERROR_RESPONSE_TIMEOUT:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Timed out waiting on server response");
+        errorStr = "timed out waiting on server response";
         break;
     case OT_ERROR_INVALID_ARGS:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Invalid service structure detected");
+        errorStr = "invalid service structure detected";
         break;
     case OT_ERROR_NO_BUFS:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Insufficient buffer to handle message");
+        errorStr = "insufficient buffer to handle message";
         break;
     case OT_ERROR_FAILED:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Internal server error occurred");
+        errorStr = "internal server error";
         break;
     default:
-        ChipLogError(DeviceLayer, "OnSrpClientNotification: Unknown error occurred");
+        errorStr = "unknown error";
         break;
+    }
+
+    if (errorStr != nullptr)
+    {
+        ChipLogError(DeviceLayer, "SRP update error: %s", errorStr);
     }
 }
 
@@ -2037,10 +2079,46 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientStateChange
 }
 
 template <class ImplClass>
-bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::SrpClient::Service::Matches(const char * aInstanceName,
-                                                                                      const char * aName) const
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::SrpClient::Service::Matches(const char * instanceName,
+                                                                                      const char * name) const
 {
-    return IsUsed() && (strcmp(mService.mInstanceName, aInstanceName) == 0) && (strcmp(mService.mName, aName) == 0);
+    return IsUsed() && (strcmp(mService.mInstanceName, instanceName) == 0) && (strcmp(mService.mName, name) == 0);
+}
+
+template <class ImplClass>
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::SrpClient::Service::Matches(
+    const char * instanceName, const char * name, uint16_t port, const Span<const char * const> & subTypes,
+    const Span<const Dnssd::TextEntry> & txtEntries) const
+{
+    size_t myNumSubTypes = 0;
+
+    for (const char * const * mySubType = mService.mSubTypeLabels; (mySubType != nullptr) && (*mySubType != nullptr); ++mySubType)
+    {
+        myNumSubTypes++;
+    }
+
+    VerifyOrReturnError(Matches(instanceName, name) && mService.mPort == port, false);
+    VerifyOrReturnError(myNumSubTypes == subTypes.size() && mService.mNumTxtEntries == txtEntries.size(), false);
+
+    const char * const * mySubType = mService.mSubTypeLabels;
+
+    for (const char * subType : subTypes)
+    {
+        VerifyOrReturnError(strcmp(*mySubType, subType) == 0, false);
+        ++mySubType;
+    }
+
+    const otDnsTxtEntry * myTxtEntry = mService.mTxtEntries;
+
+    for (const Dnssd::TextEntry & txtEntry : txtEntries)
+    {
+        VerifyOrReturnError(strcmp(myTxtEntry->mKey, txtEntry.mKey) == 0, false);
+        VerifyOrReturnError(
+            ByteSpan(myTxtEntry->mValue, myTxtEntry->mValueLength).data_equal(ByteSpan(txtEntry.mData, txtEntry.mDataSize)), false);
+        ++myTxtEntry;
+    }
+
+    return true;
 }
 
 template <class ImplClass>
@@ -2055,19 +2133,26 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     size_t entryId                           = 0;
     FixedBufferAllocator alloc;
 
-    Impl()->LockThreadStack();
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(aInstanceName, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aName, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(mSrpClient.mIsInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
-    VerifyOrExit(aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(aName, error = CHIP_ERROR_INVALID_ARGUMENT);
+    Impl()->LockThreadStack();
 
     // Try to find an empty slot in array for the new service and
     // remove the possible existing entry from anywhere in the list
     for (typename SrpClient::Service & service : mSrpClient.mServices)
     {
-        // Remove possible existing entry
+        if (service.Matches(aInstanceName, aName, aPort, aSubTypes, aTxtEntries))
+        {
+            // Re-adding existing service without any changes
+            service.mIsInvalid = false;
+            ExitNow();
+        }
+
         if (service.Matches(aInstanceName, aName))
         {
+            // Updating existing service
             SuccessOrExit(error = MapOpenThreadError(otSrpClientClearService(mOTInst, &service.mService)));
             // Clear memory immediately, as OnSrpClientNotification will not be called.
             memset(&service, 0, sizeof(service));
@@ -2148,12 +2233,11 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveSrpServic
     CHIP_ERROR error                         = CHIP_NO_ERROR;
     typename SrpClient::Service * srpService = nullptr;
 
-    VerifyOrExit(mSrpClient.mIsInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(aInstanceName, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aName, CHIP_ERROR_INVALID_ARGUMENT);
 
     Impl()->LockThreadStack();
-
-    VerifyOrExit(aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(aName, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Check if service to remove exists.
     for (typename SrpClient::Service & service : mSrpClient.mServices)
@@ -2198,7 +2282,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSr
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    VerifyOrExit(mSrpClient.mIsInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
 
     Impl()->LockThreadStack();
 
@@ -2222,9 +2306,11 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(const char * aHostName)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
+#if OPENTHREAD_API_VERSION < 218
     Inet::IPAddress hostAddress;
+#endif
 
-    VerifyOrExit(mSrpClient.mIsInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
 
     Impl()->LockThreadStack();
 
@@ -2237,8 +2323,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
         strcpy(mSrpClient.mHostName, aHostName);
         error = MapOpenThreadError(otSrpClientSetHostName(mOTInst, mSrpClient.mHostName));
         SuccessOrExit(error);
+
+#if OPENTHREAD_API_VERSION >= 218
+        error = MapOpenThreadError(otSrpClientEnableAutoHostAddress(mOTInst));
+#endif
     }
 
+#if OPENTHREAD_API_VERSION < 218
     // Check if device has any external IPv6 assigned. If not, host will be set without IPv6 addresses
     // and updated later on.
     if (ThreadStackMgr().GetExternalIPv6Address(hostAddress) == CHIP_NO_ERROR)
@@ -2246,6 +2337,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
         memcpy(&mSrpClient.mHostAddress.mFields.m32, hostAddress.Addr, sizeof(hostAddress.Addr));
         error = MapOpenThreadError(otSrpClientSetHostAddresses(mOTInst, &mSrpClient.mHostAddress, 1));
     }
+#endif
 
 exit:
     Impl()->UnlockThreadStack();

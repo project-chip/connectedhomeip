@@ -18,6 +18,7 @@
 #include "ExtendedOTARequestorDriver.h"
 #include "OTARequestorInterface.h"
 #include <app/server/Server.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -76,7 +77,7 @@ CHIP_ERROR ExtendedOTARequestorDriver::GetUserConsentSubject(chip::ota::UserCons
         return CHIP_ERROR_INTERNAL;
     }
 
-    FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(subject.fabricIndex);
+    const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(subject.fabricIndex);
     if (fabricInfo == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Cannot find fabric");
@@ -84,8 +85,8 @@ CHIP_ERROR ExtendedOTARequestorDriver::GetUserConsentSubject(chip::ota::UserCons
     }
     subject.requestorNodeId = fabricInfo->GetPeerId().GetNodeId();
 
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetVendorId(subject.requestorVendorId));
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetProductId(subject.requestorProductId));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(subject.requestorVendorId));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(subject.requestorProductId));
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(subject.requestorCurrentVersion));
     subject.requestorTargetVersion = update.softwareVersion;
     subject.metadata               = update.metadataForRequestor;

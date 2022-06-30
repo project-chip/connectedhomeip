@@ -435,7 +435,7 @@ static uint8_t * singletonAttributeLocation(const EmberAfAttributeMetadata * am)
     uint16_t index                     = 0;
     while (m < am)
     {
-        if ((m->mask & ATTRIBUTE_MASK_SINGLETON) != 0U)
+        if (m->IsSingleton() && !m->IsExternal())
         {
             index = static_cast<uint16_t>(index + m->size);
         }
@@ -1227,7 +1227,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                 ptr                                 = nullptr; // Will get set to the value to write, as needed.
 
                 // First check for a persisted value.
-                if (!ignoreStorage && am->IsNonVolatile())
+                if (!ignoreStorage && am->IsAutomaticallyPersisted())
                 {
                     VerifyOrDie(attrStorage && "Attribute persistence needs a persistence provider");
                     MutableByteSpan bytes(attrData);
@@ -1331,7 +1331,7 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, EndpointId endpoint, Clu
                                         const EmberAfAttributeMetadata * metadata)
 {
     // Get out of here if this attribute isn't marked non-volatile.
-    if (!metadata->IsNonVolatile())
+    if (!metadata->IsAutomaticallyPersisted())
     {
         return;
     }

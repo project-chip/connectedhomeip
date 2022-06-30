@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    19.8.3. [TC-IDM-6.3] Events Read Interaction from DUT to TH [DUT -
+    20.6.3. [TC-IDM-6.3] Events Read Interaction from DUT to TH [DUT -
     Controller]
 
 config:
@@ -28,4 +28,252 @@ tests:
           In case of chip tool, here is an example command to use
 
           sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+
+          [1655210591.947581][2883:2883] CHIP:IM: Received Read request
+          [1655210591.947662][2883:2883] CHIP:DMG: ReadRequestMessage =
+          [1655210591.947709][2883:2883] CHIP:DMG: {
+          [1655210591.947750][2883:2883] CHIP:DMG: 	EventPathIBs =
+          [1655210591.947797][2883:2883] CHIP:DMG: 	[
+          [1655210591.947841][2883:2883] CHIP:DMG: 		EventPath =
+          [1655210591.947889][2883:2883] CHIP:DMG: 		{
+          [1655210591.947935][2883:2883] CHIP:DMG: 		},
+          [1655210591.947984][2883:2883] CHIP:DMG:
+          [1655210591.948027][2883:2883] CHIP:DMG: 	],
+          [1655210591.948076][2883:2883] CHIP:DMG:
+          [1655210591.948121][2883:2883] CHIP:DMG: 	isFabricFiltered = true,
+          [1655210591.948168][2883:2883] CHIP:DMG: 	InteractionModelRevision = 1
+          [1655210591.948211][2883:2883] CHIP:DMG: },
+          [1655210591.948313][2883:2883] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1655210591.948437][2883:2883] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1655210591.948549][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
+          [1655210591.948611][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.948716][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_001F e=0 p=a
+          [1655210591.948744][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.948825][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0034 e=0 p=v
+          [1655210591.948852][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.948921][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
+          [1655210591.948948][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.949032][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
+          [1655210591.949061][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.949123][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0034 e=0 p=v
+          [1655210591.949150][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.949218][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0034 e=0 p=v
+          [1655210591.949244][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.949311][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
+          [1655210591.949337][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.949398][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
+          [1655210591.949424][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.949484][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
+          [1655210591.949510][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.949570][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
+          [1655210591.949595][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.949656][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0033 e=0 p=v
+          [1655210591.949681][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.949743][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
+          [1655210591.949769][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.949829][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
+          [1655210591.949855][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.949914][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
+          [1655210591.949940][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.949999][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
+          [1655210591.950025][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.950086][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0034 e=0 p=v
+          [1655210591.950112][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.950178][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
+          [1655210591.950204][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.950263][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
+          [1655210591.950289][2883:2883] CHIP:DMG: AccessControl: allowed
+          [1655210591.950334][2883:2883] CHIP:DMG: Fetched 19 events
+          [1655210591.950362][2883:2883] CHIP:DMG: <RE> Sending report (payload has 887 bytes)...
+          [1655210591.950396][2883:2883] CHIP:EM: Piggybacking Ack for MessageCounter:38120344 on exchange: 48722r
+          [1655210591.950502][2883:2883] CHIP:IN: Prepared secure message 0xaaaade6d4e40 to 0x000000000001B669 (1)  of type 0x5 and protocolId (0, 1) on exchange 48722r with MessageCounter:59542778.
+          [1655210591.950539][2883:2883] CHIP:IN: Sending encrypted msg 0xaaaade6d4e40 with MessageCounter:59542778 to 0x000000000001B669 (1) at monotonic time: 0000000001C61135 msec
+          [1655210591.950689][2883:2883] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
+
+
+
+          [1655210591.986723][4218:4223] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1655210591.986748][4218:4223] CHIP:TOO:          Event number: 65536
+          [1655210591.986771][4218:4223] CHIP:TOO:          Priority: Critical
+          [1655210591.986792][4218:4223] CHIP:TOO:          Timestamp: 17281280
+          [1655210591.986847][4218:4223] CHIP:TOO:   StartUp: {
+          [1655210591.986883][4218:4223] CHIP:TOO:     SoftwareVersion: 1
+          [1655210591.986907][4218:4223] CHIP:TOO:    }
+          [1655210591.987005][4218:4223] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1655210591.987028][4218:4223] CHIP:TOO:          Event number: 65537
+          [1655210591.987050][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.987071][4218:4223] CHIP:TOO:          Timestamp: 17295548
+          [1655210591.987132][4218:4223] CHIP:TOO:   AccessControlEntryChanged: {
+          [1655210591.987158][4218:4223] CHIP:TOO:     AdminNodeID: null
+          [1655210591.987182][4218:4223] CHIP:TOO:     AdminPasscodeID: 0
+          [1655210591.987206][4218:4223] CHIP:TOO:     ChangeType: 1
+          [1655210591.987229][4218:4223] CHIP:TOO:     LatestValue: {
+          [1655210591.987252][4218:4223] CHIP:TOO:       Privilege: 5
+          [1655210591.987274][4218:4223] CHIP:TOO:       AuthMode: 2
+          [1655210591.987301][4218:4223] CHIP:TOO:       Subjects: 1 entries
+          [1655210591.987330][4218:4223] CHIP:TOO:         [1]: 112233
+          [1655210591.987355][4218:4223] CHIP:TOO:       Targets: null
+          [1655210591.987378][4218:4223] CHIP:TOO:       FabricIndex: 1
+          [1655210591.987400][4218:4223] CHIP:TOO:      }
+          [1655210591.987422][4218:4223] CHIP:TOO:     AdminFabricIndex: 1
+          [1655210591.987445][4218:4223] CHIP:TOO:    }
+          [1655210591.987545][4218:4223] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1655210591.987568][4218:4223] CHIP:TOO:          Event number: 65538
+          [1655210591.987590][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.987611][4218:4223] CHIP:TOO:          Timestamp: 17343962
+          [1655210591.987645][4218:4223] CHIP:TOO:   SoftwareFault: {
+          [1655210591.987668][4218:4223] CHIP:TOO:     SoftwareFault: {
+          [1655210591.987690][4218:4223] CHIP:TOO:       Id: 2883
+          [1655210591.987712][4218:4223] CHIP:TOO:       Name: 2883
+          [1655210591.987738][4218:4223] CHIP:TOO:       FaultRecording: 547565204A756E2031342030393A31363A313820323032320A
+          [1655210591.987761][4218:4223] CHIP:TOO:      }
+          [1655210591.987783][4218:4223] CHIP:TOO:    }
+          [1655210591.987867][4218:4223] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655210591.987891][4218:4223] CHIP:TOO:          Event number: 65539
+          [1655210591.987912][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.987933][4218:4223] CHIP:TOO:          Timestamp: 17634460
+          [1655210591.987969][4218:4223] CHIP:TOO:   ShortRelease: {
+          [1655210591.987994][4218:4223] CHIP:TOO:     PreviousPosition: 10
+          [1655210591.988016][4218:4223] CHIP:TOO:    }
+          [1655210591.988095][4218:4223] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655210591.988118][4218:4223] CHIP:TOO:          Event number: 65540
+          [1655210591.988139][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.988160][4218:4223] CHIP:TOO:          Timestamp: 17634472
+          [1655210591.988186][4218:4223] CHIP:TOO:   ShortRelease: {
+          [1655210591.988210][4218:4223] CHIP:TOO:     PreviousPosition: 10
+          [1655210591.988232][4218:4223] CHIP:TOO:    }
+          [1655210591.988326][4218:4223] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1655210591.988348][4218:4223] CHIP:TOO:          Event number: 65541
+          [1655210591.988370][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.988391][4218:4223] CHIP:TOO:          Timestamp: 17644185
+          [1655210591.988421][4218:4223] CHIP:TOO:   SoftwareFault: {
+          [1655210591.988444][4218:4223] CHIP:TOO:     SoftwareFault: {
+          [1655210591.988467][4218:4223] CHIP:TOO:       Id: 2883
+          [1655210591.988488][4218:4223] CHIP:TOO:       Name: 2883
+          [1655210591.988512][4218:4223] CHIP:TOO:       FaultRecording: 547565204A756E2031342030393A32313A313820323032320A
+          [1655210591.988534][4218:4223] CHIP:TOO:      }
+          [1655210591.988555][4218:4223] CHIP:TOO:    }
+          [1655210591.988650][4218:4223] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1655210591.988672][4218:4223] CHIP:TOO:          Event number: 65542
+          [1655210591.988694][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.988715][4218:4223] CHIP:TOO:          Timestamp: 17685092
+          [1655210591.988745][4218:4223] CHIP:TOO:   SoftwareFault: {
+          [1655210591.988768][4218:4223] CHIP:TOO:     SoftwareFault: {
+          [1655210591.988790][4218:4223] CHIP:TOO:       Id: 2883
+          [1655210591.988812][4218:4223] CHIP:TOO:       Name: 2883
+          [1655210591.988836][4218:4223] CHIP:TOO:       FaultRecording: 547565204A756E2031342030393A32313A353920323032320A
+          [1655210591.988859][4218:4223] CHIP:TOO:      }
+          [1655210591.988880][4218:4223] CHIP:TOO:    }
+          [1655210591.988966][4218:4223] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655210591.988988][4218:4223] CHIP:TOO:          Event number: 65543
+          [1655210591.989010][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.989031][4218:4223] CHIP:TOO:          Timestamp: 17701621
+          [1655210591.989057][4218:4223] CHIP:TOO:   ShortRelease: {
+          [1655210591.989080][4218:4223] CHIP:TOO:     PreviousPosition: 10
+          [1655210591.989102][4218:4223] CHIP:TOO:    }
+          [1655210591.989186][4218:4223] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655210591.989209][4218:4223] CHIP:TOO:          Event number: 65544
+          [1655210591.989230][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.989251][4218:4223] CHIP:TOO:          Timestamp: 17701638
+          [1655210591.989277][4218:4223] CHIP:TOO:   ShortRelease: {
+          [1655210591.989301][4218:4223] CHIP:TOO:     PreviousPosition: 10
+          [1655210591.989323][4218:4223] CHIP:TOO:    }
+          [1655210591.989403][4218:4223] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655210591.989425][4218:4223] CHIP:TOO:          Event number: 65545
+          [1655210591.989446][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.989467][4218:4223] CHIP:TOO:          Timestamp: 18639509
+          [1655210591.989493][4218:4223] CHIP:TOO:   ShortRelease: {
+          [1655210591.989516][4218:4223] CHIP:TOO:     PreviousPosition: 10
+          [1655210591.989539][4218:4223] CHIP:TOO:    }
+          [1655210591.989676][4218:4223] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655210591.989701][4218:4223] CHIP:TOO:          Event number: 65546
+          [1655210591.989723][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.989744][4218:4223] CHIP:TOO:          Timestamp: 18639535
+          [1655210591.989770][4218:4223] CHIP:TOO:   ShortRelease: {
+          [1655210591.989794][4218:4223] CHIP:TOO:     PreviousPosition: 10
+          [1655210591.989816][4218:4223] CHIP:TOO:    }
+          [1655210591.989946][4218:4223] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0001
+          [1655210591.989972][4218:4223] CHIP:TOO:          Event number: 65547
+          [1655210591.989994][4218:4223] CHIP:TOO:          Priority: Critical
+          [1655210591.990015][4218:4223] CHIP:TOO:          Timestamp: 18646739
+          [1655210591.990047][4218:4223] CHIP:TOO:   RadioFaultChange: {
+          [1655210591.990074][4218:4223] CHIP:TOO:     Current: 0 entries
+          [1655210591.990101][4218:4223] CHIP:TOO:     Previous: 0 entries
+          [1655210591.990125][4218:4223] CHIP:TOO:    }
+          [1655210591.990209][4218:4223] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655210591.990232][4218:4223] CHIP:TOO:          Event number: 65548
+          [1655210591.990253][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.990274][4218:4223] CHIP:TOO:          Timestamp: 18649932
+          [1655210591.990300][4218:4223] CHIP:TOO:   ShortRelease: {
+          [1655210591.990347][4218:4223] CHIP:TOO:     PreviousPosition: 10
+          [1655210591.990369][4218:4223] CHIP:TOO:    }
+          [1655210591.990471][4218:4223] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655210591.990494][4218:4223] CHIP:TOO:          Event number: 65549
+          [1655210591.990524][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.990546][4218:4223] CHIP:TOO:          Timestamp: 18649967
+          [1655210591.990572][4218:4223] CHIP:TOO:   ShortRelease: {
+          [1655210591.990596][4218:4223] CHIP:TOO:     PreviousPosition: 10
+          [1655210591.990628][4218:4223] CHIP:TOO:    }
+          [1655210591.990729][4218:4223] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655210591.990752][4218:4223] CHIP:TOO:          Event number: 65550
+          [1655210591.990782][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.990804][4218:4223] CHIP:TOO:          Timestamp: 24455580
+          [1655210591.990830][4218:4223] CHIP:TOO:   ShortRelease: {
+          [1655210591.990864][4218:4223] CHIP:TOO:     PreviousPosition: 10
+          [1655210591.990888][4218:4223] CHIP:TOO:    }
+          [1655210591.990991][4218:4223] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655210591.991023][4218:4223] CHIP:TOO:          Event number: 65551
+          [1655210591.991046][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.991067][4218:4223] CHIP:TOO:          Timestamp: 24455612
+          [1655210591.991094][4218:4223] CHIP:TOO:   ShortRelease: {
+          [1655210591.991126][4218:4223] CHIP:TOO:     PreviousPosition: 10
+          [1655210591.991149][4218:4223] CHIP:TOO:    }
+          [1655210591.991253][4218:4223] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1655210591.991284][4218:4223] CHIP:TOO:          Event number: 65552
+          [1655210591.991307][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.991328][4218:4223] CHIP:TOO:          Timestamp: 24481031
+          [1655210591.991359][4218:4223] CHIP:TOO:   SoftwareFault: {
+          [1655210591.991392][4218:4223] CHIP:TOO:     SoftwareFault: {
+          [1655210591.991414][4218:4223] CHIP:TOO:       Id: 2883
+          [1655210591.991446][4218:4223] CHIP:TOO:       Name: 2883
+          [1655210591.991471][4218:4223] CHIP:TOO:       FaultRecording: 547565204A756E2031342031313A31353A313520323032320A
+          [1655210591.991503][4218:4223] CHIP:TOO:      }
+          [1655210591.991524][4218:4223] CHIP:TOO:    }
+          [1655210591.991629][4218:4223] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655210591.991660][4218:4223] CHIP:TOO:          Event number: 65553
+          [1655210591.991682][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.991703][4218:4223] CHIP:TOO:          Timestamp: 24589823
+          [1655210591.991730][4218:4223] CHIP:TOO:   ShortRelease: {
+          [1655210591.991753][4218:4223] CHIP:TOO:     PreviousPosition: 10
+          [1655210591.991783][4218:4223] CHIP:TOO:    }
+          [1655210591.991872][4218:4223] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1655210591.991903][4218:4223] CHIP:TOO:          Event number: 65554
+          [1655210591.991925][4218:4223] CHIP:TOO:          Priority: Info
+          [1655210591.991954][4218:4223] CHIP:TOO:          Timestamp: 24589844
+          [1655210591.991981][4218:4223] CHIP:TOO:   ShortRelease: {
+          [1655210591.992013][4218:4223] CHIP:TOO:     PreviousPosition: 10
+          [1655210591.992036][4218:4223] CHIP:TOO:    }
+          [1655210591.992342][4218:4223] CHIP:EM: Sending Standalone Ack for MessageCounter:59542778 on exchange 48722i
+          267.321684][6338:6343] CHIP:TOO:   BootReason: {
+          [1654597267.321716][6338:6343] CHIP:TOO:     BootReason: 0
+          [1654597267.321743][6338:6343] CHIP:TOO:    }
+          [1654597267.321874][6338:6343] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1654597267.321904][6338:6343] CHIP:TOO:          Event number: 2
+          [1654597267.321931][6338:6343] CHIP:TOO:          Priority: Info
+          [1654597267.321958][6338:6343] CHIP:TOO:          Timestamp: 17071275
+          [1654597267.322055][6338:6343] CHIP:TOO:   AccessControlEntryChanged: {
+          [1654597267.322087][6338:6343] CHIP:TOO:     AdminNodeID: null
+          [1654597267.322116][6338:6343] CHIP:TOO:     AdminPasscodeID: 0
+          [1654597267.322143][6338:6343] CHIP:TOO:     ChangeType: 1
+          [1654597267.322170][6338:6343] CHIP:TOO:     LatestValue: {
+          [1654597267.322196][6338:6343] CHIP:TOO:       Privilege: 5
+          [1654597267.322223][6338:6343] CHIP:TOO:       AuthMode: 2
+          [1654597267.322260][6338:6343] CHIP:TOO:       Subjects: 1 entries
+          [1654597267.322296][6338:6343] CHIP:TOO:         [1]: 112233
+          [1654597267.322327][6338:6343] CHIP:TOO:       Targets: null
+          [1654597267.322354][6338:6343] CHIP:TOO:       FabricIndex: 1
+          [1654597267.322381][6338:6343] CHIP:TOO:      }
+          [1654597267.322413][6338:6343] CHIP:TOO:     AdminFabricIndex: 1
+          [1654597267.322440][6338:6343] CHIP:TOO:    }
+          [1654597267.322579][6338:6343] CHIP:EM: Sending Standalone Ack for MessageCounter:32518205 on exchange 11331i
       disabled: true

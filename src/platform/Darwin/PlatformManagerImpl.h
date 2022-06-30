@@ -26,7 +26,7 @@
 #include <dispatch/dispatch.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
-static constexpr const char * const CHIP_CONTROLLER_QUEUE = "com.zigbee.chip.framework.controller.workqueue";
+static constexpr const char * const CHIP_CONTROLLER_QUEUE = "com.csa.matter.framework.controller.workqueue";
 
 namespace chip {
 namespace DeviceLayer {
@@ -58,7 +58,7 @@ public:
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
     CHIP_ERROR _InitChipStack();
-    CHIP_ERROR _Shutdown();
+    void _Shutdown();
 
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout delay) { return CHIP_ERROR_NOT_IMPLEMENTED; };
     CHIP_ERROR _StartEventLoopTask();

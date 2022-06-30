@@ -122,16 +122,6 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_hash(
-    const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) const
-{
-    if (!HasKeypair()) {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
 CHIP_ERROR CHIPP256KeypairBridge::ECDH_derive_secret(
     const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
@@ -161,7 +151,7 @@ CHIP_ERROR CHIPP256KeypairBridge::MatterPubKeyFromSecKeyRef(SecKeyRef pubkeyRef,
         return CHIP_ERROR_INTERNAL;
     }
     chip::FixedByteSpan<kP256_PublicKey_Length> pubkeyBytes((const uint8_t *) pubkeyData.bytes);
-    *matterPubKey = P256PublicKey(pubkeyBytes);
+    *matterPubKey = pubkeyBytes;
 
     return CHIP_NO_ERROR;
 }

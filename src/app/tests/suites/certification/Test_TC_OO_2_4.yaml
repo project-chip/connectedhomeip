@@ -37,13 +37,7 @@ tests:
       arguments:
           value: 0
 
-    - label: "TH reads the StartUpOnOff attribute from the DUT"
-      command: "readAttribute"
-      attribute: "StartUpOnOff"
-      response:
-          value: 0
-
-    - label: "Power off DUT"
+    - label: "Power Off and On DUT"
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
@@ -55,9 +49,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    - label: "Power on DUT"
-      disabled: true
 
     - label: "TH reads the OnOff attribute from the DUT"
       command: "readAttribute"
@@ -71,7 +62,7 @@ tests:
       arguments:
           value: 1
 
-    - label: "Power off DUT"
+    - label: "Power Off and On DUT"
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
@@ -83,9 +74,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    - label: "Power on DUT"
-      disabled: true
 
     - label: "TH reads the OnOff attribute from the DUT"
       command: "readAttribute"
@@ -99,7 +87,7 @@ tests:
       arguments:
           value: 2
 
-    - label: "Power off DUT"
+    - label: "Power Off and On DUT"
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
@@ -111,9 +99,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    - label: "Power on DUT"
-      disabled: true
 
     - label: "TH reads the OnOff attribute from the DUT"
       command: "readAttribute"
@@ -121,7 +106,7 @@ tests:
       response:
           value: 0
 
-    - label: "Power off DUT"
+    - label: "Power Off and On DUT"
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
@@ -133,9 +118,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    - label: "Power on DUT"
-      disabled: true
 
     - label: "TH reads the OnOff attribute from the DUT"
       command: "readAttribute"
@@ -149,7 +131,7 @@ tests:
       arguments:
           value: null
 
-    - label: "Power off DUT"
+    - label: "Power Off and On DUT"
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
@@ -161,9 +143,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    - label: "Power on DUT"
-      disabled: true
 
     - label: "TH reads the OnOff attribute from the DUT"
       command: "readAttribute"
@@ -174,7 +153,7 @@ tests:
     - label: "TH sends Off command to DUT"
       command: "Off"
 
-    - label: "Power off DUT"
+    - label: "Power Off and On DUT"
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
@@ -186,9 +165,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    - label: "Power on DUT"
-      disabled: true
 
     - label: "TH reads the OnOff attribute from the DUT"
       command: "readAttribute"

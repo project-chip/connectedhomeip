@@ -13,101 +13,74 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 84.1.1. [ [TC-DESC-1.1]] Descriptor Cluster Attributes with DUT as Server
+name: 84.1.1. [TC-DESC-1.1] Descriptor Cluster Attributes with DUT as Server
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Descriptor"
     endpoint: 0
 
 tests:
-    - label: "TH reads DeviceTypeList attribute from DUT."
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: uint16
+
+    - label: "Read the global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
+
+    - label: "Read the global attribute: AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          value: [0, 1, 2, 3, 65528, 65529, 65531, 65532, 65533]
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
       verification: |
-          sudo ./chip-tool descriptor read device-list 1 0
-
-          [1641454498.809603][16120:16125] CHIP:TOO: Descriptor.DeviceList response: 1 entries
-          [1641454498.809737][16120:16125] CHIP:TOO:   [1]: {
-          [1641454498.809780][16120:16125] CHIP:TOO:     Type: 22
-          [1641454498.809817][16120:16125] CHIP:TOO:     Revision: 1
-          [1641454498.809852][16120:16125] CHIP:TOO:   }
-          [1641454498.809938][16120:16125] CHIP:EM: Sending Standalone Ack for MessageCounter:52943 on exchange 24061i
-      disabled: true
-
-    - label: "TH reads 'ServerList' attribute."
-      verification: |
-          sudo ./chip-tool descriptor read server-list 1 0
-
-          [1641454794.918507][16140:16146] CHIP:DMG:      SuppressResponse = true,
-          [1641454794.918530][16140:16146] CHIP:DMG: }
-          [1641454794.920033][16140:16146] CHIP:TOO: Descriptor.ServerList response: 23 entries
-          [1641454794.920083][16140:16146] CHIP:TOO:   [1]: 3
-          [1641454794.920110][16140:16146] CHIP:TOO:   [2]: 4
-          [1641454794.920134][16140:16146] CHIP:TOO:   [3]: 29
-          [1641454794.920157][16140:16146] CHIP:TOO:   [4]: 30
-          [1641454794.920181][16140:16146] CHIP:TOO:   [5]: 31
-          [1641454794.920204][16140:16146] CHIP:TOO:   [6]: 40
-          [1641454794.920227][16140:16146] CHIP:TOO:   [7]: 41
-          [1641454794.920250][16140:16146] CHIP:TOO:   [8]: 42
-          [1641454794.920274][16140:16146] CHIP:TOO:   [9]: 46
-          [1641454794.920297][16140:16146] CHIP:TOO:   [10]: 48
-          [1641454794.920321][16140:16146] CHIP:TOO:   [11]: 49
-          [1641454794.920344][16140:16146] CHIP:TOO:   [12]: 50
-          [1641454794.920367][16140:16146] CHIP:TOO:   [13]: 51
-          [1641454794.920391][16140:16146] CHIP:TOO:   [14]: 52
-          [1641454794.920414][16140:16146] CHIP:TOO:   [15]: 53
-          [1641454794.920437][16140:16146] CHIP:TOO:   [16]: 54
-          [1641454794.920461][16140:16146] CHIP:TOO:   [17]: 55
-          [1641454794.920484][16140:16146] CHIP:TOO:   [18]: 60
-          [1641454794.920507][16140:16146] CHIP:TOO:   [19]: 62
-          [1641454794.920530][16140:16146] CHIP:TOO:   [20]: 63
-          [1641454794.920554][16140:16146] CHIP:TOO:   [21]: 64
-          [1641454794.920577][16140:16146] CHIP:TOO:   [22]: 65
-          [1641454794.920600][16140:16146] CHIP:TOO:   [23]: 1029
-          [1641454794.920687][16140:16146] CHIP:EM: Sending Standalone Ack for MessageCounter:8175897 on exchange 54373i
-      disabled: true
-
-    - label: "TH reads 'ClientList' attribute"
-      verification: |
-          sudo ./chip-tool descriptor read client-list 1 0
-
-          [1641456529.633047][16220:16225] CHIP:DMG:      SuppressResponse = true,
-          [1641456529.633105][16220:16225] CHIP:DMG: }
-          [1641456529.633403][16220:16225] CHIP:TOO: Descriptor.ClientList response: 0 entries
-          [1641456529.633509][16220:16225] CHIP:EM: Sending Standalone Ack for MessageCounter:3437551 on exchange 887i
-      disabled: true
-
-    - label: "TH reads 'PartsList' attribute."
-      verification: |
-          sudo ./chip-tool descriptor read  parts-list 1 0
-
-          [1641456769.777217][16238:16244] CHIP:DMG:      SuppressResponse = true,
-          [1641456769.777267][16238:16244] CHIP:DMG: }
-          [1641456769.777839][16238:16244] CHIP:TOO: Descriptor.PartsList response: 2 entries
-          [1641456769.777925][16238:16244] CHIP:TOO:   [1]: 1
-          [1641456769.777978][16238:16244] CHIP:TOO:   [2]: 2
-          [1641456769.778080][16238:16244] CHIP:EM: Sending Standalone Ack for MessageCounter:2830202 on exchange 38042i
-      disabled: true
-
-    - label: "TH1 reads the AttributeList attribute from the DUT"
-      verification: |
-          sudo ./chip-tool descriptor read attribute-list 1 0
-
-          [1641456932.082331][16256:16261] CHIP:TOO: Descriptor.AttributeList response: 6 entries
-          [1641456932.082382][16256:16261] CHIP:TOO:   [1]: 0
-          [1641456932.082409][16256:16261] CHIP:TOO:   [2]: 1
-          [1641456932.082435][16256:16261] CHIP:TOO:   [3]: 2
-          [1641456932.082461][16256:16261] CHIP:TOO:   [4]: 3
-          [1641456932.082487][16256:16261] CHIP:TOO:   [5]: 65531
-          [1641456932.082512][16256:16261] CHIP:TOO:   [6]: 65533
-          [1641456932.082570][16256:16261] CHIP:EM: Sending Standalone Ack for MessageCounter:9736412 on exchange 3286i
-      disabled: true
-
-    - label: "TH1 reads the ClusterRevision attribute from the DUT"
-      verification: |
-          sudo ./chip-tool descriptor read cluster-revision 1 0
-
-          [1641456975.533390][16268:16274] CHIP:DMG:      SuppressResponse = true,
-          [1641456975.533439][16268:16274] CHIP:DMG: }
-          [1641456975.533710][16268:16274] CHIP:TOO: Descriptor.ClusterRevision response: 1
-          [1641456975.533831][16268:16274] CHIP:EM: Sending Standalone Ack for MessageCounter:14484175 on exchange 41618i
-      disabled: true
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

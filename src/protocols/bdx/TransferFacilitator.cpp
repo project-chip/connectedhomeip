@@ -46,7 +46,7 @@ CHIP_ERROR TransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeConte
         mTransfer.HandleMessageReceived(payloadHeader, std::move(payload), System::SystemClock().GetMonotonicTimestamp());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(BDX, "failed to handle message: %s", ErrorStr(err));
+        ChipLogError(BDX, "failed to handle message: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Almost every BDX message will follow up with a response on the exchange. Even messages that might signify the end of a

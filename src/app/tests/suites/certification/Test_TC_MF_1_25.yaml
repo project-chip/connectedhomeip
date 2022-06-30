@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    22.1.25. [TC-MF-1.25] Open commissioning window - durations max and max+1
+    24.1.25. [TC-MF-1.25] Open commissioning window - durations max and max+1
     [BCM] [DUT - Commissionee]
 
 config:
@@ -24,11 +24,13 @@ config:
 
 tests:
     - label: "Reset DUT_CE to factory defaults"
+      PICS: PICS_MF
       verification: |
 
       disabled: true
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE using BCM"
+      PICS: PICS_MF
       verification: |
           "1. Provision the device using 1st controller chip tool(use above instructions) ,
           "
@@ -37,6 +39,7 @@ tests:
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE with a value of 900
           seconds"
+      PICS: PICS_MF
       verification: |
           On 1st controller chip tool, open commissioning window
 
@@ -80,12 +83,14 @@ tests:
       disabled: true
 
     - label: "Wait for commissioning Window to 901 seconds"
+      PICS: PICS_MF
       verification: |
           Wait for commissioning Window to Timeout
       disabled: true
 
     - label:
           "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+      PICS: PICS_MF
       verification: |
           ./chip-tool administratorcommissioning read window-status 1 0
 
@@ -97,6 +102,7 @@ tests:
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE with a value of 901
           seconds"
+      PICS: PICS_MF
       verification: |
           On 1st controller chip tool, open commissioning window
 
@@ -111,6 +117,7 @@ tests:
 
     - label:
           "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+      PICS: PICS_MF
       verification: |
           ./chip-tool administratorcommissioning read window-status 1 0
 

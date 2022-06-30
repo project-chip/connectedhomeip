@@ -27,6 +27,12 @@
 #include <hal_wifi.h>
 #include <wifi_mgmr_ext.h>
 
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
+#endif
+
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

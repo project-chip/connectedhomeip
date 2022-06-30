@@ -142,7 +142,7 @@ void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)
     const char * instanceName1 = "servertest1";
 
     // setup for tests
-    DeviceTransportMgr * mUdcTransportMgr = chip::Platform::New<DeviceTransportMgr>();
+    auto mUdcTransportMgr = chip::Platform::MakeUnique<DeviceTransportMgr>();
     mUdcTransportMgr->SetSessionManager(&udcServer);
     udcServer.SetInstanceNameResolver(&testCallback);
 

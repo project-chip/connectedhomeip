@@ -143,16 +143,6 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Operationa
 
         ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenCommissioningWindowSuccess,
                                                    OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
-
-        char payloadBuffer[QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
-
-        MutableCharSpan manualCode(payloadBuffer);
-        ReturnErrorOnFailure(ManualSetupPayloadGenerator(mSetupPayload).payloadDecimalStringRepresentation(manualCode));
-        ChipLogProgress(Controller, "Manual pairing code: [%s]", payloadBuffer);
-
-        MutableCharSpan QRCode(payloadBuffer);
-        ReturnErrorOnFailure(QRCodeBasicSetupPayloadGenerator(mSetupPayload).payloadBase38Representation(QRCode));
-        ChipLogProgress(Controller, "SetupQRCode: [%s]", payloadBuffer);
     }
     else
     {
@@ -211,6 +201,30 @@ void CommissioningWindowOpener::OnOpenCommissioningWindowSuccess(void * context,
     {
         self->mCommissioningWindowCallback->mCall(self->mCommissioningWindowCallback->mContext, self->mNodeId, CHIP_NO_ERROR,
                                                   self->mSetupPayload);
+
+        char payloadBuffer[QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+
+        MutableCharSpan manualCode(payloadBuffer);
+        CHIP_ERROR err = ManualSetupPayloadGenerator(self->mSetupPayload).payloadDecimalStringRepresentation(manualCode);
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Controller, "Manual pairing code: [%s]", payloadBuffer);
+        }
+        else
+        {
+            ChipLogError(Controller, "Unable to generate manual code for setup payload: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+        MutableCharSpan QRCode(payloadBuffer);
+        err = QRCodeBasicSetupPayloadGenerator(self->mSetupPayload).payloadBase38Representation(QRCode);
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Controller, "SetupQRCode: [%s]", payloadBuffer);
+        }
+        else
+        {
+            ChipLogError(Controller, "Unable to generate QR code for setup payload: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
     else if (self->mBasicCommissioningWindowCallback != nullptr)
     {

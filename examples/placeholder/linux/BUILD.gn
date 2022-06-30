@@ -52,6 +52,8 @@ executable("chip-${chip_tests_zap_config}") {
     "${chip_root}/src/app/tests/suites/credentials:dac_provider",
     "${chip_root}/src/app/tests/suites/pics",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/support:testing",  # For sleepMillis. TODO: this is
+                                             # odd and should be fixed
   ]
 
   include_dirs = [ "include" ]

@@ -144,6 +144,7 @@ void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
     {
     case DevicePairingDelegate::Status::SecurePairingSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");
+        ChipLogProgress(chipTool, "CASE establishment successful");
         break;
     case DevicePairingDelegate::Status::SecurePairingFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
@@ -157,6 +158,7 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Pairing Success");
+        ChipLogProgress(chipTool, "PASE establishment successful");
         if (mPairingMode == PairingMode::CodePaseOnly)
         {
             SetCommandExitStatus(err);

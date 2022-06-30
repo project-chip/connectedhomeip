@@ -140,6 +140,13 @@ tests:
       arguments:
           value: 0x04
 
+    ## If Verify DUT responds with BUSY (value 0x9c) status response
+    - label: "3b: TH send DownOrClose command to the DUT"
+      command: "DownOrClose"
+      PICS: "WNCV_MAINTENANCE"
+      response:
+          error: BUSY
+
     ## Value of bitO must be 0b
     - label: "3c: TH reads ConfigStatus attribute from DUT"
       command: "readAttribute"
@@ -151,13 +158,6 @@ tests:
               minValue: 0x00
               maxValue: 0x7F
 
-    ## If Verify DUT responds with BUSY (value 0x9c) status response
-    - label: "3c: TH send DownOrClose command to the DUT"
-      command: "DownOrClose"
-      PICS: "WNCV_MAINTENANCE"
-      response:
-          error: BUSY
-
     ## Clear b2
     - label: "3d: TH clear the Mode Attribute bit2 of the DUT"
       command: "writeAttribute"
@@ -165,6 +165,11 @@ tests:
       PICS: "WNCV_MAINTENANCE"
       arguments:
           value: 0x00
+
+    ## Verify DUT responds with SUCCESS status response
+    - label: "3e: TH send DownOrClose command to the DUT"
+      command: "DownOrClose"
+      PICS: "WNCV_MAINTENANCE"
 
     ## Value of bitO must be 1b
     - label: "3e: TH reads ConfigStatus attribute from DUT"
@@ -175,18 +180,3 @@ tests:
           constraints:
               minValue: 0x01
               maxValue: 0x7F
-
-    ## Value of bit2 must be 0b
-    - label: "3f: TH reads the Mode Attribute from the DUT"
-      command: "readAttribute"
-      attribute: "Mode"
-      PICS: "WNCV_MAINTENANCE"
-      response:
-          constraints:
-              minValue: 0x00
-              maxValue: 0x7F
-
-    ## Verify DUT responds with SUCCESS status response
-    - label: "3g: TH send DownOrClose command to the DUT"
-      command: "DownOrClose"
-      PICS: "WNCV_MAINTENANCE"

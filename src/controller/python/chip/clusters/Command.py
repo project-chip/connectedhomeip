@@ -29,6 +29,7 @@ import chip.interaction_model
 
 import inspect
 import sys
+import builtins
 
 
 @dataclass
@@ -157,8 +158,9 @@ def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPa
 
     payloadTLV = payload.ToTLV()
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-    return handle.pychip_CommandSender_SendCommand(ctypes.py_object(
-        transaction), device, c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), commandPath.EndpointId, commandPath.ClusterId, commandPath.CommandId, payloadTLV, len(payloadTLV))
+    return builtins.chipStack.Call(
+        lambda: handle.pychip_CommandSender_SendCommand(ctypes.py_object(
+            transaction), device, c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), commandPath.EndpointId, commandPath.ClusterId, commandPath.CommandId, payloadTLV, len(payloadTLV)))
 
 
 def Init():

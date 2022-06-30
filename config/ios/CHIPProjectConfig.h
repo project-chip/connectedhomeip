@@ -40,6 +40,13 @@
 
 #define CHIP_CONFIG_MAX_SOFTWARE_VERSION_LENGTH 128
 
+#ifndef CHIP_CONFIG_KVS_PATH
 #define CHIP_CONFIG_KVS_PATH "chip.store"
+#endif
+
+// The session pool size limits how many subscriptions we can have live at
+// once.  Home supports up to 1000 accessories, and we subscribe to all of them,
+// so we need to make sure the pool is big enough for that.
+#define CHIP_CONFIG_SECURE_SESSION_POOL_SIZE 1000
 
 #endif /* CHIPPROJECTCONFIG_H */

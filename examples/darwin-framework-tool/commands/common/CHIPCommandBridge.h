@@ -45,7 +45,6 @@ public:
     void SetCommandExitStatus(CHIP_ERROR status)
     {
         mCommandExitStatus = status;
-        ShutdownCommissioner();
         StopWaiting();
     }
 
@@ -76,10 +75,26 @@ protected:
     // if failure).
     void LogNSError(const char * logString, NSError * error);
 
+    // Clean up any resources allocated by the command.  Some commands may hold
+    // on to resources after Shutdown(), but Cleanup() will guarantee those are
+    // cleaned up.
+    virtual void Cleanup() {}
+
+    // If true, skip calling Cleanup() when in interactive mode, so the command
+    // can keep doing work as needed.  Cleanup() will be called when quitting
+    // interactive mode.  This method will be called before Shutdown, so it can
+    // use member values that Shutdown will normally reset.
+    virtual bool DeferInteractiveCleanup() { return NO; }
+
+    // Execute any deferred cleanups.  Used when exiting interactive mode.
+    void ExecuteDeferredCleanups();
+
+    static std::set<CHIPCommandBridge *> sDeferredCleanups;
+
 private:
     CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
                                       const chip::Credentials::AttestationTrustStore * trustStore);
-    CHIP_ERROR ShutdownCommissioner();
+    void ShutdownCommissioner();
     uint16_t CurrentCommissionerIndex();
 
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
@@ -87,8 +102,11 @@ private:
     CHIP_ERROR StartWaiting(chip::System::Clock::Timeout seconds);
     void StopWaiting();
 
+    CHIP_ERROR MaybeSetUpStack();
+    void MaybeTearDownStack();
+
     // Our three controllers: alpha, beta, gamma.
-    std::map<std::string, CHIPDeviceController *> mControllers;
+    static std::map<std::string, CHIPDeviceController *> mControllers;
 
     // The current controller; the one the current command should be using.
     CHIPDeviceController * mCurrentController;

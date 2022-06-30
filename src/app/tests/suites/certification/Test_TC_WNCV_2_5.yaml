@@ -28,12 +28,11 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads EndProductType attribute from DUT"
+    - label: "TH reads EndProductType attribute from DUT"
       command: "readAttribute"
       attribute: "EndProductType"
       PICS: A_ENDPRODUCTTYPE
       response:
-          value: 0
           constraints:
               type: enum8
               minValue: 0

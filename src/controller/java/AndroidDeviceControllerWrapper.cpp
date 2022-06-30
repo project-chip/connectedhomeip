@@ -23,6 +23,7 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
@@ -34,6 +35,7 @@
 #include <lib/support/TestGroupData.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/android/CHIPP256KeypairBridge.h>
 
 using namespace chip;
 using namespace chip::Controller;
@@ -47,6 +49,12 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
         JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mJavaObjectRef);
     }
     mController->Shutdown();
+
+    if (mKeypairBridge != nullptr)
+    {
+        chip::Platform::Delete(mKeypairBridge);
+        mKeypairBridge = nullptr;
+    }
 }
 
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
@@ -61,12 +69,12 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
                                              argument);
 }
 
-AndroidDeviceControllerWrapper *
-AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
-                                            const chip::CATValues & cats, chip::System::Layer * systemLayer,
-                                            chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
-                                            chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager,
-                                            AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr, CHIP_ERROR * errInfoOnFailure)
+AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
+    JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, const chip::CATValues & cats, chip::System::Layer * systemLayer,
+    chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
+    chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager, AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr,
+    jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate,
+    jbyteArray ipkEpochKey, uint16_t listenPort, CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {
@@ -94,6 +102,14 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
 
     *errInfoOnFailure = CHIP_NO_ERROR;
 
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Controller, "Failed to retrieve JNIEnv.");
+        *errInfoOnFailure = CHIP_ERROR_INCORRECT_STATE;
+        return nullptr;
+    }
+
     std::unique_ptr<DeviceCommissioner> controller(new DeviceCommissioner());
 
     if (!controller)
@@ -103,6 +119,8 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     }
     std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(
         new AndroidDeviceControllerWrapper(std::move(controller), std::move(opCredsIssuerPtr)));
+
+    chip::PersistentStorageDelegate * wrapperStorage = wrapper.get();
 
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
 
@@ -124,12 +142,12 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
 #if CONFIG_NETWORK_LAYER_BLE
     initParams.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
 #endif
-    initParams.listenPort                      = CHIP_PORT + 1;
+    initParams.listenPort                      = listenPort;
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
-    initParams.fabricIndependentStorage        = wrapper.get();
+    initParams.fabricIndependentStorage        = wrapperStorage;
 
-    wrapper->mGroupDataProvider.SetStorageDelegate(wrapper.get());
+    wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
 
     CHIP_ERROR err = wrapper->mGroupDataProvider.Init();
     if (err != CHIP_NO_ERROR)
@@ -138,6 +156,14 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
         return nullptr;
     }
     initParams.groupDataProvider = &wrapper->mGroupDataProvider;
+
+    err = wrapper->mOpCertStore.Init(wrapperStorage);
+    if (err != CHIP_NO_ERROR)
+    {
+        *errInfoOnFailure = err;
+        return nullptr;
+    }
+    initParams.opCertStore = &wrapper->mOpCertStore;
 
     // TODO: Init IPK Epoch Key in opcreds issuer, so that commissionees get the right IPK
     opCredsIssuer->Initialize(*wrapper.get(), wrapper.get()->mJavaObjectRef);
@@ -167,24 +193,52 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     }
     MutableByteSpan rcacSpan(rcac.Get(), kMaxCHIPDERCertLength);
 
-    Crypto::P256Keypair ephemeralKey;
-    *errInfoOnFailure = ephemeralKey.Initialize();
-    if (*errInfoOnFailure != CHIP_NO_ERROR)
+    if (rootCertificate != nullptr && intermediateCertificate != nullptr && nodeOperationalCertificate != nullptr &&
+        keypairDelegate != nullptr)
     {
-        return nullptr;
-    }
+        CHIPP256KeypairBridge * nativeKeypairBridge = wrapper->GetP256KeypairBridge();
+        nativeKeypairBridge->SetDelegate(keypairDelegate);
+        *errInfoOnFailure = nativeKeypairBridge->Initialize();
+        if (*errInfoOnFailure != CHIP_NO_ERROR)
+        {
+            return nullptr;
+        }
 
-    *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId, /* fabricId = */ 1, cats, ephemeralKey.Pubkey(),
-                                                                       rcacSpan, icacSpan, nocSpan);
-    if (*errInfoOnFailure != CHIP_NO_ERROR)
+        setupParams.operationalKeypair                   = nativeKeypairBridge;
+        setupParams.hasExternallyOwnedOperationalKeypair = true;
+
+        JniByteArray jniRcac(env, rootCertificate);
+        JniByteArray jniIcac(env, intermediateCertificate);
+        JniByteArray jniNoc(env, nodeOperationalCertificate);
+
+        setupParams.controllerRCAC = jniRcac.byteSpan();
+        setupParams.controllerICAC = jniIcac.byteSpan();
+        setupParams.controllerNOC  = jniNoc.byteSpan();
+    }
+    else
     {
-        return nullptr;
-    }
+        Crypto::P256Keypair ephemeralKey;
+        *errInfoOnFailure = ephemeralKey.Initialize();
+        if (*errInfoOnFailure != CHIP_NO_ERROR)
+        {
+            return nullptr;
+        }
+        setupParams.operationalKeypair                   = &ephemeralKey;
+        setupParams.hasExternallyOwnedOperationalKeypair = false;
 
-    setupParams.operationalKeypair = &ephemeralKey;
-    setupParams.controllerRCAC     = rcacSpan;
-    setupParams.controllerICAC     = icacSpan;
-    setupParams.controllerNOC      = nocSpan;
+        *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId,
+                                                                           /* fabricId = */ 1, cats, ephemeralKey.Pubkey(),
+                                                                           rcacSpan, icacSpan, nocSpan);
+
+        if (*errInfoOnFailure != CHIP_NO_ERROR)
+        {
+            return nullptr;
+        }
+
+        setupParams.controllerRCAC = rcacSpan;
+        setupParams.controllerICAC = icacSpan;
+        setupParams.controllerNOC  = nocSpan;
+    }
 
     *errInfoOnFailure = DeviceControllerFactory::GetInstance().Init(initParams);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
@@ -198,29 +252,31 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     }
 
     // Setup IPK
-    chip::FabricInfo * fabricInfo = wrapper->Controller()->GetFabricInfo();
-    if (fabricInfo == nullptr)
-    {
-        *errInfoOnFailure = CHIP_ERROR_INTERNAL;
-        return nullptr;
-    }
-
     uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
     chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
 
-    *errInfoOnFailure = fabricInfo->GetCompressedId(compressedFabricIdSpan);
+    *errInfoOnFailure = wrapper->Controller()->GetCompressedFabricIdBytes(compressedFabricIdSpan);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;
     }
     ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
-                    static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+                    static_cast<unsigned>(wrapper->Controller()->GetFabricIndex()));
     ChipLogByteSpan(Support, compressedFabricIdSpan);
 
-    chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+    chip::ByteSpan ipkSpan;
+    if (ipkEpochKey != nullptr)
+    {
+        JniByteArray jniIpk(env, ipkEpochKey);
+        ipkSpan = jniIpk.byteSpan();
+    }
+    else
+    {
+        ipkSpan = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+    }
 
-    *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(&wrapper->mGroupDataProvider, fabricInfo->GetFabricIndex(),
-                                                                defaultIpk, compressedFabricIdSpan);
+    *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(
+        &wrapper->mGroupDataProvider, wrapper->Controller()->GetFabricIndex(), ipkSpan, compressedFabricIdSpan);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;

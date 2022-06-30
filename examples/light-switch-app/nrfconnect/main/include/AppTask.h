@@ -24,6 +24,10 @@
 #include <core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if CONFIG_CHIP_FACTORY_DATA
+#include <platform/nrfconnect/FactoryDataProvider.h>
+#endif
+
 #ifdef CONFIG_MCUMGR_SMP_BT
 #include "DFUOverSMP.h"
 #endif
@@ -53,7 +57,7 @@ private:
     {
         NoneSelected = 0,
         SoftwareUpdate,
-        FactoryReset
+        FactoryReset,
     };
     TimerFunction mFunction = TimerFunction::NoneSelected;
 
@@ -87,6 +91,10 @@ private:
 
 #ifdef CONFIG_MCUMGR_SMP_BT
     static void RequestSMPAdvertisingStart(void);
+#endif
+
+#if CONFIG_CHIP_FACTORY_DATA
+    chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
 #endif
 };
 

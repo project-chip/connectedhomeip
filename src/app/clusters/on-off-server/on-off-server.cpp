@@ -383,13 +383,7 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
 #endif // EMBER_AF_PLUGIN_SCENES
 
             OnOff::Attributes::GlobalSceneControl::Set(endpoint, false);
-
-            status = setOnOffValue(endpoint, Commands::Off::Id, false);
             Attributes::OnTime::Set(endpoint, 0);
-        }
-        else
-        {
-            status = setOnOffValue(endpoint, Commands::Off::Id, false);
         }
 
         // Only apply effect if OnOff is on
@@ -405,6 +399,8 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
                 effect->mOffWithEffectTrigger(effect);
             }
         }
+
+        status = setOnOffValue(endpoint, Commands::Off::Id, false);
     }
     else
     {
@@ -584,12 +580,8 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
 #ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
 bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint)
 {
-    if (emberAfIsNonVolatileAttribute(endpoint, OnOff::Id, Attributes::OnOff::Id))
-    {
-        return emberAfIsNonVolatileAttribute(endpoint, OnOff::Id, Attributes::StartUpOnOff::Id);
-    }
-
-    return false;
+    return !emberAfIsKnownVolatileAttribute(endpoint, OnOff::Id, Attributes::OnOff::Id) &&
+        !emberAfIsKnownVolatileAttribute(endpoint, OnOff::Id, Attributes::StartUpOnOff::Id);
 }
 #endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
 

@@ -39,6 +39,8 @@ namespace chip {
 class MessageCounter
 {
 public:
+    static constexpr uint32_t kMessageCounterRandomInitMask = 0x0FFFFFFF; ///< 28-bit mask
+
     enum Type : uint8_t
     {
         GlobalUnencrypted,
@@ -50,6 +52,9 @@ public:
 
     virtual Type GetType() const                           = 0;
     virtual CHIP_ERROR AdvanceAndConsume(uint32_t & fetch) = 0; /** Advance the counter, and feed the new counter to fetch */
+
+    // Note: this function must be called after Crypto is initialized. It can not be called from global variable constructor.
+    static uint32_t GetDefaultInitialValuePredecessor() { return Crypto::GetRandU32() & kMessageCounterRandomInitMask; }
 };
 
 class GlobalUnencryptedMessageCounter : public MessageCounter
@@ -57,7 +62,7 @@ class GlobalUnencryptedMessageCounter : public MessageCounter
 public:
     GlobalUnencryptedMessageCounter() : mLastUsedValue(0) {}
 
-    void Init();
+    void Init() { mLastUsedValue = GetDefaultInitialValuePredecessor(); }
 
     Type GetType() const override { return GlobalUnencrypted; }
     CHIP_ERROR AdvanceAndConsume(uint32_t & fetch) override
@@ -73,8 +78,7 @@ private:
 class LocalSessionMessageCounter : public MessageCounter
 {
 public:
-    static constexpr uint32_t kMessageCounterMax            = 0xFFFFFFFF;
-    static constexpr uint32_t kMessageCounterRandomInitMask = 0x0FFFFFFF; ///< 28-bit mask
+    static constexpr uint32_t kMessageCounterMax = 0xFFFFFFFF;
 
     /**
      * Initialize a local message counter with random value between [1, 2^28]. This increases the difficulty of traffic analysis
@@ -83,7 +87,7 @@ public:
      *
      * The mLastUsedValue is the predecessor of the initial value, it will be advanced before using, so don't need to add 1 here.
      */
-    LocalSessionMessageCounter() { mLastUsedValue = (Crypto::GetRandU32() & kMessageCounterRandomInitMask); }
+    LocalSessionMessageCounter() { mLastUsedValue = GetDefaultInitialValuePredecessor(); }
 
     Type GetType() const override { return Session; }
     CHIP_ERROR AdvanceAndConsume(uint32_t & fetch) override

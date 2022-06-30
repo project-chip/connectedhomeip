@@ -19,7 +19,8 @@ Semiconductor's nRF Connect SDK, and supports remote access and control of a
 lighting examples over a low-power, 802.15.4 Thread network.
 
 The example behaves as a Matter accessory, that is a device that can be paired
-into an existing Matter network and can be controlled by this network.
+into an existing Matter network and can be controlled by this network. The
+device works as a Thread Sleepy End Device.
 
 <hr>
 
@@ -61,13 +62,39 @@ and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
 [nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
 to read more about the platform structure and dependencies.
 
+In Matter, the following types of light switch devices are available:
+
+-   Group 1: On/Off Light Switch, Dimmer Switch, Color Dimmer Switch, Control
+    Bridge
+-   Group 2: Generic Switch
+
+The first type (here referred to as Group 1) uses client application clusters
+(for example, Level Control) and bindings to send commands to the server
+clusters. This type of switch is on the endpoint 1 of this example.
+
+With the second type (Group 2), controllers can use event subscriptions to be
+informed about changes on the switch server cluster. This type of switch is on
+the endpoint 2 of this example.
+
+### Group 1 light switch devices overview
+
 A light switch device is a simple embedded controller, which has the ability to
 control lighting devices, such as light bulbs or LEDs. After commissioning into
 a Matter network, the light switch device does not know what it can control. In
 other words, it has no information about another device being connected to the
 same network. You must provide this information to the light switch through the
 process called binding, which links clusters and endpoints on both devices, so
-that the devices can interact with each other.
+that the devices can interact with each other. This functionality is on the
+endpoint 1 and triggered by **Button 2**.
+
+### Generic Switch
+
+The Generic Switch on the endpoint 2 offers the switch server cluster. It
+implements the Momentary Switch (`MS`) and Momentary Switch Release (`MSR`)
+features. For this reason, it sends event notifications `InitialPress` and
+`ShortRelease` if **Button 3** of the DK is pressed and released.
+
+### Common example settings
 
 The Matter device that runs the light switch application is controlled by the
 Matter controller device over the Thread protocol. By default, the Matter device
@@ -272,6 +299,11 @@ platform image.
     with 1% increments every 300 milliseconds as long as **Button 2** is
     pressed.
 
+**Button 3** can be used for the following purposes:
+
+-   _Pressed once_ &mdash; Changes the value of the attribute `CurrentPosition`
+    and (if subscribed) sends the event notifications to the controller.
+
 **Button 4** can be used to start the NFC tag emulation and enable Bluetooth LE
 advertising for the predefined period of time (15 minutes by default).
 
@@ -451,22 +483,6 @@ features like logs and command-line interface, run the following command:
 
 Remember to replace _build-target_ with the build target name of the Nordic
 Semiconductor's kit you own.
-
-### Building with low-power configuration
-
-You can build the example using the low-power configuration, which enables
-Thread's Sleepy End Device mode and disables debug features, such as the UART
-console or the **LED 1** usage.
-
-To build for the low-power configuration, run the following command with
-_build-target_ replaced with the build target name of the Nordic Semiconductor's
-kit you own (for example `nrf52840dk_nrf52840`):
-
-    $ west build -b build-target -- -DOVERLAY_CONFIG=overlay-low_power.conf
-
-For example, use the following command for `nrf52840dk_nrf52840`:
-
-    $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=overlay-low_power.conf
 
 ### Building with Device Firmware Upgrade support
 
@@ -722,6 +738,24 @@ To test the communication between the light switch device and the bound devices,
 use [light switch buttons](#buttons) or
 [Matter CLI commands](#matter-cli-commands), as described in the
 [Device UI](#device-ui) section.
+
+### Testing the Generic Switch
+
+To test the Generic Switch, complete the following steps:
+
+1.  Enter the interactive mode of the CHIP Tool:
+
+        chip-tool interactive start
+
+2.  Subscribe to the `InitialPress` and `ShortRelease` event notifications:
+
+```shell
+switch subscribe-event initial-press 1 20 <node_id> 2 --is-urgent true
+switch subscribe-event short-release 1 20 <node_id> 2 --is-urgent true --keepSubscriptions true
+```
+
+3.  Press **Button 3** to test the new configuration. When pressing and
+    releasing **Button 3**, both events should be sent to the controller.
 
 ### Testing Device Firmware Upgrade
 

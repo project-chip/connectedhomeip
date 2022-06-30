@@ -25,6 +25,7 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
+#include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <lib/support/CHIPMem.h>
@@ -66,17 +67,17 @@ void HandleSoftwareFaultEvent(intptr_t arg)
     if (!IsClusterPresentOnAnyEndpoint(Clusters::SoftwareDiagnostics::Id))
         return;
 
-    Clusters::SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type softwareFault;
+    Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type softwareFault;
     char threadName[kMaxThreadNameLength + 1];
 
     softwareFault.id = static_cast<uint64_t>(getpid());
     Platform::CopyString(threadName, std::to_string(softwareFault.id).c_str());
 
-    softwareFault.name = CharSpan::fromCharString(threadName);
+    softwareFault.name.SetValue(CharSpan::fromCharString(threadName));
 
-    std::time_t result           = std::time(nullptr);
-    char * asctime               = std::asctime(std::localtime(&result));
-    softwareFault.faultRecording = ByteSpan(Uint8::from_const_char(asctime), strlen(asctime));
+    std::time_t result = std::time(nullptr);
+    char * asctime     = std::asctime(std::localtime(&result));
+    softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(asctime), strlen(asctime)));
 
     Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
 }
@@ -140,6 +141,52 @@ void HandleGeneralFaultEvent(intptr_t arg)
         ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
 #endif
         Clusters::GeneralDiagnosticsServer::Instance().OnNetworkFaultsDetect(previous, current);
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Unknow event ID:%d", eventId);
+    }
+}
+
+/**
+ * Should be called when a switch operation takes place on the Node.
+ */
+void HandleSwitchEvent(intptr_t arg)
+{
+    uint32_t eventId = static_cast<uint32_t>(arg);
+
+    EndpointId endpoint      = 1;
+    uint8_t newPosition      = 20;
+    uint8_t previousPosition = 10;
+    uint8_t count            = 3;
+
+    if (eventId == Clusters::Switch::Events::SwitchLatched::Id)
+    {
+        Clusters::SwitchServer::Instance().OnSwitchLatch(endpoint, newPosition);
+    }
+    else if (eventId == Clusters::Switch::Events::InitialPress::Id)
+    {
+        Clusters::SwitchServer::Instance().OnInitialPress(endpoint, newPosition);
+    }
+    else if (eventId == Clusters::Switch::Events::LongPress::Id)
+    {
+        Clusters::SwitchServer::Instance().OnLongPress(endpoint, newPosition);
+    }
+    else if (eventId == Clusters::Switch::Events::ShortRelease::Id)
+    {
+        Clusters::SwitchServer::Instance().OnShortRelease(endpoint, previousPosition);
+    }
+    else if (eventId == Clusters::Switch::Events::LongRelease::Id)
+    {
+        Clusters::SwitchServer::Instance().OnLongRelease(endpoint, previousPosition);
+    }
+    else if (eventId == Clusters::Switch::Events::MultiPressOngoing::Id)
+    {
+        Clusters::SwitchServer::Instance().OnMultiPressOngoing(endpoint, newPosition, count);
+    }
+    else if (eventId == Clusters::Switch::Events::MultiPressComplete::Id)
+    {
+        Clusters::SwitchServer::Instance().OnMultiPressComplete(endpoint, newPosition, count);
     }
     else
     {
@@ -223,6 +270,42 @@ void OnGeneralFaultSignalHandler(int signum)
     PlatformMgr().ScheduleWork(HandleGeneralFaultEvent, static_cast<intptr_t>(eventId));
 }
 
+void OnSwitchSignalHandler(int signum)
+{
+    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
+
+    uint32_t eventId;
+    switch (signum)
+    {
+    case SIGTSTP:
+        eventId = Clusters::Switch::Events::SwitchLatched::Id;
+        break;
+    case SIGSTOP:
+        eventId = Clusters::Switch::Events::InitialPress::Id;
+        break;
+    case SIGTTOU:
+        eventId = Clusters::Switch::Events::LongPress::Id;
+        break;
+    case SIGWINCH:
+        eventId = Clusters::Switch::Events::ShortRelease::Id;
+        break;
+    case SIGQUIT:
+        eventId = Clusters::Switch::Events::LongRelease::Id;
+        break;
+    case SIGFPE:
+        eventId = Clusters::Switch::Events::MultiPressOngoing::Id;
+        break;
+    case SIGPIPE:
+        eventId = Clusters::Switch::Events::MultiPressComplete::Id;
+        break;
+    default:
+        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
+        chipDie();
+        break;
+    }
+
+    PlatformMgr().ScheduleWork(HandleSwitchEvent, static_cast<intptr_t>(eventId));
+}
 void SetupSignalHandlers()
 {
     // sigaction is not used here because Tsan interceptors seems to
@@ -238,6 +321,13 @@ void SetupSignalHandlers()
     signal(SIGUSR2, OnGeneralFaultSignalHandler);
     signal(SIGHUP, OnGeneralFaultSignalHandler);
     signal(SIGTTIN, OnGeneralFaultSignalHandler);
+    signal(SIGTSTP, OnSwitchSignalHandler);
+    signal(SIGSTOP, OnSwitchSignalHandler);
+    signal(SIGTTOU, OnSwitchSignalHandler);
+    signal(SIGWINCH, OnSwitchSignalHandler);
+    signal(SIGQUIT, OnSwitchSignalHandler);
+    signal(SIGFPE, OnSwitchSignalHandler);
+    signal(SIGPIPE, OnSwitchSignalHandler);
 }
 #endif // !defined(ENABLE_CHIP_SHELL)
 

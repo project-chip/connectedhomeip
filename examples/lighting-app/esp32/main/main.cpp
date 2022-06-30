@@ -16,7 +16,8 @@
  */
 
 #include "DeviceCallbacks.h"
-#include "LEDWidget.h"
+
+#include "AppTask.h"
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 
@@ -29,15 +30,27 @@
 #include "shell_extension/launch.h"
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+#include <platform/ESP32/ESP32FactoryDataProvider.h>
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
 using namespace ::chip;
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
-
-LEDWidget AppLED;
+using namespace ::chip::DeviceLayer;
 
 static const char * TAG = "light-app";
 
 static AppDeviceCallbacks EchoCallbacks;
+
+namespace {
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+} // namespace
 
 static void InitServer(intptr_t context)
 {
@@ -61,14 +74,9 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "chip-esp32-light-example starting");
     ESP_LOGI(TAG, "==================================================");
 
-#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-    SetCommissionableDataProvider(&sFactoryDataProvider);
-#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
 #endif
-
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
@@ -77,6 +85,17 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
         return;
     }
+
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+    SetCommissionableDataProvider(&sFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+#if CONFIG_ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER
+    SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+#endif
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
     {
@@ -89,7 +108,12 @@ extern "C" void app_main()
         return;
     }
 #endif
-    AppLED.Init();
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+
+    error = GetAppTask().StartAppTask();
+    if (error != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %s", ErrorStr(error));
+    }
 }

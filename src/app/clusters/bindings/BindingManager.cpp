@@ -25,7 +25,7 @@ namespace {
 
 class BindingFabricTableDelegate : public chip::FabricTable::Delegate
 {
-    void OnFabricDeletedFromStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+    void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
     {
         chip::BindingTable & bindingTable = chip::BindingTable::GetInstance();
         auto iter                         = bindingTable.begin();
@@ -42,12 +42,6 @@ class BindingFabricTableDelegate : public chip::FabricTable::Delegate
         }
         chip::BindingManager::GetInstance().FabricRemoved(fabricIndex);
     }
-
-    // Intentionally left blank
-    void OnFabricRetrievedFromStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
-
-    // Intentionally left blank
-    void OnFabricPersistedToStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
 };
 
 BindingFabricTableDelegate gFabricTableDelegate;
@@ -58,7 +52,7 @@ namespace {
 
 chip::PeerId PeerIdForNode(chip::FabricTable * fabricTable, chip::FabricIndex fabric, chip::NodeId node)
 {
-    chip::FabricInfo * fabricInfo = fabricTable->FindFabricWithIndex(fabric);
+    const chip::FabricInfo * fabricInfo = fabricTable->FindFabricWithIndex(fabric);
     if (fabricInfo == nullptr)
     {
         return chip::PeerId();
@@ -208,7 +202,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
         {
             if (iter->type == EMBER_UNICAST_BINDING)
             {
-                FabricInfo * fabricInfo = mInitParams.mFabricTable->FindFabricWithIndex(iter->fabricIndex);
+                const FabricInfo * fabricInfo = mInitParams.mFabricTable->FindFabricWithIndex(iter->fabricIndex);
                 VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NOT_FOUND);
                 PeerId peer                         = fabricInfo->GetPeerIdForNode(iter->nodeId);
                 OperationalDeviceProxy * peerDevice = mInitParams.mCASESessionManager->FindExistingSession(peer);

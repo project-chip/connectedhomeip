@@ -68,7 +68,7 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(Inet, "Failed to initialize Udp transport: %s", ErrorStr(err));
+        ChipLogProgress(Inet, "Failed to initialize Udp transport: %" CHIP_ERROR_FORMAT, err.Format());
         if (mUDPEndPoint)
         {
             mUDPEndPoint->Free();
@@ -123,13 +123,13 @@ void UDP::OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle 
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Inet, "Failed to receive UDP message: %s", ErrorStr(err));
+        ChipLogError(Inet, "Failed to receive UDP message: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
 void UDP::OnUdpError(Inet::UDPEndPoint * endPoint, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo)
 {
-    ChipLogError(Inet, "Failed to receive UDP message: %s", ErrorStr(err));
+    ChipLogError(Inet, "Failed to receive UDP message: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 CHIP_ERROR UDP::MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join)

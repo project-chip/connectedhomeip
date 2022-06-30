@@ -32,6 +32,7 @@ tests:
           "TH sends TriggerEffect command to DUT with the effect identifier
           field set to 0x00 blink and the effect variant field set to 0x00
           default"
+      PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
           values:
@@ -52,6 +53,7 @@ tests:
           "TH sends TriggerEffect command to DUT with the effect identifier
           field set to 0x01 breathe and the effect variant field set to 0x00
           default"
+      PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
           values:
@@ -72,6 +74,7 @@ tests:
           "TH sends TriggerEffect command to DUT with the effect identifier
           field set to 0x02 okay and the effect variant field set to 0x00
           default"
+      PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
           values:
@@ -92,6 +95,7 @@ tests:
           "TH sends TriggerEffect command to DUT with the effect identifier
           field set to 0x0b channel change and the effect variant field set to
           0x00 default"
+      PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
           values:
@@ -112,6 +116,7 @@ tests:
           "TH sends TriggerEffect command to DUT with the effect identifier
           field set to 0x01 breathe and the effect variant field set to 0x00
           default"
+      PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
           values:
@@ -132,6 +137,7 @@ tests:
           "TH sends TriggerEffect command to DUT with the effect identifier
           field set to 0xfe finish effect and the effect variant field set to
           0x00 default"
+      PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
           values:
@@ -143,6 +149,7 @@ tests:
     - label:
           "Manually check DUT stops the breathe effect after the current effect
           sequence"
+      PICS: I.S.C40.Rsp
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -156,6 +163,7 @@ tests:
           "TH sends TriggerEffect command to DUT with the effect identifier
           field set to 0x01 breathe and the effect variant field set to 0x00
           default"
+      PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
           values:
@@ -176,6 +184,7 @@ tests:
           "TH sends TriggerEffect command to DUT with the effect identifier
           field set to 0xff stop effect and the effect variant field set to 0x00
           default"
+      PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
           values:
@@ -196,6 +205,7 @@ tests:
           "TH sends TriggerEffect command to DUT with the effect identifier
           field set to 0x00 blink and the effect variant field set to 0x42
           unknown"
+      PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
           values:
@@ -216,6 +226,7 @@ tests:
           "TH sends TriggerEffect command to DUT with the effect identifier
           field set to 0xff stop effect and the effect variant field set to 0x00
           default"
+      PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
           values:

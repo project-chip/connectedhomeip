@@ -258,6 +258,16 @@
 #endif // CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
 
 /**
+ * CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC
+ *
+ * The default conservative value in seconds denoting the maximum total duration for which a fail safe
+ * timer can be re-armed.
+ */
+#ifndef CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC
+#define CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC 900
+#endif // CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC
+
+/**
  * CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
  *
  * Whether a device supports "concurrent connection commissioning mode" (1) or
@@ -574,18 +584,6 @@
 #define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME 30000
 #endif
 
-/**
- * CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
- *
- * The amount of time in miliseconds after which BLE advertisement should be disabled, counting
- * from the moment of advertisement commencement.
- *
- * Defaults to 9000000 (15 minutes).
- */
-#ifndef CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
-#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)
-#endif
-
 // -------------------- Time Sync Configuration --------------------
 
 /**
@@ -789,7 +787,13 @@
  * Amount of services available for advertising using SRP.
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES (CHIP_CONFIG_MAX_FABRICS + 3)
+#elif CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY || CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES (CHIP_CONFIG_MAX_FABRICS + 2)
+#else
 #define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES (CHIP_CONFIG_MAX_FABRICS + 1)
+#endif
 #endif
 
 /**

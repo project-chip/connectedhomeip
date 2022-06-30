@@ -28,32 +28,26 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Sending on command"
-      cluster: "On/Off"
-      command: "on"
+    - label: "Reads Minlevel attribute from DUT"
+      command: "readAttribute"
+      attribute: "min level"
+      response:
+          saveAs: MinlevelValue
+          constraints:
+              type: uint8
 
-    - label: "Precondition: DUT level is set to its lowest point"
-      command: "Step"
+    - label: "Sends MoveToLevelWithOnOff command to DUT"
+      command: "MoveToLevelWithOnOff"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "level"
                 value: 1
-              - name: "stepSize"
-                value: 100
               - name: "transitionTime"
-                value: 20
+                value: 0
               - name: "optionMask"
-                value: 0
+                value: 1
               - name: "optionOverride"
-                value: 0
-
-    - label: "Wait 3000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 3000
+                value: 1
 
     - label: "Reads current level attribute from DUT"
       command: "readAttribute"
@@ -72,29 +66,30 @@ tests:
               - name: "stepSize"
                 value: 64
               - name: "transitionTime"
-                value: 2
+                value: 20
               - name: "optionMask"
-                value: 0
+                value: 1
               - name: "optionOverride"
-                value: 0
+                value: 1
 
-    - label: "Wait 5000ms"
+    - label: "Wait 4000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 5000
+                value: 4000
 
     - label: "Reads current level attribute from DUT"
       command: "readAttribute"
       attribute: "current level"
       response:
+          value: 65
           constraints:
-              notValue: CurrentlevelValue
+              type: uint8
 
-    - label: "Sends a Step down command"
-      command: "Step"
+    - label: "Sends a StepWithOnOff command"
+      command: "StepWithOnOff"
       arguments:
           values:
               - name: "stepMode"
@@ -102,11 +97,11 @@ tests:
               - name: "stepSize"
                 value: 64
               - name: "transitionTime"
-                value: 2
+                value: 20
               - name: "optionMask"
-                value: 0
+                value: 1
               - name: "optionOverride"
-                value: 0
+                value: 1
 
     - label: "Wait 4000ms"
       cluster: "DelayCommands"
@@ -142,7 +137,3 @@ tests:
           values:
               - name: "ms"
                 value: 100
-
-    - label: "Sending off command"
-      cluster: "On/Off"
-      command: "off"

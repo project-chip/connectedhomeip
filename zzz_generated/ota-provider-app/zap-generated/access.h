@@ -45,6 +45,7 @@
     49, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
     /* Cluster: User Label, Attribute: label list, Privilege: view */ \
 }
 
@@ -66,6 +67,7 @@
     6, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     7, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
     /* Cluster: User Label, Attribute: label list, Privilege: view */ \
 }
 
@@ -87,6 +89,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
     /* Cluster: User Label, Attribute: label list, Privilege: view */ \
 }
 
@@ -101,6 +104,7 @@
     40, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
+    63, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
     65, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
 }
 
@@ -113,6 +117,7 @@
     16, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
+    0, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
     0, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
 }
 
@@ -125,6 +130,7 @@
     kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
 }
 
@@ -141,13 +147,21 @@
     49, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
+    60, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
+    60, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
+    60, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
+    62, /* Cluster: Operational Credentials, Command: UpdateNOC, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    63, /* Cluster: Group Key Management, Command: KeySetWrite, Privilege: administer */ \
+    63, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
+    63, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
+    63, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
@@ -161,13 +175,21 @@
     4, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
     6, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     8, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
+    0, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
+    1, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
+    2, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
     0, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
     2, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
     4, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
     6, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
+    7, /* Cluster: Operational Credentials, Command: UpdateNOC, Privilege: administer */ \
     9, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
     10, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     11, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    0, /* Cluster: Group Key Management, Command: KeySetWrite, Privilege: administer */ \
+    1, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
+    3, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
+    4, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
@@ -181,13 +203,21 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: CSRRequest, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AddNOC, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: UpdateNOC, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetWrite, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

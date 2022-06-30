@@ -30,6 +30,13 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT BindingCluster : public ClusterBase
+{
+public:
+    BindingCluster() : ClusterBase(app::Clusters::Binding::Id) {}
+    ~BindingCluster() {}
+};
+
 class DLL_EXPORT AccessControlCluster : public ClusterBase
 {
 public:

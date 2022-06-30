@@ -29,6 +29,8 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #include <app/util/attribute-storage.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -57,11 +59,50 @@ K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(Ap
 
 namespace {
 
+// NOTE! This key is for test/certification only and should not be available in production devices.
+// Ideally, it should be a part of the factory data set.
+constexpr uint8_t kTestEventTriggerEnableKey[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                     0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+
 LEDWidget sStatusLED;
 UnusedLedsWrapper<3> sUnusedLeds{ { DK_LED2, DK_LED3, DK_LED4 } };
 k_timer sFunctionTimer;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+constexpr EndpointId kIdentifyEndpointId = 1;
+
+void OnIdentifyTriggerEffect(Identify * identify)
+{
+    ChipLogProgress(Zcl, "OnIdentifyTriggerEffect");
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+        ChipLogProgress(Zcl, "Effect: EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+        ChipLogProgress(Zcl, "Effect: EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+        ChipLogProgress(Zcl, "Effect: EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+        ChipLogProgress(Zcl, "Effect: EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
+        break;
+    default:
+        ChipLogProgress(Zcl, "Effect: No identifier effect");
+        break;
+    }
+    return;
+}
+
+Identify sIdentify = {
+    chip::EndpointId{ kIdentifyEndpointId },
+    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE,
+    OnIdentifyTriggerEffect,
+};
 
 } // namespace
 
@@ -145,11 +186,19 @@ CHIP_ERROR AppTask::Init()
     k_timer_user_data_set(&sFunctionTimer, this);
 
     // Initialize CHIP server
+#if CONFIG_CHIP_FACTORY_DATA
+    ReturnErrorOnFailure(mFactoryDataProvider.Init());
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
 
-    static chip::CommonCaseDeviceServerInitParams initParams;
+    static CommonCaseDeviceServerInitParams initParams;
+    static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(kTestEventTriggerEnableKey) };
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());

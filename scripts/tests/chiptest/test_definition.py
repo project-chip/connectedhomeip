@@ -119,7 +119,7 @@ class App:
     def __waitFor(self, waitForString, server_process, outpipe):
         logging.debug('Waiting for %s' % waitForString)
 
-        start_time = time.time()
+        start_time = time.monotonic()
         ready, self.lastLogIndex = outpipe.CapturedLogContains(
             waitForString, self.lastLogIndex)
         while not ready:
@@ -128,7 +128,7 @@ class App:
                             (waitForString, server_process.returncode))
                 logging.error(died_str)
                 raise Exception(died_str)
-            if time.time() - start_time > 10:
+            if time.monotonic() - start_time > 10:
                 raise Exception('Timeout while waiting for %s' % waitForString)
             time.sleep(0.1)
             ready, self.lastLogIndex = outpipe.CapturedLogContains(
@@ -207,8 +207,9 @@ class TestDefinition:
     name: str
     run_name: str
     target: TestTarget
+    is_manual: bool
 
-    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str):
+    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str, timeout_seconds: typing.Optional[int]):
         """
         Executes the given test case using the provided runner for execution.
         """
@@ -269,7 +270,8 @@ class TestDefinition:
             test_cmd = tool_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
             runner.RunSubprocess(
                 test_cmd,
-                name='TEST', dependencies=[apps_register])
+                name='TEST', dependencies=[apps_register],
+                timeout_seconds=timeout_seconds)
 
         except Exception:
             logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")

@@ -18,15 +18,19 @@
 
 #pragma once
 
+#ifdef CONFIG_USE_LOCAL_STORAGE
 #include "../../config/PersistentStorage.h"
+#endif // CONFIG_USE_LOCAL_STORAGE
+
 #include "Command.h"
+
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
 
 #pragma once
-
-class PersistentStorage;
 
 constexpr const char kIdentityAlpha[] = "alpha";
 constexpr const char kIdentityBeta[]  = "beta";
@@ -113,8 +117,13 @@ protected:
     // Execute any deferred cleanups.  Used when exiting interactive mode.
     void ExecuteDeferredCleanups();
 
+#ifdef CONFIG_USE_LOCAL_STORAGE
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
+#endif // CONFIG_USE_LOCAL_STORAGE
+    chip::PersistentStorageOperationalKeystore mOperationalKeystore;
+    chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+
     chip::Credentials::GroupDataProviderImpl mGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
     CredentialIssuerCommands * mCredIssuerCmds;
 
@@ -130,11 +139,11 @@ protected:
 
 private:
     CHIP_ERROR MaybeSetUpStack();
-    CHIP_ERROR MaybeTearDownStack();
+    void MaybeTearDownStack();
 
     CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
                                       const chip::Credentials::AttestationTrustStore * trustStore);
-    CHIP_ERROR ShutdownCommissioner(std::string key);
+    void ShutdownCommissioner(std::string key);
     chip::FabricId CurrentCommissionerId();
     static std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     static std::set<CHIPCommand *> sDeferredCleanups;

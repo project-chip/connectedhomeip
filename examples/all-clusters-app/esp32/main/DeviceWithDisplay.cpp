@@ -301,7 +301,9 @@ public:
             {
                 // update the operational status here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Operational status changed to : %d", n);
-                app::Clusters::WindowCovering::Attributes::OperationalStatus::Set(1, static_cast<uint8_t>(n));
+                chip::BitFlags<app::Clusters::WindowCovering::OperationalStatus> opStatus =
+                    static_cast<chip::BitFlags<app::Clusters::WindowCovering::OperationalStatus>>(n);
+                app::Clusters::WindowCovering::Attributes::OperationalStatus::Set(1, opStatus);
             }
             else if (name == "Bat remaining")
             {
@@ -676,7 +678,9 @@ void SetupPretendDevices()
     AddAttribute("Current Tilt", "5");
     app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Set(1, static_cast<uint16_t>(5 * 100));
     AddAttribute("Opr Status", "0");
-    app::Clusters::WindowCovering::Attributes::OperationalStatus::Set(1, static_cast<uint8_t>(0));
+    chip::BitFlags<app::Clusters::WindowCovering::OperationalStatus> opStatus =
+        static_cast<chip::BitFlags<app::Clusters::WindowCovering::OperationalStatus>>(0);
+    app::Clusters::WindowCovering::Attributes::OperationalStatus::Set(1, opStatus);
 
     AddDevice("Battery");
     AddEndpoint("1");

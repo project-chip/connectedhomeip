@@ -571,21 +571,21 @@ void TestIsDeviceSleepyIdle(nlTestSuite * inSuite, void * inContext)
     char key[4];
     char val[32];
     NodeData nodeData;
-    const ReliableMessageProtocolConfig defaultMRPConfig(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL,
-                                                         CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
+    const ReliableMessageProtocolConfig defaultMRPConfig(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL,
+                                                         CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL);
 
     // No key/val set, so the device can't be sleepy
     NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is the default value, the device is not sleepy
     strcpy(key, "SII");
-    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL.count()));
+    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL.count()));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
     NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is greater than the default value, the device is sleepy
     sprintf(key, "SII");
-    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL.count() + 1));
+    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL.count() + 1));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
     NL_TEST_ASSERT(inSuite, nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 }
@@ -597,21 +597,21 @@ void TestIsDeviceSleepyActive(nlTestSuite * inSuite, void * inContext)
     char key[4];
     char val[32];
     NodeData nodeData;
-    const ReliableMessageProtocolConfig defaultMRPConfig(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL,
-                                                         CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
+    const ReliableMessageProtocolConfig defaultMRPConfig(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL,
+                                                         CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL);
 
     // No key/val set, so the device can't be sleepy
     NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is the default value, the device is not sleepy
     sprintf(key, "SAI");
-    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count()));
+    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL.count()));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
     NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is greater than the default value, the device is sleepy
     strcpy(key, "SAI");
-    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count() + 1));
+    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL.count() + 1));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
     NL_TEST_ASSERT(inSuite, nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 }

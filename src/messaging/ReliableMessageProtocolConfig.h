@@ -25,13 +25,14 @@
  */
 #pragma once
 
+#include <lib/core/Optional.h>
 #include <system/SystemClock.h>
 #include <system/SystemConfig.h>
 
 namespace chip {
 
 /**
- *  @def CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+ *  @def CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
  *
  *  @brief
  *    Active retransmit interval, or time to wait before retransmission after
@@ -41,12 +42,12 @@ namespace chip {
  *  needs (e.g. sleeping period) using Service Discovery TXT record CRA key.
  *
  */
-#ifndef CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
-#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (300_ms32)
-#endif // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+#ifndef CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+#define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (300_ms32)
+#endif // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
 
 /**
- *  @def CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
+ *  @def CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
  *
  *  @brief
  *    Initial base retransmission interval, or time to wait before retransmission after first
@@ -55,9 +56,9 @@ namespace chip {
  * This is the default value, that might be adjusted by end device depending on its
  * needs (e.g. sleeping period) using Service Discovery TXT record CRI key.
  */
-#ifndef CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-#define CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL (5000_ms32)
-#endif // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
+#ifndef CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+#define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (5000_ms32)
+#endif // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
 
 /**
  *  @def CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
@@ -115,8 +116,24 @@ struct ReliableMessageProtocolConfig
 
     // Configurable timeout in msec for retransmission of all subsequent messages.
     System::Clock::Milliseconds32 mActiveRetransTimeout;
+
+    bool operator==(const ReliableMessageProtocolConfig & that) const
+    {
+        return mIdleRetransTimeout == that.mIdleRetransTimeout && mActiveRetransTimeout == that.mActiveRetransTimeout;
+    }
 };
 
-ReliableMessageProtocolConfig GetLocalMRPConfig();
+/// @brief The default MRP config. The value is defined by spec, and shall be same for all implementations,
+ReliableMessageProtocolConfig GetDefaultMRPConfig();
+
+/**
+ *  @brief  The custom value of MRP config for the platform.
+ *  @return Missing   If the value is same as default value defined by spec
+ *          Value     The custom value for the platform
+ *
+ *  @note   This value is not used by our MRP manager. The value is advertised via mDNS or during PASE/CASE paring, and our peers
+ *          use it when communicating with us.
+ */
+Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig();
 
 } // namespace chip

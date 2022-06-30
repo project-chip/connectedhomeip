@@ -50,7 +50,7 @@ tests:
       attribute: "OccupiedCoolingSetpoint"
       PICS: A_OCCUPIEDCOOLINGSETPOINT
       arguments:
-          value: 2000
+          value: 2250
 
     - label:
           "Reads it back again to confirm the successful write of
@@ -60,7 +60,7 @@ tests:
       attribute: "OccupiedCoolingSetpoint"
       PICS: A_OCCUPIEDCOOLINGSETPOINT
       response:
-          value: 2000
+          value: 2250
 
     - label:
           "Writes OccupiedCoolingSetpoint to value below the
@@ -508,9 +508,13 @@ tests:
       arguments:
           value: 700
 
+    # Disabled: This test makes no sense: It's setting MaxHeatSetpointLimit to
+    # a value too close to MaxCoolSetpointLimit, ignoring deadband.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Writes the limit of AbsMaxHeatSetpointLimit to MaxHeatSetpointLimit
           attribute"
+      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
@@ -691,7 +695,11 @@ tests:
       arguments:
           value: 700
 
+    # Disabled: This test makes no sense: It's setting MaxHeatSetpointLimit to
+    # a value too close to MaxCoolSetpointLimit, ignoring deadband.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label: "Writes (sets back)default value of MaxHeatSetpointLimit"
+      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
@@ -814,8 +822,11 @@ tests:
       response:
           value: 2
 
+    # Disabled: This test can't work because our setpoint limits are all messed up.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label: "Sets OccupiedHeatingSetpoint to default value"
       optional: true
+      disabled: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: A_OCCUPIEDHEATINGSETPOINT
@@ -843,8 +854,11 @@ tests:
       response:
           value: -30
 
+    # Disabled: This test can't work because our setpoint limits are all messed up.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label: "Sets OccupiedHeatingSetpoint to default value"
       optional: true
+      disabled: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: A_OCCUPIEDHEATINGSETPOINT
@@ -938,7 +952,10 @@ tests:
       arguments:
           value: 2600
 
+    # Disabled: This test can't work because our setpoint limits are all messed up.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label: "Sets OccupiedHeatingSetpoint to default value"
+      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
@@ -985,8 +1002,11 @@ tests:
       arguments:
           value: 2600
 
+    # Disabled: This test can't work because our setpoint limits are all messed up.
+    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label: "Sets OccupiedHeatingSetpoint to default value"
       optional: true
+      disabled: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
       PICS: A_OCCUPIEDHEATINGSETPOINT

@@ -21,11 +21,15 @@ from .gn import GnBuilder
 
 
 class TizenApp(Enum):
+
+    CHIP_TOOL = auto()
     LIGHT = auto()
 
-    def ExampleName(self):
-        if self == TizenApp.LIGHT:
-            return 'lighting-app'
+    def ExamplePath(self):
+        if self == TizenApp.CHIP_TOOL:
+            return 'chip-tool'
+        elif self == TizenApp.LIGHT:
+            return 'lighting-app/tizen'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -68,7 +72,7 @@ class TizenBuilder(GnBuilder):
                  use_tsan: bool = False,
                  ):
         super(TizenBuilder, self).__init__(
-            root=os.path.join(root, 'examples', app.ExampleName(), 'tizen'),
+            root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
 
         self.app = app

@@ -33,34 +33,61 @@ tests:
       attribute: "ClusterRevision"
       response:
           value: 5
-
-    - label: "Read the global attribute constraints : ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
           constraints:
               type: uint16
 
-    - label:
-          "write the default values to mandatory global attribute:
-          ClusterRevision"
-      command: "writeAttribute"
-      attribute: "ClusterRevision"
-      arguments:
-          value: 5
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "reads back global attribute: ClusterRevision"
+    - label: "Read the global attribute constraints : FeatureMap"
+      PICS:
+          PICS_SKIP_SAMPLE_APP && (CC.S.F00 || CC.S.F01 || CC.S.F02 || CC.S.F03)
       command: "readAttribute"
-      attribute: "ClusterRevision"
+      attribute: "FeatureMap"
       response:
-          value: 5
+          value: 1
+          constraints:
+              type: map32
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0,
+                      1,
+                      3,
+                      4,
+                      7,
+                      8,
+                      15,
+                      16384,
+                      16385,
+                      16386,
+                      16394,
+                      16395,
+                      16396,
+                      16397,
+                      16400,
+                      65528,
+                      65529,
+                      65531,
+                      65532,
+                      65533,
+                  ]
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
           constraints:
               type: list
 
@@ -79,33 +106,3 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
-    - label: "Read the global attribute: AcceptedCommandList"
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          constraints:
-              type: list
-
-    - label: "Read the global attribute: GeneratedCommandList"
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          constraints:
-              type: list
-
-    #issue #17483
-    - label:
-          "Read FeatureMap attribute from the DUT and Verify that the DUT
-          response indicates FeatureMap attribute has the value 0"
-      verification: |
-          Not implemented in SDK
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter '0' for success"
-              - name: "expectedValue"
-                value: 0

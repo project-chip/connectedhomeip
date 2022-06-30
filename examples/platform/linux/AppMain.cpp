@@ -67,6 +67,10 @@
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
+#endif
+
 #include <signal.h>
 
 #include "AppMain.h"
@@ -182,6 +186,11 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
                                                    LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
 
+    if (LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.HasAny())
+    {
+        rendezvousFlags = LinuxDeviceOptions::GetInstance().payload.rendezvousInformation;
+    }
+
     err = GetPayloadContents(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
 
@@ -289,10 +298,22 @@ void ChipLinuxAppMainLoop()
     // use a different service port to make testing possible with other sample devices running on same host
     initParams.operationalServicePort        = LinuxDeviceOptions::GetInstance().securedDevicePort;
     initParams.userDirectedCommissioningPort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
-    ;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     initParams.interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
+
+    if (LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrExistingKeyPair)
+    {
+        LinuxDeviceOptions::GetInstance().mCSRResponseOptions.badCsrOperationalKeyStoreForTest.Init(
+            initParams.persistentStorageDelegate);
+        initParams.operationalKeystore = &LinuxDeviceOptions::GetInstance().mCSRResponseOptions.badCsrOperationalKeyStoreForTest;
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(
+        LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+#endif
 
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);

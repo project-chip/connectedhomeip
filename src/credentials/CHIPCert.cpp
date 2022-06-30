@@ -378,13 +378,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
     // X.509/RFC5280 defines the special time 99991231235959Z to mean 'no
     // well-defined expiration date'.  In CHIP TLV-encoded certificates, this
     // special value is represented as a CHIP Epoch time value of 0 sec
-    // (2020-01-01 00:00:00 UTC).
-    //
-    // When evaluating NotBefore from a CHIP TLV-encoded certificate, this
-    // special value 0 does not require additional handling, as it is impossible
-    // for CHIP epoch time to represent any moment before the epoch, and so all
-    // representable times at or after this will be considered valid.  But for
-    // NotAfter, we special case this value as always passing (not expired).
+    // (2000-01-01 00:00:00 UTC).
     CertificateValidityResult validityResult;
     if (context.mEffectiveTime.Is<CurrentChipEpochTime>())
     {
@@ -392,7 +386,8 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
         {
             validityResult = CertificateValidityResult::kNotYetValid;
         }
-        else if (cert->mNotAfterTime != 0 && context.mEffectiveTime.Get<CurrentChipEpochTime>().count() > cert->mNotAfterTime)
+        else if (cert->mNotAfterTime != kNullCertTime &&
+                 context.mEffectiveTime.Get<CurrentChipEpochTime>().count() > cert->mNotAfterTime)
         {
             validityResult = CertificateValidityResult::kExpired;
         }
@@ -1080,9 +1075,25 @@ exit:
 DLL_EXPORT CHIP_ERROR ASN1ToChipEpochTime(const chip::ASN1::ASN1UniversalTime & asn1Time, uint32_t & epochTime)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
     // X.509/RFC5280 defines the special time 99991231235959Z to mean 'no well-defined expiration date'.
     // In CHIP certificate it is represented as a CHIP Epoch time value of 0 sec (2000-01-01 00:00:00 UTC).
+    //
+    // While it is not conventional to use this special value for NotBefore, for simplicity we convert all
+    // time values of 99991231235959Z to CHIP epoch zero seconds.  ChipEpochToASN1Time performs the inverse
+    // translation for conversions in the other direction.
+    //
+    // If in a conversion from X509 to CHIP TLV format the input X509 certificate encloses 99991231235959Z
+    // for NotBefore, this will be converted to the CHIP Epoch time value of 0 and consuming code will
+    // handle this transparently, as logic considering a NotBefore time at the CHIP epoch will evaluate all
+    // possible unsigned offsets from the CHIP epoch as valid, which is equivalent to ignoring NotBefore.
+    //
+    // If in a conversion from X509 to CHIP TLV format the input X509 certificate encloses a NotBefore time
+    // at the CHIP epoch itself, 2000-01-01 00:00:00, a resultant conversion to CHIP TLV certificate format
+    // will appear to have an invalid TBS signature when the symmetric ChipEpochToASN1Time produces
+    // 99991231235959Z for NotBefore during signature validation.
+    //
+    // Thus such certificates, when passing through this code, will not appear valid.  This should be
+    // immediately evident at commissioning time.
     if ((asn1Time.Year == kX509NoWellDefinedExpirationDateYear) && (asn1Time.Month == kMonthsPerYear) &&
         (asn1Time.Day == kMaxDaysPerMonth) && (asn1Time.Hour == kHoursPerDay - 1) && (asn1Time.Minute == kMinutesPerHour - 1) &&
         (asn1Time.Second == kSecondsPerMinute - 1))
@@ -1106,6 +1117,16 @@ DLL_EXPORT CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1Un
 {
     // X.509/RFC5280 defines the special time 99991231235959Z to mean 'no well-defined expiration date'.
     // In CHIP certificate it is represented as a CHIP Epoch time value of 0 secs (2000-01-01 00:00:00 UTC).
+    //
+    // For simplicity and symmetry with ASN1ToChipEpochTime, this method makes this conversion for all
+    // times, which in consuming code can create a conversion from CHIP epoch 0 seconds to 99991231235959Z
+    // for NotBefore, which is not conventional.
+    //
+    // If an original X509 certificate encloses a NotBefore time that this the CHIP Epoch itself, 2000-01-01
+    // 00:00:00, the resultant X509 certificate in a conversion back from CHIP TLV format using this time
+    // conversion method will instead enclose the NotBefore time 99991231235959Z, which will invalidiate the
+    // TBS signature.  Thus, certificates with this specific attribute are not usable with this code.
+    // Attempted installation of such certficates will fail during commissioning.
     if (epochTime == kNullCertTime)
     {
         asn1Time.Year   = kX509NoWellDefinedExpirationDateYear;

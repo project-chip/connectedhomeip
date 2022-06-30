@@ -36,19 +36,18 @@ _bootstrap_or_activate() {
         git submodule update --init
     fi
 
-    local _CHIP_BANNER="$(
-        cat <<EOF
-           ░▓░
-           ▓█▓
-           ▓█▓                                                     ▒█     ▒█
-      ▒██▒▒▓██▒███▒                ░▒▓▒░  ░▒▓▒░       ░░▓█▒░ ░█  █████████████░    ░▒█▒░       ░░▒░
-       ░▓█████▓██░               ▒█▒░░▒▓██▓▒░░▒█▒   ░█▓▒░░▒████    █▓░    █▓░    ▒█▒░░░▒█▓░   ██▒░░
-    ▒█▒░         ░██▒           ░█░     █▓     ░█░ ░▓▒      ░▓█    █▓     █▓    ▒█░░    ░██  ▒▓
-    ░▓██▓░     ░██▓█░           ░█      ▓█      █░ ░█░       ██    █▓     █▓    ▓██████████  ▒█
-     ░▓███▒   ▒███▒░            ░█      ▓█      █░  ██░    ░███    █▓     █▓    ░█▒░         ▒█
- ░▒████████░ ░███▓▓█▓▓▒         ░█      ▒▒      █░   ░█▓██▓█░▒█    ░▓▓█░  ░▓▓█░   ▒▓▓██▓█░   ▒▓
- ░██▒░  ▒██▒ ▒██░  ░▒█▓
-         ░▓░ ░▓░
+    local _MATTER_BANNER="$(
+        cat <<-EOF
+
+        █
+        █
+    ▄   █   ▄                                 █     ▌
+    ▀▀█████▀▀     ▄▓▀▀▀▄,▄▀▀▀▀▄   ╓▄▀▀▀▀▄█  ▀▀█▀▀▀▀▀█▀▀  ,▄▀▀▀▀▄    ▄▀▀
+  ▀█▄       ▄█▀   █     █     █  ▐▌      █    █     █   .█▄▄▄▄▄▄█⌐ ▐▌
+    ▀█▄   ▄█▀     █     █     █  ▐▌      █    █     █    █         ▐▌
+ ▄██▀▀█   █▀▀██▄  █     █     █   ╙▀▄▄▄Φ▀█    ▀▄▄   ▀▄▄   ▀▄▄▄▄▀^  ▐▌
+▀▀    █   █    ▀▀
+
 EOF
     )"
 
@@ -58,16 +57,11 @@ EOF
     PW_ROOT="$_CHIP_ROOT/third_party/pigweed/repo"
     export PW_ROOT
 
-    # Do not force use Rosetta in Pigweed because Matter is using host toolchain
-    if [ -z "$PW_BOOTSTRAP_USE_ROSETTA" ]; then
-        export PW_BOOTSTRAP_USE_ROSETTA=false
-    fi
-
     . "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh"
 
     _chip_bootstrap_banner() {
         if [ -z "$PW_ENVSETUP_QUIET" ] && [ -z "$PW_ENVSETUP_NO_BANNER" ]; then
-            pw_bold_white "$_CHIP_BANNER\n"
+            pw_bold_white "$_MATTER_BANNER\n"
         fi
     }
 

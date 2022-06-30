@@ -249,6 +249,7 @@ def HostTargets():
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
         app_targets.append(target.Extend('light', app=HostApp.LIGHT))
+        app_targets.append(target.Extend('light-rpc', app=HostApp.LIGHT, enable_rpcs=True))
         app_targets.append(target.Extend('lock', app=HostApp.LOCK))
         app_targets.append(target.Extend('shell', app=HostApp.SHELL))
         app_targets.append(target.Extend(
@@ -321,6 +322,10 @@ def Esp32Targets():
                               enable_rpcs=True)
     yield esp32_target.Extend('m5stack-all-clusters-rpc-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS,
                               enable_rpcs=True, enable_ipv4=False)
+
+    yield esp32_target.Extend('m5stack-ota-requestor', board=Esp32Board.M5Stack, app=Esp32App.OTA_REQUESTOR)
+    yield esp32_target.Extend('m5stack-ota-requestor-rpc', board=Esp32Board.M5Stack, app=Esp32App.OTA_REQUESTOR,
+                              enable_rpcs=True)
 
     yield esp32_target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
 
@@ -554,6 +559,7 @@ def TizenTargets():
 
     target = Target('tizen-arm', TizenBuilder, board=TizenBoard.ARM)
 
+    builder.targets.append(target.Extend('chip-tool', app=TizenApp.CHIP_TOOL))
     builder.targets.append(target.Extend('light', app=TizenApp.LIGHT))
 
     for target in builder.AllVariants():

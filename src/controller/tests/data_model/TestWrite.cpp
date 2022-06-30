@@ -22,6 +22,7 @@
 #include <app/tests/AppTestContext.h>
 #include <controller/WriteInteraction.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
@@ -89,7 +90,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
                 {
                     auto & item = iter.GetValue();
 
-                    VerifyOrReturnError(item.fabricIndex == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
+                    VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
                     listStructOctetStringElementCount++;
                 }
 
@@ -99,7 +100,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
             {
                 Structs::TestListStructOctet::DecodableType item;
                 ReturnErrorOnFailure(DataModel::Decode(aReader, item));
-                VerifyOrReturnError(item.fabricIndex == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
                 listStructOctetStringElementCount++;
 
                 aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
@@ -182,7 +183,7 @@ void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCont
     uint8_t i = 0;
     for (auto & item : valueBuf)
     {
-        item.fabricIndex = i;
+        item.member1 = i;
         i++;
     }
 
@@ -221,7 +222,7 @@ void TestWriteInteraction::TestDataResponseWithAcceptedDataVersion(nlTestSuite *
     uint8_t i = 0;
     for (auto & item : valueBuf)
     {
-        item.fabricIndex = i;
+        item.member1 = i;
         i++;
     }
 
@@ -262,7 +263,7 @@ void TestWriteInteraction::TestDataResponseWithRejectedDataVersion(nlTestSuite *
     uint8_t i = 0;
     for (auto & item : valueBuf)
     {
-        item.fabricIndex = i;
+        item.member1 = i;
         i++;
     }
 
@@ -302,7 +303,7 @@ void TestWriteInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCo
     uint8_t i = 0;
     for (auto & item : valueBuf)
     {
-        item.fabricIndex = i;
+        item.member1 = i;
         i++;
     }
 
@@ -393,9 +394,7 @@ nlTestSuite sSuite =
 
 int TestWriteInteractionTest()
 {
-    TestContext gContext;
-    nlTestRunner(&sSuite, &gContext);
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestWriteInteractionTest)

@@ -1,0 +1,86 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    55.2.1. [TC-DLOG-2.1] Diagnostic Logs Cluster Commands Checks with BDX
+    [DUT-Server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Reboot DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends RetrieveLogsRequest Command (Intent =
+          EndUserSupport,TransferFileDesignator = 'test.txt', RequestedProtocol=
+          BDX) to DUT"
+      verification: |
+          sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 1 "test.txt" 1 0
+
+
+          [1651207333.385887][2441:2446] CHIP:DMG:                                StatusIB =
+          [1651207333.385937][2441:2446] CHIP:DMG:                                {
+          [1651207333.385985][2441:2446] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1651207333.386037][2441:2446] CHIP:DMG:                                },
+      disabled: true
+
+    - label: "TH Sends BDX SendAccept message"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "TH sends RetrieveLogsRequest Command (Intent =
+          EndUserSupport,TransferFileDesignator = 'test.txt', RequestedProtocol=
+          BDX) to DUT"
+      verification: |
+          sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 1 "test.txt" 1 0
+
+          [1651207386.883337][2457:2462] CHIP:DMG:
+          [1651207386.883383][2457:2462] CHIP:DMG:                                StatusIB =
+          [1651207386.883443][2457:2462] CHIP:DMG:                                {
+          [1651207386.883498][2457:2462] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1651207386.883563][2457:2462] CHIP:DMG:                                },
+      disabled: true
+
+    - label:
+          "TH Sends StatusReport(GeneralCode: FAILURE, ProtocolId: BDX,
+          ProtocolCode: TRANSFER_METHOD_NOT_SUPPORTED)"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label:
+          "TH sends RetrieveLogsRequest Command (Intent = EndUserSupport,
+          RequestedProtocol = ResponsePayload) to DUT"
+      verification: |
+          sudo ./chip-tool diagnosticlogs retrieve-logs-request 0 0 "test.txt" 1 0
+
+          [1651207416.783607][2465:2470] CHIP:DMG:                                StatusIB =
+          [1651207416.783676][2465:2470] CHIP:DMG:                                {
+          [1651207416.783722][2465:2470] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1651207416.783766][2465:2470] CHIP:DMG:                                },
+      disabled: true

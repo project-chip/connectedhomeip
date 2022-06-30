@@ -29,10 +29,11 @@ if (lwip_platform == "") {
 }
 
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
-           lwip_platform == "cc13x2_26x2" || lwip_platform == "efr32" ||
-           lwip_platform == "k32w0" || lwip_platform == "qpg" ||
-           lwip_platform == "mbed" || lwip_platform == "p6" ||
-           lwip_platform == "cyw30739" || lwip_platform == "bl602",
+           lwip_platform == "cc13x2_26x2" || lwip_platform == "cc32xx" ||
+           lwip_platform == "efr32" || lwip_platform == "k32w0" ||
+           lwip_platform == "qpg" || lwip_platform == "mbed" ||
+           lwip_platform == "p6" || lwip_platform == "cyw30739" ||
+           lwip_platform == "bl602" || lwip_platform == "mw320",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -43,6 +44,8 @@ if (lwip_platform != "external") {
 }
 
 if (lwip_platform == "cc13x2_26x2") {
+  import("//build_overrides/ti_simplelink_sdk.gni")
+} else if (lwip_platform == "cc32xx") {
   import("//build_overrides/ti_simplelink_sdk.gni")
 } else if (lwip_platform == "efr32") {
   import("//build_overrides/efr32_sdk.gni")
@@ -57,6 +60,8 @@ if (lwip_platform == "cc13x2_26x2") {
   import("//build_overrides/cyw30739_sdk.gni")
 } else if (lwip_platform == "bl602") {
   import("//build_overrides/bl602_sdk.gni")
+} else if (lwip_platform == "mw320") {
+  import("//build_overrides/mw320_sdk.gni")
 }
 
 buildconfig_header("lwip_buildconfig") {
@@ -79,9 +84,12 @@ buildconfig_header("lwip_buildconfig") {
 if (current_os == "zephyr" || current_os == "mbed") {
   group("lwip") {
   }
-} else if (lwip_platform == "external") {
+} else if (lwip_platform == "external" || lwip_platform == "mw320") {
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
+    if (lwip_platform == "mw320") {
+      public_deps += [ "${mw320_sdk_build_root}:mw320_sdk" ]
+    }
   }
 
   group("all") {
@@ -161,6 +169,10 @@ if (current_os == "zephyr" || current_os == "mbed") {
     public_deps = [ ":lwip_buildconfig" ]
     if (lwip_platform == "cc13x2_26x2") {
       public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
+    } else if (lwip_platform == "cc32xx") {
+      public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
+      sources +=
+          [ "${chip_root}/third_party/lwip/repo/lwip/src/apps/mdns/mdns.c" ]
     } else if (lwip_platform == "efr32") {
       public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
     } else if (lwip_platform == "standalone") {

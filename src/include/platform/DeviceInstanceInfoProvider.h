@@ -29,6 +29,50 @@ public:
     virtual ~DeviceInstanceInfoProvider() = default;
 
     /**
+     * @brief Obtain the Vendor Name from the device's factory data.
+     *
+     * @param[in, out] buf Buffer to copy string.
+     *                 On CHIP_NO_ERROR return from this function this buffer will be null-terminated.
+     *                 On error CHIP_ERROR_BUFFER_TOO_SMALL there is no guarantee that buffer will be null-terminated.
+     * @param[in] bufSize Size of data, including the null terminator, that can be written to buf.
+     *                    This size should be +1 higher than maximum possible string.
+     * @returns CHIP_NO_ERROR on success, or another CHIP_ERROR from the underlying implementation
+     *          if access fails.
+     */
+    virtual CHIP_ERROR GetVendorName(char * buf, size_t bufSize) = 0;
+
+    /**
+     * @brief Obtain the Vendor Id from the device's factory data.
+     *
+     * @param[out] vendorId Reference to location where the vendor id integer will be copied
+     * @returns CHIP_NO_ERROR on success, or another CHIP_ERROR from the underlying implementation
+     *          if access fails.
+     */
+    virtual CHIP_ERROR GetVendorId(uint16_t & vendorId) = 0;
+
+    /**
+     * @brief Obtain the Product Name from the device's factory data.
+     *
+     * @param[in, out] buf Buffer to copy string.
+     *                 On CHIP_NO_ERROR return from this function this buffer will be null-terminated.
+     *                 On error CHIP_ERROR_BUFFER_TOO_SMALL there is no guarantee that buffer will be null-terminated.
+     * @param[in] bufSize Size of data, including the null terminator, that can be written to buf.
+     *                    This size should be +1 higher than maximum possible string.
+     * @returns CHIP_NO_ERROR on success, or another CHIP_ERROR from the underlying implementation
+     *          if access fails.
+     */
+    virtual CHIP_ERROR GetProductName(char * buf, size_t bufSize) = 0;
+
+    /**
+     * @brief Obtain the Product Id from the device's factory data.
+     *
+     * @param[out] productId Reference to location where the product id integer will be copied
+     * @returns CHIP_NO_ERROR on success, or another CHIP_ERROR from the underlying implementation
+     *          if access fails.
+     */
+    virtual CHIP_ERROR GetProductId(uint16_t & productId) = 0;
+
+    /**
      * @brief Obtain the Serial Number from the device's factory data.
      *
      * The SerialNumber attribute specifies a human readable serial number

@@ -30,8 +30,6 @@
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
 
-#include <lib/support/ErrorStr.h>
-
 namespace chip {
 namespace Ble {
 

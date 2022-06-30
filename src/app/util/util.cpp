@@ -210,9 +210,6 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
 
     memset(afDeviceEnabled, true, emberAfEndpointCount());
 
-    // Set up client API buffer.
-    emberAfSetExternalBuffer(appResponseData, EMBER_AF_RESPONSE_BUFFER_LEN, &appResponseLength, &emberAfResponseApsFrame);
-
     MATTER_PLUGINS_INIT
 
     emAfCallInits();
@@ -771,7 +768,7 @@ bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId cluster
     return (emberAfGetServerAttributeIndexByAttributeId(endpoint, clusterId, attributeId) != UINT16_MAX);
 }
 
-bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
+bool emberAfIsKnownVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {
     const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId);
 
@@ -780,7 +777,7 @@ bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId cl
         return false;
     }
 
-    return metadata->IsNonVolatile();
+    return !metadata->IsAutomaticallyPersisted() && !metadata->IsExternal();
 }
 
 chip::Messaging::ExchangeManager * chip::ExchangeManager()

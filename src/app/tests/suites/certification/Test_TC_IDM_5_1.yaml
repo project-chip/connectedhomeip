@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.7.1. [TC-IDM-5.1] Timed Request Action from DUT to TH [DUT - Controller]
+name: 3.7.1. [TC-IDM-5.1] Timed Request Action from DUT to TH [DUT - Client]
 
 config:
     nodeId: 0x12344321
@@ -24,7 +24,7 @@ tests:
     - label:
           "DUT sends the Timed Request to the TH and then sends an Invoke
           Request Message to the TH after receiving the status response message
-          from the TH. The Time Request Message should contain a timeout value
+          from the TH. The Timed Request Message should contain a timeout value
           in milliseconds. (Example - 200 milliseconds)"
       verification: |
           Chip-tool as controller , here is the example command you can use
@@ -94,64 +94,67 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends the Timed Request to the TH and then sends a Write Request
-          Message to the TH after receiving the status response message from the
-          TH. The Time Request Message should contain a timeout value in
-          milliseconds. (Example - 200 milliseconds)"
+          "DUT sends the Timed Request to the TH and then sends a
+          WriteRequestMessage to the TH after receiving the status response
+          message from the TH. The Timed Request Message should contain a
+          timeout value in milliseconds. (Example - 200 milliseconds)"
       verification: |
           Chip-tool as controller , here is the example command to write an attribute you can use
-
-           ./chip-tool levelcontrol read  on-level  1 1
-
           ./chip-tool levelcontrol write on-level 1 1 1 --timedInteractionTimeoutMs 200
 
           on the TH (reference all cluster app) you should see
 
-          1649684576.547631][2241:2241] CHIP:DMG: TimedRequestMessage =
-          [1649684576.547669][2241:2241] CHIP:DMG: {
-          [1649684576.547700][2241:2241] CHIP:DMG:         TimeoutMs = 0xc8,
-          [1649684576.547734][2241:2241] CHIP:DMG:         InteractionModelRevision = 1
-          [1649684576.547766][2241:2241] CHIP:DMG: }
-          [1649684576.547801][2241:2241] CHIP:DMG: Got Timed Request with timeout 200: handler 0xaaaaee795bd0 exchange 60329r
+          [1652943666.776460][8499:8499] CHIP:DMG: TimedRequestMessage =
+          [1652943666.776504][8499:8499] CHIP:DMG: {
+          [1652943666.776542][8499:8499] CHIP:DMG:         TimeoutMs = 0x384,
+          [1652943666.776584][8499:8499] CHIP:DMG:         InteractionModelRevision = 1
+          [1652943666.776623][8499:8499] CHIP:DMG: }
+          [1652943666.776666][8499:8499] CHIP:DMG: Got Timed Request with timeout 900: handler 0xaaaab360c2d0 exchange 2224r
 
-          [1649684576.549548][2241:2241] CHIP:IM: Received Write request
-          [1649684576.549577][2241:2241] CHIP:DMG: IM WH moving to [Initialized]
-          [1649684576.549635][2241:2241] CHIP:DMG: WriteRequestMessage =
-          [1649684576.549670][2241:2241] CHIP:DMG: {
-          [1649684576.549700][2241:2241] CHIP:DMG:         suppressResponse = false,
-          [1649684576.549736][2241:2241] CHIP:DMG:         timedRequest = true,
-          [1649684576.549769][2241:2241] CHIP:DMG:         AttributeDataIBs =
-          [1649684576.549809][2241:2241] CHIP:DMG:         [
-          [1649684576.549842][2241:2241] CHIP:DMG:                 AttributeDataIB =
-          [1649684576.549976][2241:2241] CHIP:DMG:                 {
-          [1649684576.550016][2241:2241] CHIP:DMG:                         AttributePathIB =
-          [1649684576.550060][2241:2241] CHIP:DMG:                         {
-          [1649684576.550103][2241:2241] CHIP:DMG:                                 Endpoint = 0x1,
-          [1649684576.550149][2241:2241] CHIP:DMG:                                 Cluster = 0x8,
-          [1649684576.550194][2241:2241] CHIP:DMG:                                 Attribute = 0x0000_0011,
-          [1649684576.550237][2241:2241] CHIP:DMG:                         }
-          [1649684576.550282][2241:2241] CHIP:DMG:
-          [1649684576.550330][2241:2241] CHIP:DMG:                                 Data = 1,
-          [1649684576.550376][2241:2241] CHIP:DMG:                 },
-          [1649684576.550419][2241:2241] CHIP:DMG:
-          [1649684576.550451][2241:2241] CHIP:DMG:         ],
-          [1649684576.550491][2241:2241] CHIP:DMG:
-          [1649684576.550524][2241:2241] CHIP:DMG:         moreChunkedMessages = false,
-          [1649684576.550558][2241:2241] CHIP:DMG:         InteractionModelRevision = 1
-          [1649684576.550590][2241:2241] CHIP:DMG: },
-          [1649684576.550690][2241:2241] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
-                        AttributePathIB =
-          [1641535415.494811][3878:3878] CHIP:DMG:                         {
-          [1641535415.494854][3878:3878] CHIP:DMG:                                 Endpoint = 0x1,
-          [1641535415.494887][3878:3878] CHIP:DMG:                                 Cluster = 0x6,
-          [1641535415.494927][3878:3878] CHIP:DMG:                                 Attribute = 0x0000_4001,
-          [1641535415.494993][3878:3878] CHIP:DMG:                         }
-          [1641535415.495060][3878:3878] CHIP:DMG:
-          [1641535415.495092][3878:3878] CHIP:DMG:                                 Data = 1,
-          [1641535415.495129][3878:3878] CHIP:DMG:                 },
-          [1641535415.495187][3878:3878] CHIP:DMG:
-          [1641535415.495219][3878:3878] CHIP:DMG:         ],
-          [1641535415.495248][3878:3878] CHIP:DMG:
-          [1641535415.495323][3878:3878] CHIP:DMG:         isFabricFiltered = false,
-          [1641535415.495345][3878:3878] CHIP:DMG: },
+
+          [1652943666.780309][8499:8499] CHIP:DMG: WriteRequestMessage =
+          [1652943666.780349][8499:8499] CHIP:DMG: {
+          [1652943666.780387][8499:8499] CHIP:DMG:         suppressResponse = false,
+          [1652943666.780430][8499:8499] CHIP:DMG:         timedRequest = true,
+          [1652943666.780470][8499:8499] CHIP:DMG:         AttributeDataIBs =
+          [1652943666.780518][8499:8499] CHIP:DMG:         [
+          [1652943666.780558][8499:8499] CHIP:DMG:                 AttributeDataIB =
+          [1652943666.780609][8499:8499] CHIP:DMG:                 {
+          [1652943666.780653][8499:8499] CHIP:DMG:                         AttributePathIB =
+          [1652943666.780710][8499:8499] CHIP:DMG:                         {
+          [1652943666.780763][8499:8499] CHIP:DMG:                                 Endpoint = 0x1,
+          [1652943666.780824][8499:8499] CHIP:DMG:                                 Cluster = 0x8,
+          [1652943666.780883][8499:8499] CHIP:DMG:                                 Attribute = 0x0000_0011,
+          [1652943666.780934][8499:8499] CHIP:DMG:                         }
+          [1652943666.780993][8499:8499] CHIP:DMG:
+          [1652943666.781046][8499:8499] CHIP:DMG:                                 Data = 1,
+          [1652943666.781101][8499:8499] CHIP:DMG:                 },
+          [1652943666.781152][8499:8499] CHIP:DMG:
+          [1652943666.781191][8499:8499] CHIP:DMG:         ],
+          [1652943666.781238][8499:8499] CHIP:DMG:
+          [1652943666.781278][8499:8499] CHIP:DMG:         moreChunkedMessages = false,
+          [1652943666.781318][8499:8499] CHIP:DMG:         InteractionModelRevision = 1
+          [1652943666.781356][8499:8499] CHIP:DMG: },
+
+          On DUT---
+          [1652943666.816563][34595:34600] CHIP:DMG:                         AttributePathIB =
+          [1652943666.816581][34595:34600] CHIP:DMG:                         {
+          [1652943666.816600][34595:34600] CHIP:DMG:                                 Endpoint = 0x1,
+          [1652943666.816617][34595:34600] CHIP:DMG:                                 Cluster = 0x8,
+          [1652943666.816637][34595:34600] CHIP:DMG:                                 Attribute = 0x0000_0011,
+          [1652943666.816653][34595:34600] CHIP:DMG:                         }
+          [1652943666.816676][34595:34600] CHIP:DMG:
+          [1652943666.816692][34595:34600] CHIP:DMG:                         StatusIB =
+          [1652943666.816710][34595:34600] CHIP:DMG:                         {
+          [1652943666.816727][34595:34600] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1652943666.816744][34595:34600] CHIP:DMG:                         },
+      disabled: true
+
+    - label:
+          "DUT sends the Timed Request to the TH The Timed Request Message
+          should contain a timeout value in milliseconds. (Example - 200
+          milliseconds) Force the TH to not send a response back to the DUT for
+          the received timed request."
+      verification: |
+          This is not testable in normal scenario, and needs to be tested as part of Unit test.
       disabled: true

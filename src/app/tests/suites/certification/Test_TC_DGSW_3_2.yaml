@@ -1,0 +1,64 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.3.2. [TC-DGSW-3.2] Commands generated with client as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends ResetWatermarks to DUT"
+      PICS: DGSW.S.C00
+      verification: |
+          ./chip-tool softwarediagnostics reset-watermarks 1 0
+
+          CHIP:DMG: InvokeResponseMessage =
+          [1649662992.857322][8036:8041] CHIP:DMG: {
+          [1649662992.857373][8036:8041] CHIP:DMG:         suppressResponse = false,
+          [1649662992.857426][8036:8041] CHIP:DMG:         InvokeResponseIBs =
+          [1649662992.857491][8036:8041] CHIP:DMG:         [
+          [1649662992.857543][8036:8041] CHIP:DMG:                 InvokeResponseIB =
+          [1649662992.857615][8036:8041] CHIP:DMG:                 {
+          [1649662992.857673][8036:8041] CHIP:DMG:                         CommandStatusIB =
+          [1649662992.857741][8036:8041] CHIP:DMG:                         {
+          [1649662992.857810][8036:8041] CHIP:DMG:                                 CommandPathIB =
+          [1649662992.857880][8036:8041] CHIP:DMG:                                 {
+          [1649662992.857952][8036:8041] CHIP:DMG:                                         EndpointId = 0x0,
+          [1649662992.858026][8036:8041] CHIP:DMG:                                         ClusterId = 0x34,
+          [1649662992.858096][8036:8041] CHIP:DMG:                                         CommandId = 0x0,
+          [1649662992.858165][8036:8041] CHIP:DMG:                                 },
+          [1649662992.858251][8036:8041] CHIP:DMG:
+          [1649662992.858315][8036:8041] CHIP:DMG:                                 StatusIB =
+          [1649662992.858386][8036:8041] CHIP:DMG:                                 {
+          [1649662992.858464][8036:8041] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1649662992.858552][8036:8041] CHIP:DMG:                                 },
+          [1649662992.858635][8036:8041] CHIP:DMG:
+          [1649662992.858710][8036:8041] CHIP:DMG:                         },
+          [1649662992.858796][8036:8041] CHIP:DMG:
+          [1649662992.858897][8036:8041] CHIP:DMG:                 },
+          [1649662992.858987][8036:8041] CHIP:DMG:
+          [1649662992.859046][8036:8041] CHIP:DMG:         ],
+          [1649662992.859120][8036:8041] CHIP:DMG:
+          [1649662992.859179][8036:8041] CHIP:DMG:         InteractionModelRevision = 1
+          [1649662992.859237][8036:8041] CHIP:DMG: },
+          [1649662992.859377][8036:8041] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0034 Command=0x0000_0000 Status=0x0
+      disabled: true

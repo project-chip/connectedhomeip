@@ -57,6 +57,8 @@ esp32-m5stack-all-clusters-minimal-rpc
 esp32-m5stack-all-clusters-minimal-rpc-ipv6only
 esp32-m5stack-all-clusters-rpc
 esp32-m5stack-all-clusters-rpc-ipv6only
+esp32-m5stack-ota-requestor
+esp32-m5stack-ota-requestor-rpc
 esp32-qemu-tests
 imx-all-clusters-app
 imx-all-clusters-app-release
@@ -108,4 +110,5 @@ qpg-persistent-storage
 qpg-shell
 telink-tlsr9518adk80d-light
 telink-tlsr9518adk80d-light-switch
+tizen-arm-chip-tool
 tizen-arm-light

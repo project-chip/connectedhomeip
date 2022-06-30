@@ -33,7 +33,7 @@ public:
     CHIP_ERROR Init() override;
 
     // Shutdown all layers, finalize operations
-    CHIP_ERROR Shutdown() override;
+    void Shutdown() override;
 };
 
 } // namespace Test

@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    22.1.21. [TC-MF-1.21] Open commissioning window - durations max and max+1
-    [BCM] [DUT - Commissionee]
+    3.1.21. [TC-MF-1.21] max number of Commissioned Fabrics and SupportedFabrics
+    rollover using ECM [DUT - Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -24,18 +24,22 @@ config:
 
 tests:
     - label: "Reset DUT_CE to factory defaults"
+      PICS: PICS_MF
       verification: |
 
       disabled: true
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
+      PICS: PICS_MF
       verification: |
-          1. Provision the device using 1st controller chip tool(use above instructions) ,
+          "1. Provision the device using 1st controller chip tool(use above instructions) ,
+          "
       disabled: true
 
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
           timeout of PIXIT_COMM_WIN seconds using ECM"
+      PICS: PICS_MF
       verification: |
           On 1st controller chip tool, open commissioning window
 
@@ -57,29 +61,43 @@ tests:
       disabled: true
 
     - label: "THn starts a commissioning process with DUT_CE"
+      PICS: PICS_MF
       verification: |
           On nth controller using chip tool connect to the accessory
 
 
           ./chip-tool pairing code 1 36217551633
+
+          Verify you got below message
+          Device commissioning completed with success
       disabled: true
 
     - label:
-          "Repeat Step 3 an additional (SupportedFabrics - 2) times to reach an
-          index value of SupportedFabrics on DUT_CE"
+          "Repeat Step 3 and Step 4 an additional (SupportedFabrics - 2) times
+          to reach an index value of SupportedFabrics on DUT_CE"
+      PICS: PICS_MF
       verification: |
           Repeat step 3 until  CommissionedFabrics=SupportedFabrics
       disabled: true
 
-    - label: "THn starts a commissioning process with DUT_CE"
+    - label:
+          "THn starts a commissioning process and opens a commissioning window
+          with DUT_CE"
+      PICS: PICS_MF
       verification: |
           On nth controller using chip tool connect to the accessory
 
 
           ./chip-tool pairing code 1 36217551633
+
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1649756670.402192][10794:10799] CHIP:CTL: Device returned status 5 on receiving the NOC
+          [1649756670.402221][10794:10799] CHIP:CTL: Add NOC failed with error ../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1110: CHIP Error 0x0000000B: No memory
+          [1649756670.402241][10794:10799] CHIP:CTL: Failed to perform commissioning step 12
       disabled: true
 
     - label: "TH_CR1 removes FabricIndex1"
+      PICS: PICS_MF
       verification: |
           on 1st controller using chip tool, remove fabric with FabricIndex=1
 

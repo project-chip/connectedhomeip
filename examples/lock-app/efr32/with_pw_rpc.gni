@@ -26,3 +26,6 @@ chip_enable_openthread = true
 chip_openthread_ftd = true
 
 cpp_standard = "gnu++17"
+
+# To fit in flash
+chip_detail_logging = false

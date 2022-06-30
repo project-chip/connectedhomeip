@@ -17,9 +17,14 @@ import("//build_overrides/chip.gni")
 
 import("${build_root}/config/linux/pkg_config.gni")
 
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "linux")
+
+if (chip_use_pw_logging) {
+  import("//build_overrides/pigweed.gni")
+}
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
@@ -53,6 +58,8 @@ static_library("Linux") {
     "ConnectivityManagerImpl.h",
     "ConnectivityUtils.cpp",
     "ConnectivityUtils.h",
+    "DeviceInstanceInfoProviderImpl.cpp",
+    "DeviceInstanceInfoProviderImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
@@ -63,7 +70,6 @@ static_library("Linux") {
     "Logging.cpp",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningEthernetDriver.cpp",
-    "NetworkCommissioningThreadDriver.cpp",
     "NetworkCommissioningWiFiDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
@@ -81,6 +87,10 @@ static_library("Linux") {
     "bluez/MainLoop.h",
     "bluez/Types.h",
   ]
+
+  if (chip_enable_openthread) {
+    sources += [ "NetworkCommissioningThreadDriver.cpp" ]
+  }
 
   deps = [ "${chip_root}/src/setup_payload" ]
 
@@ -120,7 +130,13 @@ static_library("Linux") {
     public_deps += [ "dbus/openthread" ]
   }
 
+  if (chip_use_pw_logging) {
+    deps += [ "$dir_pw_log" ]
+  }
+
   if (chip_enable_wifi) {
+    sources += [ "GlibTypeDeleter.h" ]
+
     public_deps += [ "dbus/wpa" ]
   }
 

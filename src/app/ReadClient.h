@@ -66,16 +66,18 @@ public:
         virtual ~Callback() = default;
 
         /**
-         * Used to signal the commencement of processing of the first attribute report received in a given exchange.
+         * Used to signal the commencement of processing of the first attribute or event report received in a given exchange.
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
+         *
+         * Once OnReportBegin has been called, either OnReportEnd or OnError will be called before OnDone.
          *
          */
         virtual void OnReportBegin() {}
 
         /**
-         * Used to signal the completion of processing of the last attribute report in a given exchange.
+         * Used to signal the completion of processing of the last attribute or event report in a given exchange.
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
@@ -290,7 +292,7 @@ public:
         VerifyOrReturnError(IsSubscriptionActive(), CHIP_ERROR_INCORRECT_STATE);
 
         aMinIntervalFloorSeconds   = mMinIntervalFloorSeconds;
-        aMaxIntervalCeilingSeconds = mMaxIntervalCeilingSeconds;
+        aMaxIntervalCeilingSeconds = mMaxInterval;
 
         return CHIP_NO_ERROR;
     }
@@ -316,12 +318,12 @@ public:
     // Like SendSubscribeRequest, but allows sending certain forms of invalid
     // subscribe requests that servers are expected to reject, for testing
     // purposes.  Should only be called from tests.
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     CHIP_ERROR SendSubscribeRequestWithoutValidation(const ReadPrepareParams & aReadPrepareParams)
     {
         return SendSubscribeRequestImpl(aReadPrepareParams);
     }
-#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
     friend class TestReadInteraction;
@@ -395,6 +397,8 @@ private:
     CHIP_ERROR SendSubscribeRequestImpl(const ReadPrepareParams & aSubscribePrepareParams);
     void UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath);
     static void OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState);
+    // Called to ensure OnReportBegin is called before calling OnEventData or OnAttributeData
+    void NoteReportingData();
 
     /*
      * Called internally to signal the completion of all work on this object, gracefully close the
@@ -413,18 +417,18 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback & mpCallback;
-    ClientState mState                  = ClientState::Idle;
-    bool mIsInitialReport               = true;
-    bool mIsPrimingReports              = true;
-    bool mPendingMoreChunks             = false;
-    uint16_t mMinIntervalFloorSeconds   = 0;
-    uint16_t mMaxIntervalCeilingSeconds = 0;
-    SubscriptionId mSubscriptionId      = 0;
-    NodeId mPeerNodeId                  = kUndefinedNodeId;
-    FabricIndex mFabricIndex            = kUndefinedFabricIndex;
-    InteractionType mInteractionType    = InteractionType::Read;
+    ClientState mState                = ClientState::Idle;
+    bool mIsReporting                 = false;
+    bool mIsInitialReport             = true;
+    bool mIsPrimingReports            = true;
+    bool mPendingMoreChunks           = false;
+    uint16_t mMinIntervalFloorSeconds = 0;
+    uint16_t mMaxInterval             = 0;
+    SubscriptionId mSubscriptionId    = 0;
+    NodeId mPeerNodeId                = kUndefinedNodeId;
+    FabricIndex mFabricIndex          = kUndefinedFabricIndex;
+    InteractionType mInteractionType  = InteractionType::Read;
     Timestamp mEventTimestamp;
-    bool mSawAttributeReportsInCurrentReport = false;
 
     ReadClient * mpNext                 = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;
