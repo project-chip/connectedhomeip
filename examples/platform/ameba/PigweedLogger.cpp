@@ -23,7 +23,7 @@
 #include <pw_stream/sys_io_stream.h>
 
 #include <assert.h>
-#include <span>
+#include "pw_span/span.h"
 
 namespace PigweedLogger {
 namespace {

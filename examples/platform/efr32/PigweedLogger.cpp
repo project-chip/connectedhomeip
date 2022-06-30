@@ -33,7 +33,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <span>
+#include "pw_span/span.h"
 #include <string_view>
 
 namespace PigweedLogger {
