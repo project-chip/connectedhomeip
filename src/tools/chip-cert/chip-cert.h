@@ -94,7 +94,8 @@ enum CertFormat
     kCertFormat_X509_DER,
     kCertFormat_X509_PEM,
     kCertFormat_Chip_Raw,
-    kCertFormat_Chip_Base64
+    kCertFormat_Chip_Base64,
+    kCertFormat_Chip_Hex,
 };
 
 enum KeyFormat
