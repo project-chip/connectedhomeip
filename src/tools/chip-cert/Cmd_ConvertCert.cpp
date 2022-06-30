@@ -63,7 +63,7 @@ const char * const gCmdOptionHelp =
     "\n"
     "  -x, --chip-hex\n"
     "\n"
-    "       Output certificate in CHIP TLV hexidecimal format.\n"
+    "       Output certificate in CHIP TLV hexadecimal format.\n"
     "\n"
     "  -b --chip-b64\n"
     "\n"
