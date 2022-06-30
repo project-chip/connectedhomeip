@@ -275,7 +275,11 @@ uint8_t emberAfGetChannelFrom8bitEncodedChanPg(uint8_t chanPg);
 uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel);
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
-bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
+
+/* @brief returns true if the attribute is known to be volatile (i.e. RAM
+ * storage).
+ */
+bool emberAfIsKnownVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 namespace chip {
 chip::Messaging::ExchangeManager * ExchangeManager();
