@@ -19,6 +19,7 @@ pw_log_BACKEND = "$dir_pw_log_basic"
 pw_assert_BACKEND = "$dir_pw_assert_log:check_backend"
 pw_sys_io_BACKEND =
     "${chip_root}/examples/platform/bl602/pw_sys_io:pw_sys_io_bl602"
+pw_span_ENABLE_STD_SPAN_POLYFILL = false
 
 pw_build_LINK_DEPS = [
   "$dir_pw_assert:impl",
