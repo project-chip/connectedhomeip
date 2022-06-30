@@ -704,29 +704,29 @@ bool emberAfBridgedActionsClusterInstantActionCallback(app::CommandHandler * com
         invokeID    = commandData.invokeID.Value();
     }
 
-    if (actionID == action1.getActionId() && action1.getIsVisible() && room1.getIsVisible())
+    if (actionID == action1.getActionId() && action1.getIsVisible())
     {
         // Turn On Lights in Room 1
         runOnOffRoomAction(&room1, true, endpointID, actionID, invokeID, hasInvokeID);
-        emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
         return true;
     }
-    else if (actionID == action2.getActionId() && action2.getIsVisible() && room2.getIsVisible())
+    if (actionID == action2.getActionId() && action2.getIsVisible())
     {
         // Turn On Lights in Room 2
         runOnOffRoomAction(&room2, true, endpointID, actionID, invokeID, hasInvokeID);
-        emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
         return true;
     }
-    else if (actionID == action3.getActionId() && action3.getIsVisible() && room1.getIsVisible())
+    if (actionID == action3.getActionId() && action3.getIsVisible())
     {
         // Turn Off Lights in Room 1
         runOnOffRoomAction(&room1, false, endpointID, actionID, invokeID, hasInvokeID);
-        emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
         return true;
     }
 
-    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_FAILURE);
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
     return true;
 }
 

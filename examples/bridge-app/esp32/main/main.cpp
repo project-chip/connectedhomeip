@@ -333,8 +333,8 @@ bool emberAfBridgedActionsClusterInstantActionCallback(app::CommandHandler * com
                                                        const app::ConcreteCommandPath & commandPath,
                                                        const BridgedActions::Commands::InstantAction::DecodableType & commandData)
 {
-    // No actions are implemented
-    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
+    // No actions are implemented, just return status NotFound.
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
     return true;
 }
 
