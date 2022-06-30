@@ -103,7 +103,7 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 {
     std::string iniValue;
 
-    if ((buffer == nullptr) && (size != 0))
+    if ((value == nullptr) && (size != 0))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -116,7 +116,7 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 
     iniValue = Base64ToString(iniValue);
 
-    if ((buffer == nullptr) && (size == 0))
+    if ((value == nullptr) && (size == 0))
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }

@@ -237,9 +237,6 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     const char * kLongKeyString = "aKeyThatIsExactlyMaxKeyLengthhhh";
     // strlen() is not compile time so we just have this runtime assert that should aways pass as a sanity check.
     NL_TEST_ASSERT(inSuite, strlen(kLongKeyString) == PersistentStorageDelegate::kKeyLengthMax);
-    // TODO is what we have above what we are looking for of when strlen including null terminated character is
-    // PersistentStorageDelegate::kKeyLengthMax static_assert(sizeof(kLongKeyString) == PersistentStorageDelegate::kKeyLengthMax,
-    // "testing for");
 
     err = storage.SyncSetKeyValue(kLongKeyString, kStringValue2, static_cast<uint16_t>(strlen(kStringValue2)));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);

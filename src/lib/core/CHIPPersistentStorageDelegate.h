@@ -100,7 +100,11 @@ public:
     {
         uint16_t size  = 0;
         CHIP_ERROR err = SyncGetKeyValue(key, nullptr, size);
-        return err == CHIP_ERROR_BUFFER_TOO_SMALL;
+        if (err == CHIP_ERROR_BUFFER_TOO_SMALL || err == CHIP_NO_ERROR)
+        {
+            return true;
+        }
+        return false;
     }
 };
 
