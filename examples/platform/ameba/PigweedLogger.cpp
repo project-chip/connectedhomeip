@@ -22,8 +22,8 @@
 #include <pw_hdlc/encoder.h>
 #include <pw_stream/sys_io_stream.h>
 
-#include <assert.h>
 #include "pw_span/span.h"
+#include <assert.h>
 
 namespace PigweedLogger {
 namespace {
