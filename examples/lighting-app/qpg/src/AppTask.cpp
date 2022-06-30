@@ -172,9 +172,12 @@ OnOffEffect gEffect = {
     static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS),
 };
 
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 } // namespace
 
 AppTask AppTask::sAppTask;
+
+
 
 namespace {
 constexpr int extDiscTimeoutSecs = 20;
