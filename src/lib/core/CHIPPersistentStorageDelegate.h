@@ -54,8 +54,8 @@ public:
      *   bytes of the stored value.
      *
      *   A way to determine if the key exists is to pass `size` of 0, which is always valid to do,
-     *   and check if CHIP_ERROR_BUFFER_TOO_SMALL is returned. Alternativelt you can use the helper
-     *   function SyncDoesKeyExist(key).
+     *   and check if CHIP_ERROR_BUFFER_TOO_SMALL is returned. Alternatively, the helper
+     *   method SyncDoesKeyExist(key) can be used to more easily achieve the same effect.
      *
      *   It is legal to use `nullptr` for `buffer` if `size` is 0.
      *
