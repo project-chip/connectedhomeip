@@ -101,12 +101,7 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
 bool LockManager::IsValidUserIndex(uint16_t userIndex)
 {
-    if (userIndex > kMaxUsers)
-    {
-        return false;
-    }
-
-    return true;
+    return (userIndex < kMaxUsers);
 }
 
 bool LockManager::IsValidCredentialIndex(uint16_t credentialIndex, DlCredentialType type)
@@ -117,44 +112,22 @@ bool LockManager::IsValidCredentialIndex(uint16_t credentialIndex, DlCredentialT
         return (0 == credentialIndex);
     }
 
-    if (credentialIndex > kMaxCredentialsPerUser)
-    {
-        return false;
-    }
-
-    // Check programming pin
-
-    return true;
+    return (credentialIndex < kMaxCredentialsPerUser);
 }
 
 bool LockManager::IsValidWeekdayScheduleIndex(uint8_t scheduleIndex)
 {
-    if (scheduleIndex > kMaxWeekdaySchedulesPerUser)
-    {
-        return false;
-    }
-
-    return true;
+    return (scheduleIndex < kMaxWeekdaySchedulesPerUser);
 }
 
 bool LockManager::IsValidYeardayScheduleIndex(uint8_t scheduleIndex)
 {
-    if (scheduleIndex > kMaxYeardaySchedulesPerUser)
-    {
-        return false;
-    }
-
-    return true;
+    return (scheduleIndex < kMaxYeardaySchedulesPerUser);
 }
 
 bool LockManager::IsValidHolidayScheduleIndex(uint8_t scheduleIndex)
 {
-    if (scheduleIndex > kMaxHolidaySchedules)
-    {
-        return false;
-    }
-
-    return true;
+    return (scheduleIndex < kMaxHolidaySchedules);
 }
 
 bool LockManager::ReadConfigValues()
