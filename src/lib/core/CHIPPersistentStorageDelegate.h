@@ -49,9 +49,9 @@ public:
      *   If a key is found and the `buffer`'s `size` is large enough, then the value will
      *   be copied to `buffer` and `size` will be updated to the actual size used.
      *
-     *   Whenever the passed `size` is smaller than the value for which the key exists in storage,
-     *   CHIP_ERROR_BUFFER_TOO_SMALL will be given, but the `buffer` will still be filled `size`
-     *   bytes of the stored value.
+     *   Whenever the passed `size` is smaller than the size of the stored value for the given key,
+     *   CHIP_ERROR_BUFFER_TOO_SMALL will be returned, but the `buffer` will still be filled with the
+     *   first `size` bytes of the stored value.
      *
      *   A way to determine if the key exists is to pass `size` of 0, which is always valid to do,
      *   and check if CHIP_ERROR_BUFFER_TOO_SMALL is returned. Alternatively, the helper
@@ -61,11 +61,11 @@ public:
      *
      * @param[in]      key Key to lookup
      * @param[out]     buffer Pointer to a buffer where the place the read value.
-     * @param[in, out] size Input is maximum buffer size, output updated to length of value.
+     * @param[in, out] size Input is maximum buffer size, output updated to number of bytes written into `buffer`.
      *
      * @return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND the key is not found in storage.
      * @return CHIP_ERROR_BUFFER_TOO_SMALL the provided buffer is not big enough.  In this case
-     *                                     `buffer` will be filled up to `size`.
+     *                                     the first `size` bytes of the value will be placed in `buffer`.
      */
     virtual CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) = 0;
 

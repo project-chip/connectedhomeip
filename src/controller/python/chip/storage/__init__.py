@@ -46,7 +46,7 @@ def _OnSyncSetKeyValueCb(storageObj, key: str, value, size):
 
 @_SyncGetKeyValueCbFunct
 def _OnSyncGetKeyValueCb(storageObj, key: str, value, size):
-    ''' This does not adhere API requirement of
+    ''' This does not adhere to the API requirements of
     PersistentStorageDelegate::SyncGetKeyValue, but that is okay since
     the C++ storage binding layer is capable of adapting results from
     this method to the requirements of
@@ -70,7 +70,7 @@ def _OnSyncGetKeyValueCb(storageObj, key: str, value, size):
             count = count + 1
 
         # As mentioned above, we are intentionally not returning
-        # sizeToCopy as one might expected because the caller
+        # sizeToCopy as one might expect because the caller
         # will use the value in size[0] to determine if it should
         # return CHIP_ERROR_BUFFER_TOO_SMALL.
         size[0] = len(keyValue)
