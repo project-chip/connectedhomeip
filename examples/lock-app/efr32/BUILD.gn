@@ -330,9 +330,7 @@ efr32_executable("lock_app") {
 
   # Attestation Credentials
   if (chip_build_device_attestation_credentials) {
-    deps += [
-      "${examples_plat_dir}:efr32-attestation-credentials",
-    ]
+    deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
   }
 
   output_dir = root_out_dir
