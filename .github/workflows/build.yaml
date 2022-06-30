@@ -62,7 +62,7 @@ jobs:
               run: |
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
-                  mkdir objdir-clone || true
+                  mkdir /tmp/executables || true
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -105,6 +105,9 @@ jobs:
             - name: Run Build Without Error Logging
               timeout-minutes: 20
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Copying executables
+              if: ${{ failure() }} && ${{ !env.ACT }}
+              run: find out/ -type f -executable | xargs cp -t /tmp/executables
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
@@ -113,12 +116,12 @@ jobs:
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
-            - name: Uploading objdir for debugging
+            - name: Uploading executables for debugging
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
-                  name: crash-objdir-linux-gcc-debug
-                  path: out/
+                  name: crash-executables-linux-gcc-debug
+                  path: /tmp/executables/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
     build_linux:
@@ -164,7 +167,7 @@ jobs:
               run: |
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
-                  mkdir objdir-clone || true
+                  mkdir /tmp/executables || true
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -239,6 +242,9 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --no-log-timestamps --target linux-fake-tests build"
+            - name: Copying executables
+              if: ${{ failure() }} && ${{ !env.ACT }}
+              run: find out/ -type f -executable | xargs cp -t /tmp/executables
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
@@ -247,13 +253,13 @@ jobs:
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
-            - name: Uploading objdir for debugging
+            - name: Uploading executables for debugging
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
-                  name: crash-objdir-linux
-                  path: out/
-                  # objdirs are big; don't hold on to them too long.
+                  name: crash-executables-linux
+                  path: /tmp/executables/
+                  # Executables are big; don't hold on to them too long.
                   retention-days: 5
 
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
