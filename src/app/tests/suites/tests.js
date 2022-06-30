@@ -163,6 +163,7 @@ function getManualTests() {
   ];
 
   const GeneralDiagnostics = [
+    'Test_TC_DGGEN_2_1',
     'Test_TC_DGGEN_2_2',
     'Test_TC_DGGEN_2_3',
     'Test_TC_DGGEN_3_1',
@@ -328,6 +329,7 @@ function getManualTests() {
   ];
 
   const WindowCovering = [
+    'Test_TC_WNCV_4_5',
     'Test_TC_WNCV_6_1',
     'Test_TC_WNCV_7_1',
   ];
@@ -396,6 +398,7 @@ function getManualTests() {
 
   const OnOff = [
     'Test_TC_OO_2_3',
+    'Test_TC_OO_2_4',
     'Test_TC_OO_3_1',
     'Test_TC_OO_3_2',
   ];
@@ -594,7 +597,6 @@ function getTests() {
 
   const GeneralDiagnostics = [
     'Test_TC_DGGEN_1_1',
-    'Test_TC_DGGEN_2_1',
   ];
 
   const Identify = [
@@ -688,7 +690,6 @@ function getTests() {
     'Test_TC_OO_1_1',
     'Test_TC_OO_2_1',
     'Test_TC_OO_2_2',
-    'Test_TC_OO_2_4',
   ];
 
   const PowerSource = [
@@ -771,7 +772,6 @@ function getTests() {
     'Test_TC_WNCV_4_2',
     'Test_TC_WNCV_4_3',
     'Test_TC_WNCV_4_4',
-    'Test_TC_WNCV_4_5',
   ];
 
   const TV = [

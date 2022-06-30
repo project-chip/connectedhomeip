@@ -43,13 +43,31 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Reboot DUT (node)"
-      cluster: "SystemCommands"
-      command: "Reboot"
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Reboot DUT (node)"
-      cluster: "SystemCommands"
-      command: "Reboot"
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -75,9 +93,18 @@ tests:
           constraints:
               type: uint32
 
-    - label: "Reboot DUT (node)"
-      cluster: "SystemCommands"
-      command: "Reboot"
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"

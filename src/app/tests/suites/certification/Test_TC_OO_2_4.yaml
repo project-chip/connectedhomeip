@@ -37,10 +37,18 @@ tests:
       arguments:
           value: 0
 
-    - label: "Power Off and On DUT"
-      cluster: "SystemCommands"
-      endpoint: 0
-      command: "Reboot"
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -62,10 +70,18 @@ tests:
       arguments:
           value: 1
 
-    - label: "Power Off and On DUT"
-      cluster: "SystemCommands"
-      endpoint: 0
-      command: "Reboot"
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -87,10 +103,18 @@ tests:
       arguments:
           value: 2
 
-    - label: "Power Off and On DUT"
-      cluster: "SystemCommands"
-      endpoint: 0
-      command: "Reboot"
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -106,10 +130,20 @@ tests:
       response:
           value: 0
 
-    - label: "Power Off and On DUT"
-      cluster: "SystemCommands"
-      endpoint: 0
-      command: "Reboot"
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please reboot the DUT and enter 'y' for success after DUT
+                    starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -131,10 +165,20 @@ tests:
       arguments:
           value: null
 
-    - label: "Power Off and On DUT"
-      cluster: "SystemCommands"
-      endpoint: 0
-      command: "Reboot"
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please reboot the DUT and enter 'y' for success after DUT
+                    starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -153,10 +197,20 @@ tests:
     - label: "TH sends Off command to DUT"
       command: "Off"
 
-    - label: "Power Off and On DUT"
-      cluster: "SystemCommands"
-      endpoint: 0
-      command: "Reboot"
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please reboot the DUT and enter 'y' for success after DUT
+                    starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
