@@ -1,5 +1,14 @@
-#ifndef MATTER_DEVICE_CREDENTIALS_EFR32
-#define MATTER_DEVICE_CREDENTIALS_EFR32
+/**
+ * This is a boilerplat header to define the EFR32 authentication credentials.
+ * Applications must provide their own version of this header, and include:
+ *  - The content of the CSA-provided Certification Declaration
+ *  - The location and size of the PAI, and DAC
+ *  - The key ID of the key-pair associated with the DAC
+ *
+ *  These credentials MUST be provided if the build variable "chip_build_device_attestation_credentials" is set to true.
+ */
+#ifndef EFR32_EXAMPLE_DEVICE_CREDENTIALS
+#define EFR32_EXAMPLE_DEVICE_CREDENTIALS
 
 //-> format_version = 1
 //-> vendor_id = 0xFFF1
@@ -54,4 +63,4 @@ const uint8_t kCertificationDeclaration[541] = {
 #define MFG_MATTER_DAC_SIZE 492
 #define MFG_MATTER_DAC_KEY_ID PSA_KEY_ID_USER_MIN + 1
 
-#endif // MATTER_DEVICE_CREDENTIALS_EFR32
+#endif // EFR32_EXAMPLE_DEVICE_CREDENTIALS

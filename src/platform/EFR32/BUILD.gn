@@ -25,7 +25,6 @@ if (chip_enable_openthread) {
 
 static_library("EFR32") {
   sources = [
-    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
     "../FreeRTOS/SystemTimeSupport.cpp",
     "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
@@ -44,8 +43,6 @@ static_library("EFR32") {
     "DiagnosticDataProviderImpl.h",
     "EFR32Config.cpp",
     "EFR32Config.h",
-    "EFR32DeviceAttestationCreds.cpp",
-    "EFR32DeviceAttestationCreds.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
