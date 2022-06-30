@@ -87,7 +87,7 @@ jobs:
                     linux arm64 chip-tool \
                     out/linux-arm64-chip-tool/chip-tool \
                     /tmp/bloat_reports/
-            - name: Bloat report - thermostat
+            - name: Bloat report - lighting-app
               timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
