@@ -20,10 +20,10 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
-#include "psa/crypto.h"
 #include "efr32_certs.h"
-#include "sl_token_manager.h"
+#include "psa/crypto.h"
 #include "sl_token_api.h"
+#include "sl_token_manager.h"
 
 namespace chip {
 namespace Credentials {
@@ -79,12 +79,12 @@ public:
 
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_buffer) override
     {
-        psa_key_id_t key_id = MFG_MATTER_DAC_KEY_ID;
+        psa_key_id_t key_id   = MFG_MATTER_DAC_KEY_ID;
         uint8_t signature[64] = { 0 };
         size_t signature_size = sizeof(signature);
 
         psa_status_t err = psa_sign_hash(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), digest_to_sign.data(), digest_to_sign.size(),
-                                            signature, signature_size, &signature_size);
+                                         signature, signature_size, &signature_size);
         VerifyOrReturnError(!err, CHIP_ERROR_INTERNAL);
 
         return CopySpanToMutableSpan(ByteSpan(signature, signature_size), out_buffer);
