@@ -56,6 +56,10 @@ static_library("EFR32") {
     "gatt_db.h",
   ]
 
+  if (chip_device_attestation_credentials) {
+    sources += [ "DeviceAttestationCredsImpl.cpp" ]
+  }
+
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
