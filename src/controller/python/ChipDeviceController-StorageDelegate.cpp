@@ -41,7 +41,7 @@ CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, vo
 
     uint16_t neededSize = val->second.size();
     ReturnErrorCodeIf(size == 0 && neededSize == 0, CHIP_NO_ERROR);
-    ReturnErrorCodeIf(((value == nullptr) && (size == 0)), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(value == nullptr, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     if (size < neededSize)
     {
