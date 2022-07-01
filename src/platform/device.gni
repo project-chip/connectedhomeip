@@ -63,7 +63,8 @@ declare_args() {
       chip_device_platform == "mbed" || chip_device_platform == "tizen" ||
       chip_device_platform == "android" || chip_device_platform == "ameba" ||
       chip_device_platform == "webos" || chip_device_platform == "cc32xx" ||
-      chip_device_platform == "bl602" || chip_device_platform == "bl602"
+      chip_device_platform == "bl602" || chip_device_platform == "bl602" ||
+      chip_device_platform == "mw320"
 
   # Enable ble support.
   if (chip_device_platform == "fake") {

@@ -80,6 +80,14 @@ NS_ASSUME_NONNULL_BEGIN
                     fabricIndex:(chip::FabricIndex)fabricIndex
                       isRunning:(BOOL *)isRunning;
 
+/**
+ * Shut down the underlying C++ controller.  Must be called on the Matter work
+ * queue or after the Matter work queue has been shut down.
+ *
+ * Only MTRControllerFactory should be calling this.
+ */
+- (void)shutDownCppController;
+
 @end
 
 NS_ASSUME_NONNULL_END
