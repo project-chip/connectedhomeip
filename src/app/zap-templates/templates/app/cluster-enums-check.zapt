@@ -35,21 +35,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue({{asUpperCamelCase
 }
 {{/zcl_enums}}
 
-{{#zcl_bitmaps}}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue({{asUpperCamelCase ../name}}::{{asType label}} val)
-{
-    switch (val) {
-    using EnumType = {{asUpperCamelCase ../name}}::{{asType label}};
-    {{#zcl_bitmap_items}}
-    case EnumType::k{{asUpperCamelCase label}}:
-    {{/zcl_bitmap_items}}
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-{{/zcl_bitmaps}}
-
 {{/zcl_clusters}}
 } // namespace Clusters
 } // namespace app

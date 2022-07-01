@@ -97,18 +97,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(Identify::Identify
     }
 }
 
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(Scenes::ScenesCopyMode val)
-{
-    switch (val)
-    {
-        using EnumType = Scenes::ScenesCopyMode;
-    case EnumType::kCopyAllScenes:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
 static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(OnOff::OnOffDelayedAllOffEffectVariant val)
 {
     switch (val)
@@ -180,40 +168,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(OnOff::OnOffStartU
     }
 }
 
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(OnOff::OnOffControl val)
-{
-    switch (val)
-    {
-        using EnumType = OnOff::OnOffControl;
-    case EnumType::kAcceptOnlyWhenOn:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(OnOff::OnOffFeature val)
-{
-    switch (val)
-    {
-        using EnumType = OnOff::OnOffFeature;
-    case EnumType::kLighting:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(OnOff::SceneFeatures val)
-{
-    switch (val)
-    {
-        using EnumType = OnOff::SceneFeatures;
-    case EnumType::kSceneNames:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
 static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(LevelControl::MoveMode val)
 {
     switch (val)
@@ -247,20 +201,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(LevelControl::Step
     case EMBER_ZCL_STEP_MODE_UP:
     case EMBER_ZCL_STEP_MODE_DOWN:
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(LevelControl::LevelControlFeature val)
-{
-    switch (val)
-    {
-        using EnumType = LevelControl::LevelControlFeature;
-    case EnumType::kOnOff:
-    case EnumType::kLighting:
-    case EnumType::kFrequency:
         return CHIP_NO_ERROR;
     default:
         return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
@@ -323,19 +263,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ApplianceControl::
     case EnumType::kWarning3OverallPowerBackBelowTheAvailablePowerLevel:
     case EnumType::kWarning4OverallPowerBackBelowThePowerThresholdLevel:
     case EnumType::kWarning5OverallPowerWillBePotentiallyAboveAvailablePowerLevelIfTheApplianceStarts:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ApplianceControl::RemoteEnableFlagsAndDeviceStatus2 val)
-{
-    switch (val)
-    {
-        using EnumType = ApplianceControl::RemoteEnableFlagsAndDeviceStatus2;
-    case EnumType::kRemoteEnableFlags:
-    case EnumType::kDeviceStatus2Structure:
         return CHIP_NO_ERROR;
     default:
         return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
@@ -435,29 +362,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(BridgedActions::En
     case EnumType::kOther:
     case EnumType::kRoom:
     case EnumType::kZone:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(BridgedActions::CommandBits val)
-{
-    switch (val)
-    {
-        using EnumType = BridgedActions::CommandBits;
-    case EnumType::kInstantAction:
-    case EnumType::kInstantActionWithTransition:
-    case EnumType::kStartAction:
-    case EnumType::kStartActionWithDuration:
-    case EnumType::kStopAction:
-    case EnumType::kPauseAction:
-    case EnumType::kPauseActionWithDuration:
-    case EnumType::kResumeAction:
-    case EnumType::kEnableAction:
-    case EnumType::kEnableActionWithDuration:
-    case EnumType::kDisableAction:
-    case EnumType::kDisableActionWithDuration:
         return CHIP_NO_ERROR;
     default:
         return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
@@ -603,18 +507,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(UnitLocalization::
     }
 }
 
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(UnitLocalization::UnitLocalizationFeature val)
-{
-    switch (val)
-    {
-        using EnumType = UnitLocalization::UnitLocalizationFeature;
-    case EnumType::kTemperatureUnit:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
 static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(PowerSource::BatChargeFaultType val)
 {
     switch (val)
@@ -730,21 +622,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(PowerSource::Wired
     }
 }
 
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(PowerSource::PowerSourceFeature val)
-{
-    switch (val)
-    {
-        using EnumType = PowerSource::PowerSourceFeature;
-    case EnumType::kWired:
-    case EnumType::kBattery:
-    case EnumType::kRechargeable:
-    case EnumType::kReplaceable:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
 static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(GeneralCommissioning::CommissioningError val)
 {
     switch (val)
@@ -807,35 +684,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(NetworkCommissioni
     case EnumType::k5g:
     case EnumType::k6g:
     case EnumType::k60g:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(NetworkCommissioning::NetworkCommissioningFeature val)
-{
-    switch (val)
-    {
-        using EnumType = NetworkCommissioning::NetworkCommissioningFeature;
-    case EnumType::kWiFiNetworkInterface:
-    case EnumType::kThreadNetworkInterface:
-    case EnumType::kEthernetNetworkInterface:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(NetworkCommissioning::WiFiSecurity val)
-{
-    switch (val)
-    {
-        using EnumType = NetworkCommissioning::WiFiSecurity;
-    case EnumType::kUnencrypted:
-    case EnumType::kWepPersonal:
-    case EnumType::kWpaPersonal:
-    case EnumType::kWpa2Personal:
-    case EnumType::kWpa3Personal:
         return CHIP_NO_ERROR;
     default:
         return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
@@ -1015,18 +863,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(GeneralDiagnostics
     }
 }
 
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(SoftwareDiagnostics::SoftwareDiagnosticsFeature val)
-{
-    switch (val)
-    {
-        using EnumType = SoftwareDiagnostics::SoftwareDiagnosticsFeature;
-    case EnumType::kWaterMarks:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
 static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ThreadNetworkDiagnostics::NetworkFault val)
 {
     switch (val)
@@ -1077,21 +913,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ThreadNetworkDiagn
         using EnumType = ThreadNetworkDiagnostics::ThreadConnectionStatus;
     case EnumType::kConnected:
     case EnumType::kNotConnected:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsFeature val)
-{
-    switch (val)
-    {
-        using EnumType = ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsFeature;
-    case EnumType::kPacketCounts:
-    case EnumType::kErrorCounts:
-    case EnumType::kMLECounts:
-    case EnumType::kMACCounts:
         return CHIP_NO_ERROR;
     default:
         return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
@@ -1279,18 +1100,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(GroupKeyManagement
         using EnumType = GroupKeyManagement::GroupKeySecurityPolicy;
     case EnumType::kTrustFirst:
     case EnumType::kCacheAndSync:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ModeSelect::ModeSelectFeature val)
-{
-    switch (val)
-    {
-        using EnumType = ModeSelect::ModeSelectFeature;
-    case EnumType::kDeponoff:
         return CHIP_NO_ERROR;
     default:
         return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
@@ -1627,250 +1436,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DoorLock
     }
 }
 
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DlCredentialRuleMask val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DlCredentialRuleMask;
-    case EnumType::kSingle:
-    case EnumType::kDual:
-    case EnumType::kTri:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DlCredentialRulesSupport val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DlCredentialRulesSupport;
-    case EnumType::kSingle:
-    case EnumType::kDual:
-    case EnumType::kTri:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DlDaysMaskMap val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DlDaysMaskMap;
-    case EnumType::kSunday:
-    case EnumType::kMonday:
-    case EnumType::kTuesday:
-    case EnumType::kWednesday:
-    case EnumType::kThursday:
-    case EnumType::kFriday:
-    case EnumType::kSaturday:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DlDefaultConfigurationRegister val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DlDefaultConfigurationRegister;
-    case EnumType::kEnableLocalProgrammingEnabled:
-    case EnumType::kKeypadInterfaceDefaultAccessEnabled:
-    case EnumType::kRemoteInterfaceDefaultAccessIsEnabled:
-    case EnumType::kSoundEnabled:
-    case EnumType::kAutoRelockTimeSet:
-    case EnumType::kLEDSettingsSet:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DlKeypadOperationEventMask val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DlKeypadOperationEventMask;
-    case EnumType::kUnknown:
-    case EnumType::kLock:
-    case EnumType::kUnlock:
-    case EnumType::kLockInvalidPIN:
-    case EnumType::kLockInvalidSchedule:
-    case EnumType::kUnlockInvalidCode:
-    case EnumType::kUnlockInvalidSchedule:
-    case EnumType::kNonAccessUserOpEvent:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DlKeypadProgrammingEventMask val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DlKeypadProgrammingEventMask;
-    case EnumType::kUnknown:
-    case EnumType::kProgrammingPINChanged:
-    case EnumType::kPINAdded:
-    case EnumType::kPINCleared:
-    case EnumType::kPINChanged:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DlLocalProgrammingFeatures val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DlLocalProgrammingFeatures;
-    case EnumType::kAddUsersCredentialsSchedulesLocally:
-    case EnumType::kModifyUsersCredentialsSchedulesLocally:
-    case EnumType::kClearUsersCredentialsSchedulesLocally:
-    case EnumType::kAdjustLockSettingsLocally:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DlManualOperationEventMask val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DlManualOperationEventMask;
-    case EnumType::kUnknown:
-    case EnumType::kThumbturnLock:
-    case EnumType::kThumbturnUnlock:
-    case EnumType::kOneTouchLock:
-    case EnumType::kKeyLock:
-    case EnumType::kKeyUnlock:
-    case EnumType::kAutoLock:
-    case EnumType::kScheduleLock:
-    case EnumType::kScheduleUnlock:
-    case EnumType::kManualLock:
-    case EnumType::kManualUnlock:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DlRFIDOperationEventMask val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DlRFIDOperationEventMask;
-    case EnumType::kUnknown:
-    case EnumType::kLock:
-    case EnumType::kUnlock:
-    case EnumType::kLockInvalidRFID:
-    case EnumType::kLockInvalidSchedule:
-    case EnumType::kUnlockInvalidRFID:
-    case EnumType::kUnlockInvalidSchedule:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DlRFIDProgrammingEventMask val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DlRFIDProgrammingEventMask;
-    case EnumType::kUnknown:
-    case EnumType::kRFIDCodeAdded:
-    case EnumType::kRFIDCodeCleared:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DlRemoteOperationEventMask val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DlRemoteOperationEventMask;
-    case EnumType::kUnknown:
-    case EnumType::kLock:
-    case EnumType::kUnlock:
-    case EnumType::kLockInvalidCode:
-    case EnumType::kLockInvalidSchedule:
-    case EnumType::kUnlockInvalidCode:
-    case EnumType::kUnlockInvalidSchedule:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DlRemoteProgrammingEventMask val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DlRemoteProgrammingEventMask;
-    case EnumType::kUnknown:
-    case EnumType::kProgrammingPINChanged:
-    case EnumType::kPINAdded:
-    case EnumType::kPINCleared:
-    case EnumType::kPINChanged:
-    case EnumType::kRFIDCodeAdded:
-    case EnumType::kRFIDCodeCleared:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DlSupportedOperatingModes val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DlSupportedOperatingModes;
-    case EnumType::kNormal:
-    case EnumType::kVacation:
-    case EnumType::kPrivacy:
-    case EnumType::kNoRemoteLockUnlock:
-    case EnumType::kPassage:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DoorLockDayOfWeek val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DoorLockDayOfWeek;
-    case EnumType::kSunday:
-    case EnumType::kMonday:
-    case EnumType::kTuesday:
-    case EnumType::kWednesday:
-    case EnumType::kThursday:
-    case EnumType::kFriday:
-    case EnumType::kSaturday:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(DoorLock::DoorLockFeature val)
-{
-    switch (val)
-    {
-        using EnumType = DoorLock::DoorLockFeature;
-    case EnumType::kPINCredentials:
-    case EnumType::kRFIDCredentials:
-    case EnumType::kFingerCredentials:
-    case EnumType::kLogging:
-    case EnumType::kAccessSchedules:
-    case EnumType::kDoorPositionSensor:
-    case EnumType::kFaceCredentials:
-    case EnumType::kCredentialsOTA:
-    case EnumType::kUsersManagement:
-    case EnumType::kNotifications:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
 static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(WindowCovering::EndProductType val)
 {
     switch (val)
@@ -1928,88 +1493,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(WindowCovering::Ty
     }
 }
 
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(WindowCovering::ConfigStatus val)
-{
-    switch (val)
-    {
-        using EnumType = WindowCovering::ConfigStatus;
-    case EnumType::kOperational:
-    case EnumType::kOnlineReserved:
-    case EnumType::kLiftMovementReversed:
-    case EnumType::kLiftPositionAware:
-    case EnumType::kTiltPositionAware:
-    case EnumType::kLiftEncoderControlled:
-    case EnumType::kTiltEncoderControlled:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(WindowCovering::Feature val)
-{
-    switch (val)
-    {
-        using EnumType = WindowCovering::Feature;
-    case EnumType::kLift:
-    case EnumType::kTilt:
-    case EnumType::kPositionAwareLift:
-    case EnumType::kAbsolutePosition:
-    case EnumType::kPositionAwareTilt:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(WindowCovering::Mode val)
-{
-    switch (val)
-    {
-        using EnumType = WindowCovering::Mode;
-    case EnumType::kMotorDirectionReversed:
-    case EnumType::kCalibrationMode:
-    case EnumType::kMaintenanceMode:
-    case EnumType::kLedFeedback:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(WindowCovering::OperationalStatus val)
-{
-    switch (val)
-    {
-        using EnumType = WindowCovering::OperationalStatus;
-    case EnumType::kGlobal:
-    case EnumType::kLift:
-    case EnumType::kTilt:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(WindowCovering::SafetyStatus val)
-{
-    switch (val)
-    {
-        using EnumType = WindowCovering::SafetyStatus;
-    case EnumType::kRemoteLockout:
-    case EnumType::kTamperDetection:
-    case EnumType::kFailedCommunication:
-    case EnumType::kPositionFailure:
-    case EnumType::kThermalProtection:
-    case EnumType::kObstacleDetected:
-    case EnumType::kPower:
-    case EnumType::kStopInput:
-    case EnumType::kMotorJammed:
-    case EnumType::kHardwareFailure:
-    case EnumType::kManualOperation:
-    case EnumType::kProtection:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
 static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(PumpConfigurationAndControl::PumpControlMode val)
 {
     switch (val)
@@ -2035,26 +1518,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(PumpConfigurationA
     case EnumType::kMinimum:
     case EnumType::kMaximum:
     case EnumType::kLocal:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(PumpConfigurationAndControl::PumpStatus val)
-{
-    switch (val)
-    {
-        using EnumType = PumpConfigurationAndControl::PumpStatus;
-    case EnumType::kDeviceFault:
-    case EnumType::kSupplyfault:
-    case EnumType::kSpeedLow:
-    case EnumType::kSpeedHigh:
-    case EnumType::kLocalOverride:
-    case EnumType::kRunning:
-    case EnumType::kRemotePressure:
-    case EnumType::kRemoteFlow:
-    case EnumType::kRemoteTemperature:
         return CHIP_NO_ERROR;
     default:
         return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
@@ -2129,53 +1592,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(Thermostat::Thermo
     }
 }
 
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(Thermostat::DayOfWeek val)
-{
-    switch (val)
-    {
-        using EnumType = Thermostat::DayOfWeek;
-    case EnumType::kSunday:
-    case EnumType::kMonday:
-    case EnumType::kTuesday:
-    case EnumType::kWednesday:
-    case EnumType::kThursday:
-    case EnumType::kFriday:
-    case EnumType::kSaturday:
-    case EnumType::kAwayOrVacation:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(Thermostat::ModeForSequence val)
-{
-    switch (val)
-    {
-        using EnumType = Thermostat::ModeForSequence;
-    case EnumType::kHeatSetpointFieldPresent:
-    case EnumType::kCoolSetpointFieldPresent:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(Thermostat::ThermostatFeature val)
-{
-    switch (val)
-    {
-        using EnumType = Thermostat::ThermostatFeature;
-    case EnumType::kHeating:
-    case EnumType::kCooling:
-    case EnumType::kOccupancy:
-    case EnumType::kSchedule:
-    case EnumType::kSetback:
-    case EnumType::kAutomode:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
 static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(FanControl::FanModeSequenceType val)
 {
     switch (val)
@@ -2204,58 +1620,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(FanControl::FanMod
     case EnumType::kOn:
     case EnumType::kAuto:
     case EnumType::kSmart:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(FanControl::FanControlFeature val)
-{
-    switch (val)
-    {
-        using EnumType = FanControl::FanControlFeature;
-    case EnumType::kMultiSpeed:
-    case EnumType::kAuto:
-    case EnumType::kRocking:
-    case EnumType::kWind:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(FanControl::RockSupportMask val)
-{
-    switch (val)
-    {
-        using EnumType = FanControl::RockSupportMask;
-    case EnumType::kRockLeftRight:
-    case EnumType::kRockUpDown:
-    case EnumType::kRockRound:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(FanControl::WindSettingMask val)
-{
-    switch (val)
-    {
-        using EnumType = FanControl::WindSettingMask;
-    case EnumType::kSleepWind:
-    case EnumType::kNaturalWind:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(FanControl::WindSupportMask val)
-{
-    switch (val)
-    {
-        using EnumType = FanControl::WindSupportMask;
-    case EnumType::kSleepWind:
-    case EnumType::kNaturalWind:
         return CHIP_NO_ERROR;
     default:
         return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
@@ -2427,51 +1791,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ColorControl::Satu
     }
 }
 
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ColorControl::ColorCapabilities val)
-{
-    switch (val)
-    {
-        using EnumType = ColorControl::ColorCapabilities;
-    case EnumType::kHueSaturationSupported:
-    case EnumType::kEnhancedHueSupported:
-    case EnumType::kColorLoopSupported:
-    case EnumType::kXYAttributesSupported:
-    case EnumType::kColorTemperatureSupported:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ColorControl::ColorControlFeature val)
-{
-    switch (val)
-    {
-        using EnumType = ColorControl::ColorControlFeature;
-    case EnumType::kHueAndSaturation:
-    case EnumType::kEnhancedHue:
-    case EnumType::kColorLoop:
-    case EnumType::kXy:
-    case EnumType::kColorTemperature:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ColorControl::ColorLoopUpdateFlags val)
-{
-    switch (val)
-    {
-        using EnumType = ColorControl::ColorLoopUpdateFlags;
-    case EnumType::kUpdateAction:
-    case EnumType::kUpdateDirection:
-    case EnumType::kUpdateTime:
-    case EnumType::kUpdateStartHue:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
 static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(IlluminanceMeasurement::LightSensorType val)
 {
     switch (val)
@@ -2479,18 +1798,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(IlluminanceMeasure
         using EnumType = IlluminanceMeasurement::LightSensorType;
     case EnumType::kPhotodiode:
     case EnumType::kCmos:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(PressureMeasurement::PressureFeature val)
-{
-    switch (val)
-    {
-        using EnumType = PressureMeasurement::PressureFeature;
-    case EnumType::kExt:
         return CHIP_NO_ERROR;
     default:
         return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
@@ -2516,19 +1823,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(Channel::LineupInf
     {
         using EnumType = Channel::LineupInfoTypeEnum;
     case EnumType::kMso:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(Channel::ChannelFeature val)
-{
-    switch (val)
-    {
-        using EnumType = Channel::ChannelFeature;
-    case EnumType::kChannelList:
-    case EnumType::kLineupInfo:
         return CHIP_NO_ERROR;
     default:
         return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
@@ -2597,18 +1891,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(MediaInput::InputT
     case EnumType::kScart:
     case EnumType::kUsb:
     case EnumType::kOther:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(MediaInput::MediaInputFeature val)
-{
-    switch (val)
-    {
-        using EnumType = MediaInput::MediaInputFeature;
-    case EnumType::kNameUpdates:
         return CHIP_NO_ERROR;
     default:
         return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
@@ -2725,20 +2007,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(KeypadInput::Keypa
     }
 }
 
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(KeypadInput::KeypadInputFeature val)
-{
-    switch (val)
-    {
-        using EnumType = KeypadInput::KeypadInputFeature;
-    case EnumType::kNavigationKeyCodes:
-    case EnumType::kLocationKeys:
-    case EnumType::kNumberKeys:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
 static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ContentLauncher::ContentLaunchStatusEnum val)
 {
     switch (val)
@@ -2788,31 +2056,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ContentLauncher::P
     }
 }
 
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ContentLauncher::ContentLauncherFeature val)
-{
-    switch (val)
-    {
-        using EnumType = ContentLauncher::ContentLauncherFeature;
-    case EnumType::kContentSearch:
-    case EnumType::kURLPlayback:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ContentLauncher::SupportedStreamingProtocol val)
-{
-    switch (val)
-    {
-        using EnumType = ContentLauncher::SupportedStreamingProtocol;
-    case EnumType::kDash:
-    case EnumType::kHls:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
 static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(AudioOutput::OutputTypeEnum val)
 {
     switch (val)
@@ -2830,18 +2073,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(AudioOutput::Outpu
     }
 }
 
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(AudioOutput::AudioOutputFeature val)
-{
-    switch (val)
-    {
-        using EnumType = AudioOutput::AudioOutputFeature;
-    case EnumType::kNameUpdates:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
 static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ApplicationLauncher::ApplicationLauncherStatusEnum val)
 {
     switch (val)
@@ -2850,18 +2081,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ApplicationLaunche
     case EnumType::kSuccess:
     case EnumType::kAppNotAvailable:
     case EnumType::kSystemBusy:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ApplicationLauncher::ApplicationLauncherFeature val)
-{
-    switch (val)
-    {
-        using EnumType = ApplicationLauncher::ApplicationLauncherFeature;
-    case EnumType::kApplicationPlatform:
         return CHIP_NO_ERROR;
     default:
         return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
@@ -3027,44 +2246,6 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(Messaging::Messagi
     }
 }
 
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(Messaging::MessagingConfirmationControl val)
-{
-    switch (val)
-    {
-        using EnumType = Messaging::MessagingConfirmationControl;
-    case EnumType::kNoReturned:
-    case EnumType::kYesReturned:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(Messaging::MessagingControlMask val)
-{
-    switch (val)
-    {
-        using EnumType = Messaging::MessagingControlMask;
-    case EnumType::kTransMechanism:
-    case EnumType::kMessageUrgency:
-    case EnumType::kEnhancedConfirmationRequest:
-    case EnumType::kMessageConfirmation:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(Messaging::MessagingExtendedControlMask val)
-{
-    switch (val)
-    {
-        using EnumType = Messaging::MessagingExtendedControlMask;
-    case EnumType::kMessageConfirmationStatus:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
 static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ApplianceEventsAndAlert::EventIdentification val)
 {
     switch (val)
@@ -3081,108 +2262,12 @@ static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ApplianceEventsAnd
     }
 }
 
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ApplianceEventsAndAlert::AlertCount val)
-{
-    switch (val)
-    {
-        using EnumType = ApplianceEventsAndAlert::AlertCount;
-    case EnumType::kNumberOfAlerts:
-    case EnumType::kTypeOfAlert:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(ApplianceEventsAndAlert::AlertStructure val)
-{
-    switch (val)
-    {
-        using EnumType = ApplianceEventsAndAlert::AlertStructure;
-    case EnumType::kAlertId:
-    case EnumType::kCategory:
-    case EnumType::kPresenceRecovery:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
 static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(TestCluster::SimpleEnum val)
 {
     switch (val)
     {
         using EnumType = TestCluster::SimpleEnum;
     case EnumType::kUnspecified:
-    case EnumType::kValueA:
-    case EnumType::kValueB:
-    case EnumType::kValueC:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(TestCluster::Bitmap16MaskMap val)
-{
-    switch (val)
-    {
-        using EnumType = TestCluster::Bitmap16MaskMap;
-    case EnumType::kMaskVal1:
-    case EnumType::kMaskVal2:
-    case EnumType::kMaskVal3:
-    case EnumType::kMaskVal4:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(TestCluster::Bitmap32MaskMap val)
-{
-    switch (val)
-    {
-        using EnumType = TestCluster::Bitmap32MaskMap;
-    case EnumType::kMaskVal1:
-    case EnumType::kMaskVal2:
-    case EnumType::kMaskVal3:
-    case EnumType::kMaskVal4:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(TestCluster::Bitmap64MaskMap val)
-{
-    switch (val)
-    {
-        using EnumType = TestCluster::Bitmap64MaskMap;
-    case EnumType::kMaskVal1:
-    case EnumType::kMaskVal2:
-    case EnumType::kMaskVal3:
-    case EnumType::kMaskVal4:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(TestCluster::Bitmap8MaskMap val)
-{
-    switch (val)
-    {
-        using EnumType = TestCluster::Bitmap8MaskMap;
-    case EnumType::kMaskVal1:
-    case EnumType::kMaskVal2:
-    case EnumType::kMaskVal3:
-    case EnumType::kMaskVal4:
-        return CHIP_NO_ERROR;
-    default:
-        return CHIP_ERROR_UNKNOWN_ENUM_VALUE;
-    }
-}
-static CHIP_ERROR __attribute__((unused)) CheckValidEnumValue(TestCluster::SimpleBitmap val)
-{
-    switch (val)
-    {
-        using EnumType = TestCluster::SimpleBitmap;
     case EnumType::kValueA:
     case EnumType::kValueB:
     case EnumType::kValueC:
