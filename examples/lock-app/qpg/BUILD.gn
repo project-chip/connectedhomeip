@@ -40,6 +40,7 @@ examples_plat_dir = "${chip_root}/examples/platform/qpg"
 qpg_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/qpg",
+    "${chip_root}/examples/providers:device_info_provider",
     "${examples_plat_dir}",
     "${qpg_project_dir}/include",
   ]
