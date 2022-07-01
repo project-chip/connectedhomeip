@@ -26,7 +26,7 @@ tests:
     - label: "Commission DUT to TH1s Fabric"
       verification: |
           DUT side:
-          sudo ./chip-all-clusters-app --wifi 
+          sudo ./chip-all-clusters-app --wifi
 
           TH side:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
@@ -47,7 +47,7 @@ tests:
           [1655471672.386378][13377:13382] CHIP:TOO:       VendorId: 65521
           [1655471672.386412][13377:13382] CHIP:TOO:       FabricId: 1
           [1655471672.386445][13377:13382] CHIP:TOO:       NodeId: 1
-          [1655471672.386675][13377:13382] CHIP:TOO:       Label: 
+          [1655471672.386675][13377:13382] CHIP:TOO:       Label:
           [1655471672.386716][13377:13382] CHIP:TOO:       FabricIndex: 1
           [1655471672.386750][13377:13382] CHIP:TOO:      }
       disabled: true
@@ -81,7 +81,7 @@ tests:
           [1655471672.386378][13377:13382] CHIP:TOO:       VendorId: 65521
           [1655471672.386412][13377:13382] CHIP:TOO:       FabricId: 1
           [1655471672.386445][13377:13382] CHIP:TOO:       NodeId: 2
-          [1655471672.386675][13377:13382] CHIP:TOO:       Label: 
+          [1655471672.386675][13377:13382] CHIP:TOO:       Label:
           [1655471672.386716][13377:13382] CHIP:TOO:       FabricIndex: 2
           [1655471672.386750][13377:13382] CHIP:TOO:      }
       disabled: true
