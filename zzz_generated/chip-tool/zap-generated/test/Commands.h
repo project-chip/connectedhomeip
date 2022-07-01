@@ -56578,7 +56578,7 @@ private:
 class DL_LockUnlockSuite : public TestCommand
 {
 public:
-    DL_LockUnlockSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("DL_LockUnlock", 15, credsIssuerConfig)
+    DL_LockUnlockSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("DL_LockUnlock", 18, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -56702,6 +56702,15 @@ private:
             }
             break;
         case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 17:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         default:
@@ -56837,7 +56846,32 @@ private:
                                  chip::NullOptional);
         }
         case 14: {
-            LogStep(14, "Clean the created credential");
+            LogStep(14, "Set OperatingMode to NoRemoteLockUnlock");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::DlOperatingMode value;
+            value = static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(3);
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Attributes::OperatingMode::Id, value,
+                                  chip::NullOptional, chip::NullOptional);
+        }
+        case 15: {
+            LogStep(15, "Try to unlock the door when OperatingMode is NoRemoteLockUnlock");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 16: {
+            LogStep(16, "Set OperatingMode to Normal");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::DlOperatingMode value;
+            value = static_cast<chip::app::Clusters::DoorLock::DlOperatingMode>(0);
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Attributes::OperatingMode::Id, value,
+                                  chip::NullOptional, chip::NullOptional);
+        }
+        case 17: {
+            LogStep(17, "Clean the created credential");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
             value.credential.SetNonNull();

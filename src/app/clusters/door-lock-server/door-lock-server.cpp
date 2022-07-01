@@ -3094,6 +3094,14 @@ void DoorLockServer::clearHolidaySchedule(chip::app::CommandHandler * commandObj
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
+bool DoorLockServer::RemoteOperationEnabled(chip::EndpointId endpointId) const
+{
+    DlOperatingMode mode;
+
+    return GetAttribute(endpointId, Attributes::OperatingMode::Id, Attributes::OperatingMode::Get, mode) &&
+        mode != DlOperatingMode::kPrivacy && mode != DlOperatingMode::kNoRemoteLockUnlock;
+}
+
 bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * commandObj,
                                                const chip::app::ConcreteCommandPath & commandPath, DlLockOperationType opType,
                                                RemoteLockOpHandler opHandler, const Optional<ByteSpan> & pinCode)
@@ -3107,19 +3115,21 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
     uint16_t pinUserIdx      = 0;
     uint16_t pinCredIdx      = 0;
     bool credentialsOk       = false;
-    bool operationOk         = false;
+    bool success             = false;
+
+    VerifyOrExit(RemoteOperationEnabled(endpoint), reason = DlOperationError::kUnspecified);
 
     // appclusters.pdf 5.3.4.1:
     // When the PINCode field is provided an invalid PIN will count towards the WrongCodeEntryLimit and the
-    // UserCodeTemporaryDisableTime will be triggered if the WrongCodeEntryLimit is exceeded. The lock SHALL ignore any attempts to
-    // lock/unlock the door until the UserCodeTemporaryDisableTime expires.
+    // UserCodeTemporaryDisableTime will be triggered if the WrongCodeEntryLimit is exceeded. The lock SHALL ignore any attempts
+    // to lock/unlock the door until the UserCodeTemporaryDisableTime expires.
     // TODO: check whether UserCodeTemporaryDisableTime expired or not.
 
     if (pinCode.HasValue())
     {
         // appclusters.pdf 5.3.4.1:
-        // If the PINCode field is provided, the door lock SHALL verify PINCode before granting access regardless of the value of
-        // RequirePINForRemoteOperation attribute.
+        // If the PINCode field is provided, the door lock SHALL verify PINCode before granting access regardless of the value
+        // of RequirePINForRemoteOperation attribute.
         VerifyOrExit(SupportsPIN(endpoint) && SupportsUSR(endpoint),
                      emberAfDoorLockClusterPrintln(
                          "PIN code is supplied while USR/PIN features are disabled. Exiting [endpoint=%d, lock_op=%d]", endpoint,
@@ -3140,9 +3150,9 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
         bool requirePin = false;
 
         // appclusters.pdf 5.3.4.1:
-        // If the RequirePINForRemoteOperation attribute is True then PINCode field SHALL be provided and the door lock SHALL NOT
-        // grant access if it is not provided. This attribute exists when COTA and PIN features are both enabled. Otherwise we
-        // assume PIN to be OK.
+        // If the RequirePINForRemoteOperation attribute is True then PINCode field SHALL be provided and the door lock SHALL
+        // NOT grant access if it is not provided. This attribute exists when COTA and PIN features are both enabled. Otherwise
+        // we assume PIN to be OK.
         if (SupportsCredentialsOTA(endpoint) && SupportsPIN(endpoint))
         {
             auto status = Attributes::RequirePINforRemoteOperation::Get(endpoint, &requirePin);
@@ -3161,15 +3171,13 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
     });
 
     // credentials check succeeded, try to lock/unlock door
-    operationOk = opHandler(endpoint, pinCode, reason);
-    VerifyOrExit(operationOk, /* reason is set by the above call */);
+    success = opHandler(endpoint, pinCode, reason);
+    VerifyOrExit(success, /* reason is set by the above call */);
 
     // door locked, set cluster attribute
     VerifyOrDie(SetLockState(endpoint, newLockState, DlOperationSource::kRemote));
 
 exit:
-    bool success = credentialsOk && operationOk;
-
     // Send command response
     emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
 
@@ -3256,7 +3264,7 @@ void DoorLockServer::SendEvent(chip::EndpointId endpointId, T & event)
 
 template <typename T>
 bool DoorLockServer::GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                                  EmberAfStatus (*getFn)(chip::EndpointId endpointId, T * value), T & value)
+                                  EmberAfStatus (*getFn)(chip::EndpointId endpointId, T * value), T & value) const
 {
     EmberAfStatus status = getFn(endpointId, &value);
     bool success         = (EMBER_ZCL_STATUS_SUCCESS == status);
