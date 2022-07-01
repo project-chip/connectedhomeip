@@ -303,8 +303,7 @@ void ReportCallback::OnDone(app::ReadClient *)
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jmethodID onDoneMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onDone", "()V",
-                                                  &onDoneMethod);
+    err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onDone", "()V", &onDoneMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onDone method"));
 
     DeviceLayer::StackUnlock unlock;
@@ -347,7 +346,8 @@ void ReportCallback::ReportError(jobject attributePath, const char * message, Ch
     env->CallVoidMethod(mReportCallbackRef, onErrorMethod, attributePath, exception);
 }
 
-ReportEventCallback::ReportEventCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback, jobject resubscriptionAttemptCallback) :
+ReportEventCallback::ReportEventCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback,
+                                         jobject resubscriptionAttemptCallback) :
     mBufferedReadAdapter(*this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -427,12 +427,12 @@ void ReportEventCallback::OnReportEnd()
 }
 
 void ReportEventCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData,
-                                     const app::StatusIB * apStatus)
+                                      const app::StatusIB * apStatus)
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    JNIEnv * env             = JniReferences::GetInstance().GetEnvForCurrentThread();
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     jobject eventPathObj = nullptr;
-    err                      = CreateChipEventPath(aEventHeader.mPath, eventPathObj);
+    err                  = CreateChipEventPath(aEventHeader.mPath, eventPathObj);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create Java ChipEventPath: %s", ErrorStr(err)));
 
     if (apData == nullptr)
@@ -452,8 +452,7 @@ void ReportEventCallback::OnEventData(const app::EventHeader & aEventHeader, TLV
     // If we don't know this event, just skip it.
     VerifyOrReturn(err != CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(eventPathObj, err));
-    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe(),
-                   ReportError(eventPathObj, CHIP_JNI_ERROR_EXCEPTION_THROWN));
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe(), ReportError(eventPathObj, CHIP_JNI_ERROR_EXCEPTION_THROWN));
 
     // Create TLV byte array to pass to Java layer
     size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
@@ -484,17 +483,17 @@ void ReportEventCallback::OnEventData(const app::EventHeader & aEventHeader, TLV
     chip::JniClass eventStateJniCls(eventStateCls);
     jmethodID eventStateCtor = env->GetMethodID(eventStateCls, "<init>", "(Ljava/lang/Object;[BLjava/lang/String;)V");
     VerifyOrReturn(eventStateCtor != nullptr, ChipLogError(Controller, "Could not find EventState constructor"));
-    jobject eventStateObj =
-        env->NewObject(eventStateCls, eventStateCtor, value, jniByteArray.jniValue(), jsonString.jniValue());
+    jobject eventStateObj = env->NewObject(eventStateCls, eventStateCtor, value, jniByteArray.jniValue(), jsonString.jniValue());
     VerifyOrReturn(eventStateObj != nullptr, ChipLogError(Controller, "Could not create EventState object"));
 
     // Add EventState to NodeState
     jmethodID addEventMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "addEvent",
-                                                  "(IJJLchip/devicecontroller/model/EventState;)V", &addEventMethod);
+    err = JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "addEvent", "(IJJLchip/devicecontroller/model/EventState;)V",
+                                                  &addEventMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find addEvent method"));
     env->CallVoidMethod(mNodeStateObj, addEventMethod, static_cast<jint>(aEventHeader.mPath.mEndpointId),
-                        static_cast<jlong>(aEventHeader.mPath.mClusterId), static_cast<jlong>(aEventHeader.mPath.mEventId), eventStateObj);
+                        static_cast<jlong>(aEventHeader.mPath.mClusterId), static_cast<jlong>(aEventHeader.mPath.mEventId),
+                        eventStateObj);
     VerifyOrReturnError(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
@@ -504,7 +503,7 @@ CHIP_ERROR ReportEventCallback::CreateChipEventPath(const app::ConcreteEventPath
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     jclass eventPathCls = nullptr;
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/model/ChipEventPath", eventPathCls);
+    err                 = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/model/ChipEventPath", eventPathCls);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
     JniClass eventPathJniCls(eventPathCls);
 
@@ -512,8 +511,7 @@ CHIP_ERROR ReportEventCallback::CreateChipEventPath(const app::ConcreteEventPath
         env->GetStaticMethodID(eventPathCls, "newInstance", "(JJJ)Lchip/devicecontroller/model/ChipEventPath;");
     VerifyOrReturnError(eventPathCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outObj =
-        env->CallStaticObjectMethod(eventPathCls, eventPathCtor, aPath.mEndpointId, aPath.mClusterId, aPath.mEventId);
+    outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, aPath.mEndpointId, aPath.mClusterId, aPath.mEventId);
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
     return err;
@@ -530,8 +528,7 @@ void ReportEventCallback::OnDone(app::ReadClient *)
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jmethodID onDoneMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onDone", "()V",
-                                                  &onDoneMethod);
+    err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onDone", "()V", &onDoneMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onDone method"));
 
     DeviceLayer::StackUnlock unlock;
@@ -547,7 +544,8 @@ void ReportEventCallback::OnSubscriptionEstablished(SubscriptionId aSubscription
 
 void ReportEventCallback::OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec)
 {
-    VerifyOrReturn(mResubscriptionAttemptCallbackRef != nullptr, ChipLogError(Controller, "mResubscriptionAttemptCallbackRef is null"));
+    VerifyOrReturn(mResubscriptionAttemptCallbackRef != nullptr,
+                   ChipLogError(Controller, "mResubscriptionAttemptCallbackRef is null"));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -558,7 +556,8 @@ void ReportEventCallback::OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, 
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onResubscriptionAttempt method"));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod, aTerminationCause.AsInteger(), aNextResubscribeIntervalMsec);
+    env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod, aTerminationCause.AsInteger(),
+                        aNextResubscribeIntervalMsec);
 }
 
 void ReportEventCallback::ReportError(jobject attributePath, CHIP_ERROR err)
@@ -581,9 +580,8 @@ void ReportEventCallback::ReportError(jobject attributePath, const char * messag
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create IllegalStateException: %s", ErrorStr(err)));
 
     jmethodID onErrorMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onError",
-                                                  "(Lchip/devicecontroller/model/ChipEventPath;Ljava/lang/Exception;)V",
-                                                  &onErrorMethod);
+    err = JniReferences::GetInstance().FindMethod(
+        env, mReportCallbackRef, "onError", "(Lchip/devicecontroller/model/ChipEventPath;Ljava/lang/Exception;)V", &onErrorMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
 
     DeviceLayer::StackUnlock unlock;

@@ -55,10 +55,11 @@ JNI_METHOD(void, ReportCallbackJni, deleteCallback)(JNIEnv * env, jobject self, 
 }
 
 JNI_METHOD(jlong, ReportEventCallbackJni, newCallback)
-(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject reportCallbackJava, jobject resubscriptionAttemptCallbackJava)
+(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject reportCallbackJava,
+ jobject resubscriptionAttemptCallbackJava)
 {
-    ReportEventCallback * reportCallback =
-        chip::Platform::New<ReportEventCallback>(self, subscriptionEstablishedCallbackJava, reportCallbackJava, resubscriptionAttemptCallbackJava);
+    ReportEventCallback * reportCallback = chip::Platform::New<ReportEventCallback>(
+        self, subscriptionEstablishedCallbackJava, reportCallbackJava, resubscriptionAttemptCallbackJava);
     return reinterpret_cast<jlong>(reportCallback);
 }
 

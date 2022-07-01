@@ -82,15 +82,15 @@ struct ReportCallback : public app::ReadClient::Callback
 struct ReportEventCallback : public app::ReadClient::Callback
 {
     /** Subscription established callback can be nullptr. */
-    ReportEventCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback, jobject resubscriptionAttemptCallback);
+    ReportEventCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback,
+                        jobject resubscriptionAttemptCallback);
     ~ReportEventCallback();
 
     void OnReportBegin() override;
 
     void OnReportEnd() override;
 
-    void OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData,
-                         const app::StatusIB * apStatus) override;
+    void OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus) override;
 
     void OnError(CHIP_ERROR aError) override;
 
