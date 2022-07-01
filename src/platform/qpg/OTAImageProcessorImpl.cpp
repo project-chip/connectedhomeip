@@ -82,10 +82,10 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 
         // Load qvCHIP_Ota header structure and call application callback to validate image header
         qvCHIP_Ota_ImageHeader_t qvCHIP_OtaImgHeader;
-        this->mSwVer = header.mSoftwareVersion; // Store software version in imageProcessor as well
-        qvCHIP_OtaImgHeader.vendorId = header.mVendorId;
-        qvCHIP_OtaImgHeader.productId = header.mProductId;
-        qvCHIP_OtaImgHeader.softwareVersion = header.mSoftwareVersion;
+        this->mSwVer                             = header.mSoftwareVersion; // Store software version in imageProcessor as well
+        qvCHIP_OtaImgHeader.vendorId             = header.mVendorId;
+        qvCHIP_OtaImgHeader.productId            = header.mProductId;
+        qvCHIP_OtaImgHeader.softwareVersion      = header.mSoftwareVersion;
         qvCHIP_OtaImgHeader.minApplicableVersion = header.mMinApplicableVersion.ValueOr(0);
         qvCHIP_OtaImgHeader.maxApplicableVersion = header.mMaxApplicableVersion.ValueOr(0);
 
@@ -129,7 +129,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-     // Process block header info
+    // Process block header info
     err = ProcessHeader(block);
     if (err != CHIP_NO_ERROR)
     {
@@ -137,7 +137,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
         return err;
     }
 
-     // Store block data for HandleProcessBlock to access
+    // Store block data for HandleProcessBlock to access
     err = SetBlock(block);
     if (err != CHIP_NO_ERROR)
     {
@@ -225,8 +225,9 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "Q: HandleProcessBlock");
 
-    status = qvCHIP_OtaWriteChunk(imageProcessor->mParams.downloadedBytes, static_cast<std::uint16_t>(imageProcessor->mBlock.size()),
-                                  reinterpret_cast<std::uint8_t *>(imageProcessor->mBlock.data()));
+    status =
+        qvCHIP_OtaWriteChunk(imageProcessor->mParams.downloadedBytes, static_cast<std::uint16_t>(imageProcessor->mBlock.size()),
+                             reinterpret_cast<std::uint8_t *>(imageProcessor->mBlock.data()));
 
     if (status != qvCHIP_OtaStatusSuccess)
     {
