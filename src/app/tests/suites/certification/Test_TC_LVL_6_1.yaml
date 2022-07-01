@@ -88,15 +88,16 @@ tests:
               - name: "optionOverride"
                 value: 0
 
-    - label: "user prompt message"
+    - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value:
-                    "Physically verify that the device has stopped
-                    transitioning."
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads CurrentLevel attribute from DUT"
       command: "readAttribute"
@@ -137,15 +138,16 @@ tests:
               - name: "optionOverride"
                 value: 0
 
-    - label: "user prompt message"
+    - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value:
-                    "Physically verify that the device has stopped
-                    transitioning."
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads CurrentLevel attribute from DUT"
       command: "readAttribute"

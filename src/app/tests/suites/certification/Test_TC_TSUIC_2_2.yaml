@@ -38,10 +38,13 @@ tests:
     - label: "Verify device temperature displayed in °C"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Verify device temperature displayed in °C"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads the TemperatureDisplayMode attribute of DUT"
       command: "readAttribute"
@@ -60,10 +63,13 @@ tests:
     - label: "Verify device temperature displayed in °F"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Verify device temperature displayed in °F"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads the TemperatureDisplayMode attribute of DUT"
       command: "readAttribute"
@@ -100,10 +106,13 @@ tests:
     - label: "Verify all device functionality available to the user"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Verify all device functionality available to the user"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads the KeypadLockout attribute of DUT"
       command: "readAttribute"
@@ -122,10 +131,13 @@ tests:
     - label: "Verify device operates at Level 1 reduced functionality"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Verify device operates at Level 1 reduced functionality"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads the KeypadLockout attribute of DUT"
       command: "readAttribute"
@@ -144,10 +156,13 @@ tests:
     - label: "Verify device operates at Level 2 reduced functionality"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Verify device operates at Level 2 reduced functionality"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads the KeypadLockout attribute of DUT"
       command: "readAttribute"
@@ -166,10 +181,13 @@ tests:
     - label: "Verify device operates at Level 3 reduced functionality"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Verify device operates at Level 3 reduced functionality"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads the KeypadLockout attribute of DUT"
       command: "readAttribute"
@@ -188,10 +206,13 @@ tests:
     - label: "Verify device operates at Level 4 reduced functionality"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Verify device operates at Level 4 reduced functionality"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads the KeypadLockout attribute of DUT"
       command: "readAttribute"
@@ -210,10 +231,13 @@ tests:
     - label: "Verify device operates at least functionality level"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Verify device operates at least functionality level"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads the KeypadLockout attribute of DUT"
       command: "readAttribute"
@@ -252,12 +276,13 @@ tests:
           thermostat"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value:
-                    "Verify local schedule programming functionality is enabled
-                    at the thermostat"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads the ScheduleProgrammingVisibility attribute of DUT"
       command: "readAttribute"
@@ -279,12 +304,13 @@ tests:
           thermostat"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value:
-                    "Verify local schedule programming functionality is disabled
-                    at the thermostat"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads the ScheduleProgrammingVisibility attribute of DUT"
       command: "readAttribute"

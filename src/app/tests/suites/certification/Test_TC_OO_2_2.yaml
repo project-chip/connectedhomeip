@@ -107,13 +107,16 @@ tests:
       response:
           value: 0
 
-    - label: "User prompt Set OnOff attribute manually to on"
+    - label: "Operate on device to set OnOff attribute manually to on"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Operate on device to set OnOff attribute manually to on"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     # Skipped this step because the above test need manual input
     - label: "Check on/off attribute value is true after on command"
@@ -123,14 +126,16 @@ tests:
       response:
           value: 1
 
-    - label: "User prompt Set OnOff attribute manually to off"
+    - label: "Operate on device to set OnOff attribute manually to off"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value:
-                    "Operate on device to set OnOff attribute manually to off"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     # Skipped the step because the above test need manual input
     - label: "Check on/off attribute value is false after off command"

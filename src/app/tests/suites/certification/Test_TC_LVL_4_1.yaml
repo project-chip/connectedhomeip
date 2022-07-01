@@ -70,16 +70,19 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "user prompt message"
+    - label:
+          "Physically verify that the DUT moves at a rate of 32 units per second
+          or as close as possible to this rate and completes moving to its
+          maximum level"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value:
-                    "Physically verify that the DUT moves at a rate of 32 units
-                    per second or as close as possible to this rate and
-                    completes moving to its maximum level"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait 9000ms"
       cluster: "DelayCommands"
@@ -109,16 +112,19 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "user prompt message"
+    - label:
+          "Physically verify that the DUT moves at a rate of 64 units per second
+          or as close as possible to this rate and complete moving to its
+          minimum level"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value:
-                    "Physically verify that the DUT moves at a rate of 64 units
-                    per second or as close as possible to this rate and complete
-                    moving to its minimum level"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait 5000ms"
       cluster: "DelayCommands"
@@ -168,16 +174,18 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "user prompt message"
+    - label:
+          "Physically verify that the device moves at the rate recorded in step
+          3a and completes moving to its maximum level"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value:
-                    "Physically verify that the device moves at the rate
-                    recorded in step 3a and completes moving to its maximum
-                    level."
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reset level to 254"
       command: "MoveToLevel"

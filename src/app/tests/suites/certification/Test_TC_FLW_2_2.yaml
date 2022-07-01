@@ -37,13 +37,15 @@ tests:
               type: uint16
 
     - label: "operate on DUT to change the flow significantly"
-      PICS: MANUAL_FLOW_CHANGE
       cluster: "LogCommands"
-      command: "Log"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value: "Operate on device to change the flow significantly"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
