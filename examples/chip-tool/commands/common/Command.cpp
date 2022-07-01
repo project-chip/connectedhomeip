@@ -355,7 +355,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         isValidArgument = HandleNullableOptional<chip::ByteSpan>(arg, argValue, [&](auto * value) {
             // We support two ways to pass an octet string argument.  If it happens
             // to be all-ASCII, you can just pass it in.  Otherwise you can pass in
-            // 0x followed by the hex-encoded bytes.
+            // "hex:" followed by the hex-encoded bytes.
             size_t argLen                     = strlen(argValue);
             static constexpr char hexPrefix[] = "hex:";
             constexpr size_t prefixLen        = ArraySize(hexPrefix) - 1; // Don't count the null
