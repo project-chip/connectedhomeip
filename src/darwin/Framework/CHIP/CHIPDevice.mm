@@ -244,6 +244,16 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
     return _cppDevice;
 }
 
+- (void)invalidateCASESession
+{
+    dispatch_sync(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+        DeviceProxy * device = [self internalDevice];
+        if (device != nullptr) {
+            device->Disconnect();
+        }
+    });
+}
+
 typedef void (^ReportCallback)(NSArray * _Nullable value, NSError * _Nullable error);
 typedef void (^DataReportCallback)(NSArray * value);
 typedef void (^ErrorCallback)(NSError * error);
@@ -371,76 +381,78 @@ private:
                errorHandler:(void (^)(NSError * error))errorHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
 {
-    DeviceProxy * device = [self internalDevice];
-    if (!device) {
-        dispatch_async(queue, ^{
-            errorHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
-        });
-        return;
-    }
-
-    // Wildcard endpoint, cluster, attribute, event.
-    auto attributePath = std::make_unique<AttributePathParams>();
-    auto eventPath = std::make_unique<EventPathParams>();
-    ReadPrepareParams readParams(device->GetSecureSession().Value());
-    readParams.mMinIntervalFloorSeconds = minInterval;
-    readParams.mMaxIntervalCeilingSeconds = maxInterval;
-    readParams.mpAttributePathParamsList = attributePath.get();
-    readParams.mAttributePathParamsListSize = 1;
-    readParams.mpEventPathParamsList = eventPath.get();
-    readParams.mEventPathParamsListSize = 1;
-    readParams.mKeepSubscriptions
-        = (params != nil) && (params.keepPreviousSubscriptions != nil) && [params.keepPreviousSubscriptions boolValue];
-
-    std::unique_ptr<SubscriptionCallback> callback;
-    std::unique_ptr<ReadClient> readClient;
-    std::unique_ptr<ClusterStateCache> attributeCache;
-    if (attributeCacheContainer) {
-        __weak CHIPAttributeCacheContainer * weakPtr = attributeCacheContainer;
-        callback = std::make_unique<SubscriptionCallback>(
-            queue, attributeReportHandler, eventReportHandler, errorHandler, subscriptionEstablishedHandler, ^{
-                CHIPAttributeCacheContainer * container = weakPtr;
-                if (container) {
-                    container.cppAttributeCache = nullptr;
-                }
+    dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+        DeviceProxy * device = [self internalDevice];
+        if (!device) {
+            dispatch_async(queue, ^{
+                errorHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
             });
-        attributeCache = std::make_unique<ClusterStateCache>(*callback.get());
-        readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
-            attributeCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
-    } else {
-        callback = std::make_unique<SubscriptionCallback>(
-            queue, attributeReportHandler, eventReportHandler, errorHandler, subscriptionEstablishedHandler);
-        readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
-            callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
-    }
+            return;
+        }
 
-    CHIP_ERROR err;
-    if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
-        err = readClient->SendRequest(readParams);
-    } else {
-        // SendAutoResubscribeRequest cleans up the params, even on failure.
-        attributePath.release();
-        eventPath.release();
-        err = readClient->SendAutoResubscribeRequest(std::move(readParams));
-    }
+        // Wildcard endpoint, cluster, attribute, event.
+        auto attributePath = std::make_unique<AttributePathParams>();
+        auto eventPath = std::make_unique<EventPathParams>();
+        ReadPrepareParams readParams(device->GetSecureSession().Value());
+        readParams.mMinIntervalFloorSeconds = minInterval;
+        readParams.mMaxIntervalCeilingSeconds = maxInterval;
+        readParams.mpAttributePathParamsList = attributePath.get();
+        readParams.mAttributePathParamsListSize = 1;
+        readParams.mpEventPathParamsList = eventPath.get();
+        readParams.mEventPathParamsListSize = 1;
+        readParams.mKeepSubscriptions
+            = (params != nil) && (params.keepPreviousSubscriptions != nil) && [params.keepPreviousSubscriptions boolValue];
 
-    if (err != CHIP_NO_ERROR) {
-        dispatch_async(queue, ^{
-            errorHandler([CHIPError errorForCHIPErrorCode:err]);
-        });
+        std::unique_ptr<SubscriptionCallback> callback;
+        std::unique_ptr<ReadClient> readClient;
+        std::unique_ptr<ClusterStateCache> attributeCache;
+        if (attributeCacheContainer) {
+            __weak CHIPAttributeCacheContainer * weakPtr = attributeCacheContainer;
+            callback = std::make_unique<SubscriptionCallback>(
+                queue, attributeReportHandler, eventReportHandler, errorHandler, subscriptionEstablishedHandler, ^{
+                    CHIPAttributeCacheContainer * container = weakPtr;
+                    if (container) {
+                        container.cppAttributeCache = nullptr;
+                    }
+                });
+            attributeCache = std::make_unique<ClusterStateCache>(*callback.get());
+            readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+                attributeCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+        } else {
+            callback = std::make_unique<SubscriptionCallback>(
+                queue, attributeReportHandler, eventReportHandler, errorHandler, subscriptionEstablishedHandler);
+            readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+                callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+        }
 
-        return;
-    }
+        CHIP_ERROR err;
+        if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+            err = readClient->SendRequest(readParams);
+        } else {
+            // SendAutoResubscribeRequest cleans up the params, even on failure.
+            attributePath.release();
+            eventPath.release();
+            err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+        }
 
-    if (attributeCacheContainer) {
-        attributeCacheContainer.cppAttributeCache = attributeCache.get();
-        // ClusterStateCache will be deleted when OnDone is called or an error is encountered as well.
-        callback->AdoptAttributeCache(std::move(attributeCache));
-    }
-    // Callback and ReadClient will be deleted when OnDone is called or an error is
-    // encountered.
-    callback->AdoptReadClient(std::move(readClient));
-    callback.release();
+        if (err != CHIP_NO_ERROR) {
+            dispatch_async(queue, ^{
+                errorHandler([CHIPError errorForCHIPErrorCode:err]);
+            });
+
+            return;
+        }
+
+        if (attributeCacheContainer) {
+            attributeCacheContainer.cppAttributeCache = attributeCache.get();
+            // ClusterStateCache will be deleted when OnDone is called or an error is encountered as well.
+            callback->AdoptAttributeCache(std::move(attributeCache));
+        }
+        // Callback and ReadClient will be deleted when OnDone is called or an error is
+        // encountered.
+        callback->AdoptReadClient(std::move(readClient));
+        callback.release();
+    });
 }
 
 // Convert TLV data into NSObject

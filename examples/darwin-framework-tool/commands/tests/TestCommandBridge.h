@@ -117,14 +117,11 @@ public:
 
         SetIdentity(identity);
 
-        // Disconnect our existing device; otherwise getConnectedDevice will
-        // just hand it right back to us without establishing a new CASE
+        // Invalidate our existing CASE session; otherwise getConnectedDevice
+        // will just hand it right back to us without establishing a new CASE
         // session.
         if (GetDevice(identity) != nil) {
-            auto device = [GetDevice(identity) internalDevice];
-            if (device != nullptr) {
-                device->Disconnect();
-            }
+            [GetDevice(identity) invalidateCASESession];
             mConnectedDevices[identity] = nil;
         }
 

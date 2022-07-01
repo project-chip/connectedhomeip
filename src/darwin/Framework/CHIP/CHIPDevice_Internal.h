@@ -32,6 +32,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithDevice:(chip::DeviceProxy *)device;
 - (chip::DeviceProxy *)internalDevice;
 
+/**
+ * Invalidate the CASE session, so an attempt to getConnectedDevice for this
+ * device id will have to create a new CASE session.  Ideally this API will go
+ * away.
+ */
+- (void)invalidateCASESession;
+
 @end
 
 @interface CHIPAttributePath ()
