@@ -125,14 +125,21 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     [self cleanup];
 }
 
+// Part of cleanupAfterStartup that has to interact with the Matter work queue
+// in a very specific way that only MTRControllerFactory knows about.
+- (void)shutDownCppController
+{
+    if (_cppCommissioner) {
+        _cppCommissioner->Shutdown();
+        delete _cppCommissioner;
+        _cppCommissioner = nullptr;
+    }
+}
+
 // Clean up any members we might have allocated.
 - (void)cleanup
 {
-    if (self->_cppCommissioner) {
-        self->_cppCommissioner->Shutdown();
-        delete self->_cppCommissioner;
-        self->_cppCommissioner = nullptr;
-    }
+    VerifyOrDie(_cppCommissioner == nullptr);
 
     [self clearDeviceAttestationDelegateBridge];
 
@@ -673,11 +680,6 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     }
 
     return YES;
-}
-
-- (void)dealloc
-{
-    [self cleanup];
 }
 
 - (BOOL)deviceBeingCommissionedOverBLE:(uint64_t)deviceId

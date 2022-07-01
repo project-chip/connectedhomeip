@@ -73,7 +73,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
   if (chip_stack_lock_tracking == "auto") {
     if (chip_device_platform == "linux" || chip_device_platform == "tizen" ||
         chip_device_platform == "android" || current_os == "freertos" ||
-        chip_device_platform == "webos") {
+        chip_device_platform == "webos" || chip_device_platform == "darwin") {
       # TODO: should be fatal for development. Change once bugs are fixed
       chip_stack_lock_tracking = "fatal"
     } else {
