@@ -31,8 +31,18 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetVendorId(uint16_t 
 template <class ConfigClass>
 CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetProductId(uint16_t & productId)
 {
-    productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
-    return CHIP_NO_ERROR;
+    ChipError err       = CHIP_NO_ERROR;
+    uint64_t realProductID = 0;
+    
+    err = mGenericConfigManager.ReadConfigValue(ConfigClass::kConfigKey_ProductId, realProductID);
+    productId = realProductID;
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+        err = CHIP_NO_ERROR;
+    }
+    
+    return err;
 }
 
 template <class ConfigClass>
