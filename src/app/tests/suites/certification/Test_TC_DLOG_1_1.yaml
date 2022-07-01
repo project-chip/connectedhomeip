@@ -31,11 +31,8 @@ tests:
           sudo ./chip-tool diagnosticlogs read cluster-revision 1 0
 
 
-          [1649670811.424717][3655:3660] CHIP:DMG:
-          [1649670811.424750][3655:3660] CHIP:DMG:        SuppressResponse = true,
-          [1649670811.424783][3655:3660] CHIP:DMG:        InteractionModelRevision = 1
-          [1649670811.424814][3655:3660] CHIP:DMG: }
-          [1649670811.424949][3655:3660] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1653983972.206171][5186:5191] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0032 Attribute 0x0000_FFFD DataVersion: 2389393200
+          [1653983972.206236][5186:5191] CHIP:TOO:   ClusterRevision: 1
       disabled: true
 
     - label: "TH reads the FeatureMap from DUT"
@@ -43,11 +40,8 @@ tests:
           sudo ./chip-tool diagnosticlogs read feature-map 1 0
 
 
-          [1649670512.997198][3591:3596] CHIP:DMG:
-          [1649670512.997231][3591:3596] CHIP:DMG:        SuppressResponse = true,
-          [1649670512.997265][3591:3596] CHIP:DMG:        InteractionModelRevision = 1
-          [1649670512.997329][3591:3596] CHIP:DMG: }
-          [1649670512.997468][3591:3596] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1653983676.882544][5166:5171] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0032 Attribute 0x0000_FFFC DataVersion: 2389393200
+          [1653983676.882637][5166:5171] CHIP:TOO:   FeatureMap: 0
       disabled: true
 
     - label: "TH reads AttributeList from DUT"

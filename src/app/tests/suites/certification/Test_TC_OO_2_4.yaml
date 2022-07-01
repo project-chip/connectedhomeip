@@ -29,9 +29,11 @@ tests:
                 value: nodeId
 
     - label: "TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
       command: "On"
 
     - label: "TH writes a value of 0 to StartUpOnOff attribute of DUT"
+      PICS: OO.S.A4003
       command: "writeAttribute"
       attribute: "StartUpOnOff"
       arguments:
@@ -51,12 +53,14 @@ tests:
                 value: nodeId
 
     - label: "TH reads the OnOff attribute from the DUT"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
 
     - label: "TH writes a value of 1 to StartUpOnOff attribute of DUT"
+      PICS: OO.S.A4003
       command: "writeAttribute"
       attribute: "StartUpOnOff"
       arguments:
@@ -76,12 +80,14 @@ tests:
                 value: nodeId
 
     - label: "TH reads the OnOff attribute from the DUT"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
     - label: "TH writes a value of 2 to StartUpOnOff attribute of DUT"
+      PICS: OO.S.A4003
       command: "writeAttribute"
       attribute: "StartUpOnOff"
       arguments:
@@ -101,6 +107,7 @@ tests:
                 value: nodeId
 
     - label: "TH reads the OnOff attribute from the DUT"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
@@ -120,12 +127,14 @@ tests:
                 value: nodeId
 
     - label: "TH reads the OnOff attribute from the DUT"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
     - label: "TH writes NULL to StartUpOnOff attribute of DUT"
+      PICS: OO.S.A4003
       command: "writeAttribute"
       attribute: "StartUpOnOff"
       arguments:
@@ -145,12 +154,14 @@ tests:
                 value: nodeId
 
     - label: "TH reads the OnOff attribute from the DUT"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
     - label: "TH sends Off command to DUT"
+      PICS: OO.S.C00.Rsp
       command: "Off"
 
     - label: "Power Off and On DUT"
@@ -167,6 +178,7 @@ tests:
                 value: nodeId
 
     - label: "TH reads the OnOff attribute from the DUT"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:

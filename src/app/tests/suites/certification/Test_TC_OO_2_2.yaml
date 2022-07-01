@@ -29,51 +29,62 @@ tests:
                 value: nodeId
 
     - label: "Send Off Command"
+      PICS: OO.S.C00.Rsp
       command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
 
     - label: "Send On Command"
+      PICS: OO.S.C01.Rsp
       command: "On"
 
     - label: "Check on/off attribute value is true after on command"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
     - label: "Send On Command"
+      PICS: OO.S.C01.Rsp
       command: "On"
 
     - label: "Check on/off attribute value is true after on command"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
     - label: "Send Off Command"
+      PICS: OO.S.C00.Rsp
       command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
 
     - label: "Send Off Command"
+      PICS: OO.S.C00.Rsp
       command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
 
     - label: "Send Toggle Command"
+      PICS: OO.S.C02.Rsp
       command: "Toggle"
 
     - label: "Wait 1000ms"
@@ -85,12 +96,14 @@ tests:
                 value: 1000
 
     - label: "Check on/off attribute value is true after toggle command"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
     - label: "Send Toggle Command"
+      PICS: OO.S.C02.Rsp
       command: "Toggle"
 
     - label: "Wait 1000ms"
@@ -102,12 +115,14 @@ tests:
                 value: 1000
 
     - label: "Check on/off attribute value is false after toggle command"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
 
     - label: "User prompt Set OnOff attribute manually to on"
+      PICS: OO.M.ManuallyControlled
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -124,6 +139,7 @@ tests:
           value: 1
 
     - label: "User prompt Set OnOff attribute manually to off"
+      PICS: OO.M.ManuallyControlled
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -141,9 +157,11 @@ tests:
           value: 0
 
     - label: "Reset Off Command"
+      PICS: OO.S.C00.Rsp
       command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
