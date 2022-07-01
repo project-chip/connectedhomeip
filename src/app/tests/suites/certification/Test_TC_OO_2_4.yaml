@@ -37,12 +37,18 @@ tests:
       arguments:
           value: 0
 
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+
     - label: "Reboot target device(DUT)"
       verification: |
           Not implemented in chip-tool
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
@@ -70,12 +76,18 @@ tests:
       arguments:
           value: 1
 
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+
     - label: "Reboot target device(DUT)"
       verification: |
           Not implemented in chip-tool
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
@@ -103,12 +115,18 @@ tests:
       arguments:
           value: 2
 
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+
     - label: "Reboot target device(DUT)"
       verification: |
           Not implemented in chip-tool
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
@@ -130,18 +148,22 @@ tests:
       response:
           value: 0
 
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+
     - label: "Reboot target device(DUT)"
       verification: |
           Not implemented in chip-tool
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
-                value:
-                    "Please reboot the DUT and enter 'y' for success after DUT
-                    starts"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
               - name: "expectedValue"
                 value: "y"
 
@@ -165,18 +187,22 @@ tests:
       arguments:
           value: null
 
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+
     - label: "Reboot target device(DUT)"
       verification: |
           Not implemented in chip-tool
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
-                value:
-                    "Please reboot the DUT and enter 'y' for success after DUT
-                    starts"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
               - name: "expectedValue"
                 value: "y"
 
@@ -197,18 +223,22 @@ tests:
     - label: "TH sends Off command to DUT"
       command: "Off"
 
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+
     - label: "Reboot target device(DUT)"
       verification: |
           Not implemented in YAML
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
-                value:
-                    "Please reboot the DUT and enter 'y' for success after DUT
-                    starts"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
               - name: "expectedValue"
                 value: "y"
 

@@ -43,12 +43,17 @@ tests:
           constraints:
               type: bool
 
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
     - label: "Reboot target device(DUT)"
       verification: |
           Not implemented in YAML
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
@@ -71,12 +76,17 @@ tests:
           value: SoftwareVersionValue
 
     ##Event 11343 implementation not done
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
     - label: "Reboot target device(DUT)"
       verification: |
           Not implemented in YAML
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
@@ -104,12 +114,17 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
     - label: "Reboot target device(DUT)"
       verification: |
           Not implemented in YAML
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"

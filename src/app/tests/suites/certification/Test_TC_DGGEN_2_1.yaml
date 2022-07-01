@@ -43,12 +43,17 @@ tests:
           constraints:
               type: uint16
 
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
     - label: "Reboot target device(DUT)"
       verification: |
           Not implemented in YAML
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
@@ -56,12 +61,17 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
     - label: "Reboot target device(DUT)"
       verification: |
           Not implemented in YAML
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
@@ -93,12 +103,17 @@ tests:
           constraints:
               type: uint32
 
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
     - label: "Reboot target device(DUT)"
       verification: |
           Not implemented in YAML
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"

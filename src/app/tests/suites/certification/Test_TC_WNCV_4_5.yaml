@@ -133,12 +133,18 @@ tests:
               notValue: 0
 
     ### DUT TurnOff
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+
     - label: "Reboot target device(DUT)"
       verification: |
           Not implemented in chip-tool
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
