@@ -53,9 +53,9 @@ public:
      *   CHIP_ERROR_BUFFER_TOO_SMALL will be returned, but the `buffer` will still be filled with the
      *   first `size` bytes of the stored value.
      *
-     *   A way to determine if the key exists is to pass `size` of 0, which is always valid to do,
-     *   and check if CHIP_ERROR_BUFFER_TOO_SMALL is returned. Alternatively, the helper
-     *   method SyncDoesKeyExist(key) can be used to more easily achieve the same effect.
+     *   In the case where `size` of 0 is given, and the value stored is of size 0, CHIP_NO_ERROR is
+     *   returned. It is recommended to use helper method SyncDoesKeyExist(key) to determine if key
+     *   exists.
      *
      *   It is legal to use `nullptr` for `buffer` if `size` is 0.
      *

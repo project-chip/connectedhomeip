@@ -199,6 +199,11 @@ bool ExecutePersistentStorageApiAudit(PersistentStorageDelegate & storage)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, size == 0);
 
+    size = 0;
+    err  = storage.SyncGetKeyValue("key2", nullptr, size);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, size == 0);
+
     size = actualSizeOfBuf;
     err  = storage.SyncGetKeyValue("key2", &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
