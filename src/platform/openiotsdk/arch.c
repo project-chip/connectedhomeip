@@ -52,14 +52,14 @@ void SetTick(uint64_t newTick)
 /* Time to kernel ticks */
 static uint32_t ms2tick(uint32_t ms)
 {
+    if (ms == 0U) {
+        return (osWaitForever);
+    }
+
     uint32_t tick_freq = osKernelGetTickFreq();
     if (tick_freq == 1000U) {
         // No scaling for 1ms ticks
         tick_freq = 0U;
-    }
-
-    if (ms == 0U) {
-        return (osWaitForever);
     }
     if (tick_freq != 0U) {
         ms = (ms * tick_freq) / 1000U;
@@ -75,18 +75,14 @@ static uint32_t us2tick(uint32_t usec)
 
     uint32_t tick_freq = osKernelGetTickFreq();
 
+    // 0 tick_freq is a special case where 1 tick = 1 ms
     if (tick_freq == 0U) {
-        return usec;
+        tick_freq = 1000;
     }
     
-    // round division up
-    uint32_t ticks = (uint32_t)(((uint64_t)usec * tick_freq + (1000000 / 2)) / 1000000);
-
-    // because our tick is so long this might become 0
+    // round division up because our tick is so long this might become 0
     // we need the timer to sleep at least one tick as it otherwise breaks expectations
-    if (!ticks) {
-        ticks = 1;
-    }
+    uint32_t ticks = (uint32_t)(((uint64_t)usec * tick_freq + (1000000 - 1)) / 1000000);
 
     return ticks;
 }
