@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "read the mandatory attribute: MeasuredValue"
+      PICS: TM.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
@@ -36,6 +37,7 @@ tests:
               type: int16
 
     - label: "read the mandatory attribute: MinMeasuredValue"
+      PICS: TM.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
@@ -45,6 +47,7 @@ tests:
               maxValue: 32766
 
     - label: "read the mandatory attribute: MaxMeasuredValue"
+      PICS: TM.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
@@ -54,6 +57,7 @@ tests:
               maxValue: 32767
 
     - label: "read the optional attribute: Tolerance"
+      PICS: TM.S.A0003
       optional: true
       command: "readAttribute"
       attribute: "Tolerance"

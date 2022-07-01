@@ -15,15 +15,14 @@
  *    limitations under the License.
  */
 
-function disable(testName)
-{
-  const index = this.indexOf(testName);
-  if (index == -1) {
-    const errStr = `Test ${testName}  does not exists.`;
-    throw new Error(errStr);
-  }
+function disable(testName) {
+    const index = this.indexOf(testName);
+    if (index == -1) {
+        const errStr = `Test ${testName}  does not exists.`;
+        throw new Error(errStr);
+    }
 
-  this.splice(index, 1);
+    this.splice(index, 1);
 }
 
 // clang-format off
@@ -99,6 +98,7 @@ function getManualTests() {
         "Test_TC_DA_1_4",
         "Test_TC_DA_1_5",
         "Test_TC_DA_1_6",
+        "Test_TC_DA_1_7",
     ];
 
     const DeviceManagement = [
@@ -319,6 +319,7 @@ function getManualTests() {
     const FlowMeasurement = ["Test_TC_FLW_2_2", "Test_TC_FLW_3_1"];
 
     const OccupancySensing = [
+        "Test_TC_OCC_2_2",
         "Test_TC_OCC_2_3",
         "Test_TC_OCC_2_4",
         "Test_TC_OCC_3_1",
@@ -388,7 +389,12 @@ function getManualTests() {
         "Test_TC_DIAG_TH_NW_3_5",
     ];
 
-    const Actions = ["Test_TC_ACT_2_1", "Test_TC_ACT_2_2", "Test_TC_ACT_3_1"];
+    const Actions = [
+        "Test_TC_ACT_2_1",
+        "Test_TC_ACT_2_2",
+        "Test_TC_ACT_3_1",
+        "Test_TC_ACT_3_2",
+    ];
 
     const TimeFormatLocalization = [
         "Test_TC_TFL_1_1",
@@ -782,5 +788,5 @@ function getTests() {
 //
 // Module exports
 //
-exports.getTests       = getTests;
+exports.getTests = getTests;
 exports.getManualTests = getManualTests;
