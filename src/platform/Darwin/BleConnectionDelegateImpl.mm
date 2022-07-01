@@ -108,13 +108,28 @@ namespace DeviceLayer {
 
         dispatch_source_set_event_handler(_timer, ^{
             [self stop];
-            _onConnectionError(_appState, BLE_ERROR_APP_CLOSED_CONNECTION);
+            [self dispatchConnectionError:BLE_ERROR_APP_CLOSED_CONNECTION];
         });
         dispatch_source_set_timer(
             _timer, dispatch_walltime(nullptr, kScanningTimeoutInSeconds * NSEC_PER_SEC), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
     }
 
     return self;
+}
+
+// All our callback dispatch must happen on _chipWorkQueue
+- (void)dispatchConnectionError:(CHIP_ERROR)error
+{
+    dispatch_async(_chipWorkQueue, ^{
+        self.onConnectionError(self.appState, error);
+    });
+}
+
+- (void)dispatchConnectionComplete:(CBPeripheral *)peripheral
+{
+    dispatch_async(_chipWorkQueue, ^{
+        self.onConnectionComplete(self.appState, (__bridge void *) peripheral);
+    });
 }
 
 // Start CBCentralManagerDelegate
@@ -129,7 +144,7 @@ namespace DeviceLayer {
     case CBManagerStatePoweredOff:
         ChipLogDetail(Ble, "CBManagerState: OFF");
         [self stop];
-        _onConnectionError(_appState, BLE_ERROR_APP_CLOSED_CONNECTION);
+        [self dispatchConnectionError:BLE_ERROR_APP_CLOSED_CONNECTION];
         break;
     case CBManagerStateUnauthorized:
         ChipLogDetail(Ble, "CBManagerState: Unauthorized");
@@ -216,7 +231,7 @@ namespace DeviceLayer {
 
     if (!self.found || error != nil) {
         ChipLogError(Ble, "Service not found on the device.");
-        _onConnectionError(_appState, CHIP_ERROR_INCORRECT_STATE);
+        [self dispatchConnectionError:CHIP_ERROR_INCORRECT_STATE];
     }
 }
 
@@ -228,7 +243,7 @@ namespace DeviceLayer {
     }
 
     // XXX error ?
-    _onConnectionComplete(_appState, (__bridge void *) peripheral);
+    [self dispatchConnectionComplete:peripheral];
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral
