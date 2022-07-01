@@ -1049,13 +1049,13 @@ tests:
     - label: "Send a command with a vendor_id and invalid enum"
       command: "testEnumsRequest"
       arguments:
-        values:
-          - name: "arg1"
-            value: 20003
-          - name: "arg2"
-            value: 101
+          values:
+              - name: "arg1"
+                value: 20003
+              - name: "arg2"
+                value: 101
       response:
-        error: INVALID_COMMAND
+          error: INVALID_COMMAND
 
     # Tests for Struct
 
