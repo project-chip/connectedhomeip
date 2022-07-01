@@ -22,8 +22,8 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #include <drivers/flash.h>
-#include <pm_config.h>
 #include <fprotect.h>
+#include <pm_config.h>
 
 #include "FactoryDataParser.h"
 
