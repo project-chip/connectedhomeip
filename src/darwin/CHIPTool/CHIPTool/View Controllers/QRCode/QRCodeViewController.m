@@ -497,7 +497,7 @@
     } else {
         MTRDeviceController * controller = InitializeCHIP();
         uint64_t deviceId = CHIPGetLastPairedDeviceId();
-        if ([controller respondsToSelector:@selector(deviceBeingCommissionedOverBLE:) 
+        if ([controller respondsToSelector:@selector(deviceBeingCommissionedOverBLE:)
              && [controller deviceBeingCommissionedOverBLE:deviceId]) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self->_deviceList refreshDeviceList];
