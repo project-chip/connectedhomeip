@@ -24,7 +24,7 @@ tests:
     - label: "Start the commissioning process of DUT1 by TH on a first Fabric"
       verification: |
           DUT side:
-          sudo ./chip-all-clusters-app --wifi 
+          sudo ./chip-all-clusters-app --wifi
 
           TH side:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
