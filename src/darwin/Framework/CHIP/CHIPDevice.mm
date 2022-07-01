@@ -244,7 +244,7 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
     return _cppDevice;
 }
 
-- (void)disconnect
+- (void)invalidateCASESession
 {
     dispatch_sync(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
         DeviceProxy * device = [self internalDevice];
