@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Read mandatory non-global attribute: StateValue"
+      PICS: BOOL.S.A0000
       command: "readAttribute"
       attribute: "StateValue"
       response:

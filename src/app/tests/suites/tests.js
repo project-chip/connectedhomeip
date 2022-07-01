@@ -103,6 +103,7 @@ function getManualTests() {
     'Test_TC_DA_1_4',
     'Test_TC_DA_1_5',
     'Test_TC_DA_1_6',
+    'Test_TC_DA_1_7',
   ];
 
   const DeviceManagement = [
@@ -439,6 +440,7 @@ function getManualTests() {
     'Test_TC_ACT_2_1',
     'Test_TC_ACT_2_2',
     'Test_TC_ACT_3_1',
+    'Test_TC_ACT_3_2',
   ];
 
   const TimeFormatLocalization = [

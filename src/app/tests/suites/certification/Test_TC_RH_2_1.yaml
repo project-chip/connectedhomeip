@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Reads constraints of attribute: MeasuredValue"
+      PICS: RH.S.A0000
       command: "readAttribute"
       attribute: "measured value"
       response:
@@ -38,6 +39,7 @@ tests:
               maxValue: 10000
 
     - label: "Reads constraints of attribute: MinMeasuredValue"
+      PICS: RH.S.A0001
       command: "readAttribute"
       attribute: "min measured value"
       response:
@@ -56,6 +58,7 @@ tests:
               maxValue: 10000
 
     - label: "Reads constraints of attribute: Tolerance"
+      PICS: RH.S.A0003
       optional: true
       command: "readAttribute"
       attribute: "tolerance"

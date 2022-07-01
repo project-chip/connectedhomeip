@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Reads constraints of attribute: MinMeasuredValue"
+      PICS: RH.S.A0001
       command: "readAttribute"
       attribute: "min measured value"
       response:
@@ -50,7 +51,7 @@ tests:
     - label: "Reads MeasuredValue attribute from DUT"
       command: "readAttribute"
       attribute: "measured value"
-      PICS: A_RELATIVEHUMIDITY
+      PICS: RH.S.A0000
       response:
           saveAs: ValueBeforeChange
           constraints:
@@ -61,7 +62,7 @@ tests:
     - label: "Operate on device to change the relative humidity significantly"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && RH.M.ManuallyControlled
       arguments:
           values:
               - name: "message"
@@ -72,7 +73,7 @@ tests:
     - label: "Read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
       attribute: "measured value"
-      PICS: A_RELATIVEHUMIDITY
+      PICS: RH.S.A0000
       response:
           constraints:
               type: uint16
