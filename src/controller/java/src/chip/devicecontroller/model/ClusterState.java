@@ -75,8 +75,7 @@ public final class ClusterState {
           builder.append("Event ");
           builder.append(eventId);
           builder.append(": ");
-          builder.append(
-              eventState.getValue() == null ? "null" : eventState.getValue().toString());
+          builder.append(eventState.getValue() == null ? "null" : eventState.getValue().toString());
           builder.append("\n");
         });
     return builder.toString();

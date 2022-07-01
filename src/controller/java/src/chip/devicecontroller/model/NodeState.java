@@ -52,8 +52,7 @@ public final class NodeState {
     clusterState.getAttributeStates().put(attributeId, attributeStateToAdd);
   }
 
-  private void addEvent(
-      int endpointId, long clusterId, long eventId, EventState eventStateToAdd) {
+  private void addEvent(int endpointId, long clusterId, long eventId, EventState eventStateToAdd) {
     EndpointState endpointState = getEndpointState(endpointId);
     if (endpointState == null) {
       endpointState = new EndpointState(new HashMap<>());

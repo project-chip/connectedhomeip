@@ -411,7 +411,8 @@ public class ChipDeviceController {
       boolean keepSubscriptions,
       boolean isFabricFiltered) {
     ReportEventCallbackJni jniCallback =
-        new ReportEventCallbackJni(subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
+        new ReportEventCallbackJni(
+            subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
     subscribeToEventPath(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),

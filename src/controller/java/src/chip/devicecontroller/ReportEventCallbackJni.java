@@ -28,11 +28,13 @@ public class ReportEventCallbackJni {
 
   public ReportEventCallbackJni(
       @Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback,
-      ReportEventCallback reportCallback, ResubscriptionAttemptCallback resubscriptionAttemptCallback) {
+      ReportEventCallback reportCallback,
+      ResubscriptionAttemptCallback resubscriptionAttemptCallback) {
     this.wrappedSubscriptionEstablishedCallback = subscriptionEstablishedCallback;
     this.wrappedReportCallback = reportCallback;
     this.wrappedResubscriptionAttemptCallback = resubscriptionAttemptCallback;
-    this.callbackHandle = newCallback(subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
+    this.callbackHandle =
+        newCallback(subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
   }
 
   long getCallbackHandle() {
@@ -41,7 +43,8 @@ public class ReportEventCallbackJni {
 
   private native long newCallback(
       @Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback,
-      ReportEventCallback wrappedCallback, @Nullable ResubscriptionAttemptCallback resubscriptionAttemptCallback);
+      ReportEventCallback wrappedCallback,
+      @Nullable ResubscriptionAttemptCallback resubscriptionAttemptCallback);
 
   private native void deleteCallback(long callbackHandle);
 
