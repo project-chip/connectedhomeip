@@ -120,7 +120,7 @@ tests:
       response:
           value: 2
 
-    - label: "Try to unlock the door with valid PIN"
+    - label: "Try to lock the door with valid PIN"
       command: "LockDoor"
       timedInteractionTimeoutMs: 10000
       arguments:

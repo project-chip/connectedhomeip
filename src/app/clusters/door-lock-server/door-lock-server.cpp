@@ -1654,7 +1654,7 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    const auto & newUserName            = !userName.IsNull() ? userName.Value() : chip::CharSpan("");
+    const auto & newUserName            = !userName.IsNull() ? userName.Value() : chip::CharSpan::fromCharString("");
     auto newUserUniqueId                = userUniqueId.IsNull() ? 0xFFFFFFFF : userUniqueId.Value();
     auto newUserStatus                  = userStatus.IsNull() ? DlUserStatus::kOccupiedEnabled : userStatus.Value();
     auto newUserType                    = userType.IsNull() ? DlUserType::kUnrestrictedUser : userType.Value();

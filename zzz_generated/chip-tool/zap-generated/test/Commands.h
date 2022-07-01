@@ -56821,7 +56821,7 @@ private:
                                  chip::NullOptional);
         }
         case 12: {
-            LogStep(12, "Try to unlock the door with valid PIN");
+            LogStep(12, "Try to lock the door with valid PIN");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
             value.pinCode.Emplace();
