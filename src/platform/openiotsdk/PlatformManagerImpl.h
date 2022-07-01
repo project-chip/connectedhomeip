@@ -53,8 +53,10 @@ public:
     /* none so far */
 
 private:
-    static constexpr uint32_t FLAG_EVENT_TASK_RUNNING = 0x1;
-    static constexpr uint32_t FLAG_STOP_EVENT_TASK    = 0x2;
+    static constexpr uint32_t kTaskRunningEventFlag = 1 << 0;
+    static constexpr uint32_t kTaskStopEventFlag    = 1 << 1;
+    static constexpr uint32_t kPostEventFlag        = 1 << 2;
+    static constexpr uint32_t kTimerEventFlag       = 1 << 3;
 
     // ===== Methods that implement the PlatformManager abstract interface.
 
@@ -72,10 +74,14 @@ private:
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
     void _Shutdown();
 
-    void ProcessDeviceEvents();
+    void SetEventFlags(uint32_t flags);
+    void HandleTimerEvent(void);
+    void HandlePostEvent(void);
 
-    static void RunEventLoopTask(void * arg);
-    void RunEventLoopInternal();
+    static void EventLoopTask(void * arg);
+    static void TimerCallback(void * arg);
+
+    void RunEventLoopInternal(void);
 
     // ===== Members for internal use by the following friends.
 
@@ -93,6 +99,7 @@ private:
     osMutexId_t mChipStackMutex     = nullptr;
     osMutexId_t mEventTaskMutex     = nullptr;
     osMessageQueueId_t mQueue       = nullptr;
+    osTimerId_t mTimer              = nullptr;
 };
 
 /**
