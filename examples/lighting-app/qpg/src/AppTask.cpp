@@ -177,8 +177,6 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 AppTask AppTask::sAppTask;
 
-
-
 namespace {
 constexpr int extDiscTimeoutSecs = 20;
 }
