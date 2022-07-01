@@ -121,10 +121,7 @@ public:
         // just hand it right back to us without establishing a new CASE
         // session.
         if (GetDevice(identity) != nil) {
-            auto device = [GetDevice(identity) internalDevice];
-            if (device != nullptr) {
-                device->Disconnect();
-            }
+            [GetDevice(identity) disconnect];
             mConnectedDevices[identity] = nil;
         }
 

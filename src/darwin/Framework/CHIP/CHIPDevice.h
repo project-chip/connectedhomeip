@@ -99,6 +99,12 @@ extern NSString * const kCHIPArrayValueType;
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
+ * Disconnect the device, so an attempt to getConnectedDevice for this device id
+ * will have to create a new secure session.
+ */
+- (void)disconnect;
+
+/**
  * Subscribe to receive attribute reports for everything (all endpoints, all
  * clusters, all attributes, all events) on the device.
  *
