@@ -105,21 +105,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     // TODO: Initialize the global GroupKeyStore object here (#1266)
 
-#if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-
-    {
-        FactoryProvisioning factoryProv;
-        uint8_t * const kInternalSRAM12Start = (uint8_t *) 0x3FFAE000;
-        uint8_t * const kInternalSRAM12End   = kInternalSRAM12Start + (328 * 1024) - 1;
-
-        // Scan ESP32 Internal SRAM regions 1 and 2 for injected provisioning data and save
-        // to persistent storage if found.
-        err = factoryProv.ProvisionDeviceFromRAM(kInternalSRAM12Start, kInternalSRAM12End);
-        SuccessOrExit(err);
-    }
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-
     err = CHIP_NO_ERROR;
 
 exit:
