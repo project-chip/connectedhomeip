@@ -29,7 +29,7 @@
 #include "semphr.h"
 #include <pw_hdlc/encoder.h>
 #include <pw_stream/sys_io_stream.h>
-#include <pw_sys_io_efr32/init.h>
+#include "pw_sys_io_bl602/init.h"
 
 #include "pw_span/span.h"
 #include <cassert>
@@ -75,7 +75,7 @@ int putString(const char * buffer, size_t size)
     for (size_t i = 0; i < size; ++i)
     {
         // Send each line excluding "\r\n" in a separate frame
-
+        
         if (buffer[i] == '\r')
             continue;
 
