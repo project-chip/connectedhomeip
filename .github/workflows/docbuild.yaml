@@ -39,12 +39,12 @@ jobs:
           mkdir -p _build/src
           make html
           touch _build/html/.nojekyll
-      - name: Deploy to gh-pages
-        if: github.repository == 'project-chip/connectedhomeip'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          deploy_key: ${{ secrets.DOXYGEN_DEPLOY_KEY }}
-          external_repository: project-chip/connectedhomeip-doc
-          publish_dir: matter/docs/_build/html
-          # Keep only the latest version of the documentation
-          force_orphan: true
+      # - name: Deploy to gh-pages
+      #   if: github.repository == 'project-chip/connectedhomeip'
+      #   uses: peaceiris/actions-gh-pages@v3
+      #   with:
+      #     deploy_key: ${{ secrets.SPHINX_DEPLOY_KEY }}
+      #     external_repository: project-chip/matter-doc
+      #     publish_dir: matter/docs/_build/html
+      #     # Keep only the latest version of the documentation
+      #     force_orphan: true
