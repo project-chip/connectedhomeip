@@ -24,6 +24,7 @@
 #include <string>
 
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
