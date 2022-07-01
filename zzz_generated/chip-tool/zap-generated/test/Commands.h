@@ -298,6 +298,7 @@ public:
         printf("Test_TC_DA_1_4\n");
         printf("Test_TC_DA_1_5\n");
         printf("Test_TC_DA_1_6\n");
+        printf("Test_TC_DA_1_7\n");
         printf("Test_TC_BINFO_1_1\n");
         printf("Test_TC_OPCREDS_1_2\n");
         printf("Test_TC_CNET_1_3\n");
@@ -528,6 +529,7 @@ public:
         printf("Test_TC_ACT_2_1\n");
         printf("Test_TC_ACT_2_2\n");
         printf("Test_TC_ACT_3_1\n");
+        printf("Test_TC_ACT_3_2\n");
         printf("Test_TC_TFL_1_1\n");
         printf("Test_TC_TFL_1_2\n");
         printf("Test_TC_TFL_2_1\n");
@@ -2090,6 +2092,7 @@ private:
         }
         case 1: {
             LogStep(1, "Read mandatory non-global attribute: StateValue");
+            VerifyOrDo(!ShouldSkip("BOOL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), BooleanState::Id, BooleanState::Attributes::StateValue::Id, true,
                                  chip::NullOptional);
         }
@@ -22192,25 +22195,30 @@ private:
         }
         case 1: {
             LogStep(1, "read the mandatory attribute: OnOff");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "read LT attribute: GlobalSceneControl");
+            VerifyOrDo(!ShouldSkip("OO.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
                                  chip::NullOptional);
         }
         case 3: {
             LogStep(3, "read LT attribute: OnTime");
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
             LogStep(4, "read LT attribute: OffWaitTime");
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
         case 5: {
             LogStep(5, "read LT attribute: StartUpOnOff");
+            VerifyOrDo(!ShouldSkip("OO.S.A4003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::StartUpOnOff::Id, true,
                                  chip::NullOptional);
         }
@@ -22403,6 +22411,7 @@ private:
         }
         case 1: {
             LogStep(1, "Send Off Command");
+            VerifyOrDo(!ShouldSkip("OO.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
@@ -22411,10 +22420,12 @@ private:
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is false after off command");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Send On Command");
+            VerifyOrDo(!ShouldSkip("OO.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
@@ -22423,10 +22434,12 @@ private:
         }
         case 4: {
             LogStep(4, "Check on/off attribute value is true after on command");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Send On Command");
+            VerifyOrDo(!ShouldSkip("OO.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
@@ -22435,10 +22448,12 @@ private:
         }
         case 6: {
             LogStep(6, "Check on/off attribute value is true after on command");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Send Off Command");
+            VerifyOrDo(!ShouldSkip("OO.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
@@ -22447,10 +22462,12 @@ private:
         }
         case 8: {
             LogStep(8, "Check on/off attribute value is false after off command");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 9: {
             LogStep(9, "Send Off Command");
+            VerifyOrDo(!ShouldSkip("OO.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
@@ -22459,10 +22476,12 @@ private:
         }
         case 10: {
             LogStep(10, "Check on/off attribute value is false after off command");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Send Toggle Command");
+            VerifyOrDo(!ShouldSkip("OO.S.C02.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Toggle::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Toggle::Id, value, chip::NullOptional
@@ -22478,10 +22497,12 @@ private:
         }
         case 13: {
             LogStep(13, "Check on/off attribute value is true after toggle command");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 14: {
             LogStep(14, "Send Toggle Command");
+            VerifyOrDo(!ShouldSkip("OO.S.C02.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Toggle::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Toggle::Id, value, chip::NullOptional
@@ -22497,11 +22518,12 @@ private:
         }
         case 16: {
             LogStep(16, "Check on/off attribute value is false after toggle command");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 17: {
             LogStep(17, "Operate on device to set OnOff attribute manually to on");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && OO.M.ManuallyControlled"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -22516,7 +22538,7 @@ private:
         }
         case 19: {
             LogStep(19, "Operate on device to set OnOff attribute manually to off");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && OO.M.ManuallyControlled"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -22531,6 +22553,7 @@ private:
         }
         case 21: {
             LogStep(21, "Reset Off Command");
+            VerifyOrDo(!ShouldSkip("OO.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
@@ -22539,6 +22562,7 @@ private:
         }
         case 22: {
             LogStep(22, "Check on/off attribute value is false after off command");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         }
@@ -22748,6 +22772,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH sends On command to DUT");
+            VerifyOrDo(!ShouldSkip("OO.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
@@ -22756,6 +22781,7 @@ private:
         }
         case 2: {
             LogStep(2, "TH writes a value of 0 to StartUpOnOff attribute of DUT");
+            VerifyOrDo(!ShouldSkip("OO.S.A4003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> value;
             value.SetNonNull();
@@ -22790,10 +22816,12 @@ private:
         }
         case 6: {
             LogStep(6, "TH reads the OnOff attribute from the DUT");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "TH writes a value of 1 to StartUpOnOff attribute of DUT");
+            VerifyOrDo(!ShouldSkip("OO.S.A4003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> value;
             value.SetNonNull();
@@ -22828,10 +22856,12 @@ private:
         }
         case 11: {
             LogStep(11, "TH reads the OnOff attribute from the DUT");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 12: {
             LogStep(12, "TH writes a value of 2 to StartUpOnOff attribute of DUT");
+            VerifyOrDo(!ShouldSkip("OO.S.A4003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> value;
             value.SetNonNull();
@@ -22866,6 +22896,7 @@ private:
         }
         case 16: {
             LogStep(16, "TH reads the OnOff attribute from the DUT");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 17: {
@@ -22895,10 +22926,12 @@ private:
         }
         case 20: {
             LogStep(20, "TH reads the OnOff attribute from the DUT");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 21: {
             LogStep(21, "TH writes NULL to StartUpOnOff attribute of DUT");
+            VerifyOrDo(!ShouldSkip("OO.S.A4003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> value;
             value.SetNull();
@@ -22932,10 +22965,12 @@ private:
         }
         case 25: {
             LogStep(25, "TH reads the OnOff attribute from the DUT");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 26: {
             LogStep(26, "TH sends Off command to DUT");
+            VerifyOrDo(!ShouldSkip("OO.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
@@ -22969,6 +23004,7 @@ private:
         }
         case 30: {
             LogStep(30, "TH reads the OnOff attribute from the DUT");
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         }
@@ -25783,11 +25819,13 @@ private:
         }
         case 1: {
             LogStep(1, "Reads constraints of attribute: MeasuredValue");
+            VerifyOrDo(!ShouldSkip("RH.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::MeasuredValue::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Reads constraints of attribute: MinMeasuredValue");
+            VerifyOrDo(!ShouldSkip("RH.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Id, true, chip::NullOptional);
         }
@@ -25798,6 +25836,7 @@ private:
         }
         case 4: {
             LogStep(4, "Reads constraints of attribute: Tolerance");
+            VerifyOrDo(!ShouldSkip("RH.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::Tolerance::Id, true, chip::NullOptional);
         }
@@ -27061,21 +27100,25 @@ private:
         }
         case 1: {
             LogStep(1, "read the mandatory attribute: MeasuredValue");
+            VerifyOrDo(!ShouldSkip("TM.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MeasuredValue::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "read the mandatory attribute: MinMeasuredValue");
+            VerifyOrDo(!ShouldSkip("TM.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MinMeasuredValue::Id, true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "read the mandatory attribute: MaxMeasuredValue");
+            VerifyOrDo(!ShouldSkip("TM.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MaxMeasuredValue::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "read the optional attribute: Tolerance");
+            VerifyOrDo(!ShouldSkip("TM.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::Tolerance::Id, true, chip::NullOptional);
         }
@@ -67307,6 +67350,62 @@ private:
     }
 };
 
+class Test_TC_DA_1_7Suite : public TestCommand
+{
+public:
+    Test_TC_DA_1_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DA_1_7", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DA_1_7Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_BINFO_1_1Suite : public TestCommand
 {
 public:
@@ -83468,7 +83567,7 @@ private:
         }
         case 1: {
             LogStep(1, "2a: Send On Command");
-            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
@@ -83484,18 +83583,18 @@ private:
         }
         case 3: {
             LogStep(3, "2b: Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "2b:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
                                  chip::NullOptional);
         }
         case 5: {
             LogStep(5, "3a:Sends OffWithEffect command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_OFFWITHEFFECT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OffWithEffect::Type value;
             value.effectId      = static_cast<chip::app::Clusters::OnOff::OnOffEffectIdentifier>(0);
@@ -83514,18 +83613,18 @@ private:
         }
         case 7: {
             LogStep(7, "3b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 8: {
             LogStep(8, "3b:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
                                  chip::NullOptional);
         }
         case 9: {
             LogStep(9, "4a:Sends OnWithRecallGlobalScene command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHRECALL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C41.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithRecallGlobalScene::Id, value,
@@ -83542,18 +83641,18 @@ private:
         }
         case 11: {
             LogStep(11, "4b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 12: {
             LogStep(12, "4b:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
                                  chip::NullOptional);
         }
         case 13: {
             LogStep(13, "5a:Sends OffWithEffect command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_OFFWITHEFFECT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OffWithEffect::Type value;
             value.effectId      = static_cast<chip::app::Clusters::OnOff::OnOffEffectIdentifier>(0);
@@ -83572,18 +83671,18 @@ private:
         }
         case 15: {
             LogStep(15, "5b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 16: {
             LogStep(16, "5b:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
                                  chip::NullOptional);
         }
         case 17: {
             LogStep(17, "5c:Send On Command");
-            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
@@ -83599,18 +83698,18 @@ private:
         }
         case 19: {
             LogStep(19, "5d:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 20: {
             LogStep(20, "5d:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
                                  chip::NullOptional);
         }
         case 21: {
             LogStep(21, "6a:Sends OffWithEffect command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_OFFWITHEFFECT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OffWithEffect::Type value;
             value.effectId      = static_cast<chip::app::Clusters::OnOff::OnOffEffectIdentifier>(1);
@@ -83629,18 +83728,18 @@ private:
         }
         case 23: {
             LogStep(23, "6b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 24: {
             LogStep(24, "6b:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
                                  chip::NullOptional);
         }
         case 25: {
             LogStep(25, "7a:Send On Command");
-            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
@@ -83656,18 +83755,18 @@ private:
         }
         case 27: {
             LogStep(27, "7b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 28: {
             LogStep(28, "7b:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
                                  chip::NullOptional);
         }
         case 29: {
             LogStep(29, "7c:Sends OnWithRecallGlobalScene command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHRECALL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C41.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithRecallGlobalScene::Id, value,
@@ -83684,29 +83783,30 @@ private:
         }
         case 31: {
             LogStep(31, "7d:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 32: {
             LogStep(32, "7d:Reads GlobalSceneControl attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_GLOBALSCENECONTROL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, true,
                                  chip::NullOptional);
         }
         case 33: {
             LogStep(33, "8:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 34: {
             LogStep(34, "8:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
         case 35: {
             LogStep(35, "9a:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
@@ -83719,19 +83819,19 @@ private:
         }
         case 36: {
             LogStep(36, "9b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 37: {
             LogStep(37, "9b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
         case 38: {
             LogStep(38, "10a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
@@ -83751,7 +83851,7 @@ private:
         }
         case 40: {
             LogStep(40, "10b:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
@@ -83771,7 +83871,7 @@ private:
         }
         case 42: {
             LogStep(42, "10c:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
@@ -83791,7 +83891,7 @@ private:
         }
         case 44: {
             LogStep(44, "10d:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
@@ -83804,18 +83904,18 @@ private:
         }
         case 45: {
             LogStep(45, "10e:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 46: {
             LogStep(46, "10e:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 47: {
             LogStep(47, "10e:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
@@ -83828,7 +83928,7 @@ private:
         }
         case 49: {
             LogStep(49, "11a:Sends OffWithEffect command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_OFFWITHEFFECT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OffWithEffect::Type value;
             value.effectId      = static_cast<chip::app::Clusters::OnOff::OnOffEffectIdentifier>(0);
@@ -83840,18 +83940,18 @@ private:
         }
         case 50: {
             LogStep(50, "11b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 51: {
             LogStep(51, "11b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 52: {
             LogStep(52, "11b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
@@ -83864,7 +83964,7 @@ private:
         }
         case 54: {
             LogStep(54, "12a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
@@ -83877,18 +83977,18 @@ private:
         }
         case 55: {
             LogStep(55, "12b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 56: {
             LogStep(56, "12b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 57: {
             LogStep(57, "12b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
@@ -83901,7 +84001,7 @@ private:
         }
         case 59: {
             LogStep(59, "13a:Send On Command");
-            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
@@ -83910,18 +84010,18 @@ private:
         }
         case 60: {
             LogStep(60, "13b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 61: {
             LogStep(61, "13b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 62: {
             LogStep(62, "13b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
@@ -83934,7 +84034,7 @@ private:
         }
         case 64: {
             LogStep(64, "14a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
@@ -83954,7 +84054,7 @@ private:
         }
         case 66: {
             LogStep(66, "14b:Send Off Command");
-            VerifyOrDo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
@@ -83963,18 +84063,18 @@ private:
         }
         case 67: {
             LogStep(67, "14c:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 68: {
             LogStep(68, "14c:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 69: {
             LogStep(69, "14c:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
@@ -83987,18 +84087,18 @@ private:
         }
         case 71: {
             LogStep(71, "15:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 72: {
             LogStep(72, "15:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 73: {
             LogStep(73, "15:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
@@ -84011,7 +84111,7 @@ private:
         }
         case 75: {
             LogStep(75, "16a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
@@ -84024,24 +84124,24 @@ private:
         }
         case 76: {
             LogStep(76, "16b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 77: {
             LogStep(77, "16b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 78: {
             LogStep(78, "16b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
         case 79: {
             LogStep(79, "17a:Send On Command");
-            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
@@ -84057,7 +84157,7 @@ private:
         }
         case 81: {
             LogStep(81, "17b:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
@@ -84070,18 +84170,18 @@ private:
         }
         case 82: {
             LogStep(82, "17c:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 83: {
             LogStep(83, "17c:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 84: {
             LogStep(84, "17c:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
@@ -84094,18 +84194,18 @@ private:
         }
         case 86: {
             LogStep(86, "17d:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 87: {
             LogStep(87, "17d:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 88: {
             LogStep(88, "17d:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
@@ -84118,7 +84218,7 @@ private:
         }
         case 90: {
             LogStep(90, "18a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
@@ -84131,24 +84231,24 @@ private:
         }
         case 91: {
             LogStep(91, "18b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 92: {
             LogStep(92, "18b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 93: {
             LogStep(93, "18b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
         case 94: {
             LogStep(94, "19a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0U);
@@ -84168,7 +84268,7 @@ private:
         }
         case 96: {
             LogStep(96, "19b:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(1U);
@@ -84188,24 +84288,24 @@ private:
         }
         case 98: {
             LogStep(98, "19c:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 99: {
             LogStep(99, "19c:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 100: {
             LogStep(100, "19c:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
         case 101: {
             LogStep(101, "20a:Send Off Command");
-            VerifyOrDo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
@@ -84214,24 +84314,24 @@ private:
         }
         case 102: {
             LogStep(102, "20b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 103: {
             LogStep(103, "20b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 104: {
             LogStep(104, "20b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
         case 105: {
-            LogStep(105, "21a:Sends OnWithimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(105, "21a:Sends OnWithTimedOff command to DUT");
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0U);
@@ -84244,24 +84344,24 @@ private:
         }
         case 106: {
             LogStep(106, "21b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 107: {
             LogStep(107, "21b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 108: {
             LogStep(108, "21b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
         case 109: {
             LogStep(109, "22a:Send On Command");
-            VerifyOrDo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
@@ -84270,23 +84370,23 @@ private:
         }
         case 110: {
             LogStep(110, "22b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 111: {
             LogStep(111, "22b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 112: {
             LogStep(112, "22b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
         case 113: {
-            LogStep(113, ":Wait 10000ms");
+            LogStep(113, "Wait 10000ms");
             ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 10000UL;
@@ -84294,7 +84394,7 @@ private:
         }
         case 114: {
             LogStep(114, "23a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0U);
@@ -84307,7 +84407,7 @@ private:
         }
         case 115: {
             LogStep(115, "23b:Send Off Command");
-            VerifyOrDo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
@@ -84316,18 +84416,18 @@ private:
         }
         case 116: {
             LogStep(116, "23c:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 117: {
             LogStep(117, "23c:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 118: {
             LogStep(118, "23c:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
@@ -84340,24 +84440,24 @@ private:
         }
         case 120: {
             LogStep(120, "23d:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 121: {
             LogStep(121, "23d:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 122: {
             LogStep(122, "23d:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
         case 123: {
             LogStep(123, "24a:Sends OnWithTimedOff command to DUT");
-            VerifyOrDo(!ShouldSkip("CR_ONWITHTIMEOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C42.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type value;
             value.onOffControl = static_cast<chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>>(0U);
@@ -84370,18 +84470,18 @@ private:
         }
         case 124: {
             LogStep(124, "24b:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 125: {
             LogStep(125, "24b:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 126: {
             LogStep(126, "24b:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
@@ -84394,24 +84494,24 @@ private:
         }
         case 128: {
             LogStep(128, "24c:Reads OnOff attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONOFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 129: {
             LogStep(129, "24c:Reads OnTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_ONTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnTime::Id, true,
                                  chip::NullOptional);
         }
         case 130: {
             LogStep(130, "24c:Reads OffWaitTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_OFFWAITTIME"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OffWaitTime::Id, true,
                                  chip::NullOptional);
         }
         case 131: {
             LogStep(131, "Send Off Command");
-            VerifyOrDo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OO.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
@@ -84645,6 +84745,7 @@ private:
         }
         case 1: {
             LogStep(1, "Reads constraints of attribute: MinMeasuredValue");
+            VerifyOrDo(!ShouldSkip("RH.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Id, true, chip::NullOptional);
         }
@@ -84656,13 +84757,13 @@ private:
         }
         case 3: {
             LogStep(3, "Reads MeasuredValue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_RELATIVEHUMIDITY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("RH.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::MeasuredValue::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Operate on device to change the relative humidity significantly");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && RH.M.ManuallyControlled"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -84672,7 +84773,7 @@ private:
         }
         case 5: {
             LogStep(5, "Read the mandatory attribute: MeasuredValue");
-            VerifyOrDo(!ShouldSkip("A_RELATIVEHUMIDITY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("RH.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::MeasuredValue::Id, true, chip::NullOptional);
         }
@@ -85069,23 +85170,25 @@ private:
         }
         case 1: {
             LogStep(1, "read the mandatory attribute: MinMeasuredValue");
+            VerifyOrDo(!ShouldSkip("TM.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MinMeasuredValue::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "read the mandatory attribute: MaxMeasuredValue");
+            VerifyOrDo(!ShouldSkip("TM.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MaxMeasuredValue::Id, true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads MeasuredValue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("A_TEMPERATURE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TM.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MeasuredValue::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Operate on device to change the temperature significantly");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TM.M.ManuallyControlled"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -85095,7 +85198,7 @@ private:
         }
         case 5: {
             LogStep(5, "Read the mandatory attribute: MeasuredValue");
-            VerifyOrDo(!ShouldSkip("A_TEMPERATURE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TM.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MeasuredValue::Id, true, chip::NullOptional);
         }
@@ -85851,6 +85954,62 @@ public:
     }
 
     ~Test_TC_ACT_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACT_3_2Suite : public TestCommand
+{
+public:
+    Test_TC_ACT_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACT_3_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACT_3_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -87334,6 +87493,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_DA_1_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_DA_1_5Suite>(credsIssuerConfig),
         make_unique<Test_TC_DA_1_6Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DA_1_7Suite>(credsIssuerConfig),
         make_unique<Test_TC_BINFO_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_OPCREDS_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_CNET_1_3Suite>(credsIssuerConfig),
@@ -87564,6 +87724,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_ACT_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_ACT_2_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_ACT_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACT_3_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_TFL_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_TFL_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_TFL_2_1Suite>(credsIssuerConfig),
