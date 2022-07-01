@@ -63,7 +63,6 @@ shared_library("ChipDeviceCtrl") {
       "chip/internal/ChipThreadWork.h",
       "chip/internal/CommissionerImpl.cpp",
       "chip/logging/LoggingRedirect.cpp",
-      "chip/native/StackInit.cpp",
     ]
   } else {
     sources += [

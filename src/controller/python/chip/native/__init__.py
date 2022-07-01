@@ -75,11 +75,6 @@ def GetLibraryHandle() -> ctypes.CDLL:
     global _nativeLibraryHandle
     if _nativeLibraryHandle is None:
         _nativeLibraryHandle = ctypes.CDLL(FindNativeLibraryPath())
-
         setter = NativeLibraryHandleMethodArguments(_nativeLibraryHandle)
-
-        setter.Set("pychip_native_init", None, [])
-
-        _nativeLibraryHandle.pychip_native_init()
 
     return _nativeLibraryHandle

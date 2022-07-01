@@ -247,8 +247,14 @@ class ChipStack(object):
         # set by other modules(BLE) that require service by thread while thread blocks.
         self.blockingCB = None
 
-        # Initialize the chip library
-        res = self._ChipStackLib.pychip_Stack_Init()
+        #
+        # Storage has to be initialized BEFORE initializing the stack, since the latter
+        # requires a PersistentStorageDelegate to be provided to DeviceControllerFactory.
+        #
+        self._persistentStorage = PersistentStorage(persistentStoragePath)
+
+        # Initialize the chip stack.
+        res = self._ChipStackLib.pychip_DeviceController_StackInit()
         if res != 0:
             raise self.ErrorToException(res)
 
@@ -257,12 +263,6 @@ class ChipStack(object):
 
         res = self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle(
             bluetoothAdapter)
-        if res != 0:
-            raise self.ErrorToException(res)
-
-        self._persistentStorage = PersistentStorage(persistentStoragePath)
-
-        res = self._ChipStackLib.pychip_DeviceController_StackInit()
         if res != 0:
             raise self.ErrorToException(res)
 
@@ -321,7 +321,7 @@ class ChipStack(object):
         # Make sure PersistentStorage is destructed before chipStack
         # to avoid accessing builtins.chipStack after destruction.
         self._persistentStorage = None
-        self.Call(lambda: self._ChipStackLib.pychip_Stack_Shutdown())
+        self.Call(lambda: self._ChipStackLib.pychip_DeviceController_StackShutdown())
         self.networkLock = None
         self.completeEvent = None
         self._ChipStackLib = None
@@ -459,10 +459,10 @@ class ChipStack(object):
     def _loadLib(self):
         if self._ChipStackLib is None:
             self._ChipStackLib = CDLL(self.LocateChipDLL())
-            self._ChipStackLib.pychip_Stack_Init.argtypes = []
-            self._ChipStackLib.pychip_Stack_Init.restype = c_uint32
-            self._ChipStackLib.pychip_Stack_Shutdown.argtypes = []
-            self._ChipStackLib.pychip_Stack_Shutdown.restype = c_uint32
+            self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = []
+            self._ChipStackLib.pychip_DeviceController_StackInit.restype = c_uint32
+            self._ChipStackLib.pychip_DeviceController_StackShutdown.argtypes = []
+            self._ChipStackLib.pychip_DeviceController_StackShutdown.restype = c_uint32
             self._ChipStackLib.pychip_Stack_StatusReportToString.argtypes = [
                 c_uint32,
                 c_uint16,
