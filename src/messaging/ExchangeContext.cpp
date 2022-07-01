@@ -309,6 +309,15 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     mFlags.Set(Flags::kFlagEphemeralExchange, isEphemeralExchange);
     mDelegate = delegate;
 
+    //
+    // If we're an initiator and we just created this exchange, we obviously did so to send a message. Let's go ahead and
+    // set the flag on this to correctly mark it as so.
+    //
+    if (Initiator)
+    {
+        WillSendMessage();
+    }
+
     SetAckPending(false);
 
     // Do not request Ack for multicast
@@ -547,6 +556,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
 
     DefaultOnMessageReceived(this, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), messageCounter,
                              std::move(msgBuf));
+
     return CHIP_NO_ERROR;
 }
 
