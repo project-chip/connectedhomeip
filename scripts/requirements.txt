@@ -53,3 +53,9 @@ lark
 stringcase
 
 cryptography
+
+# python unit tests
+colorama
+
+# update tornado for pw_watch
+tornado
