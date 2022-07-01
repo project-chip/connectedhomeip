@@ -77,6 +77,28 @@ std::string Base64ToString(const std::string & b64Value)
     return std::string(reinterpret_cast<const char *>(buffer.get()), len);
 }
 
+void AdjustConfig(Sections & sections)
+{
+    Section section = sections[kDefaultSectionName];
+    Section newSection;
+
+    for (auto it = section.begin(); it != section.end(); it++)
+    {
+        std::string key    = it->first;
+        const char * value = it->second.c_str();
+
+        while (value[0] == '=')
+        {
+            key += '=';
+            value++;
+        }
+
+        newSection[key] = value;
+    }
+
+    sections[kDefaultSectionName] = newSection;
+}
+
 } // namespace
 
 CHIP_ERROR PersistentStorage::Init(const char * name)
@@ -95,6 +117,10 @@ CHIP_ERROR PersistentStorage::Init(const char * name)
     mName = name;
     mConfig.parse(ifs);
     ifs.close();
+
+    // inipp.h cannot deal with keys containing '=' and does not support escapes either
+    AdjustConfig(mConfig.sections);
+
 exit:
     return err;
 }
