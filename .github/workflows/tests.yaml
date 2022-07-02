@@ -177,7 +177,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build Apps
-              timeout-minutes: 40
+              timeout-minutes: 60
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -240,8 +240,7 @@ jobs:
 
         container:
             image: connectedhomeip/chip-build:0.5.79
-            options:
-                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
@@ -249,8 +248,7 @@ jobs:
               uses: actions/checkout@v2
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
-            - name:
-                  Try to ensure the directories for core dumping exist and we
+            - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
                   mkdir /tmp/cores || true
@@ -263,32 +261,30 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ always() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build Python REPL and example apps
               timeout-minutes: 50
               run: |
-                    scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
-                    ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test \
-                        --target linux-x64-python-bindings \
-                        build \
-                        --copy-artifacts-to objdir-clone \
-                     "
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
+                  ./scripts/run_in_build_env.sh \
+                   "./scripts/build/build_examples.py \
+                      --target linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test \
+                      --target linux-x64-python-bindings \
+                      build \
+                      --copy-artifacts-to objdir-clone \
+                   "
             - name: Run Tests
               timeout-minutes: 40
               run: |
-                    scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factoryreset --script-args "--log-level INFO -t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
+                  scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factoryreset --script-args "--log-level INFO -t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      crash-core-linux-python-repl
+                  name: crash-core-linux-python-repl
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -296,8 +292,7 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      crash-objdir-linux-python-repl
+                  name: crash-objdir-linux-python-repl
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
@@ -346,31 +341,29 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ always() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build Python REPL and example apps
               timeout-minutes: 50
               run: |
-                    scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
-                    ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target darwin-x64-all-clusters-${BUILD_VARIANT}-test \
-                        build \
-                        --copy-artifacts-to objdir-clone \
-                     "
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
+                  ./scripts/run_in_build_env.sh \
+                   "./scripts/build/build_examples.py \
+                      --target darwin-x64-all-clusters-${BUILD_VARIANT}-test \
+                      build \
+                      --copy-artifacts-to objdir-clone \
+                   "
             - name: Run Tests
               timeout-minutes: 30
               run: |
-                    scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/darwin-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factoryreset --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
+                  scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/darwin-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factoryreset --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      crash-core-darwin-python-repl
+                  name: crash-core-darwin-python-repl
                   path: /cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -378,15 +371,13 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      crash-log-darwin-python-repl
+                  name: crash-log-darwin-python-repl
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      crash-objdir-darwin-python-repl
+                  name: crash-objdir-darwin-python-repl
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5

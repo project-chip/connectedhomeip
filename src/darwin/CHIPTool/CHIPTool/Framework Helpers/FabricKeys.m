@@ -23,8 +23,8 @@
 @property (readonly) SecKeyRef publicKey;
 @end
 
-static const NSString * kCHIPIPKKeyChainLabel = @"matter-tool.nodeopcerts.IPK:0";
-static const NSString * kCHIPCAKeyChainLabel = @"matter-tool.nodeopcerts.CA:0";
+static const NSString * MTRIPKKeyChainLabel = @"matter-tool.nodeopcerts.IPK:0";
+static const NSString * MTRCAKeyChainLabel = @"matter-tool.nodeopcerts.CA:0";
 
 @implementation FabricKeys
 
@@ -32,7 +32,7 @@ static const NSString * kCHIPCAKeyChainLabel = @"matter-tool.nodeopcerts.CA:0";
 {
     return @{
         (__bridge NSString *) kSecClass : (__bridge NSString *) kSecClassKey,
-        (__bridge NSString *) kSecAttrApplicationLabel : kCHIPIPKKeyChainLabel,
+        (__bridge NSString *) kSecAttrApplicationLabel : MTRIPKKeyChainLabel,
         (__bridge NSString *) kSecAttrKeyClass : (__bridge NSString *) kSecAttrKeyClassSymmetric,
     };
 }
@@ -95,7 +95,7 @@ static const NSString * kCHIPCAKeyChainLabel = @"matter-tool.nodeopcerts.CA:0";
 {
     return @{
         (__bridge NSString *) kSecClass : (__bridge NSString *) kSecClassKey,
-        (__bridge NSString *) kSecAttrApplicationLabel : kCHIPCAKeyChainLabel,
+        (__bridge NSString *) kSecAttrApplicationLabel : MTRCAKeyChainLabel,
         // We're storing a base-64 encoding of some opaque thing that represents
         // our keypair.  It's not really a public or private key; claim it's a
         // symmetric key.
@@ -207,7 +207,7 @@ static const NSString * kCHIPCAKeyChainLabel = @"matter-tool.nodeopcerts.CA:0";
     return self;
 }
 
-- (NSData *)ECDSA_sign_message_DER:(NSData *)message
+- (NSData *)signMessageECDSA_DER:(NSData *)message
 {
     CFErrorRef error = NULL;
     CFDataRef outData
@@ -219,7 +219,7 @@ static const NSString * kCHIPCAKeyChainLabel = @"matter-tool.nodeopcerts.CA:0";
     return (__bridge_transfer NSData *) outData;
 }
 
-- (SecKeyRef)pubkey
+- (SecKeyRef)publicKey
 {
     return self.publicKey;
 }

@@ -226,9 +226,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_standalone_chip_tool_build =
         enable_default_builds && host_os != "win"
 
-    # Build the darwin-framework-tool example.
-    enable_standalone_chip_tool_darwin_build =
-        enable_default_builds && host_os == "mac"
+    # Build the darwin-framework-tool example.  By default this is off, because
+    # it requires a preceding XCode build of the framework.
+    enable_standalone_chip_tool_darwin_build = false
 
     # Build the shell example.
     enable_standalone_shell_build = enable_default_builds && host_os != "win"

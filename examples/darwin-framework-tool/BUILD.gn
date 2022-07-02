@@ -23,10 +23,16 @@ assert(chip_build_tools)
 config("config") {
   include_dirs = [
     ".",
+    "${chip_root}/src/darwin/Framework/CHIP/zap-generated",
+    "${chip_root}/src/darwin/Framework/CHIP",
+    "${chip_root}/examples/darwin-framework-tool/commands/common",
     "${chip_root}/zzz_generated/darwin-framework-tool",
     "${chip_root}/zzz_generated/controller-clusters",
     "${chip_root}/examples/chip-tool/commands/clusters/ComplexArgument.h",
+    "/tmp/macos_framework_output",
   ]
+
+  framework_dirs = [ "/tmp/macos_framework_output" ]
 
   defines = [
     "CONFIG_ENABLE_YAML_TESTS=${config_enable_yaml_tests}",
@@ -51,6 +57,7 @@ executable("darwin-framework-tool") {
     # privilege-storage.cpp.
     "${chip_root}/src/app/util/privilege-storage.cpp",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
+    "${chip_root}/zzz_generated/controller-clusters/zap-generated/CHIPClusters.h",
     "commands/clusters/ClusterCommandBridge.h",
     "commands/clusters/ModelCommandBridge.mm",
     "commands/clusters/ReportCommandBridge.h",
@@ -58,6 +65,9 @@ executable("darwin-framework-tool") {
     "commands/common/CHIPCommandBridge.mm",
     "commands/common/CHIPCommandStorageDelegate.mm",
     "commands/common/CHIPToolKeypair.mm",
+    "commands/common/MTRError.mm",
+    "commands/common/MTRError_Utils.h",
+    "commands/common/MTRLogging.h",
     "commands/pairing/Commands.h",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.mm",
@@ -73,17 +83,22 @@ executable("darwin-framework-tool") {
   }
 
   if (config_enable_yaml_tests) {
-    sources += [ "${chip_root}/zzz_generated/darwin-framework-tool/zap-generated/cluster/CHIPTestClustersObjc.mm" ]
+    sources += [ "${chip_root}/zzz_generated/darwin-framework-tool/zap-generated/cluster/MTRTestClustersObjc.mm" ]
   }
 
   deps = [
     "${chip_root}/examples/chip-tool:chip-tool-utils",
     "${chip_root}/src/app/server",
-    "${chip_root}/src/darwin/Framework/CHIP",
+    "${chip_root}/src/darwin/Framework/CHIP:static-matter",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
+  ]
+
+  frameworks = [
+    "Matter.framework",
+    "Security.framework",
   ]
 
   public_configs = [ ":config" ]
