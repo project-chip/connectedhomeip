@@ -591,3 +591,4 @@ void AppTask::LightStateUpdateEventHandler(void)
         }      
     }while (0);             
 }
+
