@@ -57,8 +57,8 @@ std::string EscapeKey(const std::string & key)
 
     for (char c : key)
     {
-        // Replace spaces, non-printable chars and `=` with hex-escaped (C-style) characters.
-        if ((c <= 0x20) || (c == '=') || (c >= 0x7F))
+        // Replace spaces, non-printable chars, `=` and the escape itself with hex-escaped (C-style) characters.
+        if ((c <= 0x20) || (c == '=') || (c == '\\') || (c >= 0x7F))
         {
             char escaped[5] = { 0 };
             snprintf(escaped, sizeof(escaped), "\\x%02x", (static_cast<unsigned>(c) & 0xff));
