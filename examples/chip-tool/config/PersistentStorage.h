@@ -32,6 +32,7 @@ public:
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
+    bool SyncDoesKeyExist(const char * key) override;
 
     uint16_t GetListenPort();
     chip::Logging::LogCategory GetLoggingLevel();
