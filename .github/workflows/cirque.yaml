@@ -127,7 +127,7 @@ jobs:
                      -- scripts/tests/cirque_tests.sh run_all_tests
             - name: Uploading Binaries
               uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
+              if: ${{ always() && !env.ACT }}
               with:
                   name: cirque_log-${{steps.outsuffix.outputs.value}}-logs
                   path: /tmp/cirque_test_output/

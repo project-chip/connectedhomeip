@@ -69,7 +69,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
+              if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: |
@@ -106,7 +106,7 @@ jobs:
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }} && ${{ !env.ACT }}
+              if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: /tmp/cores/
@@ -114,7 +114,7 @@ jobs:
                   retention-days: 5
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }} && ${{ !env.ACT }}
+              if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: objdir-clone/
@@ -170,7 +170,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
+              if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: |
@@ -208,7 +208,7 @@ jobs:
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }} && ${{ !env.ACT }}
+              if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: /cores/
@@ -216,13 +216,13 @@ jobs:
                   retention-days: 5
             - name: Uploading diagnostic logs
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }} && ${{ !env.ACT }}
+              if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }} && ${{ !env.ACT }}
+              if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: objdir-clone/
@@ -259,7 +259,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
+              if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: |
@@ -282,7 +282,7 @@ jobs:
                   scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factoryreset --script-args "--log-level INFO -t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }} && ${{ !env.ACT }}
+              if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-python-repl
                   path: /tmp/cores/
@@ -290,7 +290,7 @@ jobs:
                   retention-days: 5
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }} && ${{ !env.ACT }}
+              if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-linux-python-repl
                   path: objdir-clone/
@@ -339,7 +339,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
+              if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: |
@@ -361,7 +361,7 @@ jobs:
                   scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/darwin-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factoryreset --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }} && ${{ !env.ACT }}
+              if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-python-repl
                   path: /cores/
@@ -369,13 +369,13 @@ jobs:
                   retention-days: 5
             - name: Uploading diagnostic logs
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }} && ${{ !env.ACT }}
+              if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-python-repl
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }} && ${{ !env.ACT }}
+              if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-python-repl
                   path: objdir-clone/
