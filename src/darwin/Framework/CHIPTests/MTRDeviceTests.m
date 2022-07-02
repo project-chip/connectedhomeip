@@ -708,6 +708,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * subscribeExpectation = [self expectationWithDescription:@"Subscription complete"];
 
     NSLog(@"Subscribing...");
+    __block void (^reportHandler)(NSArray * _Nullable value, NSError * _Nullable error);
     [device subscribeWithQueue:queue
         minInterval:2
         maxInterval:60
@@ -715,10 +716,20 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         cacheContainer:attributeCacheContainer
         attributeReportHandler:^(NSArray * value) {
             NSLog(@"Received report: %@", value);
+            if (reportHandler) {
+                __auto_type handler = reportHandler;
+                reportHandler = nil;
+                handler(value, nil);
+            }
         }
         eventReportHandler:nil
         errorHandler:^(NSError * error) {
             NSLog(@"Received report error: %@", error);
+            if (reportHandler) {
+                __auto_type handler = reportHandler;
+                reportHandler = nil;
+                handler(nil, error);
+            }
         }
         subscriptionEstablished:^() {
             [subscribeExpectation fulfill];

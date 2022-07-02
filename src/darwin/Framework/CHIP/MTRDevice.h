@@ -131,8 +131,8 @@ extern NSString * const MTRArrayValueType;
                 maxInterval:(uint16_t)maxInterval
                      params:(nullable MTRSubscribeParams *)params
              cacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
-     attributeReportHandler:(void (^)(NSArray * value))attributeReportHandler
-         eventReportHandler:(void (^)(NSArray * value))eventReportHandler
+     attributeReportHandler:(nullable void (^)(NSArray * value))attributeReportHandler
+         eventReportHandler:(nullable void (^)(NSArray * value))eventReportHandler
                errorHandler:(void (^)(NSError * error))errorHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
 

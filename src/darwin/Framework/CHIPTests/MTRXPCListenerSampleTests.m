@@ -1785,7 +1785,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         params:nil
         cacheContainer:attributeCacheContainer
         attributeReportHandler:^(NSArray * value) {
-            NSLog(@"Report for attribute cache: %@", error);
+            NSLog(@"Report for attribute cache: %@", value);
         }
         eventReportHandler:nil
         errorHandler:^(NSError * error) {

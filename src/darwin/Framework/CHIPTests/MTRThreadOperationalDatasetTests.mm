@@ -44,7 +44,7 @@
                     channel:25
                       panID:[NSData dataWithBytes:&panID length:sizeof(panID)]];
     XCTAssertNotNil(dataset);
-    NSData * data = [dataset asData];
+    NSData * data = [dataset data];
     XCTAssertNotNil(data);
 
     MTRThreadOperationalDataset * reconstructed = [[MTRThreadOperationalDataset alloc] initWithData:data];
