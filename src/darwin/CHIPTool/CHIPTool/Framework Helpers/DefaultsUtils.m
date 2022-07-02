@@ -101,7 +101,7 @@ MTRDeviceController * InitializeMTR(void)
     return sController;
 }
 
-MTRDeviceController * CHIPRestartController(MTRDeviceController * controller)
+MTRDeviceController * MTRRestartController(MTRDeviceController * controller)
 {
     __auto_type * keys = [[FabricKeys alloc] init];
     if (keys == nil) {

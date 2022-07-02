@@ -219,47 +219,46 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
         @"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds), @(deltaInCelsius));
 
     if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
-        if (chipDevice) {
-            // Use a wildcard subscription
+            if (chipDevice) {
+                // Use a wildcard subscription
                 [chipDevice subscribeWithQueue:dispatch_get_main_queue()
-                                   minInterval:minIntervalSeconds
-                                   maxInterval:maxIntervalSeconds
-                                        params:nil
-                                cacheContainer:nil
-                        attributeReportHandler:^(NSArray * _Nullable reports) {
-                if (!reports)
-                    return;
-                for (MTRAttributeReport * report in reports) {
-                    // These should be exposed by the SDK
-                    if ([report.path.cluster isEqualToNumber:@(MTRClusterTemperatureMeasurementID)] &&
-                        [report.path.attribute isEqualToNumber:@(MTRClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
-                        if (report.error != nil) {
-                            NSLog(@"Error reading temperature: %@", report.error);
-                        } else {
-                            __auto_type controller = [TemperatureSensorViewController currentController];
-                            if (controller != nil) {
-                                [controller updateTempInUI:((NSNumber *) report.value).shortValue];
+                    minInterval:minIntervalSeconds
+                    maxInterval:maxIntervalSeconds
+                    params:nil
+                    cacheContainer:nil
+                    attributeReportHandler:^(NSArray * _Nullable reports) {
+                        if (!reports)
+                            return;
+                        for (MTRAttributeReport * report in reports) {
+                            // These should be exposed by the SDK
+                            if ([report.path.cluster isEqualToNumber:@(MTRClusterTemperatureMeasurementID)] &&
+                                [report.path.attribute
+                                    isEqualToNumber:@(MTRClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
+                                if (report.error != nil) {
+                                    NSLog(@"Error reading temperature: %@", report.error);
+                                } else {
+                                    __auto_type controller = [TemperatureSensorViewController currentController];
+                                    if (controller != nil) {
+                                        [controller updateTempInUI:((NSNumber *) report.value).shortValue];
+                                    }
+                                }
                             }
                         }
                     }
-                }
-                        }
-                            eventReportHandler:nil
-                                 errorHandler:^(NSError * error) {
-                NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
-                                 }
-                      subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler {
-                if (error) {
-                    NSLog(@"Status: update reportAttributeMeasuredValue completed");
-                }
-                ];
+                    eventReportHandler:nil
+                    errorHandler:^(NSError * error) {
+                        NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
+                    }
+                    subscriptionEstablished:^ {
+                    }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
         })) {
         NSLog(@"Status: Waiting for connection with the device");
+    } else {
+        NSLog(@"Status: Failed to trigger the connection with the device");
     }
-        else { NSLog(@"Status: Failed to trigger the connection with the device"); }
 }
 
 @end
