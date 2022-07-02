@@ -662,9 +662,10 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     AddInvokeRequestData(apSuite, apContext, &commandSender);
     asyncCommand = true;
     err          = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
+
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    ctx.DeliverOneMessage();
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 0 &&
@@ -672,6 +673,7 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
 
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 1);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
+
     commandSender.MoveToState(app::CommandSender::State::ResponseReceived);
 
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
@@ -696,9 +698,14 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     // Decrease CommandHandler refcount and send response
     asyncCommandHandle = nullptr;
 
+    ctx.GetLoopback().mSentMessageCount = 0;
     ctx.DrainAndServiceIO();
+    // a command response message was sent
+    printf("debug %d", ctx.GetLoopback().mSentMessageCount);
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 1);
 
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
+
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
