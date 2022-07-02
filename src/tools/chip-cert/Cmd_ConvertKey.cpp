@@ -41,8 +41,9 @@ bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[]);
 OptionDef gCmdOptionDefs[] =
 {
     { "x509-pem",       kNoArgument, 'p' },
-    { "x509-der",       kNoArgument, 'x' },
+    { "x509-der",       kNoArgument, 'd' },
     { "chip",           kNoArgument, 'c' },
+    { "chip-hex",       kNoArgument, 'x' },
     { "chip-b64",       kNoArgument, 'b' },
     { }
 };
@@ -52,13 +53,16 @@ const char * const gCmdOptionHelp =
     "\n"
     "       Output the private key in SEC1/RFC-5915 PEM format.\n"
     "\n"
-    "   -x, --x509-der\n"
+    "   -d, --x509-der\n"
     "\n"
     "       Output the private key in SEC1/RFC-5915 DER format. \n"
     "\n"
     "   -c, --chip\n"
     "\n"
     "       Output the private key in raw CHIP serialized format.\n"
+    "   -x, --chip-hex\n"
+    "\n"
+    "       Output the private key in hex encoded CHIP serialized format.\n"
     "\n"
     "   -b, --chip-b64\n"
     "\n"
@@ -115,11 +119,14 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
     case 'p':
         gOutFormat = kKeyFormat_X509_PEM;
         break;
-    case 'x':
+    case 'd':
         gOutFormat = kKeyFormat_X509_DER;
         break;
     case 'b':
         gOutFormat = kKeyFormat_Chip_Base64;
+        break;
+    case 'x':
+        gOutFormat = kKeyFormat_Chip_Hex;
         break;
     case 'c':
         gOutFormat = kKeyFormat_Chip_Raw;

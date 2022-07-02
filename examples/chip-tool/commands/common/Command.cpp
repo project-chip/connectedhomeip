@@ -854,44 +854,154 @@ size_t Command::AddArgumentToList(Argument && argument)
     return 0;
 }
 
+namespace {
+template <typename T>
+void ResetOptionalArg(const Argument & arg)
+{
+    VerifyOrDie(arg.isOptional());
+
+    if (arg.isNullable())
+    {
+        reinterpret_cast<chip::Optional<chip::app::DataModel::Nullable<T>> *>(arg.value)->ClearValue();
+    }
+    else
+    {
+        reinterpret_cast<chip::Optional<T> *>(arg.value)->ClearValue();
+    }
+}
+} // anonymous namespace
+
 void Command::ResetArguments()
 {
     for (size_t i = 0; i < mArgs.size(); i++)
     {
         const Argument arg      = mArgs[i];
         const ArgumentType type = arg.type;
-        const uint8_t flags     = arg.flags;
-        if (type == ArgumentType::VectorBool && flags == Argument::kOptional)
+        if (arg.isOptional())
         {
-            auto vectorArgument = static_cast<std::vector<uint16_t> *>(arg.value);
-            vectorArgument->clear();
-        }
-        else if (type == ArgumentType::Vector16 && flags != Argument::kOptional)
-        {
-            auto vectorArgument = static_cast<std::vector<uint16_t> *>(arg.value);
-            vectorArgument->clear();
-        }
-        else if (type == ArgumentType::Vector32 && flags != Argument::kOptional)
-        {
-            auto vectorArgument = static_cast<std::vector<uint32_t> *>(arg.value);
-            vectorArgument->clear();
-        }
-        else if (type == ArgumentType::Vector32 && flags == Argument::kOptional)
-        {
-            auto optionalArgument = static_cast<chip::Optional<std::vector<uint32_t>> *>(arg.value);
-            if (optionalArgument->HasValue())
+            // Must always clean these up so they don't carry over to the next
+            // command invocation in interactive mode.
+            switch (type)
             {
-                optionalArgument->Value().clear();
+            case ArgumentType::Complex: {
+                // No optional complex arguments so far.
+                VerifyOrDie(false);
+                break;
+            }
+            case ArgumentType::Custom: {
+                // No optional custom arguments so far.
+                VerifyOrDie(false);
+                break;
+            }
+            case ArgumentType::VectorBool: {
+                auto vectorArgument = static_cast<std::vector<bool> *>(arg.value);
+                vectorArgument->clear();
+                break;
+            }
+            case ArgumentType::Vector16: {
+                // No optional Vector16 arguments so far.
+                VerifyOrDie(false);
+                break;
+            }
+            case ArgumentType::Vector32: {
+                ResetOptionalArg<std::vector<uint32_t>>(arg);
+                break;
+            }
+            case ArgumentType::VectorCustom: {
+                // No optional VectorCustom arguments so far.
+                VerifyOrDie(false);
+                break;
+            }
+            case ArgumentType::Attribute: {
+                // No optional Attribute arguments so far.
+                VerifyOrDie(false);
+                break;
+            }
+            case ArgumentType::String: {
+                ResetOptionalArg<char *>(arg);
+                break;
+            }
+            case ArgumentType::CharString: {
+                ResetOptionalArg<chip::CharSpan>(arg);
+                break;
+            }
+            case ArgumentType::OctetString: {
+                ResetOptionalArg<chip::ByteSpan>(arg);
+                break;
+            }
+            case ArgumentType::Bool: {
+                ResetOptionalArg<bool>(arg);
+                break;
+            }
+            case ArgumentType::Number_uint8: {
+                ResetOptionalArg<uint8_t>(arg);
+                break;
+            }
+            case ArgumentType::Number_uint16: {
+                ResetOptionalArg<uint16_t>(arg);
+                break;
+            }
+            case ArgumentType::Number_uint32: {
+                ResetOptionalArg<uint32_t>(arg);
+                break;
+            }
+            case ArgumentType::Number_uint64: {
+                ResetOptionalArg<uint64_t>(arg);
+                break;
+            }
+            case ArgumentType::Number_int8: {
+                ResetOptionalArg<int8_t>(arg);
+                break;
+            }
+            case ArgumentType::Number_int16: {
+                ResetOptionalArg<int16_t>(arg);
+                break;
+            }
+            case ArgumentType::Number_int32: {
+                ResetOptionalArg<int32_t>(arg);
+                break;
+            }
+            case ArgumentType::Number_int64: {
+                ResetOptionalArg<int64_t>(arg);
+                break;
+            }
+            case ArgumentType::Float: {
+                ResetOptionalArg<float>(arg);
+                break;
+            }
+            case ArgumentType::Double: {
+                ResetOptionalArg<double>(arg);
+                break;
+            }
+            case ArgumentType::Address: {
+                ResetOptionalArg<AddressWithInterface>(arg);
+                break;
+            }
             }
         }
-        else if (type == ArgumentType::VectorCustom && flags != Argument::kOptional)
+        else
         {
-            auto vectorArgument = static_cast<std::vector<CustomArgument *> *>(arg.value);
-            for (auto & customArgument : *vectorArgument)
+            // Some non-optional arguments have state that needs to be cleaned
+            // up too.
+            if (type == ArgumentType::Vector16)
             {
-                delete customArgument;
+                auto vectorArgument = static_cast<std::vector<uint16_t> *>(arg.value);
+                vectorArgument->clear();
             }
-            vectorArgument->clear();
+            else if (type == ArgumentType::Vector32)
+            {
+                auto vectorArgument = static_cast<std::vector<uint32_t> *>(arg.value);
+                vectorArgument->clear();
+            }
+            else if (type == ArgumentType::VectorCustom)
+            {
+                auto vectorArgument = static_cast<std::vector<CustomArgument *> *>(arg.value);
+                for (auto & customArgument : *vectorArgument)
+                {
+                    delete customArgument;
+                }
+                vectorArgument->clear();
+            }
         }
     }
 }
