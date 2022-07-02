@@ -129,7 +129,7 @@
 - (IBAction)unpairSelectedDevices:(id)sender
 {
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        CHIPUnpairDeviceWithID(deviceId);
+        MTRUnpairDeviceWithID(deviceId);
     }];
 
     [_deviceSelector refreshDeviceList];

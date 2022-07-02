@@ -79,7 +79,7 @@ CHIP_ERROR MTRP256KeypairBridge::NewCertificateSigningRequest(uint8_t * csr, siz
 CHIP_ERROR MTRP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const
 {
     if (!HasKeypair()) {
-        CHIP_LOG_ERROR("ECDSA sign msg failure: no keypair to sign with.");
+        MTR_LOG_ERROR("ECDSA sign msg failure: no keypair to sign with.");
         return CHIP_ERROR_INCORRECT_STATE;
     }
     NSData * msgData = [NSData dataWithBytes:msg length:msg_length];
@@ -87,7 +87,7 @@ CHIP_ERROR MTRP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_
     if ([mKeypair respondsToSelector:@selector(signMessageECDSA_DER:)]) {
         signature = [mKeypair signMessageECDSA_DER:msgData];
         if (!signature) {
-            CHIP_LOG_ERROR("ECDSA sign msg failure: no signature returned");
+            MTR_LOG_ERROR("ECDSA sign msg failure: no signature returned");
             return CHIP_ERROR_INTERNAL;
         }
 
@@ -96,24 +96,24 @@ CHIP_ERROR MTRP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_
 
         CHIP_ERROR err = EcdsaAsn1SignatureToRaw(kP256_FE_Length, AsByteSpan(signature), rawSignature);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Converting ASN.1 DER signature to raw form failed: %s", chip::ErrorStr(err));
+            MTR_LOG_ERROR("Converting ASN.1 DER signature to raw form failed: %s", chip::ErrorStr(err));
             return err;
         }
 
         signature = AsData(rawSignature);
         if (!signature) {
-            CHIP_LOG_ERROR("Failed to create NSData for raw signature");
+            MTR_LOG_ERROR("Failed to create NSData for raw signature");
             return CHIP_ERROR_INTERNAL;
         }
     } else {
         signature = [mKeypair signMessageECDSA_RAW:msgData];
         if (!signature) {
-            CHIP_LOG_ERROR("ECDSA sign msg failure: no signature returned");
+            MTR_LOG_ERROR("ECDSA sign msg failure: no signature returned");
             return CHIP_ERROR_INTERNAL;
         }
     }
     if (signature.length > out_signature.Capacity()) {
-        CHIP_LOG_ERROR("ECDSA sign msg failure: unexpected signature size %llu vs %llu", static_cast<uint64_t>(signature.length),
+        MTR_LOG_ERROR("ECDSA sign msg failure: unexpected signature size %llu vs %llu", static_cast<uint64_t>(signature.length),
             static_cast<uint64_t>(out_signature.Capacity()));
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -137,17 +137,17 @@ CHIP_ERROR MTRP256KeypairBridge::setPubkey() { return MatterPubKeyFromSecKeyRef(
 CHIP_ERROR MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(SecKeyRef pubkeyRef, P256PublicKey * matterPubKey)
 {
     if (!pubkeyRef) {
-        CHIP_LOG_ERROR("Unable to initialize Pubkey");
+        MTR_LOG_ERROR("Unable to initialize Pubkey");
         return CHIP_ERROR_INTERNAL;
     }
 
     NSData * pubkeyData = (__bridge_transfer NSData *) SecKeyCopyExternalRepresentation(pubkeyRef, nil);
     if (!pubkeyData) {
-        CHIP_LOG_ERROR("Unable to copy external representation for publicKey ref, cannot initialize publicKey");
+        MTR_LOG_ERROR("Unable to copy external representation for publicKey ref, cannot initialize publicKey");
         return CHIP_ERROR_INTERNAL;
     }
     if (pubkeyData.length != kP256_PublicKey_Length) {
-        CHIP_LOG_ERROR("Unexpected publicKey length, cannot initialize publicKey");
+        MTR_LOG_ERROR("Unexpected publicKey length, cannot initialize publicKey");
         return CHIP_ERROR_INTERNAL;
     }
     chip::FixedByteSpan<kP256_PublicKey_Length> pubkeyBytes((const uint8_t *) pubkeyData.bytes);

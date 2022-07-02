@@ -62,7 +62,7 @@ size_t const MTRSizeThreadPSKc = chip::Thread::kSizePSKc;
     _cppThreadOperationalDataset.SetNetworkName([self.networkName cStringUsingEncoding:NSUTF8StringEncoding]);
 
     if (![self _checkDataLength:self.extendedPANID expectedLength:chip::Thread::kSizeExtendedPanId]) {
-        CHIP_LOG_ERROR("Invalid ExtendedPANID");
+        MTR_LOG_ERROR("Invalid ExtendedPANID");
         return NO;
     }
     uint8_t extendedPanId[chip::Thread::kSizeExtendedPanId];
@@ -70,7 +70,7 @@ size_t const MTRSizeThreadPSKc = chip::Thread::kSizePSKc;
     _cppThreadOperationalDataset.SetExtendedPanId(extendedPanId);
 
     if (![self _checkDataLength:self.masterKey expectedLength:chip::Thread::kSizeMasterKey]) {
-        CHIP_LOG_ERROR("Invalid MasterKey");
+        MTR_LOG_ERROR("Invalid MasterKey");
         return NO;
     }
     uint8_t masterKey[chip::Thread::kSizeMasterKey];
@@ -78,7 +78,7 @@ size_t const MTRSizeThreadPSKc = chip::Thread::kSizePSKc;
     _cppThreadOperationalDataset.SetMasterKey(masterKey);
 
     if (![self _checkDataLength:self.PSKc expectedLength:chip::Thread::kSizePSKc]) {
-        CHIP_LOG_ERROR("Invalid PKSc");
+        MTR_LOG_ERROR("Invalid PKSc");
         return NO;
     }
     uint8_t PSKc[chip::Thread::kSizePSKc];
@@ -89,7 +89,7 @@ size_t const MTRSizeThreadPSKc = chip::Thread::kSizePSKc;
 
     // Thread's PAN ID is 2 bytes
     if (![self _checkDataLength:self.panID expectedLength:2]) {
-        CHIP_LOG_ERROR("Invalid PAN ID");
+        MTR_LOG_ERROR("Invalid PAN ID");
         return NO;
     }
     uint16_t * valuePtr = (uint16_t *) [self.panID bytes];
@@ -105,7 +105,7 @@ size_t const MTRSizeThreadPSKc = chip::Thread::kSizePSKc;
 - (BOOL)_checkDataLength:(NSData *)data expectedLength:(size_t)expectedLength
 {
     if (data.length != expectedLength) {
-        CHIP_LOG_ERROR("Length Check Failed. Length:%tu is incorrect, must be %tu", data.length, expectedLength);
+        MTR_LOG_ERROR("Length Check Failed. Length:%tu is incorrect, must be %tu", data.length, expectedLength);
         return NO;
     }
     return YES;
@@ -117,7 +117,7 @@ size_t const MTRSizeThreadPSKc = chip::Thread::kSizePSKc;
     auto dataset = chip::Thread::OperationalDataset();
     CHIP_ERROR error = dataset.Init(span);
     if (error != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Failed to parse data, cannot construct Operational Dataset. %s", chip::ErrorStr(error));
+        MTR_LOG_ERROR("Failed to parse data, cannot construct Operational Dataset. %s", chip::ErrorStr(error));
         return nil;
     }
     // len+1 for null termination

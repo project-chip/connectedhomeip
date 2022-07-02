@@ -102,7 +102,7 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
     _numLightsTextField = [UITextField new];
     _numLightsOptions = @[ @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"10" ];
     _numLightsTextField.text
-        = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, MTRNumLightOnOffCluster) ?: [_numLightsOptions objectAtIndex:0];
+        = MTRGetDomainValueForKey(MTRToolDefaultsDomain, MTRNumLightOnOffCluster) ?: [_numLightsOptions objectAtIndex:0];
     UIPickerView * numLightsPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 100, 0, 0)];
     _numLightsTextField.inputView = numLightsPicker;
     [numLightsPicker setDataSource:self];
@@ -210,7 +210,7 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 - (IBAction)pickerDoneClicked:(id)sender
 {
-    CHIPSetDomainValueForKey(MTRToolDefaultsDomain, MTRNumLightOnOffCluster, _numLightsTextField.text);
+    MTRSetDomainValueForKey(MTRToolDefaultsDomain, MTRNumLightOnOffCluster, _numLightsTextField.text);
     [_numLightsTextField resignFirstResponder];
     [self setupStackView];
 }
@@ -219,7 +219,7 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
 
 - (int)numLightClustersToShow
 {
-    NSString * numClusters = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, MTRNumLightOnOffCluster);
+    NSString * numClusters = MTRGetDomainValueForKey(MTRToolDefaultsDomain, MTRNumLightOnOffCluster);
     int numberOfLights = 1;
 
     if (numClusters) {
@@ -237,7 +237,7 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [self updateResult:[NSString stringWithFormat:@"On command sent on endpoint %@", @(endpoint)]];
 
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        if (CHIPGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
                     MTROnOff * onOff = [[MTROnOff alloc] initWithDevice:chipDevice
                                                                endpoint:endpoint
@@ -266,7 +266,7 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [self updateResult:[NSString stringWithFormat:@"Off command sent on endpoint %@", @(endpoint)]];
 
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        if (CHIPGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
                     MTROnOff * onOff = [[MTROnOff alloc] initWithDevice:chipDevice
                                                                endpoint:endpoint
@@ -295,7 +295,7 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [self updateResult:[NSString stringWithFormat:@"Toggle command sent on endpoint %@", @(endpoint)]];
 
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        if (CHIPGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
                     MTROnOff * onOff = [[MTROnOff alloc] initWithDevice:chipDevice
                                                                endpoint:endpoint

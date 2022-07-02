@@ -418,7 +418,7 @@
     [self setupUI];
 
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
-    self.chipController = InitializeCHIP();
+    self.chipController = InitializeMTR();
     [self.chipController setPairingDelegate:self queue:callbackQueue];
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
@@ -478,7 +478,7 @@
 - (void)setVendorIDOnAccessory
 {
     NSLog(@"Call to setVendorIDOnAccessory");
-    if (CHIPGetConnectedDevice(^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable device, NSError * _Nullable error) {
             if (!device) {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
@@ -495,8 +495,8 @@
     if (error != nil) {
         NSLog(@"Got pairing error back %@", error);
     } else {
-        MTRDeviceController * controller = InitializeCHIP();
-        uint64_t deviceId = CHIPGetLastPairedDeviceId();
+        MTRDeviceController * controller = InitializeMTR();
+        uint64_t deviceId = MTRGetLastPairedDeviceId();
         if ([controller respondsToSelector:@selector(deviceBeingCommissionedOverBLE:)
              && [controller deviceBeingCommissionedOverBLE:deviceId]) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -614,7 +614,7 @@
         textField.clearButtonMode = UITextFieldViewModeWhileEditing;
         textField.borderStyle = UITextBorderStyleRoundedRect;
 
-        NSString * networkSSID = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey);
+        NSString * networkSSID = MTRGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey);
         if ([networkSSID length] > 0) {
             textField.text = networkSSID;
         }
@@ -626,7 +626,7 @@
         textField.borderStyle = UITextBorderStyleRoundedRect;
         textField.secureTextEntry = YES;
 
-        NSString * networkPassword = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey);
+        NSString * networkPassword = MTRGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey);
         if ([networkPassword length] > 0) {
             textField.text = networkPassword;
         }
@@ -647,12 +647,12 @@
                                                  UITextField * networkSSID = textfields[0];
                                                  UITextField * networkPassword = textfields[1];
                                                  if ([networkSSID.text length] > 0) {
-                                                     CHIPSetDomainValueForKey(
+                                                     MTRSetDomainValueForKey(
                                                          MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey, networkSSID.text);
                                                  }
 
                                                  if ([networkPassword.text length] > 0) {
-                                                     CHIPSetDomainValueForKey(
+                                                     MTRSetDomainValueForKey(
                                                          MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey, networkPassword.text);
                                                  }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
@@ -667,7 +667,7 @@
 {
 
     NSError * error;
-    MTRDeviceController * controller = InitializeCHIP();
+    MTRDeviceController * controller = InitializeMTR();
     // create commissioning params in ObjC. Pass those in here with network credentials.
     // maybe this just becomes the new norm
     MTRCommissioningParameters * params = [[MTRCommissioningParameters alloc] init];
@@ -676,7 +676,7 @@
     params.deviceAttestationDelegate = [[CHIPToolDeviceAttestationDelegate alloc] initWithViewController:self];
     params.failSafeExpiryTimeoutSecs = @600;
 
-    uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
+    uint64_t deviceId = MTRGetNextAvailableDeviceID() - 1;
 
     if (![controller commissionDevice:deviceId commissioningParams:params error:&error]) {
         NSLog(@"Failed to commission Device %llu, with error %@", deviceId, error);
@@ -690,8 +690,8 @@
         return;
     }
     // track this device
-    uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
-    CHIPSetDevicePaired(deviceId, YES);
+    uint64_t deviceId = MTRGetNextAvailableDeviceID() - 1;
+    MTRSetDevicePaired(deviceId, YES);
     [self setVendorIDOnAccessory];
 }
 
@@ -787,7 +787,7 @@
 
 - (void)_restartMatterStack
 {
-    self.chipController = CHIPRestartController(self.chipController);
+    self.chipController = MTRRestartController(self.chipController);
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
     [self.chipController setPairingDelegate:self queue:callbackQueue];
 }
@@ -795,14 +795,14 @@
 - (void)handleRendezVousDefault:(NSString *)payload
 {
     NSError * error;
-    uint64_t deviceID = CHIPGetNextAvailableDeviceID();
+    uint64_t deviceID = MTRGetNextAvailableDeviceID();
 
     // restart the Matter Stack before pairing (for reliability + testing restarts)
     [self _restartMatterStack];
 
     if ([self.chipController pairDevice:deviceID onboardingPayload:payload error:&error]) {
         deviceID++;
-        CHIPSetNextAvailableDeviceID(deviceID);
+        MTRSetNextAvailableDeviceID(deviceID);
     }
 }
 

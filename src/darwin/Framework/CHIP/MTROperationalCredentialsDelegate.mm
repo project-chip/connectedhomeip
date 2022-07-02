@@ -52,7 +52,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::Init(MTRPersistentStorageDelegateB
     mIssuerKey = std::move(nocSigner);
 
     if ([ipk length] != mIPK.Length()) {
-        CHIP_LOG_ERROR("MTROperationalCredentialsDelegate::init provided IPK is wrong size");
+        MTR_LOG_ERROR("MTROperationalCredentialsDelegate::init provided IPK is wrong size");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     memcpy(mIPK.Bytes(), [ipk bytes], [ipk length]);

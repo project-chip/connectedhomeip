@@ -63,14 +63,14 @@ static CHIP_ERROR AppendAttibuteValueToArray(
             [array addObject:@ { MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:path], MTRDataKey : obj }];
             return CHIP_NO_ERROR;
         }
-        CHIP_LOG_ERROR("Error: Cached value could not be converted to generic NSObject");
+        MTR_LOG_ERROR("Error: Cached value could not be converted to generic NSObject");
         [array addObject:@ {
             MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:path],
             MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_DECODE_FAILED]
         }];
         return CHIP_ERROR_DECODE_FAILED;
     }
-    CHIP_LOG_ERROR("Error: Failed to read from attribute cache: %s", err.AsString());
+    MTR_LOG_ERROR("Error: Failed to read from attribute cache: %s", err.AsString());
     [array addObject:@ {
         MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:path],
         MTRErrorKey : [MTRError errorForCHIPErrorCode:err]
@@ -94,7 +94,7 @@ static CHIP_ERROR AppendAttibuteValueToArray(
     if (self.shouldUseXPC) {
         MTRDeviceControllerXPCConnection * xpcConnection = self.xpcConnection;
         if (!xpcConnection) {
-            CHIP_LOG_ERROR("Attribute cache read failed: MTRDeviceController was already disposed");
+            MTR_LOG_ERROR("Attribute cache read failed: MTRDeviceController was already disposed");
             completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             return;
         }
@@ -114,7 +114,7 @@ static CHIP_ERROR AppendAttibuteValueToArray(
                                                             (void) handleRetainer;
                                                         }];
                 } else {
-                    CHIP_LOG_ERROR("Attribute cache read failed due to XPC connection failure");
+                    MTR_LOG_ERROR("Attribute cache read failed due to XPC connection failure");
                     completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
                 }
             }];
@@ -123,13 +123,13 @@ static CHIP_ERROR AppendAttibuteValueToArray(
 
     dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
         if (endpointId == nil && clusterId == nil) {
-            CHIP_LOG_ERROR("Error: currently read from attribute cache does not support wildcards for both endpoint and cluster");
+            MTR_LOG_ERROR("Error: currently read from attribute cache does not support wildcards for both endpoint and cluster");
             completionHandler(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidArgument userInfo:nil]);
             return;
         }
 
         if (!self.cppAttributeCache) {
-            CHIP_LOG_ERROR("Error: No attribute cache available to read from");
+            MTR_LOG_ERROR("Error: No attribute cache available to read from");
             completionHandler(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             return;
         }

@@ -25,7 +25,7 @@ NSString * const MTRNextAvailableDeviceIDKey = @"nextDeviceID";
 NSString * const kFabricIdKey = @"fabricId";
 NSString * const kDevicePairedKey = @"Paired";
 
-id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
+id MTRGetDomainValueForKey(NSString * domain, NSString * key)
 {
     id value = (id) CFBridgingRelease(CFPreferencesCopyAppValue((CFStringRef) key, (CFStringRef) domain));
     if (value) {
@@ -34,24 +34,24 @@ id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
     return nil;
 }
 
-BOOL CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value)
+BOOL MTRSetDomainValueForKey(NSString * domain, NSString * key, id value)
 {
     CFPreferencesSetAppValue((CFStringRef) key, (__bridge CFPropertyListRef _Nullable)(value), (CFStringRef) domain);
     return CFPreferencesAppSynchronize((CFStringRef) domain) == true;
 }
 
-void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key)
+void MTRRemoveDomainValueForKey(NSString * domain, NSString * key)
 {
     CFPreferencesSetAppValue((CFStringRef) key, NULL, (CFStringRef) domain);
     CFPreferencesAppSynchronize((CFStringRef) domain);
 }
 
-uint64_t CHIPGetNextAvailableDeviceID(void)
+uint64_t MTRGetNextAvailableDeviceID(void)
 {
     uint64_t nextAvailableDeviceIdentifier = 1;
-    NSNumber * value = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, MTRNextAvailableDeviceIDKey);
+    NSNumber * value = MTRGetDomainValueForKey(MTRToolDefaultsDomain, MTRNextAvailableDeviceIDKey);
     if (!value) {
-        CHIPSetDomainValueForKey(MTRToolDefaultsDomain, MTRNextAvailableDeviceIDKey,
+        MTRSetDomainValueForKey(MTRToolDefaultsDomain, MTRNextAvailableDeviceIDKey,
             [NSNumber numberWithUnsignedLongLong:nextAvailableDeviceIdentifier]);
     } else {
         nextAvailableDeviceIdentifier = [value unsignedLongLongValue];
@@ -60,9 +60,9 @@ uint64_t CHIPGetNextAvailableDeviceID(void)
     return nextAvailableDeviceIdentifier;
 }
 
-void CHIPSetNextAvailableDeviceID(uint64_t id)
+void MTRSetNextAvailableDeviceID(uint64_t id)
 {
-    CHIPSetDomainValueForKey(MTRToolDefaultsDomain, MTRNextAvailableDeviceIDKey, [NSNumber numberWithUnsignedLongLong:id]);
+    MTRSetDomainValueForKey(MTRToolDefaultsDomain, MTRNextAvailableDeviceIDKey, [NSNumber numberWithUnsignedLongLong:id]);
 }
 
 static CHIPToolPersistentStorageDelegate * storage = nil;
@@ -71,7 +71,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
 static MTRDeviceController * sController = nil;
 
-MTRDeviceController * InitializeCHIP(void)
+MTRDeviceController * InitializeMTR(void)
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -120,60 +120,60 @@ MTRDeviceController * CHIPRestartController(MTRDeviceController * controller)
     return sController;
 }
 
-uint64_t CHIPGetLastPairedDeviceId(void)
+uint64_t MTRGetLastPairedDeviceId(void)
 {
-    uint64_t deviceId = CHIPGetNextAvailableDeviceID();
+    uint64_t deviceId = MTRGetNextAvailableDeviceID();
     if (deviceId > 1) {
         deviceId--;
     }
     return deviceId;
 }
 
-BOOL CHIPGetConnectedDevice(MTRDeviceConnectionCallback completionHandler)
+BOOL MTRGetConnectedDevice(MTRDeviceConnectionCallback completionHandler)
 {
-    MTRDeviceController * controller = InitializeCHIP();
+    MTRDeviceController * controller = InitializeMTR();
 
     // Let's use the last device that was paired
-    uint64_t deviceId = CHIPGetLastPairedDeviceId();
+    uint64_t deviceId = MTRGetLastPairedDeviceId();
     return [controller getDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
 }
 
-MTRDevice * CHIPGetDeviceBeingCommissioned(void)
+MTRDevice * MTRGetDeviceBeingCommissioned(void)
 {
     NSError * error;
-    MTRDeviceController * controller = InitializeCHIP();
-    MTRDevice * device = [controller getDeviceBeingCommissioned:CHIPGetLastPairedDeviceId() error:&error];
+    MTRDeviceController * controller = InitializeMTR();
+    MTRDevice * device = [controller getDeviceBeingCommissioned:MTRGetLastPairedDeviceId() error:&error];
     if (error) {
-        NSLog(@"Error retrieving device being commissioned for deviceId %llu", CHIPGetLastPairedDeviceId());
+        NSLog(@"Error retrieving device being commissioned for deviceId %llu", MTRGetLastPairedDeviceId());
         return nil;
     }
     return device;
 }
 
-BOOL CHIPGetConnectedDeviceWithID(uint64_t deviceId, MTRDeviceConnectionCallback completionHandler)
+BOOL MTRGetConnectedDeviceWithID(uint64_t deviceId, MTRDeviceConnectionCallback completionHandler)
 {
-    MTRDeviceController * controller = InitializeCHIP();
+    MTRDeviceController * controller = InitializeMTR();
 
     return [controller getDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
 }
 
-BOOL CHIPIsDevicePaired(uint64_t deviceId)
+BOOL MTRIsDevicePaired(uint64_t deviceId)
 {
-    NSString * PairedString = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, KeyForPairedDevice(deviceId));
+    NSString * PairedString = MTRGetDomainValueForKey(MTRToolDefaultsDomain, KeyForPairedDevice(deviceId));
     return [PairedString boolValue];
 }
 
-void CHIPSetDevicePaired(uint64_t deviceId, BOOL paired)
+void MTRSetDevicePaired(uint64_t deviceId, BOOL paired)
 {
-    CHIPSetDomainValueForKey(MTRToolDefaultsDomain, KeyForPairedDevice(deviceId), paired ? @"YES" : @"NO");
+    MTRSetDomainValueForKey(MTRToolDefaultsDomain, KeyForPairedDevice(deviceId), paired ? @"YES" : @"NO");
 }
 
 NSString * KeyForPairedDevice(uint64_t deviceId) { return [NSString stringWithFormat:@"%@%llu", kDevicePairedKey, deviceId]; }
 
-void CHIPUnpairDeviceWithID(uint64_t deviceId)
+void MTRUnpairDeviceWithID(uint64_t deviceId)
 {
-    CHIPSetDevicePaired(deviceId, NO);
-    CHIPGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+    MTRSetDevicePaired(deviceId, NO);
+    MTRGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable device, NSError * _Nullable error) {
         if (error) {
             NSLog(@"Failed to unpair device %llu still removing from CHIPTool. %@", deviceId, error);
             return;
@@ -211,22 +211,22 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
 
 - (nullable NSData *)storageDataForKey:(NSString *)key
 {
-    NSData * value = CHIPGetDomainValueForKey(MTRToolDefaultsDomain, key);
+    NSData * value = MTRGetDomainValueForKey(MTRToolDefaultsDomain, key);
     NSLog(@"MTRPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
     return value;
 }
 
 - (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key
 {
-    return CHIPSetDomainValueForKey(MTRToolDefaultsDomain, key, value);
+    return MTRSetDomainValueForKey(MTRToolDefaultsDomain, key, value);
 }
 
 - (BOOL)removeStorageDataForKey:(NSString *)key
 {
-    if (CHIPGetDomainValueForKey(MTRToolDefaultsDomain, key) == nil) {
+    if (MTRGetDomainValueForKey(MTRToolDefaultsDomain, key) == nil) {
         return NO;
     }
-    CHIPRemoveDomainValueForKey(MTRToolDefaultsDomain, key);
+    MTRRemoveDomainValueForKey(MTRToolDefaultsDomain, key);
     return YES;
 }
 

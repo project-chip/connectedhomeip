@@ -217,7 +217,7 @@
 - (void)fetchCommissionedFabricsNumber
 {
     NSLog(@"Fetching the commissioned fabrics attribute");
-    if (CHIPGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 MTROperationalCredentials * cluster = [[MTROperationalCredentials alloc] initWithDevice:chipDevice
                                                                                                endpoint:0
@@ -265,7 +265,7 @@
 - (void)fetchFabricsList
 {
     NSLog(@"Request to fetchFabricsList");
-    if (CHIPGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 MTROperationalCredentials * cluster = [[MTROperationalCredentials alloc] initWithDevice:chipDevice
                                                                                                endpoint:0
@@ -320,7 +320,7 @@
         actionWithTitle:@"Remove"
                   style:UIAlertActionStyleDefault
                 handler:^(UIAlertAction * action) {
-                    if (CHIPGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+                    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
                             if (!chipDevice) {
                                 [self
                                     updateResult:[NSString
@@ -365,7 +365,7 @@
                                          completionHandler:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                              NSError * _Nullable error) {
                                              if (!error) {
-                                                 CHIPSetDevicePaired(CHIPGetLastPairedDeviceId(), NO);
+                                                 MTRSetDevicePaired(MTRGetLastPairedDeviceId(), NO);
                                              }
                                              [self updateResult:[NSString
                                                                     stringWithFormat:@"Removed own Fabric Index %@ with Error %@",
@@ -398,7 +398,7 @@
     NSLog(@"Request to updateFabricLabel %@", label);
     [self.updateFabricLabelTextField resignFirstResponder];
 
-    if (CHIPGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 MTROperationalCredentials * cluster = [[MTROperationalCredentials alloc] initWithDevice:chipDevice
                                                                                                endpoint:0
@@ -451,7 +451,7 @@
 {
     NSNumber * fabricIndex = @([_removeFabricTextField.text intValue]);
     NSLog(@"Request to fabric at index %@", fabricIndex);
-    if (CHIPGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 [self updateResult:[NSString stringWithFormat:@"removeFabric command sent for fabricIndex %@.", fabricIndex]
                            isError:NO];
@@ -466,7 +466,7 @@
                              MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error) {
                              if (!error) {
                                  if (fabricIndex == self.currentFabricIndex) {
-                                     CHIPSetDevicePaired(CHIPGetLastPairedDeviceId(), NO);
+                                     MTRSetDevicePaired(MTRGetLastPairedDeviceId(), NO);
                                  }
                              }
                              [self updateResult:[NSString stringWithFormat:@"Finished removing fabric Index %@ with Error :%@",

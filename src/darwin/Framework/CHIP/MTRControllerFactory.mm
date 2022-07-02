@@ -136,7 +136,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
         return NO;
     }
 
-    CHIP_LOG_ERROR("Error: %@", logMsg);
+    MTR_LOG_ERROR("Error: %@", logMsg);
 
     [self cleanupInitObjects];
 
@@ -192,7 +192,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
 - (BOOL)startup:(MTRControllerFactoryParams *)startupParams
 {
     if ([self isRunning]) {
-        CHIP_LOG_DEBUG("Ignoring duplicate call to startup, Matter controller factory already started...");
+        MTR_LOG_DEBUG("Ignoring duplicate call to startup, Matter controller factory already started...");
         return YES;
     }
 
@@ -207,33 +207,33 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
 
         _persistentStorageDelegateBridge = new MTRPersistentStorageDelegateBridge(startupParams.storageDelegate);
         if (_persistentStorageDelegateBridge == nil) {
-            CHIP_LOG_ERROR("Error: %@", kErrorPersistentStorageInit);
+            MTR_LOG_ERROR("Error: %@", kErrorPersistentStorageInit);
             return;
         }
 
         // TODO: Allow passing a different keystore implementation via startupParams.
         _keystore = new PersistentStorageOperationalKeystore();
         if (_keystore == nullptr) {
-            CHIP_LOG_ERROR("Error: %@", kErrorKeystoreInit);
+            MTR_LOG_ERROR("Error: %@", kErrorKeystoreInit);
             return;
         }
 
         CHIP_ERROR errorCode = _keystore->Init(_persistentStorageDelegateBridge);
         if (errorCode != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Error: %@", kErrorKeystoreInit);
+            MTR_LOG_ERROR("Error: %@", kErrorKeystoreInit);
             return;
         }
 
         // TODO Allow passing a different opcert store implementation via startupParams.
         _opCertStore = new Credentials::PersistentStorageOpCertStore();
         if (_opCertStore == nullptr) {
-            CHIP_LOG_ERROR("Error: %@", kErrorCertStoreInit);
+            MTR_LOG_ERROR("Error: %@", kErrorCertStoreInit);
             return;
         }
 
         errorCode = _opCertStore->Init(_persistentStorageDelegateBridge);
         if (errorCode != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Error: %@", kErrorCertStoreInit);
+            MTR_LOG_ERROR("Error: %@", kErrorCertStoreInit);
             return;
         }
 
@@ -242,7 +242,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
         if (startupParams.paaCerts) {
             _attestationTrustStoreBridge = new MTRAttestationTrustStoreBridge(startupParams.paaCerts);
             if (_attestationTrustStoreBridge == nullptr) {
-                CHIP_LOG_ERROR("Error: %@", kErrorAttestationTrustStoreInit);
+                MTR_LOG_ERROR("Error: %@", kErrorAttestationTrustStoreInit);
                 return;
             }
             trustStore = _attestationTrustStoreBridge;
@@ -252,7 +252,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
         }
         _deviceAttestationVerifier = new Credentials::DefaultDACVerifier(trustStore);
         if (_deviceAttestationVerifier == nullptr) {
-            CHIP_LOG_ERROR("Error: %@", kErrorDACVerifierInit);
+            MTR_LOG_ERROR("Error: %@", kErrorDACVerifierInit);
             return;
         }
 
@@ -270,7 +270,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
         params.opCertStore = _opCertStore;
         errorCode = _controllerFactory->Init(params);
         if (errorCode != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Error: %@", kErrorControllerFactoryInit);
+            MTR_LOG_ERROR("Error: %@", kErrorControllerFactoryInit);
             return;
         }
 
@@ -297,7 +297,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
         [_controllers[0] shutdown];
     }
 
-    CHIP_LOG_DEBUG("%@", kInfoFactoryShutdown);
+    MTR_LOG_DEBUG("%@", kInfoFactoryShutdown);
     _controllerFactory->Shutdown();
 
     [self cleanupStartupObjects];
@@ -312,7 +312,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
 - (MTRDeviceController * _Nullable)startControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
 {
     if (![self isRunning]) {
-        CHIP_LOG_ERROR("Trying to start controller while Matter controller factory is not running");
+        MTR_LOG_ERROR("Trying to start controller while Matter controller factory is not running");
         return nil;
     }
 
@@ -332,12 +332,12 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
         const FabricInfo * fabric = nullptr;
         BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
         if (!ok) {
-            CHIP_LOG_ERROR("Can't start on existing fabric: fabric matching failed");
+            MTR_LOG_ERROR("Can't start on existing fabric: fabric matching failed");
             return;
         }
 
         if (fabric == nullptr) {
-            CHIP_LOG_ERROR("Can't start on existing fabric: fabric not found");
+            MTR_LOG_ERROR("Can't start on existing fabric: fabric not found");
             return;
         }
 
@@ -345,12 +345,12 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
             BOOL isRunning = YES; // assume the worst
             if ([existing isRunningOnFabric:fabricTable fabricIndex:fabric->GetFabricIndex() isRunning:&isRunning]
                 != CHIP_NO_ERROR) {
-                CHIP_LOG_ERROR("Can't tell what fabric a controller is running on.  Not safe to start.");
+                MTR_LOG_ERROR("Can't tell what fabric a controller is running on.  Not safe to start.");
                 return;
             }
 
             if (isRunning) {
-                CHIP_LOG_ERROR("Can't start on existing fabric: another controller is running on it");
+                MTR_LOG_ERROR("Can't start on existing fabric: another controller is running on it");
                 return;
             }
         }
@@ -377,17 +377,17 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
 - (MTRDeviceController * _Nullable)startControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
 {
     if (![self isRunning]) {
-        CHIP_LOG_ERROR("Trying to start controller while Matter controller factory is not running");
+        MTR_LOG_ERROR("Trying to start controller while Matter controller factory is not running");
         return nil;
     }
 
     if (startupParams.vendorId == nil) {
-        CHIP_LOG_ERROR("Must provide vendor id when starting controller on new fabric");
+        MTR_LOG_ERROR("Must provide vendor id when starting controller on new fabric");
         return nil;
     }
 
     if (startupParams.intermediateCertificate != nil && startupParams.rootCertificate == nil) {
-        CHIP_LOG_ERROR("Must provide a root certificate when using an intermediate certificate");
+        MTR_LOG_ERROR("Must provide a root certificate when using an intermediate certificate");
         return nil;
     }
 
@@ -407,12 +407,12 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
         const FabricInfo * fabric = nullptr;
         BOOL ok = [self findMatchingFabric:*fabricTable params:startupParams fabric:&fabric];
         if (!ok) {
-            CHIP_LOG_ERROR("Can't start on new fabric: fabric matching failed");
+            MTR_LOG_ERROR("Can't start on new fabric: fabric matching failed");
             return;
         }
 
         if (fabric != nullptr) {
-            CHIP_LOG_ERROR("Can't start on new fabric that matches existing fabric");
+            MTR_LOG_ERROR("Can't start on new fabric that matches existing fabric");
             return;
         }
 
@@ -438,7 +438,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
 {
     MTRDeviceController * controller = [[MTRDeviceController alloc] initWithFactory:self queue:_chipWorkQueue];
     if (controller == nil) {
-        CHIP_LOG_ERROR("Failed to init controller");
+        MTR_LOG_ERROR("Failed to init controller");
         return nil;
     }
 
@@ -470,7 +470,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
     CHIP_ERROR err = fabricTable.Init(
         { .storage = _persistentStorageDelegateBridge, .operationalKeystore = _keystore, .opCertStore = _opCertStore });
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Can't initialize fabric table: %s", ErrorStr(err));
+        MTR_LOG_ERROR("Can't initialize fabric table: %s", ErrorStr(err));
         return NO;
     }
 
@@ -478,7 +478,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
     if (params.rootCertificate != nil) {
         err = ExtractPubkeyFromX509Cert(AsByteSpan(params.rootCertificate), pubKey);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Can't extract public key from root certificate: %s", ErrorStr(err));
+            MTR_LOG_ERROR("Can't extract public key from root certificate: %s", ErrorStr(err));
             return NO;
         }
     } else {
@@ -486,7 +486,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
         // consumers must provide a root certificate whenever an ICA is used.
         err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(params.nocSigner.publicKey, &pubKey);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Can't extract public key from MTRKeypair: %s", ErrorStr(err));
+            MTR_LOG_ERROR("Can't extract public key from MTRKeypair: %s", ErrorStr(err));
             return NO;
         }
     }
@@ -502,7 +502,7 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
 - (void)controllerShuttingDown:(MTRDeviceController *)controller
 {
     if (![_controllers containsObject:controller]) {
-        CHIP_LOG_ERROR("Controller we don't know about shutting down");
+        MTR_LOG_ERROR("Controller we don't know about shutting down");
         return;
     }
 

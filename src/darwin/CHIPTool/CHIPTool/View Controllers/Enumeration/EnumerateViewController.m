@@ -108,7 +108,7 @@
 // 4. Success?
 - (void)enumerate
 {
-    CHIPGetConnectedDevice(^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+    MTRGetConnectedDevice(^(MTRDevice * _Nullable device, NSError * _Nullable error) {
         if (error) {
             NSString * resultLog = [[NSString alloc] initWithFormat:@"Unable to get connected device: Error: %@", error];
             [self updateResult:resultLog];

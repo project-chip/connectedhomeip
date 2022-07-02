@@ -91,7 +91,7 @@
         if (!container) {
             NSXPCConnection * xpcConnection = self.connectBlock();
             if (!xpcConnection) {
-                CHIP_LOG_ERROR("Cannot connect to XPC server for remote controller");
+                MTR_LOG_ERROR("Cannot connect to XPC server for remote controller");
                 completion(self.workQueue, nil);
                 return;
             }
@@ -109,11 +109,11 @@
                         strongSelf.proxyHandle = nil;
                         strongSelf.proxyRetainerForReports = nil;
                         [strongSelf.reportRegistry removeAllObjects];
-                        CHIP_LOG_DEBUG("CHIP XPC connection disconnected");
+                        MTR_LOG_DEBUG("CHIP XPC connection disconnected");
                     });
                 }
             };
-            CHIP_LOG_DEBUG("CHIP XPC connection established");
+            MTR_LOG_DEBUG("CHIP XPC connection established");
         }
         completion(self.workQueue, container);
     });
@@ -170,7 +170,7 @@
         [self
             getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
                 if (handle) {
-                    CHIP_LOG_DEBUG("CHIP XPC connection requests to stop reports");
+                    MTR_LOG_DEBUG("CHIP XPC connection requests to stop reports");
                     [handle.proxy stopReportsWithController:controller
                                                      nodeId:nodeId
                                                  completion:^{
@@ -179,7 +179,7 @@
                                                      clearRegistry();
                                                  }];
                 } else {
-                    CHIP_LOG_ERROR("CHIP XPC connection failed to stop reporting");
+                    MTR_LOG_ERROR("CHIP XPC connection failed to stop reporting");
                     clearRegistry();
                 }
             }];

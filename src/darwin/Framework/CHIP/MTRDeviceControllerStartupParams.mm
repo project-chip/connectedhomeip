@@ -37,7 +37,7 @@ using namespace chip;
     }
 
     if (!IsValidFabricId(fabricId)) {
-        CHIP_LOG_ERROR("%llu is not a valid fabric id to initialize a device controller with", fabricId);
+        MTR_LOG_ERROR("%llu is not a valid fabric id to initialize a device controller with", fabricId);
         return nil;
     }
 
@@ -64,7 +64,7 @@ using namespace chip;
         MutableByteSpan tlvOpCert(tlvOpCertBuf);
         CHIP_ERROR err = Credentials::ConvertX509CertToChipCert(AsByteSpan(operationalCertificate), tlvOpCert);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Unable to convert operational certificate to TLV: %s", ErrorStr(err));
+            MTR_LOG_ERROR("Unable to convert operational certificate to TLV: %s", ErrorStr(err));
             return nil;
         }
 
@@ -72,7 +72,7 @@ using namespace chip;
         NodeId unused = kUndefinedNodeId;
         err = Credentials::ExtractNodeIdFabricIdFromOpCert(tlvOpCert, &unused, &fabricId);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Unable to extract fabric id from operational certificate: %s", ErrorStr(err));
+            MTR_LOG_ERROR("Unable to extract fabric id from operational certificate: %s", ErrorStr(err));
             return nil;
         }
         _fabricId = fabricId;
@@ -116,7 +116,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     MutableByteSpan derCert(buf);
     CHIP_ERROR err = Credentials::ConvertChipCertToX509Cert(cert, derCert);
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Failed do convert Matter certificate to X.509 DER: %s", ErrorStr(err));
+        MTR_LOG_ERROR("Failed do convert Matter certificate to X.509 DER: %s", ErrorStr(err));
         return nil;
     }
 
@@ -132,23 +132,23 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     }
 
     if (self.nocSigner == nil && self.rootCertificate == nil) {
-        CHIP_LOG_ERROR("nocSigner and rootCertificate are both nil; no public key available to identify the fabric");
+        MTR_LOG_ERROR("nocSigner and rootCertificate are both nil; no public key available to identify the fabric");
         return nil;
     }
 
     if (self.operationalCertificate != nil && self.nodeId != nil) {
-        CHIP_LOG_ERROR("nodeId must be nil if operationalCertificate is not nil");
+        MTR_LOG_ERROR("nodeId must be nil if operationalCertificate is not nil");
         return nil;
     }
 
     if (self.operationalCertificate != nil) {
         if (self.operationalKeypair == nil) {
-            CHIP_LOG_ERROR("Must have an operational keypair if an operational certificate is provided");
+            MTR_LOG_ERROR("Must have an operational keypair if an operational certificate is provided");
             return nil;
         }
 
         if (![MTRCertificates keypair:self.operationalKeypair matchesCertificate:self.operationalCertificate]) {
-            CHIP_LOG_ERROR("operationalKeypair public key does not match operationalCertificate");
+            MTR_LOG_ERROR("operationalKeypair public key does not match operationalCertificate");
             return nil;
         }
     }
@@ -165,7 +165,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     }
 
     if (self.nocSigner == nil && self.operationalCertificate == nil) {
-        CHIP_LOG_ERROR("No way to get an operational certificate: nocSigner and operationalCertificate are both nil");
+        MTR_LOG_ERROR("No way to get an operational certificate: nocSigner and operationalCertificate are both nil");
         return nil;
     }
 
@@ -184,7 +184,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
                                                                fabricId:@(self.fabricId)
                                                                   error:&error];
         if (error != nil || self.rootCertificate == nil) {
-            CHIP_LOG_ERROR("Failed to generate root certificate: %@", error);
+            MTR_LOG_ERROR("Failed to generate root certificate: %@", error);
             return nil;
         }
     }
@@ -219,16 +219,16 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
             MutableByteSpan noc(nocBuf);
             CHIP_ERROR err = fabricTable->FetchNOCCert(fabric->GetFabricIndex(), noc);
             if (err != CHIP_NO_ERROR) {
-                CHIP_LOG_ERROR("Failed to get existing NOC: %s", ErrorStr(err));
+                MTR_LOG_ERROR("Failed to get existing NOC: %s", ErrorStr(err));
                 return nil;
             }
             self.operationalCertificate = MatterCertToX509Data(noc);
             if (self.operationalCertificate == nil) {
-                CHIP_LOG_ERROR("Failed to convert TLV NOC to DER X.509: %s", ErrorStr(err));
+                MTR_LOG_ERROR("Failed to convert TLV NOC to DER X.509: %s", ErrorStr(err));
                 return nil;
             }
             if (!keystore->HasOpKeypairForFabric(fabric->GetFabricIndex())) {
-                CHIP_LOG_ERROR("No existing operational key for fabric");
+                MTR_LOG_ERROR("No existing operational key for fabric");
                 return nil;
             }
         }
@@ -242,7 +242,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
         MutableByteSpan icaCert(icaBuf);
         CHIP_ERROR err = fabricTable->FetchICACert(fabric->GetFabricIndex(), icaCert);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Failed to get existing intermediate certificate: %s", ErrorStr(err));
+            MTR_LOG_ERROR("Failed to get existing intermediate certificate: %s", ErrorStr(err));
             return nil;
         }
         // There might not be an ICA cert for this fabric.
@@ -284,7 +284,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
         MutableByteSpan rootCert(rootBuf);
         CHIP_ERROR err = fabricTable->FetchRootCert(fabric->GetFabricIndex(), rootCert);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Failed to get existing root certificate: %s", ErrorStr(err));
+            MTR_LOG_ERROR("Failed to get existing root certificate: %s", ErrorStr(err));
             return nil;
         }
         oldRootCert = MatterCertToX509Data(rootCert);
@@ -296,7 +296,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     if (self.rootCertificate == nil) {
         self.rootCertificate = oldRootCert;
     } else if ([MTRCertificates isCertificate:oldRootCert equalTo:self.rootCertificate] == NO) {
-        CHIP_LOG_ERROR("Root certificate identity does not match existing root certificate");
+        MTR_LOG_ERROR("Root certificate identity does not match existing root certificate");
         return nil;
     }
 
@@ -314,20 +314,20 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
         if (signingCert == nil) {
             signingCert = self.rootCertificate;
             if (signingCert == nil) {
-                CHIP_LOG_ERROR("No certificate to match nocSigner");
+                MTR_LOG_ERROR("No certificate to match nocSigner");
                 return NO;
             }
         }
 
         if ([MTRCertificates keypair:self.nocSigner matchesCertificate:signingCert] == NO) {
-            CHIP_LOG_ERROR("Provided nocSigner does not match certificates");
+            MTR_LOG_ERROR("Provided nocSigner does not match certificates");
             return NO;
         }
     }
 
     if (self.operationalCertificate != nil && self.operationalKeypair != nil) {
         if ([MTRCertificates keypair:self.operationalKeypair matchesCertificate:self.operationalCertificate] == NO) {
-            CHIP_LOG_ERROR("Provided operationalKeypair does not match operationalCertificate");
+            MTR_LOG_ERROR("Provided operationalKeypair does not match operationalCertificate");
             return NO;
         }
     }

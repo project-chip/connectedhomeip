@@ -102,7 +102,7 @@ id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
         int64_t val;
         CHIP_ERROR err = data->Get(val);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Error(%s): TLV signed integer decoding failed", chip::ErrorStr(err));
+            MTR_LOG_ERROR("Error(%s): TLV signed integer decoding failed", chip::ErrorStr(err));
             return nil;
         }
         return [NSDictionary dictionaryWithObjectsAndKeys:MTRSignedIntegerValueType, MTRTypeKey, [NSNumber numberWithLongLong:val],
@@ -112,7 +112,7 @@ id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
         uint64_t val;
         CHIP_ERROR err = data->Get(val);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Error(%s): TLV unsigned integer decoding failed", chip::ErrorStr(err));
+            MTR_LOG_ERROR("Error(%s): TLV unsigned integer decoding failed", chip::ErrorStr(err));
             return nil;
         }
         return [NSDictionary dictionaryWithObjectsAndKeys:MTRUnsignedIntegerValueType, MTRTypeKey,
@@ -122,7 +122,7 @@ id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
         bool val;
         CHIP_ERROR err = data->Get(val);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Error(%s): TLV boolean decoding failed", chip::ErrorStr(err));
+            MTR_LOG_ERROR("Error(%s): TLV boolean decoding failed", chip::ErrorStr(err));
             return nil;
         }
         return [NSDictionary
@@ -138,7 +138,7 @@ id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
         double val;
         err = data->Get(val);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Error(%s): TLV floating point decoding failed", chip::ErrorStr(err));
+            MTR_LOG_ERROR("Error(%s): TLV floating point decoding failed", chip::ErrorStr(err));
             return nil;
         }
         return [NSDictionary
@@ -149,7 +149,7 @@ id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
         const uint8_t * ptr;
         CHIP_ERROR err = data->GetDataPtr(ptr);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Error(%s): TLV UTF8String decoding failed", chip::ErrorStr(err));
+            MTR_LOG_ERROR("Error(%s): TLV UTF8String decoding failed", chip::ErrorStr(err));
             return nil;
         }
         return [NSDictionary dictionaryWithObjectsAndKeys:MTRUTF8StringValueType, MTRTypeKey,
@@ -160,7 +160,7 @@ id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
         const uint8_t * ptr;
         CHIP_ERROR err = data->GetDataPtr(ptr);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Error(%s): TLV ByteString decoding failed", chip::ErrorStr(err));
+            MTR_LOG_ERROR("Error(%s): TLV ByteString decoding failed", chip::ErrorStr(err));
             return nil;
         }
         return [NSDictionary dictionaryWithObjectsAndKeys:MTROctetStringValueType, MTRTypeKey,
@@ -186,7 +186,7 @@ id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
         chip::TLV::TLVType tlvType;
         CHIP_ERROR err = data->EnterContainer(tlvType);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Error(%s): TLV container entering failed", chip::ErrorStr(err));
+            MTR_LOG_ERROR("Error(%s): TLV container entering failed", chip::ErrorStr(err));
             return nil;
         }
         NSMutableArray * array = [[NSMutableArray alloc] init];
@@ -194,7 +194,7 @@ id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             chip::TLV::Tag tag = data->GetTag();
             id value = NSObjectFromCHIPTLV(data);
             if (value == nullptr) {
-                CHIP_LOG_ERROR("Error when decoding TLV container");
+                MTR_LOG_ERROR("Error when decoding TLV container");
                 return nil;
             }
             NSMutableDictionary * arrayElement = [NSMutableDictionary dictionary];
@@ -205,18 +205,18 @@ id NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
             [array addObject:arrayElement];
         }
         if (err != CHIP_END_OF_TLV) {
-            CHIP_LOG_ERROR("Error(%s): TLV container decoding failed", chip::ErrorStr(err));
+            MTR_LOG_ERROR("Error(%s): TLV container decoding failed", chip::ErrorStr(err));
             return nil;
         }
         err = data->ExitContainer(tlvType);
         if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Error(%s): TLV container exiting failed", chip::ErrorStr(err));
+            MTR_LOG_ERROR("Error(%s): TLV container exiting failed", chip::ErrorStr(err));
             return nil;
         }
         return [NSDictionary dictionaryWithObjectsAndKeys:typeName, MTRTypeKey, array, MTRValueKey, nil];
     }
     default:
-        CHIP_LOG_ERROR("Error: Unsupported TLV type for conversion: %u", (unsigned) data->GetType());
+        MTR_LOG_ERROR("Error: Unsupported TLV type for conversion: %u", (unsigned) data->GetType());
         return nil;
     }
 }

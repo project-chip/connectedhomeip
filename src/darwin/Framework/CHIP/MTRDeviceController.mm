@@ -61,7 +61,7 @@ static NSString * const kErrorUnpairDevice = @"Failure while unpairing the devic
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
 static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrieve a paired device";
 static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
-static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
+static NSString * const kInfoStackShutdown = @"Shutting down the Matter Stack";
 static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code failed";
 static NSString * const kErrorGenerateNOC = @"Generating operational certificate failed";
 static NSString * const kErrorKeyAllocation = @"Generating new operational key failed";
@@ -158,7 +158,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 {
     __block BOOL commissionerInitialized = NO;
     if ([self isRunning]) {
-        CHIP_LOG_ERROR("Unexpected duplicate call to startup");
+        MTR_LOG_ERROR("Unexpected duplicate call to startup");
         return NO;
     }
 
@@ -169,24 +169,24 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
         if (startupParams.vendorId == nil || [startupParams.vendorId unsignedShortValue] == chip::VendorId::Common) {
             // Shouldn't be using the "standard" vendor ID for actual devices.
-            CHIP_LOG_ERROR("%@ is not a valid vendorId to initialize a device controller with", startupParams.vendorId);
+            MTR_LOG_ERROR("%@ is not a valid vendorId to initialize a device controller with", startupParams.vendorId);
             return;
         }
 
         if (startupParams.operationalCertificate == nil && startupParams.nodeId == nil) {
-            CHIP_LOG_ERROR("Can't start a controller if we don't know what node id it is");
+            MTR_LOG_ERROR("Can't start a controller if we don't know what node id it is");
             return;
         }
 
         if ([startupParams keypairsMatchCertificates] == NO) {
-            CHIP_LOG_ERROR("Provided keypairs do not match certificates");
+            MTR_LOG_ERROR("Provided keypairs do not match certificates");
             return;
         }
 
         if (startupParams.operationalCertificate != nil && startupParams.operationalKeypair == nil
             && (!startupParams.fabricIndex.HasValue()
                 || !startupParams.keystore->HasOpKeypairForFabric(startupParams.fabricIndex.Value()))) {
-            CHIP_LOG_ERROR("Have no operational keypair for our operational certificate");
+            MTR_LOG_ERROR("Have no operational keypair for our operational certificate");
             return;
         }
 
@@ -310,13 +310,13 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 - (NSNumber *)controllerNodeId
 {
     if (![self isRunning]) {
-        CHIP_LOG_ERROR("A controller has no node id if it has not been started");
+        MTR_LOG_ERROR("A controller has no node id if it has not been started");
         return nil;
     }
     __block NSNumber * nodeID;
     dispatch_sync(_chipWorkQueue, ^{
         if (![self isRunning]) {
-            CHIP_LOG_ERROR("A controller has no node id if it has not been started");
+            MTR_LOG_ERROR("A controller has no node id if it has not been started");
             nodeID = nil;
         } else {
             nodeID = @(_cppCommissioner->GetNodeId());
@@ -553,7 +553,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (duration > UINT16_MAX) {
-        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
+        MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -564,7 +564,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         self.cppCommissioner, deviceID, chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)));
 
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
+        MTR_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:err];
         }
@@ -583,7 +583,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (duration > UINT16_MAX) {
-        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
+        MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -591,7 +591,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     }
 
     if (discriminator > 0xfff) {
-        CHIP_LOG_ERROR("Error: Discriminator %tu is too large. Max value %d", discriminator, 0xfff);
+        MTR_LOG_ERROR("Error: Discriminator %tu is too large. Max value %d", discriminator, 0xfff);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -607,7 +607,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         setupPayload);
 
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
+        MTR_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:err];
         }
@@ -618,9 +618,9 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     std::string outCode;
 
     if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Setup code is %s", outCode.c_str());
+        MTR_LOG_ERROR("Setup code is %s", outCode.c_str());
     } else {
-        CHIP_LOG_ERROR("Failed to get decimal setup code");
+        MTR_LOG_ERROR("Failed to get decimal setup code");
         return nil;
     }
 
@@ -640,7 +640,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         return NO;
     }
 
-    CHIP_LOG_ERROR("Error: %@", logMsg);
+    MTR_LOG_ERROR("Error: %@", logMsg);
 
     [self cleanup];
 
@@ -661,7 +661,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         return NO;
     }
 
-    CHIP_LOG_ERROR("Error: %@", logMsg);
+    MTR_LOG_ERROR("Error: %@", logMsg);
 
     return YES;
 }
@@ -672,7 +672,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         return NO;
     }
 
-    CHIP_LOG_ERROR("Error(%s): %s", chip::ErrorStr(errorCode), [logMsg UTF8String]);
+    MTR_LOG_ERROR("Error(%s): %s", chip::ErrorStr(errorCode), [logMsg UTF8String]);
     if (error) {
         *error = [MTRError errorForCHIPErrorCode:errorCode];
     }

@@ -131,7 +131,7 @@ static MTRDeviceController * sController = nil;
 @end
 
 // This sample does not have multiple controllers and hence controller Id shall be the same.
-static NSString * const MTRDeviceControllerId = @"CHIPController";
+static NSString * const MTRDeviceControllerId = @"MTRController";
 
 @implementation MTRDeviceControllerServerSample
 

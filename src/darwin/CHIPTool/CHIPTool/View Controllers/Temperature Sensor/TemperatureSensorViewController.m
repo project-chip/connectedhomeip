@@ -188,7 +188,7 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
 
 - (void)readCurrentTemperature
 {
-    if (CHIPGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 MTRTemperatureMeasurement * cluster = [[MTRTemperatureMeasurement alloc] initWithDevice:chipDevice
                                                                                                endpoint:1
@@ -218,7 +218,7 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
     NSLog(
         @"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds), @(deltaInCelsius));
 
-    if (CHIPGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
         if (chipDevice) {
             // Use a wildcard subscription
                 [chipDevice subscribeWithQueue:dispatch_get_main_queue()
