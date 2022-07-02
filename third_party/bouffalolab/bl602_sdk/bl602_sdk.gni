@@ -157,6 +157,7 @@ template("bl602_sdk") {
       "SYS_BLOG_ENABLE=1",
       "SYS_VFS_ENABLE=1",
       "SYS_AOS_LOOP_ENABLE=1",
+      "BL602_USE_HAL_DRIVER=1",
       "BL602=BL602",
       "SYS_LOOPRT_ENABLE=1",
       "CFG_TXDESC=2",
@@ -201,7 +202,6 @@ template("bl602_sdk") {
       "CONFIG_BT_SETTINGS_USE_PRINTK",
       "CFG_BLE_STACK_DBG_PRINT",
 
-      "CONFIG_ENABLE_PW_RPC=0",
       "__FILENAME__=__FILE__",
       "BL602_LOG_ENABLED=1",
 

@@ -39,6 +39,12 @@ The steps in this document were validated on Ubuntu 18.04 and 20.04.
     ./scripts/build/build_examples.py --target bl602-light build
     ```
 
+-   Build the lighting-app with Pigweed RPC:
+
+    ```
+    ./scripts/examples/gn_bl602_example.sh lighting-app ./out/bl602-light 'import("//with_pw_rpc.gni")'
+    ```
+
 -   Connect the board to your flashing station (MacOS, Ubuntu, Windows).
 
 -   Set the board to the download mode:
@@ -118,3 +124,20 @@ $ sudo ./chip-tool pairing ble-wifi 1 ${SSID} ${PASSWORD} 20202021 3840
     ```
     $ sudo ./chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 1 1
     ```
+
+### Running RPC Console
+
+-   Build chip-console following this
+    [guide](../../../common/pigweed/rpc_console/README.md)
+
+-   Start the console
+
+    ```
+    $ chip-console --device /dev/ttyUSB0 -b 2000000
+    ```
+
+-   Get or Set the light state
+
+    `rpcs.chip.rpc.Lighting.Get()`
+
+    `rpcs.chip.rpc.Lighting.Set(on=True, level=128)`

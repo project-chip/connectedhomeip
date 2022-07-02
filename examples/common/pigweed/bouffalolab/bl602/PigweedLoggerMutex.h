@@ -15,22 +15,40 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/*******************************************************************************/
+
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "PigweedLogger.h"
+#include "pigweed/RpcService.h"
+#include "semphr.h"
+#include <FreeRTOS.h>
 
-// #include "board_features.h"
-// #include "hal-config-board.h"
-#include <blog.h>
+namespace chip {
+namespace rpc {
+class PigweedLoggerMutex : public ::chip::rpc::Mutex
+{
 
-void InitPlatform(void);
-void Button_Configure_FactoryResetEventHandler(void (*callback)(void));
-void Button_Configure_LightingActionEventHandler(void (*callback)(void));
-void BL602_LightState_Update(uint8_t red, uint8_t green, uint8_t blue);
+public:
+    PigweedLoggerMutex() {}
+    void Lock() override
+    {
+        SemaphoreHandle_t * sem = PigweedLogger::GetSemaphore();
+        if (sem)
+        {
+            xSemaphoreTake(*sem, portMAX_DELAY);
+        }
+    }
+    void Unlock() override
+    {
+        SemaphoreHandle_t * sem = PigweedLogger::GetSemaphore();
+        if (sem)
+        {
+            xSemaphoreGive(*sem);
+        }
+    }
+};
 
-#ifdef __cplusplus
-}
-#endif
+extern PigweedLoggerMutex logger_mutex;
+
+} // namespace rpc
+} // namespace chip
