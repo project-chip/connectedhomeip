@@ -19,9 +19,9 @@
 #include "hosal_uart.h"
 #include <string.h>
 
-extern hosal_uart_dev_t uart_stdio;
-
 #define MAX_BUFFER_SIZE 256
+
+extern hosal_uart_dev_t uart_stdio;
 
 typedef struct _uartFifo
 {
