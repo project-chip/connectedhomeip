@@ -60,7 +60,7 @@ std::string EscapeKey(const std::string & key)
         // Replace spaces, non-printable chars and `=` with hex-escaped (C-style) characters.
         if ((c <= 0x20) || (c == '=') || (c >= 0x7F))
         {
-            char escaped[5] = {0};
+            char escaped[5] = { 0 };
             snprintf(escaped, sizeof(escaped), "\\x%02x", (static_cast<unsigned>(c) & 0xff));
             escapedKey += escaped;
         }
@@ -184,8 +184,8 @@ CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
 bool PersistentStorage::SyncDoesKeyExist(const char * key)
 {
     std::string escapedKey = EscapeKey(key);
-    auto section = mConfig.sections[kDefaultSectionName];
-    auto it      = section.find(escapedKey);
+    auto section           = mConfig.sections[kDefaultSectionName];
+    auto it                = section.find(escapedKey);
     return (it != section.end());
 }
 
