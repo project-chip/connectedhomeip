@@ -45,14 +45,14 @@
 
 @interface MTRDeviceController (ToDoRemove)
 
- /**
-  * TODO: Temporary until PairingDelegate is fixed to clearly communicate this
-  * information to consumers.
-  * This should be migrated over to the proper pairing delegate path
-  */
- - (BOOL)_deviceBeingCommissionedOverBLE:(uint64_t)deviceId;
+/**
+ * TODO: Temporary until PairingDelegate is fixed to clearly communicate this
+ * information to consumers.
+ * This should be migrated over to the proper pairing delegate path
+ */
+- (BOOL)_deviceBeingCommissionedOverBLE:(uint64_t)deviceId;
 
- @end
+@end
 
 @interface QRCodeViewController ()
 
