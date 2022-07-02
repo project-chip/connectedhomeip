@@ -57,7 +57,7 @@ void LEDWidget::Set(bool state)
     if (state == mState)
         return;
 
-    mState = state;
+    mState         = state;
     mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
     DoSet();
 }
@@ -120,7 +120,7 @@ void LEDWidget::Toggle()
 {
     log_info("Toggling state to %d", !mState);
     mState = !mState;
-    if(mState == 1)
+    if (mState == 1)
     {
         SetBrightness(UINT8_MAX);
     }

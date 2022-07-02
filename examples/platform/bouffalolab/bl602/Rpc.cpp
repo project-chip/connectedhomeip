@@ -98,7 +98,7 @@ public:
     {
         if (!mRebootTimer)
         {
-            mRebootTimer = 
+            mRebootTimer =
                 xTimerCreateStatic("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler, &mRebootTimerBuffer);
             xTimerStart(mRebootTimer, 0);
         }
@@ -109,8 +109,8 @@ public:
     {
         if (!mRebootTimer)
         {
-            mRebootTimer = 
-                xTimerCreateStatic("FactoryReset", kRebootTimerPeriodTicks, false, nullptr, FactoryResetHandler, &mRebootTimerBuffer);
+            mRebootTimer = xTimerCreateStatic("FactoryReset", kRebootTimerPeriodTicks, false, nullptr, FactoryResetHandler,
+                                            &mRebootTimerBuffer);
             xTimerStart(mRebootTimer, 0);
         }
         return pw::OkStatus();

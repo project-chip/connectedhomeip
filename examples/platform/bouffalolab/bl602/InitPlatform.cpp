@@ -55,16 +55,16 @@ hosal_pwm_dev_t pwmR = { .port = 0xff };
 hosal_pwm_dev_t pwmR, pwmG, pwmB;
 #endif
 
-static void (*Button_FactoryResetEventHandler)(void) = nullptr;
+static void (*Button_FactoryResetEventHandler)(void)   = nullptr;
 static void (*Button_LightingActionEventHandler)(void) = nullptr;
 void Button_Configure_FactoryResetEventHandler(void (*callback)(void))
 {
-   Button_FactoryResetEventHandler = callback;
+    Button_FactoryResetEventHandler = callback;
 }
 
 void Button_Configure_LightingActionEventHandler(void (*callback)(void))
 {
-   Button_LightingActionEventHandler = callback;
+    Button_LightingActionEventHandler = callback;
 }
 
 static void Platform_Light_Init(void)
@@ -93,8 +93,8 @@ static void Platform_Light_Init(void)
     pwmG.config.freq       = 1000;
     hosal_pwm_init(&pwmG);
 
-    pwmB.port = 2;
-    pwmB.config.pin = 17;
+    pwmB.port              = 2;
+    pwmB.config.pin        = 17;
     pwmB.config.duty_cycle = 0; // duty_cycle range is 0~10000 correspond to 0~100%
     pwmB.config.freq       = 1000;
     hosal_pwm_init(&pwmB);
@@ -111,7 +111,7 @@ void BL602_LightState_Update(uint8_t red, uint8_t green, uint8_t blue)
 #if BOARD_ID == IOT_DVK_3S
     uint32_t level = (red * 10000) / UINT8_MAX;
     log_info("red level: %d\r\n", level);
-    hosal_pwm_duty_set(&pwmR,level);
+    hosal_pwm_duty_set(&pwmR, level);
 #else
     uint32_t r_level = (red * 10000) / UINT8_MAX;
     uint32_t g_level = (green * 10000) / UINT8_MAX;
@@ -249,10 +249,10 @@ static void event_cb_key_event(input_event_t * event, void * private_data)
         log_info("[KEY_1] [EVT] INIT DONE %lld\r\n", aos_now_ms());
         log_info("short press \r\n");
 
-       if (Button_LightingActionEventHandler != nullptr)
-       {
-           (*Button_LightingActionEventHandler)();
-       }
+        if (Button_LightingActionEventHandler != nullptr)
+        {
+            (*Button_LightingActionEventHandler)();
+        }
     }
     break;
     case KEY_2: {

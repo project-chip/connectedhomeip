@@ -25,5 +25,4 @@ chip_enable_openthread = false
 chip_build_pw_trace_lib = false
 
 cpp_standard = "gnu++17"
-
 #pw_trace_BACKEND = "$dir_pw_trace_tokenized"

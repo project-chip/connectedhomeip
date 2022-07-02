@@ -380,8 +380,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     else if (aEvent->ButtonEvent.Action == APP_BUTTON_PRESSED)
     {
         AppEvent Lightevent = {};
-        Lightevent.Type = AppEvent::kEventType_Button;
-        Lightevent.Handler = LightActionEventHandler;
+        Lightevent.Type     = AppEvent::kEventType_Button;
+        Lightevent.Handler  = LightActionEventHandler;
         sAppTask.PostEvent(&Lightevent);
     }
 }
@@ -542,8 +542,8 @@ void AppTask::OtaTask(void)
 
 void AppTask::FactoryResetButtonEventHandler(void)
 {
-    AppEvent button_event = {};
-    button_event.Type = AppEvent::kEventType_Button;
+    AppEvent button_event           = {};
+    button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = APP_BUTTON_LONGPRESSED;
 
     button_event.Handler = FunctionHandler;
@@ -553,8 +553,8 @@ void AppTask::FactoryResetButtonEventHandler(void)
 
 void AppTask::LightingActionButtonEventHandler(void)
 {
-    AppEvent button_event = {};
-    button_event.Type = AppEvent::kEventType_Button;
+    AppEvent button_event           = {};
+    button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = APP_BUTTON_PRESSED;
 
     button_event.Handler = FunctionHandler;
@@ -568,26 +568,27 @@ void AppTask::InitButtons(void)
     Button_Configure_LightingActionEventHandler(&LightingActionButtonEventHandler);
 }
 
-void AppTask::LightStateUpdateEventHandler(void) 
+void AppTask::LightStateUpdateEventHandler(void)
 {
     uint8_t onoff, level;
     do {
-        if (EMBER_ZCL_STATUS_SUCCESS != 
-            emberAfReadAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &onoff,sizeof(uint8_t)))
+        if (EMBER_ZCL_STATUS_SUCCESS !=
+            emberAfReadAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &onoff, sizeof(uint8_t)))
         {
             break;
         }
-        if ( EMBER_ZCL_STATUS_SUCCESS != 
-            emberAfReadAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) &level,sizeof(uint8_t)))
+        if ( EMBER_ZCL_STATUS_SUCCESS !=
+            emberAfReadAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) &level, 
+                                sizeof(uint8_t)))
         {
             break;
         }
-        if ( 0 == onoff)
+        if (0 == onoff)
         {
             statusLED.SetBrightness(0);
             statusLED.Set(0);
         }
-        else 
+        else
         {
             statusLED.SetBrightness(level);
         }
