@@ -32,7 +32,7 @@ extern "C" {
 
 //#define APP_LIGHT_BUTTON (34)
 #define APP_FUNCTION_BUTTON (35)
-#define APP_LOCK_BUTTON      (8)
+#define APP_LOCK_BUTTON (8)
 #define APP_BUTTON_DEBOUNCE_PERIOD_MS 50
 
 #define APP_BUTTON_PRESSED 0

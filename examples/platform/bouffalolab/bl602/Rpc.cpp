@@ -23,7 +23,7 @@
 #include "pw_sys_io_bl602/init.h"
 #include "task.h"
 extern "C" {
-    #include "bl_sys.h"
+#include "bl_sys.h"
 }
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 #include "pigweed/rpc_services/Attributes.h"
@@ -96,9 +96,10 @@ class BL602Device final : public Device
 public:
     pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
     {
-        if(!mRebootTimer)
+        if (!mRebootTimer)
         {
-            mRebootTimer = xTimerCreateStatic("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler, &mRebootTimerBuffer);
+            mRebootTimer = 
+                xTimerCreateStatic("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler, &mRebootTimerBuffer);
             xTimerStart(mRebootTimer, 0);
         }
         return pw::OkStatus();
@@ -106,9 +107,10 @@ public:
 
     pw::Status FactoryReset(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
     {
-        if(!mRebootTimer)
+        if (!mRebootTimer)
         {
-            mRebootTimer = xTimerCreateStatic("FactoryReset", kRebootTimerPeriodTicks, false, nullptr, FactoryResetHandler, &mRebootTimerBuffer);
+            mRebootTimer = 
+                xTimerCreateStatic("FactoryReset", kRebootTimerPeriodTicks, false, nullptr, FactoryResetHandler, &mRebootTimerBuffer);
             xTimerStart(mRebootTimer, 0);
         }
         return pw::OkStatus();

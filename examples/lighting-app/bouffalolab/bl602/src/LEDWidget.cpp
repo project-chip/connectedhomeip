@@ -31,7 +31,7 @@
 
 static void showRGB(uint8_t red, uint8_t green, uint8_t blue)
 {
-    BL602_LightState_Update(red,green,blue);
+    BL602_LightState_Update(red, green, blue);
 }
 
 void LEDWidget::Init(uint8_t gpioNum)
@@ -68,10 +68,9 @@ void LEDWidget::SetBrightness(uint8_t brightness)
     log_info("mDefaultOnBrightness: %d, brightness: %d\r\n", mDefaultOnBrightness, brightness);
     HSB2rgb(mHue, mSaturation, brightness, red, green, blue);
     log_info("brightness: %d, mHue: %d, mSaturation: %d, red: %d, green: %d, blue: %d\r\n", brightness, mHue, mSaturation, red,
-            green, blue);
+             green, blue);
     showRGB(red, green, blue);
-    mDefaultOnBrightness=brightness;
-    
+    mDefaultOnBrightness = brightness;
 }
 
 void LEDWidget::Blink(uint32_t changeRateMS)
@@ -100,7 +99,7 @@ void LEDWidget::Animate()
 
         if (nextChangeTimeMS < nowMS)
         {
-           // DoSet(!mState);
+            // DoSet(!mState);
             mLastChangeTimeMS = nowMS;
         }
     }
@@ -110,7 +109,7 @@ void LEDWidget::DoSet()
 {
     uint8_t red, green, blue;
     uint8_t brightness = mState ? mDefaultOnBrightness : 0;
-    log_info("state: %d, mDefaultOnBrightness: %d, brightness: %d\r\n",mState, mDefaultOnBrightness, brightness);
+    log_info("state: %d, mDefaultOnBrightness: %d, brightness: %d\r\n", mState, mDefaultOnBrightness, brightness);
     HSB2rgb(mHue, mSaturation, brightness, red, green, blue);
     log_info("brightness: %d, mHue: %d, mSaturation: %d, red: %d, green: %d, blue: %d\r\n", brightness, mHue, mSaturation, red,
              green, blue);
@@ -121,10 +120,11 @@ void LEDWidget::Toggle()
 {
     log_info("Toggling state to %d", !mState);
     mState = !mState;
-    if(mState==1)
+    if(mState == 1)
     {
         SetBrightness(UINT8_MAX);
-    }else
+    }
+    else
     {
         SetBrightness(0);
     }

@@ -16,9 +16,9 @@
 # 'import("//with_pw_rpc.gni")'
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 import("${chip_root}/config/bouffalolab/bl602/lib/pw_rpc/pw_rpc.gni")
 import("${chip_root}/examples/platform/bouffalolab/bl602/args.gni")
-import("//build_overrides/pigweed.gni")
 
 chip_enable_pw_rpc = true
 chip_enable_openthread = false

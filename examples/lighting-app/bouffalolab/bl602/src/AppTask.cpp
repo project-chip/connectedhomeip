@@ -41,12 +41,12 @@
 #include <platform/bouffalolab/BL602/OTAImageProcessorImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <InitPlatform.h>
 #include <async_log.h>
 #include <bl_sys_ota.h>
-#include <lib/support/ErrorStr.h>
-#include <InitPlatform.h>
 #include <easyflash.h>
 #include <hal_sys.h>
+#include <lib/support/ErrorStr.h>
 
 #if PW_RPC_ENABLED
 #include "Rpc.h"
@@ -376,15 +376,13 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         statusLED.Toggle();
         vTaskDelay(3000);
         chip::Server::GetInstance().ScheduleFactoryReset();
-
     }
-    else if(aEvent->ButtonEvent.Action == APP_BUTTON_PRESSED)
+    else if (aEvent->ButtonEvent.Action == APP_BUTTON_PRESSED)
     {
-        AppEvent Lightevent={};
-        Lightevent.Type               = AppEvent::kEventType_Button;
-        Lightevent.Handler            = LightActionEventHandler;
+        AppEvent Lightevent = {};
+        Lightevent.Type = AppEvent::kEventType_Button;
+        Lightevent.Handler = LightActionEventHandler;
         sAppTask.PostEvent(&Lightevent);
-        
     }
 }
 
@@ -520,13 +518,13 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 void AppTask::UpdateClusterState(void)
 {
     uint8_t newValue = LightMgr().IsLightOn();
-    log_info("updating on/off = %x\r\n",newValue);
+    log_info("updating on/off = %x\r\n", newValue);
     EmberAfStatus status =
         emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         log_error("ERR: updating on/off %x\r\n", status);
-    } 
+    }
 }
 
 void AppTask::OtaTask(void)
@@ -541,54 +539,57 @@ void AppTask::OtaTask(void)
         return;
     }
 }
+
 void AppTask::FactoryResetButtonEventHandler(void)
 {
-
     AppEvent button_event = {};
-    button_event.Type     = AppEvent::kEventType_Button;
+    button_event.Type = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = APP_BUTTON_LONGPRESSED;
 
     button_event.Handler = FunctionHandler;
     log_info("FactoryResetButtonEventHandler\r\n");
     sAppTask.PostEvent(&button_event);
-    
-
 }
+
 void AppTask::LightingActionButtonEventHandler(void)
 {
     AppEvent button_event = {};
-    button_event.Type     = AppEvent::kEventType_Button;
+    button_event.Type = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = APP_BUTTON_PRESSED;
 
     button_event.Handler = FunctionHandler;
     log_info("LightingActionButtonEventHandler\r\n");
     sAppTask.PostEvent(&button_event);
-
 }
+
 void AppTask::InitButtons(void)
 {
     Button_Configure_FactoryResetEventHandler(&FactoryResetButtonEventHandler);
     Button_Configure_LightingActionEventHandler(&LightingActionButtonEventHandler);
 }
-void AppTask::LightStateUpdateEventHandler(void) 
-{     
-    uint8_t onoff,level;     
-    do{         
-        if(EMBER_ZCL_STATUS_SUCCESS!=emberAfReadAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &onoff,sizeof(uint8_t)))         
-        {
-            break;         
-        }         
-        if(EMBER_ZCL_STATUS_SUCCESS!=emberAfReadAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) &level,sizeof(uint8_t)))
-        {  
-            break;         
-        }          
-        if(0==onoff)
-        {              
-            statusLED.SetBrightness(0);
-            statusLED.Set(0);          
-        }else{              
-            statusLED.SetBrightness(level);         
-        }      
-    }while (0);             
-}
 
+void AppTask::LightStateUpdateEventHandler(void) 
+{
+    uint8_t onoff, level;
+    do {
+        if (EMBER_ZCL_STATUS_SUCCESS != 
+            emberAfReadAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &onoff,sizeof(uint8_t)))
+        {
+            break;
+        }
+        if ( EMBER_ZCL_STATUS_SUCCESS != 
+            emberAfReadAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) &level,sizeof(uint8_t)))
+        {
+            break;
+        }
+        if ( 0 == onoff)
+        {
+            statusLED.SetBrightness(0);
+            statusLED.Set(0);
+        }
+        else 
+        {
+            statusLED.SetBrightness(level);
+        }
+    } while (0);
+}

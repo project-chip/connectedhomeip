@@ -127,7 +127,8 @@ the BL602 lighting-app to commission it onto a Wi-Fi network:
 
 ### Running RPC Console
 
--   Build chip-console following this [guide](../../../common/pigweed/rpc_console/README.md)
+-   Build chip-console following this 
+    [guide](../../../common/pigweed/rpc_console/README.md)
 
 -   Start the console
 

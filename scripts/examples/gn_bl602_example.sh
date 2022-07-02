@@ -30,7 +30,7 @@ USAGE="./scripts/examples/gn_bl602_example.sh example_dir output_dir"
 
 if [ $# -lt 2 ]; then
     echo "Usage: $USAGE"
-    exit 1	
+    exit 1
 fi
 
 EXAMPLE_DIR=examples/$1/bouffalolab/bl602/
@@ -38,12 +38,12 @@ shift
 OUTPUT_DIR=$1
 shift
 
-export BL_IOT_SDK_PATH=$MATTER_ROOT/third_party/bouffalolab/bl602_sdk/repo
+export BL_IOT_SDK_PATH="$MATTER_ROOT"/third_party/bouffalolab/bl602_sdk/repo
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-export PATH="$BL_IOT_SDK_PATH/toolchain/riscv/Linux/bin:$PATH"
+    export PATH="$BL_IOT_SDK_PATH/toolchain/riscv/Linux/bin:$PATH"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-export PATH="$BL_IOT_SDK_PATH/toolchain/riscv/Darwin/bin:$PATH"
+    export PATH="$BL_IOT_SDK_PATH/toolchain/riscv/Darwin/bin:$PATH"
 fi
 
 GN_ARGS=()
@@ -71,4 +71,3 @@ done
 gn gen --fail-on-unused-args --root="$EXAMPLE_DIR" "$OUTPUT_DIR" --args="${GN_ARGS[*]}"
 
 ninja -C "$OUTPUT_DIR" "${NINJA_ARGS[@]}"
-

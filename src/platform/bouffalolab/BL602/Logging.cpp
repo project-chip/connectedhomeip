@@ -27,7 +27,7 @@ namespace Platform {
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-    
+
 #ifndef PW_RPC_ENABLED
     vsnprintf(formattedMsg, sizeof(formattedMsg), msg, v);
 
