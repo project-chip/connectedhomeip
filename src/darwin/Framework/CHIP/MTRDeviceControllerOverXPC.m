@@ -97,12 +97,6 @@ static void SetupXPCQueue(void)
     return nil;
 }
 
-- (BOOL)deviceBeingCommissionedOverBLE:(uint64_t)deviceId
-{
-    MTR_LOG_ERROR("MTRDevice doesn't support deviceBeingCommissionedOverBLE over XPC");
-    return NO;
-}
-
 - (BOOL)getDevice:(uint64_t)deviceID queue:(dispatch_queue_t)queue completionHandler:(MTRDeviceConnectionCallback)completionHandler
 {
     dispatch_async(_workQueue, ^{
