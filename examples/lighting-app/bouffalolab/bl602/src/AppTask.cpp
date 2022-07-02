@@ -571,7 +571,7 @@ void AppTask::InitButtons(void)
 void AppTask::LightStateUpdateEventHandler(void)
 {
     uint8_t onoff, level;
-    do 
+    do
     {
         if (EMBER_ZCL_STATUS_SUCCESS !=
             emberAfReadAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &onoff, sizeof(uint8_t)))
