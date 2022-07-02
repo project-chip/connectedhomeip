@@ -39,13 +39,13 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "CHIPDeviceTests">
+                  Identifier = "MTRDeviceTests">
                </Test>
                <Test
-                  Identifier = "CHIPRemoteDeviceSampleTests">
+                  Identifier = "MTRRemoteDeviceSampleTests">
                </Test>
                <Test
-                  Identifier = "CHIPXPCListenerSampleTests">
+                  Identifier = "MTRXPCListenerSampleTests">
                </Test>
             </SkippedTests>
          </TestableReference>
