@@ -77,7 +77,6 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 @property (readonly) MTROperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) MTRP256KeypairBridge signingKeypairBridge;
 @property (readonly) MTRP256KeypairBridge operationalKeypairBridge;
-@property (readonly) chip::Optional<chip::CHIPP256KeypairNativeBridge> operationalKeypairNativeBridge;
 @property (readonly) MTRDeviceAttestationDelegateBridge * deviceAttestationDelegateBridge;
 @property (readonly) MTRControllerFactory * factory;
 @end
@@ -193,16 +192,16 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
         // create a MTRP256KeypairBridge here and pass it to the operationalCredentialsDelegate
-        std::unique_ptr<chip::Crypto::CHIPP256KeypairNativeBridge> nativeBridge;
+        chip::Crypto::P256Keypair * signingKeypair = nullptr;
         if (startupParams.nocSigner) {
             errorCode = _signingKeypairBridge.Init(startupParams.nocSigner);
             if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorSigningKeypairInit]) {
                 return;
             }
-            nativeBridge = std::make_unique<chip::Crypto::CHIPP256KeypairNativeBridge>(_signingKeypairBridge);
+            signingKeypair = &_signingKeypairBridge;
         }
-        errorCode = _operationalCredentialsDelegate->Init(_factory.storageDelegateBridge, std::move(nativeBridge),
-            startupParams.ipk, startupParams.rootCertificate, startupParams.intermediateCertificate);
+        errorCode = _operationalCredentialsDelegate->Init(_factory.storageDelegateBridge, signingKeypair, startupParams.ipk,
+            startupParams.rootCertificate, startupParams.intermediateCertificate);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
             return;
         }
@@ -231,8 +230,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
             if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalKeypairInit]) {
                 return;
             }
-            _operationalKeypairNativeBridge.Emplace(_operationalKeypairBridge);
-            commissionerParams.operationalKeypair = &_operationalKeypairNativeBridge.Value();
+            commissionerParams.operationalKeypair = &_operationalKeypairBridge;
             commissionerParams.hasExternallyOwnedOperationalKeypair = true;
         }
 

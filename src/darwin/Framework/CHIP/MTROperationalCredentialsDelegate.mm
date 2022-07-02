@@ -49,7 +49,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::Init(MTRPersistentStorageDelegateB
 
     mStorage = storage;
 
-    mIssuerKey = std::move(nocSigner);
+    mIssuerKey = nocSigner;
 
     if ([ipk length] != mIPK.Length()) {
         MTR_LOG_ERROR("MTROperationalCredentialsDelegate::init provided IPK is wrong size");
@@ -203,7 +203,6 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateRootCertificate(id<MTRKeyp
     *rootCert = nil;
     MTRP256KeypairBridge keypairBridge;
     ReturnErrorOnFailure(keypairBridge.Init(keypair));
-    CHIPP256KeypairNativeBridge nativeKeypair(keypairBridge);
 
     ChipDN rcac_dn;
     ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(GetIssuerId(issuerId)));
@@ -229,7 +228,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateRootCertificate(id<MTRKeyp
     uint8_t rcacBuffer[Controller::kMaxCHIPDERCertLength];
     MutableByteSpan rcac(rcacBuffer);
     X509CertRequestParams rcac_request = { 0, validityStart, validityEnd, rcac_dn, rcac_dn };
-    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, nativeKeypair, rcac));
+    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, keypairBridge, rcac));
     *rootCert = AsData(rcac);
     return CHIP_NO_ERROR;
 }
@@ -247,7 +246,6 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateIntermediateCertificate(id
 
     MTRP256KeypairBridge keypairBridge;
     ReturnErrorOnFailure(keypairBridge.Init(rootKeypair));
-    CHIPP256KeypairNativeBridge nativeRootKeypair(keypairBridge);
 
     ByteSpan rcac = AsByteSpan(rootCertificate);
 
@@ -280,7 +278,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateIntermediateCertificate(id
     uint8_t icacBuffer[Controller::kMaxCHIPDERCertLength];
     MutableByteSpan icac(icacBuffer);
     X509CertRequestParams icac_request = { 0, validityStart, validityEnd, icac_dn, rcac_dn };
-    ReturnErrorOnFailure(NewICAX509Cert(icac_request, pubKey, nativeRootKeypair, icac));
+    ReturnErrorOnFailure(NewICAX509Cert(icac_request, pubKey, keypairBridge, icac));
     *intermediateCert = AsData(icac);
     return CHIP_NO_ERROR;
 }
@@ -308,7 +306,6 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateOperationalCertificate(id<
 
     MTRP256KeypairBridge keypairBridge;
     ReturnErrorOnFailure(keypairBridge.Init(signingKeypair));
-    CHIPP256KeypairNativeBridge nativeSigningKeypair(keypairBridge);
 
     P256PublicKey pubKey;
     ReturnErrorOnFailure(MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(operationalPublicKey, &pubKey));
@@ -323,7 +320,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateOperationalCertificate(id<
 
     uint8_t nocBuffer[Controller::kMaxCHIPDERCertLength];
     MutableByteSpan noc(nocBuffer);
-    ReturnErrorOnFailure(GenerateNOC(nativeSigningKeypair, signingCertificate, node, fabric, cats, pubKey, noc));
+    ReturnErrorOnFailure(GenerateNOC(keypairBridge, signingCertificate, node, fabric, cats, pubKey, noc));
 
     *operationalCert = AsData(noc);
     return CHIP_NO_ERROR;
