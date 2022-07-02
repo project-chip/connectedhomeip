@@ -97,7 +97,24 @@ public:
         }
     }
 
-    void DeliverOneMessage() { mIOContext.DriveIO(); }
+    /*
+     * This drives the servicing of events using the embedded IOContext while there are pending
+     * messages in the loopback transport's pending message queue. This should run to completion for one message
+     */
+    void DeliverOneMessage(System::Clock::Timeout maxWait = chip::System::Clock::Seconds16(5))
+    {
+        auto & impl                        = GetLoopback();
+        System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
+        if (!impl.HasPendingMessages())
+        {
+            return;
+        }
+        mIOContext.DriveIO();
+        if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= maxWait)
+        {
+            return;
+        }
+    }
 
 private:
     Test::IOContext mIOContext;

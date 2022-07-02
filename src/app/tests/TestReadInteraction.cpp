@@ -2741,7 +2741,6 @@ void TestReadInteraction::TestReadInvalidMessage1(nlTestSuite * apSuite, void * 
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
 
@@ -2761,7 +2760,7 @@ void TestReadInteraction::TestReadInvalidMessage1(nlTestSuite * apSuite, void * 
         err = readClient.mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-        ctx.DeliverOneMessage();
+        ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, delegate.mError != CHIP_NO_ERROR);
     }
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
@@ -2783,7 +2782,6 @@ void TestReadInteraction::TestReadInvalidMessage2(nlTestSuite * apSuite, void * 
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
 
@@ -2831,7 +2829,7 @@ void TestReadInteraction::TestReadInvalidMessage2(nlTestSuite * apSuite, void * 
 }
 
 // Read Client creates the subscription with server, server sends chunked reports, after the hander sends out the first chunked report,
-// handle call unknow message function and send status report, client
+// handler calls unknown message function and send status report, client
 // and server would be closed
 void TestReadInteraction::TestSubscribeInvalidMessage1(nlTestSuite * apSuite, void * apContext)
 {
@@ -2842,13 +2840,10 @@ void TestReadInteraction::TestSubscribeInvalidMessage1(nlTestSuite * apSuite, vo
     // Shouldn't have anything in the retransmit table when starting the test.
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 
-    GenerateEvents(apSuite, apContext);
-
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
     chip::app::AttributePathParams attributePathParams[1];
     // Mock Attribute 4 is a big attribute, with 6 large OCTET_STRING
@@ -2857,8 +2852,6 @@ void TestReadInteraction::TestSubscribeInvalidMessage1(nlTestSuite * apSuite, vo
     attributePathParams[0].mAttributeId = Test::MockAttributeId(4);
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-    readPrepareParams.mpEventPathParamsList        = nullptr;
-    readPrepareParams.mEventPathParamsListSize     = 0;
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
 
@@ -2871,12 +2864,14 @@ void TestReadInteraction::TestSubscribeInvalidMessage1(nlTestSuite * apSuite, vo
 
         ctx.DeliverOneMessage();
 
+        //ctx.GetLoopback().mNumMessagesToDrop = 1;
+        //ctx.DeliverOneMessage();
+
         System::PacketBufferHandle msgBuf;
         ReadRequestMessage::Builder request;
         System::PacketBufferTLVWriter writer;
 
         /*
-         //TODO: Send real unknown message to trigger unknown message flow in handler
         chip::app::InitWriterWithSpaceReserved(writer, 0);
         err = request.Init(&writer);
         err = writer.Finalize(&msgBuf);
@@ -2914,7 +2909,6 @@ void TestReadInteraction::TestSubscribeInvalidMessage2(nlTestSuite * apSuite, vo
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
 
@@ -2934,7 +2928,7 @@ void TestReadInteraction::TestSubscribeInvalidMessage2(nlTestSuite * apSuite, vo
         err = readClient.mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-        ctx.DeliverOneMessage();
+        ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, delegate.mError != CHIP_NO_ERROR);
     }
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
@@ -2956,7 +2950,6 @@ void TestReadInteraction::TestSubscribeInvalidMessage3(nlTestSuite * apSuite, vo
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
 
@@ -3041,7 +3034,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestSubscribeRoundtrip", chip::app::TestReadInteraction::TestSubscribeRoundtrip),
     NL_TEST_DEF("TestReadInvalidMessage1", chip::app::TestReadInteraction::TestReadInvalidMessage1),
     NL_TEST_DEF("TestReadInvalidMessage2", chip::app::TestReadInteraction::TestReadInvalidMessage2),
-    //NL_TEST_DEF("TestSubscribeInvalidMessage1", chip::app::TestReadInteraction::TestSubscribeInvalidMessage1),
+    NL_TEST_DEF("TestSubscribeInvalidMessage1", chip::app::TestReadInteraction::TestSubscribeInvalidMessage1),
     NL_TEST_DEF("TestSubscribeInvalidMessage2", chip::app::TestReadInteraction::TestSubscribeInvalidMessage2),
     NL_TEST_DEF("TestSubscribeInvalidMessage3", chip::app::TestReadInteraction::TestSubscribeInvalidMessage3),
     NL_TEST_DEF("TestSubscribeUrgentWildcardEvent", chip::app::TestReadInteraction::TestSubscribeUrgentWildcardEvent),
