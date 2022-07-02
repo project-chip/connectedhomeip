@@ -59,15 +59,15 @@ tests:
               maxValue: 10000
 
     - label: "Operate on device to change the relative humidity significantly"
-      PICS: MANUAL_RELATIVEHUMIDITY_CHANGE
       cluster: "LogCommands"
-      command: "Log"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value:
-                    "Operate on device to change the relative humidity
-                    significantly"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Read the mandatory attribute: MeasuredValue"
       command: "readAttribute"

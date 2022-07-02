@@ -11349,13 +11349,15 @@ private:
                                  GeneralCommissioning::Attributes::BasicCommissioningInfo::Id, true, chip::NullOptional);
         }
         case 7: {
-            LogStep(7, "Step 6 TC-CGEN-2.1");
+            LogStep(7,
+                    "Step 6 is implicitly validating the attribute(BasicCommissioningInfo) constraints, as long as the payload is "
+                    "being parsed successfully");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message =
-                chip::Span<const char>("Step 6 is implicitly validating the attribute(BasicCommissioningInfo) constraints, as long "
-                                       "as the payload is being parsed successfullygarbage: not in length on purpose",
-                                       134);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 8: {
@@ -12389,10 +12391,13 @@ private:
             );
         }
         case 2: {
-            LogStep(2, "Manually check DUT executes a blink effect");
+            LogStep(2, "DUT executes a blink effect");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("DUT executes a blink effectgarbage: not in length on purpose", 27);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 3: {
@@ -12410,10 +12415,13 @@ private:
             );
         }
         case 4: {
-            LogStep(4, "check DUT executes a breathe effect");
+            LogStep(4, "DUT executes a breathe effect");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("DUT executes a breathe effectgarbage: not in length on purpose", 29);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
@@ -12431,10 +12439,13 @@ private:
             );
         }
         case 6: {
-            LogStep(6, "check DUT executes an okay effect");
+            LogStep(6, "DUT executes an okay effect");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("DUT executes an okay effectgarbage: not in length on purpose", 27);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 7: {
@@ -12452,10 +12463,13 @@ private:
             );
         }
         case 8: {
-            LogStep(8, "check DUT executes a channel change effect");
+            LogStep(8, "DUT executes a channel change effect");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("DUT executes a channel change effectgarbage: not in length on purpose", 36);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 9: {
@@ -12473,10 +12487,13 @@ private:
             );
         }
         case 10: {
-            LogStep(10, "check DUT executes a breathe effect");
+            LogStep(10, "DUT executes a breathe effect");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("DUT executes a breathe effectgarbage: not in length on purpose", 29);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 11: {
@@ -12494,12 +12511,13 @@ private:
             );
         }
         case 12: {
-            LogStep(12, "Manually check DUT stops the breathe effect after the current effect sequence");
-            VerifyOrDo(!ShouldSkip("I.S.C40.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(12, "DUT stops the breathe effect after the current effect sequence");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "DUT stops the breathe effect after the current effect sequencegarbage: not in length on purpose", 62);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 13: {
@@ -12517,10 +12535,13 @@ private:
             );
         }
         case 14: {
-            LogStep(14, "Manually check DUT executes a breathe effect");
+            LogStep(14, "DUT executes a breathe effect");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("DUT executes a breathe effectgarbage: not in length on purpose", 29);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 15: {
@@ -12538,11 +12559,13 @@ private:
             );
         }
         case 16: {
-            LogStep(16, "Check DUT stops the breathe effect as soon as possible.");
+            LogStep(16, "DUT stops the breathe effect as soon as possible.");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message =
-                chip::Span<const char>("DUT stops the breathe effect as soon as possiblegarbage: not in length on purpose", 48);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 17: {
@@ -12561,9 +12584,12 @@ private:
         }
         case 18: {
             LogStep(18, "Check DUT executes a blink effect.");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("DUT executes a blink effectgarbage: not in length on purpose", 27);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 19: {
@@ -12581,11 +12607,13 @@ private:
             );
         }
         case 20: {
-            LogStep(20, "Check DUT stops any effect that may be still running as soon as possible");
+            LogStep(20, "DUT stops any effect that may be still running as soon as possible");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "DUT stops any effect that may be still running as soon as possiblegarbage: not in length on purpose", 66);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         }
@@ -14296,13 +14324,15 @@ private:
             );
         }
         case 5: {
-            LogStep(5, "user prompt message");
+            LogStep(5,
+                    "Physically verify that the DUT moves at a rate of 32 units per second or as close as possible to this rate "
+                    "and completes moving to its maximum level");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "Physically verify that the DUT moves at a rate of 32 units per second or as close as possible to this rate and "
-                "completes moving to its maximum levelgarbage: not in length on purpose",
-                148);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 6: {
@@ -14330,13 +14360,15 @@ private:
             );
         }
         case 9: {
-            LogStep(9, "user prompt message");
+            LogStep(9,
+                    "Physically verify that the DUT moves at a rate of 64 units per second or as close as possible to this rate "
+                    "and complete moving to its minimum level");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "Physically verify that the DUT moves at a rate of 64 units per second or as close as possible to this rate and "
-                "complete moving to its minimum levelgarbage: not in length on purpose",
-                147);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 10: {
@@ -14378,12 +14410,15 @@ private:
             return WaitForMs(kIdentityAlpha, value);
         }
         case 15: {
-            LogStep(15, "user prompt message");
+            LogStep(15,
+                    "Physically verify that the device moves at the rate recorded in step 3a and completes moving to its maximum "
+                    "level");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("Physically verify that the device moves at the rate recorded in step 3a and "
-                                                   "completes moving to its maximum level.garbage: not in length on purpose",
-                                                   114);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 16: {
@@ -14826,11 +14861,13 @@ private:
             );
         }
         case 7: {
-            LogStep(7, "user prompt message");
+            LogStep(7, "Physically verify that the device has stopped transitioning");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "Physically verify that the device has stopped transitioning.garbage: not in length on purpose", 60);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 8: {
@@ -14870,11 +14907,13 @@ private:
             );
         }
         case 12: {
-            LogStep(12, "user prompt message");
+            LogStep(12, "Physically verify that the device has stopped transitioning");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "Physically verify that the device has stopped transitioning.garbage: not in length on purpose", 60);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 13: {
@@ -22325,11 +22364,13 @@ private:
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 17: {
-            LogStep(17, "User prompt Set OnOff attribute manually to on");
+            LogStep(17, "Operate on device to set OnOff attribute manually to on");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "Operate on device to set OnOff attribute manually to ongarbage: not in length on purpose", 55);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 18: {
@@ -22338,11 +22379,13 @@ private:
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::OnOff::Id, true, chip::NullOptional);
         }
         case 19: {
-            LogStep(19, "User prompt Set OnOff attribute manually to off");
+            LogStep(19, "Operate on device to set OnOff attribute manually to off");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "Operate on device to set OnOff attribute manually to offgarbage: not in length on purpose", 56);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 20: {
@@ -29650,10 +29693,12 @@ private:
         }
         case 2: {
             LogStep(2, "Verify device temperature displayed in °C");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message =
-                chip::Span<const char>("Verify device temperature displayed in °Cgarbage: not in length on purpose", 42);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 3: {
@@ -29675,10 +29720,12 @@ private:
         }
         case 5: {
             LogStep(5, "Verify device temperature displayed in °F");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message =
-                chip::Span<const char>("Verify device temperature displayed in °Fgarbage: not in length on purpose", 42);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 6: {
@@ -29717,10 +29764,12 @@ private:
         }
         case 10: {
             LogStep(10, "Verify all device functionality available to the user");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "Verify all device functionality available to the usergarbage: not in length on purpose", 53);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 11: {
@@ -29741,10 +29790,12 @@ private:
         }
         case 13: {
             LogStep(13, "Verify device operates at Level 1 reduced functionality");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "Verify device operates at Level 1 reduced functionalitygarbage: not in length on purpose", 55);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 14: {
@@ -29765,10 +29816,12 @@ private:
         }
         case 16: {
             LogStep(16, "Verify device operates at Level 2 reduced functionality");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "Verify device operates at Level 2 reduced functionalitygarbage: not in length on purpose", 55);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 17: {
@@ -29789,10 +29842,12 @@ private:
         }
         case 19: {
             LogStep(19, "Verify device operates at Level 3 reduced functionality");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "Verify device operates at Level 3 reduced functionalitygarbage: not in length on purpose", 55);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 20: {
@@ -29813,10 +29868,12 @@ private:
         }
         case 22: {
             LogStep(22, "Verify device operates at Level 4 reduced functionality");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "Verify device operates at Level 4 reduced functionalitygarbage: not in length on purpose", 55);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 23: {
@@ -29837,10 +29894,12 @@ private:
         }
         case 25: {
             LogStep(25, "Verify device operates at least functionality level");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message =
-                chip::Span<const char>("Verify device operates at least functionality levelgarbage: not in length on purpose", 51);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 26: {
@@ -29877,11 +29936,12 @@ private:
         }
         case 30: {
             LogStep(30, "Verify local schedule programming functionality is enabled at the thermostat");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "Verify local schedule programming functionality is enabled at the thermostatgarbage: not in length on purpose",
-                76);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 31: {
@@ -29903,11 +29963,12 @@ private:
         }
         case 33: {
             LogStep(33, "Verify local schedule programming functionality is disabled at the thermostat");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>(
-                "Verify local schedule programming functionality is disabled at the thermostatgarbage: not in length on purpose",
-                77);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 34: {
@@ -78318,12 +78379,13 @@ private:
         }
         case 2: {
             LogStep(2, "operate on DUT to change the flow significantly");
-            VerifyOrDo(!ShouldSkip("MANUAL_FLOW_CHANGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message =
-                chip::Span<const char>("Operate on device to change the flow significantlygarbage: not in length on purpose", 50);
-            return Log(kIdentityAlpha, value);
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "read the mandatory attribute: MeasuredValue");
@@ -78484,11 +78546,12 @@ private:
         }
         case 2: {
             LogStep(2, "Operate on DUT to change the occupancy status");
-            VerifyOrDo(!ShouldSkip("MANUAL_OCCUPANCY_CHANGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message =
-                chip::Span<const char>("Operate on DUT to change the occupancy statusgarbage: not in length on purpose", 45);
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 3: {
@@ -84321,12 +84384,13 @@ private:
         }
         case 4: {
             LogStep(4, "Operate on device to change the relative humidity significantly");
-            VerifyOrDo(!ShouldSkip("MANUAL_RELATIVEHUMIDITY_CHANGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message = chip::Span<const char>(
-                "Operate on device to change the relative humidity significantlygarbage: not in length on purpose", 63);
-            return Log(kIdentityAlpha, value);
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the mandatory attribute: MeasuredValue");
@@ -84743,12 +84807,13 @@ private:
         }
         case 4: {
             LogStep(4, "Operate on device to change the temperature significantly");
-            VerifyOrDo(!ShouldSkip("MANUAL_TEMPERATURE_CHANGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message = chip::Span<const char>(
-                "Operate on device to change the temperature significantlygarbage: not in length on purpose", 57);
-            return Log(kIdentityAlpha, value);
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the mandatory attribute: MeasuredValue");
