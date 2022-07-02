@@ -202,8 +202,6 @@ CHIP_ERROR PersistentStorage::CommitConfig(const char * name)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Section section;
-
     std::ofstream ofs;
     std::string tmpPath = GetFilename(name) + ".tmp";
     ofs.open(tmpPath, std::ofstream::out | std::ofstream::trunc);
