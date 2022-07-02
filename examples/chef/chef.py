@@ -323,6 +323,11 @@ def main(argv: Sequence[str]) -> None:
                       dest="keep_going", action="store_true")
     parser.add_option(
         "", "--ci", help="Builds Chef examples defined in cicd_config. Uses --use_zzz. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
+    parser.add_option(
+        "", "--ipv6only", help="Compile build which only supports ipv6. Linux only.",
+        action="store_true")
+    parser.add_option(
+        "", "--cpu_type", help="CPU type to compile for. Linux only.", choices=["arm64", "x64"])
 
     options, _ = parser.parse_args(argv)
 
@@ -596,17 +601,48 @@ def main(argv: Sequence[str]) -> None:
 
         elif options.build_target == "linux":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/linux")
+
+            linux_args = []
+            if options.do_rpc:
+                linux_args.append('import("//with_pw_rpc.gni")')
+            linux_args.extend([
+                'import("//build_overrides/chip.gni")',
+                'import("${chip_root}/config/standalone/args.gni")',
+                'chip_shell_cmd_server = false',
+                'chip_build_libshell = true',
+                'chip_config_network_layer_ble = false',
+                f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}"]',
+            ])
+            if options.cpu_type == "arm64":
+                uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
+                if "aarch" not in uname_resp and "arm" not in uname_resp:
+                    if (
+                            "aarch" not in uname_resp and
+                            "arm" not in uname_resp and
+                            "SYSROOT_AARCH64" not in shell.env):
+                        flush_print(
+                            "SYSROOT_AARCH64 env variable not set. "
+                            "AARCH64 toolchain needed for cross-compiling for arm64.")
+                        exit(1)
+                    shell.env["PKG_CONFIG_PATH"] = (
+                        f'{shell.env["SYSROOT_AARCH64"]}/lib/aarch64-linux-gnu/pkgconfig')
+                linux_args.append('target_cpu="arm64"')
+                linux_args.append('is_clang=true')
+                linux_args.append('chip_crypto="mbedtls"')
+                linux_args.append(f'sysroot="{shell.env["SYSROOT_AARCH64"]}"')
+            elif options.cpu_type == "x64":
+                uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
+                if "x64" not in uname_resp and "x86_64" not in uname_resp:
+                    flush_print(f"Unable to cross compile for x64 on {uname_resp}")
+                    exit(1)
+            if options.ipv6only:
+                linux_args.append("chip_inet_config_enable_ipv4=false")
+
+            if sw_ver_string:
+                linux_args.append(
+                    f'chip_device_config_device_software_version_string = "{sw_ver_string}"')
             with open(f"{_CHEF_SCRIPT_PATH}/linux/args.gni", "w") as f:
-                sw_ver_string_config_text = f"chip_device_config_device_software_version_string = \"{sw_ver_string}\"" if sw_ver_string else ""
-                f.write(textwrap.dedent(f"""\
-                        import("//build_overrides/chip.gni")
-                        import("${{chip_root}}/config/standalone/args.gni")
-                        chip_shell_cmd_server = false
-                        chip_build_libshell = true
-                        chip_config_network_layer_ble = false
-                        target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.do_rpc else '0'}"]
-                        {sw_ver_string_config_text}
-                        """))
+                f.write("\n".join(linux_args))
             with open(f"{_CHEF_SCRIPT_PATH}/linux/sample.gni", "w") as f:
                 f.write(textwrap.dedent(f"""\
                         sample_zap_file = "{options.sample_device_type_name}.zap"
@@ -614,11 +650,7 @@ def main(argv: Sequence[str]) -> None:
                         """))
             if options.do_clean:
                 shell.run_cmd(f"rm -rf out")
-            if options.do_rpc:
-                shell.run_cmd(
-                    "gn gen out --args='import(\"//with_pw_rpc.gni\")'")
-            else:
-                shell.run_cmd("gn gen out --args=''")
+            shell.run_cmd("gn gen out")
             shell.run_cmd("ninja -C out")
 
     #
