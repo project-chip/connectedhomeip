@@ -219,11 +219,6 @@ static const NSString * MTRCAKeyChainLabel = @"matter-tool.nodeopcerts.CA:0";
     return (__bridge_transfer NSData *) outData;
 }
 
-- (SecKeyRef)publicKey
-{
-    return self.publicKey;
-}
-
 - (void)dealloc
 {
     if (_publicKey) {
