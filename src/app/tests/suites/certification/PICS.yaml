@@ -859,6 +859,9 @@ PICS:
     - label: "Skip sample app"
       id: PICS_SKIP_SAMPLE_APP
 
+    - label: "Run steps in SDK and CI only"
+      id: PICS_SDK_CI_ONLY
+
     - label: "Level Control for Lighting"
       id: OO_LT
 

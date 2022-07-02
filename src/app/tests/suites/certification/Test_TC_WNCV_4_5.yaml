@@ -133,10 +133,24 @@ tests:
               notValue: 0
 
     ### DUT TurnOff
-    - label: "3c: reboot/restart the DUT"
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
+
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     ### DUT GoesOff
     - label: "3d: Wait for the commissioned device to be retrieved"
