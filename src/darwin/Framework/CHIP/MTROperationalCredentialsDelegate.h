@@ -28,13 +28,12 @@
 #include <controller/OperationalCredentialsDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CASEAuthTag.h>
-#include <platform/Darwin/CHIPP256KeypairNativeBridge.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 class MTROperationalCredentialsDelegate : public chip::Controller::OperationalCredentialsDelegate {
 public:
-    using ChipP256KeypairPtr = std::unique_ptr<chip::Crypto::P256Keypair>;
+    using ChipP256KeypairPtr = chip::Crypto::P256Keypair *;
 
     ~MTROperationalCredentialsDelegate() {}
 

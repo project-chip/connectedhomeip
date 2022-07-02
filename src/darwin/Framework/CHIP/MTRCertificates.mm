@@ -179,11 +179,10 @@ using namespace chip::Credentials;
         if (err != CHIP_NO_ERROR) {
             break;
         }
-        CHIPP256KeypairNativeBridge nativeKeypair(keypairBridge);
 
         uint8_t buf[kMAX_CSR_Length];
         MutableByteSpan csr(buf);
-        err = GenerateCertificateSigningRequest(&nativeKeypair, csr);
+        err = GenerateCertificateSigningRequest(&keypairBridge, csr);
         if (err != CHIP_NO_ERROR) {
             break;
         }

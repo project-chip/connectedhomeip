@@ -22,7 +22,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-class MTRP256KeypairBridge : public chip::Crypto::P256KeypairBase
+class MTRP256KeypairBridge : public chip::Crypto::P256Keypair
 {
 public:
     ~MTRP256KeypairBridge(){};
