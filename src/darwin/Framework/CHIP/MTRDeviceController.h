@@ -103,12 +103,6 @@ typedef void (^MTRDeviceConnectionCallback)(MTRDevice * _Nullable device, NSErro
                                           error:(NSError * __autoreleasing *)error;
 
 /**
- * Temporary until PairingDelegate is fixed to clearly communicate this
- * information to consumers.
- */
-- (BOOL)deviceBeingCommissionedOverBLE:(uint64_t)deviceId;
-
-/**
  * Controllers are created via the MTRControllerFactory object.
  */
 - (instancetype)init NS_UNAVAILABLE;
