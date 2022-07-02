@@ -17,14 +17,6 @@
  */
 package chip.devicecontroller;
 
-import chip.devicecontroller.model.ChipAttributePath;
-import chip.devicecontroller.model.NodeState;
-
-/** An interface for receiving read/subscribe CHIP reports. */
-public interface ReportCallback {
-  void onError(ChipAttributePath attributePath, Exception e);
-
-  void onReport(NodeState nodeState);
-
-  default void onDone() {}
+public interface ResubscriptionAttemptCallback {
+  void onResubscriptionAttempt(int terminationCause, int nextResubscribeIntervalMsec);
 }

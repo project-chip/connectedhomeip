@@ -79,5 +79,45 @@ struct ReportCallback : public app::ReadClient::Callback
     jclass mNodeStateCls  = nullptr;
 };
 
+struct ReportEventCallback : public app::ReadClient::Callback
+{
+    /** Subscription established callback can be nullptr. */
+    ReportEventCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback,
+                        jobject resubscriptionAttemptCallback);
+    ~ReportEventCallback();
+
+    void OnReportBegin() override;
+
+    void OnReportEnd() override;
+
+    void OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus) override;
+
+    void OnError(CHIP_ERROR aError) override;
+
+    void OnDone(app::ReadClient *) override;
+
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override;
+
+    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override;
+
+    /** Report errors back to Java layer. attributePath may be nullptr for general errors. */
+    void ReportError(jobject eventPath, CHIP_ERROR err);
+    void ReportError(jobject eventPath, Protocols::InteractionModel::Status status);
+    void ReportError(jobject eventPath, const char * message, ChipError::StorageType errorCode);
+
+    CHIP_ERROR CreateChipEventPath(const app::ConcreteEventPath & aPath, jobject & outObj);
+
+    app::ReadClient * mReadClient = nullptr;
+
+    app::BufferedReadCallback mBufferedReadAdapter;
+    jobject mWrapperCallbackRef                 = nullptr;
+    jobject mSubscriptionEstablishedCallbackRef = nullptr;
+    jobject mResubscriptionAttemptCallbackRef   = nullptr;
+    jobject mReportCallbackRef                  = nullptr;
+    // NodeState Java object that will be returned to the application.
+    jobject mNodeStateObj = nullptr;
+    jclass mNodeStateCls  = nullptr;
+};
+
 } // namespace Controller
 } // namespace chip
