@@ -360,7 +360,10 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.ci:
-        for device_name in [d for d in _DEVICE_LIST if d in cicd_config["ci_allow_list"]]:
+        for device_name in cicd_config["ci_allow_list"]:
+            if device_name not in _DEVICE_LIST:
+                flush_print(f"{device_name} in CICD config but not {_DEVICE_FOLDER}!")
+                exit(1)
             if options.build_target == "nrfconnect":
                 shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
