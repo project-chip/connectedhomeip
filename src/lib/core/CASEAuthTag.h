@@ -23,6 +23,7 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SortUtils.h>
 
 namespace chip {
 
@@ -60,7 +61,9 @@ struct CATValues
         return false;
     }
 
-    bool operator==(const CATValues & that) const { return values == that.values; }
+    bool operator==(const CATValues & that) const { return this->Sorted().values == that.Sorted().values; }
+    bool operator!=(const CATValues & that) const { return !(*this == that); }
+    bool operator<(const CATValues & that) const { return this->Sorted().values < that.Sorted().values; }
 
     static constexpr size_t kSerializedLength = kMaxSubjectCATAttributeCount * sizeof(CASEAuthTag);
     typedef uint8_t Serialized[kSerializedLength];
@@ -83,6 +86,16 @@ struct CATValues
             values[i] = Encoding::LittleEndian::Read32(p);
         }
         return CHIP_NO_ERROR;
+    }
+
+private:
+    static bool Cmp(const CASEAuthTag & a, const CASEAuthTag & b) { return a < b; }
+    void Sort() { Sorting::BubbleSort(this->values.begin(), this->size(), Cmp); }
+    CATValues Sorted() const
+    {
+        auto sorted = *this;
+        sorted.Sort();
+        return sorted;
     }
 };
 

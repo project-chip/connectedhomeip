@@ -22,6 +22,7 @@ chip_test_suite("tests") {
   output_name = "libCoreTests"
 
   test_sources = [
+    "TestCATValues.cpp",
     "TestCHIPCallback.cpp",
     "TestCHIPErrorStr.cpp",
     "TestCHIPTLV.cpp",
