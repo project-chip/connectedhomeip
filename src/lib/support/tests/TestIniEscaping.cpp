@@ -88,7 +88,7 @@ void TestRoundTrip(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, UnescapeKey(EscapeKey("\x81\x82\xff")) == "\x81\x82\xff");
 
     // Make sure entire range is escapable
-    for (int c = -128; c <= 127; c++)
+    for (int c = 0; c <= 255; c++)
     {
         std::string s(5, static_cast<char>(c));
         NL_TEST_ASSERT_LOOP(inSuite, c, UnescapeKey(EscapeKey(s)) == s);
