@@ -346,7 +346,7 @@ CHIP_ERROR EFR32Config::WriteConfigValueBin(Key key, const uint8_t * data, size_
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
-    // Only write NULL pointer if the given size is 0
+    // Only write NULL pointer if the given size is 0, since in that case, nothing is read at the pointer
     if ((data != NULL) || (dataLen == 0))
     {
         // Write the binary data to nvm3.
