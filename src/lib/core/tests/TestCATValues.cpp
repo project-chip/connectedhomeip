@@ -26,44 +26,13 @@ using namespace chip;
 void TestEqualityOperator(nlTestSuite * inSuite, void * inContext)
 {
     {
-        auto a                 = CATValues{ { 1, 2, 3 } };
-        auto b                 = CATValues{ { 1, 3, 2 } };
-        auto c                 = CATValues{ { 2, 1, 3 } };
-        auto d                 = CATValues{ { 2, 3, 1 } };
-        auto e                 = CATValues{ { 3, 1, 2 } };
-        auto f                 = CATValues{ { 3, 2, 1 } };
+        auto a                 = CATValues{ { 0x1111'0001, 0x2222'0002, 0x3333'0003 } };
+        auto b                 = CATValues{ { 0x1111'0001, 0x3333'0003, 0x2222'0002 } };
+        auto c                 = CATValues{ { 0x2222'0002, 0x1111'0001, 0x3333'0003 } };
+        auto d                 = CATValues{ { 0x2222'0002, 0x3333'0003, 0x1111'0001 } };
+        auto e                 = CATValues{ { 0x3333'0003, 0x1111'0001, 0x2222'0002 } };
+        auto f                 = CATValues{ { 0x3333'0003, 0x2222'0002, 0x1111'0001 } };
         CATValues candidates[] = { a, b, c, d, e, f };
-        for (auto & outer : candidates)
-        {
-            for (auto & inner : candidates)
-            {
-                NL_TEST_ASSERT(inSuite, inner == outer);
-            }
-        }
-    }
-    {
-        auto a                 = CATValues{ { 1, 2 } };
-        auto b                 = CATValues{ { 1, 1, 2 } };
-        auto c                 = CATValues{ { 1, 2, 2 } };
-        auto d                 = CATValues{ { 1, 2, 1 } };
-        auto e                 = CATValues{ { 2, 1 } };
-        auto f                 = CATValues{ { 2, 1, 1 } };
-        auto g                 = CATValues{ { 2, 2, 1 } };
-        auto h                 = CATValues{ { 2, 1, 2 } };
-        CATValues candidates[] = { a, b, c, d, e, f, g, h };
-        for (auto & outer : candidates)
-        {
-            for (auto & inner : candidates)
-            {
-                NL_TEST_ASSERT(inSuite, inner == outer);
-            }
-        }
-    }
-    {
-        auto a                 = CATValues{ { 1 } };
-        auto b                 = CATValues{ { 1, 1 } };
-        auto c                 = CATValues{ { 1, 1, 1 } };
-        CATValues candidates[] = { a, b, c };
         for (auto & outer : candidates)
         {
             for (auto & inner : candidates)
@@ -88,27 +57,27 @@ void TestEqualityOperator(nlTestSuite * inSuite, void * inContext)
 
 void TestInequalityOperator(nlTestSuite * inSuite, void * inContext)
 {
-    auto a                 = CATValues{ { 1 } };
-    auto b                 = CATValues{ { 1, 2 } };
-    auto c                 = CATValues{ { 1, 2, 3 } };
-    auto d                 = CATValues{ { 2 } };
-    auto e                 = CATValues{ { 2, 3 } };
-    auto f                 = CATValues{ { 2, 3, 4 } };
-    auto g                 = CATValues{ { 3 } };
-    auto h                 = CATValues{ { 3, 4 } };
-    auto i                 = CATValues{ { 3, 4, 5 } };
-    auto j                 = CATValues{ { 4 } };
-    auto k                 = CATValues{ { 4, 5 } };
-    auto l                 = CATValues{ { 4, 5, 6 } };
-    auto m                 = CATValues{ { 5 } };
-    auto n                 = CATValues{ { 5, 6 } };
-    auto o                 = CATValues{ { 5, 6, 7 } };
-    auto p                 = CATValues{ { 6 } };
-    auto q                 = CATValues{ { 6, 7 } };
-    auto r                 = CATValues{ { 6, 7, 8 } };
-    auto s                 = CATValues{ { 7 } };
-    auto t                 = CATValues{ { 7, 8 } };
-    auto u                 = CATValues{ { 7, 8, 9 } };
+    auto a                 = CATValues{ { 0x1111'0001 } };
+    auto b                 = CATValues{ { 0x1111'0001, 0x2222'0002 } };
+    auto c                 = CATValues{ { 0x1111'0001, 0x2222'0002, 0x3333'0003 } };
+    auto d                 = CATValues{ { 0x2222'0002 } };
+    auto e                 = CATValues{ { 0x2222'0002, 0x3333'0003 } };
+    auto f                 = CATValues{ { 0x2222'0002, 0x3333'0003, 0x4444'0004 } };
+    auto g                 = CATValues{ { 0x3333'0003 } };
+    auto h                 = CATValues{ { 0x3333'0003, 0x4444'0004 } };
+    auto i                 = CATValues{ { 0x3333'0003, 0x4444'0004, 0x5555'0005 } };
+    auto j                 = CATValues{ { 0x4444'0004 } };
+    auto k                 = CATValues{ { 0x4444'0004, 0x5555'0005 } };
+    auto l                 = CATValues{ { 0x4444'0004, 0x5555'0005, 0x6666'0006 } };
+    auto m                 = CATValues{ { 0x5555'0005 } };
+    auto n                 = CATValues{ { 0x5555'0005, 0x6666'0006 } };
+    auto o                 = CATValues{ { 0x5555'0005, 0x6666'0006, 0x7777'0007 } };
+    auto p                 = CATValues{ { 0x6666'0006 } };
+    auto q                 = CATValues{ { 0x6666'0006, 0x7777'0007 } };
+    auto r                 = CATValues{ { 0x6666'0006, 0x7777'0007, 0x8888'0008 } };
+    auto s                 = CATValues{ { 0x7777'0007 } };
+    auto t                 = CATValues{ { 0x7777'0007, 0x8888'0008 } };
+    auto u                 = CATValues{ { 0x7777'0007, 0x8888'0008, 0x9999'0009 } };
     CATValues candidates[] = { a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u };
     for (auto & outer : candidates)
     {
@@ -123,6 +92,65 @@ void TestInequalityOperator(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void TestMembership(nlTestSuite * inSuite, void * inContext)
+{
+    auto a = CATValues{ { 0x1111'0001 } };
+    auto b = CATValues{ { 0x1111'0001, 0x2222'0002 } };
+    auto c = CATValues{ { 0x1111'0001, 0x2222'0002, 0x3333'0003 } };
+
+    NL_TEST_ASSERT(inSuite, a.Contains(0x1111'0001));
+    NL_TEST_ASSERT(inSuite, a.GetNumTagsPresent() == 1);
+    NL_TEST_ASSERT(inSuite, !a.Contains(0x1111'0002));
+    NL_TEST_ASSERT(inSuite, !a.Contains(0x2222'0002));
+    NL_TEST_ASSERT(inSuite, a.ContainsIdentifier(0x1111));
+    NL_TEST_ASSERT(inSuite, !a.ContainsIdentifier(0x2222));
+
+    NL_TEST_ASSERT(inSuite, b.Contains(0x1111'0001));
+    NL_TEST_ASSERT(inSuite, b.Contains(0x2222'0002));
+    NL_TEST_ASSERT(inSuite, b.GetNumTagsPresent() == 2);
+    NL_TEST_ASSERT(inSuite, b.ContainsIdentifier(0x1111));
+    NL_TEST_ASSERT(inSuite, b.ContainsIdentifier(0x2222));
+
+    NL_TEST_ASSERT(inSuite, c.Contains(0x1111'0001));
+    NL_TEST_ASSERT(inSuite, c.Contains(0x2222'0002));
+    NL_TEST_ASSERT(inSuite, c.Contains(0x3333'0003));
+    NL_TEST_ASSERT(inSuite, c.GetNumTagsPresent() == 3);
+    NL_TEST_ASSERT(inSuite, c.ContainsIdentifier(0x1111));
+    NL_TEST_ASSERT(inSuite, c.ContainsIdentifier(0x2222));
+    NL_TEST_ASSERT(inSuite, c.ContainsIdentifier(0x3333));
+}
+
+void TestSubjectMatching(nlTestSuite * inSuite, void * inContext)
+{
+    // Check operational node IDs don't match
+    auto a = CATValues{ { 0x2222'0002 } };
+    NL_TEST_ASSERT(inSuite, !a.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0x0001'0002'0003'0004ull)));
+    NL_TEST_ASSERT(inSuite, !a.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0x0001'0002'2222'0002ull)));
+
+
+    auto b = CATValues{ { 0x1111'0001 } };
+    NL_TEST_ASSERT(inSuite, b.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'1111'0001ull)));
+    NL_TEST_ASSERT(inSuite, !b.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'1111'0002ull)));
+
+    auto c = CATValues{ { 0x1111'0001, 0x2222'0002 } };
+    NL_TEST_ASSERT(inSuite, c.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'2222'0001ull)));
+    NL_TEST_ASSERT(inSuite, c.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'2222'0002ull)));
+    NL_TEST_ASSERT(inSuite, !c.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'2222'0003ull)));
+
+    auto d = CATValues{ { 0x1111'0001, 0x2222'0002, 0x3333'0003 } };
+    NL_TEST_ASSERT(inSuite, d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0001ull)));
+    NL_TEST_ASSERT(inSuite, d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0002ull)));
+    NL_TEST_ASSERT(inSuite, d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0003ull)));
+    NL_TEST_ASSERT(inSuite, !d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0004ull)));
+    NL_TEST_ASSERT(inSuite, !d.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'ffffull)));
+
+    auto e = CATValues{ { 0x1111'0001, 0x2222'0002, 0x3333'ffff } };
+    NL_TEST_ASSERT(inSuite, e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0001ull)));
+    NL_TEST_ASSERT(inSuite, e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0002ull)));
+    NL_TEST_ASSERT(inSuite, e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0003ull)));
+    NL_TEST_ASSERT(inSuite, e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'0004ull)));
+    NL_TEST_ASSERT(inSuite, e.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'3333'ffffull)));
+}
 // Test Suite
 
 /**
@@ -133,6 +161,8 @@ static const nlTest sTests[] =
 {
     NL_TEST_DEF("Equality operator", TestEqualityOperator),
     NL_TEST_DEF("Inequality operator", TestInequalityOperator),
+    NL_TEST_DEF("Set operations", TestMembership),
+    NL_TEST_DEF("Subject matching for ACL", TestSubjectMatching),
     NL_TEST_SENTINEL()
 };
 // clang-format on
