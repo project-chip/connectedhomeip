@@ -34,167 +34,252 @@ using namespace chip;
 using namespace chip::DeviceLayer;
 using namespace chip::DeviceLayer::PersistedStorage;
 
-static void TestKeyValueStoreMgr_EmptyStringKey(nlTestSuite * inSuite, void * inContext)
+static void TestKeyValueStoreMgr_EmptyString(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR err;
-    const char * kTestKey   = "str_key";
-    const char kTestValue[] = "";
-    char read_value[sizeof(kTestValue)];
-    size_t read_size;
-    err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
+    constexpr const char * kTestKey   = "str_key";
+    constexpr const char kTestValue[] = "";
+    constexpr size_t kTestValueLen    = 0;
+
+    char readValue[sizeof(kTestValue)];
+    size_t readSize;
+
+    CHIP_ERROR err = KeyValueStoreMgr().Put(kTestKey, kTestValue, kTestValueLen);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = KeyValueStoreMgr().Get(kTestKey, read_value, sizeof(read_value), &read_size);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     // Verify if read value is the same as wrote one
-    NL_TEST_ASSERT(inSuite, strcmp(kTestValue, read_value) == 0);
-    NL_TEST_ASSERT(inSuite, read_size == sizeof(kTestValue));
+    err = KeyValueStoreMgr().Get(kTestKey, readValue, sizeof(readValue), &readSize);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, readSize == kTestValueLen);
+
+    // Verify that read succeeds even if 0-length buffer is provided
+    err = KeyValueStoreMgr().Get(kTestKey, readValue, 0, &readSize);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, readSize == kTestValueLen);
+
+    err = KeyValueStoreMgr().Get(kTestKey, nullptr, 0, &readSize);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, readSize == kTestValueLen);
+
+    // Verify deletion
     err = KeyValueStoreMgr().Delete(kTestKey);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     // Try to get deleted key and verify if CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND is returned
-    err = KeyValueStoreMgr().Get(kTestKey, read_value, sizeof(read_value), &read_size);
+    err = KeyValueStoreMgr().Get(kTestKey, readValue, sizeof(readValue), &readSize);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 }
 
-static void TestKeyValueStoreMgr_StringKey(nlTestSuite * inSuite, void * inContext)
+static void TestKeyValueStoreMgr_String(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR err;
-    const char * kTestKey   = "str_key";
-    const char kTestValue[] = "test_value";
-    char read_value[sizeof(kTestValue)];
-    size_t read_size;
-    err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
+    constexpr const char * kTestKey   = "str_key";
+    constexpr const char kTestValue[] = "test_value";
+
+    char readValue[sizeof(kTestValue)];
+    size_t readSize;
+
+    CHIP_ERROR err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = KeyValueStoreMgr().Get(kTestKey, read_value, sizeof(read_value), &read_size);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     // Verify if read value is the same as wrote one
-    NL_TEST_ASSERT(inSuite, strcmp(kTestValue, read_value) == 0);
-    NL_TEST_ASSERT(inSuite, read_size == sizeof(kTestValue));
+    err = KeyValueStoreMgr().Get(kTestKey, readValue, sizeof(readValue), &readSize);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, strcmp(kTestValue, readValue) == 0);
+    NL_TEST_ASSERT(inSuite, readSize == sizeof(kTestValue));
+
+    // Verify deletion
     err = KeyValueStoreMgr().Delete(kTestKey);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     // Try to get deleted key and verify if CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND is returned
-    err = KeyValueStoreMgr().Get(kTestKey, read_value, sizeof(read_value), &read_size);
+    err = KeyValueStoreMgr().Get(kTestKey, readValue, sizeof(readValue), &readSize);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 }
 
-static void TestKeyValueStoreMgr_Uint32Key(nlTestSuite * inSuite, void * inContext)
+static void TestKeyValueStoreMgr_Uint32(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR err;
-    const char * kTestKey     = "uint32_key";
-    const uint32_t kTestValue = 5;
-    uint32_t read_value;
-    err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
+    constexpr const char * kTestKey     = "uint32_key";
+    constexpr const uint32_t kTestValue = 5;
+
+    uint32_t readValue = UINT32_MAX;
+
+    CHIP_ERROR err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = KeyValueStoreMgr().Get(kTestKey, &read_value);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     // Verify if read value is the same as wrote one
-    NL_TEST_ASSERT(inSuite, kTestValue == read_value);
+    err = KeyValueStoreMgr().Get(kTestKey, &readValue);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, kTestValue == readValue);
+
+    // Verify deletion
     err = KeyValueStoreMgr().Delete(kTestKey);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     // Try to get deleted key and verify if CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND is returned
-    err = KeyValueStoreMgr().Get(kTestKey, &read_value);
+    err = KeyValueStoreMgr().Get(kTestKey, &readValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 }
 
-static void TestKeyValueStoreMgr_ArrayKey(nlTestSuite * inSuite, void * inContext)
+static void TestKeyValueStoreMgr_Array(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR err;
-    const char * kTestKey  = "array_key";
-    uint32_t kTestValue[5] = { 1, 2, 3, 4, 5 };
-    uint32_t read_value[5];
-    size_t read_size;
-    err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
+    constexpr const char * kTestKey  = "array_key";
+    constexpr uint32_t kTestValue[5] = { 1, 2, 3, 4, 5 };
+
+    uint32_t readValue[5];
+    size_t readSize;
+
+    CHIP_ERROR err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = KeyValueStoreMgr().Get(kTestKey, read_value, sizeof(read_value), &read_size);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     // Verify if read value is the same as wrote one
-    NL_TEST_ASSERT(inSuite, memcmp(kTestValue, read_value, sizeof(kTestValue)) == 0);
-    NL_TEST_ASSERT(inSuite, read_size == sizeof(kTestValue));
+    err = KeyValueStoreMgr().Get(kTestKey, readValue, sizeof(readValue), &readSize);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, memcmp(kTestValue, readValue, sizeof(kTestValue)) == 0);
+    NL_TEST_ASSERT(inSuite, readSize == sizeof(kTestValue));
+
+    // Verify deletion
     err = KeyValueStoreMgr().Delete(kTestKey);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     // Try to get deleted key and verify if CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND is returned
-    err = KeyValueStoreMgr().Get(kTestKey, read_value, sizeof(read_value), &read_size);
+    err = KeyValueStoreMgr().Get(kTestKey, readValue, sizeof(readValue), &readSize);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 }
 
-static void TestKeyValueStoreMgr_StructKey(nlTestSuite * inSuite, void * inContext)
+static void TestKeyValueStoreMgr_Struct(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR err;
     struct TestStruct
     {
         uint8_t value1;
         uint32_t value2;
     };
-    const char * kTestKey = "struct_key";
-    TestStruct kTestValue{ 1, 2 };
-    TestStruct read_value;
-    size_t read_size;
-    err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
+
+    constexpr const char * kTestKey = "struct_key";
+    constexpr TestStruct kTestValue{ 1, 2 };
+
+    TestStruct readValue;
+    size_t readSize;
+
+    CHIP_ERROR err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = KeyValueStoreMgr().Get(kTestKey, &read_value, sizeof(read_value), &read_size);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     // Verify if read value is the same as wrote one
-    NL_TEST_ASSERT(inSuite, kTestValue.value1 == read_value.value1);
-    NL_TEST_ASSERT(inSuite, kTestValue.value2 == read_value.value2);
-    NL_TEST_ASSERT(inSuite, read_size == sizeof(kTestValue));
+    err = KeyValueStoreMgr().Get(kTestKey, &readValue, sizeof(readValue), &readSize);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, kTestValue.value1 == readValue.value1);
+    NL_TEST_ASSERT(inSuite, kTestValue.value2 == readValue.value2);
+    NL_TEST_ASSERT(inSuite, readSize == sizeof(kTestValue));
+
+    // Verify deletion
     err = KeyValueStoreMgr().Delete(kTestKey);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     // Try to get deleted key and verify if CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND is returned
-    err = KeyValueStoreMgr().Get(kTestKey, &read_value, sizeof(read_value), &read_size);
+    err = KeyValueStoreMgr().Get(kTestKey, &readValue, sizeof(readValue), &readSize);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 }
 
-static void TestKeyValueStoreMgr_UpdateKeyValue(nlTestSuite * inSuite, void * inContext)
+static void TestKeyValueStoreMgr_UpdateValue(nlTestSuite * inSuite, void * inContext)
 {
+    constexpr const char * kTestKey = "update_key";
+
     CHIP_ERROR err;
-    const char * kTestKey = "update_key";
-    uint32_t read_value;
+    uint32_t readValue;
+
     for (uint32_t i = 0; i < 10; i++)
     {
         err = KeyValueStoreMgr().Put(kTestKey, i);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        err = KeyValueStoreMgr().Get(kTestKey, &read_value);
+
+        err = KeyValueStoreMgr().Get(kTestKey, &readValue);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, i == read_value);
+        NL_TEST_ASSERT(inSuite, i == readValue);
     }
+
     err = KeyValueStoreMgr().Delete(kTestKey);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
 static void TestKeyValueStoreMgr_TooSmallBufferRead(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR err;
-    const char * kTestKey  = "too_small_buffer_read_key";
-    uint32_t kTestValue[5] = { 1, 2, 3, 4, 5 };
-    uint32_t read_value;
-    size_t read_size;
-    err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
+    constexpr const char * kTestKey = "too_small_buffer_read_key";
+    constexpr uint8_t kTestValue[]  = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+    uint8_t readValue[9];
+    size_t readSize;
+
+    CHIP_ERROR err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     // Returns buffer too small and should read as many bytes as possible
-    err = KeyValueStoreMgr().Get(kTestKey, &read_value, sizeof(read_value), &read_size, 0);
+    err = KeyValueStoreMgr().Get(kTestKey, &readValue, sizeof(readValue), &readSize, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
-    NL_TEST_ASSERT(inSuite, read_size == sizeof(read_value));
-    NL_TEST_ASSERT(inSuite, kTestValue[0] == read_value);
+    NL_TEST_ASSERT(inSuite, readSize == sizeof(readValue));
+    NL_TEST_ASSERT(inSuite, memcmp(kTestValue, readValue, readSize) == 0);
+
     err = KeyValueStoreMgr().Delete(kTestKey);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-static void TestKeyValueStoreMgr_MultiReadKey(nlTestSuite * inSuite, void * inContext)
+static void TestKeyValueStoreMgr_AllCharactersKey(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR err;
-    const char * kTestKey  = "multi_key";
-    uint32_t kTestValue[5] = { 1, 2, 3, 4, 5 };
-    err                    = KeyValueStoreMgr().Put(kTestKey, kTestValue);
+    // Test that all printable characters [0x20 - 0x7f) can be part of the key
+    constexpr size_t kKeyLength   = 32;
+    constexpr char kCharBegin     = 0x20;
+    constexpr char kCharEnd       = 0x7f;
+    constexpr uint32_t kTestValue = 5;
+
+    char allChars[kCharEnd - kCharBegin];
+
+    for (char character = kCharBegin; character < kCharEnd; character++)
+    {
+        allChars[character - kCharBegin] = character;
+    }
+
+    for (size_t charId = 0; charId < sizeof(allChars); charId += kKeyLength)
+    {
+        char testKey[kKeyLength + 1] = {};
+        memcpy(testKey, &allChars[charId], chip::min(sizeof(allChars) - charId, kKeyLength));
+
+        CHIP_ERROR err = KeyValueStoreMgr().Put(testKey, kTestValue);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        uint32_t readValue = UINT32_MAX;
+        err                = KeyValueStoreMgr().Get(testKey, &readValue);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = KeyValueStoreMgr().Delete(testKey);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    }
+}
+
+static void TestKeyValueStoreMgr_NonExistentDelete(nlTestSuite * inSuite, void * inContext)
+{
+    constexpr const char * kTestKey = "non_existent";
+
+    CHIP_ERROR err = KeyValueStoreMgr().Delete(kTestKey);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+}
+
+static void TestKeyValueStoreMgr_MultiRead(nlTestSuite * inSuite, void * inContext)
+{
+    constexpr const char * kTestKey  = "multi_key";
+    constexpr uint32_t kTestValue[5] = { 1, 2, 3, 4, 5 };
+
+    CHIP_ERROR err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     for (uint32_t i = 0; i < 5; i++)
     {
-        uint32_t read_value;
-        size_t read_size;
+        uint32_t readValue;
+        size_t readSize;
+
         // Returns buffer too small for all but the last read.
-        err = KeyValueStoreMgr().Get(kTestKey, &read_value, sizeof(read_value), &read_size, i * sizeof(uint32_t));
+        err = KeyValueStoreMgr().Get(kTestKey, &readValue, sizeof(readValue), &readSize, i * sizeof(uint32_t));
         NL_TEST_ASSERT(inSuite, err == (i < 4 ? CHIP_ERROR_BUFFER_TOO_SMALL : CHIP_NO_ERROR));
-        NL_TEST_ASSERT(inSuite, read_size == sizeof(read_value));
-        NL_TEST_ASSERT(inSuite, kTestValue[i] == read_value);
+        NL_TEST_ASSERT(inSuite, readSize == sizeof(readValue));
+        NL_TEST_ASSERT(inSuite, kTestValue[i] == readValue);
     }
+
     err = KeyValueStoreMgr().Delete(kTestKey);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
@@ -223,16 +308,18 @@ static void TestKeyValueStoreMgr_DoFactoryReset(nlTestSuite * inSuite, void * in
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF("Test KeyValueStoreMgr_EmptyStringKey", TestKeyValueStoreMgr_EmptyStringKey),
-                                 NL_TEST_DEF("Test KeyValueStoreMgr_StringKey", TestKeyValueStoreMgr_StringKey),
-                                 NL_TEST_DEF("Test KeyValueStoreMgr_Uint32Key", TestKeyValueStoreMgr_Uint32Key),
-                                 NL_TEST_DEF("Test KeyValueStoreMgr_ArrayKey", TestKeyValueStoreMgr_ArrayKey),
-                                 NL_TEST_DEF("Test KeyValueStoreMgr_StructKey", TestKeyValueStoreMgr_StructKey),
-                                 NL_TEST_DEF("Test KeyValueStoreMgr_UpdateKeyValue", TestKeyValueStoreMgr_UpdateKeyValue),
+static const nlTest sTests[] = { NL_TEST_DEF("Test KeyValueStoreMgr_EmptyString", TestKeyValueStoreMgr_EmptyString),
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_String", TestKeyValueStoreMgr_String),
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_Uint32", TestKeyValueStoreMgr_Uint32),
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_Array", TestKeyValueStoreMgr_Array),
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_Struct", TestKeyValueStoreMgr_Struct),
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_UpdateValue", TestKeyValueStoreMgr_UpdateValue),
                                  NL_TEST_DEF("Test KeyValueStoreMgr_TooSmallBufferRead", TestKeyValueStoreMgr_TooSmallBufferRead),
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_AllCharactersKey", TestKeyValueStoreMgr_AllCharactersKey),
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_NonExistentDelete", TestKeyValueStoreMgr_NonExistentDelete),
 #if !defined(__ZEPHYR__) && !defined(__MBED__)
                                  // Zephyr and Mbed platforms do not support partial or offset reads yet.
-                                 NL_TEST_DEF("Test KeyValueStoreMgr_MultiReadKey", TestKeyValueStoreMgr_MultiReadKey),
+                                 NL_TEST_DEF("Test KeyValueStoreMgr_MultiRead", TestKeyValueStoreMgr_MultiRead),
 #endif
 #ifdef __ZEPHYR__
                                  NL_TEST_DEF("Test TestKeyValueStoreMgr_DoFactoryReset", TestKeyValueStoreMgr_DoFactoryReset),
