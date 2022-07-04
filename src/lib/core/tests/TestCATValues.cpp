@@ -101,7 +101,9 @@ void TestInequalityOperator(nlTestSuite * inSuite, void * inContext)
         auto j                 = CATValues{ { 4 } };
         auto k                 = CATValues{ { 4, 5 } };
         auto l                 = CATValues{ { 4, 5, 6 } };
-        auto m                 = CATValues{ { 5, } };
+        auto m                 = CATValues{ {
+            5,
+        } };
         auto n                 = CATValues{ { 5, 6 } };
         auto o                 = CATValues{ { 5, 6, 7 } };
         auto p                 = CATValues{ { 6 } };
@@ -117,7 +119,7 @@ void TestInequalityOperator(nlTestSuite * inSuite, void * inContext)
             {
                 if (&inner == &outer)
                 {
-                     continue;
+                    continue;
                 }
                 NL_TEST_ASSERT(inSuite, inner != outer);
             }
