@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Test Harness Client reads Status attribute from Server DUT"
+      PICS: PS.S.A0000
       command: "readAttribute"
       attribute: "Status"
       response:
@@ -38,6 +39,7 @@ tests:
               maxValue: 3
 
     - label: "Test Harness Client reads Order attribute from Server DUT"
+      PICS: PS.S.A0001
       command: "readAttribute"
       attribute: "Order"
       response:
@@ -45,6 +47,7 @@ tests:
               type: uint8
 
     - label: "Test Harness Client reads Description attribute from Server DUT"
+      PICS: PS.S.A0002
       command: "readAttribute"
       attribute: "Description"
       response:
@@ -54,7 +57,7 @@ tests:
     - label:
           "Test Harness Client reads WiredAssessedInputVoltage attribue from
           Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0003
       command: "readAttribute"
       attribute: "WiredAssessedInputVoltage"
       response:
@@ -64,7 +67,7 @@ tests:
     - label:
           "Test Harness Client reads WiredAssessedInputFrequency attribute from
           Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0004
       command: "readAttribute"
       attribute: "WiredAssessedInputFrequency"
       response:
@@ -73,7 +76,7 @@ tests:
 
     - label:
           "Test Harness Client reads WiredCurrentType attribute from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0005
       command: "readAttribute"
       attribute: "WiredCurrentType"
       response:
@@ -85,7 +88,7 @@ tests:
     - label:
           "Test Harness Client reads WiredAssessedCurrent attribute from Server
           DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0006
       command: "readAttribute"
       attribute: "WiredAssessedCurrent"
       response:
@@ -93,7 +96,7 @@ tests:
               type: uint32
 
     - label: "Test Harness Client reads WiredNominalVoltage from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0007
       command: "readAttribute"
       attribute: "WiredNominalVoltage"
       response:
@@ -101,7 +104,7 @@ tests:
               type: uint32
 
     - label: "Test Harness Client reads WiredMaximumCurrent from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0008
       command: "readAttribute"
       attribute: "WiredMaximumCurrent"
       response:
@@ -109,7 +112,7 @@ tests:
               type: uint32
 
     - label: "Test Harness Client reads WiredPresent from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0009
       command: "readAttribute"
       attribute: "WiredPresent"
       response:
@@ -117,7 +120,7 @@ tests:
               type: bool
 
     - label: "Test Harness Client reads ActiveWiredFaults from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000a
       command: "readAttribute"
       attribute: "ActiveWiredFaults"
       response:
@@ -126,7 +129,7 @@ tests:
               maxlength: 8
 
     - label: "Test Harness Client reads BatVoltage from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000b
       command: "readAttribute"
       attribute: "BatteryVoltage"
       response:
@@ -134,7 +137,7 @@ tests:
               type: uint32
 
     - label: "Test Harness Client reads BatPercentRemaining from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000c
       command: "readAttribute"
       attribute: "BatteryPercentRemaining"
       response:
@@ -144,7 +147,7 @@ tests:
               maxvalue: 200
 
     - label: "Test Harness Client reads BatTimeRemaining from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000d
       command: "readAttribute"
       attribute: "BatteryTimeRemaining"
       response:
@@ -152,6 +155,7 @@ tests:
               type: uint32
 
     - label: "Test Harness Client reads BatChargeLevel from Server DUT"
+      PICS: PS.S.A000e
       command: "readAttribute"
       attribute: "BatteryChargeLevel"
       response:
@@ -161,7 +165,7 @@ tests:
               maxValue: 2
 
     - label: "Test Harness Client reads BatReplacementNeeded from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000f
       command: "readAttribute"
       attribute: "BatteryReplacementNeeded"
       response:
@@ -169,7 +173,7 @@ tests:
               type: bool
 
     - label: "Test Harness Client reads BatReplaceability from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0010
       command: "readAttribute"
       attribute: "BatteryReplaceability"
       response:
@@ -179,7 +183,7 @@ tests:
               maxValue: 3
 
     - label: "Test Harness Client reads BatPresent from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0011
       command: "readAttribute"
       attribute: "BatteryPresent"
       response:
@@ -187,7 +191,7 @@ tests:
               type: bool
 
     - label: "Test Harness Client readsActiveBatFaults from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0012
       command: "readAttribute"
       attribute: "ActiveBatteryFaults"
       response:
@@ -197,7 +201,7 @@ tests:
 
     - label:
           "Test Harness Client reads BatReplacementDescription from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0013
       command: "readAttribute"
       attribute: "BatteryReplacementDescription"
       response:
@@ -206,7 +210,7 @@ tests:
               maxLength: 60
 
     - label: "Test Harness Client reads BatCommonDesignation from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0014
       command: "readAttribute"
       attribute: "BatteryCommonDesignation"
       response:
@@ -216,7 +220,7 @@ tests:
               maxValue: 80
 
     - label: "Test Harness Client reads BatANSIDesignation from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0015
       command: "readAttribute"
       attribute: "BatteryANSIDesignation"
       response:
@@ -225,7 +229,7 @@ tests:
               maxLength: 20
 
     - label: "Test Harness Client reads BatIECDesignation from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0016
       command: "readAttribute"
       attribute: "BatteryIECDesignation"
       response:
@@ -234,7 +238,7 @@ tests:
               maxLength: 20
 
     - label: "Test Harness Client reads BatApprovedChemistry from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0017
       command: "readAttribute"
       attribute: "BatteryApprovedChemistry"
       response:
@@ -244,7 +248,7 @@ tests:
               maxValue: 32
 
     - label: "Test Harness Client reads BatCapacity from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0018
       command: "readAttribute"
       attribute: "BatteryCapacity"
       response:
@@ -252,7 +256,7 @@ tests:
               type: uint32
 
     - label: "Test Harness Client reads BatQuantity from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0019
       command: "readAttribute"
       attribute: "BatteryQuantity"
       response:
@@ -260,7 +264,7 @@ tests:
               type: uint8
 
     - label: "Test Harness Client reads BatChargeState from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001a
       command: "readAttribute"
       attribute: "BatteryChargeState"
       response:
@@ -270,7 +274,7 @@ tests:
               maxValue: 3
 
     - label: "Test Harness Client reads BatTimeToFullCharge from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001b
       command: "readAttribute"
       attribute: "BatteryTimeToFullCharge"
       response:
@@ -279,7 +283,7 @@ tests:
 
     - label:
           "Test Harness Client reads BatFunctionalWhileCharging from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001c
       command: "readAttribute"
       attribute: "BatteryFunctionalWhileCharging"
       response:
@@ -287,7 +291,7 @@ tests:
               type: bool
 
     - label: "Test Harness Client reads BatChargingCurrent from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001d
       command: "readAttribute"
       attribute: "BatteryChargingCurrent"
       response:
@@ -295,7 +299,7 @@ tests:
               type: uint32
 
     - label: "Test Harness Client reads ActiveBatChargeFaults from Server DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001e
       command: "readAttribute"
       attribute: "ActiveBatteryChargeFaults"
       response:

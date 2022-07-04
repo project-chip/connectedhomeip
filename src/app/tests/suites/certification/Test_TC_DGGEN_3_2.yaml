@@ -30,6 +30,7 @@ tests:
           execution. c. DUT checks TH sent EventTrigger mode if it is a DUT
           supported test mode. If not, INVALID_COMMAND is sent and stops the
           command execution."
+      PICS: DGGEN.S.C00
       verification: |
           Need SDK implementation
       disabled: true
