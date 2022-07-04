@@ -146,10 +146,7 @@ namespace DeviceLayer {
             return CHIP_NO_ERROR;
         }
 
-        void DarwinWiFiDriver::Shutdown()
-        {
-            mStatusChangeCallback = nullptr;
-        }
+        void DarwinWiFiDriver::Shutdown() { mStatusChangeCallback = nullptr; }
 
         NetworkIterator * DarwinWiFiDriver::GetNetworks() { return new DarwinWiFiNetworkIterator(); }
 
