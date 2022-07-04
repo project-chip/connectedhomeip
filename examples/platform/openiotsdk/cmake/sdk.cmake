@@ -37,6 +37,7 @@ set(IOTSDK_MBEDTLS ON)
 set(IOTSDK_LWIP ON)
 set(FETCHCONTENT_QUIET OFF)
 set(IOTSDK_EXAMPLES OFF)
+set(BUILD_TESTING NO)
 set(VARIANT "FVP")
 
 # Add Open IoT SDK source
@@ -70,8 +71,7 @@ if(TARGET lwip-cmsis-port)
             lwip-cmsis-port
     )
 
-    # lwip requires user_lwipopts.h, we use the template provided by the lwip-cmsis-port
-    get_target_property(lwip-cmsis-port_SOURCE_DIR lwip-cmsis-port SOURCE_DIR)
+    # lwip requires user_lwipopts.h, we use the custom settings
     target_include_directories(lwipopts
         INTERFACE
             ${OPEN_IOT_SDK_CONFIG}/lwip
