@@ -153,7 +153,7 @@ class PersistentStorage:
             raise ValueError("Invalid Key")
 
         if (value is None):
-            self.jsonData['sdk-config'][key] = None
+            raise ValueError('value is not expected to be None')
         else:
             self.jsonData['sdk-config'][key] = base64.b64encode(
                 value).decode("utf-8")
