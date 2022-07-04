@@ -74,9 +74,9 @@ def _OnSyncGetKeyValueCb(storageObj, key: str, value, size, is_found):
         # will use the value in size[0] to determine if it should
         # return CHIP_ERROR_BUFFER_TOO_SMALL.
         size[0] = len(keyValue)
-        is_found[0] = True;
+        is_found[0] = True
     else:
-        is_found[0] = False;
+        is_found[0] = False
         size[0] = 0
 
 
