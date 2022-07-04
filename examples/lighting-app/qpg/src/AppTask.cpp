@@ -37,9 +37,9 @@
 
 #include <inet/EndPointStateOpenThread.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <DeviceInfoProviderImpl.h>
 
 using namespace chip::TLV;
 using namespace chip::Credentials;
@@ -133,7 +133,7 @@ CHIP_ERROR AppTask::Init()
 
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-    
+
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
     nativeParams.unlockCb              = UnlockOpenThreadTask;
