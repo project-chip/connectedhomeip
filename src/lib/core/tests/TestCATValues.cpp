@@ -24,7 +24,6 @@
  */
 
 #include <lib/support/UnitTestRegistration.h>
-#include <nlbyteorder.h>
 #include <nlunit-test.h>
 
 #include <lib/core/CASEAuthTag.h>
