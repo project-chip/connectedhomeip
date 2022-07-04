@@ -42,3 +42,16 @@ chip_test_suite("tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 }
+
+executable("fuzz-minmdns-packet-parsing") {
+  sources = [ "FuzzPacketParsing.cpp" ]
+
+  public_deps = [ "${chip_root}/src/lib/dnssd/minimal_mdns" ]
+
+  public_configs = [
+    "//build/config/compiler:libfuzzer_fuzzing",
+    "//build/config/compiler:sanitize_address",
+  ]
+
+  output_dir = "${root_out_dir}/tests"
+}
