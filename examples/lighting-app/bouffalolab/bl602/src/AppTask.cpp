@@ -574,8 +574,8 @@ void AppTask::LightStateUpdateEventHandler(void)
     do
     {
         if (EMBER_ZCL_STATUS_SUCCESS !=
-            emberAfReadAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                 (uint8_t *) &onoff, sizeof(uint8_t), NULL))
+            emberAfReadAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, (uint8_t *) &onoff,
+                                 sizeof(uint8_t), NULL))
         {
             break;
         }
