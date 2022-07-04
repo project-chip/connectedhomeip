@@ -30,6 +30,8 @@ assert(chip_root == "//")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/build/chip/tools.gni")
 
+import("${build_root}/config/compiler/compiler.gni")
+
 import("//src/crypto/crypto.gni")
 
 if (current_toolchain != "${dir_pw_toolchain}/default:default") {
@@ -38,7 +40,17 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         (current_os == "mac" || current_os == "linux") &&
         (host_cpu == "x64" || host_cpu == "arm64" || host_cpu == "arm")
     enable_pylib = false
+
+    enable_fuzz_test_targets =
+        is_clang && (current_os == "linux" || current_os == "mac")
   }
+
+  if (enable_fuzz_test_targets) {
+    group("fuzz_tests") {
+      deps = [ "${chip_root}/src/lib/core/tests:fuzz-tlv-reader" ]
+    }
+  }
+
 
   # Python packages for supporting specific targets.
   pw_python_group("python_packages") {
@@ -87,6 +99,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       "${nlio_root}:nlio",
       "${nlunit_test_root}:nlunit-test",
     ]
+
+    if (enable_fuzz_test_targets) {
+      deps += [ "//:fuzz_tests" ]
+    }
 
     if (chip_device_platform != "none") {
       deps += [ "${chip_root}/src/app/server" ]
@@ -260,9 +276,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Build the Linux lock app example.
     enable_linux_lock_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
-
-    enable_fuzz_test_targets =
-        is_clang && (host_os = "linux" || host_os == "mac")
 
     # Build the cc13x2x7_26x2x7 lock app example.
     enable_cc13x2x7_26x2x7_lock_app_build = enable_ti_simplelink_builds
@@ -499,12 +512,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 
-  if (enable_fuzz_test_targets) {
-    group("fuzz_tests") {
-      deps = [ "${chip_root}/src/lib/core/tests:fuzz-tlv-reader" ]
-    }
-  }
-
   group("default") {
     deps = []
     if (enable_host_clang_build) {
@@ -589,9 +596,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
     if (enable_cc13x2x7_26x2x7_all_clusters_app_build) {
       deps += [ ":cc13x2x7_26x2x7_all_clusters_app" ]
-    }
-    if (enable_fuzz_test_targets) {
-      deps += [ ":fuzz_tests" ]
     }
   }
 
