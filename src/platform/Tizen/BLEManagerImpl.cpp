@@ -1140,7 +1140,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         HandleConnectionError(event->CHIPoBLEConnectionError.ConId, event->CHIPoBLEConnectionError.Reason);
         break;
     case DeviceEventType::kServiceProvisioningChange:
-    case DeviceEventType::kAccountPairingChange:
         break;
     default:
         HandlePlatformSpecificBLEEvent(event);

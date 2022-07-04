@@ -141,13 +141,6 @@ enum PublicEventTypes
     kServiceProvisioningChange,
 
     /**
-     * Account Pairing Change
-     *
-     * Signals a change to the device's state with respect to being paired to a user account.
-     */
-    kAccountPairingChange,
-
-    /**
      * Time Sync Change
      *
      * Signals a change to the device's real time clock synchronization state.
