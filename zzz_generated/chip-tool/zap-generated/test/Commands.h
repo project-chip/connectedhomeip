@@ -33364,13 +33364,13 @@ private:
         }
         case 5: {
             LogStep(5, "1e: read the RW mandatory attribute default: Mode");
-            VerifyOrDo(!ShouldSkip("NCV.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("WNCV.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, true,
                                  chip::NullOptional);
         }
         case 6: {
             LogStep(6, "1f: write a value into the RW mandatory attribute:: Mode");
-            VerifyOrDo(!ShouldSkip("NCV.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("WNCV.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;
             value = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0U);
