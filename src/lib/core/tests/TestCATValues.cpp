@@ -127,7 +127,6 @@ void TestSubjectMatching(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !a.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0x0001'0002'0003'0004ull)));
     NL_TEST_ASSERT(inSuite, !a.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0x0001'0002'2222'0002ull)));
 
-
     auto b = CATValues{ { 0x1111'0001 } };
     NL_TEST_ASSERT(inSuite, b.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'1111'0001ull)));
     NL_TEST_ASSERT(inSuite, !b.CheckSubjectAgainstCATs(static_cast<chip::NodeId>(0xFFFF'FFFD'1111'0002ull)));
