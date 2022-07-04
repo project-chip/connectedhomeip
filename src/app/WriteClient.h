@@ -358,7 +358,7 @@ private:
     CHIP_ERROR FinishAttributeIB();
     TLV::TLVWriter * GetAttributeDataIBTLVWriter();
 
-    CHIP_ERROR ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext, bool aSuppressErrorStatusResponse);
+    void ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext, bool aSuppressErrorStatusResponse);
     /**
      * Create a new message (or a new chunk) for the write request.
      */

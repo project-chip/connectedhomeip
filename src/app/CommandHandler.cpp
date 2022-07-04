@@ -178,7 +178,7 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
 CHIP_ERROR CommandHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                              System::PacketBufferHandle && aPayload)
 {
-    ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
+    ChipLogDetail(DataManagement, "CommandHandler: Unexpected message type %d", aPayloadHeader.GetMessageType());
     return OnUnknownMsgType();
 }
 

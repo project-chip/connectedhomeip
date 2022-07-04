@@ -142,10 +142,11 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
     if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
         ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
-        if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+        err = StatusResponse::Send(Status::InvalidAction, apExchangeContext,
+                                   false /*aExpectResponse*/);
+        if (err == CHIP_NO_ERROR)
         {
-            err = StatusResponse::Send(Status::InvalidAction, apExchangeContext,
-                                       false /*aExpectResponse*/);
+            mpExchangeCtx = nullptr;
         }
         Close();
         return err;
@@ -715,7 +716,7 @@ const char * WriteHandler::GetStateStr() const
 void WriteHandler::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
-    ChipLogDetail(DataManagement, "IM WH moving to [%s]", GetStateStr());
+    ChipLogDetail(DataManagement, "IM WriteHandler moving to [%s]", GetStateStr());
 }
 
 void WriteHandler::ClearState()

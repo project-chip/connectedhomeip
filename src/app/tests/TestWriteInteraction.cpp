@@ -577,9 +577,12 @@ void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void 
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
 
+    ctx.GetLoopback().mSentMessageCount = 0;
+    ctx.GetLoopback().mNumMessagesToDrop = 1;
+    ctx.GetLoopback().mNumMessagesToDropSinceIndex = 2;
     err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    writeClient.MoveToState(WriteClient::State::ResponseReceived);
+    ctx.DrainAndServiceIO();
 
     char PAYLOAD[] = "Hello!";
     uint16_t payload_len = sizeof(PAYLOAD);
@@ -588,15 +591,23 @@ void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void 
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
     chip::System::PacketBufferHandle payload = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(apSuite, !payload.IsNull());
-    writeClient.OnMessageReceived(writeClient.mpExchangeCtx, payloadHeader, std::move(payload));
+
+    rm->ClearRetransTable(writeClient.mpExchangeCtx);
+    ctx.GetLoopback().mSentMessageCount = 0;
+    ctx.GetLoopback().mNumMessagesToDrop = 0;
+    ctx.GetLoopback().mNumMessagesToDropSinceIndex = 0;
+    err = writeClient.OnMessageReceived(writeClient.mpExchangeCtx, payloadHeader, std::move(payload));
+    NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 1 && callback.mOnDoneCalled == 1);
-    ctx.DrainAndServiceIO();
-    // By now we should have closed all exchanges and sent all pending acks, so
-    // there should be no queued-up things in the retransmit table.
-    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
 
     engine->Shutdown();
+    ctx.ExpireSessionAliceToBob();
+    ctx.ExpireSessionBobToAlice();
+    ctx.CreateSessionAliceToBob();
+    ctx.CreateSessionBobToAlice();
 }
 
 // Write Client sends the malformed write request, and server generates invalid action status report to client, and further the
@@ -651,11 +662,11 @@ const nlTest sTests[] =
         NL_TEST_DEF("CheckWriteClientGroup", chip::app::TestWriteInteraction::TestWriteClientGroup),
         NL_TEST_DEF("CheckWriteHandler", chip::app::TestWriteInteraction::TestWriteHandler),
         NL_TEST_DEF("CheckWriteRoundtrip", chip::app::TestWriteInteraction::TestWriteRoundtrip),
-        NL_TEST_DEF("TestWriteInvalidMessage1", chip::app::TestWriteInteraction::TestWriteInvalidMessage1),
-        NL_TEST_DEF("TestWriteInvalidMessage2", chip::app::TestWriteInteraction::TestWriteInvalidMessage2),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjects", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjects),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjectsVersionMatch", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMatch),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjectsVersionMismatch", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMismatch),
+        NL_TEST_DEF("TestWriteInvalidMessage1", chip::app::TestWriteInteraction::TestWriteInvalidMessage1),
+        NL_TEST_DEF("TestWriteInvalidMessage2", chip::app::TestWriteInteraction::TestWriteInvalidMessage2),
         NL_TEST_SENTINEL()
 };
 // clang-format on

@@ -44,7 +44,6 @@
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <app/InteractionModelHelper.h>
 #include <nlunit-test.h>
 
 using TestContext = chip::Test::AppContext;
@@ -217,7 +216,6 @@ public:
     static void TestCommandHandlerCommandEncodeFailure(nlTestSuite * apSuite, void * apContext);
     static void TestCommandInvalidMessage1(nlTestSuite * apSuite, void * apContext);
     static void TestCommandInvalidMessage2(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandInvalidMessage3(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerCommandEncodeExternalFailure(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendSimpleStatusCode(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendEmptyResponse(nlTestSuite * apSuite, void * apContext);
@@ -650,31 +648,30 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
 #endif
 }
 
-// Command Sender sends the invoke request, then receives unknown message.
+// Command Sender sends the invoke request, command handler drops invoke response, then test injects unknown message to client, client would
+// out the status response with invalid action, and interaction model engine would send out the status reponse with invalid action
 void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
-
     mockCommandSenderDelegate.ResetCounter();
     app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
 
     AddInvokeRequestData(apSuite, apContext, &commandSender);
-    asyncCommand = true;
+    asyncCommand = false;
+
+    ctx.GetLoopback().mSentMessageCount = 0;
+    ctx.GetLoopback().mNumMessagesToDrop = 1;
+    ctx.GetLoopback().mNumMessagesToDropSinceIndex = 2;
     err          = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
-
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 0 &&
                        mockCommandSenderDelegate.onErrorCalledTimes == 0);
 
-    NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 1);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
-
-    commandSender.MoveToState(app::CommandSender::State::ResponseReceived);
+    NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
 
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
@@ -689,66 +686,29 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
-    commandSender.OnMessageReceived(commandSender.mpExchangeCtx, payloadHeader, std::move(msgBuf));
+    Messaging::ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    rm->ClearRetransTable(commandSender.mpExchangeCtx);
+    ctx.GetLoopback().mSentMessageCount = 0;
+    ctx.GetLoopback().mNumMessagesToDrop = 0;
+    ctx.GetLoopback().mNumMessagesToDropSinceIndex = 0;
 
+    err = commandSender.OnMessageReceived(commandSender.mpExchangeCtx, payloadHeader, std::move(msgBuf));
+    NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
                        mockCommandSenderDelegate.onErrorCalledTimes == 1);
 
-    // Decrease CommandHandler refcount and send response
-    asyncCommandHandle = nullptr;
-
-    ctx.GetLoopback().mSentMessageCount = 0;
     ctx.DrainAndServiceIO();
-    // a command response message was sent
-    printf("debug %d", ctx.GetLoopback().mSentMessageCount);
-    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 1);
-
+    NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
-
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
-}
-
-// Command Sender sends the invoke request, handler runs the async procedure, and triggers unknown message call
-void TestCommandInteraction::TestCommandInvalidMessage2(nlTestSuite * apSuite, void * apContext)
-{
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-
-    mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
-
-    AddInvokeRequestData(apSuite, apContext, &commandSender);
-    asyncCommand = true;
-    err          = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    ctx.DeliverOneMessage();
-
-    NL_TEST_ASSERT(apSuite,
-                   mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 0 &&
-                       mockCommandSenderDelegate.onErrorCalledTimes == 0);
-
-    NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 1);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
-
-    System::PacketBufferHandle msgBuf;
-    WriteRequestMessage::Builder request;
-    System::PacketBufferTLVWriter writer;
-
-    chip::app::InitWriterWithSpaceReserved(writer, 0);
-    err = request.Init(&writer);
-    err = writer.Finalize(&msgBuf);
-    err = commandSender.mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(msgBuf),
-                                                Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
-    ctx.DrainAndServiceIO();
-
-    asyncCommandHandle = nullptr;
-    NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
+    ctx.ExpireSessionAliceToBob();
+    ctx.ExpireSessionBobToAlice();
+    ctx.CreateSessionAliceToBob();
+    ctx.CreateSessionBobToAlice();
 }
 
 // Command Sender sends the  malformed invoke request, handler fails to process it and send status report with invalid action
-void TestCommandInteraction::TestCommandInvalidMessage3(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandInvalidMessage2(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -1077,6 +1037,8 @@ namespace {
 // clang-format off
 const nlTest sTests[] =
 {
+    NL_TEST_DEF("TestCommandInvalidMessage1", chip::app::TestCommandInteraction::TestCommandInvalidMessage1),
+    NL_TEST_DEF("TestCommandInvalidMessage2", chip::app::TestCommandInteraction::TestCommandInvalidMessage2),
     NL_TEST_DEF("TestCommandSenderWithWrongState", chip::app::TestCommandInteraction::TestCommandSenderWithWrongState),
     NL_TEST_DEF("TestCommandHandlerWithWrongState", chip::app::TestCommandInteraction::TestCommandHandlerWithWrongState),
     NL_TEST_DEF("TestCommandSenderWithSendCommand", chip::app::TestCommandInteraction::TestCommandSenderWithSendCommand),
@@ -1085,16 +1047,12 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandHandlerWithSendSimpleCommandData", chip::app::TestCommandInteraction::TestCommandHandlerWithSendSimpleCommandData),
     NL_TEST_DEF("TestCommandHandlerCommandDataEncoding", chip::app::TestCommandInteraction::TestCommandHandlerCommandDataEncoding),
     NL_TEST_DEF("TestCommandHandlerCommandEncodeFailure", chip::app::TestCommandInteraction::TestCommandHandlerCommandEncodeFailure),
-    NL_TEST_DEF("TestCommandInvalidMessage1", chip::app::TestCommandInteraction::TestCommandInvalidMessage1),
-    NL_TEST_DEF("TestCommandInvalidMessage2", chip::app::TestCommandInteraction::TestCommandInvalidMessage2),
-    NL_TEST_DEF("TestCommandInvalidMessage3", chip::app::TestCommandInteraction::TestCommandInvalidMessage3),
     NL_TEST_DEF("TestCommandHandlerCommandEncodeExternalFailure", chip::app::TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure),
     NL_TEST_DEF("TestCommandHandlerWithSendSimpleStatusCode", chip::app::TestCommandInteraction::TestCommandHandlerWithSendSimpleStatusCode),
     NL_TEST_DEF("TestCommandHandlerWithProcessReceivedMsg", chip::app::TestCommandInteraction::TestCommandHandlerWithProcessReceivedMsg),
     NL_TEST_DEF("TestCommandHandlerWithProcessReceivedNotExistCommand", chip::app::TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistCommand),
     NL_TEST_DEF("TestCommandHandlerWithProcessReceivedEmptyDataMsg", chip::app::TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg),
     NL_TEST_DEF("TestCommandHandlerRejectMultipleCommands", chip::app::TestCommandInteraction::TestCommandHandlerRejectMultipleCommands),
-
     NL_TEST_DEF("TestCommandSenderCommandSuccessResponseFlow", chip::app::TestCommandInteraction::TestCommandSenderCommandSuccessResponseFlow),
     NL_TEST_DEF("TestCommandSenderCommandAsyncSuccessResponseFlow", chip::app::TestCommandInteraction::TestCommandSenderCommandAsyncSuccessResponseFlow),
     NL_TEST_DEF("TestCommandSenderCommandSpecificResponseFlow", chip::app::TestCommandInteraction::TestCommandSenderCommandSpecificResponseFlow),

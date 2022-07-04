@@ -155,8 +155,8 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     {
         CHIP_ERROR statusError = CHIP_NO_ERROR;
         SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
-        suppressErrorStatusResponse = true;
         SuccessOrExit(err = statusError);
+        err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
     else
     {
@@ -164,28 +164,28 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     }
 
 exit:
-    return ResponseMessageHandled(err, apExchangeContext, suppressErrorStatusResponse);
+    ResponseMessageHandled(err, apExchangeContext, suppressErrorStatusResponse);
+    return err;
 }
 
-CHIP_ERROR CommandSender::ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
+void CommandSender::ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
                                        bool aSuppressErrorStatusResponse)
 {
-    CHIP_ERROR err = aError;
     if (aError != CHIP_NO_ERROR)
     {
         if (!aSuppressErrorStatusResponse)
         {
-            err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext,
-                                       false /*aExpectResponse*/);
+            CHIP_ERROR err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext,
+                                                  false /*aExpectResponse*/);
             if (err == CHIP_NO_ERROR)
             {
                 mpExchangeCtx = nullptr;
             }
-        }
 
-        if (mpCallback != nullptr)
-        {
-            mpCallback->OnError(this, aError);
+            if (mpCallback != nullptr)
+            {
+                mpCallback->OnError(this, aError);
+            }
         }
     }
 
@@ -193,9 +193,6 @@ CHIP_ERROR CommandSender::ResponseMessageHandled(CHIP_ERROR aError, Messaging::E
     {
         Close();
     }
-    // Else we got a response to a Timed Request and just sent the invoke.
-
-    return err;
 }
 
 CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && payload)
