@@ -22,257 +22,385 @@
 #import "MTRDevice.h"
 
 @interface MTRIdentify ()
-@property (readonly) chip::Controller::IdentifyCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::IdentifyCluster * cppCluster;
+- (chip::Controller::IdentifyCluster **)cppClusterSlot;
 @end
 
 @interface MTRGroups ()
-@property (readonly) chip::Controller::GroupsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::GroupsCluster * cppCluster;
+- (chip::Controller::GroupsCluster **)cppClusterSlot;
 @end
 
 @interface MTRScenes ()
-@property (readonly) chip::Controller::ScenesCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ScenesCluster * cppCluster;
+- (chip::Controller::ScenesCluster **)cppClusterSlot;
 @end
 
 @interface MTROnOff ()
-@property (readonly) chip::Controller::OnOffCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::OnOffCluster * cppCluster;
+- (chip::Controller::OnOffCluster **)cppClusterSlot;
 @end
 
 @interface MTROnOffSwitchConfiguration ()
-@property (readonly) chip::Controller::OnOffSwitchConfigurationCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::OnOffSwitchConfigurationCluster * cppCluster;
+- (chip::Controller::OnOffSwitchConfigurationCluster **)cppClusterSlot;
 @end
 
 @interface MTRLevelControl ()
-@property (readonly) chip::Controller::LevelControlCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::LevelControlCluster * cppCluster;
+- (chip::Controller::LevelControlCluster **)cppClusterSlot;
 @end
 
 @interface MTRBinaryInputBasic ()
-@property (readonly) chip::Controller::BinaryInputBasicCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BinaryInputBasicCluster * cppCluster;
+- (chip::Controller::BinaryInputBasicCluster **)cppClusterSlot;
 @end
 
 @interface MTRDescriptor ()
-@property (readonly) chip::Controller::DescriptorCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::DescriptorCluster * cppCluster;
+- (chip::Controller::DescriptorCluster **)cppClusterSlot;
 @end
 
 @interface MTRBinding ()
-@property (readonly) chip::Controller::BindingCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BindingCluster * cppCluster;
+- (chip::Controller::BindingCluster **)cppClusterSlot;
 @end
 
 @interface MTRAccessControl ()
-@property (readonly) chip::Controller::AccessControlCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::AccessControlCluster * cppCluster;
+- (chip::Controller::AccessControlCluster **)cppClusterSlot;
 @end
 
 @interface MTRBridgedActions ()
-@property (readonly) chip::Controller::BridgedActionsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BridgedActionsCluster * cppCluster;
+- (chip::Controller::BridgedActionsCluster **)cppClusterSlot;
 @end
 
 @interface MTRBasic ()
-@property (readonly) chip::Controller::BasicCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BasicCluster * cppCluster;
+- (chip::Controller::BasicCluster **)cppClusterSlot;
 @end
 
 @interface MTROtaSoftwareUpdateProvider ()
-@property (readonly) chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::OtaSoftwareUpdateProviderCluster * cppCluster;
+- (chip::Controller::OtaSoftwareUpdateProviderCluster **)cppClusterSlot;
 @end
 
 @interface MTROtaSoftwareUpdateRequestor ()
-@property (readonly) chip::Controller::OtaSoftwareUpdateRequestorCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::OtaSoftwareUpdateRequestorCluster * cppCluster;
+- (chip::Controller::OtaSoftwareUpdateRequestorCluster **)cppClusterSlot;
 @end
 
 @interface MTRLocalizationConfiguration ()
-@property (readonly) chip::Controller::LocalizationConfigurationCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::LocalizationConfigurationCluster * cppCluster;
+- (chip::Controller::LocalizationConfigurationCluster **)cppClusterSlot;
 @end
 
 @interface MTRTimeFormatLocalization ()
-@property (readonly) chip::Controller::TimeFormatLocalizationCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::TimeFormatLocalizationCluster * cppCluster;
+- (chip::Controller::TimeFormatLocalizationCluster **)cppClusterSlot;
 @end
 
 @interface MTRUnitLocalization ()
-@property (readonly) chip::Controller::UnitLocalizationCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::UnitLocalizationCluster * cppCluster;
+- (chip::Controller::UnitLocalizationCluster **)cppClusterSlot;
 @end
 
 @interface MTRPowerSourceConfiguration ()
-@property (readonly) chip::Controller::PowerSourceConfigurationCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::PowerSourceConfigurationCluster * cppCluster;
+- (chip::Controller::PowerSourceConfigurationCluster **)cppClusterSlot;
 @end
 
 @interface MTRPowerSource ()
-@property (readonly) chip::Controller::PowerSourceCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::PowerSourceCluster * cppCluster;
+- (chip::Controller::PowerSourceCluster **)cppClusterSlot;
 @end
 
 @interface MTRGeneralCommissioning ()
-@property (readonly) chip::Controller::GeneralCommissioningCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::GeneralCommissioningCluster * cppCluster;
+- (chip::Controller::GeneralCommissioningCluster **)cppClusterSlot;
 @end
 
 @interface MTRNetworkCommissioning ()
-@property (readonly) chip::Controller::NetworkCommissioningCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::NetworkCommissioningCluster * cppCluster;
+- (chip::Controller::NetworkCommissioningCluster **)cppClusterSlot;
 @end
 
 @interface MTRDiagnosticLogs ()
-@property (readonly) chip::Controller::DiagnosticLogsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::DiagnosticLogsCluster * cppCluster;
+- (chip::Controller::DiagnosticLogsCluster **)cppClusterSlot;
 @end
 
 @interface MTRGeneralDiagnostics ()
-@property (readonly) chip::Controller::GeneralDiagnosticsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::GeneralDiagnosticsCluster * cppCluster;
+- (chip::Controller::GeneralDiagnosticsCluster **)cppClusterSlot;
 @end
 
 @interface MTRSoftwareDiagnostics ()
-@property (readonly) chip::Controller::SoftwareDiagnosticsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::SoftwareDiagnosticsCluster * cppCluster;
+- (chip::Controller::SoftwareDiagnosticsCluster **)cppClusterSlot;
 @end
 
 @interface MTRThreadNetworkDiagnostics ()
-@property (readonly) chip::Controller::ThreadNetworkDiagnosticsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ThreadNetworkDiagnosticsCluster * cppCluster;
+- (chip::Controller::ThreadNetworkDiagnosticsCluster **)cppClusterSlot;
 @end
 
 @interface MTRWiFiNetworkDiagnostics ()
-@property (readonly) chip::Controller::WiFiNetworkDiagnosticsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::WiFiNetworkDiagnosticsCluster * cppCluster;
+- (chip::Controller::WiFiNetworkDiagnosticsCluster **)cppClusterSlot;
 @end
 
 @interface MTREthernetNetworkDiagnostics ()
-@property (readonly) chip::Controller::EthernetNetworkDiagnosticsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::EthernetNetworkDiagnosticsCluster * cppCluster;
+- (chip::Controller::EthernetNetworkDiagnosticsCluster **)cppClusterSlot;
 @end
 
 @interface MTRBridgedDeviceBasic ()
-@property (readonly) chip::Controller::BridgedDeviceBasicCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BridgedDeviceBasicCluster * cppCluster;
+- (chip::Controller::BridgedDeviceBasicCluster **)cppClusterSlot;
 @end
 
 @interface MTRSwitch ()
-@property (readonly) chip::Controller::SwitchCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::SwitchCluster * cppCluster;
+- (chip::Controller::SwitchCluster **)cppClusterSlot;
 @end
 
 @interface MTRAdministratorCommissioning ()
-@property (readonly) chip::Controller::AdministratorCommissioningCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::AdministratorCommissioningCluster * cppCluster;
+- (chip::Controller::AdministratorCommissioningCluster **)cppClusterSlot;
 @end
 
 @interface MTROperationalCredentials ()
-@property (readonly) chip::Controller::OperationalCredentialsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::OperationalCredentialsCluster * cppCluster;
+- (chip::Controller::OperationalCredentialsCluster **)cppClusterSlot;
 @end
 
 @interface MTRGroupKeyManagement ()
-@property (readonly) chip::Controller::GroupKeyManagementCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::GroupKeyManagementCluster * cppCluster;
+- (chip::Controller::GroupKeyManagementCluster **)cppClusterSlot;
 @end
 
 @interface MTRFixedLabel ()
-@property (readonly) chip::Controller::FixedLabelCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::FixedLabelCluster * cppCluster;
+- (chip::Controller::FixedLabelCluster **)cppClusterSlot;
 @end
 
 @interface MTRUserLabel ()
-@property (readonly) chip::Controller::UserLabelCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::UserLabelCluster * cppCluster;
+- (chip::Controller::UserLabelCluster **)cppClusterSlot;
 @end
 
 @interface MTRBooleanState ()
-@property (readonly) chip::Controller::BooleanStateCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BooleanStateCluster * cppCluster;
+- (chip::Controller::BooleanStateCluster **)cppClusterSlot;
 @end
 
 @interface MTRModeSelect ()
-@property (readonly) chip::Controller::ModeSelectCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ModeSelectCluster * cppCluster;
+- (chip::Controller::ModeSelectCluster **)cppClusterSlot;
 @end
 
 @interface MTRDoorLock ()
-@property (readonly) chip::Controller::DoorLockCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::DoorLockCluster * cppCluster;
+- (chip::Controller::DoorLockCluster **)cppClusterSlot;
 @end
 
 @interface MTRWindowCovering ()
-@property (readonly) chip::Controller::WindowCoveringCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::WindowCoveringCluster * cppCluster;
+- (chip::Controller::WindowCoveringCluster **)cppClusterSlot;
 @end
 
 @interface MTRBarrierControl ()
-@property (readonly) chip::Controller::BarrierControlCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BarrierControlCluster * cppCluster;
+- (chip::Controller::BarrierControlCluster **)cppClusterSlot;
 @end
 
 @interface MTRPumpConfigurationAndControl ()
-@property (readonly) chip::Controller::PumpConfigurationAndControlCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::PumpConfigurationAndControlCluster * cppCluster;
+- (chip::Controller::PumpConfigurationAndControlCluster **)cppClusterSlot;
 @end
 
 @interface MTRThermostat ()
-@property (readonly) chip::Controller::ThermostatCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ThermostatCluster * cppCluster;
+- (chip::Controller::ThermostatCluster **)cppClusterSlot;
 @end
 
 @interface MTRFanControl ()
-@property (readonly) chip::Controller::FanControlCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::FanControlCluster * cppCluster;
+- (chip::Controller::FanControlCluster **)cppClusterSlot;
 @end
 
 @interface MTRThermostatUserInterfaceConfiguration ()
-@property (readonly) chip::Controller::ThermostatUserInterfaceConfigurationCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ThermostatUserInterfaceConfigurationCluster * cppCluster;
+- (chip::Controller::ThermostatUserInterfaceConfigurationCluster **)cppClusterSlot;
 @end
 
 @interface MTRColorControl ()
-@property (readonly) chip::Controller::ColorControlCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ColorControlCluster * cppCluster;
+- (chip::Controller::ColorControlCluster **)cppClusterSlot;
 @end
 
 @interface MTRIlluminanceMeasurement ()
-@property (readonly) chip::Controller::IlluminanceMeasurementCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::IlluminanceMeasurementCluster * cppCluster;
+- (chip::Controller::IlluminanceMeasurementCluster **)cppClusterSlot;
 @end
 
 @interface MTRTemperatureMeasurement ()
-@property (readonly) chip::Controller::TemperatureMeasurementCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::TemperatureMeasurementCluster * cppCluster;
+- (chip::Controller::TemperatureMeasurementCluster **)cppClusterSlot;
 @end
 
 @interface MTRPressureMeasurement ()
-@property (readonly) chip::Controller::PressureMeasurementCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::PressureMeasurementCluster * cppCluster;
+- (chip::Controller::PressureMeasurementCluster **)cppClusterSlot;
 @end
 
 @interface MTRFlowMeasurement ()
-@property (readonly) chip::Controller::FlowMeasurementCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::FlowMeasurementCluster * cppCluster;
+- (chip::Controller::FlowMeasurementCluster **)cppClusterSlot;
 @end
 
 @interface MTRRelativeHumidityMeasurement ()
-@property (readonly) chip::Controller::RelativeHumidityMeasurementCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::RelativeHumidityMeasurementCluster * cppCluster;
+- (chip::Controller::RelativeHumidityMeasurementCluster **)cppClusterSlot;
 @end
 
 @interface MTROccupancySensing ()
-@property (readonly) chip::Controller::OccupancySensingCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::OccupancySensingCluster * cppCluster;
+- (chip::Controller::OccupancySensingCluster **)cppClusterSlot;
 @end
 
 @interface MTRWakeOnLan ()
-@property (readonly) chip::Controller::WakeOnLanCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::WakeOnLanCluster * cppCluster;
+- (chip::Controller::WakeOnLanCluster **)cppClusterSlot;
 @end
 
 @interface MTRChannel ()
-@property (readonly) chip::Controller::ChannelCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ChannelCluster * cppCluster;
+- (chip::Controller::ChannelCluster **)cppClusterSlot;
 @end
 
 @interface MTRTargetNavigator ()
-@property (readonly) chip::Controller::TargetNavigatorCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::TargetNavigatorCluster * cppCluster;
+- (chip::Controller::TargetNavigatorCluster **)cppClusterSlot;
 @end
 
 @interface MTRMediaPlayback ()
-@property (readonly) chip::Controller::MediaPlaybackCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::MediaPlaybackCluster * cppCluster;
+- (chip::Controller::MediaPlaybackCluster **)cppClusterSlot;
 @end
 
 @interface MTRMediaInput ()
-@property (readonly) chip::Controller::MediaInputCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::MediaInputCluster * cppCluster;
+- (chip::Controller::MediaInputCluster **)cppClusterSlot;
 @end
 
 @interface MTRLowPower ()
-@property (readonly) chip::Controller::LowPowerCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::LowPowerCluster * cppCluster;
+- (chip::Controller::LowPowerCluster **)cppClusterSlot;
 @end
 
 @interface MTRKeypadInput ()
-@property (readonly) chip::Controller::KeypadInputCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::KeypadInputCluster * cppCluster;
+- (chip::Controller::KeypadInputCluster **)cppClusterSlot;
 @end
 
 @interface MTRContentLauncher ()
-@property (readonly) chip::Controller::ContentLauncherCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ContentLauncherCluster * cppCluster;
+- (chip::Controller::ContentLauncherCluster **)cppClusterSlot;
 @end
 
 @interface MTRAudioOutput ()
-@property (readonly) chip::Controller::AudioOutputCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::AudioOutputCluster * cppCluster;
+- (chip::Controller::AudioOutputCluster **)cppClusterSlot;
 @end
 
 @interface MTRApplicationLauncher ()
-@property (readonly) chip::Controller::ApplicationLauncherCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ApplicationLauncherCluster * cppCluster;
+- (chip::Controller::ApplicationLauncherCluster **)cppClusterSlot;
 @end
 
 @interface MTRApplicationBasic ()
-@property (readonly) chip::Controller::ApplicationBasicCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ApplicationBasicCluster * cppCluster;
+- (chip::Controller::ApplicationBasicCluster **)cppClusterSlot;
 @end
 
 @interface MTRAccountLogin ()
-@property (readonly) chip::Controller::AccountLoginCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::AccountLoginCluster * cppCluster;
+- (chip::Controller::AccountLoginCluster **)cppClusterSlot;
 @end
 
 @interface MTRElectricalMeasurement ()
-@property (readonly) chip::Controller::ElectricalMeasurementCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ElectricalMeasurementCluster * cppCluster;
+- (chip::Controller::ElectricalMeasurementCluster **)cppClusterSlot;
 @end
 
 @interface MTRTestCluster ()
-@property (readonly) chip::Controller::TestClusterCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::TestClusterCluster * cppCluster;
+- (chip::Controller::TestClusterCluster **)cppClusterSlot;
 @end

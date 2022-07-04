@@ -36,6 +36,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRIdentify : MTRCluster
 
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+
 - (void)identifyWithParams:(MTRIdentifyClusterIdentifyParams *)params completionHandler:(StatusCompletion)completionHandler;
 - (void)triggerEffectWithParams:(MTRIdentifyClusterTriggerEffectParams *)params
               completionHandler:(StatusCompletion)completionHandler;
@@ -171,6 +175,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -178,6 +185,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRGroups : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)addGroupWithParams:(MTRGroupsClusterAddGroupParams *)params
          completionHandler:
@@ -305,6 +316,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -312,6 +326,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRScenes : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)addSceneWithParams:(MTRScenesClusterAddSceneParams *)params
          completionHandler:
@@ -538,6 +556,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -545,6 +566,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTROnOff : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)offWithParams:(MTROnOffClusterOffParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler;
 - (void)offWithCompletionHandler:(StatusCompletion)completionHandler;
@@ -745,6 +770,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -752,6 +780,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTROnOffSwitchConfiguration : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeSwitchTypeWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -883,6 +915,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -890,6 +925,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRLevelControl : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)moveToLevelWithParams:(MTRLevelControlClusterMoveToLevelParams *)params
             completionHandler:(StatusCompletion)completionHandler;
@@ -1274,6 +1313,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -1281,6 +1323,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRBinaryInputBasic : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeActiveTextWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -1553,6 +1599,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -1560,6 +1609,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRDescriptor : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeDeviceListWithCompletionHandler:(void (^)(
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -1716,6 +1769,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -1723,6 +1779,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRBinding : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeBindingWithParams:(MTRReadParams * _Nullable)params
                      completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -1835,6 +1895,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -1842,6 +1905,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRAccessControl : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeAclWithParams:(MTRReadParams * _Nullable)params
                  completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -2031,6 +2098,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -2038,6 +2108,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRBridgedActions : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)instantActionWithParams:(MTRBridgedActionsClusterInstantActionParams *)params
               completionHandler:(StatusCompletion)completionHandler;
@@ -2204,6 +2278,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -2211,6 +2288,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRBasic : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)mfgSpecificPingWithParams:(MTRBasicClusterMfgSpecificPingParams * _Nullable)params
                 completionHandler:(StatusCompletion)completionHandler;
@@ -2666,6 +2747,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -2673,6 +2757,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTROtaSoftwareUpdateProvider : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)queryImageWithParams:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
            completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
@@ -2774,6 +2862,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -2781,6 +2872,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTROtaSoftwareUpdateRequestor : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)announceOtaProviderWithParams:(MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
                     completionHandler:(StatusCompletion)completionHandler;
@@ -2954,6 +3049,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -2961,6 +3059,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRLocalizationConfiguration : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeActiveLocaleWithCompletionHandler:(void (^)(
                                                            NSString * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -3093,6 +3195,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -3100,6 +3205,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRTimeFormatLocalization : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeHourFormatWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -3254,6 +3363,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -3261,6 +3373,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRUnitLocalization : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeTemperatureUnitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -3375,6 +3491,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -3382,6 +3501,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRPowerSourceConfiguration : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeSourcesWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 /**
@@ -3489,6 +3612,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -3496,6 +3622,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRPowerSource : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 /**
@@ -4158,6 +4288,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -4165,6 +4298,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRGeneralCommissioning : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)armFailSafeWithParams:(MTRGeneralCommissioningClusterArmFailSafeParams *)params
             completionHandler:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data,
@@ -4368,6 +4505,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -4375,6 +4515,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRNetworkCommissioning : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)scanNetworksWithParams:(MTRNetworkCommissioningClusterScanNetworksParams * _Nullable)params
              completionHandler:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
@@ -4633,6 +4777,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -4640,6 +4787,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRDiagnosticLogs : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)retrieveLogsRequestWithParams:(MTRDiagnosticLogsClusterRetrieveLogsRequestParams *)params
                     completionHandler:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
@@ -4736,6 +4887,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -4743,6 +4897,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRGeneralDiagnostics : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)testEventTriggerWithParams:(MTRGeneralDiagnosticsClusterTestEventTriggerParams *)params
                  completionHandler:(StatusCompletion)completionHandler;
@@ -4999,6 +5157,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -5006,6 +5167,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRSoftwareDiagnostics : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)resetWatermarksWithParams:(MTRSoftwareDiagnosticsClusterResetWatermarksParams * _Nullable)params
                 completionHandler:(StatusCompletion)completionHandler;
@@ -5175,6 +5340,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -5182,6 +5350,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRThreadNetworkDiagnostics : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)resetCountsWithParams:(MTRThreadNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
             completionHandler:(StatusCompletion)completionHandler;
@@ -6417,6 +6589,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -6424,6 +6599,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRWiFiNetworkDiagnostics : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)resetCountsWithParams:(MTRWiFiNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
             completionHandler:(StatusCompletion)completionHandler;
@@ -6751,6 +6930,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -6758,6 +6940,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTREthernetNetworkDiagnostics : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)resetCountsWithParams:(MTREthernetNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
             completionHandler:(StatusCompletion)completionHandler;
@@ -7012,6 +7198,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -7019,6 +7208,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRBridgedDeviceBasic : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeVendorNameWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -7375,6 +7568,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -7382,6 +7578,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRSwitch : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeNumberOfPositionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
@@ -7528,6 +7728,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -7535,6 +7738,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRAdministratorCommissioning : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)openCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenCommissioningWindowParams *)params
                         completionHandler:(StatusCompletion)completionHandler;
@@ -7689,6 +7896,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -7696,6 +7906,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTROperationalCredentials : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)attestationRequestWithParams:(MTROperationalCredentialsClusterAttestationRequestParams *)params
                    completionHandler:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
@@ -7918,6 +8132,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -7925,6 +8142,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRGroupKeyManagement : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)keySetWriteWithParams:(MTRGroupKeyManagementClusterKeySetWriteParams *)params
             completionHandler:(StatusCompletion)completionHandler;
@@ -8102,6 +8323,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -8109,6 +8333,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRFixedLabel : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeLabelListWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -8217,6 +8445,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -8224,6 +8455,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRUserLabel : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeLabelListWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -8336,6 +8571,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -8343,6 +8581,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRBooleanState : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeStateValueWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -8452,6 +8694,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -8459,6 +8704,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRModeSelect : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)changeToModeWithParams:(MTRModeSelectClusterChangeToModeParams *)params
              completionHandler:(StatusCompletion)completionHandler;
@@ -8664,6 +8913,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -8671,6 +8923,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRDoorLock : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)lockDoorWithParams:(MTRDoorLockClusterLockDoorParams * _Nullable)params
          completionHandler:(StatusCompletion)completionHandler;
@@ -9541,6 +9797,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -9548,6 +9807,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRWindowCovering : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)upOrOpenWithParams:(MTRWindowCoveringClusterUpOrOpenParams * _Nullable)params
          completionHandler:(StatusCompletion)completionHandler;
@@ -10068,6 +10331,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -10075,6 +10341,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRBarrierControl : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)barrierControlGoToPercentWithParams:(MTRBarrierControlClusterBarrierControlGoToPercentParams *)params
                           completionHandler:(StatusCompletion)completionHandler;
@@ -10383,6 +10653,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -10390,6 +10663,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRPumpConfigurationAndControl : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeMaxPressureWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -10903,6 +11180,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -10910,6 +11190,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRThermostat : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)setpointRaiseLowerWithParams:(MTRThermostatClusterSetpointRaiseLowerParams *)params
                    completionHandler:(StatusCompletion)completionHandler;
@@ -12036,6 +12320,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -12043,6 +12330,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRFanControl : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeFanModeWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -12349,6 +12640,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -12356,6 +12650,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRThermostatUserInterfaceConfiguration : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeTemperatureDisplayModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
@@ -12518,6 +12816,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -12525,6 +12826,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRColorControl : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)moveToHueWithParams:(MTRColorControlClusterMoveToHueParams *)params completionHandler:(StatusCompletion)completionHandler;
 - (void)moveHueWithParams:(MTRColorControlClusterMoveHueParams *)params completionHandler:(StatusCompletion)completionHandler;
@@ -13617,6 +13922,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -13624,6 +13932,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRIlluminanceMeasurement : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
@@ -13804,6 +14116,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -13811,6 +14126,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRTemperatureMeasurement : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
@@ -13973,6 +14292,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -13980,6 +14302,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRPressureMeasurement : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
@@ -14228,6 +14554,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -14235,6 +14564,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRFlowMeasurement : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
@@ -14396,6 +14729,9 @@ NS_ASSUME_NONNULL_BEGIN
                                                  queue:(dispatch_queue_t)queue
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 
@@ -14405,6 +14741,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRRelativeHumidityMeasurement : MTRCluster
 
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 /**
@@ -14566,6 +14906,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -14573,6 +14916,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTROccupancySensing : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeOccupancyWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -14939,6 +15286,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -14946,6 +15296,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRWakeOnLan : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeMACAddressWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -15055,6 +15409,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -15062,6 +15419,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRChannel : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)changeChannelWithParams:(MTRChannelClusterChangeChannelParams *)params
               completionHandler:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data,
@@ -15214,6 +15575,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -15221,6 +15585,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRTargetNavigator : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)navigateTargetWithParams:(MTRTargetNavigatorClusterNavigateTargetParams *)params
                completionHandler:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
@@ -15351,6 +15719,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -15358,6 +15729,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRMediaPlayback : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)playWithParams:(MTRMediaPlaybackClusterPlayParams * _Nullable)params
      completionHandler:
@@ -15622,6 +15997,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -15629,6 +16007,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRMediaInput : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)selectInputWithParams:(MTRMediaInputClusterSelectInputParams *)params completionHandler:(StatusCompletion)completionHandler;
 - (void)showInputStatusWithParams:(MTRMediaInputClusterShowInputStatusParams * _Nullable)params
@@ -15764,6 +16146,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -15771,6 +16156,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRLowPower : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)sleepWithParams:(MTRLowPowerClusterSleepParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler;
 - (void)sleepWithCompletionHandler:(StatusCompletion)completionHandler;
@@ -15866,6 +16255,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -15873,6 +16265,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRKeypadInput : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)sendKeyWithParams:(MTRKeypadInputClusterSendKeyParams *)params
         completionHandler:
@@ -15969,6 +16365,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -15976,6 +16375,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRContentLauncher : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)launchContentWithParams:(MTRContentLauncherClusterLaunchContentParams *)params
               completionHandler:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
@@ -16116,6 +16519,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -16123,6 +16529,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRAudioOutput : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)selectOutputWithParams:(MTRAudioOutputClusterSelectOutputParams *)params
              completionHandler:(StatusCompletion)completionHandler;
@@ -16254,6 +16664,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -16261,6 +16674,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRApplicationLauncher : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
           completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
@@ -16403,6 +16820,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -16410,6 +16830,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRApplicationBasic : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)readAttributeVendorNameWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -16640,6 +17064,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -16647,6 +17074,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRAccountLogin : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)getSetupPINWithParams:(MTRAccountLoginClusterGetSetupPINParams *)params
             completionHandler:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
@@ -16747,6 +17178,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -16754,6 +17188,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRElectricalMeasurement : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)getProfileInfoCommandWithParams:(MTRElectricalMeasurementClusterGetProfileInfoCommandParams * _Nullable)params
                       completionHandler:(StatusCompletion)completionHandler;
@@ -19253,6 +19691,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 /**
@@ -19260,6 +19701,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface MTRTestCluster : MTRCluster
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 - (void)testWithParams:(MTRTestClusterClusterTestParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler;
 - (void)testWithCompletionHandler:(StatusCompletion)completionHandler;
@@ -21154,6 +21599,9 @@ NS_ASSUME_NONNULL_BEGIN
                                                  queue:(dispatch_queue_t)queue
                                      completionHandler:
                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 
