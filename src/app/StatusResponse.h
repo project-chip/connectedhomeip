@@ -32,6 +32,9 @@ class StatusResponse
 public:
     static CHIP_ERROR Send(Protocols::InteractionModel::Status aStatus, Messaging::ExchangeContext * apExchangeContext,
                            bool aExpectResponse);
+
+    // The return value indicates whether the StatusResponse was parsed properly, and if it is CHIP_NO_ERROR
+    // then aStatus has been set to the actual status, which might be success or failure.
     static CHIP_ERROR ProcessStatusResponse(System::PacketBufferHandle && aPayload, CHIP_ERROR & aStatus);
 };
 } // namespace app

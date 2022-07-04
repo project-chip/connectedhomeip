@@ -174,6 +174,7 @@ public:
 #if CHIP_CONFIG_TEST
     // Functions for testing
     int TestGetCountRetransTable();
+    void ResetRetransTable();
 #endif // CHIP_CONFIG_TEST
 
 private:

@@ -64,7 +64,7 @@ class LoopbackTransportDelegate
 public:
     virtual ~LoopbackTransportDelegate() {}
 
-    // Called by the loopback transport when it drops a message due to a nonzero mNumMessagesToDrop.
+    // Called by the loopback transport when it drops a message due to a nonzero mNumMessagesToDrop/mNumMessagesToDropSinceIndex
     virtual void OnMessageDropped() {}
 };
 
@@ -102,19 +102,35 @@ public:
     {
         ReturnErrorOnFailure(mMessageSendError);
         mSentMessageCount++;
-
-        if (mNumMessagesToDrop == 0)
+        if (mNumMessagesToDropSinceIndex == 0)
         {
-            System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
-            mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
-            mSystemLayer->ScheduleWork(OnMessageReceived, this);
+            if (mNumMessagesToDrop == 0)
+            {
+                System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
+                mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
+                mSystemLayer->ScheduleWork(OnMessageReceived, this);
+            }
+            else
+            {
+                mNumMessagesToDrop--;
+                mDroppedMessageCount++;
+                if (mDelegate != nullptr)
+                    mDelegate->OnMessageDropped();
+            }
         }
         else
         {
-            mNumMessagesToDrop--;
-            mDroppedMessageCount++;
-            if (mDelegate != nullptr)
-                mDelegate->OnMessageDropped();
+            if (mSentMessageCount < mNumMessagesToDropSinceIndex)
+            {
+                System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
+                mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
+                mSystemLayer->ScheduleWork(OnMessageReceived, this);
+            }
+            else
+            {
+                if (mDelegate != nullptr)
+                    mDelegate->OnMessageDropped();
+            }
         }
 
         return CHIP_NO_ERROR;
@@ -124,10 +140,11 @@ public:
 
     void Reset()
     {
-        mNumMessagesToDrop   = 0;
-        mDroppedMessageCount = 0;
-        mSentMessageCount    = 0;
-        mMessageSendError    = CHIP_NO_ERROR;
+        mNumMessagesToDrop           = 0;
+        mDroppedMessageCount         = 0;
+        mSentMessageCount            = 0;
+        mNumMessagesToDropSinceIndex = 0;
+        mMessageSendError            = CHIP_NO_ERROR;
     }
 
     struct PendingMessageItem
@@ -146,6 +163,7 @@ public:
     uint32_t mNumMessagesToDrop           = 0;
     uint32_t mDroppedMessageCount         = 0;
     uint32_t mSentMessageCount            = 0;
+    uint32_t mNumMessagesToDropSinceIndex = 0;
     CHIP_ERROR mMessageSendError          = CHIP_NO_ERROR;
     LoopbackTransportDelegate * mDelegate = nullptr;
 };
