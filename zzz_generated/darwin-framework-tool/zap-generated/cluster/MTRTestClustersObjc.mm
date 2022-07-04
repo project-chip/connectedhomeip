@@ -41,12 +41,13 @@ using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
 
 @interface MTRTestIdentify ()
-@property (readonly) chip::Controller::IdentifyCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::IdentifyCluster * cppCluster;
 @end
 
 @implementation MTRTestIdentify
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::IdentifyCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -65,7 +66,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -104,7 +105,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -143,7 +144,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -182,7 +183,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -200,7 +201,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -218,19 +219,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestGroups ()
-@property (readonly) chip::Controller::GroupsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::GroupsCluster * cppCluster;
 @end
 
 @implementation MTRTestGroups
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::GroupsCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -249,7 +251,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -288,7 +290,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -327,7 +329,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -366,7 +368,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -384,7 +386,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -402,19 +404,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestScenes ()
-@property (readonly) chip::Controller::ScenesCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ScenesCluster * cppCluster;
 @end
 
 @implementation MTRTestScenes
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::ScenesCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -433,7 +436,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -451,7 +454,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -469,7 +472,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -487,7 +490,7 @@ using namespace chip::app::Clusters;
             cppValue = value.boolValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -505,7 +508,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -528,7 +531,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -567,7 +570,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -606,7 +609,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -645,7 +648,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -663,7 +666,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -681,19 +684,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestOnOff ()
-@property (readonly) chip::Controller::OnOffCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::OnOffCluster * cppCluster;
 @end
 
 @implementation MTRTestOnOff
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::OnOffCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -712,7 +716,7 @@ using namespace chip::app::Clusters;
             cppValue = value.boolValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -730,7 +734,7 @@ using namespace chip::app::Clusters;
             cppValue = value.boolValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -769,7 +773,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -808,7 +812,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -847,7 +851,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -865,7 +869,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -883,19 +887,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestOnOffSwitchConfiguration ()
-@property (readonly) chip::Controller::OnOffSwitchConfigurationCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::OnOffSwitchConfigurationCluster * cppCluster;
 @end
 
 @implementation MTRTestOnOffSwitchConfiguration
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::OnOffSwitchConfigurationCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -914,7 +919,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -953,7 +958,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -992,7 +997,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1031,7 +1036,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1049,7 +1054,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1067,19 +1072,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestLevelControl ()
-@property (readonly) chip::Controller::LevelControlCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::LevelControlCluster * cppCluster;
 @end
 
 @implementation MTRTestLevelControl
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::LevelControlCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -1098,7 +1104,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1116,7 +1122,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1134,7 +1140,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1152,7 +1158,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1170,7 +1176,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1188,7 +1194,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1206,7 +1212,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1245,7 +1251,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1284,7 +1290,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1323,7 +1329,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1341,7 +1347,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1359,19 +1365,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestBinaryInputBasic ()
-@property (readonly) chip::Controller::BinaryInputBasicCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BinaryInputBasicCluster * cppCluster;
 @end
 
 @implementation MTRTestBinaryInputBasic
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::BinaryInputBasicCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -1390,7 +1397,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1408,7 +1415,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1426,7 +1433,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1465,7 +1472,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1504,7 +1511,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1543,7 +1550,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1561,7 +1568,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1579,19 +1586,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestDescriptor ()
-@property (readonly) chip::Controller::DescriptorCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::DescriptorCluster * cppCluster;
 @end
 
 @implementation MTRTestDescriptor
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::DescriptorCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -1632,7 +1640,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1671,7 +1679,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1710,7 +1718,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1749,7 +1757,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1788,7 +1796,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1827,7 +1835,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1866,7 +1874,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1884,7 +1892,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1902,19 +1910,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestBinding ()
-@property (readonly) chip::Controller::BindingCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BindingCluster * cppCluster;
 @end
 
 @implementation MTRTestBinding
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::BindingCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -1954,7 +1963,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1993,7 +2002,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2032,7 +2041,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2050,7 +2059,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2068,19 +2077,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestAccessControl ()
-@property (readonly) chip::Controller::AccessControlCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::AccessControlCluster * cppCluster;
 @end
 
 @implementation MTRTestAccessControl
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::AccessControlCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -2100,7 +2110,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2119,7 +2129,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2138,7 +2148,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2177,7 +2187,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2216,7 +2226,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2255,7 +2265,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2273,7 +2283,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2291,19 +2301,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestBridgedActions ()
-@property (readonly) chip::Controller::BridgedActionsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BridgedActionsCluster * cppCluster;
 @end
 
 @implementation MTRTestBridgedActions
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::BridgedActionsCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -2352,7 +2363,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2417,7 +2428,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2435,7 +2446,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2474,7 +2485,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2513,7 +2524,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2552,7 +2563,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2570,7 +2581,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2588,19 +2599,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestBasic ()
-@property (readonly) chip::Controller::BasicCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BasicCluster * cppCluster;
 @end
 
 @implementation MTRTestBasic
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::BasicCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -2619,7 +2631,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2637,7 +2649,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2655,7 +2667,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2673,7 +2685,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2691,7 +2703,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2709,7 +2721,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2728,7 +2740,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2746,7 +2758,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2765,7 +2777,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2783,7 +2795,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2801,7 +2813,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2819,7 +2831,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2837,7 +2849,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2855,7 +2867,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2873,7 +2885,7 @@ using namespace chip::app::Clusters;
             cppValue = value.boolValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2891,7 +2903,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2911,7 +2923,7 @@ using namespace chip::app::Clusters;
             cppValue.subscriptionsPerFabric = value.subscriptionsPerFabric.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2950,7 +2962,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2989,7 +3001,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3028,7 +3040,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3046,7 +3058,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3064,19 +3076,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestOtaSoftwareUpdateProvider ()
-@property (readonly) chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::OtaSoftwareUpdateProviderCluster * cppCluster;
 @end
 
 @implementation MTRTestOtaSoftwareUpdateProvider
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::OtaSoftwareUpdateProviderCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -3116,7 +3129,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3155,7 +3168,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3194,7 +3207,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3212,7 +3225,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3230,19 +3243,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestOtaSoftwareUpdateRequestor ()
-@property (readonly) chip::Controller::OtaSoftwareUpdateRequestorCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::OtaSoftwareUpdateRequestorCluster * cppCluster;
 @end
 
 @implementation MTRTestOtaSoftwareUpdateRequestor
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::OtaSoftwareUpdateRequestorCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -3261,7 +3275,7 @@ using namespace chip::app::Clusters;
             cppValue = value.boolValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3279,7 +3293,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3302,7 +3316,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3341,7 +3355,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3380,7 +3394,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3419,7 +3433,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3437,7 +3451,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3455,19 +3469,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestLocalizationConfiguration ()
-@property (readonly) chip::Controller::LocalizationConfigurationCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::LocalizationConfigurationCluster * cppCluster;
 @end
 
 @implementation MTRTestLocalizationConfiguration
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::LocalizationConfigurationCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -3507,7 +3522,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3546,7 +3561,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3585,7 +3600,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3624,7 +3639,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3642,7 +3657,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3660,19 +3675,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestTimeFormatLocalization ()
-@property (readonly) chip::Controller::TimeFormatLocalizationCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::TimeFormatLocalizationCluster * cppCluster;
 @end
 
 @implementation MTRTestTimeFormatLocalization
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::TimeFormatLocalizationCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -3714,7 +3730,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3753,7 +3769,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3792,7 +3808,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3831,7 +3847,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3849,7 +3865,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3867,19 +3883,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestUnitLocalization ()
-@property (readonly) chip::Controller::UnitLocalizationCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::UnitLocalizationCluster * cppCluster;
 @end
 
 @implementation MTRTestUnitLocalization
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::UnitLocalizationCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -3919,7 +3936,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3958,7 +3975,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3997,7 +4014,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4015,7 +4032,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4033,19 +4050,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestPowerSourceConfiguration ()
-@property (readonly) chip::Controller::PowerSourceConfigurationCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::PowerSourceConfigurationCluster * cppCluster;
 @end
 
 @implementation MTRTestPowerSourceConfiguration
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::PowerSourceConfigurationCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -4085,7 +4103,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4124,7 +4142,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4163,7 +4181,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4202,7 +4220,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4220,7 +4238,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4238,19 +4256,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestPowerSource ()
-@property (readonly) chip::Controller::PowerSourceCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::PowerSourceCluster * cppCluster;
 @end
 
 @implementation MTRTestPowerSource
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::PowerSourceCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -4269,7 +4288,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4287,7 +4306,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4305,7 +4324,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4324,7 +4343,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4343,7 +4362,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4361,7 +4380,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4379,7 +4398,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4397,7 +4416,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4415,7 +4434,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4433,7 +4452,7 @@ using namespace chip::app::Clusters;
             cppValue = value.boolValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4472,7 +4491,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4490,7 +4509,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4509,7 +4528,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4527,7 +4546,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4545,7 +4564,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4564,7 +4583,7 @@ using namespace chip::app::Clusters;
             cppValue = value.boolValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4583,7 +4602,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4601,7 +4620,7 @@ using namespace chip::app::Clusters;
             cppValue = value.boolValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4640,7 +4659,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4659,7 +4678,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4678,7 +4697,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4697,7 +4716,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4716,7 +4735,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4735,7 +4754,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4753,7 +4772,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4771,7 +4790,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4789,7 +4808,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4808,7 +4827,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4827,7 +4846,7 @@ using namespace chip::app::Clusters;
             cppValue = value.boolValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4846,7 +4865,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4886,7 +4905,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4925,7 +4944,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4964,7 +4983,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5003,7 +5022,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5021,7 +5040,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5039,19 +5058,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestGeneralCommissioning ()
-@property (readonly) chip::Controller::GeneralCommissioningCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::GeneralCommissioningCluster * cppCluster;
 @end
 
 @implementation MTRTestGeneralCommissioning
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::GeneralCommissioningCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -5072,7 +5092,7 @@ using namespace chip::app::Clusters;
             cppValue.maxCumulativeFailsafeSeconds = value.maxCumulativeFailsafeSeconds.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5090,7 +5110,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5108,7 +5128,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5127,7 +5147,7 @@ using namespace chip::app::Clusters;
             cppValue = value.boolValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5166,7 +5186,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5205,7 +5225,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5244,7 +5264,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5262,7 +5282,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5280,19 +5300,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestNetworkCommissioning ()
-@property (readonly) chip::Controller::NetworkCommissioningCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::NetworkCommissioningCluster * cppCluster;
 @end
 
 @implementation MTRTestNetworkCommissioning
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::NetworkCommissioningCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -5311,7 +5332,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5351,7 +5372,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5369,7 +5390,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5388,7 +5409,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5412,7 +5433,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5435,7 +5456,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5459,7 +5480,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5498,7 +5519,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5537,7 +5558,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5576,7 +5597,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5594,7 +5615,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5612,19 +5633,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestDiagnosticLogs ()
-@property (readonly) chip::Controller::DiagnosticLogsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::DiagnosticLogsCluster * cppCluster;
 @end
 
 @implementation MTRTestDiagnosticLogs
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::DiagnosticLogsCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -5664,7 +5686,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5703,7 +5725,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5742,7 +5764,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5760,7 +5782,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5778,19 +5800,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestGeneralDiagnostics ()
-@property (readonly) chip::Controller::GeneralDiagnosticsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::GeneralDiagnosticsCluster * cppCluster;
 @end
 
 @implementation MTRTestGeneralDiagnostics
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::GeneralDiagnosticsCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -5893,7 +5916,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5911,7 +5934,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5929,7 +5952,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedLongLongValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5948,7 +5971,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5966,7 +5989,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6005,7 +6028,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6044,7 +6067,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6083,7 +6106,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6102,7 +6125,7 @@ using namespace chip::app::Clusters;
             cppValue = value.boolValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6141,7 +6164,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6180,7 +6203,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6219,7 +6242,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6237,7 +6260,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6255,19 +6278,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestSoftwareDiagnostics ()
-@property (readonly) chip::Controller::SoftwareDiagnosticsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::SoftwareDiagnosticsCluster * cppCluster;
 @end
 
 @implementation MTRTestSoftwareDiagnostics
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::SoftwareDiagnosticsCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -6323,7 +6347,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6341,7 +6365,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedLongLongValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6359,7 +6383,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedLongLongValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6378,7 +6402,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedLongLongValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6417,7 +6441,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6456,7 +6480,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6495,7 +6519,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6513,7 +6537,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6531,19 +6555,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestThreadNetworkDiagnostics ()
-@property (readonly) chip::Controller::ThreadNetworkDiagnosticsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ThreadNetworkDiagnosticsCluster * cppCluster;
 @end
 
 @implementation MTRTestThreadNetworkDiagnostics
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::ThreadNetworkDiagnosticsCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -6567,7 +6592,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6590,7 +6615,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6613,7 +6638,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6636,7 +6661,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6659,7 +6684,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6682,7 +6707,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6700,7 +6725,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedLongLongValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6762,7 +6787,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6810,7 +6835,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6833,7 +6858,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6856,7 +6881,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6879,7 +6904,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6902,7 +6927,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6925,7 +6950,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6943,7 +6968,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6961,7 +6986,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6979,7 +7004,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6997,7 +7022,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7015,7 +7040,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7034,7 +7059,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7053,7 +7078,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7071,7 +7096,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7089,7 +7114,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7107,7 +7132,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7125,7 +7150,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7143,7 +7168,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7161,7 +7186,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7180,7 +7205,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7198,7 +7223,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7216,7 +7241,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7234,7 +7259,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7252,7 +7277,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7270,7 +7295,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7288,7 +7313,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7307,7 +7332,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7326,7 +7351,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7344,7 +7369,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7362,7 +7387,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7381,7 +7406,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7399,7 +7424,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7417,7 +7442,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7435,7 +7460,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7453,7 +7478,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7471,7 +7496,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7489,7 +7514,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7507,7 +7532,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7525,7 +7550,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7544,7 +7569,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7563,7 +7588,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7581,7 +7606,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7599,7 +7624,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7618,7 +7643,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7637,7 +7662,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7655,7 +7680,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7673,7 +7698,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7691,7 +7716,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7714,7 +7739,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7737,7 +7762,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7760,7 +7785,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7785,7 +7810,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7808,7 +7833,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7844,7 +7869,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7885,7 +7910,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7924,7 +7949,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7963,7 +7988,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8002,7 +8027,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8020,7 +8045,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8038,19 +8063,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestWiFiNetworkDiagnostics ()
-@property (readonly) chip::Controller::WiFiNetworkDiagnosticsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::WiFiNetworkDiagnosticsCluster * cppCluster;
 @end
 
 @implementation MTRTestWiFiNetworkDiagnostics
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::WiFiNetworkDiagnosticsCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -8074,7 +8100,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8097,7 +8123,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8120,7 +8146,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8143,7 +8169,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8166,7 +8192,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8184,7 +8210,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8202,7 +8228,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8221,7 +8247,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8240,7 +8266,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8258,7 +8284,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8276,7 +8302,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8294,7 +8320,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedLongLongValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8312,7 +8338,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedLongLongValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8351,7 +8377,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8390,7 +8416,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8429,7 +8455,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8447,7 +8473,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8465,19 +8491,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestEthernetNetworkDiagnostics ()
-@property (readonly) chip::Controller::EthernetNetworkDiagnosticsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::EthernetNetworkDiagnosticsCluster * cppCluster;
 @end
 
 @implementation MTRTestEthernetNetworkDiagnostics
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::EthernetNetworkDiagnosticsCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -8501,7 +8528,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8524,7 +8551,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8542,7 +8569,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedLongLongValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8560,7 +8587,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedLongLongValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8578,7 +8605,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedLongLongValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8596,7 +8623,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedLongLongValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8614,7 +8641,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedLongLongValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8637,7 +8664,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8655,7 +8682,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedLongLongValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8694,7 +8721,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8733,7 +8760,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8772,7 +8799,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8790,7 +8817,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8808,19 +8835,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestBridgedDeviceBasic ()
-@property (readonly) chip::Controller::BridgedDeviceBasicCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BridgedDeviceBasicCluster * cppCluster;
 @end
 
 @implementation MTRTestBridgedDeviceBasic
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::BridgedDeviceBasicCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -8839,7 +8867,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8857,7 +8885,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8875,7 +8903,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8893,7 +8921,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8912,7 +8940,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8930,7 +8958,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8949,7 +8977,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8967,7 +8995,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8985,7 +9013,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9003,7 +9031,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9021,7 +9049,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9039,7 +9067,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9057,7 +9085,7 @@ using namespace chip::app::Clusters;
             cppValue = value.boolValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9075,7 +9103,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9114,7 +9142,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9153,7 +9181,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9192,7 +9220,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9210,7 +9238,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9228,19 +9256,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestSwitch ()
-@property (readonly) chip::Controller::SwitchCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::SwitchCluster * cppCluster;
 @end
 
 @implementation MTRTestSwitch
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::SwitchCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -9259,7 +9288,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9277,7 +9306,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9295,7 +9324,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9334,7 +9363,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9373,7 +9402,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9412,7 +9441,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9430,7 +9459,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9448,19 +9477,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestAdministratorCommissioning ()
-@property (readonly) chip::Controller::AdministratorCommissioningCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::AdministratorCommissioningCluster * cppCluster;
 @end
 
 @implementation MTRTestAdministratorCommissioning
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::AdministratorCommissioningCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -9479,7 +9509,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9497,7 +9527,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9515,7 +9545,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9554,7 +9584,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9593,7 +9623,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9632,7 +9662,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9650,7 +9680,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9668,19 +9698,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestOperationalCredentials ()
-@property (readonly) chip::Controller::OperationalCredentialsCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::OperationalCredentialsCluster * cppCluster;
 @end
 
 @implementation MTRTestOperationalCredentials
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::OperationalCredentialsCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -9727,7 +9758,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9773,7 +9804,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9791,7 +9822,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9809,7 +9840,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9849,7 +9880,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9867,7 +9898,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9906,7 +9937,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9945,7 +9976,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9984,7 +10015,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10002,7 +10033,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10020,19 +10051,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestGroupKeyManagement ()
-@property (readonly) chip::Controller::GroupKeyManagementCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::GroupKeyManagementCluster * cppCluster;
 @end
 
 @implementation MTRTestGroupKeyManagement
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::GroupKeyManagementCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -10099,7 +10131,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10117,7 +10149,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10136,7 +10168,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10175,7 +10207,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10214,7 +10246,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10253,7 +10285,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10271,7 +10303,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10289,19 +10321,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestFixedLabel ()
-@property (readonly) chip::Controller::FixedLabelCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::FixedLabelCluster * cppCluster;
 @end
 
 @implementation MTRTestFixedLabel
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::FixedLabelCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -10342,7 +10375,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10381,7 +10414,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10420,7 +10453,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10459,7 +10492,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10477,7 +10510,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10495,19 +10528,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestUserLabel ()
-@property (readonly) chip::Controller::UserLabelCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::UserLabelCluster * cppCluster;
 @end
 
 @implementation MTRTestUserLabel
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::UserLabelCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -10547,7 +10581,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10586,7 +10620,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10625,7 +10659,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10643,7 +10677,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10661,19 +10695,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestBooleanState ()
-@property (readonly) chip::Controller::BooleanStateCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BooleanStateCluster * cppCluster;
 @end
 
 @implementation MTRTestBooleanState
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::BooleanStateCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -10692,7 +10727,7 @@ using namespace chip::app::Clusters;
             cppValue = value.boolValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10731,7 +10766,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10770,7 +10805,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10809,7 +10844,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10827,7 +10862,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10845,19 +10880,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestModeSelect ()
-@property (readonly) chip::Controller::ModeSelectCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ModeSelectCluster * cppCluster;
 @end
 
 @implementation MTRTestModeSelect
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::ModeSelectCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -10876,7 +10912,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10899,7 +10935,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10963,7 +10999,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10981,7 +11017,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11020,7 +11056,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11059,7 +11095,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11098,7 +11134,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11116,7 +11152,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11134,19 +11170,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestDoorLock ()
-@property (readonly) chip::Controller::DoorLockCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::DoorLockCluster * cppCluster;
 @end
 
 @implementation MTRTestDoorLock
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::DoorLockCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -11170,7 +11207,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11188,7 +11225,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11206,7 +11243,7 @@ using namespace chip::app::Clusters;
             cppValue = value.boolValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11229,7 +11266,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11248,7 +11285,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11267,7 +11304,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11286,7 +11323,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11305,7 +11342,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11324,7 +11361,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11343,7 +11380,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11361,7 +11398,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11379,7 +11416,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11397,7 +11434,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11415,7 +11452,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11434,7 +11471,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11453,7 +11490,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11472,7 +11509,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11491,7 +11528,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11530,7 +11567,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11569,7 +11606,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11608,7 +11645,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11626,7 +11663,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11644,19 +11681,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestWindowCovering ()
-@property (readonly) chip::Controller::WindowCoveringCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::WindowCoveringCluster * cppCluster;
 @end
 
 @implementation MTRTestWindowCovering
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::WindowCoveringCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -11675,7 +11713,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11694,7 +11732,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11713,7 +11751,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11736,7 +11774,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11759,7 +11797,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11778,7 +11816,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11797,7 +11835,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11815,7 +11853,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11839,7 +11877,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11863,7 +11901,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11881,7 +11919,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11905,7 +11943,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11929,7 +11967,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11947,7 +11985,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11971,7 +12009,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11995,7 +12033,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12014,7 +12052,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12033,7 +12071,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12052,7 +12090,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12071,7 +12109,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12089,7 +12127,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12128,7 +12166,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12167,7 +12205,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12206,7 +12244,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12224,7 +12262,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12242,19 +12280,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestBarrierControl ()
-@property (readonly) chip::Controller::BarrierControlCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BarrierControlCluster * cppCluster;
 @end
 
 @implementation MTRTestBarrierControl
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::BarrierControlCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -12273,7 +12312,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12291,7 +12330,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12309,7 +12348,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12327,7 +12366,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12366,7 +12405,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12405,7 +12444,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12444,7 +12483,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12462,7 +12501,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12480,19 +12519,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestPumpConfigurationAndControl ()
-@property (readonly) chip::Controller::PumpConfigurationAndControlCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::PumpConfigurationAndControlCluster * cppCluster;
 @end
 
 @implementation MTRTestPumpConfigurationAndControl
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::PumpConfigurationAndControlCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -12516,7 +12556,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12539,7 +12579,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12562,7 +12602,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12585,7 +12625,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12608,7 +12648,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12631,7 +12671,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12654,7 +12694,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12677,7 +12717,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12700,7 +12740,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12723,7 +12763,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12746,7 +12786,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12769,7 +12809,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12792,7 +12832,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12810,7 +12850,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12829,7 +12869,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12847,7 +12887,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12870,7 +12910,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12893,7 +12933,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12916,7 +12956,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12955,7 +12995,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12994,7 +13034,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13033,7 +13073,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13051,7 +13091,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13069,19 +13109,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestThermostat ()
-@property (readonly) chip::Controller::ThermostatCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ThermostatCluster * cppCluster;
 @end
 
 @implementation MTRTestThermostat
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::ThermostatCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -13105,7 +13146,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13128,7 +13169,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13146,7 +13187,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13165,7 +13206,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13184,7 +13225,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13203,7 +13244,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13222,7 +13263,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13240,7 +13281,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13258,7 +13299,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13277,7 +13318,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13295,7 +13336,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13314,7 +13355,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13333,7 +13374,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13352,7 +13393,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13370,7 +13411,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13394,7 +13435,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13413,7 +13454,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13436,7 +13477,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13459,7 +13500,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13483,7 +13524,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13507,7 +13548,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13530,7 +13571,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13569,7 +13610,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13608,7 +13649,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13647,7 +13688,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13665,7 +13706,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13683,19 +13724,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestFanControl ()
-@property (readonly) chip::Controller::FanControlCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::FanControlCluster * cppCluster;
 @end
 
 @implementation MTRTestFanControl
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::FanControlCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -13714,7 +13756,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13732,7 +13774,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13750,7 +13792,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13768,7 +13810,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13786,7 +13828,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13825,7 +13867,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13864,7 +13906,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13903,7 +13945,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13921,7 +13963,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13939,19 +13981,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestThermostatUserInterfaceConfiguration ()
-@property (readonly) chip::Controller::ThermostatUserInterfaceConfigurationCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ThermostatUserInterfaceConfigurationCluster * cppCluster;
 @end
 
 @implementation MTRTestThermostatUserInterfaceConfiguration
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::ThermostatUserInterfaceConfigurationCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -13991,7 +14034,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14030,7 +14073,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14069,7 +14112,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14087,7 +14130,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14105,19 +14148,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestColorControl ()
-@property (readonly) chip::Controller::ColorControlCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ColorControlCluster * cppCluster;
 @end
 
 @implementation MTRTestColorControl
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::ColorControlCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -14136,7 +14180,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14154,7 +14198,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14172,7 +14216,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14190,7 +14234,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14208,7 +14252,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14226,7 +14270,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14244,7 +14288,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14262,7 +14306,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14280,7 +14324,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14303,7 +14347,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14321,7 +14365,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14339,7 +14383,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14362,7 +14406,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14380,7 +14424,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14398,7 +14442,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14421,7 +14465,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14439,7 +14483,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14457,7 +14501,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14480,7 +14524,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14498,7 +14542,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14516,7 +14560,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14539,7 +14583,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14557,7 +14601,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14575,7 +14619,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14598,7 +14642,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14616,7 +14660,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14634,7 +14678,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14657,7 +14701,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14675,7 +14719,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14693,7 +14737,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14711,7 +14755,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14729,7 +14773,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14747,7 +14791,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14766,7 +14810,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14785,7 +14829,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14803,7 +14847,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14822,7 +14866,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14841,7 +14885,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14860,7 +14904,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14899,7 +14943,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14938,7 +14982,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14977,7 +15021,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14995,7 +15039,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15013,19 +15057,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestIlluminanceMeasurement ()
-@property (readonly) chip::Controller::IlluminanceMeasurementCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::IlluminanceMeasurementCluster * cppCluster;
 @end
 
 @implementation MTRTestIlluminanceMeasurement
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::IlluminanceMeasurementCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -15049,7 +15094,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15072,7 +15117,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15095,7 +15140,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15113,7 +15158,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15136,7 +15181,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15175,7 +15220,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15214,7 +15259,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15253,7 +15298,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15271,7 +15316,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15289,19 +15334,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestTemperatureMeasurement ()
-@property (readonly) chip::Controller::TemperatureMeasurementCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::TemperatureMeasurementCluster * cppCluster;
 @end
 
 @implementation MTRTestTemperatureMeasurement
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::TemperatureMeasurementCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -15325,7 +15371,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15348,7 +15394,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15371,7 +15417,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15389,7 +15435,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15428,7 +15474,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15467,7 +15513,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15506,7 +15552,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15524,7 +15570,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15542,19 +15588,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestPressureMeasurement ()
-@property (readonly) chip::Controller::PressureMeasurementCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::PressureMeasurementCluster * cppCluster;
 @end
 
 @implementation MTRTestPressureMeasurement
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::PressureMeasurementCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -15578,7 +15625,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15601,7 +15648,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15624,7 +15671,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15642,7 +15689,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15665,7 +15712,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15688,7 +15735,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15711,7 +15758,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15729,7 +15776,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15747,7 +15794,7 @@ using namespace chip::app::Clusters;
             cppValue = value.charValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15786,7 +15833,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15825,7 +15872,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15864,7 +15911,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15882,7 +15929,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15900,19 +15947,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestFlowMeasurement ()
-@property (readonly) chip::Controller::FlowMeasurementCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::FlowMeasurementCluster * cppCluster;
 @end
 
 @implementation MTRTestFlowMeasurement
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::FlowMeasurementCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -15936,7 +15984,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15959,7 +16007,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15982,7 +16030,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16000,7 +16048,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16039,7 +16087,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16078,7 +16126,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16117,7 +16165,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16135,7 +16183,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16153,19 +16201,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestRelativeHumidityMeasurement ()
-@property (readonly) chip::Controller::RelativeHumidityMeasurementCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::RelativeHumidityMeasurementCluster * cppCluster;
 @end
 
 @implementation MTRTestRelativeHumidityMeasurement
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::RelativeHumidityMeasurementCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -16189,7 +16238,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16212,7 +16261,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16235,7 +16284,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16253,7 +16302,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16292,7 +16341,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16331,7 +16380,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16370,7 +16419,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16388,7 +16437,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16406,19 +16455,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestOccupancySensing ()
-@property (readonly) chip::Controller::OccupancySensingCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::OccupancySensingCluster * cppCluster;
 @end
 
 @implementation MTRTestOccupancySensing
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::OccupancySensingCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -16437,7 +16487,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16455,7 +16505,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16474,7 +16524,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16513,7 +16563,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16552,7 +16602,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16591,7 +16641,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16609,7 +16659,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16627,19 +16677,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestWakeOnLan ()
-@property (readonly) chip::Controller::WakeOnLanCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::WakeOnLanCluster * cppCluster;
 @end
 
 @implementation MTRTestWakeOnLan
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::WakeOnLanCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -16658,7 +16709,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16697,7 +16748,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16736,7 +16787,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16775,7 +16826,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16793,7 +16844,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16811,19 +16862,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestChannel ()
-@property (readonly) chip::Controller::ChannelCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ChannelCluster * cppCluster;
 @end
 
 @implementation MTRTestChannel
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::ChannelCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -16876,7 +16928,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16910,7 +16962,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16947,7 +16999,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16986,7 +17038,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17025,7 +17077,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17064,7 +17116,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17082,7 +17134,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17100,19 +17152,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestTargetNavigator ()
-@property (readonly) chip::Controller::TargetNavigatorCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::TargetNavigatorCluster * cppCluster;
 @end
 
 @implementation MTRTestTargetNavigator
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::TargetNavigatorCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -17153,7 +17206,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17171,7 +17224,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17210,7 +17263,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17249,7 +17302,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17288,7 +17341,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17306,7 +17359,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17324,19 +17377,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestMediaPlayback ()
-@property (readonly) chip::Controller::MediaPlaybackCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::MediaPlaybackCluster * cppCluster;
 @end
 
 @implementation MTRTestMediaPlayback
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::MediaPlaybackCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -17355,7 +17409,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17378,7 +17432,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17401,7 +17455,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17431,7 +17485,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17449,7 +17503,7 @@ using namespace chip::app::Clusters;
             cppValue = value.floatValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17472,7 +17526,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17495,7 +17549,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17534,7 +17588,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17573,7 +17627,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17612,7 +17666,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17630,7 +17684,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17648,19 +17702,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestMediaInput ()
-@property (readonly) chip::Controller::MediaInputCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::MediaInputCluster * cppCluster;
 @end
 
 @implementation MTRTestMediaInput
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::MediaInputCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -17705,7 +17760,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17723,7 +17778,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17762,7 +17817,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17801,7 +17856,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17840,7 +17895,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17858,7 +17913,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17876,19 +17931,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestLowPower ()
-@property (readonly) chip::Controller::LowPowerCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::LowPowerCluster * cppCluster;
 @end
 
 @implementation MTRTestLowPower
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::LowPowerCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -17928,7 +17984,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17967,7 +18023,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18006,7 +18062,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18024,7 +18080,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18042,19 +18098,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestKeypadInput ()
-@property (readonly) chip::Controller::KeypadInputCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::KeypadInputCluster * cppCluster;
 @end
 
 @implementation MTRTestKeypadInput
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::KeypadInputCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -18094,7 +18151,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18133,7 +18190,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18172,7 +18229,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18190,7 +18247,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18208,19 +18265,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestContentLauncher ()
-@property (readonly) chip::Controller::ContentLauncherCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ContentLauncherCluster * cppCluster;
 @end
 
 @implementation MTRTestContentLauncher
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::ContentLauncherCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -18260,7 +18318,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18299,7 +18357,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18338,7 +18396,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18377,7 +18435,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18395,7 +18453,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18413,19 +18471,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestAudioOutput ()
-@property (readonly) chip::Controller::AudioOutputCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::AudioOutputCluster * cppCluster;
 @end
 
 @implementation MTRTestAudioOutput
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::AudioOutputCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -18469,7 +18528,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18487,7 +18546,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedCharValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18526,7 +18585,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18565,7 +18624,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18604,7 +18663,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18622,7 +18681,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18640,19 +18699,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestApplicationLauncher ()
-@property (readonly) chip::Controller::ApplicationLauncherCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ApplicationLauncherCluster * cppCluster;
 @end
 
 @implementation MTRTestApplicationLauncher
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::ApplicationLauncherCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -18692,7 +18752,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18731,7 +18791,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18770,7 +18830,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18809,7 +18869,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18827,7 +18887,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18845,19 +18905,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestApplicationBasic ()
-@property (readonly) chip::Controller::ApplicationBasicCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ApplicationBasicCluster * cppCluster;
 @end
 
 @implementation MTRTestApplicationBasic
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::ApplicationBasicCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -18876,7 +18937,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18894,7 +18955,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18912,7 +18973,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18930,7 +18991,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18950,7 +19011,7 @@ using namespace chip::app::Clusters;
             cppValue.applicationId = [self asCharSpan:value.applicationId];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18968,7 +19029,7 @@ using namespace chip::app::Clusters;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18986,7 +19047,7 @@ using namespace chip::app::Clusters;
             cppValue = [self asCharSpan:value];
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19026,7 +19087,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19065,7 +19126,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19104,7 +19165,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19143,7 +19204,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19161,7 +19222,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19179,19 +19240,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestAccountLogin ()
-@property (readonly) chip::Controller::AccountLoginCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::AccountLoginCluster * cppCluster;
 @end
 
 @implementation MTRTestAccountLogin
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::AccountLoginCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -19231,7 +19293,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19270,7 +19332,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19309,7 +19371,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19327,7 +19389,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19345,19 +19407,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestElectricalMeasurement ()
-@property (readonly) chip::Controller::ElectricalMeasurementCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::ElectricalMeasurementCluster * cppCluster;
 @end
 
 @implementation MTRTestElectricalMeasurement
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::ElectricalMeasurementCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -19376,7 +19439,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19394,7 +19457,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19412,7 +19475,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19430,7 +19493,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19448,7 +19511,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19466,7 +19529,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19484,7 +19547,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19502,7 +19565,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19520,7 +19583,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19538,7 +19601,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19556,7 +19619,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19574,7 +19637,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19592,7 +19655,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19610,7 +19673,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19628,7 +19691,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19646,7 +19709,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19664,7 +19727,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19682,7 +19745,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19700,7 +19763,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19718,7 +19781,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19736,7 +19799,7 @@ using namespace chip::app::Clusters;
             cppValue = value.intValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19754,7 +19817,7 @@ using namespace chip::app::Clusters;
             cppValue = value.intValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19772,7 +19835,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19791,7 +19854,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19810,7 +19873,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19829,7 +19892,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19848,7 +19911,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19867,7 +19930,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19886,7 +19949,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19905,7 +19968,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19924,7 +19987,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19943,7 +20006,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19962,7 +20025,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19981,7 +20044,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20000,7 +20063,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20019,7 +20082,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20037,7 +20100,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20055,7 +20118,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20073,7 +20136,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20092,7 +20155,7 @@ using namespace chip::app::Clusters;
             cppValue = value.charValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20111,7 +20174,7 @@ using namespace chip::app::Clusters;
             cppValue = value.charValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20129,7 +20192,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20148,7 +20211,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20167,7 +20230,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20186,7 +20249,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20204,7 +20267,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20222,7 +20285,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20240,7 +20303,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20258,7 +20321,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20276,7 +20339,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20294,7 +20357,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20312,7 +20375,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20330,7 +20393,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20348,7 +20411,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20366,7 +20429,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20384,7 +20447,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20402,7 +20465,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20420,7 +20483,7 @@ using namespace chip::app::Clusters;
             cppValue = value.charValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20438,7 +20501,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20456,7 +20519,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20474,7 +20537,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20492,7 +20555,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20510,7 +20573,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20528,7 +20591,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20546,7 +20609,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20564,7 +20627,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20582,7 +20645,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20600,7 +20663,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20619,7 +20682,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20638,7 +20701,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20657,7 +20720,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20676,7 +20739,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20695,7 +20758,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20714,7 +20777,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20732,7 +20795,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20750,7 +20813,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20768,7 +20831,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20786,7 +20849,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20805,7 +20868,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20823,7 +20886,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20841,7 +20904,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20859,7 +20922,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20877,7 +20940,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20895,7 +20958,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20913,7 +20976,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20931,7 +20994,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20949,7 +21012,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20967,7 +21030,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20985,7 +21048,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21003,7 +21066,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21021,7 +21084,7 @@ using namespace chip::app::Clusters;
             cppValue = value.charValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21040,7 +21103,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21059,7 +21122,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21078,7 +21141,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21097,7 +21160,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21116,7 +21179,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21135,7 +21198,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21154,7 +21217,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21172,7 +21235,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21190,7 +21253,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21209,7 +21272,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21227,7 +21290,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21245,7 +21308,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21263,7 +21326,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21281,7 +21344,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21299,7 +21362,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21317,7 +21380,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21335,7 +21398,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21353,7 +21416,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21371,7 +21434,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21389,7 +21452,7 @@ using namespace chip::app::Clusters;
             cppValue = value.shortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21407,7 +21470,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21425,7 +21488,7 @@ using namespace chip::app::Clusters;
             cppValue = value.charValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21444,7 +21507,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21463,7 +21526,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21482,7 +21545,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21501,7 +21564,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21520,7 +21583,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21539,7 +21602,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21558,7 +21621,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21597,7 +21660,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21636,7 +21699,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21675,7 +21738,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21693,7 +21756,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21711,19 +21774,20 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 @end
 
 @interface MTRTestTestCluster ()
-@property (readonly) chip::Controller::TestClusterCluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::TestClusterCluster * cppCluster;
 @end
 
 @implementation MTRTestTestCluster
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::TestClusterCluster **)cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -21763,7 +21827,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21802,7 +21866,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21841,7 +21905,7 @@ using namespace chip::app::Clusters;
             }
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21859,7 +21923,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedIntValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21877,7 +21941,7 @@ using namespace chip::app::Clusters;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<DefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
