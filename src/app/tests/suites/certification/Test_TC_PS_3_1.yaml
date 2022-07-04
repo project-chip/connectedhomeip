@@ -42,10 +42,10 @@ tests:
           [1646155382.978459][33190:33190] CHIP:DMG:                         Cluster = 0x2f,
           [1646155382.978513][33190:33190] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1646155382.978545][33190:33190] CHIP:DMG:                 }
-          [1646155382.978767][33190:33190] CHIP:DMG:                         
+          [1646155382.978767][33190:33190] CHIP:DMG:
           [1646155382.978804][33190:33190] CHIP:DMG:         ],
-          [1646155382.978836][33190:33190] CHIP:DMG:                 
-          [1646155382.978872][33190:33190] CHIP:DMG:         isFabricFiltered = false, 
+          [1646155382.978836][33190:33190] CHIP:DMG:
+          [1646155382.978872][33190:33190] CHIP:DMG:         isFabricFiltered = false,
           [1646155382.978901][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
           [1646155382.978927][33190:33190] CHIP:DMG: },
           [1646155382.978998][33190:33190] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -66,14 +66,14 @@ tests:
           [1653395573.863037][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
           [1653395573.863101][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1653395573.863161][19412:19412] CHIP:DMG:                 }
-          [1653395573.863217][19412:19412] CHIP:DMG:                         
+          [1653395573.863217][19412:19412] CHIP:DMG:
           [1653395573.863267][19412:19412] CHIP:DMG:         ],
-          [1653395573.863319][19412:19412] CHIP:DMG:                 
-          [1653395573.863367][19412:19412] CHIP:DMG:         isFabricFiltered = true, 
+          [1653395573.863319][19412:19412] CHIP:DMG:
+          [1653395573.863367][19412:19412] CHIP:DMG:         isFabricFiltered = true,
           [1653395573.863413][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
           [1653395573.863456][19412:19412] CHIP:DMG: },
           [1653395573.863589][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1653395573.863720][19412:19412] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 
+          [1653395573.863720][19412:19412] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0
 
           ./chip-tool powersource read description 1 1
 
@@ -88,10 +88,10 @@ tests:
           [1653395620.020703][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
           [1653395620.020770][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1653395620.020833][19412:19412] CHIP:DMG:                 }
-          [1653395620.020893][19412:19412] CHIP:DMG:                         
+          [1653395620.020893][19412:19412] CHIP:DMG:
           [1653395620.020945][19412:19412] CHIP:DMG:         ],
-          [1653395620.020999][19412:19412] CHIP:DMG:                 
-          [1653395620.021052][19412:19412] CHIP:DMG:         isFabricFiltered = true, 
+          [1653395620.020999][19412:19412] CHIP:DMG:
+          [1653395620.021052][19412:19412] CHIP:DMG:         isFabricFiltered = true,
           [1653395620.021104][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
           [1653395620.021153][19412:19412] CHIP:DMG: },
           [1653395620.021252][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -141,10 +141,10 @@ tests:
           [1646155382.978459][33190:33190] CHIP:DMG:                         Cluster = 0x2f,
           [1646155382.978513][33190:33190] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1646155382.978545][33190:33190] CHIP:DMG:                 }
-          [1646155382.978767][33190:33190] CHIP:DMG:                         
+          [1646155382.978767][33190:33190] CHIP:DMG:
           [1646155382.978804][33190:33190] CHIP:DMG:         ],
-          [1646155382.978836][33190:33190] CHIP:DMG:                 
-          [1646155382.978872][33190:33190] CHIP:DMG:         isFabricFiltered = false, 
+          [1646155382.978836][33190:33190] CHIP:DMG:
+          [1646155382.978872][33190:33190] CHIP:DMG:         isFabricFiltered = false,
           [1646155382.978901][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
           [1646155382.978927][33190:33190] CHIP:DMG: },
           [1646155382.978998][33190:33190] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -165,14 +165,14 @@ tests:
           [1653395573.863037][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
           [1653395573.863101][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1653395573.863161][19412:19412] CHIP:DMG:                 }
-          [1653395573.863217][19412:19412] CHIP:DMG:                         
+          [1653395573.863217][19412:19412] CHIP:DMG:
           [1653395573.863267][19412:19412] CHIP:DMG:         ],
-          [1653395573.863319][19412:19412] CHIP:DMG:                 
-          [1653395573.863367][19412:19412] CHIP:DMG:         isFabricFiltered = true, 
+          [1653395573.863319][19412:19412] CHIP:DMG:
+          [1653395573.863367][19412:19412] CHIP:DMG:         isFabricFiltered = true,
           [1653395573.863413][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
           [1653395573.863456][19412:19412] CHIP:DMG: },
           [1653395573.863589][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1653395573.863720][19412:19412] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 
+          [1653395573.863720][19412:19412] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0
 
           ./chip-tool powersource read description 1 1
 
@@ -187,10 +187,10 @@ tests:
           [1653395620.020703][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
           [1653395620.020770][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1653395620.020833][19412:19412] CHIP:DMG:                 }
-          [1653395620.020893][19412:19412] CHIP:DMG:                         
+          [1653395620.020893][19412:19412] CHIP:DMG:
           [1653395620.020945][19412:19412] CHIP:DMG:         ],
-          [1653395620.020999][19412:19412] CHIP:DMG:                 
-          [1653395620.021052][19412:19412] CHIP:DMG:         isFabricFiltered = true, 
+          [1653395620.020999][19412:19412] CHIP:DMG:
+          [1653395620.021052][19412:19412] CHIP:DMG:         isFabricFiltered = true,
           [1653395620.021104][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
           [1653395620.021153][19412:19412] CHIP:DMG: },
           [1653395620.021252][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]"
