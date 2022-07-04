@@ -44,9 +44,15 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
 
     CHIP_ERROR error = mFlashFactoryData.ProtectFactoryDataPartitionAgainstWrite();
 
-    if (error != CHIP_NO_ERROR)
+    // Protection against write for external storage is not supported.
+    if (error == CHIP_ERROR_NOT_IMPLEMENTED)
     {
-        ChipLogError(DeviceLayer, "Failed to protect the factory data partition");
+        ChipLogProgress(DeviceLayer, "The device does not support hardware protection against write.");
+        error = CHIP_NO_ERROR;
+    }
+    else if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to protect the factory data partition.");
         return error;
     }
 

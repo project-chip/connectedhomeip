@@ -24,6 +24,7 @@
 #include <drivers/flash.h>
 #include <fprotect.h>
 #include <pm_config.h>
+#include <system/SystemError.h>
 
 #include "FactoryDataParser.h"
 
