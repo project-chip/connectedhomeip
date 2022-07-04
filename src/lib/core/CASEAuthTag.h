@@ -23,7 +23,6 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SortUtils.h>
 
 namespace chip {
 
@@ -61,9 +60,54 @@ struct CATValues
         return false;
     }
 
-    bool operator==(const CATValues & that) const { return this->Sorted().values == that.Sorted().values; }
+    bool operator==(const CATValues & that) const
+    {
+        // Two sets of CATs confer equal permissions if for each defined value
+        // in one set, a corresponding value exists in the other set.  If this
+        // is true, we consider the sets equal.
+        for (const auto & cat : values)
+        {
+            if (cat == kUndefinedCAT)
+            {
+                continue;
+            }
+            bool miss = true;
+            for (const auto candidate : that.values)
+            {
+                if (candidate == cat)
+                {
+                    miss = false;
+                    break;
+                }
+            }
+            if (miss)
+            {
+                return !miss;
+            }
+        }
+        for (const auto & cat : that.values)
+        {
+            if (cat == kUndefinedCAT)
+            {
+                continue;
+            }
+            bool miss = true;
+            for (const auto candidate : values)
+            {
+                if (candidate == cat)
+                {
+                    miss = false;
+                    break;
+                }
+            }
+            if (miss)
+            {
+                return !miss;
+            }
+        }
+        return true;
+    }
     bool operator!=(const CATValues & that) const { return !(*this == that); }
-    bool operator<(const CATValues & that) const { return this->Sorted().values < that.Sorted().values; }
 
     static constexpr size_t kSerializedLength = kMaxSubjectCATAttributeCount * sizeof(CASEAuthTag);
     typedef uint8_t Serialized[kSerializedLength];
@@ -86,16 +130,6 @@ struct CATValues
             values[i] = Encoding::LittleEndian::Read32(p);
         }
         return CHIP_NO_ERROR;
-    }
-
-private:
-    static bool Cmp(const CASEAuthTag & a, const CASEAuthTag & b) { return a < b; }
-    void Sort() { Sorting::BubbleSort(this->values.begin(), this->size(), Cmp); }
-    CATValues Sorted() const
-    {
-        auto sorted = *this;
-        sorted.Sort();
-        return sorted;
     }
 };
 
