@@ -35,7 +35,7 @@ tests:
           to TH + TH sends a Block message back to DUT"
       PICS: MCORE.BDX.Driver
       verification: |
-          1. Verify that the OTA Reference Provider App logs show BlockQuery message from DUT 
+          1. Verify that the OTA Reference Provider App logs show BlockQuery message from DUT
 
           [1636410922974] [59203:62969336] CHIP: [ATM] Handling received BDX Message
           [1636410922974] [59203:62969336] CHIP: [ATM] BlockQuery
@@ -70,7 +70,7 @@ tests:
           "TH sends a BlockEOF message to DUT + DUT sends a BlockAckEOF message
           back to TH"
       verification: |
-          1. Verify that the OTA Reference App logs show BlockAckEOF message from DUT 
+          1. Verify that the OTA Reference App logs show BlockAckEOF message from DUT
 
           [1636410936486] [59203:62969336] CHIP: [ATM] Handling received BDX Message
           [1636410936486] [59203:62969336] CHIP: [ATM] BlockAckEOF

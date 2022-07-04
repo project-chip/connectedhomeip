@@ -33,7 +33,7 @@ tests:
 
           CHIP:DMG: ReportDataMessage =
           [1651562132.028543][7867:7872] CHIP:DMG: {
-          [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true, 
+          [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true,
           [1651562132.028632][7867:7872] CHIP:DMG:         InteractionModelRevision = 1
           [1651562132.028675][7867:7872] CHIP:DMG: }
           [1651562132.028788][7867:7872] CHIP:EM: Sending Standalone Ack for MessageCounter:10343932 on exchange 65462i
@@ -70,7 +70,7 @@ tests:
 
           CHIP:DMG: ReportDataMessage =
           [1651562132.028543][7867:7872] CHIP:DMG: {
-          [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true, 
+          [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true,
           [1651562132.028632][7867:7872] CHIP:DMG:         InteractionModelRevision = 1
           [1651562132.028675][7867:7872] CHIP:DMG: }
           [1651562132.028788][7867:7872] CHIP:EM: Sending Standalone Ack for MessageCounter:10343932 on exchange 65462i
@@ -107,7 +107,7 @@ tests:
 
           CHIP:DMG: ReportDataMessage =
           [1651562132.028543][7867:7872] CHIP:DMG: {
-          [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true, 
+          [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true,
           [1651562132.028632][7867:7872] CHIP:DMG:         InteractionModelRevision = 1
           [1651562132.028675][7867:7872] CHIP:DMG: }
           [1651562132.028788][7867:7872] CHIP:EM: Sending Standalone Ack for MessageCounter:10343932 on exchange 65462i
