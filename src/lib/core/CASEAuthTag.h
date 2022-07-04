@@ -114,9 +114,8 @@ struct CATValues
 
     bool operator==(const CATValues & other) const
     {
-        // Two sets of CATs confer equal permissions if for each defined value
-        // in one set, a corresponding value exists in the other set.  If this
-        // is true, we consider the sets equal.
+        // Two sets of CATs confer equal permissions if the sets are exactly equal.
+        // Ignoring kUndefinedCAT values, evaluate this.
         if (this->GetNumTagsPresent() != other.GetNumTagsPresent())
         {
             return false;
