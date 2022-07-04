@@ -121,8 +121,8 @@ private:
     };
     using Status = Protocols::InteractionModel::Status;
     Status ProcessWriteRequest(System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
-    Status HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
-                                                                  System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
+    Status HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
+                                     bool aIsTimedWrite);
 
     CHIP_ERROR FinalizeMessage(System::PacketBufferTLVWriter && aMessageWriter, System::PacketBufferHandle & packet);
     CHIP_ERROR SendWriteResponse(System::PacketBufferTLVWriter && aMessageWriter);
