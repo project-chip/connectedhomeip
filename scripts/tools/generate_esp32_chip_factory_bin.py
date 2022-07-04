@@ -148,13 +148,13 @@ def check_tools_exists():
 
 
 def check_str_range(s, min_len, max_len, name):
-    if s and (len(s) not in range(min_len, max_len + 1)):
+    if s and ((len(s) < min_len) or (len(s) > max_len)):
         logging.error('%s must be between %d and %d characters', name, min_len, max_len)
         sys.exit(1)
 
 
 def check_int_range(value, min_value, max_value, name):
-    if value and (value not in range(min_value, max_value + 1)):
+    if value and ((value < min_value) or (value > max_value)):
         logging.error('%s is out of range, should be in range [%d, %d]', name, min_value, max_value)
         sys.exit(1)
 
