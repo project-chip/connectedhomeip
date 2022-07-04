@@ -18,8 +18,18 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t len)
     (void) ExtractNodeIdFabricIdFromOpCert(span, &nodeId, &fabricId);
 
     {
+        ChipDN dn;
+        (void) ExtractSubjectDNFromX509Cert(span, dn);
+    }
+
+    {
         Credentials::P256PublicKeySpan key;
         (void) ExtractPublicKeyFromChipCert(span, key);
+    }
+
+    {
+        ChipCertificateData certData;
+        (void) DecodeChipCert(span, certData);
     }
 
     return 0;
