@@ -794,9 +794,6 @@ PICS:
     - label: "Does the device implement the InstalledClosedLimitTilt attribute?"
       id: WNCV.S.A0013
 
-    - label: "Does the device implement the Mode attribute?"
-      id: NCV.S.A0017
-
     - label: "Does the device implement the Mode attribute ?"
       id: WNCV.S.A0017
 
