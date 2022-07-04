@@ -42,7 +42,7 @@ constexpr bool IsLowercaseHex(char c)
 
 bool IsValidEscape(const std::string & s)
 {
-    return (s.size() >= kEscapeChunkSize) && (s[0] == '\\') & (s[1] == 'x') && IsLowercaseHex(s[2]) && IsLowercaseHex(s[3]);
+    return (s.size() >= kEscapeChunkSize) && (s[0] == '\\') && (s[1] == 'x') && IsLowercaseHex(s[2]) && IsLowercaseHex(s[3]);
 }
 
 } // namespace
