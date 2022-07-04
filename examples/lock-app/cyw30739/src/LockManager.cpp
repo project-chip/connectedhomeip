@@ -36,36 +36,42 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
     if (LockParams.numberOfUsers > kMaxUsers)
     {
-        ChipLogError(Zcl, "Max number of users is greater than %d, the maximum amount of users currently supported on this platform",
-                  kMaxUsers);
+        ChipLogError(Zcl,
+                     "Max number of users is greater than %d, the maximum amount of users currently supported on this platform",
+                     kMaxUsers);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
     if (LockParams.numberOfCredentialsPerUser > kMaxCredentialsPerUser)
     {
-        ChipLogError(Zcl, "Max number of credentials per user is greater than %d, the maximum amount of users currently supported on this "
-                  "platform",
-                  kMaxCredentialsPerUser);
+        ChipLogError(
+            Zcl,
+            "Max number of credentials per user is greater than %d, the maximum amount of users currently supported on this "
+            "platform",
+            kMaxCredentialsPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
     if (LockParams.numberOfWeekdaySchedulesPerUser > kMaxWeekdaySchedulesPerUser)
     {
-        ChipLogError(Zcl, "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
+        ChipLogError(
+            Zcl, "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
             kMaxWeekdaySchedulesPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
     if (LockParams.numberOfYeardaySchedulesPerUser > kMaxYeardaySchedulesPerUser)
     {
-        ChipLogError(Zcl, "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
+        ChipLogError(
+            Zcl, "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
             kMaxYeardaySchedulesPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
     if (LockParams.numberOfHolidaySchedules > kMaxHolidaySchedules)
     {
-        ChipLogError(Zcl, "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
+        ChipLogError(
+            Zcl, "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
             kMaxHolidaySchedules);
         return APP_ERROR_ALLOCATION_FAILED;
     }
@@ -123,33 +129,34 @@ bool LockManager::ReadConfigValues()
 {
     size_t outLen;
     CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
-                                    sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
+                                       sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
 
     CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
-                                    sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mLockCredentials), outLen);
+                                       sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mLockCredentials), outLen);
 
     CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
-                                    sizeof(mUserNames), outLen);
+                                       sizeof(mUserNames), outLen);
 
     CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
-                                    sizeof(mCredentialData), outLen);
+                                       sizeof(mCredentialData), outLen);
 
     CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
-                                    sizeof(DlCredential) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser,
-                                    outLen);
+                                       sizeof(DlCredential) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser,
+                                       outLen);
 
     CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
-                                    sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
-                                        LockParams.numberOfUsers,
-                                    outLen);
+                                       sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
+                                           LockParams.numberOfUsers,
+                                       outLen);
 
     CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
-                                    sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
-                                        LockParams.numberOfUsers,
-                                    outLen);
+                                       sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
+                                           LockParams.numberOfUsers,
+                                       outLen);
 
-    CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
-                                    sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, outLen);
+    CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_HolidaySchedules,
+                                       reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
+                                       sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, outLen);
 
     return true;
 }
@@ -378,13 +385,13 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 
     // Save user information in NVM flash
     CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
-                                     sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
+                                        sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
 
     CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
-                                     sizeof(DlCredential) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser);
+                                        sizeof(DlCredential) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser);
 
     CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
-                                     sizeof(mUserNames));
+                                        sizeof(mUserNames));
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
 
@@ -465,10 +472,10 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
 
     // Save credential information in NVM flash
     CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
-                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser);
+                                        sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser);
 
-    CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
-                                     sizeof(mCredentialData));
+    CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_CredentialData,
+                                        reinterpret_cast<const uint8_t *>(&mCredentialData), sizeof(mCredentialData));
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
 
@@ -516,9 +523,9 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     scheduleInStorage.endMinute   = endMinute;
 
     // Save schedule information in NVM flash
-    CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
-                                     sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
-                                         LockParams.numberOfUsers);
+    CYW30739Config::WriteConfigValueBin(
+        CYW30739Config::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
+        sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser * LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
 }
@@ -560,9 +567,9 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     scheduleInStorage.localEndTime   = localEndTime;
 
     // Save schedule information in NVM flash
-    CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
-                                     sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
-                                         LockParams.numberOfUsers);
+    CYW30739Config::WriteConfigValueBin(
+        CYW30739Config::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
+        sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser * LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
 }
@@ -600,8 +607,8 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
 
     // Save schedule information in NVM flash
     CYW30739Config::WriteConfigValueBin(CYW30739Config::kConfigKey_HolidaySchedules,
-                                     reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
-                                     sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
+                                        reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
+                                        sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
 
     return DlStatus::kSuccess;
 }
