@@ -31,11 +31,9 @@
 #include <platform/bouffalolab/BL602/BL602Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
-//#include "esp_wifi.h"
-//#include "nvs.h"
-//#include "nvs_flash.h"
 extern "C" {
 #include <bl602_hal/hal_sys.h>
+#include <easyflash.h>
 }
 
 namespace chip {
@@ -192,24 +190,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     CHIP_ERROR err;
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
-
-    // 3R: TODO
-
-    // // Erase all values in the chip-config NVS namespace.
-    // err = ClearNamespace(kConfigNamespace_ChipConfig);
-    // if (err != CHIP_NO_ERROR)
-    // {
-    //     ChipLogError(DeviceLayer, "ClearNamespace(ChipConfig) failed: %s", chip::ErrorStr(err));
-    // }
-
-    // // Restore WiFi persistent settings to default values.
-    // err = esp_wifi_restore();
-    // if (err != ESP_OK)
-    // {
-    //     ChipLogError(DeviceLayer, "esp_wifi_restore() failed: %s", chip::ErrorStr(err));
-    // }
-
-    // Restart the system.
+    ef_port_erase_all();
     ChipLogProgress(DeviceLayer, "System restarting");
     hal_reboot();
 }

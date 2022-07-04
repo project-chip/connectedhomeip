@@ -19,6 +19,12 @@ import("//build_overrides/chip.gni")
 import("${bl602_sdk_build_root}/bl602_executable.gni")
 import("${bl602_sdk_build_root}/bl602_sdk.gni")
 import("${build_root}/config/defaults.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
 
 assert(current_os == "freertos")
 
@@ -59,6 +65,10 @@ bl602_sdk("sdk") {
     "CONFIG_PSM_EASYFLASH_SIZE=16384",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
   ]
+
+  if (chip_enable_pw_rpc) {
+    defines += [ "PW_RPC_ENABLED" ]
+  }
 }
 
 bl602_executable("lighting_app") {
@@ -75,6 +85,10 @@ bl602_executable("lighting_app") {
     "src/LightingManager.cpp",
     "src/main.cpp",
   ]
+
+  if (chip_enable_pw_rpc) {
+    sources += [ "${examples_plat_dir}/uart.c" ]
+  }
 
   deps = [
     ":sdk",
@@ -96,6 +110,54 @@ bl602_executable("lighting_app") {
     sources += [ "${examples_plat_dir}/display/lcd.c" ]
 
     defines += [ "DISPLAY_ENABLED" ]
+  }
+
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "PW_RPC_ENABLED",
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
+
+      #"PW_RPC_OTCLI_SERVICE=1",
+      #"PW_RPC_THREAD_SERVICE=1",
+      #"PW_RPC_TRACING_SERVICE=1",
+    ]
+
+    sources += [
+      "${chip_root}/examples/common/pigweed/RpcService.cpp",
+      "${chip_root}/examples/common/pigweed/bouffalolab/bl602/PigweedLoggerMutex.cpp",
+      "${examples_plat_dir}/PigweedLogger.cpp",
+      "${examples_plat_dir}/Rpc.cpp",
+    ]
+
+    deps += [
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_stream:sys_io_stream",
+
+      #"$dir_pw_trace",
+      #"$dir_pw_trace_tokenized",
+      #"$dir_pw_trace_tokenized:trace_rpc_service",
+      "${chip_root}/config/bouffalolab/bl602/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+
+      #"${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
+      #"${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
+      "${examples_plat_dir}/pw_sys_io:pw_sys_io_bl602",
+    ]
+
+    deps += pw_build_LINK_DEPS
+
+    include_dirs += [
+      "${chip_root}/examples/common",
+      "${chip_root}/examples/common/pigweed/bouffalolab/bl602",
+    ]
   }
 
   if (enable_heap_monitoring) {
