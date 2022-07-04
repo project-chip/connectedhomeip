@@ -27,6 +27,7 @@ tests:
       disabled: true
 
     - label: "DUT reads the FeatureMap attribute from TH"
+      PICS: WNCV.C.Afffc
       verification: |
           On TestHarnes (all-cluster-app) a received read of feature-map looks like this:
 
@@ -59,6 +60,7 @@ tests:
       disabled: true
 
     - label: "DUT reads the Type attribute from TH"
+      PICS: WNCV.C.A0000
       verification: |
           On TestHarnes (all-cluster-app) a received read of type looks like this:
 
@@ -86,6 +88,7 @@ tests:
       disabled: true
 
     - label: "DUT reads the EndProductType attribute from TH"
+      PICS: WNCV.C.A000d
       verification: |
           On TestHarnes (all-cluster-app) a received read of end-product-type looks like this:
 
@@ -118,6 +121,7 @@ tests:
       disabled: true
 
     - label: "DUT reads the Mode attribute from TH"
+      PICS: WNCV.C.A0017
       verification: |
           On TestHarnes (all-cluster-app) a received read of mode looks like this:
 
@@ -145,6 +149,7 @@ tests:
       disabled: true
 
     - label: "DUT reads the ConfigStatus attribute from TH"
+      PICS: WNCV.C.A0007
       verification: |
           On TestHarnes (all-cluster-app) a received read of config-status looks like this:
 

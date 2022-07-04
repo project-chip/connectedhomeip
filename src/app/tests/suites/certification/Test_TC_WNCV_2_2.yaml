@@ -39,7 +39,7 @@ tests:
           [1650882400.614428][8634:8639] CHIP:TOO:   ConfigStatus: 27
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && WNCV.S.A0007 && WNCV.S.F00 && WNCV.S.F02
       arguments:
           values:
               - name: "message"
@@ -56,7 +56,7 @@ tests:
           [1650882400.614428][8634:8639] CHIP:TOO:   ConfigStatus: 27
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && WNCV.S.A0007 && WNCV.S.F01 && WNCV.S.F04
       arguments:
           values:
               - name: "message"

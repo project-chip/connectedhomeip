@@ -25,6 +25,7 @@ tests:
           "DUT sends a LaunchContent command to the TH with search parameter
           consisting of Type As 'Actor' and Value as An Actors name, for
           example, Gaby sHoffman"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
 
       disabled: true
@@ -33,6 +34,7 @@ tests:
           "DUT sends a LaunchContent command to the TH with search parameter
           consisting of Type As 'Channel' and Value as Channel Name name, for
           example, PBS'"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
 
       disabled: true
@@ -41,6 +43,7 @@ tests:
           "DUT sends a LaunchContent command to the TH with search parameter
           consisting of Type As 'Character' and Value as Characters name,for
           example, Snow White"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
 
       disabled: true
@@ -49,6 +52,7 @@ tests:
           "DUT sends a LaunchContent command to the TH with search parameter
           consisting of Type As 'Director' and Value as Directors name, for
           example, Spike Lee"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
 
       disabled: true
@@ -57,6 +61,7 @@ tests:
           "DUT sends a LaunchContent command to the TH with search parameter
           consisting of Type As 'Event' and Value as An Events name , for
           example 'Football games'"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
 
       disabled: true
@@ -65,6 +70,7 @@ tests:
           "DUT sends a LaunchContent command to the TH with search parameter
           consisting of Type As 'Franchise' and Value as Franchises name,for
           example 'Star Wars'"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
 
       disabled: true
@@ -73,6 +79,7 @@ tests:
           "DUT sends a LaunchContent command to the TH with search parameter
           consisting of Type As 'Genre' and Value as Genres name, for example
           'Horror'"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
 
       disabled: true
@@ -81,6 +88,7 @@ tests:
           "DUT sends a LaunchContent command to the TH with search parameter
           consisting of Type As 'League' and Value as Leagues name, for example
           'NCAA'"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
 
       disabled: true
@@ -88,6 +96,7 @@ tests:
     - label:
           "DUT sends a LaunchContent command to the TH with search parameter
           consisting of Type As 'Popularity' and Value as Popularitys name"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
 
       disabled: true
@@ -96,6 +105,7 @@ tests:
           "DUT sends a LaunchContent command to the TH with search parameter
           consisting of Type As 'Provider' and Value as Providers name, for
           example 'Netflix'"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
 
       disabled: true
@@ -104,6 +114,7 @@ tests:
           "DUT sends a LaunchContent command to the TH with search parameter
           consisting of Type As 'Sport' and Value as Sports name, for example,
           football"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
 
       disabled: true
@@ -112,6 +123,7 @@ tests:
           "DUT sends a LaunchContent command to the TH with search parameter
           consisting of Type As 'SportsTeam' and Value as SportTeams name , for
           example 'Arsenel'"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
 
       disabled: true
@@ -120,6 +132,7 @@ tests:
           "DUT sends a LaunchContent command to the TH with search parameter
           consisting of Type As 'Type' and Value as Types name, for example
           'TVSeries',"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
 
       disabled: true

@@ -42,7 +42,7 @@ tests:
           "1a: If (PA_LF & LF) TH sends GoToLiftPercentage command with 90%% to
           DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.C05.Rsp
       arguments:
           values:
               - name: "LiftPercent100thsValue"
@@ -64,6 +64,7 @@ tests:
 
     - label: "1c: TH sends StopMotion command to DUT"
       command: "StopMotion"
+      PICS: WNCV.S.C02.Rsp
 
     - label: "1d: TH Waits for 100ms-1s"
       cluster: "DelayCommands"
@@ -79,7 +80,7 @@ tests:
           "2a: If (PA_TL & TL) TH sends GoToTiltPercentage command with 90%% to
           DUT"
       command: "GoToTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.C08.Rsp
       arguments:
           values:
               - name: "TiltPercent100thsValue"
@@ -101,6 +102,7 @@ tests:
 
     - label: "2c: TH sends StopMotion command to DUT"
       command: "StopMotion"
+      PICS: WNCV.S.C02.Rsp
 
     - label: "2d: TH Waits for 100ms-1s"
       cluster: "DelayCommands"
@@ -116,7 +118,7 @@ tests:
     - label: "3a: TH reads CurrentPositionLiftPercent100ths from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           saveAs: attrCurrentPositionLiftPercent100ths
           constraints:
@@ -126,14 +128,14 @@ tests:
     - label: "3b: TH reads CurrentPositionTiltPercent100ths from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           saveAs: attrCurrentPositionTiltPercent100ths
           constraints:
               notValue: 0
 
     ### DUT TurnOff
-    - label: "Reboot target device"
+    - label: "3c: reboot/restart the DUT"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
@@ -165,7 +167,7 @@ tests:
     - label: "3e: TH reads CurrentPositionLiftPercent100ths from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           value: attrCurrentPositionLiftPercent100ths
 
@@ -173,6 +175,6 @@ tests:
     - label: "3f: TH reads CurrentPositionTiltPercent100ths from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           value: attrCurrentPositionTiltPercent100ths
