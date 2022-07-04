@@ -24,1245 +24,1354 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class ChipEventStructs {
-  public static class AccessControlClusterAccessControlEntryChangedEvent {
-    public @Nullable Long adminNodeID;
-    public @Nullable Integer adminPasscodeID;
-    public Integer changeType;
-    public @Nullable ChipStructs.AccessControlClusterAccessControlEntry latestValue;
-    public Integer adminFabricIndex;
+public static class AccessControlClusterAccessControlEntryChangedEvent {
+public @Nullable Long adminNodeID;
+public @Nullable Integer adminPasscodeID;
+public Integer changeType;
+public @Nullable ChipStructs.AccessControlClusterAccessControlEntry latestValue;
+public Integer adminFabricIndex;
 
-    public AccessControlClusterAccessControlEntryChangedEvent(
-        @Nullable Long adminNodeID,
-        @Nullable Integer adminPasscodeID,
-        Integer changeType,
-        @Nullable ChipStructs.AccessControlClusterAccessControlEntry latestValue,
-        Integer adminFabricIndex) {
-      this.adminNodeID = adminNodeID;
-      this.adminPasscodeID = adminPasscodeID;
-      this.changeType = changeType;
-      this.latestValue = latestValue;
-      this.adminFabricIndex = adminFabricIndex;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("AccessControlClusterAccessControlEntryChangedEvent {\n");
-      output.append("\tadminNodeID: ");
-      output.append(adminNodeID);
-      output.append("\n");
-      output.append("\tadminPasscodeID: ");
-      output.append(adminPasscodeID);
-      output.append("\n");
-      output.append("\tchangeType: ");
-      output.append(changeType);
-      output.append("\n");
-      output.append("\tlatestValue: ");
-      output.append(latestValue);
-      output.append("\n");
-      output.append("\tadminFabricIndex: ");
-      output.append(adminFabricIndex);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public AccessControlClusterAccessControlEntryChangedEvent(
+    @Nullable Long adminNodeID
+      , @Nullable Integer adminPasscodeID
+      , Integer changeType
+      , @Nullable ChipStructs.AccessControlClusterAccessControlEntry latestValue
+      , Integer adminFabricIndex
+  ) {
+    this.adminNodeID = adminNodeID;
+    this.adminPasscodeID = adminPasscodeID;
+    this.changeType = changeType;
+    this.latestValue = latestValue;
+    this.adminFabricIndex = adminFabricIndex;
   }
 
-  public static class AccessControlClusterAccessControlExtensionChangedEvent {
-    public @Nullable Long adminNodeID;
-    public @Nullable Integer adminPasscodeID;
-    public Integer changeType;
-    public @Nullable ChipStructs.AccessControlClusterExtensionEntry latestValue;
-    public Integer adminFabricIndex;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AccessControlClusterAccessControlEntryChangedEvent {\n");
+    output.append("\tadminNodeID: ");
+    output.append(adminNodeID);
+        output.append("\n");
+    output.append("\tadminPasscodeID: ");
+    output.append(adminPasscodeID);
+        output.append("\n");
+    output.append("\tchangeType: ");
+    output.append(changeType);
+        output.append("\n");
+    output.append("\tlatestValue: ");
+    output.append(latestValue);
+        output.append("\n");
+    output.append("\tadminFabricIndex: ");
+    output.append(adminFabricIndex);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public AccessControlClusterAccessControlExtensionChangedEvent(
-        @Nullable Long adminNodeID,
-        @Nullable Integer adminPasscodeID,
-        Integer changeType,
-        @Nullable ChipStructs.AccessControlClusterExtensionEntry latestValue,
-        Integer adminFabricIndex) {
-      this.adminNodeID = adminNodeID;
-      this.adminPasscodeID = adminPasscodeID;
-      this.changeType = changeType;
-      this.latestValue = latestValue;
-      this.adminFabricIndex = adminFabricIndex;
-    }
+public static class AccessControlClusterAccessControlExtensionChangedEvent {
+public @Nullable Long adminNodeID;
+public @Nullable Integer adminPasscodeID;
+public Integer changeType;
+public @Nullable ChipStructs.AccessControlClusterExtensionEntry latestValue;
+public Integer adminFabricIndex;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("AccessControlClusterAccessControlExtensionChangedEvent {\n");
-      output.append("\tadminNodeID: ");
-      output.append(adminNodeID);
-      output.append("\n");
-      output.append("\tadminPasscodeID: ");
-      output.append(adminPasscodeID);
-      output.append("\n");
-      output.append("\tchangeType: ");
-      output.append(changeType);
-      output.append("\n");
-      output.append("\tlatestValue: ");
-      output.append(latestValue);
-      output.append("\n");
-      output.append("\tadminFabricIndex: ");
-      output.append(adminFabricIndex);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public AccessControlClusterAccessControlExtensionChangedEvent(
+    @Nullable Long adminNodeID
+      , @Nullable Integer adminPasscodeID
+      , Integer changeType
+      , @Nullable ChipStructs.AccessControlClusterExtensionEntry latestValue
+      , Integer adminFabricIndex
+  ) {
+    this.adminNodeID = adminNodeID;
+    this.adminPasscodeID = adminPasscodeID;
+    this.changeType = changeType;
+    this.latestValue = latestValue;
+    this.adminFabricIndex = adminFabricIndex;
   }
 
-  public static class BridgedActionsClusterStateChangedEvent {
-    public Integer actionID;
-    public Long invokeID;
-    public Integer newState;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AccessControlClusterAccessControlExtensionChangedEvent {\n");
+    output.append("\tadminNodeID: ");
+    output.append(adminNodeID);
+        output.append("\n");
+    output.append("\tadminPasscodeID: ");
+    output.append(adminPasscodeID);
+        output.append("\n");
+    output.append("\tchangeType: ");
+    output.append(changeType);
+        output.append("\n");
+    output.append("\tlatestValue: ");
+    output.append(latestValue);
+        output.append("\n");
+    output.append("\tadminFabricIndex: ");
+    output.append(adminFabricIndex);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public BridgedActionsClusterStateChangedEvent(
-        Integer actionID, Long invokeID, Integer newState) {
-      this.actionID = actionID;
-      this.invokeID = invokeID;
-      this.newState = newState;
-    }
+public static class BridgedActionsClusterStateChangedEvent {
+public Integer actionID;
+public Long invokeID;
+public Integer newState;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("BridgedActionsClusterStateChangedEvent {\n");
-      output.append("\tactionID: ");
-      output.append(actionID);
-      output.append("\n");
-      output.append("\tinvokeID: ");
-      output.append(invokeID);
-      output.append("\n");
-      output.append("\tnewState: ");
-      output.append(newState);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public BridgedActionsClusterStateChangedEvent(
+    Integer actionID
+      , Long invokeID
+      , Integer newState
+  ) {
+    this.actionID = actionID;
+    this.invokeID = invokeID;
+    this.newState = newState;
   }
 
-  public static class BridgedActionsClusterActionFailedEvent {
-    public Integer actionID;
-    public Long invokeID;
-    public Integer newState;
-    public Integer error;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BridgedActionsClusterStateChangedEvent {\n");
+    output.append("\tactionID: ");
+    output.append(actionID);
+        output.append("\n");
+    output.append("\tinvokeID: ");
+    output.append(invokeID);
+        output.append("\n");
+    output.append("\tnewState: ");
+    output.append(newState);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public BridgedActionsClusterActionFailedEvent(
-        Integer actionID, Long invokeID, Integer newState, Integer error) {
-      this.actionID = actionID;
-      this.invokeID = invokeID;
-      this.newState = newState;
-      this.error = error;
-    }
+public static class BridgedActionsClusterActionFailedEvent {
+public Integer actionID;
+public Long invokeID;
+public Integer newState;
+public Integer error;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("BridgedActionsClusterActionFailedEvent {\n");
-      output.append("\tactionID: ");
-      output.append(actionID);
-      output.append("\n");
-      output.append("\tinvokeID: ");
-      output.append(invokeID);
-      output.append("\n");
-      output.append("\tnewState: ");
-      output.append(newState);
-      output.append("\n");
-      output.append("\terror: ");
-      output.append(error);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public BridgedActionsClusterActionFailedEvent(
+    Integer actionID
+      , Long invokeID
+      , Integer newState
+      , Integer error
+  ) {
+    this.actionID = actionID;
+    this.invokeID = invokeID;
+    this.newState = newState;
+    this.error = error;
   }
 
-  public static class BasicClusterStartUpEvent {
-    public Long softwareVersion;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BridgedActionsClusterActionFailedEvent {\n");
+    output.append("\tactionID: ");
+    output.append(actionID);
+        output.append("\n");
+    output.append("\tinvokeID: ");
+    output.append(invokeID);
+        output.append("\n");
+    output.append("\tnewState: ");
+    output.append(newState);
+        output.append("\n");
+    output.append("\terror: ");
+    output.append(error);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public BasicClusterStartUpEvent(Long softwareVersion) {
-      this.softwareVersion = softwareVersion;
-    }
+public static class BasicClusterStartUpEvent {
+public Long softwareVersion;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("BasicClusterStartUpEvent {\n");
-      output.append("\tsoftwareVersion: ");
-      output.append(softwareVersion);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public BasicClusterStartUpEvent(
+    Long softwareVersion
+  ) {
+    this.softwareVersion = softwareVersion;
   }
 
-  public static class BasicClusterShutDownEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BasicClusterStartUpEvent {\n");
+    output.append("\tsoftwareVersion: ");
+    output.append(softwareVersion);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public BasicClusterShutDownEvent() {}
+public static class BasicClusterShutDownEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("BasicClusterShutDownEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public BasicClusterShutDownEvent(
+) {
   }
 
-  public static class BasicClusterLeaveEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BasicClusterShutDownEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public BasicClusterLeaveEvent() {}
+public static class BasicClusterLeaveEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("BasicClusterLeaveEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public BasicClusterLeaveEvent(
+) {
   }
 
-  public static class BasicClusterReachableChangedEvent {
-    public Boolean reachableNewValue;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BasicClusterLeaveEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public BasicClusterReachableChangedEvent(Boolean reachableNewValue) {
-      this.reachableNewValue = reachableNewValue;
-    }
+public static class BasicClusterReachableChangedEvent {
+public Boolean reachableNewValue;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("BasicClusterReachableChangedEvent {\n");
-      output.append("\treachableNewValue: ");
-      output.append(reachableNewValue);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public BasicClusterReachableChangedEvent(
+    Boolean reachableNewValue
+  ) {
+    this.reachableNewValue = reachableNewValue;
   }
 
-  public static class OtaSoftwareUpdateRequestorClusterStateTransitionEvent {
-    public Integer previousState;
-    public Integer newState;
-    public Integer reason;
-    public @Nullable Long targetSoftwareVersion;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BasicClusterReachableChangedEvent {\n");
+    output.append("\treachableNewValue: ");
+    output.append(reachableNewValue);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
-        Integer previousState,
-        Integer newState,
-        Integer reason,
-        @Nullable Long targetSoftwareVersion) {
-      this.previousState = previousState;
-      this.newState = newState;
-      this.reason = reason;
-      this.targetSoftwareVersion = targetSoftwareVersion;
-    }
+public static class OtaSoftwareUpdateRequestorClusterStateTransitionEvent {
+public Integer previousState;
+public Integer newState;
+public Integer reason;
+public @Nullable Long targetSoftwareVersion;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("OtaSoftwareUpdateRequestorClusterStateTransitionEvent {\n");
-      output.append("\tpreviousState: ");
-      output.append(previousState);
-      output.append("\n");
-      output.append("\tnewState: ");
-      output.append(newState);
-      output.append("\n");
-      output.append("\treason: ");
-      output.append(reason);
-      output.append("\n");
-      output.append("\ttargetSoftwareVersion: ");
-      output.append(targetSoftwareVersion);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
+    Integer previousState
+      , Integer newState
+      , Integer reason
+      , @Nullable Long targetSoftwareVersion
+  ) {
+    this.previousState = previousState;
+    this.newState = newState;
+    this.reason = reason;
+    this.targetSoftwareVersion = targetSoftwareVersion;
   }
 
-  public static class OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {
-    public Long softwareVersion;
-    public Integer productID;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OtaSoftwareUpdateRequestorClusterStateTransitionEvent {\n");
+    output.append("\tpreviousState: ");
+    output.append(previousState);
+        output.append("\n");
+    output.append("\tnewState: ");
+    output.append(newState);
+        output.append("\n");
+    output.append("\treason: ");
+    output.append(reason);
+        output.append("\n");
+    output.append("\ttargetSoftwareVersion: ");
+    output.append(targetSoftwareVersion);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public OtaSoftwareUpdateRequestorClusterVersionAppliedEvent(
-        Long softwareVersion, Integer productID) {
-      this.softwareVersion = softwareVersion;
-      this.productID = productID;
-    }
+public static class OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {
+public Long softwareVersion;
+public Integer productID;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {\n");
-      output.append("\tsoftwareVersion: ");
-      output.append(softwareVersion);
-      output.append("\n");
-      output.append("\tproductID: ");
-      output.append(productID);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public OtaSoftwareUpdateRequestorClusterVersionAppliedEvent(
+    Long softwareVersion
+      , Integer productID
+  ) {
+    this.softwareVersion = softwareVersion;
+    this.productID = productID;
   }
 
-  public static class OtaSoftwareUpdateRequestorClusterDownloadErrorEvent {
-    public Long softwareVersion;
-    public Long bytesDownloaded;
-    public @Nullable Integer progressPercent;
-    public @Nullable Long platformCode;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {\n");
+    output.append("\tsoftwareVersion: ");
+    output.append(softwareVersion);
+        output.append("\n");
+    output.append("\tproductID: ");
+    output.append(productID);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public OtaSoftwareUpdateRequestorClusterDownloadErrorEvent(
-        Long softwareVersion,
-        Long bytesDownloaded,
-        @Nullable Integer progressPercent,
-        @Nullable Long platformCode) {
-      this.softwareVersion = softwareVersion;
-      this.bytesDownloaded = bytesDownloaded;
-      this.progressPercent = progressPercent;
-      this.platformCode = platformCode;
-    }
+public static class OtaSoftwareUpdateRequestorClusterDownloadErrorEvent {
+public Long softwareVersion;
+public Long bytesDownloaded;
+public @Nullable Integer progressPercent;
+public @Nullable Long platformCode;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("OtaSoftwareUpdateRequestorClusterDownloadErrorEvent {\n");
-      output.append("\tsoftwareVersion: ");
-      output.append(softwareVersion);
-      output.append("\n");
-      output.append("\tbytesDownloaded: ");
-      output.append(bytesDownloaded);
-      output.append("\n");
-      output.append("\tprogressPercent: ");
-      output.append(progressPercent);
-      output.append("\n");
-      output.append("\tplatformCode: ");
-      output.append(platformCode);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public OtaSoftwareUpdateRequestorClusterDownloadErrorEvent(
+    Long softwareVersion
+      , Long bytesDownloaded
+      , @Nullable Integer progressPercent
+      , @Nullable Long platformCode
+  ) {
+    this.softwareVersion = softwareVersion;
+    this.bytesDownloaded = bytesDownloaded;
+    this.progressPercent = progressPercent;
+    this.platformCode = platformCode;
   }
 
-  public static class GeneralDiagnosticsClusterHardwareFaultChangeEvent {
-    public ArrayList<Object> current;
-    public ArrayList<Object> previous;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OtaSoftwareUpdateRequestorClusterDownloadErrorEvent {\n");
+    output.append("\tsoftwareVersion: ");
+    output.append(softwareVersion);
+        output.append("\n");
+    output.append("\tbytesDownloaded: ");
+    output.append(bytesDownloaded);
+        output.append("\n");
+    output.append("\tprogressPercent: ");
+    output.append(progressPercent);
+        output.append("\n");
+    output.append("\tplatformCode: ");
+    output.append(platformCode);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public GeneralDiagnosticsClusterHardwareFaultChangeEvent(
-        ArrayList<Object> current, ArrayList<Object> previous) {
-      this.current = current;
-      this.previous = previous;
-    }
+public static class GeneralDiagnosticsClusterHardwareFaultChangeEvent {
+public ArrayList<Object> current;
+public ArrayList<Object> previous;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("GeneralDiagnosticsClusterHardwareFaultChangeEvent {\n");
-      output.append("\tcurrent: ");
-      output.append(current);
-      output.append("\n");
-      output.append("\tprevious: ");
-      output.append(previous);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public GeneralDiagnosticsClusterHardwareFaultChangeEvent(
+    ArrayList<Object> current
+      , ArrayList<Object> previous
+  ) {
+    this.current = current;
+    this.previous = previous;
   }
 
-  public static class GeneralDiagnosticsClusterRadioFaultChangeEvent {
-    public ArrayList<Object> current;
-    public ArrayList<Object> previous;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("GeneralDiagnosticsClusterHardwareFaultChangeEvent {\n");
+    output.append("\tcurrent: ");
+    output.append(current);
+    output.append("\n");
+    output.append("\tprevious: ");
+    output.append(previous);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public GeneralDiagnosticsClusterRadioFaultChangeEvent(
-        ArrayList<Object> current, ArrayList<Object> previous) {
-      this.current = current;
-      this.previous = previous;
-    }
+public static class GeneralDiagnosticsClusterRadioFaultChangeEvent {
+public ArrayList<Object> current;
+public ArrayList<Object> previous;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("GeneralDiagnosticsClusterRadioFaultChangeEvent {\n");
-      output.append("\tcurrent: ");
-      output.append(current);
-      output.append("\n");
-      output.append("\tprevious: ");
-      output.append(previous);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public GeneralDiagnosticsClusterRadioFaultChangeEvent(
+    ArrayList<Object> current
+      , ArrayList<Object> previous
+  ) {
+    this.current = current;
+    this.previous = previous;
   }
 
-  public static class GeneralDiagnosticsClusterNetworkFaultChangeEvent {
-    public ArrayList<Object> current;
-    public ArrayList<Object> previous;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("GeneralDiagnosticsClusterRadioFaultChangeEvent {\n");
+    output.append("\tcurrent: ");
+    output.append(current);
+    output.append("\n");
+    output.append("\tprevious: ");
+    output.append(previous);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public GeneralDiagnosticsClusterNetworkFaultChangeEvent(
-        ArrayList<Object> current, ArrayList<Object> previous) {
-      this.current = current;
-      this.previous = previous;
-    }
+public static class GeneralDiagnosticsClusterNetworkFaultChangeEvent {
+public ArrayList<Object> current;
+public ArrayList<Object> previous;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("GeneralDiagnosticsClusterNetworkFaultChangeEvent {\n");
-      output.append("\tcurrent: ");
-      output.append(current);
-      output.append("\n");
-      output.append("\tprevious: ");
-      output.append(previous);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public GeneralDiagnosticsClusterNetworkFaultChangeEvent(
+    ArrayList<Object> current
+      , ArrayList<Object> previous
+  ) {
+    this.current = current;
+    this.previous = previous;
   }
 
-  public static class GeneralDiagnosticsClusterBootReasonEvent {
-    public Integer bootReason;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("GeneralDiagnosticsClusterNetworkFaultChangeEvent {\n");
+    output.append("\tcurrent: ");
+    output.append(current);
+    output.append("\n");
+    output.append("\tprevious: ");
+    output.append(previous);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public GeneralDiagnosticsClusterBootReasonEvent(Integer bootReason) {
-      this.bootReason = bootReason;
-    }
+public static class GeneralDiagnosticsClusterBootReasonEvent {
+public Integer bootReason;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("GeneralDiagnosticsClusterBootReasonEvent {\n");
-      output.append("\tbootReason: ");
-      output.append(bootReason);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public GeneralDiagnosticsClusterBootReasonEvent(
+    Integer bootReason
+  ) {
+    this.bootReason = bootReason;
   }
 
-  public static class SoftwareDiagnosticsClusterSoftwareFaultEvent {
-    public Long id;
-    public Optional<String> name;
-    public Optional<byte[]> faultRecording;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("GeneralDiagnosticsClusterBootReasonEvent {\n");
+    output.append("\tbootReason: ");
+    output.append(bootReason);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public SoftwareDiagnosticsClusterSoftwareFaultEvent(
-        Long id, Optional<String> name, Optional<byte[]> faultRecording) {
-      this.id = id;
-      this.name = name;
-      this.faultRecording = faultRecording;
-    }
+public static class SoftwareDiagnosticsClusterSoftwareFaultEvent {
+public Long id;
+public Optional<String> name;
+public Optional<byte[]> faultRecording;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("SoftwareDiagnosticsClusterSoftwareFaultEvent {\n");
-      output.append("\tid: ");
-      output.append(id);
-      output.append("\n");
-      output.append("\tname: ");
-      output.append(name);
-      output.append("\n");
-      output.append("\tfaultRecording: ");
-      output.append(faultRecording.isPresent() ? Arrays.toString(faultRecording.get()) : "");
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public SoftwareDiagnosticsClusterSoftwareFaultEvent(
+    Long id
+      , Optional<String> name
+      , Optional<byte[]> faultRecording
+  ) {
+    this.id = id;
+    this.name = name;
+    this.faultRecording = faultRecording;
   }
 
-  public static class ThreadNetworkDiagnosticsClusterConnectionStatusEvent {
-    public Integer connectionStatus;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SoftwareDiagnosticsClusterSoftwareFaultEvent {\n");
+    output.append("\tid: ");
+    output.append(id);
+        output.append("\n");
+    output.append("\tname: ");
+    output.append(name);
+        output.append("\n");
+    output.append("\tfaultRecording: ");
+    output.append(faultRecording.isPresent() ? Arrays.toString(faultRecording.get()) : "");
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public ThreadNetworkDiagnosticsClusterConnectionStatusEvent(Integer connectionStatus) {
-      this.connectionStatus = connectionStatus;
-    }
+public static class ThreadNetworkDiagnosticsClusterConnectionStatusEvent {
+public Integer connectionStatus;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("ThreadNetworkDiagnosticsClusterConnectionStatusEvent {\n");
-      output.append("\tconnectionStatus: ");
-      output.append(connectionStatus);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public ThreadNetworkDiagnosticsClusterConnectionStatusEvent(
+    Integer connectionStatus
+  ) {
+    this.connectionStatus = connectionStatus;
   }
 
-  public static class WiFiNetworkDiagnosticsClusterDisconnectionEvent {
-    public Integer reasonCode;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThreadNetworkDiagnosticsClusterConnectionStatusEvent {\n");
+    output.append("\tconnectionStatus: ");
+    output.append(connectionStatus);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public WiFiNetworkDiagnosticsClusterDisconnectionEvent(Integer reasonCode) {
-      this.reasonCode = reasonCode;
-    }
+public static class WiFiNetworkDiagnosticsClusterDisconnectionEvent {
+public Integer reasonCode;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("WiFiNetworkDiagnosticsClusterDisconnectionEvent {\n");
-      output.append("\treasonCode: ");
-      output.append(reasonCode);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public WiFiNetworkDiagnosticsClusterDisconnectionEvent(
+    Integer reasonCode
+  ) {
+    this.reasonCode = reasonCode;
   }
 
-  public static class WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
-    public Integer associationFailure;
-    public Integer status;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WiFiNetworkDiagnosticsClusterDisconnectionEvent {\n");
+    output.append("\treasonCode: ");
+    output.append(reasonCode);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
-        Integer associationFailure, Integer status) {
-      this.associationFailure = associationFailure;
-      this.status = status;
-    }
+public static class WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
+public Integer associationFailure;
+public Integer status;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("WiFiNetworkDiagnosticsClusterAssociationFailureEvent {\n");
-      output.append("\tassociationFailure: ");
-      output.append(associationFailure);
-      output.append("\n");
-      output.append("\tstatus: ");
-      output.append(status);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
+    Integer associationFailure
+      , Integer status
+  ) {
+    this.associationFailure = associationFailure;
+    this.status = status;
   }
 
-  public static class WiFiNetworkDiagnosticsClusterConnectionStatusEvent {
-    public Integer connectionStatus;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WiFiNetworkDiagnosticsClusterAssociationFailureEvent {\n");
+    output.append("\tassociationFailure: ");
+    output.append(associationFailure);
+        output.append("\n");
+    output.append("\tstatus: ");
+    output.append(status);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public WiFiNetworkDiagnosticsClusterConnectionStatusEvent(Integer connectionStatus) {
-      this.connectionStatus = connectionStatus;
-    }
+public static class WiFiNetworkDiagnosticsClusterConnectionStatusEvent {
+public Integer connectionStatus;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("WiFiNetworkDiagnosticsClusterConnectionStatusEvent {\n");
-      output.append("\tconnectionStatus: ");
-      output.append(connectionStatus);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public WiFiNetworkDiagnosticsClusterConnectionStatusEvent(
+    Integer connectionStatus
+  ) {
+    this.connectionStatus = connectionStatus;
   }
 
-  public static class BridgedDeviceBasicClusterStartUpEvent {
-    public Long softwareVersion;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WiFiNetworkDiagnosticsClusterConnectionStatusEvent {\n");
+    output.append("\tconnectionStatus: ");
+    output.append(connectionStatus);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public BridgedDeviceBasicClusterStartUpEvent(Long softwareVersion) {
-      this.softwareVersion = softwareVersion;
-    }
+public static class BridgedDeviceBasicClusterStartUpEvent {
+public Long softwareVersion;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("BridgedDeviceBasicClusterStartUpEvent {\n");
-      output.append("\tsoftwareVersion: ");
-      output.append(softwareVersion);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public BridgedDeviceBasicClusterStartUpEvent(
+    Long softwareVersion
+  ) {
+    this.softwareVersion = softwareVersion;
   }
 
-  public static class BridgedDeviceBasicClusterShutDownEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BridgedDeviceBasicClusterStartUpEvent {\n");
+    output.append("\tsoftwareVersion: ");
+    output.append(softwareVersion);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public BridgedDeviceBasicClusterShutDownEvent() {}
+public static class BridgedDeviceBasicClusterShutDownEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("BridgedDeviceBasicClusterShutDownEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public BridgedDeviceBasicClusterShutDownEvent(
+) {
   }
 
-  public static class BridgedDeviceBasicClusterLeaveEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BridgedDeviceBasicClusterShutDownEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public BridgedDeviceBasicClusterLeaveEvent() {}
+public static class BridgedDeviceBasicClusterLeaveEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("BridgedDeviceBasicClusterLeaveEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public BridgedDeviceBasicClusterLeaveEvent(
+) {
   }
 
-  public static class BridgedDeviceBasicClusterReachableChangedEvent {
-    public Boolean reachableNewValue;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BridgedDeviceBasicClusterLeaveEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public BridgedDeviceBasicClusterReachableChangedEvent(Boolean reachableNewValue) {
-      this.reachableNewValue = reachableNewValue;
-    }
+public static class BridgedDeviceBasicClusterReachableChangedEvent {
+public Boolean reachableNewValue;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("BridgedDeviceBasicClusterReachableChangedEvent {\n");
-      output.append("\treachableNewValue: ");
-      output.append(reachableNewValue);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public BridgedDeviceBasicClusterReachableChangedEvent(
+    Boolean reachableNewValue
+  ) {
+    this.reachableNewValue = reachableNewValue;
   }
 
-  public static class SwitchClusterSwitchLatchedEvent {
-    public Integer newPosition;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BridgedDeviceBasicClusterReachableChangedEvent {\n");
+    output.append("\treachableNewValue: ");
+    output.append(reachableNewValue);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public SwitchClusterSwitchLatchedEvent(Integer newPosition) {
-      this.newPosition = newPosition;
-    }
+public static class SwitchClusterSwitchLatchedEvent {
+public Integer newPosition;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("SwitchClusterSwitchLatchedEvent {\n");
-      output.append("\tnewPosition: ");
-      output.append(newPosition);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public SwitchClusterSwitchLatchedEvent(
+    Integer newPosition
+  ) {
+    this.newPosition = newPosition;
   }
 
-  public static class SwitchClusterInitialPressEvent {
-    public Integer newPosition;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SwitchClusterSwitchLatchedEvent {\n");
+    output.append("\tnewPosition: ");
+    output.append(newPosition);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public SwitchClusterInitialPressEvent(Integer newPosition) {
-      this.newPosition = newPosition;
-    }
+public static class SwitchClusterInitialPressEvent {
+public Integer newPosition;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("SwitchClusterInitialPressEvent {\n");
-      output.append("\tnewPosition: ");
-      output.append(newPosition);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public SwitchClusterInitialPressEvent(
+    Integer newPosition
+  ) {
+    this.newPosition = newPosition;
   }
 
-  public static class SwitchClusterLongPressEvent {
-    public Integer newPosition;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SwitchClusterInitialPressEvent {\n");
+    output.append("\tnewPosition: ");
+    output.append(newPosition);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public SwitchClusterLongPressEvent(Integer newPosition) {
-      this.newPosition = newPosition;
-    }
+public static class SwitchClusterLongPressEvent {
+public Integer newPosition;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("SwitchClusterLongPressEvent {\n");
-      output.append("\tnewPosition: ");
-      output.append(newPosition);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public SwitchClusterLongPressEvent(
+    Integer newPosition
+  ) {
+    this.newPosition = newPosition;
   }
 
-  public static class SwitchClusterShortReleaseEvent {
-    public Integer previousPosition;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SwitchClusterLongPressEvent {\n");
+    output.append("\tnewPosition: ");
+    output.append(newPosition);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public SwitchClusterShortReleaseEvent(Integer previousPosition) {
-      this.previousPosition = previousPosition;
-    }
+public static class SwitchClusterShortReleaseEvent {
+public Integer previousPosition;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("SwitchClusterShortReleaseEvent {\n");
-      output.append("\tpreviousPosition: ");
-      output.append(previousPosition);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public SwitchClusterShortReleaseEvent(
+    Integer previousPosition
+  ) {
+    this.previousPosition = previousPosition;
   }
 
-  public static class SwitchClusterLongReleaseEvent {
-    public Integer previousPosition;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SwitchClusterShortReleaseEvent {\n");
+    output.append("\tpreviousPosition: ");
+    output.append(previousPosition);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public SwitchClusterLongReleaseEvent(Integer previousPosition) {
-      this.previousPosition = previousPosition;
-    }
+public static class SwitchClusterLongReleaseEvent {
+public Integer previousPosition;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("SwitchClusterLongReleaseEvent {\n");
-      output.append("\tpreviousPosition: ");
-      output.append(previousPosition);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public SwitchClusterLongReleaseEvent(
+    Integer previousPosition
+  ) {
+    this.previousPosition = previousPosition;
   }
 
-  public static class SwitchClusterMultiPressOngoingEvent {
-    public Integer newPosition;
-    public Integer currentNumberOfPressesCounted;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SwitchClusterLongReleaseEvent {\n");
+    output.append("\tpreviousPosition: ");
+    output.append(previousPosition);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public SwitchClusterMultiPressOngoingEvent(
-        Integer newPosition, Integer currentNumberOfPressesCounted) {
-      this.newPosition = newPosition;
-      this.currentNumberOfPressesCounted = currentNumberOfPressesCounted;
-    }
+public static class SwitchClusterMultiPressOngoingEvent {
+public Integer newPosition;
+public Integer currentNumberOfPressesCounted;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("SwitchClusterMultiPressOngoingEvent {\n");
-      output.append("\tnewPosition: ");
-      output.append(newPosition);
-      output.append("\n");
-      output.append("\tcurrentNumberOfPressesCounted: ");
-      output.append(currentNumberOfPressesCounted);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public SwitchClusterMultiPressOngoingEvent(
+    Integer newPosition
+      , Integer currentNumberOfPressesCounted
+  ) {
+    this.newPosition = newPosition;
+    this.currentNumberOfPressesCounted = currentNumberOfPressesCounted;
   }
 
-  public static class SwitchClusterMultiPressCompleteEvent {
-    public Integer newPosition;
-    public Integer totalNumberOfPressesCounted;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SwitchClusterMultiPressOngoingEvent {\n");
+    output.append("\tnewPosition: ");
+    output.append(newPosition);
+        output.append("\n");
+    output.append("\tcurrentNumberOfPressesCounted: ");
+    output.append(currentNumberOfPressesCounted);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public SwitchClusterMultiPressCompleteEvent(
-        Integer newPosition, Integer totalNumberOfPressesCounted) {
-      this.newPosition = newPosition;
-      this.totalNumberOfPressesCounted = totalNumberOfPressesCounted;
-    }
+public static class SwitchClusterMultiPressCompleteEvent {
+public Integer newPosition;
+public Integer totalNumberOfPressesCounted;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("SwitchClusterMultiPressCompleteEvent {\n");
-      output.append("\tnewPosition: ");
-      output.append(newPosition);
-      output.append("\n");
-      output.append("\ttotalNumberOfPressesCounted: ");
-      output.append(totalNumberOfPressesCounted);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public SwitchClusterMultiPressCompleteEvent(
+    Integer newPosition
+      , Integer totalNumberOfPressesCounted
+  ) {
+    this.newPosition = newPosition;
+    this.totalNumberOfPressesCounted = totalNumberOfPressesCounted;
   }
 
-  public static class BooleanStateClusterStateChangeEvent {
-    public Boolean stateValue;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SwitchClusterMultiPressCompleteEvent {\n");
+    output.append("\tnewPosition: ");
+    output.append(newPosition);
+        output.append("\n");
+    output.append("\ttotalNumberOfPressesCounted: ");
+    output.append(totalNumberOfPressesCounted);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public BooleanStateClusterStateChangeEvent(Boolean stateValue) {
-      this.stateValue = stateValue;
-    }
+public static class BooleanStateClusterStateChangeEvent {
+public Boolean stateValue;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("BooleanStateClusterStateChangeEvent {\n");
-      output.append("\tstateValue: ");
-      output.append(stateValue);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public BooleanStateClusterStateChangeEvent(
+    Boolean stateValue
+  ) {
+    this.stateValue = stateValue;
   }
 
-  public static class DoorLockClusterDoorLockAlarmEvent {
-    public Integer alarmCode;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BooleanStateClusterStateChangeEvent {\n");
+    output.append("\tstateValue: ");
+    output.append(stateValue);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public DoorLockClusterDoorLockAlarmEvent(Integer alarmCode) {
-      this.alarmCode = alarmCode;
-    }
+public static class DoorLockClusterDoorLockAlarmEvent {
+public Integer alarmCode;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("DoorLockClusterDoorLockAlarmEvent {\n");
-      output.append("\talarmCode: ");
-      output.append(alarmCode);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public DoorLockClusterDoorLockAlarmEvent(
+    Integer alarmCode
+  ) {
+    this.alarmCode = alarmCode;
   }
 
-  public static class DoorLockClusterDoorStateChangeEvent {
-    public Integer doorState;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DoorLockClusterDoorLockAlarmEvent {\n");
+    output.append("\talarmCode: ");
+    output.append(alarmCode);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public DoorLockClusterDoorStateChangeEvent(Integer doorState) {
-      this.doorState = doorState;
-    }
+public static class DoorLockClusterDoorStateChangeEvent {
+public Integer doorState;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("DoorLockClusterDoorStateChangeEvent {\n");
-      output.append("\tdoorState: ");
-      output.append(doorState);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public DoorLockClusterDoorStateChangeEvent(
+    Integer doorState
+  ) {
+    this.doorState = doorState;
   }
 
-  public static class DoorLockClusterLockOperationEvent {
-    public Integer lockOperationType;
-    public Integer operationSource;
-    public @Nullable Integer userIndex;
-    public @Nullable Integer fabricIndex;
-    public @Nullable Long sourceNode;
-    public @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DoorLockClusterDoorStateChangeEvent {\n");
+    output.append("\tdoorState: ");
+    output.append(doorState);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public DoorLockClusterLockOperationEvent(
-        Integer lockOperationType,
-        Integer operationSource,
-        @Nullable Integer userIndex,
-        @Nullable Integer fabricIndex,
-        @Nullable Long sourceNode,
-        @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials) {
-      this.lockOperationType = lockOperationType;
-      this.operationSource = operationSource;
-      this.userIndex = userIndex;
-      this.fabricIndex = fabricIndex;
-      this.sourceNode = sourceNode;
-      this.credentials = credentials;
-    }
+public static class DoorLockClusterLockOperationEvent {
+public Integer lockOperationType;
+public Integer operationSource;
+public @Nullable Integer userIndex;
+public @Nullable Integer fabricIndex;
+public @Nullable Long sourceNode;
+public @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("DoorLockClusterLockOperationEvent {\n");
-      output.append("\tlockOperationType: ");
-      output.append(lockOperationType);
-      output.append("\n");
-      output.append("\toperationSource: ");
-      output.append(operationSource);
-      output.append("\n");
-      output.append("\tuserIndex: ");
-      output.append(userIndex);
-      output.append("\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
-      output.append("\tsourceNode: ");
-      output.append(sourceNode);
-      output.append("\n");
-      output.append("\tcredentials: ");
-      output.append(credentials);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public DoorLockClusterLockOperationEvent(
+    Integer lockOperationType
+      , Integer operationSource
+      , @Nullable Integer userIndex
+      , @Nullable Integer fabricIndex
+      , @Nullable Long sourceNode
+      , @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials
+  ) {
+    this.lockOperationType = lockOperationType;
+    this.operationSource = operationSource;
+    this.userIndex = userIndex;
+    this.fabricIndex = fabricIndex;
+    this.sourceNode = sourceNode;
+    this.credentials = credentials;
   }
 
-  public static class DoorLockClusterLockOperationErrorEvent {
-    public Integer lockOperationType;
-    public Integer operationSource;
-    public Integer operationError;
-    public @Nullable Integer userIndex;
-    public @Nullable Integer fabricIndex;
-    public @Nullable Long sourceNode;
-    public @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DoorLockClusterLockOperationEvent {\n");
+    output.append("\tlockOperationType: ");
+    output.append(lockOperationType);
+        output.append("\n");
+    output.append("\toperationSource: ");
+    output.append(operationSource);
+        output.append("\n");
+    output.append("\tuserIndex: ");
+    output.append(userIndex);
+        output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+        output.append("\n");
+    output.append("\tsourceNode: ");
+    output.append(sourceNode);
+        output.append("\n");
+    output.append("\tcredentials: ");
+    output.append(credentials);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public DoorLockClusterLockOperationErrorEvent(
-        Integer lockOperationType,
-        Integer operationSource,
-        Integer operationError,
-        @Nullable Integer userIndex,
-        @Nullable Integer fabricIndex,
-        @Nullable Long sourceNode,
-        @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials) {
-      this.lockOperationType = lockOperationType;
-      this.operationSource = operationSource;
-      this.operationError = operationError;
-      this.userIndex = userIndex;
-      this.fabricIndex = fabricIndex;
-      this.sourceNode = sourceNode;
-      this.credentials = credentials;
-    }
+public static class DoorLockClusterLockOperationErrorEvent {
+public Integer lockOperationType;
+public Integer operationSource;
+public Integer operationError;
+public @Nullable Integer userIndex;
+public @Nullable Integer fabricIndex;
+public @Nullable Long sourceNode;
+public @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("DoorLockClusterLockOperationErrorEvent {\n");
-      output.append("\tlockOperationType: ");
-      output.append(lockOperationType);
-      output.append("\n");
-      output.append("\toperationSource: ");
-      output.append(operationSource);
-      output.append("\n");
-      output.append("\toperationError: ");
-      output.append(operationError);
-      output.append("\n");
-      output.append("\tuserIndex: ");
-      output.append(userIndex);
-      output.append("\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
-      output.append("\tsourceNode: ");
-      output.append(sourceNode);
-      output.append("\n");
-      output.append("\tcredentials: ");
-      output.append(credentials);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public DoorLockClusterLockOperationErrorEvent(
+    Integer lockOperationType
+      , Integer operationSource
+      , Integer operationError
+      , @Nullable Integer userIndex
+      , @Nullable Integer fabricIndex
+      , @Nullable Long sourceNode
+      , @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials
+  ) {
+    this.lockOperationType = lockOperationType;
+    this.operationSource = operationSource;
+    this.operationError = operationError;
+    this.userIndex = userIndex;
+    this.fabricIndex = fabricIndex;
+    this.sourceNode = sourceNode;
+    this.credentials = credentials;
   }
 
-  public static class DoorLockClusterLockUserChangeEvent {
-    public Integer lockDataType;
-    public Integer dataOperationType;
-    public Integer operationSource;
-    public @Nullable Integer userIndex;
-    public @Nullable Integer fabricIndex;
-    public @Nullable Long sourceNode;
-    public @Nullable Integer dataIndex;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DoorLockClusterLockOperationErrorEvent {\n");
+    output.append("\tlockOperationType: ");
+    output.append(lockOperationType);
+        output.append("\n");
+    output.append("\toperationSource: ");
+    output.append(operationSource);
+        output.append("\n");
+    output.append("\toperationError: ");
+    output.append(operationError);
+        output.append("\n");
+    output.append("\tuserIndex: ");
+    output.append(userIndex);
+        output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+        output.append("\n");
+    output.append("\tsourceNode: ");
+    output.append(sourceNode);
+        output.append("\n");
+    output.append("\tcredentials: ");
+    output.append(credentials);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public DoorLockClusterLockUserChangeEvent(
-        Integer lockDataType,
-        Integer dataOperationType,
-        Integer operationSource,
-        @Nullable Integer userIndex,
-        @Nullable Integer fabricIndex,
-        @Nullable Long sourceNode,
-        @Nullable Integer dataIndex) {
-      this.lockDataType = lockDataType;
-      this.dataOperationType = dataOperationType;
-      this.operationSource = operationSource;
-      this.userIndex = userIndex;
-      this.fabricIndex = fabricIndex;
-      this.sourceNode = sourceNode;
-      this.dataIndex = dataIndex;
-    }
+public static class DoorLockClusterLockUserChangeEvent {
+public Integer lockDataType;
+public Integer dataOperationType;
+public Integer operationSource;
+public @Nullable Integer userIndex;
+public @Nullable Integer fabricIndex;
+public @Nullable Long sourceNode;
+public @Nullable Integer dataIndex;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("DoorLockClusterLockUserChangeEvent {\n");
-      output.append("\tlockDataType: ");
-      output.append(lockDataType);
-      output.append("\n");
-      output.append("\tdataOperationType: ");
-      output.append(dataOperationType);
-      output.append("\n");
-      output.append("\toperationSource: ");
-      output.append(operationSource);
-      output.append("\n");
-      output.append("\tuserIndex: ");
-      output.append(userIndex);
-      output.append("\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
-      output.append("\tsourceNode: ");
-      output.append(sourceNode);
-      output.append("\n");
-      output.append("\tdataIndex: ");
-      output.append(dataIndex);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public DoorLockClusterLockUserChangeEvent(
+    Integer lockDataType
+      , Integer dataOperationType
+      , Integer operationSource
+      , @Nullable Integer userIndex
+      , @Nullable Integer fabricIndex
+      , @Nullable Long sourceNode
+      , @Nullable Integer dataIndex
+  ) {
+    this.lockDataType = lockDataType;
+    this.dataOperationType = dataOperationType;
+    this.operationSource = operationSource;
+    this.userIndex = userIndex;
+    this.fabricIndex = fabricIndex;
+    this.sourceNode = sourceNode;
+    this.dataIndex = dataIndex;
   }
 
-  public static class PumpConfigurationAndControlClusterSupplyVoltageLowEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DoorLockClusterLockUserChangeEvent {\n");
+    output.append("\tlockDataType: ");
+    output.append(lockDataType);
+        output.append("\n");
+    output.append("\tdataOperationType: ");
+    output.append(dataOperationType);
+        output.append("\n");
+    output.append("\toperationSource: ");
+    output.append(operationSource);
+        output.append("\n");
+    output.append("\tuserIndex: ");
+    output.append(userIndex);
+        output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+        output.append("\n");
+    output.append("\tsourceNode: ");
+    output.append(sourceNode);
+        output.append("\n");
+    output.append("\tdataIndex: ");
+    output.append(dataIndex);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterSupplyVoltageLowEvent() {}
+public static class PumpConfigurationAndControlClusterSupplyVoltageLowEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterSupplyVoltageLowEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterSupplyVoltageLowEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterSupplyVoltageHighEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterSupplyVoltageLowEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterSupplyVoltageHighEvent() {}
+public static class PumpConfigurationAndControlClusterSupplyVoltageHighEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterSupplyVoltageHighEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterSupplyVoltageHighEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterPowerMissingPhaseEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterSupplyVoltageHighEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterPowerMissingPhaseEvent() {}
+public static class PumpConfigurationAndControlClusterPowerMissingPhaseEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterPowerMissingPhaseEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterPowerMissingPhaseEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterSystemPressureLowEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterPowerMissingPhaseEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterSystemPressureLowEvent() {}
+public static class PumpConfigurationAndControlClusterSystemPressureLowEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterSystemPressureLowEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterSystemPressureLowEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterSystemPressureHighEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterSystemPressureLowEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterSystemPressureHighEvent() {}
+public static class PumpConfigurationAndControlClusterSystemPressureHighEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterSystemPressureHighEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterSystemPressureHighEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterDryRunningEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterSystemPressureHighEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterDryRunningEvent() {}
+public static class PumpConfigurationAndControlClusterDryRunningEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterDryRunningEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterDryRunningEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterMotorTemperatureHighEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterDryRunningEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterMotorTemperatureHighEvent() {}
+public static class PumpConfigurationAndControlClusterMotorTemperatureHighEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterMotorTemperatureHighEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterMotorTemperatureHighEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterPumpMotorFatalFailureEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterMotorTemperatureHighEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterPumpMotorFatalFailureEvent() {}
+public static class PumpConfigurationAndControlClusterPumpMotorFatalFailureEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterPumpMotorFatalFailureEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterPumpMotorFatalFailureEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterElectronicTemperatureHighEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterPumpMotorFatalFailureEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterElectronicTemperatureHighEvent() {}
+public static class PumpConfigurationAndControlClusterElectronicTemperatureHighEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterElectronicTemperatureHighEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterElectronicTemperatureHighEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterPumpBlockedEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterElectronicTemperatureHighEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterPumpBlockedEvent() {}
+public static class PumpConfigurationAndControlClusterPumpBlockedEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterPumpBlockedEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterPumpBlockedEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterSensorFailureEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterPumpBlockedEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterSensorFailureEvent() {}
+public static class PumpConfigurationAndControlClusterSensorFailureEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterSensorFailureEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterSensorFailureEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterElectronicNonFatalFailureEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterSensorFailureEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterElectronicNonFatalFailureEvent() {}
+public static class PumpConfigurationAndControlClusterElectronicNonFatalFailureEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterElectronicNonFatalFailureEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterElectronicNonFatalFailureEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterElectronicFatalFailureEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterElectronicNonFatalFailureEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterElectronicFatalFailureEvent() {}
+public static class PumpConfigurationAndControlClusterElectronicFatalFailureEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterElectronicFatalFailureEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterElectronicFatalFailureEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterGeneralFaultEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterElectronicFatalFailureEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterGeneralFaultEvent() {}
+public static class PumpConfigurationAndControlClusterGeneralFaultEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterGeneralFaultEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterGeneralFaultEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterLeakageEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterGeneralFaultEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterLeakageEvent() {}
+public static class PumpConfigurationAndControlClusterLeakageEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterLeakageEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterLeakageEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterAirDetectionEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterLeakageEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterAirDetectionEvent() {}
+public static class PumpConfigurationAndControlClusterAirDetectionEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterAirDetectionEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterAirDetectionEvent(
+) {
   }
 
-  public static class PumpConfigurationAndControlClusterTurbineOperationEvent {
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterAirDetectionEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public PumpConfigurationAndControlClusterTurbineOperationEvent() {}
+public static class PumpConfigurationAndControlClusterTurbineOperationEvent {
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("PumpConfigurationAndControlClusterTurbineOperationEvent {\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public PumpConfigurationAndControlClusterTurbineOperationEvent(
+) {
   }
 
-  public static class TestClusterClusterTestEventEvent {
-    public Integer arg1;
-    public Integer arg2;
-    public Boolean arg3;
-    public ChipStructs.TestClusterClusterSimpleStruct arg4;
-    public ArrayList<ChipStructs.TestClusterClusterSimpleStruct> arg5;
-    public ArrayList<Object> arg6;
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterTurbineOperationEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 
-    public TestClusterClusterTestEventEvent(
-        Integer arg1,
-        Integer arg2,
-        Boolean arg3,
-        ChipStructs.TestClusterClusterSimpleStruct arg4,
-        ArrayList<ChipStructs.TestClusterClusterSimpleStruct> arg5,
-        ArrayList<Object> arg6) {
-      this.arg1 = arg1;
-      this.arg2 = arg2;
-      this.arg3 = arg3;
-      this.arg4 = arg4;
-      this.arg5 = arg5;
-      this.arg6 = arg6;
-    }
+public static class TestClusterClusterTestEventEvent {
+public Integer arg1;
+public Integer arg2;
+public Boolean arg3;
+public ChipStructs.TestClusterClusterSimpleStruct arg4;
+public ArrayList<ChipStructs.TestClusterClusterSimpleStruct> arg5;
+public ArrayList<Object> arg6;
 
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("TestClusterClusterTestEventEvent {\n");
-      output.append("\targ1: ");
-      output.append(arg1);
-      output.append("\n");
-      output.append("\targ2: ");
-      output.append(arg2);
-      output.append("\n");
-      output.append("\targ3: ");
-      output.append(arg3);
-      output.append("\n");
-      output.append("\targ4: ");
-      output.append(arg4);
-      output.append("\n");
-      output.append("\targ5: ");
-      output.append(arg5);
-      output.append("\n");
-      output.append("\targ6: ");
-      output.append(arg6);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  public TestClusterClusterTestEventEvent(
+    Integer arg1
+      , Integer arg2
+      , Boolean arg3
+      , ChipStructs.TestClusterClusterSimpleStruct arg4
+      , ArrayList<ChipStructs.TestClusterClusterSimpleStruct> arg5
+      , ArrayList<Object> arg6
+  ) {
+    this.arg1 = arg1;
+    this.arg2 = arg2;
+    this.arg3 = arg3;
+    this.arg4 = arg4;
+    this.arg5 = arg5;
+    this.arg6 = arg6;
   }
 
-  public static class TestClusterClusterTestFabricScopedEventEvent {
-    public Integer arg1;
-
-    public TestClusterClusterTestFabricScopedEventEvent(Integer arg1) {
-      this.arg1 = arg1;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("TestClusterClusterTestFabricScopedEventEvent {\n");
-      output.append("\targ1: ");
-      output.append(arg1);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("TestClusterClusterTestEventEvent {\n");
+    output.append("\targ1: ");
+    output.append(arg1);
+        output.append("\n");
+    output.append("\targ2: ");
+    output.append(arg2);
+        output.append("\n");
+    output.append("\targ3: ");
+    output.append(arg3);
+        output.append("\n");
+    output.append("\targ4: ");
+    output.append(arg4);
+        output.append("\n");
+    output.append("\targ5: ");
+    output.append(arg5);
+    output.append("\n");
+    output.append("\targ6: ");
+    output.append(arg6);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
   }
+}
+
+public static class TestClusterClusterTestFabricScopedEventEvent {
+public Integer arg1;
+
+  public TestClusterClusterTestFabricScopedEventEvent(
+    Integer arg1
+  ) {
+    this.arg1 = arg1;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("TestClusterClusterTestFabricScopedEventEvent {\n");
+    output.append("\targ1: ");
+    output.append(arg1);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
 }
