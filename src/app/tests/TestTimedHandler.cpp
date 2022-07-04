@@ -69,7 +69,7 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
         if (mLastMessageWasStatus)
         {
             CHIP_ERROR statusError = CHIP_NO_ERROR;
-            mError = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
+            mError                 = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
             if (mError == CHIP_NO_ERROR)
             {
                 mError = statusError;

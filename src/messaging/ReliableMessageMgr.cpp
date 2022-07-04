@@ -381,6 +381,15 @@ int ReliableMessageMgr::TestGetCountRetransTable()
     });
     return count;
 }
+
+void ReliableMessageMgr::ResetRetransTable()
+{
+    // Clear the retransmit table
+    mRetransTable.ForEachActiveObject([&](auto * entry) {
+        mRetransTable.ReleaseObject(entry);
+        return Loop::Continue;
+    });
+}
 #endif // CHIP_CONFIG_TEST
 
 } // namespace Messaging
