@@ -562,15 +562,16 @@ PICS:
       id: MANUAL_TEMPERATURE_CHANGE
 
       # Thermostat User Configuration cluster
-    - label: "Does the device implement the TemperatureDisplayMode attribute"
-      id: A_TEMPERATURE_DISPLAY_MODE
+    - label: "Does the device implement the TemperatureDisplayMode attribute?"
+      id: TSUIC.S.A0000
 
-    - label: "Does the device implement the KeypadLockout attribute"
-      id: A_KEYPAD_LOCKOUT
+    - label: "Does the device implement the KeypadLockout attribute?"
+      id: TSUIC.S.A0001
 
     - label:
-          "Does the device implement the ScheduleProgrammingVisibility attribute"
-      id: A_SCHEDULE_PROGRAMMING_VISIBILITY
+          "Does the device implement the ScheduleProgrammingVisibility
+          attribute?"
+      id: TSUIC.S.A0002
 
       # Software Diagnostics cluster
     - label: "Does the device implement the SoftwareFault event?"
@@ -590,19 +591,6 @@ PICS:
 
     - label: "Does the device implement the ResetWaterMarks command?"
       id: DGSW.S.C00
-
-      # Pump Configuration and Control cluster
-    - label: "Does the device implement the attribute OperationMode"
-      id: A_OPERATIONMODE
-
-    - label: "Does the device implement the attribute ControlMode"
-      id: A_CONTROLMODE
-
-    - label: "Does the device implement the attribute EffectiveOperationMode"
-      id: A_EFFECTIVEOPERATIONMODE
-
-    - label: "Does the device implement the attribute EffectiveControlMode"
-      id: A_EFFECTIVECONTROLMODE
 
       # Thermostat cluster
     - label: "Does the device implement the OccupiedCoolingSetpoint attribute"
@@ -960,6 +948,14 @@ PICS:
     - label: "Does the device implement the Scale attribute?"
       id: PRS.S.A0014
 
+    - label: "Does the device support extended range and resolution?"
+      id: PRS.S.F00
+
+    - label:
+          "Can the MeasuredValue attribute changed by physical control at the
+          device?"
+      id: PRS.M.PressureChange
+
     - label: "Does the device implement the Occupancy attribute?"
       id: OCC.S.A0000
 
@@ -1015,9 +1011,6 @@ PICS:
 
     - label: "Does the device implement the Tolerance attribute?"
       id: FLW.S.A0003
-
-    - label: "Does the device support extended range and resolution?"
-      id: PRS.S.F00
 
     - label:
           "Does the DUT(server) support the Frequency attributes and behavior
@@ -1985,3 +1978,297 @@ PICS:
           "Does the DUT support the Application Launcher server cluster, HideApp
           command?"
       id: MC_APPLAUNCHER.S.C0002
+    #Bridge
+    - label: "Does the DUT implement a Bridge"
+      id: MCORE.BRIDGE
+
+    - label:
+          "Does the DUT have information on battery level of (at least some of)
+          of its bridged devices"
+      id: MCORE.BRIDGE.BatInfo
+
+    - label:
+          "Does the DUT have means to change the state of (at least some of) of
+          its bridged devices, e.g. through a manufacturer-provided app"
+      id: MCORE.BRIDGE.OtherControl
+
+    - label:
+          "Does the DUT have means to change the name of (at least some of) of
+          its bridged devices, e.g. through a manufacturer-provided app"
+      id: MCORE.BRIDGE.AllowDeviceRename
+
+    #Bulk Data Exchange Protocol
+    - label: "Does the DUT control the rate of the BDX transfer ?"
+      id: MCORE.BDX.Driver
+
+    - label: "Does the DUT support sending the BlockQueryWithSkip message?"
+      id: MCORE.BDX.BlockQueryWithSkip
+
+    #General Diagnostics Cluster
+    - label:
+          "Provides a node network interface information via NetworkInterface
+          structure."
+      id: DGGEN.S.A0000
+
+    - label:
+          "The number of times that the node has rebooted. Node low power or
+          sleep state shall not be counted and the count shall be reset by the
+          factory reset."
+      id: DGGEN.S.A0001
+
+    - label:
+          "The best effort assessment of the length of the time, in seconds,
+          since node’s last reboot. The UpTime should be incremented during
+          low-power or sleep state of the node. The UpTime shall be reset only
+          by a device reboot. The Uptime should not be subscribed."
+      id: DGGEN.S.A0002
+
+    - label:
+          "The best effort attempt to track the opeartional hours of node since
+          the node is operational. The operational hour should be incremented
+          during low-power or sleep state of the node. The TotalOperationalHours
+          shall be reset by the node factory reset."
+      id: DGGEN.S.A0003
+
+    - label: "Indicates the reason for the most recent node reboot."
+      id: DGGEN.S.A0004
+
+    - label: "Indicates a set of hardware fault detected by the node."
+      id: DGGEN.S.A0005
+
+    - label: "Indicates a set of radio fault detected by the node."
+      id: DGGEN.S.A0006
+
+    - label: "Indicates a set of network fault detected by the node."
+      id: DGGEN.S.A0007
+
+    - label: "Indicates that node is configured for test event triggers."
+      id: DGGEN.S.A0008
+
+    - label: "Indicates that node is configured for test event triggers."
+      id: DGGEN.S.C00
+
+    - label:
+          "Indicates a change in the set of hardware faults currently detected
+          by the Node."
+      id: DGGEN.S.E00
+
+    - label:
+          "Indicates a change in the set of radio faults currently detected by
+          the Node."
+      id: DGGEN.S.E01
+
+    - label:
+          "Indicates a change in the set of network faults currently detected by
+          the Node."
+      id: DGGEN.S.E02
+
+    - label: "Indicates the reason that caused the device to reboot start-up."
+      id: DGGEN.S.E03
+
+    #Flow Measurement Cluster
+    - label: "Does the device implement the MeasuredValue attribute?"
+      id: FLW.S.A0000
+
+    - label: "Does the device implement the MinMeasuredValue attribute?"
+      id: FLW.S.A0001
+
+    - label: "Does the device implement the MaxMeasuredValue attribute?"
+      id: FLW.S.A0002
+
+    - label: "Does the device implement the Tolerance attribute?"
+      id: FLW.S.A0003
+
+    - label:
+          "Can the MeasuredValue attribute changed by physical control at the
+          device?"
+      id: FLW.M.FlowChange
+
+    # Pump Configuration and Control cluster
+    - label: "Does the device implement the MaxPressure attribute?"
+      id: PCC.S.A0000
+
+    - label: "Does the device implement the MaxSpeed attribute?"
+      id: PCC.S.A0001
+
+    - label: "Does the device implement the MaxFlow attribute?"
+      id: PCC.S.A0002
+
+    - label: "Does the device implement the MinConstPressure attribute?"
+      id: PCC.S.A0003
+
+    - label: "Does the device implement the MaxConstPressure attribute?"
+      id: PCC.S.A0004
+
+    - label: "Does the device implement the MinCompPressure attribute?"
+      id: PCC.S.A0005
+
+    - label: "Does the device implement the MaxCompPressure attribute?"
+      id: PCC.S.A0006
+
+    - label: "Does the device implement the MinConstSpeed attribute?"
+      id: PCC.S.A0007
+
+    - label: "Does the device implement the MaxConstSpeed attribute?"
+      id: PCC.S.A0008
+
+    - label: "Does the device implement the MinConstFlow attribute?"
+      id: PCC.S.A0009
+
+    - label: "Does the device implement the MaxConstFlow attribute?"
+      id: PCC.S.A000a
+
+    - label: "Does the device implement the MinConstTemp attribute?"
+      id: PCC.S.A000b
+
+    - label: "Does the device implement the MaxConstTemp attribute?"
+      id: PCC.S.A000c
+
+    - label: "Does the device implement the PumpStatus attribute?"
+      id: PCC.S.A0010
+
+    - label: "Does the device implement the EffectiveOperationMode attribute?"
+      id: PCC.S.A0011
+
+    - label: "Does the device implement the EffectiveControlMode attribute?"
+      id: PCC.S.A0012
+
+    - label: "Does the device implement the Capacity attribute?"
+      id: PCC.S.A0013
+
+    - label: "Does the device implement the Speed attribute?"
+      id: PCC.S.A0014
+
+    - label: "Does the device implement the LifetimeRunningHours attribute?"
+      id: PCC.S.A0015
+
+    - label: "Does the device implement the Power attribute?"
+      id: PCC.S.A0016
+
+    - label: "Does the device implement the LifetimeEnergyConsumed attribute?"
+      id: PCC.S.A0017
+
+    - label: "Does the device implement the OperationMode attribute?"
+      id: PCC.S.A0020
+
+    - label: "Does the device implement the LifetimeEnergyConsumed attribute?"
+      id: PCC.S.A0021
+
+    #Power Source Cluster
+    - label: "Does the device implement the Status attribute?"
+      id: PS.S.A0000
+
+    - label: "Does the device implement the Order attribute?"
+      id: PS.S.A0001
+
+    - label: "Does the device implement the Description attribute?"
+      id: PS.S.A0002
+
+    - label:
+          "Does the device implement the WiredAssessedInputVoltage attribute?"
+      id: PS.S.A0003
+
+    - label:
+          "Does the device implement the WiredAssessedInputFrequency attribute?"
+      id: PS.S.A0004
+
+    - label: "Does the device implement the WiredCurrentType attribute?"
+      id: PS.S.A0005
+
+    - label: "Does the device implement the WiredAssessedCurrent attribute?"
+      id: PS.S.A0006
+
+    - label: "Does the device implement the WiredNominalVoltage attribute?"
+      id: PS.S.A0007
+
+    - label: "Does the device implement the WiredMaximumCurrent attribute?"
+      id: PS.S.A0008
+
+    - label: "Does the device implement the WiredPresent attribute?"
+      id: PS.S.A0009
+
+    - label: "Does the device implement the ActiveWiredFaults attribute?"
+      id: PS.S.A000a
+
+    - label: "Does the device implement the BatVoltage attribute?"
+      id: PS.S.A000b
+
+    - label: "Does the device implement the BatPercentRemaining attribute?"
+      id: PS.S.A000c
+
+    - label: "Does the device implement the BatTimeRemaining attribute?"
+      id: PS.S.A000d
+
+    - label: "Does the device implement the BatChargeLevel attribute?"
+      id: PS.S.A000e
+
+    - label: "Does the device implement the BatReplacementNeeded attribute?"
+      id: PS.S.A000f
+
+    - label: "Does the device implement the BatReplaceability attribute?"
+      id: PS.S.A0010
+
+    - label: "Does the device implement the BatPresent attribute?"
+      id: PS.S.A0011
+
+    - label: "Does the device implement the ActiveBatFaults attribute?"
+      id: PS.S.A0012
+
+    - label:
+          "Does the device implement the BatReplacementDescription attribute?"
+      id: PS.S.A0013
+
+    - label: "Does the device implement the BatCommonDesignation attribute?"
+      id: PS.S.A0014
+
+    - label: "Does the device implement the BatANSIDesignation attribute?"
+      id: PS.S.A0015
+
+    - label: "Does the device implement the BatIECDesignation attribute?"
+      id: PS.S.A0016
+
+    - label: "Does the device implement the BatApprovedChemistry attribute?"
+      id: PS.S.A0017
+
+    - label: "Does the device implement the BatCapacity attribute?"
+      id: PS.S.A0018
+
+    - label: "Does the device implement the BatQuantity attribute?"
+      id: PS.S.A0019
+
+    - label: "Does the device implement the BatChargeState attribute?"
+      id: PS.S.A001a
+
+    - label: "Does the device implement the BatTimeToFullCharge attribute?"
+      id: PS.S.A001b
+
+    - label:
+          "Does the device implement the BatFunctionalWhileCharging attribute?"
+      id: PS.S.A001c
+
+    - label: "Does the device implement the BatChargingCurrent attribute?"
+      id: PS.S.A001d
+
+    - label: "Does the device implement the ActiveBatChargeFaults attribute?"
+      id: PS.S.A001e
+
+    - label: "Does the device implement the WiredFaultChange event?"
+      id: PS.S.E00
+
+    - label: "Does the device implement the BatFaultChange event?"
+      id: PS.S.E01
+
+    - label: "Does the device implement the BatChargeFaultChange event?"
+      id: PS.S.E02
+
+    #Thermostat User Configuration Cluster
+    - label: "Does the device implement the TemperatureDisplayMode attribute?"
+      id: TSUIC.S.A0000
+
+    - label: "Does the device implement the KeypadLockout attribute?"
+      id: TSUIC.S.A0001
+
+    - label:
+          "Does the device implement the ScheduleProgrammingVisibility
+          attribute?"
+      id: TSUIC.S.A0002

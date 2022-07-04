@@ -29,9 +29,9 @@ tests:
                 value: nodeId
 
     - label: "Writes a value of 0 to TemperatureDisplayMode attribute of DUT"
+      PICS: TSUIC.S.A0000
       command: "writeAttribute"
       attribute: "temperature display mode"
-      PICS: A_TEMPERATURE_DISPLAY_MODE
       arguments:
           value: 0
 
@@ -47,16 +47,16 @@ tests:
                 value: "y"
 
     - label: "TH reads the TemperatureDisplayMode attribute of DUT"
+      PICS: TSUIC.S.A0000
       command: "readAttribute"
       attribute: "temperature display mode"
-      PICS: A_TEMPERATURE_DISPLAY_MODE
       arguments:
           value: 0
 
     - label: "Writes a value of 1 to TemperatureDisplayMode attribute of DUT"
+      PICS: TSUIC.S.A0000
       command: "writeAttribute"
       attribute: "temperature display mode"
-      PICS: A_TEMPERATURE_DISPLAY_MODE
       arguments:
           value: 1
 
@@ -72,34 +72,34 @@ tests:
                 value: "y"
 
     - label: "TH reads the TemperatureDisplayMode attribute of DUT"
+      PICS: TSUIC.S.A0000
       command: "readAttribute"
       attribute: "temperature display mode"
-      PICS: A_TEMPERATURE_DISPLAY_MODE
       response:
           value: 1
 
     - label:
           "Writes a value of greater than 1 to TemperatureDisplayMode attribute
           of DUT"
+      PICS: TSUIC.S.A0000
       command: "writeAttribute"
       attribute: "temperature display mode"
-      PICS: A_TEMPERATURE_DISPLAY_MODE
       arguments:
           value: 2
       response:
           error: CONSTRAINT_ERROR
 
     - label: "TH reads the TemperatureDisplayMode attribute of DUT"
+      PICS: TSUIC.S.A0000
       command: "readAttribute"
       attribute: "temperature display mode"
-      PICS: A_TEMPERATURE_DISPLAY_MODE
       response:
           value: 1
 
     - label: "Writes a value of 0 to KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "keypad lockout"
-      PICS: A_KEYPAD_LOCKOUT
       arguments:
           value: 0
 
@@ -115,16 +115,16 @@ tests:
                 value: "y"
 
     - label: "TH reads the KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "keypad lockout"
-      PICS: A_KEYPAD_LOCKOUT
       response:
           value: 0
 
     - label: "Writes a value of 1 to KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "keypad lockout"
-      PICS: A_KEYPAD_LOCKOUT
       arguments:
           value: 1
 
@@ -140,16 +140,16 @@ tests:
                 value: "y"
 
     - label: "TH reads the KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "keypad lockout"
-      PICS: A_KEYPAD_LOCKOUT
       response:
           value: 1
 
     - label: "Writes a value of 2 to KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "keypad lockout"
-      PICS: A_KEYPAD_LOCKOUT
       arguments:
           value: 2
 
@@ -165,16 +165,16 @@ tests:
                 value: "y"
 
     - label: "TH reads the KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "keypad lockout"
-      PICS: A_KEYPAD_LOCKOUT
       response:
           value: 2
 
     - label: "Writes a value of 3 to KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "keypad lockout"
-      PICS: A_KEYPAD_LOCKOUT
       arguments:
           value: 3
 
@@ -190,16 +190,16 @@ tests:
                 value: "y"
 
     - label: "TH reads the KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "keypad lockout"
-      PICS: A_KEYPAD_LOCKOUT
       response:
           value: 3
 
     - label: "Writes a value of 4 to KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "keypad lockout"
-      PICS: A_KEYPAD_LOCKOUT
       arguments:
           value: 4
 
@@ -215,16 +215,16 @@ tests:
                 value: "y"
 
     - label: "TH reads the KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "keypad lockout"
-      PICS: A_KEYPAD_LOCKOUT
       response:
           value: 4
 
     - label: "Writes a value of 5 to KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "keypad lockout"
-      PICS: A_KEYPAD_LOCKOUT
       arguments:
           value: 5
 
@@ -240,34 +240,34 @@ tests:
                 value: "y"
 
     - label: "TH reads the KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "keypad lockout"
-      PICS: A_KEYPAD_LOCKOUT
       response:
           value: 5
 
     - label:
           "Writes a value of greater than 5 to KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "keypad lockout"
-      PICS: A_KEYPAD_LOCKOUT
       arguments:
           value: 6
       response:
           error: CONSTRAINT_ERROR
 
     - label: "TH reads the KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "keypad lockout"
-      PICS: A_KEYPAD_LOCKOUT
       response:
           value: 5
 
     - label:
           "Writes a value of 0 to ScheduleProgrammingVisibility attribute of DUT"
+      PICS: TSUIC.S.A0001
       command: "writeAttribute"
       attribute: "schedule programming visibility"
-      PICS: A_SCHEDULE_PROGRAMMING_VISIBILITY
       arguments:
           value: 0
 
@@ -285,17 +285,17 @@ tests:
                 value: "y"
 
     - label: "TH reads the ScheduleProgrammingVisibility attribute of DUT"
+      PICS: TSUIC.S.A0002
       command: "readAttribute"
       attribute: "schedule programming visibility"
-      PICS: A_SCHEDULE_PROGRAMMING_VISIBILITY
       response:
           value: 0
 
     - label:
           "Writes a value of 1 to ScheduleProgrammingVisibility attribute of DUT"
+      PICS: TSUIC.S.A0002
       command: "writeAttribute"
       attribute: "schedule programming visibility"
-      PICS: A_SCHEDULE_PROGRAMMING_VISIBILITY
       arguments:
           value: 1
 
@@ -313,26 +313,26 @@ tests:
                 value: "y"
 
     - label: "TH reads the ScheduleProgrammingVisibility attribute of DUT"
+      PICS: TSUIC.S.A0002
       command: "readAttribute"
       attribute: "schedule programming visibility"
-      PICS: A_SCHEDULE_PROGRAMMING_VISIBILITY
       response:
           value: 1
 
     - label:
           "Writes a value of greater than 1 to ScheduleProgrammingVisibility
           attribute of DUT"
+      PICS: TSUIC.S.A0002
       command: "writeAttribute"
       attribute: "schedule programming visibility"
-      PICS: A_SCHEDULE_PROGRAMMING_VISIBILITY
       arguments:
           value: 2
       response:
           error: CONSTRAINT_ERROR
 
     - label: "TH reads the ScheduleProgrammingVisibility attribute of DUT"
+      PICS: TSUIC.S.A0002
       command: "readAttribute"
       attribute: "schedule programming visibility"
-      PICS: A_SCHEDULE_PROGRAMMING_VISIBILITY
       response:
           value: 1

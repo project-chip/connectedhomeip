@@ -347,7 +347,6 @@ function getManualTests() {
 
   const PressureMeasurement = [
     'Test_TC_PRS_2_2',
-    'Test_TC_PRS_2_3',
     'Test_TC_PRS_3_1',
   ];
 
