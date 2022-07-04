@@ -46,7 +46,10 @@ executable("fuzz-tlv-reader") {
 
   public_deps = [ "${chip_root}/src/lib/core" ]
 
-  public_configs = [ "//build/config/compiler:libfuzzer_fuzzing" ]
+  public_configs = [ 
+     "//build/config/compiler:libfuzzer_fuzzing",
+     "//build/config/compiler:sanitize_address", 
+  ]
 
   output_dir = "${root_out_dir}/tests"
 }
