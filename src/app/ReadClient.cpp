@@ -384,8 +384,7 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                          System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
-    bool suppressErrorStatusResponse = false;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(!IsIdle(), err = CHIP_ERROR_INCORRECT_STATE);
 
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
@@ -405,8 +404,8 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 
         CHIP_ERROR statusError = CHIP_NO_ERROR;
         SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
-        suppressErrorStatusResponse = true;
         SuccessOrExit(err = statusError);
+        err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
     else
     {
@@ -414,32 +413,25 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     }
 
 exit:
-    return ResponseMessageHandled(err, apExchangeContext, suppressErrorStatusResponse);
+    ResponseMessageHandled(err, apExchangeContext);
+    return err;
 }
 
-CHIP_ERROR ReadClient::ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
-                                    bool aSuppressErrorStatusResponse)
+void ReadClient::ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext)
 {
-    CHIP_ERROR err = aError;
     if (aError != CHIP_NO_ERROR)
     {
-        if (!aSuppressErrorStatusResponse)
+        CHIP_ERROR err = StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        if (err == CHIP_NO_ERROR)
         {
-            err = StatusResponse::Send(Status::InvalidAction, apExchangeContext,
-                                       false /*aExpectResponse*/);
-            if (err == CHIP_NO_ERROR)
-            {
-                mpExchangeCtx = nullptr;
-            }
+            mpExchangeCtx = nullptr;
         }
     }
 
-    if ((!IsSubscriptionType() && !mPendingMoreChunks) || err != CHIP_NO_ERROR)
+    if ((!IsSubscriptionType() && !mPendingMoreChunks) || aError != CHIP_NO_ERROR)
     {
         Close(aError);
     }
-
-    return err;
 }
 
 CHIP_ERROR ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext,
@@ -567,9 +559,7 @@ exit:
     if (!suppressResponse)
     {
         bool noResponseExpected = IsSubscriptionActive() && !mPendingMoreChunks;
-        err                     = StatusResponse::Send(err == CHIP_NO_ERROR ? Status::Success
-                                                        : Status::Failure,
-                                   mExchange.Get(),, !noResponseExpected);
+        err = StatusResponse::Send(err == CHIP_NO_ERROR ? Status::Success : Status::Failure, mExchange.Get(), !noResponseExpected);
     }
 
     mIsPrimingReports = false;

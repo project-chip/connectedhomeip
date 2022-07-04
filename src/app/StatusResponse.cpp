@@ -25,6 +25,7 @@ namespace app {
 CHIP_ERROR StatusResponse::Send(Protocols::InteractionModel::Status aStatus, Messaging::ExchangeContext * apExchangeContext,
                                 bool aExpectResponse)
 {
+    ChipLogProgress(InteractionModel, "send status response");
     VerifyOrReturnError(apExchangeContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
