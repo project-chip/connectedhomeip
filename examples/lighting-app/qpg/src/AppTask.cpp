@@ -37,9 +37,9 @@
 
 #include <inet/EndPointStateOpenThread.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <DeviceInfoProviderImpl.h>
 
 using namespace chip::TLV;
 using namespace chip::Credentials;
