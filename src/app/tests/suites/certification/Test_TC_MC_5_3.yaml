@@ -43,7 +43,7 @@ tests:
               type: list
 
     - label: "Reads the CurrentChannel attribute from the DUT"
-      PICS:	MC_CHANNEL.S.A0002
+      PICS: MC_CHANNEL.S.A0002
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
