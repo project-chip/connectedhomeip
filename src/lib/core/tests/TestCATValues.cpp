@@ -17,11 +17,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements unit tests for the CHIP TLV implementation.
- *
- */
 
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
