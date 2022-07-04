@@ -93,7 +93,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 282
+#define GENERATED_ATTRIBUTE_COUNT 301
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -215,7 +215,9 @@
               ZAP_EMPTY_DEFAULT() }, /* BasicCommissioningInfo */                                                                  \
             { 0x00000002, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* RegulatoryConfig */  \
             { 0x00000003, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
-              ZAP_EMPTY_DEFAULT() },                                         /* LocationCapability */                              \
+              ZAP_EMPTY_DEFAULT() }, /* LocationCapability */                                                                      \
+            { 0x00000004, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                              \
+              ZAP_EMPTY_DEFAULT() },                                         /* SupportsConcurrentConnection */                    \
             { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) }, /* FeatureMap */                                      \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },   /* ClusterRevision */                                 \
                                                                                                                                    \
@@ -446,15 +448,24 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },   /* ClusterRevision */                                 \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Identify (server) */                                                                          \
-            { 0x00000000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x0000) }, /* identify time */     \
-            { 0x00000001, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x0) },                                /* identify type */     \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },                               /* FeatureMap */        \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },                                 /* ClusterRevision */   \
+            { 0x00000000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x0) }, /* identify time */        \
+            { 0x00000001, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x05) },                            /* identify type */        \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },                            /* FeatureMap */           \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },                              /* ClusterRevision */      \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Groups (server) */                                                                            \
             { 0x00000000, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },    /* name support */                                    \
             { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) }, /* FeatureMap */                                      \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },   /* ClusterRevision */                                 \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Scenes (server) */                                                                            \
+            { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },      /* SceneCount */                                 \
+            { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },      /* CurrentScene */                               \
+            { 0x00000002, ZAP_TYPE(GROUP_ID), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* CurrentGroup */                               \
+            { 0x00000003, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* SceneValid */                                 \
+            { 0x00000004, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },         /* NameSupport */                                \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },      /* FeatureMap */                                 \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },        /* ClusterRevision */                            \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Descriptor (server) */                                                                        \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* device list */      \
@@ -506,10 +517,25 @@
             { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0x0017) }, /* FeatureMap */                                 \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(5) },        /* ClusterRevision */                            \
                                                                                                                                    \
+            /* Endpoint: 2, Cluster: Identify (server) */                                                                          \
+            { 0x00000000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x0) }, /* identify time */        \
+            { 0x00000001, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x05) },                            /* identify type */        \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },                            /* FeatureMap */           \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },                              /* ClusterRevision */      \
+                                                                                                                                   \
             /* Endpoint: 2, Cluster: Groups (server) */                                                                            \
             { 0x00000000, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },    /* name support */                                    \
             { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) }, /* FeatureMap */                                      \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },   /* ClusterRevision */                                 \
+                                                                                                                                   \
+            /* Endpoint: 2, Cluster: Scenes (server) */                                                                            \
+            { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },      /* SceneCount */                                 \
+            { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },      /* CurrentScene */                               \
+            { 0x00000002, ZAP_TYPE(GROUP_ID), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* CurrentGroup */                               \
+            { 0x00000003, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* SceneValid */                                 \
+            { 0x00000004, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },         /* NameSupport */                                \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },      /* FeatureMap */                                 \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },        /* ClusterRevision */                            \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Descriptor (server) */                                                                        \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* device list */      \
@@ -586,6 +612,9 @@
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayGroupsServer[] = {                                                            \
         (EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback,                                                    \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayScenesServer[] = {                                                            \
+        (EmberAfGenericClusterFunction) emberAfScenesClusterServerInitCallback,                                                    \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayWindowCoveringServer[] = {                                                    \
         (EmberAfGenericClusterFunction) MatterWindowCoveringClusterServerAttributeChangedCallback,                                 \
@@ -688,8 +717,26 @@
   0x00000002 /* GetGroupMembershipResponse */, \
   0x00000003 /* RemoveGroupResponse */, \
   chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 1, Cluster: Window Covering (server) */\
+  /* Endpoint: 1, Cluster: Scenes (server) */\
   /*   AcceptedCommandList (index=68) */ \
+  0x00000000 /* AddScene */, \
+  0x00000001 /* ViewScene */, \
+  0x00000002 /* RemoveScene */, \
+  0x00000003 /* RemoveAllScenes */, \
+  0x00000004 /* StoreScene */, \
+  0x00000005 /* RecallScene */, \
+  0x00000006 /* GetSceneMembership */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /*   GeneratedCommandList (index=76)*/ \
+  0x00000000 /* AddSceneResponse */, \
+  0x00000001 /* ViewSceneResponse */, \
+  0x00000002 /* RemoveSceneResponse */, \
+  0x00000003 /* RemoveAllScenesResponse */, \
+  0x00000004 /* StoreSceneResponse */, \
+  0x00000006 /* GetSceneMembershipResponse */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 1, Cluster: Window Covering (server) */\
+  /*   AcceptedCommandList (index=83) */ \
   0x00000000 /* UpOrOpen */, \
   0x00000001 /* DownOrClose */, \
   0x00000002 /* StopMotion */, \
@@ -698,8 +745,12 @@
   0x00000007 /* GoToTiltValue */, \
   0x00000008 /* GoToTiltPercentage */, \
   chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 2, Cluster: Identify (server) */\
+  /*   AcceptedCommandList (index=91) */ \
+  0x00000000 /* Identify */, \
+  chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 2, Cluster: Groups (server) */\
-  /*   AcceptedCommandList (index=76) */ \
+  /*   AcceptedCommandList (index=93) */ \
   0x00000000 /* AddGroup */, \
   0x00000001 /* ViewGroup */, \
   0x00000002 /* GetGroupMembership */, \
@@ -707,14 +758,32 @@
   0x00000004 /* RemoveAllGroups */, \
   0x00000005 /* AddGroupIfIdentifying */, \
   chip::kInvalidCommandId /* end of list */, \
-  /*   GeneratedCommandList (index=83)*/ \
+  /*   GeneratedCommandList (index=100)*/ \
   0x00000000 /* AddGroupResponse */, \
   0x00000001 /* ViewGroupResponse */, \
   0x00000002 /* GetGroupMembershipResponse */, \
   0x00000003 /* RemoveGroupResponse */, \
   chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 2, Cluster: Scenes (server) */\
+  /*   AcceptedCommandList (index=105) */ \
+  0x00000000 /* AddScene */, \
+  0x00000001 /* ViewScene */, \
+  0x00000002 /* RemoveScene */, \
+  0x00000003 /* RemoveAllScenes */, \
+  0x00000004 /* StoreScene */, \
+  0x00000005 /* RecallScene */, \
+  0x00000006 /* GetSceneMembership */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /*   GeneratedCommandList (index=113)*/ \
+  0x00000000 /* AddSceneResponse */, \
+  0x00000001 /* ViewSceneResponse */, \
+  0x00000002 /* RemoveSceneResponse */, \
+  0x00000003 /* RemoveAllScenesResponse */, \
+  0x00000004 /* StoreSceneResponse */, \
+  0x00000006 /* GetSceneMembershipResponse */, \
+  chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 2, Cluster: Window Covering (server) */\
-  /*   AcceptedCommandList (index=88) */ \
+  /*   AcceptedCommandList (index=120) */ \
   0x00000000 /* UpOrOpen */, \
   0x00000001 /* DownOrClose */, \
   0x00000002 /* StopMotion */, \
@@ -728,7 +797,7 @@
 // clang-format on
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 30
+#define GENERATED_CLUSTER_COUNT 31
 
 // clang-format off
 #define GENERATED_CLUSTERS { \
@@ -835,7 +904,7 @@
       /* Endpoint: 0, Cluster: General Commissioning (server) */ \
       .clusterId = 0x00000030,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(63), \
-      .attributeCount = 6, \
+      .attributeCount = 7, \
       .clusterSize = 14, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
@@ -845,7 +914,7 @@
   { \
       /* Endpoint: 0, Cluster: Network Commissioning (server) */ \
       .clusterId = 0x00000031,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(69), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(70), \
       .attributeCount = 10, \
       .clusterSize = 48, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -856,7 +925,7 @@
   { \
       /* Endpoint: 0, Cluster: General Diagnostics (server) */ \
       .clusterId = 0x00000033,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(79), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(80), \
       .attributeCount = 11, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -867,7 +936,7 @@
   { \
       /* Endpoint: 0, Cluster: Software Diagnostics (server) */ \
       .clusterId = 0x00000034,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(90), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(91), \
       .attributeCount = 6, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -878,7 +947,7 @@
   { \
       /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */ \
       .clusterId = 0x00000035,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(96), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(97), \
       .attributeCount = 65, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -889,7 +958,7 @@
   { \
       /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */ \
       .clusterId = 0x00000036,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(161), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(162), \
       .attributeCount = 15, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -900,7 +969,7 @@
   { \
       /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */ \
       .clusterId = 0x00000037,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(176), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(177), \
       .attributeCount = 11, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -911,7 +980,7 @@
   { \
       /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */ \
       .clusterId = 0x0000003C,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(187), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(188), \
       .attributeCount = 5, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -922,7 +991,7 @@
   { \
       /* Endpoint: 0, Cluster: Operational Credentials (server) */ \
       .clusterId = 0x0000003E,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(192), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(193), \
       .attributeCount = 8, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -933,7 +1002,7 @@
   { \
       /* Endpoint: 0, Cluster: Group Key Management (server) */ \
       .clusterId = 0x0000003F,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(200), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(201), \
       .attributeCount = 6, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -944,7 +1013,7 @@
   { \
       /* Endpoint: 0, Cluster: Fixed Label (server) */ \
       .clusterId = 0x00000040,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(206), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(207), \
       .attributeCount = 3, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -955,7 +1024,7 @@
   { \
       /* Endpoint: 0, Cluster: User Label (server) */ \
       .clusterId = 0x00000041,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(209), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(210), \
       .attributeCount = 3, \
       .clusterSize = 6, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -966,7 +1035,7 @@
   { \
       /* Endpoint: 1, Cluster: Identify (server) */ \
       .clusterId = 0x00000003,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(212), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(213), \
       .attributeCount = 4, \
       .clusterSize = 9, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
@@ -977,7 +1046,7 @@
   { \
       /* Endpoint: 1, Cluster: Groups (server) */ \
       .clusterId = 0x00000004,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(216), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(217), \
       .attributeCount = 3, \
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
@@ -986,20 +1055,20 @@
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 63 ) ,\
     },\
   { \
-      /* Endpoint: 1, Cluster: Scenes (client) */ \
+      /* Endpoint: 1, Cluster: Scenes (server) */ \
       .clusterId = 0x00000005,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(219), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(CLIENT), \
-      .functions = NULL, \
-      .acceptedCommandList = nullptr ,\
-      .generatedCommandList = nullptr ,\
+      .attributes = ZAP_ATTRIBUTE_INDEX(220), \
+      .attributeCount = 7, \
+      .clusterSize = 12, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .functions = chipFuncArrayScenesServer, \
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 68 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 76 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(219), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(227), \
       .attributeCount = 6, \
       .clusterSize = 4, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1010,40 +1079,51 @@
   { \
       /* Endpoint: 1, Cluster: Window Covering (server) */ \
       .clusterId = 0x00000102,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(225), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(233), \
       .attributeCount = 24, \
       .clusterSize = 43, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayWindowCoveringServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 68 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 83 ) ,\
+      .generatedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 2, Cluster: Identify (server) */ \
+      .clusterId = 0x00000003,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(257), \
+      .attributeCount = 4, \
+      .clusterSize = 9, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
+      .functions = chipFuncArrayIdentifyServer, \
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 91 ) ,\
       .generatedCommandList = nullptr ,\
     },\
   { \
       /* Endpoint: 2, Cluster: Groups (server) */ \
       .clusterId = 0x00000004,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(249), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(261), \
       .attributeCount = 3, \
       .clusterSize = 7, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayGroupsServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 76 ) ,\
-      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 83 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 93 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 100 ) ,\
     },\
   { \
-      /* Endpoint: 2, Cluster: Scenes (client) */ \
+      /* Endpoint: 2, Cluster: Scenes (server) */ \
       .clusterId = 0x00000005,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(252), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(CLIENT), \
-      .functions = NULL, \
-      .acceptedCommandList = nullptr ,\
-      .generatedCommandList = nullptr ,\
+      .attributes = ZAP_ATTRIBUTE_INDEX(264), \
+      .attributeCount = 7, \
+      .clusterSize = 12, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .functions = chipFuncArrayScenesServer, \
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 105 ) ,\
+      .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 113 ) ,\
     },\
   { \
       /* Endpoint: 2, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(252), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(271), \
       .attributeCount = 6, \
       .clusterSize = 4, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1054,12 +1134,12 @@
   { \
       /* Endpoint: 2, Cluster: Window Covering (server) */ \
       .clusterId = 0x00000102,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(258), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(277), \
       .attributeCount = 24, \
       .clusterSize = 43, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayWindowCoveringServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 88 ) ,\
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 120 ) ,\
       .generatedCommandList = nullptr ,\
     },\
 }
@@ -1068,12 +1148,12 @@
 
 #define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
 
-#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 27
+#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 30
 
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 21, 318 }, { ZAP_CLUSTER_INDEX(21), 5, 63 }, { ZAP_CLUSTER_INDEX(26), 4, 54 },                     \
+        { ZAP_CLUSTER_INDEX(0), 21, 318 }, { ZAP_CLUSTER_INDEX(21), 5, 75 }, { ZAP_CLUSTER_INDEX(26), 5, 75 },                     \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1085,7 +1165,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (41)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (435)
+#define ATTRIBUTE_MAX_SIZE (468)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (3)
