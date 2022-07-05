@@ -29,6 +29,7 @@ assert(chip_root == "//")
 
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/build/chip/fuzz_test.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
 
@@ -40,9 +41,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         (current_os == "mac" || current_os == "linux") &&
         (host_cpu == "x64" || host_cpu == "arm64" || host_cpu == "arm")
     enable_pylib = false
-
-    enable_fuzz_test_targets =
-        is_clang && (current_os == "linux" || current_os == "mac")
   }
 
   if (enable_fuzz_test_targets) {

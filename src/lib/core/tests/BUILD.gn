@@ -16,9 +16,8 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
-import("${build_root}/config/compiler/compiler.gni")
-
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/fuzz_test.gni")
 
 chip_test_suite("tests") {
   output_name = "libCoreTests"
@@ -42,15 +41,9 @@ chip_test_suite("tests") {
   ]
 }
 
-executable("fuzz-tlv-reader") {
-  sources = [ "FuzzTlvReader.cpp" ]
-
-  public_deps = [ "${chip_root}/src/lib/core" ]
-
-  public_configs = [
-    "//build/config/compiler:libfuzzer_fuzzing",
-    "//build/config/compiler:sanitize_address",
-  ]
-
-  output_dir = "${root_out_dir}/tests"
+if (enable_fuzz_test_targets) {
+  chip_fuzz_target("fuzz-tlv-reader") {
+    sources = [ "FuzzTlvReader.cpp" ]
+    public_deps = [ "${chip_root}/src/lib/core" ]
+  }
 }

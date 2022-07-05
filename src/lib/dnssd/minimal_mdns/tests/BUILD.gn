@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/fuzz_test.gni")
 
 chip_test_suite("tests") {
   output_name = "libMinimalMdnstests"
@@ -43,15 +44,9 @@ chip_test_suite("tests") {
   ]
 }
 
-executable("fuzz-minmdns-packet-parsing") {
-  sources = [ "FuzzPacketParsing.cpp" ]
-
-  public_deps = [ "${chip_root}/src/lib/dnssd/minimal_mdns" ]
-
-  public_configs = [
-    "//build/config/compiler:libfuzzer_fuzzing",
-    "//build/config/compiler:sanitize_address",
-  ]
-
-  output_dir = "${root_out_dir}/tests"
+if (enable_fuzz_test_targets) {
+  chip_fuzz_target("fuzz-minmdns-packet-parsing") {
+    sources = [ "FuzzPacketParsing.cpp" ]
+    public_deps = [ "${chip_root}/src/lib/dnssd/minimal_mdns" ]
+  }
 }
