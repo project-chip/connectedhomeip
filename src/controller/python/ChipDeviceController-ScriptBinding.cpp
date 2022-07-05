@@ -369,8 +369,6 @@ ChipError::StorageType pychip_DeviceController_SetWiFiCredentials(const char * s
 
     sCommissioningParameters.SetWiFiCredentials(
         chip::Controller::WiFiCredentials(ByteSpan(sSsidBuf.Get(), ssidSize), ByteSpan(sCredsBuf.Get(), credsSize)));
-    char tmp[128];
-    chip::Platform::CopyString(tmp, sCommissioningParameters.GetWiFiCredentials().Value().ssid);
     return CHIP_NO_ERROR.AsInteger();
 }
 
