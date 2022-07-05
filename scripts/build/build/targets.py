@@ -308,6 +308,7 @@ def HostTargets():
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
     for board in [HostBoard.NATIVE, HostBoard.FAKE]:
         yield test_target.Extend(board.BoardName() + '-tests', board=board, app=HostApp.TESTS)
+        yield test_target.Extend(board.BoardName() + '-tests-clang', board=board, app=HostApp.TESTS, use_clang=True)
 
 
 def Esp32Targets():
