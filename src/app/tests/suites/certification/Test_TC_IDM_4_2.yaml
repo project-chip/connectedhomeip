@@ -13,7 +13,9 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 20.4.2. [TC-IDM-4.2] Subscription Response Messages from DUT Test Cases
+name:
+    21.4.2. [TC-IDM-4.2] Subscription Response Messages from DUT Test Cases.
+    [{DUT_Server}]
 
 config:
     nodeId: 0x12344321
@@ -191,21 +193,6 @@ tests:
           [1654861525.174252][32132:32137] CHIP:DMG: }
           [1654861525.174390][32132:32137] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
           [1654861525.174448][32132:32137] CHIP:DMG: MoveToState ReadClient[0xaaaac3e723c0]: Moving to [AwaitingSu]
-          [1654861525.174539][32132:32137] CHIP:EM: Piggybacking Ack for MessageCounter:84810773 on exchange: 49933i
-          [1654861525.174618][32132:32137] CHIP:IN: Prepared secure message 0xaaaac3e8e388 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 49933i with MessageCounter:22480748.
-          [1654861525.174669][32132:32137] CHIP:IN: Sending encrypted msg 0xaaaac3e8e388 with MessageCounter:22480748 to 0x0000000000000001 (1) at monotonic time: 00000000019A8CF5 msec
-          [1654861525.175785][32132:32137] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:84810774 on exchange 49933i
-          [1654861525.175832][32132:32137] CHIP:EM: Found matching exchange: 49933i, Delegate: 0xaaaac3e723c0
-          [1654861525.175877][32132:32137] CHIP:EM: Rxd Ack; Removing MessageCounter:22480748 from Retrans Table on exchange 49933i
-          [1654861525.175912][32132:32137] CHIP:EM: Removed CHIP MessageCounter:22480748 from RetransTable on exchange 49933i
-          [1654861525.175999][32132:32137] CHIP:DMG: SubscribeResponseMessage =
-          [1654861525.176039][32132:32137] CHIP:DMG: {
-          [1654861525.176073][32132:32137] CHIP:DMG:         SubscriptionId = 0xa6e75c5a,
-          [1654861525.176116][32132:32137] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
-          [1654861525.176154][32132:32137] CHIP:DMG:         MaxIntervalCeilingSeconds = 0xbb8,
-          [1654861525.176191][32132:32137] CHIP:DMG:         InteractionModelRevision = 1
-          [1654861525.176226][32132:32137] CHIP:DMG: }
-          [1654861525.176268][32132:32137] CHIP:DMG: Subscription established with SubscriptionID = 0xa6e75c5a MinInterval = 100s MaxInterval = 3000s Peer = 01:0000000000000001
       disabled: true
 
     - label:
@@ -249,23 +236,7 @@ tests:
           [1654862486.786685][32309:32314] CHIP:DMG:         InteractionModelRevision = 1
           [1654862486.786720][32309:32314] CHIP:DMG: }
           [1654862486.786862][32309:32314] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1654862486.786918][32309:32314] CHIP:DMG: MoveToState ReadClient[0xffff840040e0]: Moving to [AwaitingSu]
-          [1654862486.786977][32309:32314] CHIP:EM: Piggybacking Ack for MessageCounter:50225771 on exchange: 12667i
-          [1654862486.787050][32309:32314] CHIP:IN: Prepared secure message 0xaaab0afd31d8 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 12667i with MessageCounter:57280470.
-          [1654862486.787101][32309:32314] CHIP:IN: Sending encrypted msg 0xaaab0afd31d8 with MessageCounter:57280470 to 0x0000000000000001 (1) at monotonic time: 0000000001A93942 msec
-          [1654862486.788415][32309:32314] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:50225772 on exchange 12667i
-          [1654862486.788461][32309:32314] CHIP:EM: Found matching exchange: 12667i, Delegate: 0xffff840040e0
-          [1654862486.788504][32309:32314] CHIP:EM: Rxd Ack; Removing MessageCounter:57280470 from Retrans Table on exchange 12667i
-          [1654862486.788539][32309:32314] CHIP:EM: Removed CHIP MessageCounter:57280470 from RetransTable on exchange 12667i
-          [1654862486.788597][32309:32314] CHIP:DMG: SubscribeResponseMessage =
-          [1654862486.788636][32309:32314] CHIP:DMG: {
-          [1654862486.788671][32309:32314] CHIP:DMG:         SubscriptionId = 0x111a3e69,
-          [1654862486.788709][32309:32314] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
-          [1654862486.788747][32309:32314] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
-          [1654862486.788783][32309:32314] CHIP:DMG:         InteractionModelRevision = 1
-          [1654862486.788817][32309:32314] CHIP:DMG: }
-          [1654862486.788904][32309:32314] CHIP:DMG: Subscription established with SubscriptionID = 0x111a3e69 MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
-          [1654862486.788947][32309:32314] CHIP:DMG: MoveToState ReadClient[0xffff840040e0]: Moving to [Subscripti]
+          [1654862486.786918][32309:32314] CHIP:DMG: MoveToState ReadClient[0xffff840040e0]: Moving to
       disabled: true
 
     - label:
@@ -274,17 +245,43 @@ tests:
           all endpoints on a Node for which it does not have access.
           AttributePath = [[ ]]."
       verification: |
-          Waiting For Test-Plan author for more input. Verification step upadte is in progress
+          Out of Scope for V1.0
       disabled: true
 
     - label:
-          "DUT sends a subscription request action for an attribute with an
-          empty DataVersionFilters field. DUT sends a report data action with
-          the data of the attribute along with the data version. Tear down the
+          "TH sends a subscription request action for an attribute with an empty
+          DataVersionFilters field. DUT sends a report data action with the data
+          of the attribute along with the data version. Tear down the
           subscription for that attribute. Start another subscription with the
           DataVersionFilter field set to the data version received above."
       verification: |
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1451
+          ./chip-tool onoff  subscribe start-up-on-off  50 800 1 1
+          [1655893106.834876][1656:1661] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_4003 DataVersion: 633563796
+          [1655893106.834928][1656:1661] CHIP:TOO:   StartUpOnOff: null
+          [1655893106.834980][1656:1661] CHIP:DMG: MoveToState ReadClient[0xffff90003ab0]: Moving to [AwaitingSu]
+
+          ./chip-tool onoff  subscribe start-up-on-off  50 800 1 1 --data-version 0x25c36a94
+          [1655893181.169225][1664:1669] CHIP:EM: Removed CHIP MessageCounter:96233214 from RetransTable on exchange 43726i
+          [1655893181.169289][1664:1669] CHIP:DMG: ReportDataMessage =
+          [1655893181.169344][1664:1669] CHIP:DMG: {
+          [1655893181.169381][1664:1669] CHIP:DMG:         SubscriptionId = 0xde0c12dc,
+          [1655893181.169432][1664:1669] CHIP:DMG:         InteractionModelRevision = 1
+          [1655893181.169468][1664:1669] CHIP:DMG: }
+          [1655893181.169533][1664:1669] CHIP:DMG: MoveToState ReadClient[0xffff98002df0]: Moving to [AwaitingSu]
+          [1655893181.169610][1664:1669] CHIP:EM: Piggybacking Ack for MessageCounter:253027362 on exchange: 43726i
+          [1655893181.169684][1664:1669] CHIP:IN: Prepared secure message 0xaaaaeeb6fb78 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 43726i with MessageCounter:96233215.
+          [1655893181.169734][1664:1669] CHIP:IN: Sending encrypted msg 0xaaaaeeb6fb78 with MessageCounter:96233215 to 0x0000000000000001 (1) at monotonic time: 000000000038773B msec
+          [1655893181.171142][1664:1669] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:253027363 on exchange 43726i
+          [1655893181.171186][1664:1669] CHIP:EM: Found matching exchange: 43726i, Delegate: 0xffff98002df0
+          [1655893181.171230][1664:1669] CHIP:EM: Rxd Ack; Removing MessageCounter:96233215 from Retrans Table on exchange 43726i
+          [1655893181.171265][1664:1669] CHIP:EM: Removed CHIP MessageCounter:96233215 from RetransTable on exchange 43726i
+          [1655893181.171321][1664:1669] CHIP:DMG: SubscribeResponseMessage =
+          [1655893181.171359][1664:1669] CHIP:DMG: {
+          [1655893181.171395][1664:1669] CHIP:DMG:         SubscriptionId = 0xde0c12dc,
+          [1655893181.171436][1664:1669] CHIP:DMG:         MaxInterval = 0x320,
+          [1655893181.171473][1664:1669] CHIP:DMG:         InteractionModelRevision = 1
+          [1655893181.171507][1664:1669] CHIP:DMG: }
+          [1655893181.171545][1664:1669] CHIP:DMG: Subscription established with SubscriptionID = 0xde0c12dc MinInterval = 0s MaxInterval = 800s Peer = 01:0000000000000001
       disabled: true
 
     - label:
@@ -349,8 +346,8 @@ tests:
 
           [1654863279.009335][32383:32388] CHIP:DMG: StatusResponseMessage =
           [1654863279.009366][32383:32388] CHIP:DMG: {
-          [1654863279.009402][32383:32388] CHIP:DMG: 	Status = 0x01 (FAILURE),
-          [1654863279.009430][32383:32388] CHIP:DMG: 	InteractionModelRevision = 1
+          [1654863279.009402][32383:32388] CHIP:DMG:         Status = 0x01 (FAILURE),
+          [1654863279.009430][32383:32388] CHIP:DMG:         InteractionModelRevision = 1
           [1654863279.009455][32383:32388] CHIP:DMG: }
           [1654863279.009491][32383:32388] CHIP:IM: Received status response, status is 0x01 (FAILURE)
           [1654863279.009531][32383:32388] CHIP:DMG: mResubscribePolicy is null

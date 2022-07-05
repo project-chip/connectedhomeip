@@ -29,6 +29,7 @@ tests:
       disabled: true
 
     - label: "DUT reads OccupancySensorType attribute from TH"
+      PICS: OCC.C.A0001
       verification: |
           ./chip-tool occupancysensing read occupancy-sensor-type 1 1
 
@@ -39,6 +40,7 @@ tests:
       disabled: true
 
     - label: "DUT reads OccupancySensorTypeBitmap attribute from TH"
+      PICS: OCC.C.A0002
       verification: |
           ./chip-tool occupancysensing read occupancy-sensor-type-bitmap 1 1
 
