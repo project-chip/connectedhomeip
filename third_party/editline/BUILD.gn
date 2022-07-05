@@ -26,7 +26,7 @@ static_library("editline") {
     "repo/src/unix.h",
   ]
 
-  public_configs = [":editline_config"]
+  public_configs = [ ":editline_config" ]
 
-  include_dirs = ["include"]
+  include_dirs = [ "include" ]
 }
