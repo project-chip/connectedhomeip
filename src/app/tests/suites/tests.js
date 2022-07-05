@@ -15,15 +15,14 @@
  *    limitations under the License.
  */
 
-function disable(testName)
-{
-  const index = this.indexOf(testName);
-  if (index == -1) {
-    const errStr = `Test ${testName}  does not exists.`;
-    throw new Error(errStr);
-  }
+function disable(testName) {
+    const index = this.indexOf(testName);
+    if (index == -1) {
+        const errStr = `Test ${testName}  does not exists.`;
+        throw new Error(errStr);
+    }
 
-  this.splice(index, 1);
+    this.splice(index, 1);
 }
 
 // clang-format off
@@ -319,6 +318,7 @@ function getManualTests() {
     const FlowMeasurement = ["Test_TC_FLW_2_2", "Test_TC_FLW_3_1"];
 
     const OccupancySensing = [
+        "Test_TC_OCC_2_2",
         "Test_TC_OCC_2_3",
         "Test_TC_OCC_2_4",
         "Test_TC_OCC_3_1",
@@ -359,7 +359,11 @@ function getManualTests() {
         "Test_TC_LCFG_3_1",
     ];
 
-    const LevelControl = ["Test_TC_LVL_2_3", "Test_TC_LVL_8_1"];
+    const LevelControl = [
+        "Test_TC_LVL_2_3",
+        "Test_TC_LVL_7_1",
+        "Test_TC_LVL_8_1",
+    ];
 
     const OnOff = ["Test_TC_OO_2_3", "Test_TC_OO_3_1", "Test_TC_OO_3_2"];
 
@@ -410,7 +414,12 @@ function getManualTests() {
         "Test_TC_FLABEL_2_2",
     ];
 
-    const Binding = ["Test_TC_BIND_1_1", "Test_TC_BIND_2_1"];
+    const Binding = [
+        "Test_TC_BIND_1_1",
+        "Test_TC_BIND_2_1",
+        "Test_TC_BIND_2_2",
+        "Test_TC_BIND_2_3",
+    ];
 
     const Scenes = [
         "Test_TC_S_1_1",
@@ -782,5 +791,5 @@ function getTests() {
 //
 // Module exports
 //
-exports.getTests       = getTests;
+exports.getTests = getTests;
 exports.getManualTests = getManualTests;

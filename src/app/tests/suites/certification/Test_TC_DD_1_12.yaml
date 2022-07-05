@@ -13,7 +13,9 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.1.12. [TC-DD-1.12] Onboarding Payload Verification - Custom Flow = 0
+name:
+    3.1.12. [TC-DD-1.12] Onboarding Payload Verification - Custom Flow = 0 [DUT
+    - Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -21,80 +23,49 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Scan the DUTs QR code using a QR code reader"
+    - label: "Scan the DUTs QR code using the TH."
       verification: |
-          1. Get the QR code from the DUT
-          16-MacBook-Pro:connectedhomeip liam$ ./out/lighting-app/chip-lighting-app
-          [1641836544619] [16162:695667] CHIP: [DL] _Init
-          [1641836544619] [16162:695667] CHIP: [DL] Device Configuration:
-          [1641836544619] [16162:695667] CHIP: [DL]   Serial Number: TEST_SN
-          [1641836544619] [16162:695667] CHIP: [DL]   Vendor Id: 9050 (0x235A)
-          [1641836544619] [16162:695667] CHIP: [DL]   Product Id: 65279 (0xFEFF)
-          [1641836544619] [16162:695667] CHIP: [DL]   Hardware Version: 0
-          [1641836544619] [16162:695667] CHIP: [DL]   Setup Pin Code: 20202021
-          [1641836544619] [16162:695667] CHIP: [DL]   Setup Discriminator: 3840 (0xF00)
-          [1641836544619] [16162:695667] CHIP: [DL]   Manufacturing Date: (not set)
-          [1641836544619] [16162:695667] CHIP: [DL]   Device Type: 257 (0x101)
-          [1641836544619] [16162:695667] CHIP: [SVR] SetupQRCode: [MT:YNJV7VSC00KA0648G00]
-          [1641836544619] [16162:695667] CHIP: [SVR] Copy/paste the below URL in a browser to see the QR Code:
-          [1641836544619] [16162:695667] CHIP: [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00KA0648G00
-          [1641836544619] [16162:695667] CHIP: [SVR] Manual pairing code: [34970112332]
+          1. Run DUT. Example for DUT=all-clusters app
+          $ ./out/all-clusters-app/chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 0 --capabilities 4 --discriminator 3840 --passcode 20202021
 
-
-          2. Parse the DUT's QR Code using the TH commissioner: chip-tool
-          16-MacBook-Pro:connectedhomeip liam$  ./examples/chip-tool/out/debug/chip-tool payload parse-setup-payload MT:YNJV7VSC00KA0648G00
-          [1641836844939] [16334:698889] CHIP: [SPL] Parsing base38Representation: MT:YNJV7VSC00KA0648G00
-          [1641836844940] [16334:698889] CHIP: [SPL] CommissioningFlow: 0
-          [1641836844940] [16334:698889] CHIP: [SPL] VendorID: 9050
-          [1641836844940] [16334:698889] CHIP: [SPL] Version: 0
-          [1641836844940] [16334:698889] CHIP: [SPL] ProductID: 65279
-          [1641836844940] [16334:698889] CHIP: [SPL] Discriminator: 3840
-          [1641836844940] [16334:698889] CHIP: [SPL] SetUpPINCode: 20202021
-          [1641836844940] [16334:698889] CHIP: [SPL] RendezvousInformation: 2
-      disabled: true
-
-    - label: "Verify Custom payload support"
-      verification: |
-          1. Custom Flow bit in the Onboarding Payload QR Code is set to 0 (Standard Flow)
-
-          16-MacBook-Pro:connectedhomeip liam$  ./examples/chip-tool/out/debug/chip-tool payload parse-setup-payload MT:YNJV7VSC00KA0648G00
-          [1641836844939] [16334:698889] CHIP: [SPL] Parsing base38Representation: MT:YNJV7VSC00KA0648G00
-          [1641836844940] [16334:698889] CHIP: [SPL] CommissioningFlow: 0
-          [1641836844940] [16334:698889] CHIP: [SPL] VendorID: 9050
-          [1641836844940] [16334:698889] CHIP: [SPL] Version: 0
-          [1641836844940] [16334:698889] CHIP: [SPL] ProductID: 65279
-          [1641836844940] [16334:698889] CHIP: [SPL] Discriminator: 3840
-          [1641836844940] [16334:698889] CHIP: [SPL] SetUpPINCode: 20202021
-          [1641836844940] [16334:698889] CHIP: [SPL] RendezvousInformation: 2
+          2. Parse onboarding payload using TH=chip-tool
+          $  ./out/chip-tool/chip-tool payload parse-setup-payload MT:-24J0AFN00KA0648G00
+          [1651193251086] [15494:447566] CHIP: [SPL] Parsing base38Representation: MT:-24J0AFN00KA0648G00
+          [1651193251087] [15494:447566] CHIP: [SPL] CommissioningFlow: 0
+          [1651193251087] [15494:447566] CHIP: [SPL] VendorID: 65521
+          [1651193251087] [15494:447566] CHIP: [SPL] Version: 0
+          [1651193251087] [15494:447566] CHIP: [SPL] ProductID: 32769
+          [1651193251087] [15494:447566] CHIP: [SPL] Discriminator: 3840
+          [1651193251087] [15494:447566] CHIP: [SPL] SetUpPINCode: 20202021
+          [1651193251087] [15494:447566] CHIP: [SPL] RendezvousInformation: 4
       disabled: true
 
     - label:
-          "if custom flow bit in step 2 is equal to 0 (Standard flow), reboot
-          the device"
+          "Verify that the TH presents the user with a pairing hint in the
+          CommissioningModeInitialStepsHint field of the DCL. Verify that the
+          CommissioningCustomFlow field is set to a value = 0"
       verification: |
-          1. Reboot the DUT
-          2. Verfy that the DUT enters commissioningmode upon power up
+          1. Verify CommissioningCustomFlow=0
+          2. Verify CommissioningModeInitialStepsHint contains a valid, non-zero integer = 1 for Standard Commissioning flow
+      disabled: true
 
-          [1641836544690] [16162:695667] CHIP: [DL] Device Configuration:
-          [1641836544690] [16162:695667] CHIP: [DL]   Serial Number: TEST_SN
-          [1641836544690] [16162:695667] CHIP: [DL]   Vendor Id: 9050 (0x235A)
-          [1641836544690] [16162:695667] CHIP: [DL]   Product Id: 65279 (0xFEFF)
-          [1641836544690] [16162:695667] CHIP: [DL]   Hardware Version: 0
-          [1641836544690] [16162:695667] CHIP: [DL]   Setup Pin Code: 20202021
-          [1641836544690] [16162:695667] CHIP: [DL]   Setup Discriminator: 3840 (0xF00)
-          [1641836544690] [16162:695667] CHIP: [DL]   Manufacturing Date: (not set)
-          [1641836544690] [16162:695667] CHIP: [DL]   Device Type: 257 (0x101)
-          [1641836544690] [16162:695667] CHIP: [SVR] SetupQRCode: [MT:YNJV7VSC00KA0648G00]
-          [1641836544690] [16162:695667] CHIP: [SVR] Copy/paste the below URL in a browser to see the QR Code:
-          [1641836544690] [16162:695667] CHIP: [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00KA0648G00
-          [1641836544690] [16162:695667] CHIP: [SVR] Manual pairing code: [34970112332]
-          [1641836544690] [16162:695684] CHIP: [DL] _OnPlatformEvent
-          [1641836544690] [16162:695684] CHIP: [DIS] DNS-SD StartServer mode=0
-          [1641836544690] [16162:695684] CHIP: [DIS] Failed to find a valid admin pairing. Node ID unknown
-          [1641836544690] [16162:695684] CHIP: [DIS] Start dns-sd server - no current nodeId
-          [1641836544690] [16162:695684] CHIP: [DL] Using wifi MAC for hostname
-          [1641836544690] [16162:695684] CHIP: [DIS] Advertise commission parameter vendorID=9050 productID=65279 discriminator=3840/15
-          [1641836544690] [16162:695684] CHIP: [DL] Publishing service D920ECCFF905179B on port 5540 with type: _matterc._udp,_V9050,_T257,_S15,_L3840,_CM on interface id: 0
-          [1641836544690] [16162:695684] CHIP: [DIS] Scheduling Discovery timeout in secs=900
-          [1641836545360] [16162:695684] CHIP: [DL] Mdns: OnRegister name: D920ECCFF905179B, type: _matterc._udp., domain: local., flags: 2
+    - label:
+          "If CommissioningCustomFlow field in Step 2 = 0 (Standard
+          Commissioning Flow), reboot the DUT device"
+      verification: |
+          1. Verify DUT is advertising in commissioning mode. On DUT,
+
+          $  ./out/chip-tool/chip-tool discover commissionables
+          [1651192893436] [15304:442604] CHIP: [DL] Mdns: OnNewAddress interface: 24 ip:fe80::dea6:32ff:fe8d:6e32
+          [1651192893436] [15304:442604] CHIP: [DIS]         Vendor ID: 65521
+          [1651192893436] [15304:442604] CHIP: [DIS]         Product ID: 32769
+          [1651192893436] [15304:442604] CHIP: [DIS]         Long Discriminator: 3840
+          [1651192893436] [15304:442604] CHIP: [DIS]         Pairing Hint: 33
+          [1651192893436] [15304:442604] CHIP: [DIS]         Hostname: DCA6328D6E320000
+          [1651192893436] [15304:442604] CHIP: [DIS]         Instance Name: 914762134DA8E7D1
+          [1651192893436] [15304:442604] CHIP: [DIS]         IP Address #1: fe80::dea6:32ff:fe8d:6e32
+          [1651192893436] [15304:442604] CHIP: [DIS]         Port: 5540
+          [1651192893436] [15304:442604] CHIP: [DIS]         Commissioning Mode: 1
+          [1651192893436] [15304:442604] CHIP: [DIS]         Mrp Interval idle: 5000 ms
+          [1651192893436] [15304:442604] CHIP: [DIS]         Mrp Interval active: 300 ms
       disabled: true
