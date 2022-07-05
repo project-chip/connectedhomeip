@@ -25,7 +25,7 @@ tests:
     - label: "DUT sends Read Request Message to the TH for a supported event."
       verification: |
           In case of chip tool, here is an example command to use
-           
+
           On TH verify that Read Request Message received has these fields  EventRequests, EventFilters, and FabricFiltered.
 
           sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF

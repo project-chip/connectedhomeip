@@ -30,7 +30,7 @@ tests:
           [1655981582.711841][1637:1637] CHIP:IM: Received Subscribe request
           [1655981582.712024][1637:1637] CHIP:DMG: SubscribeRequestMessage =
           [1655981582.712110][1637:1637] CHIP:DMG: {
-          [1655981582.712167][1637:1637] CHIP:DMG:         KeepSubscriptions = false, 
+          [1655981582.712167][1637:1637] CHIP:DMG:         KeepSubscriptions = false,
           [1655981582.712231][1637:1637] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
           [1655981582.712316][1637:1637] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
           [1655981582.712375][1637:1637] CHIP:DMG:         EventPathIBs =
@@ -41,10 +41,10 @@ tests:
           [1655981582.712764][1637:1637] CHIP:DMG:                         Cluster = 0x28,
           [1655981582.712860][1637:1637] CHIP:DMG:                         Event = 0x0,
           [1655981582.712930][1637:1637] CHIP:DMG:                 },
-          [1655981582.713020][1637:1637] CHIP:DMG:                 
+          [1655981582.713020][1637:1637] CHIP:DMG:
           [1655981582.713079][1637:1637] CHIP:DMG:         ],
-          [1655981582.713125][1637:1637] CHIP:DMG:         
-          [1655981582.713149][1637:1637] CHIP:DMG:         isFabricFiltered = true, 
+          [1655981582.713125][1637:1637] CHIP:DMG:
+          [1655981582.713149][1637:1637] CHIP:DMG:         isFabricFiltered = true,
           [1655981582.713182][1637:1637] CHIP:DMG:         InteractionModelRevision = 1
           [1655981582.713205][1637:1637] CHIP:DMG: },
           [1655981582.713270][1637:1637] CHIP:DMG: Final negotiated min/max parameters: Min = 100s, Max = 1000s
@@ -105,7 +105,7 @@ tests:
       verification: |
           ./chip-tool softwarediagnostics read-event software-fault 1 0
 
-          [1655375196.291424][35133:35138] CHIP:DMG:         SuppressResponse = true, 
+          [1655375196.291424][35133:35138] CHIP:DMG:         SuppressResponse = true,
           [1655375196.291478][35133:35138] CHIP:DMG:         InteractionModelRevision = 1
           [1655375196.291527][35133:35138] CHIP:DMG: }
           [1655375196.291829][35133:35138] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
@@ -123,12 +123,12 @@ tests:
 
           Provision DUT and TH.
 
-          To generate the software fault event, execute the following 
+          To generate the software fault event, execute the following
           1. Get the PID of the DUT & KIll it .
                       ps  -aef|grep all-clusters-app
                       sudo kill -SIGUSR1 <PID of DUT>
 
-          After killing the DUT , you may observe the following log in the DUT 
+          After killing the DUT , you may observe the following log in the DUT
 
           [1655198519.293098][2883:2883] CHIP:ZCL: SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected
           [1655198519.293180][2883:2883] CHIP:EVL: LogEvent event number: 0x0000000000010006 priority: 1, endpoint id:  0x0 cluster id: 0x0000_0034 event id: 0x0 Sys timestamp: 0x00000000010DDA64
@@ -139,7 +139,7 @@ tests:
 
           ./chip-tool softwarediagnostics read-event software-fault 1 0
 
-          [1655375196.291424][35133:35138] CHIP:DMG:         SuppressResponse = true, 
+          [1655375196.291424][35133:35138] CHIP:DMG:         SuppressResponse = true,
           [1655375196.291478][35133:35138] CHIP:DMG:         InteractionModelRevision = 1
           [1655375196.291527][35133:35138] CHIP:DMG: }
           [1655375196.291829][35133:35138] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000

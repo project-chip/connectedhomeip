@@ -75,26 +75,26 @@ tests:
           ->For T0 and 30s we have to get advertisement range between 20ms to 60ms
           ->For 30s and 15mins we have to get advertisement range between 150ms to 1200ms
 
-          I: 3242 [DL]CHIPoBLE advertising started                                        
-          I: 3279 [DL]NFC Tag emulation started                                           
-          I: 33245 [DL]CHIPoBLE advertising mode changed to slow                          
-          D: 901346 [DIS]OnExpiration callback for cleared session                        
-          D: 901351 [DIS]Extended discovery timeout cancelled                             
-          I: 903097 [SVR]Closing pairing window                                           
-          D: 903100 [IN]SecureSession Released 0x20002c00 Type:1 LSID:27704               
-          I: 903106 [DIS]Updating services using commissioning mode 0                     
-          D: 903111 [DL]Using Thread extended MAC for hostname.                           
-          D: 903116 [DL]Using Thread extended MAC for hostname.                           
+          I: 3242 [DL]CHIPoBLE advertising started
+          I: 3279 [DL]NFC Tag emulation started
+          I: 33245 [DL]CHIPoBLE advertising mode changed to slow
+          D: 901346 [DIS]OnExpiration callback for cleared session
+          D: 901351 [DIS]Extended discovery timeout cancelled
+          I: 903097 [SVR]Closing pairing window
+          D: 903100 [IN]SecureSession Released 0x20002c00 Type:1 LSID:27704
+          I: 903106 [DIS]Updating services using commissioning mode 0
+          D: 903111 [DL]Using Thread extended MAC for hostname.
+          D: 903116 [DL]Using Thread extended MAC for hostname.
           I: 903138 [DIS]Advertise commission parameter vendorID=65521 productID=32784 di5
           E: 903147 [DIS]Failed to advertise extended commissionable node: Error CHIP:0x03
 
 
           After 900s that is 15min advertisement stops
 
-          D: 903154 [DIS]Scheduling extended discovery timeout in 900s                    
-          E: 903160 [DIS]Failed to finalize service update: Error CHIP:0x0000001C         
-          D: 903166 [DL]CHIPoBLE advertising set to off                                   
-          I: 903171 [DL]CHIPoBLE advertising stopped                                      
+          D: 903154 [DIS]Scheduling extended discovery timeout in 900s
+          E: 903160 [DIS]Failed to finalize service update: Error CHIP:0x0000001C
+          D: 903166 [DL]CHIPoBLE advertising set to off
+          I: 903171 [DL]CHIPoBLE advertising stopped
           I: 903174 [DL]NFC Tag emulation stopped
       disabled: true
 
@@ -111,7 +111,7 @@ tests:
       verification: |
           Check timestamp, ADV stop after 15 mins
 
-          D: 903154 [DIS]Scheduling extended discovery timeout in 900s                    
+          D: 903154 [DIS]Scheduling extended discovery timeout in 900s
           E: 903160 [DIS]Failed to finalize service update: Error CHIP:0x0000001C
       disabled: true
 

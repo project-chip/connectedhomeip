@@ -29,8 +29,8 @@ tests:
           the attributes that have been subscribed or trigger an action on the
           DUT to generate an event."
       verification: |
-          Send 3 Subscriptionrequest message from each Reference Device(Eg. RD1...) to DUT 
-          and verify all the subscription requests are succes, and change the value of 
+          Send 3 Subscriptionrequest message from each Reference Device(Eg. RD1...) to DUT
+          and verify all the subscription requests are succes, and change the value of
           all the attributes by sending write command, after sending write commanfd
            verify on each of these Reference Devices that the appropriate attribute
            value has been received.
@@ -67,7 +67,7 @@ tests:
           [1656330608.134434][9924:9924] CHIP:DMG: Refresh Subscribe Sync Timer with max 1000 seconds
 
 
-          ./chip-tool any subscribe-by-id 0x0008 0x0010 100 1000  1 1 
+          ./chip-tool any subscribe-by-id 0x0008 0x0010 100 1000  1 1
           [1656330747.137973][9924:9924] CHIP:DMG: StatusResponseMessage =
           [1656330747.138003][9924:9924] CHIP:DMG: {
           [1656330747.138031][9924:9924] CHIP:DMG:         Status = 0x00 (SUCCESS),
@@ -112,12 +112,12 @@ tests:
           contain 3 different paths. The subscription request from RD1 should
           contain 4 paths."
       verification: |
-          Send 3 Subscriptionrequest message from each Reference Device(Eg. RD1...) to DUT 
+          Send 3 Subscriptionrequest message from each Reference Device(Eg. RD1...) to DUT
           and verify all the subscription requests are succes. and in The subscription request from RD1 should contain 4 paths, Verify that the subscriptions from RD2, RD3, RD4 and RD5 are not affected.
 
           Below Given a example commands
 
-          ./chip-tool any subscribe-by-id 0x0008 0x0010 100 1000  1 1 
+          ./chip-tool any subscribe-by-id 0x0008 0x0010 100 1000  1 1
           [1656330747.137973][9924:9924] CHIP:DMG: StatusResponseMessage =
           [1656330747.138003][9924:9924] CHIP:DMG: {
           [1656330747.138031][9924:9924] CHIP:DMG:         Status = 0x00 (SUCCESS),
@@ -182,8 +182,8 @@ tests:
           Requests are activated, RD1 sends 6 subscription request messages with
           each of them having 3 different paths."
       verification: |
-          Send 3 Subscriptionrequest message from each Reference Device(Eg. RD1...) to DUT 
-          and verify all the subscription requests are succes. and in The subscription request 
+          Send 3 Subscriptionrequest message from each Reference Device(Eg. RD1...) to DUT
+          and verify all the subscription requests are succes. and in The subscription request
           from RD1 should contain 6 paths, Verify that the subscriptions from RD2, RD3, RD4 and
            RD5 are not affected.
 
@@ -217,7 +217,7 @@ tests:
           [1656330608.134434][9924:9924] CHIP:DMG: Refresh Subscribe Sync Timer with max 1000 seconds
 
 
-          ./chip-tool any subscribe-by-id 0x0008 0x0010 100 1000  1 1 
+          ./chip-tool any subscribe-by-id 0x0008 0x0010 100 1000  1 1
           [1656330747.137973][9924:9924] CHIP:DMG: StatusResponseMessage =
           [1656330747.138003][9924:9924] CHIP:DMG: {
           [1656330747.138031][9924:9924] CHIP:DMG:         Status = 0x00 (SUCCESS),
