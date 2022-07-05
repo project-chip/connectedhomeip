@@ -210,7 +210,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   declare_args() {
     # Enable building chip with clang.
-    enable_host_clang_build = enable_default_builds && host_os != "win"
+    # Disabled on Mac arm64 but note that the "gcc" build uses Apple clang.
+    enable_host_clang_build = enable_default_builds && host_os != "win" &&
+                              (host_os != "mac" || host_cpu != "arm64")
 
     # Enable building chip with gcc.
     enable_host_gcc_build = enable_default_builds && host_os != "win"
