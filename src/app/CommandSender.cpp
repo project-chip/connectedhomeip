@@ -169,7 +169,7 @@ exit:
 }
 
 void CommandSender::ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
-                                       bool aSuppressErrorStatusResponse)
+                                           bool aSuppressErrorStatusResponse)
 {
     if (aError != CHIP_NO_ERROR)
     {

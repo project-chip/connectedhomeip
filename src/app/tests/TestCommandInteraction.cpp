@@ -40,11 +40,11 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <nlunit-test.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <nlunit-test.h>
 
 using TestContext = chip::Test::AppContext;
 using namespace chip::Protocols;
@@ -648,8 +648,9 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
 #endif
 }
 
-// Command Sender sends the invoke request, command handler drops invoke response, then test injects unknown message to client, client would
-// out the status response with invalid action, and interaction model engine would send out the status reponse with invalid action
+// Command Sender sends the invoke request, command handler drops invoke response, then test injects unknown message to client,
+// client would out the status response with invalid action, and interaction model engine would send out the status reponse with
+// invalid action
 void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -660,10 +661,10 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     AddInvokeRequestData(apSuite, apContext, &commandSender);
     asyncCommand = false;
 
-    ctx.GetLoopback().mSentMessageCount = 0;
-    ctx.GetLoopback().mNumMessagesToDrop = 1;
+    ctx.GetLoopback().mSentMessageCount            = 0;
+    ctx.GetLoopback().mNumMessagesToDrop           = 1;
     ctx.GetLoopback().mNumMessagesToDropSinceIndex = 2;
-    err          = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
+    err                                            = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
@@ -686,10 +687,10 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
-    Messaging::ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     rm->ClearRetransTable(commandSender.mpExchangeCtx);
-    ctx.GetLoopback().mSentMessageCount = 0;
-    ctx.GetLoopback().mNumMessagesToDrop = 0;
+    ctx.GetLoopback().mSentMessageCount            = 0;
+    ctx.GetLoopback().mNumMessagesToDrop           = 0;
     ctx.GetLoopback().mNumMessagesToDropSinceIndex = 0;
 
     err = commandSender.OnMessageReceived(commandSender.mpExchangeCtx, payloadHeader, std::move(msgBuf));

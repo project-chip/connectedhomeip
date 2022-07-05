@@ -66,10 +66,8 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
-Status CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
-                                                                           const PayloadHeader & payloadHeader,
-                                                                           System::PacketBufferHandle && payload,
-                                                                           bool isTimedInvoke)
+Status CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & payloadHeader,
+                                              System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
     Status status = Status::Success;
     System::PacketBufferHandle response;
@@ -97,7 +95,7 @@ Status CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * apExc
     if (status != Status::Success)
     {
         CHIP_ERROR err = StatusResponse::Send(status, mpExchangeCtx,
-                /* aExpectResponse = */ false);
+                                              /* aExpectResponse = */ false);
 
         if (err != CHIP_NO_ERROR)
         {
@@ -110,7 +108,7 @@ Status CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * apExc
         // SendCommandResponse() later (when our holdoff count drops to 0) it
         // just fails and we don't double-respond.
         mpExchangeCtx = nullptr;
-        status = Status::Success;
+        status        = Status::Success;
     }
     return status;
 }
@@ -125,16 +123,12 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
     reader.Init(std::move(payload));
     VerifyOrReturnError(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    VerifyOrReturnError(invokeRequestMessage.CheckSchemaValidity() == CHIP_NO_ERROR,
-                        Status::InvalidAction);
+    VerifyOrReturnError(invokeRequestMessage.CheckSchemaValidity() == CHIP_NO_ERROR, Status::InvalidAction);
 #endif
 
-    VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR,
-                        Status::InvalidAction);
-    VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR,
-                        Status::InvalidAction);
-    VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR,
-                        Status::InvalidAction);
+    VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
+    VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
+    VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::UnsupportedAccess);
     invokeRequests.GetReader(&invokeRequestsReader);
 
@@ -148,16 +142,13 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
 
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
-        VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(),
-                            Status::InvalidAction);
+        VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), Status::InvalidAction);
         CommandDataIB::Parser commandData;
-        VerifyOrReturnError(commandData.Init(invokeRequestsReader) == CHIP_NO_ERROR,
-                            Status::InvalidAction);
+        VerifyOrReturnError(commandData.Init(invokeRequestsReader) == CHIP_NO_ERROR, Status::InvalidAction);
 
         if (mpExchangeCtx->IsGroupExchangeContext())
         {
-            VerifyOrReturnError(ProcessGroupCommandDataIB(commandData) == CHIP_NO_ERROR,
-                                Status::Failure);
+            VerifyOrReturnError(ProcessGroupCommandDataIB(commandData) == CHIP_NO_ERROR, Status::Failure);
         }
         else
         {
@@ -185,8 +176,7 @@ CHIP_ERROR CommandHandler::OnMessageReceived(Messaging::ExchangeContext * apExch
 CHIP_ERROR CommandHandler::OnUnknownMsgType()
 {
     VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    CHIP_ERROR err =
-        StatusResponse::Send(Status::InvalidAction, mpExchangeCtx, false /*aExpectResponse*/);
+    CHIP_ERROR err = StatusResponse::Send(Status::InvalidAction, mpExchangeCtx, false /*aExpectResponse*/);
     if (err != CHIP_NO_ERROR)
     {
         // We have to manually close the exchange, because we called

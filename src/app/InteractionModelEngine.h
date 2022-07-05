@@ -349,9 +349,8 @@ private:
      * Called when Interaction Model receives a Command Request message.  Errors processing
      * If this returns a failure status the caller should send a status response with that status.
      */
-    Status OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
-                                                               const PayloadHeader & aPayloadHeader,
-                                                               System::PacketBufferHandle && aPayload, bool aIsTimedInvoke);
+    Status OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                  System::PacketBufferHandle && aPayload, bool aIsTimedInvoke);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;

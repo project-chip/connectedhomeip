@@ -2771,14 +2771,14 @@ void TestReadInteraction::TestReadInvalidMessage1(nlTestSuite * apSuite, void * 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-// Read Client sends the read request, hander drops out the first report, then test asks read client to process invalid message, read client
-// sends out status report
+// Read Client sends the read request, hander drops out the first report, then test asks read client to process invalid message,
+// read client sends out status report
 void TestReadInteraction::TestReadInvalidMessage2(nlTestSuite * apSuite, void * apContext)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx                   = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
     ctx.GetLoopback().mSentMessageCount = 0;
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm  = ctx.GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 
@@ -2805,9 +2805,9 @@ void TestReadInteraction::TestReadInvalidMessage2(nlTestSuite * apSuite, void * 
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Read);
 
-        ctx.GetLoopback().mNumMessagesToDrop = 1;
+        ctx.GetLoopback().mNumMessagesToDrop           = 1;
         ctx.GetLoopback().mNumMessagesToDropSinceIndex = 2;
-        err = readClient.SendRequest(readPrepareParams);
+        err                                            = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
 
@@ -2824,8 +2824,8 @@ void TestReadInteraction::TestReadInvalidMessage2(nlTestSuite * apSuite, void * 
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
         rm->ClearRetransTable(readClient.mpExchangeCtx);
-        ctx.GetLoopback().mSentMessageCount = 0;
-        ctx.GetLoopback().mNumMessagesToDrop = 0;
+        ctx.GetLoopback().mSentMessageCount            = 0;
+        ctx.GetLoopback().mNumMessagesToDrop           = 0;
         ctx.GetLoopback().mNumMessagesToDropSinceIndex = 0;
         readClient.OnMessageReceived(readClient.mpExchangeCtx, payloadHeader, std::move(msgBuf));
         ctx.DrainAndServiceIO();
@@ -2840,9 +2840,9 @@ void TestReadInteraction::TestReadInvalidMessage2(nlTestSuite * apSuite, void * 
     ctx.CreateSessionBobToAlice();
 }
 
-// Read Client creates the subscription with server, server sends chunked reports, after the handler sends out the first chunked report,
-// handler calls unknown message function, send status report with invalid action and close, client sends the status report and close.
-// InteractionModelEngine would process the above status report, and sends out the status report with invalid action.
+// Read Client creates the subscription with server, server sends chunked reports, after the handler sends out the first chunked
+// report, handler calls unknown message function, send status report with invalid action and close, client sends the status report
+// and close. InteractionModelEngine would process the above status report, and sends out the status report with invalid action.
 void TestReadInteraction::TestSubscribeInvalidMessage1(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -2871,16 +2871,16 @@ void TestReadInteraction::TestSubscribeInvalidMessage1(nlTestSuite * apSuite, vo
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
-        ctx.GetLoopback().mSentMessageCount = 0;
-        ctx.GetLoopback().mNumMessagesToDrop = 1;
+        ctx.GetLoopback().mSentMessageCount            = 0;
+        ctx.GetLoopback().mNumMessagesToDrop           = 1;
         ctx.GetLoopback().mNumMessagesToDropSinceIndex = 2;
 
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
 
-        ctx.GetLoopback().mSentMessageCount = 0;
-        ctx.GetLoopback().mNumMessagesToDrop = 0;
+        ctx.GetLoopback().mSentMessageCount            = 0;
+        ctx.GetLoopback().mNumMessagesToDrop           = 0;
         ctx.GetLoopback().mNumMessagesToDropSinceIndex = 0;
 
         rm->ClearRetransTable(readClient.mpExchangeCtx);
@@ -2986,10 +2986,10 @@ void TestReadInteraction::TestSubscribeInvalidMessage3(nlTestSuite * apSuite, vo
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
-        ctx.GetLoopback().mSentMessageCount = 0;
-        ctx.GetLoopback().mNumMessagesToDrop = 1;
+        ctx.GetLoopback().mSentMessageCount            = 0;
+        ctx.GetLoopback().mNumMessagesToDrop           = 1;
         ctx.GetLoopback().mNumMessagesToDropSinceIndex = 2;
-        err = readClient.SendRequest(readPrepareParams);
+        err                                            = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
 
@@ -3009,8 +3009,8 @@ void TestReadInteraction::TestSubscribeInvalidMessage3(nlTestSuite * apSuite, vo
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mpExchangeCtx);
-        ctx.GetLoopback().mSentMessageCount = 0;
-        ctx.GetLoopback().mNumMessagesToDrop = 0;
+        ctx.GetLoopback().mSentMessageCount            = 0;
+        ctx.GetLoopback().mNumMessagesToDrop           = 0;
         ctx.GetLoopback().mNumMessagesToDropSinceIndex = 0;
         readClient.OnMessageReceived(readClient.mpExchangeCtx, payloadHeader, std::move(msgBuf));
         ctx.DrainAndServiceIO();

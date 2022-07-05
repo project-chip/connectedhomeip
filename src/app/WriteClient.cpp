@@ -510,12 +510,12 @@ exit:
 }
 
 void WriteClient::ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
-                                     bool aSuppressErrorStatusResponse)
+                                         bool aSuppressErrorStatusResponse)
 {
     if (aError != CHIP_NO_ERROR)
     {
-        CHIP_ERROR err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext,
-                                   false /*aExpectResponse*/);
+        CHIP_ERROR err =
+            StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
         if (!aSuppressErrorStatusResponse)
         {
             if (err == CHIP_NO_ERROR)

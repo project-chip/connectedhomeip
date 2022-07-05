@@ -142,11 +142,11 @@ public:
 
     void Reset()
     {
-        mNumMessagesToDrop   = 0;
-        mDroppedMessageCount = 0;
-        mSentMessageCount    = 0;
-        mNumMessagesToDropSinceIndex      = 0;
-        mMessageSendError    = CHIP_NO_ERROR;
+        mNumMessagesToDrop           = 0;
+        mDroppedMessageCount         = 0;
+        mSentMessageCount            = 0;
+        mNumMessagesToDropSinceIndex = 0;
+        mMessageSendError            = CHIP_NO_ERROR;
     }
 
     struct PendingMessageItem
@@ -165,7 +165,7 @@ public:
     uint32_t mNumMessagesToDrop           = 0;
     uint32_t mDroppedMessageCount         = 0;
     uint32_t mSentMessageCount            = 0;
-    uint32_t mNumMessagesToDropSinceIndex      = 0;
+    uint32_t mNumMessagesToDropSinceIndex = 0;
     CHIP_ERROR mMessageSendError          = CHIP_NO_ERROR;
     LoopbackTransportDelegate * mDelegate = nullptr;
 };

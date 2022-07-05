@@ -577,14 +577,14 @@ void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void 
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 0);
 
-    ctx.GetLoopback().mSentMessageCount = 0;
-    ctx.GetLoopback().mNumMessagesToDrop = 1;
+    ctx.GetLoopback().mSentMessageCount            = 0;
+    ctx.GetLoopback().mNumMessagesToDrop           = 1;
     ctx.GetLoopback().mNumMessagesToDropSinceIndex = 2;
-    err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+    err                                            = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
-    char PAYLOAD[] = "Hello!";
+    char PAYLOAD[]       = "Hello!";
     uint16_t payload_len = sizeof(PAYLOAD);
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
@@ -593,8 +593,8 @@ void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void 
     NL_TEST_ASSERT(apSuite, !payload.IsNull());
 
     rm->ClearRetransTable(writeClient.mpExchangeCtx);
-    ctx.GetLoopback().mSentMessageCount = 0;
-    ctx.GetLoopback().mNumMessagesToDrop = 0;
+    ctx.GetLoopback().mSentMessageCount            = 0;
+    ctx.GetLoopback().mNumMessagesToDrop           = 0;
     ctx.GetLoopback().mNumMessagesToDropSinceIndex = 0;
     err = writeClient.OnMessageReceived(writeClient.mpExchangeCtx, payloadHeader, std::move(payload));
     NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
