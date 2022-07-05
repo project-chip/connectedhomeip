@@ -1706,29 +1706,34 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(GObject * source_object, G
     for (const gchar * bssPath = (bsss != nullptr ? *bsss : nullptr); bssPath != nullptr; bssPath = *(++bsss))
     {
         WiFiScanResponse network;
-        if (_GetBssInfo(bssPath, network) && network.ssidLen == sInterestedSSIDLen &&
-            memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0)
+        if (_GetBssInfo(bssPath, network))
         {
-            networkScanned->push_back(network);
+            if (sInterestedSSIDLen == 0)
+            {
+                networkScanned->push_back(network);
+            }
+            else if (network.ssidLen == sInterestedSSIDLen && memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0)
+            {
+                networkScanned->push_back(network);
+            }
         }
+
+        DeviceLayer::SystemLayer().ScheduleLambda([networkScanned]() {
+            // Note: We cannot post a event in ScheduleLambda since std::vector is not trivial copiable. This results in the use of
+            // const_cast but should be fine for almost all cases, since we actually handled the ownership of this element to this
+            // lambda.
+            if (mpScanCallback != nullptr)
+            {
+                LinuxScanResponseIterator<WiFiScanResponse> iter(const_cast<std::vector<WiFiScanResponse> *>(networkScanned));
+                mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
+                mpScanCallback = nullptr;
+            }
+
+            delete const_cast<std::vector<WiFiScanResponse> *>(networkScanned);
+        });
+
+        g_strfreev(oldBsss);
     }
-
-    DeviceLayer::SystemLayer().ScheduleLambda([networkScanned]() {
-        // Note: We cannot post a event in ScheduleLambda since std::vector is not trivial copiable. This results in the use of
-        // const_cast but should be fine for almost all cases, since we actually handled the ownership of this element to this
-        // lambda.
-        if (mpScanCallback != nullptr)
-        {
-            LinuxScanResponseIterator<WiFiScanResponse> iter(const_cast<std::vector<WiFiScanResponse> *>(networkScanned));
-            mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
-            mpScanCallback = nullptr;
-        }
-
-        delete const_cast<std::vector<WiFiScanResponse> *>(networkScanned);
-    });
-
-    g_strfreev(oldBsss);
-}
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
