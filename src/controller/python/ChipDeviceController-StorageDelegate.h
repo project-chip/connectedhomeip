@@ -68,8 +68,6 @@ private:
     SetGetKeyValueCb mGetKeyCb;
     SyncDeleteKeyValueCb mDeleteKeyCb;
     PyObject * mContext;
-
-    std::map<std::string, std::string> mStorage;
 };
 
 } // namespace Python
