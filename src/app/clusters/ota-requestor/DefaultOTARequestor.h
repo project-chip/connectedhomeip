@@ -175,6 +175,13 @@ private:
             mDownloader  = downloader;
         }
 
+        void Reset()
+        {
+            VerifyOrReturn(mExchangeCtx != nullptr);
+            mExchangeCtx->Close();
+            mExchangeCtx = nullptr;
+        }
+
     private:
         chip::Messaging::ExchangeContext * mExchangeCtx;
         chip::BDXDownloader * mDownloader;
@@ -296,7 +303,6 @@ private:
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
     CASESessionManager * mCASESessionManager  = nullptr;
     OnConnectedAction mOnConnectedAction      = kQueryImage;
-    Messaging::ExchangeContext * mExchangeCtx = nullptr;
     BDXDownloader * mBdxDownloader            = nullptr; // TODO: this should be OTADownloader
     BDXMessenger mBdxMessenger;                          // TODO: ideally this is held by the application
     uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
