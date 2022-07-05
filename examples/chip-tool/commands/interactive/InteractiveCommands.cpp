@@ -18,8 +18,8 @@
 
 #include "InteractiveCommands.h"
 
-#include <iomanip>
 #include <editline.h>
+#include <iomanip>
 #include <sstream>
 
 char kInteractiveModeName[]                            = "";
