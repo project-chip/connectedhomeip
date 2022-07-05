@@ -39,6 +39,7 @@ tests:
           "1a: TH sends DownOrClose command to preposition the DUT in the
           opposite direction"
       command: "DownOrClose"
+      PICS: WNCV.S.C01.Rsp
 
     ### Step 5x -> Verify the DUT has moved
     ### DUT moves toward its DownOrClose position
@@ -56,7 +57,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           constraints:
               notValue: 0
@@ -65,7 +66,7 @@ tests:
     ### Step 2x ->  Check GoToLiftPercentage 25% Long-Run effects
     - label: "2a: TH sends GoToLiftPercentage command with 25 percent to DUT"
       command: "GoToLiftPercentage"
-      PICS: "WNCV_LF && CR_GOTOLIFTPERCENTAGE"
+      PICS: "WNCV.S.F00 && WNCV.S.C05.Rsp"
       arguments:
           values:
               - name: "liftPercent100thsValue"
@@ -88,7 +89,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
       response:
           value: 2500
 
@@ -106,6 +107,7 @@ tests:
     - label: "3b: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
@@ -115,7 +117,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           value: 2500
 
@@ -125,7 +127,7 @@ tests:
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: "WNCV_PA_LF && WNCV_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       response:
           value: 25
 
@@ -133,7 +135,7 @@ tests:
     ### Step 4x ->  Check GoToLiftPercentage 75.20% Long-Run effects
     - label: "4a: TH sends GoToLiftPercentage command with 75.20 percent to DUT"
       command: "GoToLiftPercentage"
-      PICS: "WNCV_LF && CR_GOTOLIFTPERCENTAGE"
+      PICS: WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
               - name: "liftPercent100thsValue"
@@ -156,7 +158,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
       response:
           value: 7520
 
@@ -174,6 +176,7 @@ tests:
     - label: "5b: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
@@ -183,7 +186,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           value: 7520
 
@@ -191,7 +194,7 @@ tests:
     - label:
           "5d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
           attribute from DUT"
-      PICS: "WNCV_PA_LF && WNCV_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
       response:

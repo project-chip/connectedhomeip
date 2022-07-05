@@ -38,6 +38,7 @@ tests:
     - label:
           "1a: TH sends DownOrClose command to preposition the DUT in the
           opposite direction"
+      PICS: WNCV.S.C01.Rsp
       command: "DownOrClose"
 
     - label: "1b: TH Waits for 10 seconds movement(s) on the device"
@@ -55,7 +56,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           constraints:
               type: uint16
@@ -68,7 +69,7 @@ tests:
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       response:
           constraints:
               type: uint8
@@ -81,7 +82,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           constraints:
               type: uint16
@@ -94,7 +95,7 @@ tests:
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       response:
           constraints:
               type: uint8
@@ -116,6 +117,7 @@ tests:
     ### MANDATORY Command
     - label: "2a: TH sends UpOrOpen command to DUT"
       command: "UpOrOpen"
+      PICS: WNCV.S.C00.Rsp
 
     ### Depending on the DUT specs we might prefer a arguments here
     - label: "2b: DUT updates its attributes"
@@ -132,7 +134,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
       response:
           value: 0
 
@@ -142,7 +144,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
       response:
           value: 0
 
@@ -164,6 +166,7 @@ tests:
           UpOrOpen"
       command: "waitForReport"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           constraints:
               type: map8
@@ -185,7 +188,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           constraints:
               type: uint16
@@ -198,7 +201,7 @@ tests:
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       response:
           constraints:
               type: uint8
@@ -211,7 +214,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           constraints:
               type: uint16
@@ -224,7 +227,7 @@ tests:
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       response:
           constraints:
               type: uint8
@@ -236,6 +239,7 @@ tests:
     ### MANDATORY Command
     - label: "4a: TH sends a StopMotion command to DUT"
       command: "StopMotion"
+      PICS: WNCV.S.C02.Rsp
 
     - label:
           "4b: TH waits for 3 seconds the end of inertial movement(s) on the
@@ -254,6 +258,7 @@ tests:
           StopMotion"
       command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
@@ -272,7 +277,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
       response:
           constraints:
               type: uint16
@@ -285,7 +290,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
       response:
           constraints:
               type: uint16

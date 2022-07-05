@@ -30,13 +30,6 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT ScenesCluster : public ClusterBase
-{
-public:
-    ScenesCluster() : ClusterBase(app::Clusters::Scenes::Id) {}
-    ~ScenesCluster() {}
-};
-
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
