@@ -43,6 +43,8 @@
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
+#include <app/DefaultAttributePersistenceProvider.h>
+
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
@@ -74,6 +76,8 @@
 #include <platform/PlatformManager.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
+#include <lib/support/PersistentStorageAudit.h>
+
 using namespace chip;
 using namespace chip::Ble;
 using namespace chip::Controller;
@@ -98,7 +102,6 @@ chip::Controller::CommissioningParameters sCommissioningParameters;
 } // namespace
 
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
-chip::Controller::Python::StorageAdapter * sStorageAdapter = nullptr;
 chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
 
@@ -127,7 +130,7 @@ ChipError::StorageType pychip_DeviceController_GetNodeId(chip::Controller::Devic
 ChipError::StorageType pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
                                                           uint32_t setupPINCode, chip::NodeId nodeid);
 ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
-                                                         uint32_t setupPINCode, chip::NodeId nodeid);
+                                                         uint32_t setupPINCode, chip::NodeId nodeid, uint16_t port);
 ChipError::StorageType pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl,
                                                                const char * onboardingPayload, chip::NodeId nodeid);
 ChipError::StorageType pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
@@ -194,37 +197,11 @@ uint64_t pychip_GetCommandSenderHandle(chip::DeviceProxy * device);
 
 chip::ChipError::StorageType pychip_InteractionModel_ShutdownSubscription(SubscriptionId subscriptionId);
 
-//
-// Storage
-//
-void pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
-                                             chip::Controller::Python::SyncSetKeyValueCb setCb,
-                                             chip::Controller::Python::SetGetKeyValueCb getCb,
-                                             chip::Controller::Python::SyncDeleteKeyValueCb deleteCb);
-void pychip_Storage_ShutdownAdapter();
-}
-
-void pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
-                                             chip::Controller::Python::SyncSetKeyValueCb setCb,
-                                             chip::Controller::Python::SetGetKeyValueCb getCb,
-                                             chip::Controller::Python::SyncDeleteKeyValueCb deleteCb)
-{
-    sStorageAdapter = new chip::Controller::Python::StorageAdapter(context, setCb, getCb, deleteCb);
-}
-
-void pychip_Storage_ShutdownAdapter()
-{
-    delete sStorageAdapter;
-}
-
-chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter()
-{
-    return sStorageAdapter;
-}
-
 ChipError::StorageType pychip_DeviceController_StackInit(uint32_t bluetoothAdapterId)
 {
-    VerifyOrDie(sStorageAdapter != nullptr);
+    auto *storageAdapter = chip::Controller::Python::GetStorageAdapter();
+
+    VerifyOrDie(storageAdapter != nullptr);
 
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
@@ -234,13 +211,13 @@ ChipError::StorageType pychip_DeviceController_StackInit(uint32_t bluetoothAdapt
 #endif
 
     FactoryInitParams factoryParams;
-    factoryParams.fabricIndependentStorage = sStorageAdapter;
+    factoryParams.fabricIndependentStorage = storageAdapter;
 
-    sGroupDataProvider.SetStorageDelegate(sStorageAdapter);
+    sGroupDataProvider.SetStorageDelegate(storageAdapter);
     ReturnErrorOnFailure(sGroupDataProvider.Init().AsInteger());
     factoryParams.groupDataProvider = &sGroupDataProvider;
 
-    ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(sStorageAdapter).AsInteger());
+    ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(storageAdapter).AsInteger());
     factoryParams.opCertStore = &sPersistentStorageOpCertStore;
 
     factoryParams.enableServerInteractions = true;
@@ -250,6 +227,18 @@ ChipError::StorageType pychip_DeviceController_StackInit(uint32_t bluetoothAdapt
     // null pointer dereferences.
     static chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
     chip::DeviceLayer::SetCommissionableDataProvider(&TestOnlyCommissionableDataProvider);
+
+    //
+    // The single ChipDeviceCtrl.so that gets generated for the REPL is used in both controller and server
+    // capacities. In the latter modality, an endpoint_config.h is actually generated to compose in utility
+    // clusters into EP0. That in turn utilizes defaults, and so we need to ensure that we have a valid
+    // AttributePersistenceProvider for that bit of logic to work, even though we're just initializing the controller
+    // side here. That's because DeviceControllerFactory::Init() will initialize the data model handler logic, which is
+    // the same bits linked in and used for both controller and server modalities.
+    //
+    static app::DefaultAttributePersistenceProvider defaultPersistenceProvider;
+    ReturnErrorOnFailure(defaultPersistenceProvider.Init(storageAdapter).AsInteger());
+    SetAttributePersistenceProvider(&defaultPersistenceProvider);
 
     ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());
 
@@ -368,13 +357,17 @@ ChipError::StorageType pychip_DeviceController_ConnectBLE(chip::Controller::Devi
 }
 
 ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
-                                                         uint32_t setupPINCode, chip::NodeId nodeid)
+                                                         uint32_t setupPINCode, chip::NodeId nodeid, uint16_t port = 0)
 {
     chip::Inet::IPAddress peerAddr;
     chip::Transport::PeerAddress addr;
     chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
 
     VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+
+    if (port != 0) {
+        addr.SetPort(port);
+    }
 
     // TODO: IP rendezvous should use TCP connection.
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
@@ -415,7 +408,8 @@ ChipError::StorageType pychip_DeviceController_SetWiFiCredentials(const char * s
 
 ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
-    return devCtrl->DisconnectDevice(nodeid).AsInteger();
+    devCtrl->DisconnectDevice(nodeid);
+    return CHIP_NO_ERROR.AsInteger();
 }
 
 ChipError::StorageType pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl,
@@ -691,4 +685,6 @@ ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTa
     }
     PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(pythonContext));
     return CHIP_NO_ERROR.AsInteger();
+}
+
 }

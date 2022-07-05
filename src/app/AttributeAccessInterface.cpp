@@ -55,6 +55,12 @@ CHIP_ERROR AttributeReportBuilder::FinishAttribute(AttributeReportIBs::Builder &
     return aAttributeReportIBsBuilder.GetAttributeReport().EndOfAttributeReportIB().GetError();
 }
 
+CHIP_ERROR AttributeReportBuilder::EncodePreValue(AttributeReportIBs::Builder & aAttributeReportIBs, TLV::TLVReader & data)
+{
+    auto *tlvWriter = aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter();
+    return tlvWriter->CopyElement(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), data);
+}
+
 CHIP_ERROR AttributeValueEncoder::EnsureListStarted()
 {
     if (mCurrentEncodingListIndex == kInvalidListIndex)

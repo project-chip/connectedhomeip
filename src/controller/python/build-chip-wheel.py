@@ -169,6 +169,7 @@ try:
         'chip.tlv',
         'chip.setup_payload',
         'chip.storage',
+        'chip.dynamic_server'
     ]
     #print ("Server: {}".format(args.server))
     if args.server:

@@ -84,9 +84,7 @@ def _OnSyncGetKeyValueCb(storageObj, key: str, value, size, is_found):
 def _OnSyncDeleteKeyValueCb(storageObj, key):
     storageObj.DeleteSdkKey(key.decode("utf-8"))
 
-
 class PersistentStorage:
-
     def __init__(self, path: str):
         self._path = path
         self._handle = chip.native.GetLibraryHandle()
@@ -168,7 +166,8 @@ class PersistentStorage:
         self.Sync()
 
     def GetUnderlyingStorageAdapter(self):
-        return self._storageAdapterObj
+        self._handle.pychip_Storage_GetStorageAdapter.restype = ctypes.c_void_p
+        return self._handle.pychip_Storage_GetStorageAdapter()
 
     def __del__(self):
         builtins.chipStack.Call(
