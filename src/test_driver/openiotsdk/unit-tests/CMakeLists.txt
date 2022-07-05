@@ -23,6 +23,15 @@ set(APP_TARGET chip-openiotsdk-unit-tests)
 
 include(${OPENIOTSDK_COMMON}/cmake/sdk.cmake)
 
+# LwIP configuration
+if(TARGET lwip-cmsis-port)
+    # lwip requires user_lwipopts.h, we use the custom settings
+    target_include_directories(lwipopts
+        INTERFACE
+            lwip-config
+    )
+endif()
+
 project(${APP_TARGET} LANGUAGES C CXX ASM)
 add_executable(${APP_TARGET})
 

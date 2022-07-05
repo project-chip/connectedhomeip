@@ -71,12 +71,6 @@ if(TARGET lwip-cmsis-port)
             lwip-cmsis-port
     )
 
-    # lwip requires user_lwipopts.h, we use the custom settings
-    target_include_directories(lwipopts
-        INTERFACE
-            ${OPEN_IOT_SDK_CONFIG}/lwip
-    )
-
     # provide method to use for tracing by the lwip port (optional)
     target_compile_definitions(lwipopts
         INTERFACE
