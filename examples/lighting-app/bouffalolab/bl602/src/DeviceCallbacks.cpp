@@ -57,10 +57,6 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         OnInternetConnectivityChange(event);
         break;
 
-    case DeviceEventType::kSessionEstablished:
-        OnSessionEstablished(event);
-        break;
-
     case DeviceEventType::kCHIPoBLEConnectionEstablished:
         log_info("CHIPoBLE connection established\r\n");
         break;
@@ -149,14 +145,6 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {
         log_info("Lost IPv6 connectivity...\r\n");
-    }
-}
-
-void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
-{
-    if (event->SessionEstablished.IsCommissioner)
-    {
-        log_info("Commissioner detected!\r\n");
     }
 }
 

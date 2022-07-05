@@ -92,6 +92,10 @@ const ble_uuid128_t UUID_CHIPoBLEChar_C3 = {
 
 SemaphoreHandle_t semaphoreHandle = NULL;
 
+// LE Random Device Address
+// (see Bluetooth® Core Specification 4.2 Vol 6, Part B, Section 1.3.2.1 "Static device address")
+uint8_t own_addr_type = BLE_OWN_ADDR_RANDOM;
+
 } // unnamed namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
@@ -589,6 +593,34 @@ void BLEManagerImpl::bleprph_on_reset(int reason)
     ESP_LOGE(TAG, "Resetting state; reason=%d\n", reason);
 }
 
+CHIP_ERROR BLEManagerImpl::bleprph_set_random_addr(void)
+{
+    ble_addr_t addr;
+
+    // Generates a new static random address
+    int rc = ble_hs_id_gen_rnd(0, &addr);
+    if (rc != 0)
+    {
+        ESP_LOGE(TAG, "Failed to generate random address err: %d", rc);
+        return CHIP_ERROR_INTERNAL;
+    }
+    // Set generated address
+    rc = ble_hs_id_set_rnd(addr.val);
+    if (rc != 0)
+    {
+        ESP_LOGE(TAG, "Failed to set random address err: %d", rc);
+        return CHIP_ERROR_INTERNAL;
+    }
+    // Try to configure the device with random static address
+    rc = ble_hs_util_ensure_addr(1);
+    if (rc != 0)
+    {
+        ESP_LOGE(TAG, "Failed to configure random address err: %d", rc);
+        return CHIP_ERROR_INTERNAL;
+    }
+    return CHIP_NO_ERROR;
+}
+
 void BLEManagerImpl::bleprph_on_sync(void)
 {
     ESP_LOGI(TAG, "BLE host-controller synced");
@@ -665,6 +697,7 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     sInstance.mFlags.Set(Flags::kESPBLELayerInitialized);
     sInstance.mFlags.Set(Flags::kGATTServiceStarted);
 
+    err = bleprph_set_random_addr();
 exit:
     return err;
 }
@@ -1160,11 +1193,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     CHIP_ERROR err;
     ble_gap_adv_params adv_params;
     memset(&adv_params, 0, sizeof(adv_params));
-#ifdef CONFIG_BT_NIMBLE_HOST_BASED_PRIVACY
-    uint8_t own_addr_type = BLE_OWN_ADDR_RANDOM;
-#else
-    uint8_t own_addr_type = BLE_OWN_ADDR_RPA_PUBLIC_DEFAULT;
-#endif
     adv_params.disc_mode = BLE_GAP_DISC_MODE_GEN;
 
     mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
