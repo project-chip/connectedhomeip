@@ -602,7 +602,7 @@ CHIP_ERROR FabricTable::FetchRootPubkey(FabricIndex fabricIndex, Crypto::P256Pub
     return fabricInfo->FetchRootPubkey(outPublicKey);
 }
 
-CHIP_ERROR FabricTable::FetchCats(const FabricIndex fabricIndex, CATValues & cats) const
+CHIP_ERROR FabricTable::FetchCATs(const FabricIndex fabricIndex, CATValues & cats) const
 {
     uint8_t nocBuf[Credentials::kMaxCHIPCertLength];
     MutableByteSpan nocSpan{ nocBuf };

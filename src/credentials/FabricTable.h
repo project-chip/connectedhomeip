@@ -566,12 +566,12 @@ public:
      * @brief Get the CASE Authenticated Tags from the NOC for the given `fabricIndex`.
      *
      * @param fabricIndex - Fabric for which to get the root public key (subject public key of RCAC)
-     * @param outCats - CATValues struct to write the NOC CATs for the given fabric index
+     * @param cats - CATValues struct to write the NOC CATs for the given fabric index
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if not found/available, or `fabricIndex` has a bad value
      * @retval other CHIP_ERROR values on other invalid arguments or internal errors.
      */
-    CHIP_ERROR FetchCats(const FabricIndex fabricIndex, CATValues & outCats) const;
+    CHIP_ERROR FetchCATs(const FabricIndex fabricIndex, CATValues & cats) const;
 
     /**
      * @brief Sign a message with a given fabric's operational keypair. This is used for

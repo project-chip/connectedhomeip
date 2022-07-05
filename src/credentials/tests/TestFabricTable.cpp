@@ -1818,7 +1818,7 @@ void TestFabricLookup(nlTestSuite * inSuite, void * inContext)
     } while (0);
 }
 
-void TestFetchCats(nlTestSuite * inSuite, void * inContext)
+void TestFetchCATs(nlTestSuite * inSuite, void * inContext)
 {
     // Initialize a fabric table.
     chip::TestPersistentStorageDelegate testStorage;
@@ -1831,7 +1831,7 @@ void TestFetchCats(nlTestSuite * inSuite, void * inContext)
     // Attempt Fetching fabric index 1 CATs and verify contents.
     {
         CATValues cats;
-        NL_TEST_ASSERT(inSuite, fabricTable.FetchCats(1, cats) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, fabricTable.FetchCATs(1, cats) == CHIP_NO_ERROR);
         // Test fabric NOCs don't contain any CATs.
         NL_TEST_ASSERT(inSuite, cats == kUndefinedCATs);
     }
@@ -1839,7 +1839,7 @@ void TestFetchCats(nlTestSuite * inSuite, void * inContext)
     // Attempt Fetching fabric index 2 CATs and verify contents.
     {
         CATValues cats;
-        NL_TEST_ASSERT(inSuite, fabricTable.FetchCats(2, cats) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, fabricTable.FetchCATs(2, cats) == CHIP_NO_ERROR);
         // Test fabric NOCs don't contain any CATs.
         NL_TEST_ASSERT(inSuite, cats == kUndefinedCATs);
     }
@@ -2143,7 +2143,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Test fabric label changes", TestFabricLabelChange),
     NL_TEST_DEF("Test compressed fabric ID is properly generated", TestCompressedFabricId),
     NL_TEST_DEF("Test fabric lookup by <root public key, fabric ID>", TestFabricLookup),
-    NL_TEST_DEF("Test Fetching CATs", TestFetchCats),
+    NL_TEST_DEF("Test Fetching CATs", TestFetchCATs),
     NL_TEST_DEF("Test AddNOC root collision", TestAddNocRootCollision),
     NL_TEST_DEF("Test invalid chaining in AddNOC and UpdateNOC", TestInvalidChaining),
     NL_TEST_DEF("Test ephemeral keys allocation", TestEphemeralKeys),
