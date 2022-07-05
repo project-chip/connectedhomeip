@@ -45,7 +45,7 @@ tests:
           CommissioningModeInitialStepsHint field of the DCL. Verify that the
           CommissioningCustomFlow field is set to a value = 0"
       verification: |
-          1. Verify CommissioningCustomFlow=0 
+          1. Verify CommissioningCustomFlow=0
           2. Verify CommissioningModeInitialStepsHint contains a valid, non-zero integer = 1 for Standard Commissioning flow
       disabled: true
 
@@ -53,7 +53,7 @@ tests:
           "If CommissioningCustomFlow field in Step 2 = 0 (Standard
           Commissioning Flow), reboot the DUT device"
       verification: |
-          1. Verify DUT is advertising in commissioning mode. On DUT, 
+          1. Verify DUT is advertising in commissioning mode. On DUT,
 
           $  ./out/chip-tool/chip-tool discover commissionables
           [1651192893436] [15304:442604] CHIP: [DL] Mdns: OnNewAddress interface: 24 ip:fe80::dea6:32ff:fe8d:6e32

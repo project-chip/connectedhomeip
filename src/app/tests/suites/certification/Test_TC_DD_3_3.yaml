@@ -30,7 +30,7 @@ tests:
 
     - label: "TH is instructed to advertise Commissioner Discovery service"
       verification: |
-          ubuntu@ubuntu:~/may23_DUT/connectedhomeip/examples/tv-app/linux/out/tv-app$ sudo ./chip-tv-app 
+          ubuntu@ubuntu:~/may23_DUT/connectedhomeip/examples/tv-app/linux/out/tv-app$ sudo ./chip-tv-app
 
           CHIP:DL: Using wifi MAC for hostname
           CHIP:DIS: Advertise operational node DFC28FF9FE811EF2-FFFFFFEFFFFFFFFF
@@ -70,7 +70,7 @@ tests:
           [1653478433.098023][3785:3785] CHIP:DIS:         Device Type: 35
           [1653478433.098056][3785:3785] CHIP:DIS:         Instance Name: 02DEC0D7B8A76577
           [1653478433.098076][3785:3785] CHIP:DIS:         Commissioning Mode: 0
-          [1653478433.098103][3785:3785] CHIP:SVR: 2 commissioner(s) discovered. Select one (by number# above) to request commissioning from: 
+          [1653478433.098103][3785:3785] CHIP:SVR: 2 commissioner(s) discovered. Select one (by number# above) to request commissioning from:
           [1653478433.098124][3785:3785] CHIP:SVR: Example: cast request 0
       disabled: true
 

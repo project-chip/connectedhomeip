@@ -132,7 +132,7 @@ tests:
           55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          1. Use this as an example of how to generate a manual code with an invalid passcode 
+          1. Use this as an example of how to generate a manual code with an invalid passcode
 
           $ ./out/chip-tool/chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 1 --allow-invalid-payload 1 --setup-pin-code 00000000
           [1651188323732] [14068:388953] CHIP: [TOO] Manual Code: 749152000065521327698
@@ -211,9 +211,9 @@ tests:
           Test VENDOR_ID from the list: 0xFFF1, 0xFFF2, 0xFFF3, 0xFFF4"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          1. Use this as an example of how to generate a manual code with an invalid vendor IDs 
+          1. Use this as an example of how to generate a manual code with an invalid vendor IDs
 
-          $ ./out/chip-tool/chip-tool payload generate-manualcode --discriminator 3840 --setup-pin-code 20202021 --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 1 
+          $ ./out/chip-tool/chip-tool payload generate-manualcode --discriminator 3840 --setup-pin-code 20202021 --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 1
           [1651189120686] [14218:398626] CHIP: [TOO] Manual Code: 749701123365521327694
       disabled: true
 
@@ -258,7 +258,7 @@ tests:
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           $  ./out/chip-tool/chip-tool pairing manualcode 1 749701123365521000006
-           
+
           [1655380389.096806][35861:35861] CHIP:TOO: Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
       disabled: true
 
