@@ -57,17 +57,17 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_USER_INTENT_COMM_FLOW), Using the QR code from Step 1,
-          generate a new QR code using all the same Onboarding Payload
-          components except for the Custom Flow field, set it to 1: User-Intent
-          Commissioning Flow"
+          "Using the QR code from Step 1, generate a new QR code using all the
+          same Onboarding Payload components except for the Custom Flow field,
+          set it to 1: User-Intent Commissioning Flow"
+      PICS: MCORE.DD.USER_INTENT_COMM_FLOW
       verification: |
           MT:-24J06VO00KA0648G00
       disabled: true
 
     - label:
-          "If (PICS_USER_INTENT_COMM_FLOW), Scan/read the QR code, generated in
-          the previous step, using the DUT"
+          "Scan/read the QR code, generated in the previous step, using the DUT"
+      PICS: MCORE.DD.USER_INTENT_COMM_FLOW
       verification: |
           ERROR: chip-tool allows pairing to all-clusters-app when QR code contains user-intent flow but device uses custom commissioning flow
 
@@ -75,16 +75,17 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_CUSTOM_COMM_FLOW), Using the QR code from Step 1, generate a
-          new QR code using all the same Onboarding Payload components except
-          for the Custom Flow field, set it to 2: Custom Commissioning Flow"
+          "Using the QR code from Step 1, generate a new QR code using all the
+          same Onboarding Payload components except for the Custom Flow field,
+          set it to 2: Custom Commissioning Flow"
+      PICS: MCORE.DD.CUSTOM_COMM_FLOW
       verification: |
           MT:-24J029Q00KA0648G00
       disabled: true
 
     - label:
-          "If (PICS_CUSTOM_COMM_FLOW), Scan/read the QR code, generated in the
-          previous step, using the DUT"
+          "Scan/read the QR code, generated in the previous step, using the DUT"
+      PICS: MCORE.DD.CUSTOM_COMM_FLOW
       verification: |
           ERROR: chip-tool allows pairing to all-clusters-app when QR code contains custom commissioning flow but device uses standard commissioning flow
 
@@ -108,41 +109,39 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_DT_BLE), Using the QR code from Step 1, generate a new QR
-          code using all the same Onboarding Payload components except for the
-          Discovery Capability bit string, set it to BLE for discovery"
+          "Using the QR code from Step 1, generate a new QR code using all the
+          same Onboarding Payload components except for the Discovery Capability
+          bit string, set it to BLE for discovery"
+      PICS: MCORE.DD.DT_BLE
       verification: |
           MT:-24J0YXE00KA0648G00
       disabled: true
 
     - label:
-          "If (PICS_DT_BLE), Scan/read the QR code, generated in the previous
-          step, using the DUT"
+          "Scan/read the QR code, generated in the previous step, using the DUT"
+      PICS: MCORE.DD.DT_BLE
       verification: |
-          $ ./out/chip-tool/chip-tool pairing code 1 MT:-24J0YXE00KA0648G00
+          ERROR: chip-tool allows pairing to all-clusters-app when QR code contains BLE Discovery but device uses IP Discovery
 
-          CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
-          [1653048447.653685][119116:119121] CHIP:TOO: Secure Pairing Failed
-          [1653048447.653777][119116:119121] CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:245: CHIP Error 0x00000032: Timeout
+          $ ./out/chip-tool/chip-tool pairing code 1 MT:-24J0YXE00KA0648G00
       disabled: true
 
     - label:
-          "If (PICS_DT_IP), Using the QR code from Step 1, generate a new QR
-          code using all the same Onboarding Payload components except for the
-          Discovery Capability bit string, set it to IP Network for discovery"
+          "Using the QR code from Step 1, generate a new QR code using all the
+          same Onboarding Payload components except for the Discovery Capability
+          bit string, set it to IP Network for discovery"
+      PICS: MCORE.DD.DT_IP
       verification: |
           MT:-24J029Q00KA0648G00
       disabled: true
 
     - label:
-          "If (PICS_DT_IP), Scan/read the QR code, generated in the previous
-          step, using the DUT"
+          "Scan/read the QR code, generated in the previous step, using the DUT"
+      PICS: MCORE.DD.DT_IP
       verification: |
-          $ ./out/chip-tool/chip-tool pairing code 1 MT:-24J029Q00KA0648G00
+          ERROR: chip-tool allows pairing to all-clusters-app when QR code contains IP Discovery but device uses BLE Discovery
 
-          PASESession timed out while waiting for a response from the peer. Expected message type was 33
-          [1653048958.640087][119165:119170] CHIP:TOO: Secure Pairing Failed
-          [1653048958.640178][119165:119170] CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:245: CHIP Error 0x00000032: Timeout
+          $ ./out/chip-tool/chip-tool pairing code 1 MT:-24J029Q00KA0648G00
       disabled: true
 
     - label:
@@ -171,17 +170,17 @@ tests:
           00000000, 11111111, 22222222, 33333333, 44444444, 55555555, 66666666,
           77777777, 88888888, 99999999, 12345678, 87654321"
       verification: |
-          "MT:-24J029Q00OC0000000" (00000000),
-          "MT:-24J029Q00KMSP0Z800" (11111111),
-          "MT:-24J029Q00GWID1WH00" (22222222),
-          "MT:-24J029Q00C4912TQ00" (33333333),
-          "MT:-24J029Q008E.Q2QZ00" (44444444),
-          "MT:-24J029Q004ORE3N610" (55555555),
-          "MT:-24J029Q000YH24KF10" (66666666),
-          "MT:-24J029Q00Y58S4HO10" (77777777),
-          "MT:-24J029Q00UF-F5EX10" (88888888),
-          "MT:-24J029Q00QPQ36B420" (99999999),
-          "MT:-24J029Q004QG46Y900" (12345678),
+          "MT:-24J029Q00OC0000000" (00000000), 
+          "MT:-24J029Q00KMSP0Z800" (11111111), 
+          "MT:-24J029Q00GWID1WH00" (22222222), 
+          "MT:-24J029Q00C4912TQ00" (33333333), 
+          "MT:-24J029Q008E.Q2QZ00" (44444444), 
+          "MT:-24J029Q004ORE3N610" (55555555), 
+          "MT:-24J029Q000YH24KF10" (66666666), 
+          "MT:-24J029Q00Y58S4HO10" (77777777), 
+          "MT:-24J029Q00UF-F5EX10" (88888888), 
+          "MT:-24J029Q00QPQ36B420" (99999999), 
+          "MT:-24J029Q004QG46Y900" (12345678), 
           "MT:-24J029Q00YX018EW10" (87654321)
       disabled: true
 

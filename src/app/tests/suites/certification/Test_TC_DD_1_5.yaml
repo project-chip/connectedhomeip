@@ -24,45 +24,46 @@ config:
 
 tests:
     - label:
-          "If (PICS_SCAN_NFC), Keep the DUT in packaging and bring in TH NFC
-          scanner close to the DUT packaging."
+          "Keep the DUT in packaging and bring in TH NFC scanner close to the
+          DUT packaging."
+      PICS: MCORE.DD.SCAN_NFC
       verification: |
           Vendor specific field verification
       disabled: true
 
     - label:
-          "If (PICS_SCAN_NFC), Unpack DUT from its packaging, make sure DUT is
-          not powered on and do not put the DUT in pairing mode. Bring in TH NFC
+          "Unpack DUT from its packaging, make sure DUT is not powered on and do
+          not put the DUT in pairing mode. Bring in TH NFC scanner close to the
+          DUTs NFC tag"
+      PICS: MCORE.DD.SCAN_NFC
+      verification: |
+          Vendor specific field verification
+      disabled: true
+
+    - label:
+          "Power on DUT and do not put the DUT in pairing mode. Bring in TH NFC
           scanner close to the DUTs NFC tag"
+      PICS: MCORE.DD.PHYSICAL_TAMPERING && MCORE.DD.SCAN_NFC
+      verification: |
+          Vendor specific field verification
+      disabled: true
+
+    - label: "DUT must have an explicit trigger of the the NFC pairing mode"
+      PICS: MCORE.DD.PHYSICAL_TAMPERING
       verification: |
           Vendor specific field verification
       disabled: true
 
     - label:
-          "If (PICS_PHYSICAL_TEMPERING, PICS_SCAN_NFC) Power on DUT and do not
-          put the DUT in pairing mode. Bring in TH NFC scanner close to the DUTs
-          NFC tag"
+          "Power on DUT and put the DUT in pairing mode. Bring in TH NFC scanner
+          close to NFC tag"
+      PICS: MCORE.DD.PHYSICAL_TAMPERING && MCORE.DD.SCAN_NFC
       verification: |
           Vendor specific field verification
       disabled: true
 
-    - label:
-          "If (PICS_PHYSICAL_TEMPERING) DUT must have an explicit trigger of the
-          the NFC pairing mode"
-      verification: |
-          Vendor specific field verification
-      disabled: true
-
-    - label:
-          "If (PICS_PHYSICAL_TEMPERING, PICS_SCAN_NFC) Power on DUT and put the
-          DUT in pairing mode. Bring in TH NFC scanner close to NFC tag"
-      verification: |
-          Vendor specific field verification
-      disabled: true
-
-    - label:
-          "If !(PICS_PHYSICAL_TEMPERING, PICS_SCAN_NFC) Power on DUT. Bring in
-          NFC scanner close to NFC tag"
+    - label: "Power on DUT. Bring in NFC scanner close to NFC tag"
+      PICS: MCORE.DD.PHYSICAL_TAMPERING && MCORE.DD.SCAN_NFC
       verification: |
           Vendor specific field verification
       disabled: true
@@ -91,8 +92,8 @@ tests:
           Vendor specific field verification
       disabled: true
 
-    - label:
-          "If (PICS_SCAN_NFC), Using TH NFC scanner - read NFC tag Reader type"
+    - label: "Using TH NFC scanner - read NFC tag Reader type"
+      PICS: MCORE.DD.SCAN_NFC
       verification: |
           Vendor specific field verification
       disabled: true

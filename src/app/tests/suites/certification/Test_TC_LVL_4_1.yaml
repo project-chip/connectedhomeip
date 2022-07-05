@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Reads Minlevel attribute from DUT"
+      PICS: LVL.S.A0002
       command: "readAttribute"
       attribute: "min level"
       response:
@@ -37,6 +38,7 @@ tests:
               type: uint8
 
     - label: "sends a Move to level command"
+      PICS: LVL.S.C00.Rsp
       command: "MoveToLevel"
       arguments:
           values:
@@ -50,6 +52,7 @@ tests:
                 value: 1
 
     - label: "reads max level attribute from DUT"
+      PICS: LVL.S.A0003
       command: "readAttribute"
       attribute: "max level"
       response:
@@ -58,6 +61,7 @@ tests:
               type: uint8
 
     - label: "sends a Move up command"
+      PICS: LVL.S.C01.Rsp
       command: "Move"
       arguments:
           values:
@@ -93,13 +97,14 @@ tests:
                 value: 9000
 
     - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0003
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
           value: MaxlevelValue
 
     - label: "sends a MoveWithOnOff command"
+      PICS: LVL.S.C05.Rsp
       command: "MoveWithOnOff"
       arguments:
           values:
@@ -136,7 +141,7 @@ tests:
 
     # For lighting Device type current level minimal value is 1
     - label: "reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0002
+      PICS: LVL.S.C05.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
@@ -146,6 +151,7 @@ tests:
               maxValue: 1
 
     - label: "reads default move rate attribute from DUT"
+      PICS: LVL.S.A0014
       command: "readAttribute"
       attribute: "default move rate"
       response:
@@ -154,6 +160,7 @@ tests:
               type: uint8
 
     - label: "sends a Move up command at default move rate"
+      PICS: LVL.S.C05.Rsp && LVL.S.A0014
       command: "Move"
       arguments:
           values:
@@ -188,6 +195,7 @@ tests:
                 value: "y"
 
     - label: "Reset level to 254"
+      PICS: LVL.S.C00.Rsp
       command: "MoveToLevel"
       arguments:
           values:

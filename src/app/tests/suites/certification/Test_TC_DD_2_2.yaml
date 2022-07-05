@@ -26,6 +26,7 @@ tests:
     - label:
           "If (PICS_BLE) TH starts matter announcement procedure using BLE
           transport"
+      PICS: MCORE.DD.BLE
       verification: |
           $ ./out/all-clusters-app/chip-all-clusters-app --wifi --discriminator 3841
 
@@ -50,6 +51,7 @@ tests:
           "If (PICS_BLE) DUT starts BLE scan across all three advertising
           channels with a sufficient dwell time, interval, and overall duration
           of scan"
+      PICS: MCORE.DD.BLE
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing
 
@@ -107,6 +109,7 @@ tests:
       disabled: true
 
     - label: "If (PICS_BLE) DUT starts scan in background using BLE transport"
+      PICS: MCORE.DD.BLE
       verification: |
           1. Discover commissionables over BLE using DUT=chip-tool pairing command
 
@@ -164,6 +167,7 @@ tests:
       disabled: true
 
     - label: "If (PICS_BLE) TH starts matter announcement using BLE transport"
+      PICS: MCORE.DD.BLE
       verification: |
           $ ./out/all-clusters-app/chip-all-clusters-app --wifi --discriminator 3841
 
@@ -187,6 +191,7 @@ tests:
     - label:
           "If (PICS_WIFI) TH starts SoftAP and begin matter announcement
           procedure"
+      PICS: MCORE.DD.WIFI
       verification: |
           BLOCKED: SoftAP commissioning not currently supported on DUT=chip-tool
       disabled: true
@@ -195,11 +200,13 @@ tests:
           "If (PICS_WIFI) DUT starts Wi-Fi scan of all 2.4 GHz Wi-Fi channels
           allowed per its operational regulatory domain (channels 1, 6, and 11
           are preferred)"
+      PICS: MCORE.DD.WIFI
       verification: |
           BLOCKED: SoftAP commissioning not currently supported on DUT=chip-tool
       disabled: true
 
     - label: "If (PICS_WIFI) DUT scans using Wi-Fi in background"
+      PICS: MCORE.DD.WIFI
       verification: |
           BLOCKED: SoftAP commissioning not currently supported on DUT=chip-tool
       disabled: true
@@ -207,6 +214,7 @@ tests:
     - label:
           "If (PICS_WIFI) TH starts SoftAP and begin matter announcement
           procedure"
+      PICS: MCORE.DD.WIFI
       verification: |
           BLOCKED: SoftAP commissioning not currently supported on DUT=chip-tool
       disabled: true

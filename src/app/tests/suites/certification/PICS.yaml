@@ -651,15 +651,6 @@ PICS:
     - label: "Supports a System Mode of Auto"
       id: TSTAT_AUTO
 
-      # Occupency sensing cluster
-    - label: "Does the device implement the Occupancy attribute?"
-      id: A_OCCUPANCY
-
-    - label:
-          "Can the Occupancy attribute changed by physical control at the
-          device?"
-      id: MANUAL_OCCUPANCY_CHANGE
-
       # Window covering cluster
       ## WC-Features
     - label: "Does the device implement the Lift feature?"
@@ -956,6 +947,7 @@ PICS:
           device?"
       id: PRS.M.PressureChange
 
+    # Occupency sensing cluster
     - label: "Does the device implement the Occupancy attribute?"
       id: OCC.S.A0000
 
@@ -1009,19 +1001,152 @@ PICS:
           PhysicalContactUnoccupiedToOccupiedThreshold attribute?"
       id: OCC.S.A0032
 
+    - label:
+          "Can the Occupancy attribute changed by physical control at the
+          device?"
+      id: OCC.M.OccupancyChange
+
+    - label: "Does the device implement the Occupancy attribute?"
+      id: OCC.C.A0000
+
+    - label: "Does the device implement the OccupancySensorType attribute?"
+      id: OCC.C.A0001
+
+    - label:
+          "Does the device implement the OccupancySensorTypeBitmap attribute?"
+      id: OCC.C.A0002
+
+    - label:
+          "Does the device implement the PIROccupiedToUnoccupiedDelay attribute?"
+      id: OCC.C.A0010
+
+    - label:
+          "Does the device implement the PIRUnoccupiedToOccupiedDelay attribute?"
+      id: OCC.C.A0011
+
+    - label:
+          "Does the device implement the PIRUnoccupiedToOccupiedThreshold
+          attribute?"
+      id: OCC.C.A0012
+
+    - label:
+          "Does the device implement the UltrasonicOccupiedToUnoccupiedDelay
+          attribute?"
+      id: OCC.C.A0020
+
+    - label:
+          "Does the device implement the UltrasonicUnoccupiedToOccupiedDelay
+          attribute?"
+      id: OCC.C.A0021
+
+    - label:
+          "Does the device implement the UltrasonicUnoccupiedToOccupiedThreshold
+          attribute?"
+      id: OCC.C.A0022
+
+    - label:
+          "Does the device implement the
+          PhysicalContactOccupiedToUnoccupiedDelay attribute?"
+      id: OCC.C.A0030
+
+    - label:
+          "Does the device implement the
+          PhysicalContactUnoccupiedToOccupiedDelay attribute?"
+      id: OCC.C.A0031
+
+    - label:
+          "Does the device implement the
+          PhysicalContactUnoccupiedToOccupiedThreshold attribute?"
+      id: OCC.C.A0032
+
     - label: "Does the device implement the Tolerance attribute?"
       id: FLW.S.A0003
+
+    - label: "Does the device support extended range and resolution?"
+      id: PRS.S.F00
+
+    #Level Control Cluster
+    - label:
+          "Does the DUT(server) support the Behavior that supports lighting
+          applications feature?"
+      id: LVL.S.F01
 
     - label:
           "Does the DUT(server) support the Frequency attributes and behavior
           feature?"
       id: LVL.S.F02
 
-    - label: "Does the DUT(server) support the MaxLevel attribute?"
-      id: LVL.S.A0003
+    - label: "Does the DUT(server) support the CurrentLevel attribute?"
+      id: LVL.S.A0000
+
+    - label: "Does the DUT(server) support the RemainingTime attribute?"
+      id: LVL.S.A0001
 
     - label: "Does the DUT(server) support the MinLevel attribute?"
       id: LVL.S.A0002
+
+    - label: "Does the DUT(server) support the MaxLevel attribute?"
+      id: LVL.S.A0003
+
+    - label: "Does the DUT(server) support the CurrentFrequency attribute?"
+      id: LVL.S.A0004
+
+    - label: "Does the DUT(server) support the MinFrequency attribute?"
+      id: LVL.S.A0005
+
+    - label: "Does the DUT(server) support the MaxFrequency attribute?"
+      id: LVL.S.A0006
+
+    - label: "Does the DUT(server) support the Options attribute?"
+      id: LVL.S.A000f
+
+    - label: "Does the DUT(server) support the OnOffTransitionTime attribute?"
+      id: LVL.S.A0010
+
+    - label: "Does the DUT(server) support the OnLevel attribute?"
+      id: LVL.S.A0011
+
+    - label: "Does the DUT(server) support the OnTransitionTime attribute?"
+      id: LVL.S.A0012
+
+    - label: "Does the DUT(server) support the OffTransitionTime attribute?"
+      id: LVL.S.A0013
+
+    - label: "Does the DUT(server) support the DefaultMoveRate attribute?"
+      id: LVL.S.A0014
+
+    - label: "Does the DUT(server) support the StartUpCurrentLevel attribute?"
+      id: LVL.S.A4000
+
+    - label: "Does the DUT(server) support the MoveToLevel command?"
+      id: LVL.S.C00.Rsp
+
+    - label: "Does the DUT(server) support the Move command?"
+      id: LVL.S.C01.Rsp
+
+    - label: "Does the DUT(server) support the Step command?"
+      id: LVL.S.C02.Rsp
+
+    - label: "Does the DUT(server) support the Stop command?"
+      id: LVL.S.C03.Rsp
+
+    - label: "Does the DUT(server) support the MoveToLevel with On/Off command?"
+      id: LVL.S.C04.Rsp
+
+    - label: "Does the DUT(server) support the Move with On/Off command?"
+      id: LVL.S.C05.Rsp
+
+    - label: "Does the DUT(server) support the Step with On/Off command?"
+      id: LVL.S.C06.Rsp
+
+    - label: "Does the DUT(server) support the Stop with On/Off command?"
+      id: LVL.S.C07.Rsp
+
+    - label: "Does the DUT(server) support the MoveToClosestFrequency command?"
+      id: LVL.S.C08.Rsp
+
+    - label: "Is the DUT(server) able to move at a variable rate feature?"
+      id: LVL.S.M.VarRate
 
     #Groups Cluster
     - label: "Does the DUT(Server) support NameSupport attribute?"
@@ -1233,11 +1358,6 @@ PICS:
 
     - label: "Does the MS device support Momentary Switch MultiPress?"
       id: SWTCH.S.F04
-
-    - label:
-          "Does the DUT(server) support the Behavior that supports lighting
-          applications feature?"
-      id: LVL.S.F01
 
     #General Commissioning Cluster
     - label: "Does the device(Server) support Breadcrumb attribute?"
@@ -2272,3 +2392,267 @@ PICS:
           "Does the device implement the ScheduleProgrammingVisibility
           attribute?"
       id: TSUIC.S.A0002
+    #Binding Cluster
+    - label: "Does the DUT(server) support the Binding attribute?"
+      id: BIND.S.A0000
+
+    - label: "Does the DUT(client) implement the GroupKeyMap attribute?"
+      id: GRPKEY.C.A0000
+
+    - label: "Does the DUT(client) implement sending the Off command?"
+      id: OO.C.C00.Tx
+
+    - label: "Does the DUT(client) implement sending the On command?"
+      id: OO.C.C01.Tx
+
+    - label: "Does the DUT(Client) implement sending Keysetwrite command?"
+      id: GRPKEY.C.C00.Tx
+
+    - label: "Does the DUT(Client) implement sending AddGroup command?"
+      id: G.C.C00.Tx
+
+    #Device Discovery
+    - label:
+          "Does the device support discovery over Bluetooth Low Energy (BLE)?"
+      id: MCORE.DD.BLE
+
+    - label: "Does the device support discovery over WiFi?"
+      id: MCORE.DD.WIFI
+
+    - label: "Does the device only function within a Matter network?"
+      id: MCORE.DD.CHIP_DEV
+
+    - label: "Is the device a lock device?"
+      id: MCORE.DD.DEV_LOCK
+
+    - label: "Is the device a barrier access device?"
+      id: MCORE.DD.DEV_BARRIER
+
+    - label: "Does the device have a vendor specific information element (IE)?"
+      id: MCORE.DD.IE
+
+    - label:
+          "Does the device or device packaging have a QR code based onboarding
+          payload?"
+      id: MCORE.DD.QR
+
+    - label: "Does the device or device packaging have a Manual Pairing Code?"
+      id: MCORE.DD.MANUAL_PC
+
+    - label: "Does the packed binary data structure contain encoded TLV Data?"
+      id: MCORE.DD.TLV
+
+    - label:
+          "Does the QR code contain multiple concatenated onboarding payloads?"
+      id: MCORE.DD.CONCAT
+
+    - label: "Does the device have a NFC tag containing the onboarding payload?"
+      id: MCORE.DD.NFC
+
+    - label: "Does the device support dynamic passcodes?"
+      id: MCORE.DD.PASSCODE
+
+    - label: "Does the device support user interface?"
+      id: MCORE.DD.UI
+
+    - label: "Does the device support Commissioner Discovery?"
+      id: MCORE.DD.COMM_DISCOVERY
+
+    - label: "Is the DUT a Controller?"
+      id: MCORE.DD.CONTROLLER
+
+    - label: "Does the DUT support scanning concatenated QR codes?"
+      id: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
+
+    - label:
+          "Does the DUT support indicating to user the need to commission device
+          one by one for concatenated QR codes?"
+      id: MCORE.DD.CTRL_CONCATENATED_QR_CODE_2
+
+    - label: "Is the DUT a Commissioner?"
+      id: MCORE.DD.COMMISSIONER
+
+    - label: "Does the DUT require a custom commissioning flow?"
+      id: MCORE.DD.CUSTOM_COMM_FLOW
+
+    - label: "Does the DUT support Discovery Capability over BLE?"
+      id: MCORE.DD.DT_BLE
+
+    - label: "Is the DUT a Controller?"
+      id: MCORE.DD.CONTROLLER
+
+    - label: "Does the DUT support Discovery Capability over IP Network?"
+      id: MCORE.DD.DT_IP
+
+    - label: "Does the DUT support Discovery Capability over SoftAP?"
+      id: MCORE.DD.DT_SOFTAP
+
+    - label: "Does the DUT support Standard Commissioning Flow?"
+      id: MCORE.DD.STANDARD_COMM_FLOW
+
+    - label: "Does the DUT support User-Intent Commissioning Flow?"
+      id: MCORE.DD.USER_INTENT_COMM_FLOW
+
+    - label: "Does the DUT support Custom Commissioning Flow?"
+      id: MCORE.DD.CUSTOM_COMM_FLOW
+
+    - label:
+          "Does the DUT commissioner support accepting an 11-digit Manual
+          Pairing Code for commissioning?"
+      id: MCORE.DD.11_MANUAL_PC
+
+    - label:
+          "Does the DUT commissioner support accepting a 21-digit Manual Pairing
+          Code for commissioning?"
+      id: MCORE.DD.21_MANUAL_PC
+
+    - label:
+          "Does the device is subject to physical tampering (doorbell, camera,
+          door lock, designed for outdoor usage)?"
+      id: MCORE.DD.PHYSICAL_TAMPERING
+
+    - label:
+          "Does the device support scanning NFC tags containing the onboarding
+          payload?"
+      id: MCORE.DD.SCAN_NFC
+
+    - label:
+          "Does the DUT support scanning QR codes containing the onboarding
+          payload?"
+      id: MCORE.DD.SCAN_QR_CODE
+
+    - label: "Does the device support Thread interface?"
+      id: MCORE.DD.THREAD
+
+    - label: "Does the device support Wifi or Thread interfaces?"
+      id: MCORE.DD.WIRELESS
+
+    #Ethernet Network Diagnostics Cluster
+    - label: "Does the device implement the ResetCounts command?"
+      id: DGETH.S.C00
+
+    - label: "Does the device implement the PHYRate attribute?"
+      id: DGETH.S.A0000
+
+    - label: "Does the device implement the FullDuplex attribute?"
+      id: DGETH.S.A0001
+
+    - label: "Does the device implement the PacketRxCount attribute?"
+      id: DGETH.S.A0002
+
+    - label: "Does the device implement the PacketTxCount attribute?"
+      id: DGETH.S.A0003
+
+    - label: "Does the device implement the TxErrCount attribute?"
+      id: DGETH.S.A0004
+
+    - label: "Does the device implement the CollisionCount attribute?"
+      id: DGETH.S.A0005
+
+    - label: "Does the device implement the OverrunCount attribute?"
+      id: DGETH.S.A0006
+
+    - label: "Does the device implement the CarrierDetect attribute?"
+      id: DGETH.S.A0007
+
+    - label: "Does the device implement the CarrierDetect attribute?"
+      id: DGETH.S.A0008
+
+    #Wi-Fi Network Diagnostics Cluster
+    - label:
+          "Counts for the number of received and transmitted packets on the
+          ethernet interface."
+      id: DGWIFI.S.F00
+
+    - label:
+          "Counts for the number of errors during the reception and transmission
+          of packets on the ethernet interface."
+      id: DGWIFI.S.F01
+
+    - label:
+          "Indicates the BSSID for which the Wi-Fi network the Node is currently
+          connected. If the interface not configured, a NULL value should be
+          presented."
+      id: DGWIFI.S.A0000
+
+    - label: "The current type of WiFi security being used."
+      id: DGWIFI.S.A0001
+
+    - label: "Indicates the current 802.11 standard version in use by the Node."
+      id: DGWIFI.S.A0002
+
+    - label:
+          "Indicate the channel that Wi-Fi communication is currently operating
+          on. If the interface not configured, a NULL value should be presented"
+      id: DGWIFI.S.A0003
+
+    - label:
+          "Indicates the current RSSI of the Node 's Wi-Fi radio in dB. If the
+          interface not configured or operational, a NULL value should be
+          presented. This value should not be subscribed."
+      id: DGWIFI.S.A0004
+
+    - label:
+          "Indicates the count of the number of received beacons. This value
+          should not be subscribed."
+      id: DGWIFI.S.A0005
+
+    - label:
+          "Indicates the count of the number of received beacons. This value
+          should not be subscribed."
+      id: DGWIFI.S.A0006
+
+    - label:
+          "Indicates the number of multicast packets received by the Node. This
+          value should not be subscribed."
+      id: DGWIFI.S.A0007
+
+    - label:
+          "Indicates the number of mul5icast packets transmitted by the Node.
+          This value should not be subscribed."
+      id: DGWIFI.S.A0008
+
+    - label:
+          "Indicates the number of uicast packets received by the Node. This
+          value should not be subscribed."
+      id: DGWIFI.S.A0009
+
+    - label:
+          "Indicates the number of unicast packets transmitted by the Node. This
+          value should not be subscribed."
+      id: DGWIFI.S.A000a
+
+    - label:
+          "Indicates the current maximum PHY rate of transfer of data in
+          bytes-per-second."
+      id: DGWIFI.S.A000b
+
+    - label:
+          "Indicates the number of packets dropped either at ingress or egress,
+          due to lack of buffer memory to retain all packets on the ethernet
+          network interface. This attribute SHALL be reset to 0 upon a reboot of
+          the Node. This value should not be subscribed."
+      id: DGWIFI.S.A000c
+
+    - label:
+          "Indicates Node’s Wi-Fi connection has been disconnected as a result
+          of de-authenticated or dis-association and indicates the reason."
+      id: DGWIFI.S.E00
+
+    - label:
+          "Indicates unsuccessful connection and reconnection to WiFi access
+          point after exhaustive retries. AssociationFailure fields are to
+          indicate the cause and status. Each field set values are described in
+          11.14.6.2"
+      id: DGWIFI.S.E01
+
+    - label:
+          "Indicates that a Node’s connection status to a Wi-Fi network has
+          changed."
+      id: DGWIFI.S.E02
+
+    - label:
+          "Reset the following attributes to 0; BeaconLostCount, BeaconRxCount,
+          PacketMulticastRxCount, PacketMulticastTxCount, PacketUnicastRxCount,
+          PacketUnicastTxCount"
+      id: DGWIFI.S.C00
