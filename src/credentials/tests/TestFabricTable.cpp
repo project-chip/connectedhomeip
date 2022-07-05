@@ -1837,6 +1837,8 @@ void TestFetchCATs(nlTestSuite * inSuite, void * inContext)
         // Test fabric NOCs don't contain any CATs.
         NL_TEST_ASSERT(inSuite, cats == kUndefinedCATs);
     }
+
+    // TODO(#20335): Add test cases for NOCs that actually embed CATs
 }
 
 void TestAddNocRootCollision(nlTestSuite * inSuite, void * inContext)
