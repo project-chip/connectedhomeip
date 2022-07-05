@@ -29,14 +29,17 @@ public:
 
     void setDelegate(id<MTROtaProviderDelegate> delegate, dispatch_queue_t queue);
 
-    void HandleQueryImage(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                          const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData) override;
+    void HandleQueryImage(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData) override;
 
-    void HandleApplyUpdateRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                  const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData) override;
+    void HandleApplyUpdateRequest(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData) override;
 
-    void HandleNotifyUpdateApplied(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                   const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
+    void HandleNotifyUpdateApplied(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
 
 private:
     _Nullable id<MTROtaProviderDelegate> mDelegate;

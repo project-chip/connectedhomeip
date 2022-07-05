@@ -31,23 +31,27 @@ NS_ASSUME_NONNULL_BEGIN
  * Notify the delegate when query image command is received
  *
  */
-//cyang: Determine what the params should be to pass all necessary data over
+// cyang: Determine what the params should be to pass all necessary data over
 - (void)handleQueryImage:(CHIPOtaSoftwareUpdateProviderClusterQueryImageParams *)command
-   completionHandler:(void (^)(NSError * _Nullable error, CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable responseParams))completionHandler;
+       completionHandler:
+           (void (^)(NSError * _Nullable error,
+               CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable responseParams))completionHandler;
 
 /**
  * Notify the delegate when apply update request command is received
  *
  */
 - (void)handleApplyUpdateRequest:(CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)command
-   completionHandler:(void (^)(NSError * _Nullable error, CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable responseParams))completionHandler;
+               completionHandler:
+                   (void (^)(NSError * _Nullable error,
+                       CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable responseParams))completionHandler;
 
 /**
  * Notify the delegate when notify update applied command is received
  *
  */
 - (void)handleNotifyUpdateApplied:(CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)command
-   completionHandler:(void (^)(NSError * _Nullable error))completionHandler;
+                completionHandler:(void (^)(NSError * _Nullable error))completionHandler;
 
 @end
 
