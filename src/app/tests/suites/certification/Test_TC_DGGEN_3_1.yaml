@@ -21,12 +21,8 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
-
-      disabled: true
-
     - label: "TH reads NetworkInterfaces structure attribute from DUT."
+      PICS: DGGEN.S.A0000
       verification: |
           ./chip-tool generaldiagnostics read network-interfaces 1 0
           [1654682355.830733][32933:32938] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0000 DataVersion: 2161135285
@@ -164,6 +160,7 @@ tests:
     - label:
           "TH reads a RebootCount attribute value from DUT. Then a DUT (node)
           gets rebooted more than 2 times."
+      PICS: DGGEN.S.A0001
       verification: |
           ./chip-tool generaldiagnostics read reboot-count 1 0
 
@@ -201,6 +198,7 @@ tests:
     - label:
           "DUT reboots and TH reads a UpTime attribute value of DUT since some
           arbitrary start time of DUT rebooting."
+      PICS: DGGEN.S.A0002
       verification: |
           ./chip-tool generaldiagnostics read up-time 1 0
           [1650877936.461150][2360:2365] CHIP:DMG: ReportDataMessage =
@@ -234,6 +232,7 @@ tests:
       disabled: true
 
     - label: "TH reads a TotalOpreationalHours attribute value from DUT."
+      PICS: DGGEN.S.A0003
       verification: |
           ./chip-tool generaldiagnostics read total-operational-hours 1 0
 
@@ -269,6 +268,7 @@ tests:
 
     - label:
           "DUT undergoes a reboot process. TH reads a attribute value from DUT."
+      PICS: DGGEN.S.A0004
       verification: |
           ./chip-tool generaldiagnostics read boot-reasons 1 0
 
@@ -305,6 +305,7 @@ tests:
     - label:
           "TH reads ActiveHardwareFaults attribute value from DUT. Subscription
           is possible option for this attribute."
+      PICS: DGGEN.S.A0005
       verification: |
           ./chip-tool generaldiagnostics read active-hardware-faults 1 0
           [1650878034.131791][2385:2390] CHIP:DMG: ReportDataMessage =
@@ -342,6 +343,7 @@ tests:
     - label:
           "TH reads ActiveRadioFaults attribute value from DUT. Subscription is
           possible option for this attribute"
+      PICS: DGGEN.S.A0006
       verification: |
           ./chip-tool generaldiagnostics read active-radio-faults 1 0
 
@@ -380,6 +382,7 @@ tests:
     - label:
           "TH reads ActiveNetworkFaults attribute value from DUT. Subscription
           is possible option for this attribute."
+      PICS: DGGEN.S.A0007
       verification: |
           ./chip-tool generaldiagnostics read active-network-faults 1 0
           [1650878077.693017][2399:2404] CHIP:DMG: ReportDataMessage =
@@ -418,6 +421,7 @@ tests:
           "TH reads TestEventTriggersEnabled attribute value. If this value is
           set True, then a certain test mode will be performed (or triggered)
           according to pre-provisioned client and server test mode."
+      PICS: DGGEN.S.A0008
       verification: |
           ./chip-tool generaldiagnostics read   test-event-triggers-enabled  1 0
 

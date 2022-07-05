@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "read the mandatory attribute: MeasuredValue"
+      PICS: FLW.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
@@ -39,7 +40,7 @@ tests:
     - label: "operate on DUT to change the flow significantly"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && FLW.M.FlowChange
       arguments:
           values:
               - name: "message"
@@ -48,6 +49,7 @@ tests:
                 value: "y"
 
     - label: "read the mandatory attribute: MeasuredValue"
+      PICS: FLW.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
