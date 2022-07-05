@@ -1738,4 +1738,4 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(GObject * source_object, G
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 } // namespace DeviceLayer
-} // namespace chip
+} // namespace DeviceLayer
