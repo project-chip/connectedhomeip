@@ -319,7 +319,7 @@ def main():
     parser.add_argument('--mfg-date', type=str, required=False, help='Manufacturing date in format YYYY-MM-DD')
     parser.add_argument('--serial-num', type=str, required=False, help='Serial number')
     parser.add_argument('--unique-id', type=str, required=False,
-                        help='128-bt unique identifier, provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"')
+                        help='128-bit unique identifier, provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"')
 
     parser.add_argument('-s', '--size', type=any_base_int, required=False, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')
