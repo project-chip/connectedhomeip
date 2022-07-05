@@ -13,7 +13,7 @@
 #import <setup_payload/SetupPayload.h>
 #endif
 
-@interface MTRSetupPayload ()
+@interface MTRSetupPayload () <NSSecureCoding>
 
 #ifdef __cplusplus
 - (id)initWithSetupPayload:(chip::SetupPayload)setupPayload;
