@@ -1789,7 +1789,7 @@ void TestFabricLookup(nlTestSuite * inSuite, void * inContext)
             break;
         }
         memcpy(key.Bytes(), TestCerts::sTestCert_Root01_PublicKey, TestCerts::sTestCert_Root01_PublicKey_Len);
-        FabricInfo * fabricInfo = fabricTable.FindFabricWithRootPubKeyFabricId(key, 0xFAB000000000001D);
+        auto fabricInfo = fabricTable.FindFabric(key, 0xFAB000000000001D);
         NL_TEST_ASSERT(inSuite, fabricInfo != nullptr);
         if (fabricInfo == nullptr)
         {
@@ -1808,7 +1808,7 @@ void TestFabricLookup(nlTestSuite * inSuite, void * inContext)
             break;
         }
         memcpy(key.Bytes(), TestCerts::sTestCert_Root02_PublicKey, TestCerts::sTestCert_Root02_PublicKey_Len);
-        FabricInfo * fabricInfo = fabricTable.FindFabricWithRootPubKeyFabricId(key, 0xFAB000000000001D);
+        auto fabricInfo = fabricTable.FindFabric(key, 0xFAB000000000001D);
         NL_TEST_ASSERT(inSuite, fabricInfo != nullptr);
         if (fabricInfo == nullptr)
         {

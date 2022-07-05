@@ -402,7 +402,6 @@ public:
     const FabricInfo * FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId) const;
     const FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex) const;
     const FabricInfo * FindFabricWithCompressedId(CompressedFabricId compressedFabricId) const;
-    FabricInfo * FindFabricWithRootPubKeyFabricId(const Crypto::P256PublicKey & rootPubKey, const FabricId & fabricId);
 
     CHIP_ERROR Init(const FabricTable::InitParams & initParams);
     void Shutdown();

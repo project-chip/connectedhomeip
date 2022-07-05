@@ -538,32 +538,6 @@ const FabricInfo * FabricTable::FindFabricWithCompressedId(CompressedFabricId co
     return nullptr;
 }
 
-FabricInfo * FabricTable::FindFabricWithRootPubKeyFabricId(const Crypto::P256PublicKey & rootPubKey, const FabricId & fabricId)
-{
-    for (auto & fabric : mStates)
-    {
-        if (!fabric.IsInitialized())
-        {
-            continue;
-        }
-        if (fabricId != fabric.GetFabricId())
-        {
-            continue;
-        }
-        Crypto::P256PublicKey candidateKey;
-        if (fabric.FetchRootPubkey(candidateKey) != CHIP_NO_ERROR)
-        {
-            continue;
-        }
-        if (memcmp(rootPubKey.ConstBytes(), candidateKey.ConstBytes(), candidateKey.Length()) != 0)
-        {
-            continue;
-        }
-        return &fabric;
-    }
-    return nullptr;
-}
-
 CHIP_ERROR FabricTable::FetchRootCert(FabricIndex fabricIndex, MutableByteSpan & outCert) const
 {
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
