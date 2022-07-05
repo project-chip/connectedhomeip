@@ -30,6 +30,13 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
+#endif
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
@@ -55,6 +62,26 @@ static TaskHandle_t sAppTaskHandle;
 extern "C" {
 int cc13x2_26x2LogInit(void);
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+static DefaultOTARequestor sRequestorCore;
+static DefaultOTARequestorStorage sRequestorStorage;
+static DefaultOTARequestorDriver sRequestorUser;
+static BDXDownloader sDownloader;
+static OTAImageProcessorImpl sImageProcessor;
+
+void InitializeOTARequestor(void)
+{
+    // Initialize and interconnect the Requestor and Image Processor objects
+    SetRequestorInstance(&sRequestorCore);
+
+    sRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+    sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
+    sImageProcessor.SetOTADownloader(&sDownloader);
+    sDownloader.SetImageProcessorDelegate(&sImageProcessor);
+    sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
+}
+#endif
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -124,7 +151,9 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    InitializeOTARequestor();
+#endif
     return err;
 }
 

@@ -144,6 +144,9 @@ PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
 # Generating linux-fake-tests
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_build_tests=true custom_toolchain="//build/toolchain/fake:fake_x64_gcc" chip_link_tests=true chip_device_platform="fake" chip_fake_platform=true' {out}/linux-fake-tests
 
+# Generating linux-fake-tests-clang
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=is_clang=true chip_build_tests=true custom_toolchain="//build/toolchain/fake:fake_x64_gcc" chip_link_tests=true chip_device_platform="fake" chip_fake_platform=true' {out}/linux-fake-tests-clang
+
 # Generating linux-x64-address-resolve-tool
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} {out}/linux-x64-address-resolve-tool
 
@@ -230,6 +233,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating linux-x64-tests
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} --args=chip_build_tests=true {out}/linux-x64-tests
+
+# Generating linux-x64-tests-clang
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=is_clang=true chip_build_tests=true' {out}/linux-x64-tests-clang
 
 # Generating linux-x64-thermostat
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/thermostat/linux {out}/linux-x64-thermostat
@@ -336,6 +342,9 @@ ninja -C {out}/linux-arm64-tv-casting-app-ipv6only
 # Building linux-fake-tests
 ninja -C {out}/linux-fake-tests check
 
+# Building linux-fake-tests-clang
+ninja -C {out}/linux-fake-tests-clang check
+
 # Building linux-x64-address-resolve-tool
 ninja -C {out}/linux-x64-address-resolve-tool src/lib/address_resolve:address-resolve-tool
 
@@ -422,6 +431,9 @@ ninja -C {out}/linux-x64-shell-ipv6only
 
 # Building linux-x64-tests
 ninja -C {out}/linux-x64-tests check
+
+# Building linux-x64-tests-clang
+ninja -C {out}/linux-x64-tests-clang check
 
 # Building linux-x64-thermostat
 ninja -C {out}/linux-x64-thermostat

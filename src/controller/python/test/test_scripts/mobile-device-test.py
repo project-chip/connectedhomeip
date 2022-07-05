@@ -81,6 +81,9 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
                                           nodeid=1))
     FailIfNot(ok, "Failed to commission multi-fabric")
 
+    FailIfNot(asyncio.run(test.TestAddUpdateRemoveFabric(nodeid=device_nodeid)),
+              "Failed AddUpdateRemoveFabric test")
+
     logger.info("Testing CASE Eviction")
     FailIfNot(asyncio.run(test.TestCaseEviction(device_nodeid)), "Failed TestCaseEviction")
 

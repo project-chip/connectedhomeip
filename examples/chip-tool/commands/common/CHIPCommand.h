@@ -101,7 +101,7 @@ protected:
 
     // Shut down the command.  After a Shutdown call the command object is ready
     // to be used for another command invocation.
-    virtual void Shutdown() {}
+    virtual void Shutdown() { ResetArguments(); }
 
     // Clean up any resources allocated by the command.  Some commands may hold
     // on to resources after Shutdown(), but Cleanup() will guarantee those are

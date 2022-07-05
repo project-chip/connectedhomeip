@@ -18,6 +18,8 @@
 
 #pragma once
 
+#import <Matter/Matter.h>
+
 #include "OpenCommissioningWindowCommand.h"
 #include "PairingCommandBridge.h"
 

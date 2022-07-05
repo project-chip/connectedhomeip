@@ -21,9 +21,9 @@
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
 #import "DeviceSelector.h"
-#import <CHIP/CHIP.h>
-#import <CHIP/CHIPDeviceAttestationDelegate.h>
-#import <CHIP/CHIPSetupPayload.h>
+#import <Matter/MTRDeviceAttestationDelegate.h>
+#import <Matter/MTRSetupPayload.h>
+#import <Matter/Matter.h>
 
 // system imports
 #import <AVFoundation/AVFoundation.h>
@@ -77,15 +77,15 @@
 @property (strong, nonatomic) UIActivityIndicatorView * activityIndicator;
 @property (strong, nonatomic) UILabel * errorLabel;
 
-@property (readwrite) CHIPDeviceController * chipController;
-@property (nonatomic, strong) CHIPNetworkCommissioning * cluster;
+@property (readwrite) MTRDeviceController * chipController;
+@property (nonatomic, strong) MTRNetworkCommissioning * cluster;
 
 @property (strong, nonatomic) NFCNDEFReaderSession * session;
-@property (strong, nonatomic) CHIPSetupPayload * setupPayload;
+@property (strong, nonatomic) MTRSetupPayload * setupPayload;
 @property (strong, nonatomic) DeviceSelector * deviceList;
 @end
 
-@interface CHIPToolDeviceAttestationDelegate : NSObject <CHIPDeviceAttestationDelegate>
+@interface CHIPToolDeviceAttestationDelegate : NSObject <MTRDeviceAttestationDelegate>
 
 @property (weak, nonatomic) QRCodeViewController * viewController;
 
@@ -407,7 +407,7 @@
     [self setupUI];
 
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
-    self.chipController = InitializeCHIP();
+    self.chipController = InitializeMTR();
     [self.chipController setPairingDelegate:self queue:callbackQueue];
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
@@ -467,7 +467,7 @@
 - (void)setVendorIDOnAccessory
 {
     NSLog(@"Call to setVendorIDOnAccessory");
-    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable device, NSError * _Nullable error) {
             if (!device) {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
@@ -478,21 +478,21 @@
     }
 }
 
-// MARK: CHIPDevicePairingDelegate
+// MARK: MTRDevicePairingDelegate
 - (void)onPairingComplete:(NSError * _Nullable)error
 {
     if (error != nil) {
         NSLog(@"Got pairing error back %@", error);
     } else {
-        CHIPDeviceController * controller = InitializeCHIP();
-        uint64_t deviceId = CHIPGetLastPairedDeviceId();
+        MTRDeviceController * controller = InitializeMTR();
+        uint64_t deviceId = MTRGetLastPairedDeviceId();
         if ([controller deviceBeingCommissionedOverBLE:deviceId]) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self->_deviceList refreshDeviceList];
                 [self retrieveAndSendWiFiCredentials];
             });
         } else {
-            CHIPCommissioningParameters * params = [[CHIPCommissioningParameters alloc] init];
+            MTRCommissioningParameters * params = [[MTRCommissioningParameters alloc] init];
             params.deviceAttestationDelegate = [[CHIPToolDeviceAttestationDelegate alloc] initWithViewController:self];
             params.failSafeExpiryTimeoutSecs = @600;
             NSError * error;
@@ -577,7 +577,7 @@
     });
 }
 
-- (void)showPayload:(CHIPSetupPayload *)payload rawPayload:(NSString *)rawPayload isManualCode:(BOOL)isManualCode
+- (void)showPayload:(MTRSetupPayload *)payload rawPayload:(NSString *)rawPayload isManualCode:(BOOL)isManualCode
 {
     [self->_activityIndicator stopAnimating];
     self->_activityIndicator.hidden = YES;
@@ -602,7 +602,7 @@
         textField.clearButtonMode = UITextFieldViewModeWhileEditing;
         textField.borderStyle = UITextBorderStyleRoundedRect;
 
-        NSString * networkSSID = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
+        NSString * networkSSID = MTRGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey);
         if ([networkSSID length] > 0) {
             textField.text = networkSSID;
         }
@@ -614,7 +614,7 @@
         textField.borderStyle = UITextBorderStyleRoundedRect;
         textField.secureTextEntry = YES;
 
-        NSString * networkPassword = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkPasswordDefaultsKey);
+        NSString * networkPassword = MTRGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey);
         if ([networkPassword length] > 0) {
             textField.text = networkPassword;
         }
@@ -635,13 +635,13 @@
                                                  UITextField * networkSSID = textfields[0];
                                                  UITextField * networkPassword = textfields[1];
                                                  if ([networkSSID.text length] > 0) {
-                                                     CHIPSetDomainValueForKey(
-                                                         kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey, networkSSID.text);
+                                                     MTRSetDomainValueForKey(
+                                                         MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey, networkSSID.text);
                                                  }
 
                                                  if ([networkPassword.text length] > 0) {
-                                                     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkPasswordDefaultsKey,
-                                                         networkPassword.text);
+                                                     MTRSetDomainValueForKey(
+                                                         MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey, networkPassword.text);
                                                  }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
 
@@ -655,16 +655,16 @@
 {
 
     NSError * error;
-    CHIPDeviceController * controller = InitializeCHIP();
+    MTRDeviceController * controller = InitializeMTR();
     // create commissioning params in ObjC. Pass those in here with network credentials.
     // maybe this just becomes the new norm
-    CHIPCommissioningParameters * params = [[CHIPCommissioningParameters alloc] init];
+    MTRCommissioningParameters * params = [[MTRCommissioningParameters alloc] init];
     params.wifiSSID = [ssid dataUsingEncoding:NSUTF8StringEncoding];
     params.wifiCredentials = [password dataUsingEncoding:NSUTF8StringEncoding];
     params.deviceAttestationDelegate = [[CHIPToolDeviceAttestationDelegate alloc] initWithViewController:self];
     params.failSafeExpiryTimeoutSecs = @600;
 
-    uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
+    uint64_t deviceId = MTRGetNextAvailableDeviceID() - 1;
 
     if (![controller commissionDevice:deviceId commissioningParams:params error:&error]) {
         NSLog(@"Failed to commission Device %llu, with error %@", deviceId, error);
@@ -678,12 +678,12 @@
         return;
     }
     // track this device
-    uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
-    CHIPSetDevicePaired(deviceId, YES);
+    uint64_t deviceId = MTRGetNextAvailableDeviceID() - 1;
+    MTRSetDevicePaired(deviceId, YES);
     [self setVendorIDOnAccessory];
 }
 
-- (void)updateUIFields:(CHIPSetupPayload *)payload rawPayload:(nullable NSString *)rawPayload isManualCode:(BOOL)isManualCode
+- (void)updateUIFields:(MTRSetupPayload *)payload rawPayload:(nullable NSString *)rawPayload isManualCode:(BOOL)isManualCode
 {
     if (isManualCode) {
         _manualCodeLabel.hidden = NO;
@@ -711,12 +711,12 @@
 
     [self updateResultViewUI:_setupPayloadView];
 
-    if (payload.commissioningFlow == kCommissioningFlowCustom) {
+    if (payload.commissioningFlow == MTRCommissioningFlowCustom) {
         _readFromLedgerButton.hidden = NO;
     }
 }
 
-- (void)parseOptionalData:(CHIPSetupPayload *)payload
+- (void)parseOptionalData:(MTRSetupPayload *)payload
 {
     NSLog(@"Payload vendorID %@", payload.vendorID);
     BOOL isSameVendorID = [payload.vendorID isEqualToNumber:[NSNumber numberWithInt:EXAMPLE_VENDOR_ID]];
@@ -725,13 +725,13 @@
     }
 
     NSArray * optionalInfo = [payload getAllOptionalVendorData:nil];
-    for (CHIPOptionalQRCodeInfo * info in optionalInfo) {
+    for (MTROptionalQRCodeInfo * info in optionalInfo) {
         NSNumber * tag = info.tag;
         if (!tag) {
             continue;
         }
 
-        BOOL isTypeString = [info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeString]];
+        BOOL isTypeString = [info.infoType isEqualToNumber:[NSNumber numberWithInt:MTROptionalQRCodeInfoTypeString]];
         if (!isTypeString) {
             return;
         }
@@ -749,17 +749,17 @@
 
 // MARK: Rendez Vous
 
-- (void)handleRendezVous:(CHIPSetupPayload *)payload rawPayload:(NSString *)rawPayload
+- (void)handleRendezVous:(MTRSetupPayload *)payload rawPayload:(NSString *)rawPayload
 {
     switch (payload.rendezvousInformation) {
-    case kRendezvousInformationNone:
-    case kRendezvousInformationOnNetwork:
-    case kRendezvousInformationBLE:
-    case kRendezvousInformationAllMask:
+    case MTRRendezvousInformationNone:
+    case MTRRendezvousInformationOnNetwork:
+    case MTRRendezvousInformationBLE:
+    case MTRRendezvousInformationAllMask:
         NSLog(@"Rendezvous Default");
         [self handleRendezVousDefault:rawPayload];
         break;
-    case kRendezvousInformationSoftAP:
+    case MTRRendezvousInformationSoftAP:
         NSLog(@"Rendezvous Wi-Fi");
         [self handleRendezVousWiFi:[self getNetworkName:payload.discriminator]];
         break;
@@ -775,7 +775,7 @@
 
 - (void)_restartMatterStack
 {
-    self.chipController = CHIPRestartController(self.chipController);
+    self.chipController = MTRRestartController(self.chipController);
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
     [self.chipController setPairingDelegate:self queue:callbackQueue];
 }
@@ -783,14 +783,14 @@
 - (void)handleRendezVousDefault:(NSString *)payload
 {
     NSError * error;
-    uint64_t deviceID = CHIPGetNextAvailableDeviceID();
+    uint64_t deviceID = MTRGetNextAvailableDeviceID();
 
     // restart the Matter Stack before pairing (for reliability + testing restarts)
     [self _restartMatterStack];
 
     if ([self.chipController pairDevice:deviceID onboardingPayload:payload error:&error]) {
         deviceID++;
-        CHIPSetNextAvailableDeviceID(deviceID);
+        MTRSetNextAvailableDeviceID(deviceID);
     }
 }
 
@@ -841,7 +841,7 @@
     return YES;
 }
 
-- (void)displayQRCodeInSetupPayloadView:(CHIPSetupPayload *)payload rawPayload:(NSString *)rawPayload error:(NSError *)error
+- (void)displayQRCodeInSetupPayloadView:(MTRSetupPayload *)payload rawPayload:(NSString *)rawPayload error:(NSError *)error
 {
     if (error) {
         [self showError:error];
@@ -856,7 +856,7 @@
         [self->_captureSession stopRunning];
         [self->_session invalidateSession];
     });
-    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase38Representation:qrCode];
+    MTRQRCodeSetupPayloadParser * parser = [[MTRQRCodeSetupPayloadParser alloc] initWithBase38Representation:qrCode];
     NSError * error;
     _setupPayload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
@@ -881,7 +881,7 @@
 }
 
 // MARK: Manual Code
-- (void)displayManualCodeInSetupPayloadView:(CHIPSetupPayload *)payload
+- (void)displayManualCodeInSetupPayloadView:(MTRSetupPayload *)payload
                               decimalString:(NSString *)decimalString
                                   withError:(NSError *)error
 {
@@ -929,8 +929,7 @@
     NSString * decimalString = _manualCodeTextField.text;
     [self manualCodeEnteredStartState];
 
-    CHIPManualSetupPayloadParser * parser =
-        [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:decimalString];
+    MTRManualSetupPayloadParser * parser = [[MTRManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:decimalString];
     NSError * error;
     _setupPayload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^{
@@ -1073,7 +1072,7 @@
     return self;
 }
 
-- (void)deviceAttestation:(CHIPDeviceController *)controller failedForDevice:(void *)device error:(NSError * _Nonnull)error
+- (void)deviceAttestation:(MTRDeviceController *)controller failedForDevice:(void *)device error:(NSError * _Nonnull)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         UIAlertController * alertController = [UIAlertController

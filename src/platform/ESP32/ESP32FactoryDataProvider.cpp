@@ -194,6 +194,21 @@ CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersionString(char * buf, size_t
     size_t hardwareVersionStringLen = 0; // without counting null-terminator
     return ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionStringLen);
 }
+
+CHIP_ERROR ESP32FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
+{
+    ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
+                  "Length of unique ID for rotating device ID is smaller than minimum.");
+
+    size_t uniqueIdLen = 0;
+    err = ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_UniqueId, uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
+    ReturnErrorOnFailure(err);
+    uniqueIdSpan.reduce_size(uniqueIdLen);
+#endif
+    return err;
+}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 
 } // namespace DeviceLayer

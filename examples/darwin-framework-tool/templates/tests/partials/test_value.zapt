@@ -18,13 +18,13 @@
   }
 {{else}}
   {{#if_is_struct type}}
-    {{target}} = [[CHIP{{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase type}} alloc] init];
+    {{target}} = [[MTR{{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase type}} alloc] init];
     {{#zcl_struct_items_by_struct_name type}}
       {{#if_include_struct_item_value ../definedValue name}}
         {{! target may be some place where we lost type information (e.g. an
             id), so add explicit cast when trying to assign to our
             properties. }}
-        {{>test_value target=(concat "((CHIP" (asUpperCamelCase ../cluster) "Cluster" (asUpperCamelCase ../type) " *)" ../target ")." (asStructPropertyName label)) definedValue=(lookup ../definedValue name) cluster=../cluster depth=(incrementDepth ../depth)}}
+        {{>test_value target=(concat "((MTR" (asUpperCamelCase ../cluster) "Cluster" (asUpperCamelCase ../type) " *)" ../target ")." (asStructPropertyName label)) definedValue=(lookup ../definedValue name) cluster=../cluster depth=(incrementDepth ../depth)}}
       {{/if_include_struct_item_value}}
     {{/zcl_struct_items_by_struct_name}}
 

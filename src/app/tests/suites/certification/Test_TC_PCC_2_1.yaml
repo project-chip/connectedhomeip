@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Read the mandatory attribute: MaxPressure"
+      PICS: PCC.S.A0000
       command: "readAttribute"
       attribute: "MaxPressure"
       response:
@@ -38,6 +39,7 @@ tests:
               maxValue: 32767
 
     - label: "Read the mandatory attribute: MaxSpeed"
+      PICS: PCC.S.A0001
       command: "readAttribute"
       attribute: "MaxSpeed"
       response:
@@ -47,6 +49,7 @@ tests:
               maxValue: 65535
 
     - label: "Read the mandatory attribute: MaxFlow"
+      PICS: PCC.S.A0002
       command: "readAttribute"
       attribute: "MaxFlow"
       response:
@@ -56,6 +59,7 @@ tests:
               maxValue: 65535
 
     - label: "Read the optional attribute: MinConstPressure"
+      PICS: PCC.S.A0003
       optional: true
       command: "readAttribute"
       attribute: "MinConstPressure"
@@ -66,6 +70,7 @@ tests:
               maxValue: 32767
 
     - label: "Read the optional attribute: MaxConstPressure"
+      PICS: PCC.S.A0004
       optional: true
       command: "readAttribute"
       attribute: "MaxConstPressure"
@@ -76,6 +81,7 @@ tests:
               maxValue: 32767
 
     - label: "Read the optional attribute: MinCompPressure"
+      PICS: PCC.S.A0005
       optional: true
       command: "readAttribute"
       attribute: "MinCompPressure"
@@ -86,6 +92,7 @@ tests:
               maxValue: 32767
 
     - label: "Read the optional attribute: MaxCompPressure"
+      PICS: PCC.S.A0006
       optional: true
       command: "readAttribute"
       attribute: "MaxCompPressure"
@@ -96,6 +103,7 @@ tests:
               maxValue: 32767
 
     - label: "Read the optional attribute: MinConstSpeed"
+      PICS: PCC.S.A0007
       optional: true
       command: "readAttribute"
       attribute: "MinConstSpeed"
@@ -106,6 +114,7 @@ tests:
               maxValue: 65535
 
     - label: "Read the optional attribute: MaxConstSpeed"
+      PICS: PCC.S.A0008
       optional: true
       command: "readAttribute"
       attribute: "MaxConstSpeed"
@@ -116,6 +125,7 @@ tests:
               maxValue: 65535
 
     - label: "Read the optional attribute: MinConstFlow"
+      PICS: PCC.S.A0009
       optional: true
       command: "readAttribute"
       attribute: "MinConstFlow"
@@ -126,6 +136,7 @@ tests:
               maxValue: 65535
 
     - label: "Read the optional attribute: MaxConstFlow"
+      PICS: PCC.S.A000a
       optional: true
       command: "readAttribute"
       attribute: "MaxConstFlow"
@@ -136,6 +147,7 @@ tests:
               maxValue: 65535
 
     - label: "Read the optional attribute: MinConstTemp"
+      PICS: PCC.S.A000b
       optional: true
       command: "readAttribute"
       attribute: "MinConstTemp"
@@ -146,6 +158,7 @@ tests:
               maxValue: 32767
 
     - label: "Read the optional attribute: MaxConstTemp"
+      PICS: PCC.S.A000c
       optional: true
       command: "readAttribute"
       attribute: "MaxConstTemp"
@@ -156,6 +169,7 @@ tests:
               maxValue: 32767
 
     - label: "Read the optional attribute: PumpStatus"
+      PICS: PCC.S.A0010
       optional: true
       command: "readAttribute"
       attribute: "PumpStatus"
@@ -166,6 +180,7 @@ tests:
               maxValue: 8
 
     - label: "Read attribute: EffectiveOperationMode"
+      PICS: PCC.S.A0011
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
       response:
@@ -175,6 +190,7 @@ tests:
               maxValue: 3
 
     - label: "Read attribute: EffectiveControlMode"
+      PICS: PCC.S.A0012
       command: "readAttribute"
       attribute: "EffectiveControlMode"
       response:
@@ -184,6 +200,7 @@ tests:
               maxValue: 7
 
     - label: "Read attribute: Capacity"
+      PICS: PCC.S.A0013
       command: "readAttribute"
       attribute: "Capacity"
       response:
@@ -193,6 +210,7 @@ tests:
               maxValue: 32767
 
     - label: "Read the optional attribute: Speed"
+      PICS: PCC.S.A0014
       optional: true
       command: "readAttribute"
       attribute: "Speed"
@@ -203,6 +221,7 @@ tests:
               maxValue: 65535
 
     - label: "Read the optional attribute: LifetimeRunningHours"
+      PICS: PCC.S.A0015
       optional: true
       command: "readAttribute"
       attribute: "LifetimeRunningHours"
@@ -213,6 +232,7 @@ tests:
               maxValue: 16777215
 
     - label: "Read the optional attribute: Power"
+      PICS: PCC.S.A0016
       optional: true
       command: "readAttribute"
       attribute: "Power"
@@ -223,6 +243,7 @@ tests:
               maxValue: 16777215
 
     - label: "Read the optional attribute: LifetimeEnergyConsumed"
+      PICS: PCC.S.A0017
       optional: true
       command: "readAttribute"
       attribute: "LifetimeEnergyConsumed"
@@ -233,6 +254,7 @@ tests:
               maxValue: 4294967295
 
     - label: "Read optional attribute: OperationMode"
+      PICS: PCC.S.A0020
       command: "readAttribute"
       attribute: "OperationMode"
       response:
@@ -242,6 +264,7 @@ tests:
               maxValue: 3
 
     - label: "Read optional attribute: ControlMode"
+      PICS: PCC.S.A0021
       optional: true
       command: "readAttribute"
       attribute: "ControlMode"

@@ -411,3 +411,29 @@ private:
     chip::Optional<bool> mKeepSubscriptions;
     chip::Optional<std::vector<bool>> mIsUrgents;
 };
+
+class ReadAll : public ReadCommand
+{
+public:
+    ReadAll(CredentialIssuerCommands * credsIssuerConfig) : ReadCommand("read-all", credsIssuerConfig)
+    {
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        ReadCommand::AddArguments();
+    }
+
+    ~ReadAll() {}
+
+    void OnDone(chip::app::ReadClient * aReadClient) override
+    {
+        InteractionModelReports::CleanupReadClient(aReadClient);
+        SetCommandExitStatus(mError);
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return ReadCommand::ReadAll(device, endpointIds, mFabricFiltered);
+    }
+
+private:
+    chip::Optional<bool> mFabricFiltered;
+};

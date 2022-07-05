@@ -92,19 +92,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
- *
- * Enable the device factory provisioning feature.
- *
- * The factory provisioning feature allows factory or developer-supplied provisioning information
- * to be injected into a device at boot time and automatically stored in persistent storage.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-// We don't have platform/internal/FactoryProvisioning.ipp for now, so set it to 0 by default.
-#define CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING 0
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
  *
  * Compute and log a hash of the device's provisioning data on boot.
