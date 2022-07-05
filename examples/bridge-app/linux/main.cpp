@@ -62,6 +62,7 @@ using namespace chip::app::Clusters;
 static EndpointId gCurrentEndpointId;
 static EndpointId gFirstDynamicEndpointId;
 static Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+Room gRooms[kMaxRooms];
 
 int AddDeviceEndpoint(Device * dev)
 {
@@ -75,7 +76,6 @@ int AddDeviceEndpoint(Device * dev)
             while (1)
             {
                 dev->SetEndpointId(gCurrentEndpointId);
-                dev->SetParentEndpointId(parentEndpointId);
                 ret =
                     emberAfSetDynamicEndpoint(index, gCurrentEndpointId, dev->endpointType(), dev->versions(), dev->deviceTypes());
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)
@@ -152,6 +152,16 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     }
 
     return EMBER_ZCL_STATUS_FAILURE;
+}
+
+Room * FindRoom(const std::string & name)
+{
+    for (auto & room : gRooms)
+    {
+        if (room.GetName() == name)
+            return &room;
+    }
+    return nullptr;
 }
 
 void ApplicationInit()

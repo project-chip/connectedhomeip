@@ -1,5 +1,6 @@
 #include "Backend.h"
 #include "DynamicDevice.h"
+#include "main.h"
 
 #include <algorithm>
 #include <charconv>
@@ -202,6 +203,9 @@ void RemoveDevice(const std::vector<std::string> & tokens)
 
     RemoveDeviceEndpoint(g_devices[index].get());
 
+    for (auto & room : gRooms)
+        room.RemoveEndpoint(g_devices[index]->GetEndpointId());
+
     g_devices[index]      = nullptr;
     g_device_impls[index] = nullptr;
 }
@@ -243,17 +247,31 @@ DynamicDeviceImpl * FindDevice(int32_t index)
     }
 }
 
-ClusterImpl * FindCluster(DynamicDeviceImpl * dev, const std::string& clusterId)
+Device * FindEndpoint(int32_t index)
+{
+    if (index >= 0 && (uint32_t) index < g_device_impls.size())
+    {
+        return g_devices[index].get();
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+ClusterImpl * FindCluster(DynamicDeviceImpl * dev, const std::string & clusterId)
 {
     uint32_t id;
-    const char *start = clusterId.data();
-    const char *end = start + clusterId.size();
-    if (std::from_chars(start, end, id).ptr != end) {
+    const char * start = clusterId.data();
+    const char * end   = start + clusterId.size();
+    if (std::from_chars(start, end, id).ptr != end)
+    {
         id = 0;
-        for (auto * c : dev->clusters())
+        for (const auto & c : clusters::kKnownClusters)
         {
-            if (clusterId == c->name) {
-                id = c->id;
+            if (clusterId == c.name)
+            {
+                id = c.id;
                 break;
             }
         }
@@ -301,8 +319,8 @@ void ParseValue(std::vector<uint8_t> * data, uint16_t size, const std::string & 
             return;
         data->resize(size);
         memcpy(data->data() + 2, str.data(), str.size());
-        (*data)[0]      = (uint8_t)(size & 0xFF);
-        (*data)[1]      = (uint8_t)((size >> 8) & 0xFF);
+        (*data)[0]      = (uint8_t) (size & 0xFF);
+        (*data)[1]      = (uint8_t) ((size >> 8) & 0xFF);
         data->data()[0] = (uint8_t) str.size();
     }
     break;
@@ -386,6 +404,114 @@ void SetValue(const std::vector<std::string> & tokens)
     cluster->WriteFromBridge(attrId, data.data());
 }
 
+void AddRoom(const std::vector<std::string> & tokens)
+{
+    if (tokens.size() != 1)
+    {
+        printf("Expected exactly one string\n");
+        return;
+    }
+    auto room = FindRoom(tokens[0]);
+    if (room)
+    {
+        printf("Room already exists\n");
+        return;
+    }
+}
+
+void DelRoom(const std::vector<std::string> & tokens)
+{
+    if (tokens.size() != 1)
+    {
+        printf("Expected exactly one string\n");
+        return;
+    }
+    auto room = FindRoom(tokens[0]);
+    if (!room)
+    {
+        printf("No such room\n");
+        return;
+    }
+
+    room->SetName(std::string());
+    while (room->GetEndpointListSize() > 0)
+        room->RemoveEndpoint(*room->GetEndpointListData());
+}
+
+void AddToRoom(const std::vector<std::string> & tokens)
+{
+    uint32_t index;
+    std::string room;
+    const char * err = Parse(tokens, 0, &room, &index);
+    if (err)
+    {
+        printf("Error: %s.\nExpected: room index.\n", err);
+        return;
+    }
+    auto roomPtr = FindRoom(tokens[0]);
+    if (!roomPtr)
+    {
+        printf("No such room\n");
+        return;
+    }
+    auto dev = FindEndpoint(index);
+    if (!dev)
+    {
+        printf("No such device\n");
+        return;
+    }
+    roomPtr->AddEndpoint(dev->GetEndpointId());
+}
+
+void DelFromRoom(const std::vector<std::string> & tokens)
+{
+    uint32_t index;
+    std::string room;
+    const char * err = Parse(tokens, 0, &room, &index);
+    if (err)
+    {
+        printf("Error: %s.\nExpected: room index.\n", err);
+        return;
+    }
+    auto roomPtr = FindRoom(tokens[0]);
+    if (!roomPtr)
+    {
+        printf("No such room\n");
+        return;
+    }
+    auto dev = FindEndpoint(index);
+    if (!dev)
+    {
+        printf("No such device\n");
+        return;
+    }
+    roomPtr->RemoveEndpoint(dev->GetEndpointId());
+}
+
+void SetParentId(const std::vector<std::string> & tokens)
+{
+    if (!g_pending)
+    {
+        printf("Expected pending device! Run new-device\n");
+        return;
+    }
+
+    int32_t index;
+    const char * err = Parse(tokens, 0, &index);
+    if (err)
+    {
+        printf("Error: %s.\nExpected: deviceIndex\n", err);
+        return;
+    }
+    auto dev = FindEndpoint(index);
+    if (!dev)
+    {
+        printf("No such device\n");
+        return;
+    }
+    g_pending->SetParentEndpointId(dev->GetEndpointId());
+}
+
 void Help(const std::vector<std::string> & tokens);
 
 struct Command
@@ -402,6 +528,11 @@ struct Command
     { "cancel-device", "Abort adding a new device", &CancelDevice },
     { "add-type", "id [version] - Add a device type by ID, optionally with a version", &AddType },
     { "set", "deviceIndex clusterId attributeId value - Set a value. deviceIndex -1 for adding device", &SetValue },
+    { "set-parent-id", "deviceIndex - Set the parent endpoint ID to the specified device", &SetParentId },
+    { "add-room", "name - Add a new named room", &AddRoom },
+    { "del-room", "name - Remove an existing named room", &DelRoom },
+    { "add-to-room", "name index - Add a device to a named room", &AddToRoom },
+    { "del-from-room", "name index - Remove a device from a named room", &DelFromRoom },
 };
 
 void Help(const std::vector<std::string> & tokens)

@@ -22,8 +22,8 @@
 void DynamicAttributeList::Add(chip::AttributeId id, EmberAfAttributeType type, uint16_t maxSize, EmberAfClusterMask mask)
 {
     // Do what DECLARE_DYNAMIC_ATTRIBUTE does.
-    mAttributeDecls.emplace_back(
-        EmberAfAttributeMetadata{ id, type, maxSize, (uint8_t)(mask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)), ZAP_EMPTY_DEFAULT() });
+    mAttributeDecls.emplace_back(EmberAfAttributeMetadata{
+        id, type, maxSize, (uint8_t) (mask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)), ZAP_EMPTY_DEFAULT() });
 }
 
 void DynamicAttributeList::Add(EmberAfAttributeMetadata metadata)
@@ -49,7 +49,7 @@ Device DynamicDeviceImpl::CreateDevice()
     return Device(chip::Span<chip::DataVersion>(mVersions.data(), mVersions.size()),
                   chip::Span<EmberAfCluster>(mClusterDecls.data(), mClusterDecls.size()),
                   chip::Span<ClusterImpl *>(mClusterBaseRawPtrs.data(), mClusterBaseRawPtrs.size()),
-                  chip::Span<EmberAfDeviceType>(mDeviceTypes.data(), mDeviceTypes.size()));
+                  chip::Span<EmberAfDeviceType>(mDeviceTypes.data(), mDeviceTypes.size()), mParentEndpointId);
 }
 
 DynamicDeviceImpl & DynamicDeviceImpl::AddCluster(std::unique_ptr<CommonCluster> cluster, const DynamicAttributeList & attribs,

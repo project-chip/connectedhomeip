@@ -127,7 +127,7 @@ def get_attr_mask(attr: Attribute, cluster: Cluster, idl: Idl):
 
 def get_dynamic_endpoint(idl: Idl):
     for ep in idl.endpoints:
-        if ep.number == 1:
+        if ep.number == 2:
             return ep
 
 

@@ -65,6 +65,8 @@ public:
 
     virtual ~DynamicDeviceImpl() = default;
 
+    void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; }
+
     void AddDeviceType(EmberAfDeviceType type);
 
     // Add each cluster that the device will ever use.
@@ -95,12 +97,14 @@ private:
     std::vector<EmberAfDeviceType> mDeviceTypes;
 
     std::list<std::vector<EmberAfAttributeMetadata>> mAttribStorage;
+
+    chip::EndpointId mParentEndpointId = 1;
 };
 
 class DynamicSwitchDevice : public DynamicDeviceImpl
 {
 public:
-    DynamicSwitchDevice() { AddCluster(mBridgedDevice).AddCluster(mSwitch).AddCluster(mFixedLabel).AddCluster(mDescriptor); }
+    DynamicSwitchDevice() { AddCluster(mBridgedDevice).AddCluster(mSwitch).AddCluster(mDescriptor); }
     ~DynamicSwitchDevice() override = default;
 
     void SetNumberOfPositions(uint8_t aNumberOfPositions)
@@ -140,7 +144,6 @@ public:
 private:
     DynamicCluster<clusters::BridgedDeviceBasicCluster> mBridgedDevice;
     DynamicCluster<clusters::SwitchCluster> mSwitch;
-    DynamicCluster<clusters::FixedLabelCluster> mFixedLabel;
     DynamicCluster<clusters::DescriptorCluster> mDescriptor;
 
     DeviceCallback_fn mCallback;

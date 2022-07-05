@@ -23,9 +23,10 @@
 #include <platform/CHIPDeviceLayer.h>
 
 Device::Device(chip::Span<chip::DataVersion> dataVersions, chip::Span<EmberAfCluster> clusters,
-               chip::Span<ClusterImpl *> clusterImpl, const chip::Span<const EmberAfDeviceType> & deviceTypeList) :
-    mDataVersions(dataVersions),
-    mClusters(clusters), mClusterImpl(clusterImpl), mDeviceTypeList(deviceTypeList)
+               chip::Span<ClusterImpl *> clusterImpl, const chip::Span<const EmberAfDeviceType> & deviceTypeList,
+               chip::EndpointId parentId) :
+    mParentEndpointId(parentId),
+    mDataVersions(dataVersions), mClusters(clusters), mClusterImpl(clusterImpl), mDeviceTypeList(deviceTypeList)
 {
     mEndpointType.cluster      = clusters.data();
     mEndpointType.clusterCount = (uint8_t) clusters.size();
@@ -72,33 +73,4 @@ EmberAfStatus Device::Write(chip::ClusterId clusterId, const EmberAfAttributeMet
         }
     }
     return EMBER_ZCL_STATUS_FAILURE;
-}
-
-EndpointListInfo::EndpointListInfo(uint16_t endpointListId, std::string name, EndpointListTypeEnum type)
-{
-    mEndpointListId = endpointListId;
-    mName           = name;
-    mType           = type;
-}
-
-EndpointListInfo::EndpointListInfo(uint16_t endpointListId, std::string name, EndpointListTypeEnum type,
-                                   chip::EndpointId endpointId)
-{
-    mEndpointListId = endpointListId;
-    mName           = name;
-    mType           = type;
-    mEndpoints.push_back(endpointId);
-}
-
-void EndpointListInfo::AddEndpointId(chip::EndpointId endpointId)
-{
-    mEndpoints.push_back(endpointId);
-}
-
-Room::Room(std::string name, uint16_t endpointListId, EndpointListTypeEnum type, bool isVisible)
-{
-    mName           = name;
-    mEndpointListId = endpointListId;
-    mType           = type;
-    mIsVisible      = isVisible;
 }

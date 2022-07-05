@@ -40,12 +40,13 @@
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1
 
-// This represents a single logical device occupying one endpoint
+// This represents a single logical device occupying one endpoint. A composed device consists of multiple
+// Device objects that reference a tree.
 class Device
 {
 public:
     Device(chip::Span<chip::DataVersion> dataVersions, chip::Span<EmberAfCluster> clusters, chip::Span<ClusterImpl *> clusterImpl,
-           const chip::Span<const EmberAfDeviceType> & deviceTypeList);
+           const chip::Span<const EmberAfDeviceType> & deviceTypeList, chip::EndpointId parentId);
     ~Device() = default;
 
     const chip::Span<chip::DataVersion> & versions() { return mDataVersions; }
@@ -54,7 +55,8 @@ public:
     const chip::Span<ClusterImpl *> & clusters() { return mClusterImpl; }
 
     void SetEndpointId(chip::EndpointId id);
-    inline chip::EndpointId GetEndpointId() { return mEndpointId; };
+    chip::EndpointId GetEndpointId() { return mEndpointId; }
+    chip::EndpointId GetParentEndpointId() { return mParentEndpointId; }
 
     EmberAfStatus Read(chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                        uint16_t maxReadLength);
@@ -64,6 +66,7 @@ public:
     void SetName(const char * name);
 
 private:
+    chip::EndpointId mParentEndpointId;
     chip::EndpointId mEndpointId;
     chip::Span<chip::DataVersion> mDataVersions;
     chip::Span<EmberAfCluster> mClusters;
