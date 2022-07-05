@@ -110,14 +110,14 @@
 
 #pragma mark - NSSecureCoding
 
-static NSString *const MTRSetupPayloadCodingKeyVersion = @"MTRSP.ck.version";
-static NSString *const MTRSetupPayloadCodingKeyVendorID = @"MTRSP.ck.vendorID";
-static NSString *const MTRSetupPayloadCodingKeyProductID = @"MTRSP.ck.productID";
-static NSString *const MTRSetupPayloadCodingKeyCommissioningFlow = @"MTRSP.ck.commissioningFlow";
-static NSString *const MTRSetupPayloadCodingKeyRendezvousFlags = @"MTRSP.ck.rendezvousFlags";
-static NSString *const MTRSetupPayloadCodingKeyDiscriminator = @"MTRSP.ck.discriminator";
-static NSString *const MTRSetupPayloadCodingKeySetupPINCode = @"MTRSP.ck.setupPINCode";
-static NSString *const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serialNumber";
+static NSString * const MTRSetupPayloadCodingKeyVersion = @"MTRSP.ck.version";
+static NSString * const MTRSetupPayloadCodingKeyVendorID = @"MTRSP.ck.vendorID";
+static NSString * const MTRSetupPayloadCodingKeyProductID = @"MTRSP.ck.productID";
+static NSString * const MTRSetupPayloadCodingKeyCommissioningFlow = @"MTRSP.ck.commissioningFlow";
+static NSString * const MTRSetupPayloadCodingKeyRendezvousFlags = @"MTRSP.ck.rendezvousFlags";
+static NSString * const MTRSetupPayloadCodingKeyDiscriminator = @"MTRSP.ck.discriminator";
+static NSString * const MTRSetupPayloadCodingKeySetupPINCode = @"MTRSP.ck.setupPINCode";
+static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serialNumber";
 
 + (BOOL)supportsSecureCoding
 {
@@ -138,21 +138,21 @@ static NSString *const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serialN
 
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder
 {
-    NSNumber *version = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyVersion];
-    NSNumber *vendorID = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyVendorID];
-    NSNumber *productID = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyProductID];
+    NSNumber * version = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyVersion];
+    NSNumber * vendorID = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyVendorID];
+    NSNumber * productID = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyProductID];
     NSUInteger commissioningFlow = [decoder decodeIntegerForKey:MTRSetupPayloadCodingKeyCommissioningFlow];
     NSUInteger rendezvousInformation = [decoder decodeIntegerForKey:MTRSetupPayloadCodingKeyRendezvousFlags];
-    NSNumber *discriminator = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyDiscriminator];
-    NSNumber *setUpPINCode = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeySetupPINCode];
-    NSString *serialNumber = [decoder decodeObjectOfClass:[NSString class] forKey:MTRSetupPayloadCodingKeySerialNumber];
+    NSNumber * discriminator = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyDiscriminator];
+    NSNumber * setUpPINCode = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeySetupPINCode];
+    NSString * serialNumber = [decoder decodeObjectOfClass:[NSString class] forKey:MTRSetupPayloadCodingKeySerialNumber];
 
-    MTRSetupPayload *payload = [[MTRSetupPayload alloc] init];
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] init];
     payload.version = version;
     payload.vendorID = vendorID;
     payload.productID = productID;
-    payload.commissioningFlow = (CHIPCommissioningFlow)commissioningFlow;
-    payload.rendezvousInformation = (CHIPRendezvousInformationFlags)rendezvousInformation;
+    payload.commissioningFlow = (CHIPCommissioningFlow) commissioningFlow;
+    payload.rendezvousInformation = (CHIPRendezvousInformationFlags) rendezvousInformation;
     payload.discriminator = discriminator;
     payload.setUpPINCode = setUpPINCode;
     payload.serialNumber = serialNumber;
