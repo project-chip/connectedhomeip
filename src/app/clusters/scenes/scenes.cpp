@@ -810,7 +810,7 @@ bool emberAfPluginScenesServerParseAddScene(
     }
 
 #if defined(MATTER_CLUSTER_SCENE_NAME_SUPPORT) && MATTER_CLUSTER_SCENE_NAME_SUPPORT
-    emberAfCopyString(entry.name, sceneName, ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH);
+    emberAfCopyString(entry.name, Uint8::from_const_char(sceneName.data()), ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH);
 #endif
 
     // When adding a new scene, wipe out all of the extensions before parsing the
