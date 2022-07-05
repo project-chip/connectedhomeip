@@ -43,7 +43,6 @@
 #include <linux/rtnetlink.h>
 #include <net/if.h>
 #include <netinet/in.h>
-#include <signal.h>
 #include <unistd.h>
 
 #if __GLIBC__ == 2 && __GLIBC_MINOR__ < 30
