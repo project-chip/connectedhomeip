@@ -27,16 +27,19 @@ tests:
       disabled: true
 
     - label: "TH sends chip-tool command to DUT"
+      PICS: DGWIFI.S.E00
       verification: |
           chip-tool wifinetworkdiagnostics read-event disconnection 1 0
       disabled: true
 
     - label: "TH sends chip-tool command to DUT"
+      PICS: DGWIFI.S.E01
       verification: |
           chip-tool wifinetworkdiagnostics read-event association-failure 1 0
       disabled: true
 
     - label: "TH sends chip-tool command to DUT"
+      PICS: DGWIFI.S.E02
       verification: |
           chip-tool wifinetworkdiagnostics read-event connection-status 1 0
       disabled: true
