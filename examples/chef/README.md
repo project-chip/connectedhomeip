@@ -1,6 +1,7 @@
 # MATTER CHEF APP
 
 The purpose of the chef app is to to:
+
 1. Increase the coverage of device types in Matter
 2. Provide a sample application that may have its data model easily configured.
 
@@ -12,8 +13,7 @@ As it incorporates the processing of ZAP files as part of the build process, it
 does not use `zzz_generated`, but rather places the auto-generated zap artifacts
 under its `out` temporary folder.
 
-All device types available (.zap files) are found inside the `devices`
-folder.
+All device types available (.zap files) are found inside the `devices` folder.
 
 ## Building your first sample
 
@@ -60,23 +60,24 @@ folder.
 
 ## Folder Structure and Guidelines
 
-- `<platform>`: build system and `main.cpp` file for every supported platform.
-  When porting a new platform, please minimize the source code in this folder,
-  favoring the `common` folder for code that is not platform related.
-- `common`: contains code shared between different platforms. It may contain
-  source code that enables specific features such as `LightingManager` class or
-  `LockManager`, as long as the application dynamically identify the
-  presence of the relevant cluster configurations and it doesn't break the use
-  cases where chef is built without these clusters.
-- `devices`: contains the data models that may be used with chef. As of Matter
-  1.0 the data models are defined using .zap files.
-- `out`: temporary folder used for placing ZAP generated artifacts.
-- `sample_app_util`: guidelines and scripts for generating file names for new
-  device types committed to the `devices` folder.
-- `config.yaml`: contains general configuration for the `chef.py` script. As of
-  Matter 1.0 this is used exclusively for toolchain and TTY interface paths.
-- `chef.py`: main script for generating samples. More info on its help
-  `chef.py -h`.
+-   `<platform>`: build system and `main.cpp` file for every supported platform.
+    When porting a new platform, please minimize the source code in this folder,
+    favoring the `common` folder for code that is not platform related.
+-   `common`: contains code shared between different platforms. It may contain
+    source code that enables specific features such as `LightingManager` class
+    or `LockManager`, as long as the application dynamically identify the
+    presence of the relevant cluster configurations and it doesn't break the use
+    cases where chef is built without these clusters.
+-   `devices`: contains the data models that may be used with chef. As of Matter
+    1.0 the data models are defined using .zap files.
+-   `out`: temporary folder used for placing ZAP generated artifacts.
+-   `sample_app_util`: guidelines and scripts for generating file names for new
+    device types committed to the `devices` folder.
+-   `config.yaml`: contains general configuration for the `chef.py` script. As
+    of Matter 1.0 this is used exclusively for toolchain and TTY interface
+    paths.
+-   `chef.py`: main script for generating samples. More info on its help
+    `chef.py -h`.
 
 ## CI
 
