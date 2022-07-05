@@ -390,6 +390,7 @@ function getManualTests() {
 
   const LevelControl = [
     'Test_TC_LVL_2_3',
+    'Test_TC_LVL_7_1',
     'Test_TC_LVL_8_1',
   ];
 
@@ -464,6 +465,8 @@ function getManualTests() {
   const Binding = [
     'Test_TC_BIND_1_1',
     'Test_TC_BIND_2_1',
+    'Test_TC_BIND_2_2',
+    'Test_TC_BIND_2_3',
   ];
 
   const Scenes = [

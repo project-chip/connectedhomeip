@@ -13,8 +13,8 @@
 # limitations under the License.
 
 name:
-    22.1.30. [TC-MF-1.30] Open commissioning window - normal operation and
-    closing [ECM] [DUT - Commissionee]
+    24.1.28. [TC-MF-1.28] Open commissioning window - durations min and min-1
+    [ECM] [DUT - Commissionee]
 
 config:
     nodeId: 0x12344321
