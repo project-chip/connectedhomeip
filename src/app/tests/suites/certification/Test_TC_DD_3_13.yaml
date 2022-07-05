@@ -76,7 +76,7 @@ tests:
           commissioning process using BLE."
       PICS: MCORE.DD.DT_BLE
       verification: |
-          TH all-clusters-app: 
+          TH all-clusters-app:
           [1651104141.533461][26507:26507] CHIP:SVR: Commissioning completed successfully
           [1651104141.533498][26507:26507] CHIP:DIS: Updating services using commissioning mode 0
 
@@ -122,7 +122,7 @@ tests:
           [1653998683.951357][2924:2924] CHIP:SPL: Capabilities:  0x04 (On IP network)
           [1653998683.951451][2924:2924] CHIP:SPL: Discriminator: 3840
           [1653998683.951498][2924:2924] CHIP:SPL: Passcode:      20202021
-          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$ 
+          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$
           "
       disabled: true
 

@@ -27,7 +27,7 @@ tests:
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Get the QR code from the TH
-          ubuntu@matter-7:~/Apr18_dut/connectedhomeip/examples/all-clusters-app/linux/out/all-clusters-app$ sudo ./chip-all-clusters-app --wifi 
+          ubuntu@matter-7:~/Apr18_dut/connectedhomeip/examples/all-clusters-app/linux/out/all-clusters-app$ sudo ./chip-all-clusters-app --wifi
 
           [13293:13293] CHIP:DL: Device Configuration:
           [1653306603.740569][13293:13293] CHIP:DL:   Serial Number: TEST_SN

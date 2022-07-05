@@ -87,7 +87,7 @@ tests:
 
 
           DUT Commissioner:
-          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3840 
+          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3840
 
 
 
@@ -150,11 +150,11 @@ tests:
           the commissioning process using IP Network."
       PICS: MCORE.DD.DT_IP
       verification: |
-          TH all-clusters-app: 
+          TH all-clusters-app:
           [1651105158.168056][27096:27096] CHIP:SVR: Commissioning completed successfully
           [1651105158.168100][27096:27096] CHIP:DIS: Updating services using commissioning mode 0
 
-          DUT chip-tool: 
+          DUT chip-tool:
           $ ./out/chip-tool/chip-tool pairing qrcode 1  MT:-24J06VO00KA0648G00
           [1651105158065] [95045:65602272] CHIP: [CTL] Received CommissioningComplete response
           [1651105158065] [95045:65602272] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'

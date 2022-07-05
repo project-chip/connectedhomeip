@@ -28,8 +28,8 @@ tests:
           Attribute]] On receipt of this message, DUT should send a report data
           action with the attribute value to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use 
-           
+          In case of chip tool, here is an example command to use
+
           sudo ./chip-tool identify read identify-time 1 1
           Verify on TH , DUT is responds right attribute value for above command
 
@@ -48,15 +48,15 @@ tests:
           [1655727338.261553][5267:5272] CHIP:DMG:                                         Cluster = 0x3,
           [1655727338.261609][5267:5272] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1655727338.261663][5267:5272] CHIP:DMG:                                 }
-          [1655727338.261719][5267:5272] CHIP:DMG:                                         
-          [1655727338.261776][5267:5272] CHIP:DMG:                                 Data = 0, 
+          [1655727338.261719][5267:5272] CHIP:DMG:
+          [1655727338.261776][5267:5272] CHIP:DMG:                                 Data = 0,
           [1655727338.261826][5267:5272] CHIP:DMG:                         },
-          [1655727338.261880][5267:5272] CHIP:DMG:                         
+          [1655727338.261880][5267:5272] CHIP:DMG:
           [1655727338.261925][5267:5272] CHIP:DMG:                 },
-          [1655727338.261974][5267:5272] CHIP:DMG:                 
+          [1655727338.261974][5267:5272] CHIP:DMG:
           [1655727338.262013][5267:5272] CHIP:DMG:         ],
-          [1655727338.262061][5267:5272] CHIP:DMG:         
-          [1655727338.262102][5267:5272] CHIP:DMG:         SuppressResponse = true, 
+          [1655727338.262061][5267:5272] CHIP:DMG:
+          [1655727338.262102][5267:5272] CHIP:DMG:         SuppressResponse = true,
           [1655727338.262145][5267:5272] CHIP:DMG:         InteractionModelRevision = 1
           [1655727338.262182][5267:5272] CHIP:DMG: }
           [1655727338.262379][5267:5272] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 236949823
@@ -71,14 +71,14 @@ tests:
           DUT should send a report data action with the attribute value to the
           DUT."
       verification: |
-          In case of chip tool, here is an example command to use 
-           
+          In case of chip tool, here is an example command to use
+
           sudo ./chip-tool any read-by-id 0x03 0xFFFFFFFF 1 0xFFFF
 
           Verify on TH , DUT is responds right attribute value for above command
 
-          [1655727546.354466][5286:5291] CHIP:DMG:         
-          [1655727546.354512][5286:5291] CHIP:DMG:         SuppressResponse = true, 
+          [1655727546.354466][5286:5291] CHIP:DMG:
+          [1655727546.354512][5286:5291] CHIP:DMG:         SuppressResponse = true,
           [1655727546.354538][5286:5291] CHIP:DMG:         InteractionModelRevision = 1
           [1655727546.354580][5286:5291] CHIP:DMG: }
           [1655727546.355252][5286:5291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 1545325355
@@ -137,7 +137,7 @@ tests:
           message, DUT should send a report data action with the attribute value
           from all the Endpoints to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use  
+          In case of chip tool, here is an example command to use
 
           sudo ./chip-tool any read-by-id 0x03 0x00 1 0xFFFF
 
@@ -159,12 +159,12 @@ tests:
           [1655727602.118515][5301:5306] CHIP:DMG:                                         Cluster = 0x3,
           [1655727602.118570][5301:5306] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1655727602.118618][5301:5306] CHIP:DMG:                                 }
-          [1655727602.118674][5301:5306] CHIP:DMG:                                         
-          [1655727602.118724][5301:5306] CHIP:DMG:                                 Data = 0, 
+          [1655727602.118674][5301:5306] CHIP:DMG:
+          [1655727602.118724][5301:5306] CHIP:DMG:                                 Data = 0,
           [1655727602.118768][5301:5306] CHIP:DMG:                         },
-          [1655727602.118816][5301:5306] CHIP:DMG:                         
+          [1655727602.118816][5301:5306] CHIP:DMG:
           [1655727602.118856][5301:5306] CHIP:DMG:                 },
-          [1655727602.118903][5301:5306] CHIP:DMG:                 
+          [1655727602.118903][5301:5306] CHIP:DMG:
           [1655727602.118938][5301:5306] CHIP:DMG:                 AttributeReportIB =
           [1655727602.119043][5301:5306] CHIP:DMG:                 {
           [1655727602.119084][5301:5306] CHIP:DMG:                         AttributeDataIB =
@@ -176,15 +176,15 @@ tests:
           [1655727602.119367][5301:5306] CHIP:DMG:                                         Cluster = 0x3,
           [1655727602.119423][5301:5306] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1655727602.119472][5301:5306] CHIP:DMG:                                 }
-          [1655727602.119522][5301:5306] CHIP:DMG:                                         
-          [1655727602.119568][5301:5306] CHIP:DMG:                                 Data = 0, 
+          [1655727602.119522][5301:5306] CHIP:DMG:
+          [1655727602.119568][5301:5306] CHIP:DMG:                                 Data = 0,
           [1655727602.119611][5301:5306] CHIP:DMG:                         },
-          [1655727602.119661][5301:5306] CHIP:DMG:                         
+          [1655727602.119661][5301:5306] CHIP:DMG:
           [1655727602.119698][5301:5306] CHIP:DMG:                 },
-          [1655727602.119744][5301:5306] CHIP:DMG:                 
+          [1655727602.119744][5301:5306] CHIP:DMG:
           [1655727602.119779][5301:5306] CHIP:DMG:         ],
-          [1655727602.119823][5301:5306] CHIP:DMG:         
-          [1655727602.119859][5301:5306] CHIP:DMG:         SuppressResponse = true, 
+          [1655727602.119823][5301:5306] CHIP:DMG:
+          [1655727602.119859][5301:5306] CHIP:DMG:         SuppressResponse = true,
           [1655727602.119897][5301:5306] CHIP:DMG:         InteractionModelRevision = 1
           [1655727602.119933][5301:5306] CHIP:DMG: }
           [1655727602.120134][5301:5306] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 1545325355
@@ -201,14 +201,14 @@ tests:
           Attribute]] On receipt of this message, DUT should send a report data
           action with the attribute value from all the clusters to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
           sudo ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD 1 0
 
           Verify on TH , DUT is responds right attribute value for above command
 
 
-          [1655727656.941694][5312:5317] CHIP:DMG:         SuppressResponse = true, 
+          [1655727656.941694][5312:5317] CHIP:DMG:         SuppressResponse = true,
           [1655727656.941720][5312:5317] CHIP:DMG:         InteractionModelRevision = 1
           [1655727656.941743][5312:5317] CHIP:DMG: }
           [1655727656.942228][5312:5317] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 1545325355
@@ -272,7 +272,7 @@ tests:
           this message, DUT should send a report data action with the attribute
           value from all the clusters to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
 
           sudo ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF --timeout 40
@@ -286,7 +286,7 @@ tests:
           DUT should send a report data action with the attribute value from all
           the clusters to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use  
+          In case of chip tool, here is an example command to use
 
           sudo ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD 1 0xFFFF
           Here Verifying cluster revision global attribute from all cluster for all endpoint.
@@ -299,8 +299,8 @@ tests:
           ClusterID]] On receipt of this message, DUT should send a report data
           action with the attribute value from all the Endpoints to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use 
-           
+          In case of chip tool, here is an example command to use
+
           sudo ./chip-tool any read-by-id 0x03 0xFFFFFFFF 1 0xFFFF
 
           [1653629930.057852][8778:8783] CHIP:DMG: }
@@ -358,7 +358,7 @@ tests:
           report data action with the attribute value from all the Endpoints to
           the DUT."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
           sudo ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 1
 
@@ -371,7 +371,7 @@ tests:
           attribute of data type bool. DUT responds with the report data action
           with the right attribute value."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
           sudo ./chip-tool onoff read on-off 1 1
 
@@ -385,7 +385,7 @@ tests:
           attribute of data type string. DUT responds with the report data
           action with the right attribute value."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
           sudo  ./chip-tool modeselect read description  1 1
 
@@ -399,7 +399,7 @@ tests:
           attribute of data type unsigned integer. DUT responds with the report
           data action with the right attribute value."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
            sudo  ./chip-tool any read-by-id 0x3 0x1 1 0
 
@@ -413,8 +413,8 @@ tests:
           attribute of data type signed integer. DUT responds with the report
           data action with the right attribute value."
       verification: |
-          In case of chip tool, here is an example command to use 
-           
+          In case of chip tool, here is an example command to use
+
           sudo ./chip-tool pressuremeasurement read measured-value 1 1
 
           [1653630404.570993][8934:8939] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0403 Attribute 0x0000_0000 DataVersion: 3770689028
@@ -435,8 +435,8 @@ tests:
           attribute of data type Octet String. DUT responds with the report data
           action with the right attribute value."
       verification: |
-          In case of chip tool, here is an example command to use 
-           
+          In case of chip tool, here is an example command to use
+
           sudo  ./chip-tool operationalcredentials read trusted-root-certificates 1 0
 
           [1655729519.609898][5433:5438] CHIP:DMG: }
@@ -451,8 +451,8 @@ tests:
           attribute of data type Struct. DUT responds with the report data
           action with the right attribute value."
       verification: |
-          In case of chip tool, here is an example command to use 
-           
+          In case of chip tool, here is an example command to use
+
           sudo   ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
 
           [1653630542.619226][9034:9039] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 3604656322
@@ -465,7 +465,7 @@ tests:
           attribute of data type List. DUT responds with the report data action
           with the right attribute value."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
           sudo   ./chip-tool  timeformatlocalization read supported-calendar-types 1 0
 
@@ -491,8 +491,8 @@ tests:
           attribute of data type enum. DUT responds with the report data action
           with the right attribute value."
       verification: |
-          In case of chip tool, here is an example command to use 
-           
+          In case of chip tool, here is an example command to use
+
           sudo   ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
 
           [1653630949.025002][9198:9203] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 3604656322
@@ -505,7 +505,7 @@ tests:
           attribute of data type bitmap. DUT responds with the report data
           action with the right attribute value."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
           sudo  ./chip-tool levelcontrol read options 1 1
 
@@ -525,11 +525,11 @@ tests:
           "TH sends the Read Request Message to the DUT to read any attribute to
           an unsupported Endpoint. DUT responds with the report data action."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
           sudo  ./chip-tool any read-by-id 0x3 0x1 1 8
 
-          [1653631094.367299][9229:9234] CHIP:DMG:         SuppressResponse = true, 
+          [1653631094.367299][9229:9234] CHIP:DMG:         SuppressResponse = true,
           [1653631094.367315][9229:9234] CHIP:DMG:         InteractionModelRevision = 1
           [1653631094.367329][9229:9234] CHIP:DMG: }
           [1653631094.367438][9229:9234] CHIP:TOO: Response Failure: IM Error 0x0000057F: General error: 0x7f (UNSUPPORTED_ENDPOINT)
@@ -540,11 +540,11 @@ tests:
           "TH sends the Read Request Message to the DUT to read any attribute to
           an unsupported cluster. DUT responds with the report data action."
       verification: |
-          In case of chip tool, here is an example command to use 
-           
+          In case of chip tool, here is an example command to use
+
           sudo ./chip-tool any read-by-id 0x3 0x1 1 2
 
-          [1653631187.121757][9257:9262] CHIP:DMG:         SuppressResponse = true, 
+          [1653631187.121757][9257:9262] CHIP:DMG:         SuppressResponse = true,
           [1653631187.121774][9257:9262] CHIP:DMG:         InteractionModelRevision = 1
           [1653631187.121788][9257:9262] CHIP:DMG: }
           [1653631187.121901][9257:9262] CHIP:TOO: Response Failure: IM Error 0x000005C3: General error: 0xc3 (UNSUPPORTED_CLUSTER)
@@ -555,11 +555,11 @@ tests:
           "TH sends the Read Request Message to the DUT to read an unsupported
           attribute DUT responds with the report data action."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
           sudo ./chip-tool thermostat read outdoor-temperature 1 1
 
-          [1653631289.755681][9274:9279] CHIP:DMG:         SuppressResponse = true, 
+          [1653631289.755681][9274:9279] CHIP:DMG:         SuppressResponse = true,
           [1653631289.755689][9274:9279] CHIP:DMG:         InteractionModelRevision = 1
           [1653631289.755699][9274:9279] CHIP:DMG: }
           [1653631289.755790][9274:9279] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
@@ -578,14 +578,14 @@ tests:
           the path that requires a privilege that is not granted for the cluster
           in the path. DUT responds with the report data action."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
           1st send above mentioned ACL command and then verify the below mentioned command
           ./chip-tool operationalcredentials read trusted-root-certificates 1 0
 
-          [1652964769.384639][39268:39273] CHIP:DMG:         
-          [1652964769.384652][39268:39273] CHIP:DMG:         SuppressResponse = true, 
+          [1652964769.384639][39268:39273] CHIP:DMG:
+          [1652964769.384652][39268:39273] CHIP:DMG:         SuppressResponse = true,
           [1652964769.384668][39268:39273] CHIP:DMG:         InteractionModelRevision = 1
           [1652964769.384682][39268:39273] CHIP:DMG: }
           [1652964769.384788][39268:39273] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
@@ -595,8 +595,8 @@ tests:
           "TH sends the Read Request Message to the DUT to read an attribute
           Repeat the above steps 3 times."
       verification: |
-          In case of chip tool, here is an example command to use 
-           
+          In case of chip tool, here is an example command to use
+
           sudo ./chip-tool identify read identify-time 1 1
           [1653631418.770328][9322:9327] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435651
           [1653631418.770402][9322:9327] CHIP:TOO:   identify time: 0
@@ -620,7 +620,7 @@ tests:
           read request to the same cluster with the DataVersionFilter Field set
           with the dataversion value received before."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
           sudo ./chip-tool identify read identify-time 1 1
           [1653633746.447923][9791:9796] CHIP:DMG: ReportDataMessage =
@@ -638,15 +638,15 @@ tests:
           [1653633746.448145][9791:9796] CHIP:DMG:                                         Cluster = 0x3,
           [1653633746.448165][9791:9796] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1653633746.448187][9791:9796] CHIP:DMG:                                 }
-          [1653633746.448209][9791:9796] CHIP:DMG:                                         
-          [1653633746.448229][9791:9796] CHIP:DMG:                                         Data = 0, 
+          [1653633746.448209][9791:9796] CHIP:DMG:
+          [1653633746.448229][9791:9796] CHIP:DMG:                                         Data = 0,
           [1653633746.448246][9791:9796] CHIP:DMG:                         },
-          [1653633746.448267][9791:9796] CHIP:DMG:                         
+          [1653633746.448267][9791:9796] CHIP:DMG:
           [1653633746.448283][9791:9796] CHIP:DMG:                 },
-          [1653633746.448305][9791:9796] CHIP:DMG:                 
+          [1653633746.448305][9791:9796] CHIP:DMG:
           [1653633746.448319][9791:9796] CHIP:DMG:         ],
-          [1653633746.448343][9791:9796] CHIP:DMG:         
-          [1653633746.448359][9791:9796] CHIP:DMG:         SuppressResponse = true, 
+          [1653633746.448343][9791:9796] CHIP:DMG:
+          [1653633746.448359][9791:9796] CHIP:DMG:         SuppressResponse = true,
           [1653633746.448375][9791:9796] CHIP:DMG:         InteractionModelRevision = 1
           [1653633746.448389][9791:9796] CHIP:DMG: }
           [1653633746.448532][9791:9796] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435654
@@ -657,7 +657,7 @@ tests:
           sudo ./chip-tool identify read identify-time 1 1 --data-version 0xd7cb76c6
           [1653633771.729259][9806:9811] CHIP:DMG: ReportDataMessage =
           [1653633771.729282][9806:9811] CHIP:DMG: {
-          [1653633771.729305][9806:9811] CHIP:DMG:         SuppressResponse = true, 
+          [1653633771.729305][9806:9811] CHIP:DMG:         SuppressResponse = true,
           [1653633771.729328][9806:9811] CHIP:DMG:         InteractionModelRevision = 1
           [1653633771.729347][9806:9811] CHIP:DMG: }
           [1653633771.729426][9806:9811] CHIP:EM: Sending Standalone Ack for MessageCounter:11316450 on exchange 65271i
@@ -672,7 +672,7 @@ tests:
           the DataVersionFilter Field set with the dataversion value received
           before."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
           sudo ./chip-tool identify read identify-time 1 1
 
@@ -691,15 +691,15 @@ tests:
           [1653632941.730509][9571:9576] CHIP:DMG:                                         Cluster = 0x3,
           [1653632941.730549][9571:9576] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1653632941.730574][9571:9576] CHIP:DMG:                                 }
-          [1653632941.730606][9571:9576] CHIP:DMG:                                         
-          [1653632941.730637][9571:9576] CHIP:DMG:                                         Data = 0, 
+          [1653632941.730606][9571:9576] CHIP:DMG:
+          [1653632941.730637][9571:9576] CHIP:DMG:                                         Data = 0,
           [1653632941.730665][9571:9576] CHIP:DMG:                         },
-          [1653632941.730699][9571:9576] CHIP:DMG:                         
+          [1653632941.730699][9571:9576] CHIP:DMG:
           [1653632941.730722][9571:9576] CHIP:DMG:                 },
-          [1653632941.730754][9571:9576] CHIP:DMG:                 
+          [1653632941.730754][9571:9576] CHIP:DMG:
           [1653632941.730776][9571:9576] CHIP:DMG:         ],
-          [1653632941.730810][9571:9576] CHIP:DMG:         
-          [1653632941.730835][9571:9576] CHIP:DMG:         SuppressResponse = true, 
+          [1653632941.730810][9571:9576] CHIP:DMG:
+          [1653632941.730835][9571:9576] CHIP:DMG:         SuppressResponse = true,
           [1653632941.730858][9571:9576] CHIP:DMG:         InteractionModelRevision = 1
           [1653632941.730912][9571:9576] CHIP:DMG: }
           [1653632941.731096][9571:9576] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435651
@@ -714,10 +714,10 @@ tests:
           [1653633154.992448][9645:9650] CHIP:DMG:                         {
           [1653633154.992467][9645:9650] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1653633154.992480][9645:9650] CHIP:DMG:                         },
-          [1653633154.992499][9645:9650] CHIP:DMG:                         
+          [1653633154.992499][9645:9650] CHIP:DMG:
 
 
-           sudo ./chip-tool identify read identify-time 1 1 --data-version 0xd7cb76c3 
+           sudo ./chip-tool identify read identify-time 1 1 --data-version 0xd7cb76c3
 
           [1653633215.246620][9664:9669] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435654
           [1653633215.246671][9664:9669] CHIP:TOO:   identify time: 0
@@ -733,8 +733,8 @@ tests:
           cluster with the DataVersionFilter Field set with the dataversion
           value received before."
       verification: |
-          In case of chip tool, here is an example command to use 
-           
+          In case of chip tool, here is an example command to use
+
           sudo ./chip-tool any read-by-id 0x03 0xFFFFFFFF  1 1
 
           [1653633965.092996][9835:9840] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435654
@@ -775,16 +775,16 @@ tests:
           [1653634024.367262][9851:9856] CHIP:DMG:                                 Cluster = 0x3,
           [1653634024.367273][9851:9856] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1653634024.367283][9851:9856] CHIP:DMG:                         }
-          [1653634024.367296][9851:9856] CHIP:DMG:                                 
+          [1653634024.367296][9851:9856] CHIP:DMG:
           [1653634024.367305][9851:9856] CHIP:DMG:                         StatusIB =
           [1653634024.367315][9851:9856] CHIP:DMG:                         {
           [1653634024.367325][9851:9856] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1653634024.367334][9851:9856] CHIP:DMG:                         },
-          [1653634024.367345][9851:9856] CHIP:DMG:                         
+          [1653634024.367345][9851:9856] CHIP:DMG:
           [1653634024.367354][9851:9856] CHIP:DMG:                 },
-          [1653634024.367366][9851:9856] CHIP:DMG:                 
+          [1653634024.367366][9851:9856] CHIP:DMG:
           [1653634024.367375][9851:9856] CHIP:DMG:         ],
-          [1653634024.367387][9851:9856] CHIP:DMG:         
+          [1653634024.367387][9851:9856] CHIP:DMG:
           [1653634024.367396][9851:9856] CHIP:DMG:         InteractionModelRevision = 1
           [1653634024.367404][9851:9856] CHIP:DMG: }
           [1653634024.367443][9851:9856] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -827,7 +827,7 @@ tests:
           and also an older DataVersion. The Read Request Message should have 2
           DataVersionIB filters."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
           sudo ./chip-tool identify read identify-time 1 1
 
@@ -852,12 +852,12 @@ tests:
           [1653634371.474832][9936:9941] CHIP:DMG:                                         Cluster = 0x3,
           [1653634371.474859][9936:9941] CHIP:DMG:                                         Attribute = 0x0000_0001,
           [1653634371.474917][9936:9941] CHIP:DMG:                                 }
-          [1653634371.474945][9936:9941] CHIP:DMG:                                         
-          [1653634371.474990][9936:9941] CHIP:DMG:                                         Data = 2, 
+          [1653634371.474945][9936:9941] CHIP:DMG:
+          [1653634371.474990][9936:9941] CHIP:DMG:                                         Data = 2,
           [1653634371.475012][9936:9941] CHIP:DMG:                         },
-          [1653634371.475040][9936:9941] CHIP:DMG:                         
+          [1653634371.475040][9936:9941] CHIP:DMG:
           [1653634371.475058][9936:9941] CHIP:DMG:                 },
-          [1653634371.475091][9936:9941] CHIP:DMG:                 
+          [1653634371.475091][9936:9941] CHIP:DMG:
           [1653634371.475106][9936:9941] CHIP:DMG:                 AttributeReportIB =
           [1653634371.475127][9936:9941] CHIP:DMG:                 {
           [1653634371.475139][9936:9941] CHIP:DMG:                         AttributeDataIB =
@@ -869,15 +869,15 @@ tests:
           [1653634371.475258][9936:9941] CHIP:DMG:                                         Cluster = 0x3,
           [1653634371.475279][9936:9941] CHIP:DMG:                                         Attribute = 0x0000_0001,
           [1653634371.475303][9936:9941] CHIP:DMG:                                 }
-          [1653634371.475329][9936:9941] CHIP:DMG:                                         
-          [1653634371.475353][9936:9941] CHIP:DMG:                                         Data = 2, 
+          [1653634371.475329][9936:9941] CHIP:DMG:
+          [1653634371.475353][9936:9941] CHIP:DMG:                                         Data = 2,
           [1653634371.475373][9936:9941] CHIP:DMG:                         },
-          [1653634371.475399][9936:9941] CHIP:DMG:                         
+          [1653634371.475399][9936:9941] CHIP:DMG:
           [1653634371.475416][9936:9941] CHIP:DMG:                 },
-          [1653634371.475441][9936:9941] CHIP:DMG:                 
+          [1653634371.475441][9936:9941] CHIP:DMG:
           [1653634371.475456][9936:9941] CHIP:DMG:         ],
-          [1653634371.475485][9936:9941] CHIP:DMG:         
-          [1653634371.475501][9936:9941] CHIP:DMG:         SuppressResponse = true, 
+          [1653634371.475485][9936:9941] CHIP:DMG:
+          [1653634371.475501][9936:9941] CHIP:DMG:         SuppressResponse = true,
           [1653634371.475517][9936:9941] CHIP:DMG:         InteractionModelRevision = 1
           [1653634371.475531][9936:9941] CHIP:DMG: }
           [1653634371.475692][9936:9941] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435660
@@ -896,7 +896,7 @@ tests:
           supported attribute/wildcard on another cluster B. DataVersionList
           field should only contain the DataVersion of cluster A."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
 
           sudo ./chip-tool any read-by-id 0x03 0xFFFFFFFF 1 1
 

@@ -57,7 +57,7 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-           ./chip-tool any command-by-id 0x0003 3 1 1 0 
+           ./chip-tool any command-by-id 0x0003 3 1 1 0
 
           verify DUT is responsds with unsuppported command  for the data sent in the above command
 
@@ -73,10 +73,10 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command 
+          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
 
            ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
-           
+
           ./chip-tool onoff on 1 1
 
           verify DUT is responsds with UNSUPPORTED_ACCESS  for the data sent in the above command
@@ -93,7 +93,7 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command 
+          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
 
@@ -113,7 +113,7 @@ tests:
           In case of chip tool, here is an example command to use
           sudo ./chip-tool generalcommissioning arm-fail-safe  1000 1  1 0
 
-          Verify  DUT generates an InvokeResponseIB with a valid CommandDataIB and 
+          Verify  DUT generates an InvokeResponseIB with a valid CommandDataIB and
           sends it to the TH for the data sent in the above command
 
           On TH
@@ -122,7 +122,7 @@ tests:
           [1655718690.469541][4629:4634] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1655718690.469615][4629:4634] CHIP:TOO:   ArmFailSafeResponse: {
           [1655718690.469664][4629:4634] CHIP:TOO:     errorCode: 0
-          [1655718690.469698][4629:4634] CHIP:TOO:     debugText: 
+          [1655718690.469698][4629:4634] CHIP:TOO:     debugText:
           [1655718690.469733][4629:4634] CHIP:TOO:    }
           [1655718690.469787][4629:4634] CHIP:DMG: ICR moving to [AwaitingDe]
           [1655718690.469859][4629:4634] CHIP:EM: Sending Standalone Ack for MessageCounter:60280704 on exchange 4731i
@@ -131,8 +131,8 @@ tests:
           On DUT
           [1655718690.417352][10909:10909] CHIP:DMG: InvokeRequestMessage =
           [1655718690.417401][10909:10909] CHIP:DMG: {
-          [1655718690.417436][10909:10909] CHIP:DMG:         suppressResponse = false, 
-          [1655718690.417484][10909:10909] CHIP:DMG:         timedRequest = false, 
+          [1655718690.417436][10909:10909] CHIP:DMG:         suppressResponse = false,
+          [1655718690.417484][10909:10909] CHIP:DMG:         timedRequest = false,
           [1655718690.417529][10909:10909] CHIP:DMG:         InvokeRequests =
           [1655718690.417587][10909:10909] CHIP:DMG:         [
           [1655718690.417633][10909:10909] CHIP:DMG:                 CommandDataIB =
@@ -143,16 +143,16 @@ tests:
           [1655718690.417914][10909:10909] CHIP:DMG:                                 ClusterId = 0x30,
           [1655718690.417973][10909:10909] CHIP:DMG:                                 CommandId = 0x0,
           [1655718690.418030][10909:10909] CHIP:DMG:                         },
-          [1655718690.418087][10909:10909] CHIP:DMG:                         
-          [1655718690.418140][10909:10909] CHIP:DMG:                         CommandFields = 
+          [1655718690.418087][10909:10909] CHIP:DMG:
+          [1655718690.418140][10909:10909] CHIP:DMG:                         CommandFields =
           [1655718690.418202][10909:10909] CHIP:DMG:                         {
-          [1655718690.418261][10909:10909] CHIP:DMG:                                 0x0 = 1000, 
-          [1655718690.418322][10909:10909] CHIP:DMG:                                 0x1 = 1, 
+          [1655718690.418261][10909:10909] CHIP:DMG:                                 0x0 = 1000,
+          [1655718690.418322][10909:10909] CHIP:DMG:                                 0x1 = 1,
           [1655718690.418381][10909:10909] CHIP:DMG:                         },
           [1655718690.418433][10909:10909] CHIP:DMG:                 },
-          [1655718690.418487][10909:10909] CHIP:DMG:                 
+          [1655718690.418487][10909:10909] CHIP:DMG:
           [1655718690.418531][10909:10909] CHIP:DMG:         ],
-          [1655718690.418586][10909:10909] CHIP:DMG:         
+          [1655718690.418586][10909:10909] CHIP:DMG:
           [1655718690.418630][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655718690.418673][10909:10909] CHIP:DMG: },
           [1655718690.418779][10909:10909] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0030 e=0 p=a
@@ -171,8 +171,8 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command 
-           
+          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
+
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
            ./chip-tool any command-by-id 0x0003 0 1  1 0 --timedInteractionTimeoutMs 500
 

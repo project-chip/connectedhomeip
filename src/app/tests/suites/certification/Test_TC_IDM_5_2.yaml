@@ -37,8 +37,8 @@ tests:
 
           [1655798564.113754][7331:7331] CHIP:DMG: InvokeRequestMessage =
           [1655798564.113800][7331:7331] CHIP:DMG: {
-          [1655798564.113842][7331:7331] CHIP:DMG:         suppressResponse = false, 
-          [1655798564.113892][7331:7331] CHIP:DMG:         timedRequest = true, 
+          [1655798564.113842][7331:7331] CHIP:DMG:         suppressResponse = false,
+          [1655798564.113892][7331:7331] CHIP:DMG:         timedRequest = true,
           [1655798564.113937][7331:7331] CHIP:DMG:         InvokeRequests =
           [1655798564.113993][7331:7331] CHIP:DMG:         [
           [1655798564.114038][7331:7331] CHIP:DMG:                 CommandDataIB =
@@ -49,14 +49,14 @@ tests:
           [1655798564.114323][7331:7331] CHIP:DMG:                                 ClusterId = 0x6,
           [1655798564.114387][7331:7331] CHIP:DMG:                                 CommandId = 0x1,
           [1655798564.114446][7331:7331] CHIP:DMG:                         },
-          [1655798564.114506][7331:7331] CHIP:DMG:                         
-          [1655798564.114558][7331:7331] CHIP:DMG:                         CommandFields = 
+          [1655798564.114506][7331:7331] CHIP:DMG:
+          [1655798564.114558][7331:7331] CHIP:DMG:                         CommandFields =
           [1655798564.114621][7331:7331] CHIP:DMG:                         {
           [1655798564.114677][7331:7331] CHIP:DMG:                         },
           [1655798564.114731][7331:7331] CHIP:DMG:                 },
-          [1655798564.114785][7331:7331] CHIP:DMG:                 
+          [1655798564.114785][7331:7331] CHIP:DMG:
           [1655798564.114829][7331:7331] CHIP:DMG:         ],
-          [1655798564.114883][7331:7331] CHIP:DMG:         
+          [1655798564.114883][7331:7331] CHIP:DMG:
           [1655798564.114927][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
           [1655798564.114961][7331:7331] CHIP:DMG: },
           [1655798564.115025][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
@@ -74,7 +74,7 @@ tests:
 
           [1655798564.116059][7055:7060] CHIP:DMG: InvokeResponseMessage =
           [1655798564.116095][7055:7060] CHIP:DMG: {
-          [1655798564.116130][7055:7060] CHIP:DMG:         suppressResponse = false, 
+          [1655798564.116130][7055:7060] CHIP:DMG:         suppressResponse = false,
           [1655798564.116188][7055:7060] CHIP:DMG:         InvokeResponseIBs =
           [1655798564.116234][7055:7060] CHIP:DMG:         [
           [1655798564.116270][7055:7060] CHIP:DMG:                 InvokeResponseIB =
@@ -87,18 +87,18 @@ tests:
           [1655798564.116600][7055:7060] CHIP:DMG:                                         ClusterId = 0x6,
           [1655798564.116655][7055:7060] CHIP:DMG:                                         CommandId = 0x1,
           [1655798564.116707][7055:7060] CHIP:DMG:                                 },
-          [1655798564.116761][7055:7060] CHIP:DMG:                                 
+          [1655798564.116761][7055:7060] CHIP:DMG:
           [1655798564.116801][7055:7060] CHIP:DMG:                                 StatusIB =
           [1655798564.116851][7055:7060] CHIP:DMG:                                 {
           [1655798564.116895][7055:7060] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1655798564.116943][7055:7060] CHIP:DMG:                                 },
-          [1655798564.116987][7055:7060] CHIP:DMG:                                 
+          [1655798564.116987][7055:7060] CHIP:DMG:
           [1655798564.117030][7055:7060] CHIP:DMG:                         },
-          [1655798564.117079][7055:7060] CHIP:DMG:                         
+          [1655798564.117079][7055:7060] CHIP:DMG:
           [1655798564.117119][7055:7060] CHIP:DMG:                 },
-          [1655798564.117162][7055:7060] CHIP:DMG:                 
+          [1655798564.117162][7055:7060] CHIP:DMG:
           [1655798564.117197][7055:7060] CHIP:DMG:         ],
-          [1655798564.117241][7055:7060] CHIP:DMG:         
+          [1655798564.117241][7055:7060] CHIP:DMG:
           [1655798564.117271][7055:7060] CHIP:DMG:         InteractionModelRevision = 1
           [1655798564.117306][7055:7060] CHIP:DMG: },
           [1655798564.117386][7055:7060] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
@@ -133,37 +133,37 @@ tests:
           [1655798786.132439][7065:7070] CHIP:DMG:                                 Cluster = 0x8,
           [1655798786.132512][7065:7070] CHIP:DMG:                                 Attribute = 0x0000_0011,
           [1655798786.132578][7065:7070] CHIP:DMG:                         }
-          [1655798786.132635][7065:7070] CHIP:DMG:                                 
+          [1655798786.132635][7065:7070] CHIP:DMG:
           [1655798786.132704][7065:7070] CHIP:DMG:                         StatusIB =
           [1655798786.132770][7065:7070] CHIP:DMG:                         {
           [1655798786.132822][7065:7070] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1655798786.132892][7065:7070] CHIP:DMG:                         },
-          [1655798786.132960][7065:7070] CHIP:DMG:                         
+          [1655798786.132960][7065:7070] CHIP:DMG:
           [1655798786.133006][7065:7070] CHIP:DMG:                 },
-          [1655798786.133070][7065:7070] CHIP:DMG:                 
+          [1655798786.133070][7065:7070] CHIP:DMG:
           [1655798786.133109][7065:7070] CHIP:DMG:         ],
-          [1655798786.133173][7065:7070] CHIP:DMG:         
+          [1655798786.133173][7065:7070] CHIP:DMG:
           [1655798786.133213][7065:7070] CHIP:DMG:         InteractionModelRevision = 1
           [1655798786.133269][7065:7070] CHIP:DMG: }
           [1655798786.133385][7065:7070] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
 
            By sending a ReadRequest that the Write action was performed correctly.
-          ./chip-tool levelcontrol write on-level 1 1 1 
+          ./chip-tool levelcontrol write on-level 1 1 1
           [1652945083.826161][34821:34826] CHIP:DMG:                         AttributePathIB =
           [1652945083.826181][34821:34826] CHIP:DMG:                         {
           [1652945083.826196][34821:34826] CHIP:DMG:                                 Endpoint = 0x1,
           [1652945083.826216][34821:34826] CHIP:DMG:                                 Cluster = 0x8,
           [1652945083.826233][34821:34826] CHIP:DMG:                                 Attribute = 0x0000_0011,
           [1652945083.826256][34821:34826] CHIP:DMG:                         }
-          [1652945083.826281][34821:34826] CHIP:DMG:                                 
+          [1652945083.826281][34821:34826] CHIP:DMG:
           [1652945083.826297][34821:34826] CHIP:DMG:                         StatusIB =
           [1652945083.826315][34821:34826] CHIP:DMG:                         {
           [1652945083.826330][34821:34826] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1652945083.826347][34821:34826] CHIP:DMG:                         },
 
 
-          ./chip-tool levelcontrol read on-level 1 1 
+          ./chip-tool levelcontrol read on-level 1 1
           [1655799013.466144][7075:7080] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 737039642
           [1655799013.466237][7075:7080] CHIP:TOO:   on level: 1
           [1655799013.466336][7075:7080] CHIP:EM: Sending Standalone Ack for MessageCounter:202402347 on exchange 58038i
@@ -175,7 +175,7 @@ tests:
           response message to be received. Wait for 5 seconds(Timer has expired)
           and then send the Invoke Request Message to the DUT."
       verification: |
-          here is the example command you can use 
+          here is the example command you can use
 
            sudo ./chip-tool onoff on 1 1 --repeat-delay-ms 5000  --timedInteractionTimeoutMs 200
 
