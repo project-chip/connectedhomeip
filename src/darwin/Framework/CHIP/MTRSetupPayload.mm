@@ -107,4 +107,57 @@
     }
     return allOptionalData;
 }
+
+#pragma mark - NSSecureCoding
+
+static NSString * const MTRSetupPayloadCodingKeyVersion = @"MTRSP.ck.version";
+static NSString * const MTRSetupPayloadCodingKeyVendorID = @"MTRSP.ck.vendorID";
+static NSString * const MTRSetupPayloadCodingKeyProductID = @"MTRSP.ck.productID";
+static NSString * const MTRSetupPayloadCodingKeyCommissioningFlow = @"MTRSP.ck.commissioningFlow";
+static NSString * const MTRSetupPayloadCodingKeyRendezvousFlags = @"MTRSP.ck.rendezvousFlags";
+static NSString * const MTRSetupPayloadCodingKeyDiscriminator = @"MTRSP.ck.discriminator";
+static NSString * const MTRSetupPayloadCodingKeySetupPINCode = @"MTRSP.ck.setupPINCode";
+static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serialNumber";
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [coder encodeObject:self.version forKey:MTRSetupPayloadCodingKeyVersion];
+    [coder encodeObject:self.vendorID forKey:MTRSetupPayloadCodingKeyVendorID];
+    [coder encodeObject:self.productID forKey:MTRSetupPayloadCodingKeyProductID];
+    [coder encodeInteger:self.commissioningFlow forKey:MTRSetupPayloadCodingKeyCommissioningFlow];
+    [coder encodeInteger:self.rendezvousInformation forKey:MTRSetupPayloadCodingKeyRendezvousFlags];
+    [coder encodeObject:self.discriminator forKey:MTRSetupPayloadCodingKeyDiscriminator];
+    [coder encodeObject:self.setUpPINCode forKey:MTRSetupPayloadCodingKeySetupPINCode];
+    [coder encodeObject:self.serialNumber forKey:MTRSetupPayloadCodingKeySerialNumber];
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder
+{
+    NSNumber * version = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyVersion];
+    NSNumber * vendorID = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyVendorID];
+    NSNumber * productID = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyProductID];
+    NSUInteger commissioningFlow = [decoder decodeIntegerForKey:MTRSetupPayloadCodingKeyCommissioningFlow];
+    NSUInteger rendezvousInformation = [decoder decodeIntegerForKey:MTRSetupPayloadCodingKeyRendezvousFlags];
+    NSNumber * discriminator = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyDiscriminator];
+    NSNumber * setUpPINCode = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeySetupPINCode];
+    NSString * serialNumber = [decoder decodeObjectOfClass:[NSString class] forKey:MTRSetupPayloadCodingKeySerialNumber];
+
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] init];
+    payload.version = version;
+    payload.vendorID = vendorID;
+    payload.productID = productID;
+    payload.commissioningFlow = (MTRCommissioningFlow) commissioningFlow;
+    payload.rendezvousInformation = (MTRRendezvousInformationFlags) rendezvousInformation;
+    payload.discriminator = discriminator;
+    payload.setUpPINCode = setUpPINCode;
+    payload.serialNumber = serialNumber;
+
+    return payload;
+}
+
 @end
