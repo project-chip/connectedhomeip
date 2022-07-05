@@ -162,13 +162,6 @@ enum PublicEventTypes
     kSEDIntervalChange,
 
     /**
-     * Security Session Established
-     *
-     * Signals that an external entity has established a new security session with the device.
-     */
-    kSessionEstablished,
-
-    /**
      * CHIPoBLE Connection Established
      *
      * Signals that an external entity has established a new CHIPoBLE connection with the device.
