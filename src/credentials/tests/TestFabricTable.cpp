@@ -1776,42 +1776,40 @@ void TestFabricLookup(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, LoadTestFabric_Node02_01(inSuite, fabricTable, /* doCommit = */ true) == CHIP_NO_ERROR);
 
     // Attempt lookup of the Root01 fabric.
-    do
     {
         Crypto::P256PublicKey key;
         NL_TEST_ASSERT(inSuite, key.Length() >= TestCerts::sTestCert_Root01_PublicKey_Len);
         if (key.Length() < TestCerts::sTestCert_Root01_PublicKey_Len)
         {
-            break;
+            return;
         }
         memcpy(key.Bytes(), TestCerts::sTestCert_Root01_PublicKey, TestCerts::sTestCert_Root01_PublicKey_Len);
         auto fabricInfo = fabricTable.FindFabric(key, 0xFAB000000000001D);
         NL_TEST_ASSERT(inSuite, fabricInfo != nullptr);
         if (fabricInfo == nullptr)
         {
-            break;
+            return;
         }
         NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == 1);
-    } while (0);
+    }
 
     // Attempt lookup of the Root02 fabric.
-    do
     {
         Crypto::P256PublicKey key;
         NL_TEST_ASSERT(inSuite, key.Length() >= TestCerts::sTestCert_Root02_PublicKey_Len);
         if (key.Length() < TestCerts::sTestCert_Root02_PublicKey_Len)
         {
-            break;
+            return;
         }
         memcpy(key.Bytes(), TestCerts::sTestCert_Root02_PublicKey, TestCerts::sTestCert_Root02_PublicKey_Len);
         auto fabricInfo = fabricTable.FindFabric(key, 0xFAB000000000001D);
         NL_TEST_ASSERT(inSuite, fabricInfo != nullptr);
         if (fabricInfo == nullptr)
         {
-            break;
+            return;
         }
         NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == 2);
-    } while (0);
+    }
 }
 
 void TestFetchCATs(nlTestSuite * inSuite, void * inContext)
