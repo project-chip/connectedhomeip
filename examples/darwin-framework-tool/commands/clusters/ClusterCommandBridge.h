@@ -47,7 +47,7 @@ public:
 
     ~ClusterCommand() {}
 
-    CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         chip::TLV::TLVWriter writer;
         chip::TLV::TLVReader reader;
@@ -68,7 +68,7 @@ public:
         return ClusterCommand::SendCommand(device, endpointId, mClusterId, mCommandId, commandFields);
     }
 
-    CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId, chip::ClusterId clusterId,
         chip::CommandId commandId, id _Nonnull commandFields)
     {
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
