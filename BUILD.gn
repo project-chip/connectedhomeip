@@ -27,9 +27,9 @@ import("$dir_pw_build/python.gni")
 # This build file should not be used in superproject builds.
 assert(chip_root == "//")
 
+import("${chip_root}/build/chip/fuzz_test.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/build/chip/tools.gni")
-import("${chip_root}/build/chip/fuzz_test.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
 
