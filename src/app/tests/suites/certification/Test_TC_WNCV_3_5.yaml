@@ -43,6 +43,7 @@ tests:
           "1a: TH sends UpOrOpen command to preposition the DUT in the opposite
           direction"
       command: "UpOrOpen"
+      PICS: WNCV.S.C00.Rsp
 
     ### DUT adjusts to a non-closed position
     ### Testers should input the fastMotionDuration parameter that match their DUT behavior
@@ -60,6 +61,7 @@ tests:
     ### MANDATORY Command
     - label: "2a: TH sends DownOrClose command to DUT"
       command: "DownOrClose"
+      PICS: WNCV.S.C01.Rsp
 
     ### DUT move toward its fully-closed position
     ### Testers should input the fullMotionDuration parameter that match their DUT behavior
@@ -75,6 +77,7 @@ tests:
     - label: "2c: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
@@ -86,7 +89,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           value: 10000
 
@@ -96,7 +99,7 @@ tests:
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       response:
           value: 100
 
@@ -106,7 +109,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           value: 10000
 
@@ -116,6 +119,6 @@ tests:
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONLIFTPERCENTAGE
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       response:
           value: 100

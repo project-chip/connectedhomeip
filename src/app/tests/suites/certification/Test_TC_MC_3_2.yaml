@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "TH sends CEC Settings Keys(0x0A) to DUT"
+      PICS: MC_KEYPADINPUT.S.LK
       command: "SendKey"
       arguments:
           values:
@@ -36,6 +37,7 @@ tests:
                 value: 0x0A
 
     - label: "TH sends CEC Home Keys(0x09) to DUT"
+      PICS: MC_KEYPADINPUT.S.LK
       command: "SendKey"
       arguments:
           values:
