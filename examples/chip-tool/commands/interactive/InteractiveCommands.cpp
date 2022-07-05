@@ -19,8 +19,7 @@
 #include "InteractiveCommands.h"
 
 #include <iomanip>
-#include <readline/history.h>
-#include <readline/readline.h>
+#include <editline.h>
 #include <sstream>
 
 char kInteractiveModeName[]                            = "";
