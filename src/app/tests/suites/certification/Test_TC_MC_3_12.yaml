@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 21.5.3. [TC-MC-3.10] Show and Hide Input Status Verification
+name: 21.5.3. [TC-MC-3.12] Show and Hide Input Status Verification
 
 config:
     nodeId: 0x12344321
@@ -30,6 +30,7 @@ tests:
                 value: nodeId
 
     - label: "Read attribute media input list"
+      PICS: MC_MEDIAINPUT.S.A0000
       command: "readAttribute"
       attribute: "InputList"
       response:
@@ -37,11 +38,13 @@ tests:
               type: list
 
     - label: "Hide Input Status Command"
+      PICS: MC_MEDIAINPUT.S.C0002
       command: "HideInputStatus"
       response:
           error: 0
 
     - label: "Show Input Status Command"
+      PICS: MC_MEDIAINPUT.S.C0001
       command: "ShowInputStatus"
       response:
           error: 0

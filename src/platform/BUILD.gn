@@ -95,7 +95,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     header_dir = "platform"
 
     chip_with_gio = chip_enable_wifi
-    chip_device_config_enable_wpa = chip_enable_wifi
+    chip_device_config_enable_wpa =
+        chip_enable_wifi && chip_device_platform != "darwin"
     chip_stack_lock_tracking_log = chip_stack_lock_tracking != "none"
     chip_stack_lock_tracking_fatal = chip_stack_lock_tracking == "fatal"
     defines = [
@@ -165,6 +166,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_DARWIN=1",
         "CHIP_DEVICE_LAYER_TARGET=Darwin",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
     } else if (chip_device_platform == "efr32") {
       defines += [

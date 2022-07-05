@@ -24,8 +24,15 @@ config("darwin_config") {
     "CoreFoundation.framework",
     "CoreBluetooth.framework",
     "Foundation.framework",
-    "IOKit.framework",
   ]
+
+  if (current_os == "mac") {
+    frameworks += [
+      "SystemConfiguration.framework",
+      "CoreWLAN.framework",
+      "IOKit.framework",
+    ]
+  }
 
   cflags = [ "-fobjc-arc" ]
 }
@@ -54,6 +61,7 @@ static_library("Darwin") {
     "Logging.cpp",
     "MdnsError.cpp",
     "MdnsError.h",
+    "NetworkCommissioningDriver.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
@@ -61,6 +69,15 @@ static_library("Darwin") {
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
   ]
+
+  if (chip_enable_wifi) {
+    sources += [
+      "WiFi/ConfigurationManagerImplWiFi.cpp",
+      "WiFi/ConnectivityManagerImplWiFi.mm",
+      "WiFi/NetworkCommissioningWiFiDriver.h",
+      "WiFi/NetworkCommissioningWiFiDriver.mm",
+    ]
+  }
 
   if (chip_disable_platform_kvs == false) {
     sources += [

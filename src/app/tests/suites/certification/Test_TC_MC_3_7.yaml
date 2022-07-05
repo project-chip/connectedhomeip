@@ -35,6 +35,7 @@ tests:
                 value: nodeId
 
     - label: "Launch an app with the provided a application ID"
+      PICS: MC_APPLAUNCHER.S.C0000
       command: "LaunchApp"
       arguments:
           values:
@@ -54,6 +55,7 @@ tests:
     - label:
           "TH sends a LaunchApp command to DUT to launch an app which is not
           available"
+      PICS: MC_APPLAUNCHER.S.C0000
       command: "LaunchApp"
       arguments:
           values:

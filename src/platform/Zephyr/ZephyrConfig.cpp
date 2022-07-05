@@ -98,8 +98,8 @@ struct ReadRequest
 // Callback for Zephyr's settings_load_subtree_direct() function
 int ConfigValueCallback(const char * name, size_t configSize, settings_read_cb readCb, void * cbArg, void * param)
 {
-    // If requested a config key X, process just node X and ignore all its descendants: X/*
-    if (settings_name_next(name, nullptr) > 0)
+    // If requested config key X, process just node X and ignore all its descendants: X/*
+    if (name != nullptr && *name != '\0')
         return 0;
 
     ReadRequest & request = *reinterpret_cast<ReadRequest *>(param);

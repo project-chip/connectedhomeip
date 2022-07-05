@@ -70,6 +70,7 @@ namespace DeviceLayer {
         void BleConnectionDelegateImpl::NewConnection(Ble::BleLayer * bleLayer, void * appState, const uint16_t deviceDiscriminator)
         {
             ChipLogProgress(Ble, "%s", __FUNCTION__);
+            CancelConnection();
             ble = [[BleConnection alloc] initWithDiscriminator:deviceDiscriminator];
             [ble setBleLayer:bleLayer];
             ble.appState = appState;
@@ -81,8 +82,10 @@ namespace DeviceLayer {
         CHIP_ERROR BleConnectionDelegateImpl::CancelConnection()
         {
             ChipLogProgress(Ble, "%s", __FUNCTION__);
-            [ble stop];
-            ble = nil;
+            if (ble) {
+                [ble stop];
+                ble = nil;
+            }
             return CHIP_NO_ERROR;
         }
     } // namespace Internal
@@ -386,7 +389,7 @@ namespace DeviceLayer {
         return;
     }
 
-    [_centralManager cancelPeripheralConnection:_peripheral];
+    _mBleLayer->CloseAllBleConnections();
     _peripheral = nil;
 }
 
