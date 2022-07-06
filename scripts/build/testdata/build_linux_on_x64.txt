@@ -31,10 +31,15 @@ bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/bridge-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-bridge-ipv6only'
 
-# Generating linux-arm64-chip-tool-no-interactive-ipv6only
+# Generating linux-arm64-chip-tool
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
- gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=chip_inet_config_enable_ipv4=false config_use_interactive_mode=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool-no-interactive-ipv6only'
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool'
+
+# Generating linux-arm64-chip-tool-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool-ipv6only'
 
 # Generating linux-arm64-light
 bash -c '
@@ -177,9 +182,6 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating linux-x64-chip-tool-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-chip-tool-ipv6only
 
-# Generating linux-x64-chip-tool-no-interactive-ipv6only
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_inet_config_enable_ipv4=false config_use_interactive_mode=false' {out}/linux-x64-chip-tool-no-interactive-ipv6only
-
 # Generating linux-x64-chip-tool-nodeps
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false' {out}/linux-x64-chip-tool-nodeps
 
@@ -276,8 +278,11 @@ ninja -C {out}/linux-arm64-bridge
 # Building linux-arm64-bridge-ipv6only
 ninja -C {out}/linux-arm64-bridge-ipv6only
 
-# Building linux-arm64-chip-tool-no-interactive-ipv6only
-ninja -C {out}/linux-arm64-chip-tool-no-interactive-ipv6only
+# Building linux-arm64-chip-tool
+ninja -C {out}/linux-arm64-chip-tool
+
+# Building linux-arm64-chip-tool-ipv6only
+ninja -C {out}/linux-arm64-chip-tool-ipv6only
 
 # Building linux-arm64-light
 ninja -C {out}/linux-arm64-light
@@ -377,9 +382,6 @@ ninja -C {out}/linux-x64-chip-tool
 
 # Building linux-x64-chip-tool-ipv6only
 ninja -C {out}/linux-x64-chip-tool-ipv6only
-
-# Building linux-x64-chip-tool-no-interactive-ipv6only
-ninja -C {out}/linux-x64-chip-tool-no-interactive-ipv6only
 
 # Building linux-x64-chip-tool-nodeps
 ninja -C {out}/linux-x64-chip-tool-nodeps
