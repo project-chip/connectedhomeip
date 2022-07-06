@@ -39,6 +39,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         {
     {{/first}}
         case Commands::{{asUpperCamelCase commandName}}::Id: {
+            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
         {{> im_command_handler_cluster_commands}}
             break;
         }

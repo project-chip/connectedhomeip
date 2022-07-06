@@ -14028,3 +14028,14 @@ chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const
  */
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
+
+
+/** @brief Pre Execute command callback
+ * @param commandObj Command object
+ * @param commandPath Concrete command path to be executed
+ *
+ * This function is called by the framework before execute any command
+ */
+void MatterPreExecuteCommandCallback(chip::app::CommandHandler * commandObj,
+                                     const chip::app::ConcreteCommandPath & commandPath);
+
