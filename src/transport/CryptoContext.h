@@ -46,7 +46,7 @@ public:
     CryptoContext(const CryptoContext &) = default;
     CryptoContext(Crypto::SymmetricKeyContext * context) : mKeyContext(context){};
     CryptoContext & operator=(const CryptoContext &) = default;
-    CryptoContext & operator=(CryptoContext &&)      = default;
+    CryptoContext & operator=(CryptoContext &&) = default;
 
     /**
      *    Whether the current node initiated the session, or it is responded to a session request.

@@ -818,15 +818,15 @@ static const uint8_t kGroupPrivacyInfo[] = { 'P', 'r', 'i', 'v', 'a', 'c', 'y', 
             Length = CRYPTO_SYMMETRIC_KEY_LENGTH_BITS
          )
 */
-CHIP_ERROR DeriveGroupPrivacyKey(const ByteSpan & epoch_key, MutableByteSpan & out_key)
+CHIP_ERROR DeriveGroupPrivacyKey(const ByteSpan & encryption_key, MutableByteSpan & out_key)
 {
-    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == epoch_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == encryption_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES <= out_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
 
     const ByteSpan null_span = ByteSpan(nullptr, 0);
 
     Crypto::HKDF_sha crypto;
-    return crypto.HKDF_SHA256(epoch_key.data(), epoch_key.size(), null_span.data(), null_span.size(), kGroupPrivacyInfo,
+    return crypto.HKDF_SHA256(encryption_key.data(), encryption_key.size(), null_span.data(), null_span.size(), kGroupPrivacyInfo,
                               sizeof(kGroupPrivacyInfo), out_key.data(), Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
 }
 
