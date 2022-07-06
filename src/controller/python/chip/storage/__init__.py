@@ -24,8 +24,7 @@ import ctypes
 import json
 import logging
 from ctypes import *
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from typing import *
 
 import chip.exceptions
