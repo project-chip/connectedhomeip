@@ -181,7 +181,7 @@ static MTRDeviceController * sController = nil;
     XCTestExpectation * expectation = [self expectationWithDescription:@"ReuseMTRClusterObjectFirstCall"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    MTRTestCluster * cluster = [[MTRTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    MTRBaseClusterTestCluster * cluster = [[MTRBaseClusterTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
     [cluster testWithCompletionHandler:^(NSError * err) {

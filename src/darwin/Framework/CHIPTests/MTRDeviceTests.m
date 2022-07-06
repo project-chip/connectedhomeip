@@ -823,15 +823,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Read cache
     NSLog(@"Reading from cache...");
     cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
-    [MTROnOff readAttributeOnOffWithAttributeCache:attributeCacheContainer
-                                          endpoint:@1
-                                             queue:queue
-                                 completionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-                                     NSLog(@"Read attribute cache value: %@, error: %@", value, err);
-                                     XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
-                                     XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:NO]]);
-                                     [cacheExpectation fulfill];
-                                 }];
+    [MTRBaseClusterOnOff readAttributeOnOffWithAttributeCache:attributeCacheContainer
+                                                     endpoint:@1
+                                                        queue:queue
+                                            completionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                                                NSLog(@"Read attribute cache value: %@, error: %@", value, err);
+                                                XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
+                                                XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:NO]]);
+                                                [cacheExpectation fulfill];
+                                            }];
     [self waitForExpectations:[NSArray arrayWithObject:cacheExpectation] timeout:kTimeoutInSeconds];
 
     // Read from cache using generic path
