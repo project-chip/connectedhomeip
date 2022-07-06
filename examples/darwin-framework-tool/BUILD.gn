@@ -18,6 +18,10 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/examples//chip-tool/chip-tool.gni")
 
+if (config_use_interactive_mode) {
+  import("//build_overrides/editline.gni")
+}
+
 assert(chip_build_tools)
 
 config("config") {
@@ -43,10 +47,6 @@ config("config") {
     "-Wconversion",
     "-fobjc-arc",
   ]
-
-  if (config_use_interactive_mode) {
-    libs = [ "readline" ]
-  }
 }
 
 executable("darwin-framework-tool") {
@@ -81,6 +81,7 @@ executable("darwin-framework-tool") {
 
   if (config_use_interactive_mode) {
     sources += [ "commands/interactive/InteractiveCommands.mm" ]
+    deps += [ "${editline_root}:editline" ]
   }
 
   if (config_enable_yaml_tests) {
