@@ -146,12 +146,12 @@ bool LockManager::ReadConfigValues()
 
     CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
                                        sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
-                                       LockParams.numberOfUsers,
+                                           LockParams.numberOfUsers,
                                        outLen);
 
     CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
                                        sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
-                                       LockParams.numberOfUsers,
+                                           LockParams.numberOfUsers,
                                        outLen);
 
     CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_HolidaySchedules,
@@ -483,7 +483,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
 }
 
 DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-        EmberAfPluginDoorLockWeekDaySchedule & schedule)
+                                         EmberAfPluginDoorLockWeekDaySchedule & schedule)
 {
 
     VerifyOrReturnValue(weekdayIndex > 0, DlStatus::kFailure); // indices are one-indexed
@@ -501,8 +501,8 @@ DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
 }
 
 DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-        DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
-        uint8_t endHour, uint8_t endMinute)
+                                         DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
+                                         uint8_t endHour, uint8_t endMinute)
 {
 
     VerifyOrReturnValue(weekdayIndex > 0, DlStatus::kFailure); // indices are one-indexed
@@ -531,7 +531,7 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
 }
 
 DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
-        EmberAfPluginDoorLockYearDaySchedule & schedule)
+                                         EmberAfPluginDoorLockYearDaySchedule & schedule)
 {
     VerifyOrReturnValue(yearDayIndex > 0, DlStatus::kFailure); // indices are one-indexed
     VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
@@ -550,7 +550,7 @@ DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 }
 
 DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
-        DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime)
+                                         DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime)
 {
     VerifyOrReturnValue(yearDayIndex > 0, DlStatus::kFailure); // indices are one-indexed
     VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
@@ -575,7 +575,7 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 }
 
 DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex,
-        EmberAfPluginDoorLockHolidaySchedule & schedule)
+                                         EmberAfPluginDoorLockHolidaySchedule & schedule)
 {
     VerifyOrReturnValue(holidayIndex > 0, DlStatus::kFailure); // indices are one-indexed
 
@@ -591,7 +591,7 @@ DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
 }
 
 DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
-        uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode)
+                                         uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode)
 {
     VerifyOrReturnValue(holidayIndex > 0, DlStatus::kFailure); // indices are one-indexed
 
@@ -675,7 +675,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     for (uint8_t i = 0; i < kMaxCredentials; i++)
     {
         if (mLockCredentials[i].credentialType != DlCredentialType::kPin ||
-                mLockCredentials[i].status == DlCredentialStatus::kAvailable)
+            mLockCredentials[i].status == DlCredentialStatus::kAvailable)
         {
             continue;
         }

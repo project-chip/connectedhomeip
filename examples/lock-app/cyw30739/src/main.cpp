@@ -239,12 +239,12 @@ void InitApp(intptr_t args)
 
     err = LockMgr().Init(state,
                          ParamBuilder()
-                         .SetNumberOfUsers(numberOfUsers)
-                         .SetNumberOfCredentialsPerUser(numberOfCredentialsPerUser)
-                         .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
-                         .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
-                         .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
-                         .GetLockParam());
+                             .SetNumberOfUsers(numberOfUsers)
+                             .SetNumberOfCredentialsPerUser(numberOfCredentialsPerUser)
+                             .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
+                             .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
+                             .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
+                             .GetLockParam());
 
     LockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 

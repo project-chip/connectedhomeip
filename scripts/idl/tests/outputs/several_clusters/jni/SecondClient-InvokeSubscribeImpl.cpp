@@ -59,8 +59,8 @@ JNI_METHOD(void, SecondCluster, subscribeSomeBytesAttribute)
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-            static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-            CHIPOctetStringAttributeCallback::OnSubscriptionEstablished);
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPOctetStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));

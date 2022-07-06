@@ -76,7 +76,7 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const O
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
-        DlOperationError & err)
+                                              DlOperationError & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Unlock Command endpoint=%d", endpointId);
     bool status = LockMgr().Unlock(endpointId, pinCode, err);
@@ -119,26 +119,26 @@ bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userInde
 
 // TODO: These functions will be supported by door-lock-server in the future. These are set to return failure until implemented.
 DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-        EmberAfPluginDoorLockWeekDaySchedule & schedule)
+                                          EmberAfPluginDoorLockWeekDaySchedule & schedule)
 {
     return DlStatus::kFailure;
 }
 
 DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
-        EmberAfPluginDoorLockYearDaySchedule & schedule)
+                                          EmberAfPluginDoorLockYearDaySchedule & schedule)
 {
     return DlStatus::kFailure;
 }
 
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-        DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
-        uint8_t endHour, uint8_t endMinute)
+                                          DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
+                                          uint8_t endHour, uint8_t endMinute)
 {
     return DlStatus::kFailure;
 }
 
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
-        DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime)
+                                          DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime)
 {
     return DlStatus::kFailure;
 }

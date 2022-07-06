@@ -51,9 +51,9 @@ typedef void (^MTRDeviceConnectionCallback)(MTRDevice * _Nullable device, NSErro
  * after that point if it wants to commission the device.
  */
 - (BOOL)pairDevice:(uint64_t)deviceID
-    discriminator:(uint16_t)discriminator
-    setupPINCode:(uint32_t)setupPINCode
-    error:(NSError * __autoreleasing *)error;
+     discriminator:(uint16_t)discriminator
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error;
 
 /**
  * Start pairing for a device with the given ID, using the provided IP address
@@ -66,10 +66,10 @@ typedef void (^MTRDeviceConnectionCallback)(MTRDevice * _Nullable device, NSErro
  * after that point if it wants to commission the device.
  */
 - (BOOL)pairDevice:(uint64_t)deviceID
-    address:(NSString *)address
-    port:(uint16_t)port
-    setupPINCode:(uint32_t)setupPINCode
-    error:(NSError * __autoreleasing *)error;
+           address:(NSString *)address
+              port:(uint16_t)port
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error;
 
 /**
  * Start pairing for a device with the given ID and onboarding payload (QR code
@@ -83,12 +83,12 @@ typedef void (^MTRDeviceConnectionCallback)(MTRDevice * _Nullable device, NSErro
  */
 - (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error;
 - (BOOL)commissionDevice:(uint64_t)deviceId
-    commissioningParams:(MTRCommissioningParameters *)commissioningParams
-    error:(NSError * __autoreleasing *)error;
+     commissioningParams:(MTRCommissioningParameters *)commissioningParams
+                   error:(NSError * __autoreleasing *)error;
 
 - (BOOL)continueCommissioningDevice:(void *)device
-    ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
-    error:(NSError * __autoreleasing *)error;
+           ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
+                              error:(NSError * __autoreleasing *)error;
 
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 
@@ -97,10 +97,10 @@ typedef void (^MTRDeviceConnectionCallback)(MTRDevice * _Nullable device, NSErro
 
 - (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error;
 - (nullable NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
-    duration:(NSUInteger)duration
-    discriminator:(NSUInteger)discriminator
-    setupPIN:(NSUInteger)setupPIN
-    error:(NSError * __autoreleasing *)error;
+                                       duration:(NSUInteger)duration
+                                  discriminator:(NSUInteger)discriminator
+                                       setupPIN:(NSUInteger)setupPIN
+                                          error:(NSError * __autoreleasing *)error;
 
 /**
  * Controllers are created via the MTRControllerFactory object.

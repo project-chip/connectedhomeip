@@ -80,7 +80,7 @@ class DLL_EXPORT ThermostatUserInterfaceConfigurationCluster : public ClusterBas
 {
 public:
     ThermostatUserInterfaceConfigurationCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-            EndpointId endpoint) :
+                                                EndpointId endpoint) :
         ClusterBase(exchangeManager, session, app::Clusters::ThermostatUserInterfaceConfiguration::Id, endpoint)
     {}
     ~ThermostatUserInterfaceConfigurationCluster() {}

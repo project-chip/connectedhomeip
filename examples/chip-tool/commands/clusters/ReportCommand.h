@@ -101,9 +101,7 @@ public:
         ModelCommand::Shutdown();
     }
 
-    void Cleanup() override {
-        InteractionModelReports::Shutdown();
-    }
+    void Cleanup() override { InteractionModelReports::Shutdown(); }
 
 protected:
     // Use a 3x-longer-than-default timeout because wildcard reads can take a
@@ -162,9 +160,7 @@ protected:
         ReportCommand::Shutdown();
     }
 
-    bool DeferInteractiveCleanup() override {
-        return mSubscriptionEstablished;
-    }
+    bool DeferInteractiveCleanup() override { return mSubscriptionEstablished; }
 
 private:
     bool mSubscriptionEstablished = false;
@@ -266,7 +262,7 @@ public:
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return SubscribeCommand::SubscribeAttribute(device, endpointIds, mClusterIds, mAttributeIds, mMinInterval, mMaxInterval,
-                mFabricFiltered, mDataVersion, mKeepSubscriptions);
+                                                    mFabricFiltered, mDataVersion, mKeepSubscriptions);
     }
 
 private:
