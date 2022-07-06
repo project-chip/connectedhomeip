@@ -738,6 +738,7 @@ chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUserCodeTempora
  * @brief Cluster attribute pre-change callback
  *
  * @param  EndpointId      endpoint for which attribute is changing
+ * @param  attributePath   concrete attribute path that is changing
  * @param  attrType        attribute that is going to be changed
  * @param  attrSize        attribute value storage size
  * @param  attrValue       attribute value to set
@@ -746,6 +747,7 @@ chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUserCodeTempora
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
 chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId,
+                                                                                          const chip::app::ConcreteAttributePath & attributePath,
                                                                                           EmberAfAttributeType attrType,
                                                                                           uint16_t attrSize, uint8_t * attrValue);
 
