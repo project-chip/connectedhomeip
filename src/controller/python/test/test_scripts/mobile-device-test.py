@@ -35,16 +35,22 @@ from base import TestTimeout
 from cluster_objects import ClusterObjectTests
 from cluster_objects import NODE_ID
 from network_commissioning import NetworkCommissioningTests
+
 # Commissioning test.
 
 # The thread network dataset tlv for testing, splited into T-L-V.
 
 TEST_THREAD_NETWORK_DATASET_TLV = (
-    "0e080000000000010000" + "000300000c" + "35060004001fffe0" +
-    "0208fedcba9876543210" + "0708fd00000000001234" +
-    "0510ffeeddccbbaa99887766554433221100" +
-    "030e54657374696e674e6574776f726b" + "0102d252" +
-    "041081cb3b2efa781cc778397497ff520fa50c0302a0ff")
+    "0e080000000000010000"
+    + "000300000c"
+    + "35060004001fffe0"
+    + "0208fedcba9876543210"
+    + "0708fd00000000001234"
+    + "0510ffeeddccbbaa99887766554433221100"
+    + "030e54657374696e674e6574776f726b"
+    + "0102d252"
+    + "041081cb3b2efa781cc778397497ff520fa50c0302a0ff"
+)
 # Network id, for the thread network, current a const value, will be changed to XPANID of the thread network.
 TEST_THREAD_NETWORK_ID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
@@ -81,14 +87,11 @@ def ethernet_commissioning(
 
     logger.info("Testing commissioning")
     FailIfNot(
-        test.TestCommissioning(ip=address,
-                               setuppin=setup_pin,
-                               nodeid=device_nodeid),
+        test.TestCommissioning(ip=address, setuppin=setup_pin, nodeid=device_nodeid),
         "Failed to finish key exchange",
     )
 
-    ok = asyncio.run(
-        test.TestMultiFabric(ip=address, setuppin=20202021, nodeid=1))
+    ok = asyncio.run(test.TestMultiFabric(ip=address, setuppin=20202021, nodeid=1))
     FailIfNot(ok, "Failed to commission multi-fabric")
 
     FailIfNot(
@@ -97,12 +100,12 @@ def ethernet_commissioning(
     )
 
     logger.info("Testing CASE Eviction")
-    FailIfNot(asyncio.run(test.TestCaseEviction(device_nodeid)),
-              "Failed TestCaseEviction")
+    FailIfNot(
+        asyncio.run(test.TestCaseEviction(device_nodeid)), "Failed TestCaseEviction"
+    )
 
     logger.info("Testing closing sessions")
-    FailIfNot(test.TestCloseSession(nodeid=device_nodeid),
-              "Failed to close sessions")
+    FailIfNot(test.TestCloseSession(nodeid=device_nodeid), "Failed to close sessions")
 
 
 @base.test_case
@@ -111,24 +114,23 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
 
     logger.info("Testing on off cluster")
     FailIfNot(
-        test.TestOnOffCluster(nodeid=device_nodeid,
-                              endpoint=LIGHTING_ENDPOINT_ID,
-                              group=GROUP_ID),
+        test.TestOnOffCluster(
+            nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID, group=GROUP_ID
+        ),
         "Failed to test on off cluster",
     )
 
     logger.info("Testing level control cluster")
     FailIfNot(
-        test.TestLevelControlCluster(nodeid=device_nodeid,
-                                     endpoint=LIGHTING_ENDPOINT_ID,
-                                     group=GROUP_ID),
+        test.TestLevelControlCluster(
+            nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID, group=GROUP_ID
+        ),
         "Failed to test level control cluster",
     )
 
     logger.info("Testing sending commands to non exist endpoint")
     FailIfNot(
-        not test.TestOnOffCluster(
-            nodeid=device_nodeid, endpoint=233, group=GROUP_ID),
+        not test.TestOnOffCluster(nodeid=device_nodeid, endpoint=233, group=GROUP_ID),
         "Failed to test on off cluster on non-exist endpoint",
     )
 
@@ -141,48 +143,43 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
 
     logger.info("Testing attribute reading")
     FailIfNot(
-        test.TestReadBasicAttributes(nodeid=device_nodeid,
-                                     endpoint=ENDPOINT_ID,
-                                     group=GROUP_ID),
+        test.TestReadBasicAttributes(
+            nodeid=device_nodeid, endpoint=ENDPOINT_ID, group=GROUP_ID
+        ),
         "Failed to test Read Basic Attributes",
     )
 
     logger.info("Testing attribute writing")
     FailIfNot(
-        test.TestWriteBasicAttributes(nodeid=device_nodeid,
-                                      endpoint=ENDPOINT_ID,
-                                      group=GROUP_ID),
+        test.TestWriteBasicAttributes(
+            nodeid=device_nodeid, endpoint=ENDPOINT_ID, group=GROUP_ID
+        ),
         "Failed to test Write Basic Attributes",
     )
 
     logger.info("Testing attribute reading basic again")
     FailIfNot(
-        test.TestReadBasicAttributes(nodeid=1,
-                                     endpoint=ENDPOINT_ID,
-                                     group=GROUP_ID),
+        test.TestReadBasicAttributes(nodeid=1, endpoint=ENDPOINT_ID, group=GROUP_ID),
         "Failed to test Read Basic Attributes",
     )
 
     logger.info("Testing subscription")
     FailIfNot(
-        test.TestSubscription(nodeid=device_nodeid,
-                              endpoint=LIGHTING_ENDPOINT_ID),
+        test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID),
         "Failed to subscribe attributes.",
     )
 
-    logger.info(
-        "Testing another subscription that kills previous subscriptions")
+    logger.info("Testing another subscription that kills previous subscriptions")
     FailIfNot(
-        test.TestSubscription(nodeid=device_nodeid,
-                              endpoint=LIGHTING_ENDPOINT_ID),
+        test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID),
         "Failed to subscribe attributes.",
     )
 
     logger.info("Testing on off cluster over resolved connection")
     FailIfNot(
-        test.TestOnOffCluster(nodeid=device_nodeid,
-                              endpoint=LIGHTING_ENDPOINT_ID,
-                              group=GROUP_ID),
+        test.TestOnOffCluster(
+            nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID, group=GROUP_ID
+        ),
         "Failed to test on off cluster",
     )
 
@@ -202,23 +199,22 @@ def do_tests(
     timeoutTicker = TestTimeout(timeout)
     timeoutTicker.start()
 
-    test = BaseTestHelper(nodeid=controller_nodeid,
-                          paaTrustStorePath=paa_trust_store_path)
+    test = BaseTestHelper(
+        nodeid=controller_nodeid, paaTrustStorePath=paa_trust_store_path
+    )
 
     chip.logging.RedirectToPythonLogging()
 
-    ethernet_commissioning(test, discriminator, setup_pin, address,
-                           device_nodeid)
+    ethernet_commissioning(test, discriminator, setup_pin, address, device_nodeid)
 
     logger.info("Testing resolve")
-    FailIfNot(test.TestResolve(nodeid=device_nodeid),
-              "Failed to resolve nodeid")
+    FailIfNot(test.TestResolve(nodeid=device_nodeid), "Failed to resolve nodeid")
 
     # Still test network commissioning
     FailIfNot(
         asyncio.run(
-            NetworkCommissioningTests(devCtrl=test.devCtrl,
-                                      nodeid=device_nodeid).run()),
+            NetworkCommissioningTests(devCtrl=test.devCtrl, nodeid=device_nodeid).run()
+        ),
         "Failed to finish network commissioning",
     )
 
@@ -269,10 +265,9 @@ def do_tests(
     type=int,
     help="Discriminator of the device.",
 )
-@click.option("--setup-pin",
-              default=TEST_SETUPPIN,
-              type=int,
-              help="Setup pincode of the device.")
+@click.option(
+    "--setup-pin", default=TEST_SETUPPIN, type=int, help="Setup pincode of the device."
+)
 @click.option(
     "--enable-test",
     default=["all"],
@@ -293,10 +288,7 @@ def do_tests(
     type=click.Choice(["ERROR", "WARN", "INFO", "DEBUG"]),
     help="The log level of the test.",
 )
-@click.option("--log-format",
-              default=None,
-              type=str,
-              help="Override logging format")
+@click.option("--log-format", default=None, type=str, help="Override logging format")
 @click.option(
     "--print-test-list",
     is_flag=True,
