@@ -29,9 +29,7 @@ class LinuxScanResponseIterator : public Iterator<T>
 {
 public:
     LinuxScanResponseIterator(std::vector<T> * apScanResponse) : mpScanResponse(apScanResponse) {}
-    size_t Count() override {
-        return mpScanResponse != nullptr ? mpScanResponse->size() : 0;
-    }
+    size_t Count() override { return mpScanResponse != nullptr ? mpScanResponse->size() : 0; }
     bool Next(T & item) override
     {
         if (mpScanResponse == nullptr || currentIterating >= mpScanResponse->size())
@@ -43,8 +41,8 @@ public:
         return true;
     }
     void Release() override
-    {   /* nothing to do, we don't hold the ownership of the vector, and users is not expected to hold the ownership in OnFinished for
-           scan. */
+    { /* nothing to do, we don't hold the ownership of the vector, and users is not expected to hold the ownership in OnFinished for
+         scan. */
     }
 
 private:
@@ -63,9 +61,7 @@ public:
         WiFiNetworkIterator(LinuxWiFiDriver * aDriver) : driver(aDriver) {}
         size_t Count() override;
         bool Next(Network & item) override;
-        void Release() override {
-            delete this;
-        }
+        void Release() override { delete this; }
         ~WiFiNetworkIterator() override = default;
 
     private:
@@ -82,22 +78,14 @@ public:
     };
 
     // BaseDriver
-    NetworkIterator * GetNetworks() override {
-        return new WiFiNetworkIterator(this);
-    }
+    NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
     void Shutdown() override;
 
     // WirelessDriver
-    uint8_t GetMaxNetworks() override {
-        return 1;
-    }
-    uint8_t GetScanNetworkTimeoutSeconds() override {
-        return 10;
-    }
-    uint8_t GetConnectNetworkTimeoutSeconds() override {
-        return 20;
-    }
+    uint8_t GetMaxNetworks() override { return 1; }
+    uint8_t GetScanNetworkTimeoutSeconds() override { return 10; }
+    uint8_t GetConnectNetworkTimeoutSeconds() override { return 20; }
 
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;
@@ -131,9 +119,7 @@ public:
         ThreadNetworkIterator(LinuxThreadDriver * aDriver) : driver(aDriver) {}
         size_t Count() override;
         bool Next(Network & item) override;
-        void Release() override {
-            delete this;
-        }
+        void Release() override { delete this; }
         ~ThreadNetworkIterator() override = default;
 
     private:
@@ -142,22 +128,14 @@ public:
     };
 
     // BaseDriver
-    NetworkIterator * GetNetworks() override {
-        return new ThreadNetworkIterator(this);
-    }
+    NetworkIterator * GetNetworks() override { return new ThreadNetworkIterator(this); }
     CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
     void Shutdown() override;
 
     // WirelessDriver
-    uint8_t GetMaxNetworks() override {
-        return 1;
-    }
-    uint8_t GetScanNetworkTimeoutSeconds() override {
-        return 10;
-    }
-    uint8_t GetConnectNetworkTimeoutSeconds() override {
-        return 20;
-    }
+    uint8_t GetMaxNetworks() override { return 1; }
+    uint8_t GetScanNetworkTimeoutSeconds() override { return 10; }
+    uint8_t GetConnectNetworkTimeoutSeconds() override { return 20; }
 
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;
@@ -184,9 +162,7 @@ public:
     struct EthernetNetworkIterator final : public NetworkIterator
     {
         EthernetNetworkIterator() = default;
-        size_t Count() override {
-            return interfaceNameLen > 0 ? 1 : 0;
-        }
+        size_t Count() override { return interfaceNameLen > 0 ? 1 : 0; }
         bool Next(Network & item) override
         {
             if (exhausted)
@@ -199,20 +175,16 @@ public:
             item.connected    = true;
             return true;
         }
-        void Release() override {
-            delete this;
-        }
+        void Release() override { delete this; }
         ~EthernetNetworkIterator() override = default;
 
         // Public, but cannot be accessed via NetworkIterator interface.
         uint8_t interfaceName[kMaxNetworkIDLen];
         size_t interfaceNameLen = 0;
-        bool exhausted           = false;
+        bool exhausted          = false;
     };
 
-    uint8_t GetMaxNetworks() override {
-        return 1;
-    };
+    uint8_t GetMaxNetworks() override { return 1; };
     NetworkIterator * GetNetworks() override;
 };
 
