@@ -25,28 +25,30 @@
 """Chip Device Controller interface
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-import asyncio
-from ctypes import *
-from dataclasses import dataclass
+from __future__ import absolute_import, print_function
 
-from .ChipStack import *
-from .interaction_model import InteractionModelError, delegate as im
-from .exceptions import *
-from .clusters import Command as ClusterCommand
-from .clusters import Attribute as ClusterAttribute
-from .clusters import ClusterObjects as ClusterObjects
-from .clusters import Objects as GeneratedObjects
-from .clusters.CHIPClusters import *
-from . import clusters as Clusters
+import asyncio
+import builtins
+import copy
+import ctypes
 import enum
 import threading
 import typing
-import builtins
+from ctypes import *
+from dataclasses import dataclass
+
 import ipdb
-import ctypes
-import copy
+
+from . import clusters as Clusters
+from .ChipStack import *
+from .clusters import Attribute as ClusterAttribute
+from .clusters import ClusterObjects as ClusterObjects
+from .clusters import Command as ClusterCommand
+from .clusters import Objects as GeneratedObjects
+from .clusters.CHIPClusters import *
+from .exceptions import *
+from .interaction_model import InteractionModelError
+from .interaction_model import delegate as im
 
 __all__ = ["ChipDeviceController"]
 
