@@ -40,7 +40,6 @@ examples_plat_dir = "${chip_root}/examples/platform/qpg"
 qpg_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/qpg",
-    "${chip_root}/examples/providers:device_info_provider",
     "${examples_plat_dir}",
     "${qpg_project_dir}/include",
   ]
@@ -64,6 +63,7 @@ qpg_executable("lock_app") {
   deps = [
     ":sdk",
     "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
