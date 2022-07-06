@@ -60,7 +60,7 @@ static void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
-    [controller getDevice:kDeviceId
+    [controller getBaseDevice:kDeviceId
                     queue:dispatch_get_main_queue()
         completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             XCTAssertEqual(error.code, 0);
@@ -177,7 +177,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getDevice:kDeviceId
+    [controller getBaseDevice:kDeviceId
                     queue:dispatch_get_main_queue()
         completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             XCTAssertEqual(error.code, 0);

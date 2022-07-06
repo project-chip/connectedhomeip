@@ -135,7 +135,7 @@ BOOL MTRGetConnectedDevice(MTRDeviceConnectionCallback completionHandler)
 
     // Let's use the last device that was paired
     uint64_t deviceId = MTRGetLastPairedDeviceId();
-    return [controller getDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
+    return [controller getBaseDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
 }
 
 MTRBaseDevice * MTRGetDeviceBeingCommissioned(void)
@@ -154,7 +154,7 @@ BOOL MTRGetConnectedDeviceWithID(uint64_t deviceId, MTRDeviceConnectionCallback 
 {
     MTRDeviceController * controller = InitializeMTR();
 
-    return [controller getDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
+    return [controller getBaseDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
 }
 
 BOOL MTRIsDevicePaired(uint64_t deviceId)

@@ -97,7 +97,7 @@ static void SetupXPCQueue(void)
     return nil;
 }
 
-- (BOOL)getDevice:(uint64_t)deviceID queue:(dispatch_queue_t)queue completionHandler:(MTRDeviceConnectionCallback)completionHandler
+- (BOOL)getBaseDevice:(uint64_t)deviceID queue:(dispatch_queue_t)queue completionHandler:(MTRDeviceConnectionCallback)completionHandler
 {
     dispatch_async(_workQueue, ^{
         dispatch_group_t group = dispatch_group_create();

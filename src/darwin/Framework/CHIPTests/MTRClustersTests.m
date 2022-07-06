@@ -139,7 +139,7 @@ static MTRDeviceController * sController = nil;
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getDevice:nodeId
+    [controller getBaseDevice:nodeId
                     queue:dispatch_get_main_queue()
         completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             XCTAssertEqual(error.code, 0);
@@ -168,7 +168,7 @@ static MTRDeviceController * sController = nil;
 
     __block MTRBaseDevice * device;
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getDevice:nodeId
+    [controller getBaseDevice:nodeId
                     queue:dispatch_get_main_queue()
         completionHandler:^(MTRBaseDevice * _Nullable retrievedDevice, NSError * _Nullable error) {
             XCTAssertEqual(error.code, 0);

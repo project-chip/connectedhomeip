@@ -181,7 +181,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     [controller shutdown];
 
     XCTAssertFalse([controller isRunning]);
-    XCTAssertFalse([controller getDevice:1234
+    XCTAssertFalse([controller getBaseDevice:1234
                                    queue:dispatch_get_main_queue()
                        completionHandler:^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
                            XCTAssertEqual(error.code, MTRErrorCodeInvalidState);

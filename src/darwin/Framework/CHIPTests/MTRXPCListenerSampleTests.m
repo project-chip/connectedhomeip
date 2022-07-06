@@ -170,7 +170,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     (void) controller;
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController getDevice:nodeId
+        [sharedController getBaseDevice:nodeId
                               queue:dispatch_get_main_queue()
                   completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                       if (error) {
@@ -206,7 +206,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     (void) controller;
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController getDevice:nodeId
+        [sharedController getBaseDevice:nodeId
                               queue:dispatch_get_main_queue()
                   completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                       if (error) {
@@ -243,7 +243,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     (void) controller;
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController getDevice:nodeId
+        [sharedController getBaseDevice:nodeId
                               queue:dispatch_get_main_queue()
                   completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                       if (error) {
@@ -280,7 +280,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 {
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController getDevice:nodeId
+        [sharedController getBaseDevice:nodeId
                               queue:dispatch_get_main_queue()
                   completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                       if (error) {
@@ -330,7 +330,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 {
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController getDevice:nodeId
+        [sharedController getBaseDevice:nodeId
                               queue:dispatch_get_main_queue()
                   completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                       if (error) {
@@ -360,7 +360,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
             attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
         }
 
-        [sharedController getDevice:nodeId
+        [sharedController getBaseDevice:nodeId
                               queue:dispatch_get_main_queue()
                   completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                       if (error) {
@@ -546,7 +546,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getDevice:kDeviceId
+    [controller getBaseDevice:kDeviceId
                     queue:dispatch_get_main_queue()
         completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             XCTAssertEqual(error.code, 0);
@@ -589,7 +589,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
                    NSLog(@"Listener is not active");
                    return nil;
                }];
-    [remoteController getDevice:kDeviceId
+    [remoteController getBaseDevice:kDeviceId
                           queue:queue
               completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                   mConnectedDevice = device;
