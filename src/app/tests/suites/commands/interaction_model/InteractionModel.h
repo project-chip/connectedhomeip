@@ -110,7 +110,9 @@ protected:
     CHIP_ERROR ReadAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                        const chip::Optional<bool> & fabricFiltered = chip::Optional<bool>(true));
 
-    void Shutdown() { mReadClients.clear(); }
+    void Shutdown() {
+        mReadClients.clear();
+    }
 
     void CleanupReadClient(chip::app::ReadClient * aReadClient);
 
@@ -137,13 +139,14 @@ protected:
         {
 
             chip::app::CommandPathParams commandPath = { endpointId, clusterId, commandId,
-                                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                                         (chip::app::CommandPathFlags::kEndpointIdValid)
+                                                       };
             auto commandSender = std::make_unique<chip::app::CommandSender>(mCallback, device->GetExchangeManager(),
-                                                                            timedInteractionTimeoutMs.HasValue());
+                                 timedInteractionTimeoutMs.HasValue());
             VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
             ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, timedInteractionTimeoutMs,
-                                                                           suppressResponse.ValueOr(false)));
+                                 suppressResponse.ValueOr(false)));
             ReturnErrorOnFailure(commandSender->SendCommandRequest(device->GetSecureSession().Value()));
             mCommandSender.push_back(std::move(commandSender));
 
@@ -211,7 +214,7 @@ protected:
         {
 
             mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), &mChunkedWriteCallback,
-                                                                    timedInteractionTimeoutMs, suppressResponse.ValueOr(false));
+                           timedInteractionTimeoutMs, suppressResponse.ValueOr(false));
             VerifyOrReturnError(mWriteClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
             for (uint8_t i = 0; i < pathsConfig.count; i++)
@@ -282,7 +285,9 @@ protected:
         return writeClient.SendWriteRequest(chip::SessionHandle(session));
     }
 
-    void Shutdown() { mWriteClient.reset(); }
+    void Shutdown() {
+        mWriteClient.reset();
+    }
 
     std::unique_ptr<chip::app::WriteClient> mWriteClient;
     chip::app::ChunkedWriteCallback mChunkedWriteCallback;
@@ -304,15 +309,15 @@ private:
 };
 
 class InteractionModel : public InteractionModelReports,
-                         public InteractionModelCommands,
-                         public InteractionModelWriter,
-                         public chip::app::ReadClient::Callback,
-                         public chip::app::WriteClient::Callback,
-                         public chip::app::CommandSender::Callback
+    public InteractionModelCommands,
+    public InteractionModelWriter,
+    public chip::app::ReadClient::Callback,
+    public chip::app::WriteClient::Callback,
+    public chip::app::CommandSender::Callback
 {
 public:
-    InteractionModel() : InteractionModelReports(this), InteractionModelCommands(this), InteractionModelWriter(this){};
-    virtual ~InteractionModel(){};
+    InteractionModel() : InteractionModelReports(this), InteractionModelCommands(this), InteractionModelWriter(this) {};
+    virtual ~InteractionModel() {};
 
     virtual void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) = 0;
     virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err)                              = 0;
@@ -336,7 +341,9 @@ public:
                               const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
                               const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional);
 
-    CHIP_ERROR WaitForReport() { return CHIP_NO_ERROR; }
+    CHIP_ERROR WaitForReport() {
+        return CHIP_NO_ERROR;
+    }
 
     template <class T>
     CHIP_ERROR WriteAttribute(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId,
@@ -360,7 +367,7 @@ public:
         }
 
         return InteractionModelWriter::WriteAttribute(device, endpointIds, clusterIds, attributeIds, value,
-                                                      timedInteractionTimeoutMs, suppressResponse, optionalDataVersions);
+                timedInteractionTimeoutMs, suppressResponse, optionalDataVersions);
     }
 
     template <class T>
@@ -384,7 +391,7 @@ public:
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         return InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value, timedInteractionTimeoutMs,
-                                                     suppressResponse);
+                suppressResponse);
     }
 
     template <class T>

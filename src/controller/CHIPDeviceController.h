@@ -197,7 +197,7 @@ public:
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
         mSystemState->CASESessionMgr()->FindOrEstablishSession(PeerId(GetCompressedFabricId(), peerNodeId), onConnection,
-                                                               onFailure);
+                onFailure);
         return CHIP_NO_ERROR;
     }
 
@@ -226,7 +226,9 @@ public:
     CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
                                    Spake2pVerifier & outVerifier);
 
-    void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
+    void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) {
+        mDeviceDiscoveryDelegate = delegate;
+    }
 
     /**
      * @brief Get the Compressed Fabric ID assigned to the device.
@@ -277,7 +279,9 @@ public:
      */
     CHIP_ERROR GetRootPublicKey(Crypto::P256PublicKey & outRootPublicKey) const;
 
-    FabricIndex GetFabricIndex() const { return mFabricIndex; }
+    FabricIndex GetFabricIndex() const {
+        return mFabricIndex;
+    }
 
     const FabricTable * GetFabricTable() const
     {
@@ -290,7 +294,9 @@ public:
 
     void ReleaseOperationalDevice(NodeId remoteNodeId);
 
-    OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }
+    OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() {
+        return mOperationalCredentialsDelegate;
+    }
 
     /**
      * TEMPORARY - DO NOT USE or if you use please request review on why/how to
@@ -357,7 +363,9 @@ protected:
     /// in case subclasses want to create the session if it does not yet exist
     virtual OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId);
 
-    DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
+    DiscoveredNodeList GetDiscoveredNodes() override {
+        return DiscoveredNodeList(mCommissionableNodes);
+    }
 
 private:
     void ReleaseOperationalDevice(OperationalDeviceProxy * device);
@@ -366,10 +374,10 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 using UdcTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
-                                     ,
-                                     Transport::UDP /* IPv4 */
+                        ,
+                        Transport::UDP /* IPv4 */
 #endif
-                                     >;
+                        >;
 #endif
 
 /**
@@ -380,10 +388,10 @@ using UdcTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
  */
 class DLL_EXPORT DeviceCommissioner : public DeviceController,
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
-                                      public Protocols::UserDirectedCommissioning::InstanceNameResolver,
+    public Protocols::UserDirectedCommissioning::InstanceNameResolver,
 #endif
-                                      public SessionEstablishmentDelegate,
-                                      public app::ClusterStateCache::Callback
+    public SessionEstablishmentDelegate,
+    public app::ClusterStateCache::Callback
 {
 public:
     DeviceCommissioner();
@@ -515,7 +523,7 @@ public:
      */
     CHIP_ERROR
     ContinueCommissioningAfterDeviceAttestationFailure(DeviceProxy * device,
-                                                       Credentials::AttestationVerificationResult attestationResult);
+            Credentials::AttestationVerificationResult attestationResult);
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
@@ -607,7 +615,9 @@ public:
      *   Returns the max number of commissionable nodes this commissioner can track mdns information for.
      * @return int  The max number of commissionable nodes supported
      */
-    int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
+    int GetMaxCommissionableNodesSupported() {
+        return kMaxCommissionableNodes;
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
@@ -626,7 +636,9 @@ public:
      *   Return the UDC Server instance
      *
      */
-    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
+    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() {
+        return mUdcServer;
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     /**
@@ -638,8 +650,12 @@ public:
      */
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
-    void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
-    DevicePairingDelegate * GetPairingDelegate() const { return mPairingDelegate; }
+    void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) {
+        mPairingDelegate = pairingDelegate;
+    }
+    DevicePairingDelegate * GetPairingDelegate() const {
+        return mPairingDelegate;
+    }
 
     // ClusterStateCache::Callback impl
     void OnDone(app::ReadClient *) override;
@@ -682,17 +698,17 @@ private:
        The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendCertificateChainRequestCommand(DeviceProxy * device, Credentials::CertificateType certificateType,
-                                                  Optional<System::Clock::Timeout> timeout);
+            Optional<System::Clock::Timeout> timeout);
     /* This function sends an Attestation request to the device.
        The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce,
-                                             Optional<System::Clock::Timeout> timeout);
+            Optional<System::Clock::Timeout> timeout);
     /* This function sends an CSR request to the device.
        The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce,
-                                                               Optional<System::Clock::Timeout> timeout);
+            Optional<System::Clock::Timeout> timeout);
     /* This function sends the operational credentials to the device.
        The function does not hold a reference to the device object.
      */

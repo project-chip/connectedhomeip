@@ -82,7 +82,9 @@ public:
         lockParam_.numberOfHolidaySchedules = numberOfHolidaySchedules;
         return *this;
     }
-    LockParam GetLockParam() { return lockParam_; }
+    LockParam GetLockParam() {
+        return lockParam_;
+    }
 
 private:
     LockParam lockParam_;

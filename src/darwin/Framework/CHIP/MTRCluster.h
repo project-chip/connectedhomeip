@@ -38,22 +38,22 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRWriteParams : NSObject
 
-/**
- * Controls whether the write is a timed write.
- *
- * If nil (the default value), a regular write is done for attributes that do
- * not require a timed write and a timed write with some default timed request
- * timeout is done for attributes that require a timed write.
- *
- * If not nil, a timed write is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual write
- * request) within the timeout window.
- *
- * This value is specified in milliseconds
- *
- */
+    /**
+     * Controls whether the write is a timed write.
+     *
+     * If nil (the default value), a regular write is done for attributes that do
+     * not require a timed write and a timed write with some default timed request
+     * timeout is done for attributes that require a timed write.
+     *
+     * If not nil, a timed write is done, with the provided value used as the timed
+     * request timeout.  The value should be chosen small enough to provide the
+     * desired security properties but large enough that it will allow a round-trip
+     * from the sever to the client (for the status response and actual write
+     * request) within the timeout window.
+     *
+     * This value is specified in milliseconds
+     *
+     */
 @property (strong, nonatomic, nullable) NSNumber * timedWriteTimeout;
 
 /**
@@ -76,16 +76,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRReadParams : NSObject
 
-/**
- * Whether the read/subscribe is fabric-filtered. nil (the default value) is
- * treated as YES.
- *
- * If YES, the read/subscribe is fabric-filtered and will only see things
- * associated with the fabric of the reader/subscriber.
- *
- * If NO, the read/subscribe is not fabric-filtered and will see all
- * non-fabric-sensitive data for the given attribute path.
- */
+    /**
+     * Whether the read/subscribe is fabric-filtered. nil (the default value) is
+     * treated as YES.
+     *
+     * If YES, the read/subscribe is fabric-filtered and will only see things
+     * associated with the fabric of the reader/subscriber.
+     *
+     * If NO, the read/subscribe is not fabric-filtered and will see all
+     * non-fabric-sensitive data for the given attribute path.
+     */
 @property (strong, nonatomic, nullable) NSNumber * fabricFiltered;
 
 - (instancetype)init;
@@ -100,15 +100,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTRSubscribeParams : MTRReadParams
 
-/**
- * Whether the subscribe should allow previous subscriptions to stay in
- * place. nil (the default value) is treated as NO.
- *
- * If NO, the subscribe will cancel any existing subscriptions to the target
- * node when it sets up the new one.
- *
- * If YES, the subscribe will allow any previous subscriptions to remain.
- */
+    /**
+     * Whether the subscribe should allow previous subscriptions to stay in
+     * place. nil (the default value) is treated as NO.
+     *
+     * If NO, the subscribe will cancel any existing subscriptions to the target
+     * node when it sets up the new one.
+     *
+     * If YES, the subscribe will allow any previous subscriptions to remain.
+     */
 @property (strong, nonatomic, nullable) NSNumber * keepPreviousSubscriptions;
 
 /**

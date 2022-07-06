@@ -34,7 +34,8 @@ JNI_METHOD(jlong, DemoClusterCluster, initWithDevice)(JNIEnv * env, jobject self
 
 JNI_METHOD(void, DemoClusterCluster, subscribeSomeLabelsAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
-    chip::DeviceLayer::StackLock lock;std::unique_ptr<CHIPDemoClusterSomeLabelsAttributeCallback, void (*)(CHIPDemoClusterSomeLabelsAttributeCallback *)> onSuccess(Platform::New<CHIPDemoClusterSomeLabelsAttributeCallback>(callback, true), chip::Platform::Delete<CHIPDemoClusterSomeLabelsAttributeCallback>);
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPDemoClusterSomeLabelsAttributeCallback, void (*)(CHIPDemoClusterSomeLabelsAttributeCallback *)> onSuccess(Platform::New<CHIPDemoClusterSomeLabelsAttributeCallback>(callback, true), chip::Platform::Delete<CHIPDemoClusterSomeLabelsAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
 
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);

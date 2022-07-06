@@ -68,7 +68,7 @@ constexpr uint8_t kDACCertificate = 1;
 constexpr uint8_t kPAICertificate = 2;
 
 CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::SubjectDescriptor & subjectDescriptor,
-                                                             FabricIndex fabricIndex, uint64_t subject)
+        FabricIndex fabricIndex, uint64_t subject)
 {
     NodeId subjectAsNodeID = static_cast<NodeId>(subject);
 
@@ -362,7 +362,9 @@ public:
     }
 
     // Gets called when a fabric is added/updated, but not necessarily committed to storage
-    void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override { NotifyFabricTableChanged(); }
+    void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override {
+        NotifyFabricTableChanged();
+    }
 
     // Gets called when a fabric in FabricTable is persisted to storage
     void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override
@@ -400,8 +402,8 @@ void MatterOperationalCredentialsPluginServerInitCallback(void)
 }
 
 bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandler * commandObj,
-                                                              const app::ConcreteCommandPath & commandPath,
-                                                              const Commands::RemoveFabric::DecodableType & commandData)
+        const app::ConcreteCommandPath & commandPath,
+        const Commands::RemoveFabric::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("RemoveFabric", "OperationalCredentials");
     auto & fabricBeingRemoved = commandData.fabricIndex;
@@ -457,8 +459,8 @@ exit:
 }
 
 bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandHandler * commandObj,
-                                                                   const app::ConcreteCommandPath & commandPath,
-                                                                   const Commands::UpdateFabricLabel::DecodableType & commandData)
+        const app::ConcreteCommandPath & commandPath,
+        const Commands::UpdateFabricLabel::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("UpdateFabricLabel", "OperationalCredentials");
     auto & label        = commandData.label;
@@ -590,8 +592,8 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
 } // namespace
 
 bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * commandObj,
-                                                        const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::AddNOC::DecodableType & commandData)
+        const app::ConcreteCommandPath & commandPath,
+        const Commands::AddNOC::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("AddNOC", "OperationalCredentials");
     auto & NOCValue          = commandData.NOCValue;
@@ -647,7 +649,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     VerifyOrExit(failSafeContext.AddTrustedRootCertHasBeenInvoked(), nocResponse = OperationalCertStatus::kInvalidNOC);
 
     err = fabricTable.AddNewPendingFabricWithOperationalKeystore(NOCValue, ICACValue.ValueOr(ByteSpan{}), adminVendorId,
-                                                                 &newFabricIndex);
+            &newFabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // From here if we error-out, we should revert the fabric table pending updates
@@ -690,7 +692,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     // Creating the initial ACL must occur after the PASE session has adopted the fabric index
     // (see above) so that the concomitant event, which is fabric scoped, is properly handled.
     err = CreateAccessControlEntryForNewFabricAdministrator(commandObj->GetSubjectDescriptor(), newFabricIndex,
-                                                            commandData.caseAdminSubject);
+            commandData.caseAdminSubject);
     VerifyOrExit(err != CHIP_ERROR_INTERNAL, nonDefaultStatus = Status::Failure);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
@@ -765,8 +767,8 @@ exit:
 }
 
 bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler * commandObj,
-                                                           const app::ConcreteCommandPath & commandPath,
-                                                           const Commands::UpdateNOC::DecodableType & commandData)
+        const app::ConcreteCommandPath & commandPath,
+        const Commands::UpdateNOC::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("UpdateNOC", "OperationalCredentials");
     auto & NOCValue  = commandData.NOCValue;
@@ -891,8 +893,8 @@ exit:
 }
 
 bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::CommandHandler * commandObj,
-                                                                    const app::ConcreteCommandPath & commandPath,
-                                                                    const Commands::AttestationRequest::DecodableType & commandData)
+        const app::ConcreteCommandPath & commandPath,
+        const Commands::AttestationRequest::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("AttestationRequest", "OperationalCredentials");
     auto & attestationNonce = commandData.attestationNonce;
@@ -905,7 +907,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
     size_t attestationElementsLen = 0;
     MutableByteSpan attestationElementsSpan;
     uint8_t certDeclBuf[Credentials::kMaxCMSSignedCDMessage]; // Sized to hold the example certificate declaration with 100 PIDs.
-                                                              // See DeviceAttestationCredsExample
+    // See DeviceAttestationCredsExample
     MutableByteSpan certDeclSpan(certDeclBuf);
 
     // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
@@ -944,7 +946,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 
     attestationElementsSpan = MutableByteSpan{ attestationElements.Get(), attestationElementsLen };
     err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, timestamp, kEmptyFirmwareInfo,
-                                                    emptyVendorReserved, attestationElementsSpan);
+            emptyVendorReserved, attestationElementsSpan);
     VerifyOrExit((err == CHIP_NO_ERROR) && (attestationElementsSpan.size() <= kMaxRspLen), finalStatus = Status::Failure);
 
     // Append attestation challenge in the back of the reserved space for the signature
@@ -983,8 +985,8 @@ exit:
 }
 
 bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler * commandObj,
-                                                            const app::ConcreteCommandPath & commandPath,
-                                                            const Commands::CSRRequest::DecodableType & commandData)
+        const app::ConcreteCommandPath & commandPath,
+        const Commands::CSRRequest::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("CSRRequest", "OperationalCredentials");
     ChipLogProgress(Zcl, "OpCreds: Received a CSRRequest command");
@@ -1059,9 +1061,9 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
         // Encode the NOCSR elements with the CSR and Nonce
         nocsrLengthEstimate = TLV::EstimateStructOverhead(csrSpan.size(),  // CSR buffer
-                                                          CSRNonce.size(), // CSR Nonce
-                                                          0u               // no vendor reserved data
-        );
+                              CSRNonce.size(), // CSR Nonce
+                              0u               // no vendor reserved data
+                                                         );
 
         if (!nocsrElements.Alloc(nocsrLengthEstimate + attestationChallenge.size()))
         {
@@ -1072,7 +1074,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
         nocsrElementsSpan = MutableByteSpan{ nocsrElements.Get(), nocsrLengthEstimate };
 
         err = Credentials::ConstructNOCSRElements(ByteSpan{ csrSpan.data(), csrSpan.size() }, CSRNonce, kNoVendorReserved,
-                                                  kNoVendorReserved, kNoVendorReserved, nocsrElementsSpan);
+                kNoVendorReserved, kNoVendorReserved, nocsrElementsSpan);
         VerifyOrExit((err == CHIP_NO_ERROR) && (nocsrElementsSpan.size() <= kMaxRspLen), finalStatus = Status::Failure);
 
         // Append attestation challenge in the back of the reserved space for the signature

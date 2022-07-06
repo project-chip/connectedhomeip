@@ -225,18 +225,18 @@ public:
     {
 #if CONFIG_CHIP_OTA_REQUESTOR
         chip::DeviceLayer::PlatformMgr().ScheduleWork(
-            [](intptr_t) {
-                chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
-                if (requestor == nullptr)
-                {
-                    ChipLogError(SoftwareUpdate, "Can't get the CASESessionManager");
-                }
-                else
-                {
-                    requestor->TriggerImmediateQuery();
-                }
-            },
-            reinterpret_cast<intptr_t>(nullptr));
+        [](intptr_t) {
+            chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
+            if (requestor == nullptr)
+            {
+                ChipLogError(SoftwareUpdate, "Can't get the CASESessionManager");
+            }
+            else
+            {
+                requestor->TriggerImmediateQuery();
+            }
+        },
+        reinterpret_cast<intptr_t>(nullptr));
         return pw::OkStatus();
 #else
         ChipLogError(AppServer, "Trigger OTA requested, but OTA requestor not compiled in.");
@@ -318,7 +318,7 @@ public:
         }
 
         if (DeviceLayer::ConfigurationMgr().GetSoftwareVersionString(response.software_version_string,
-                                                                     sizeof(response.software_version_string)) != CHIP_NO_ERROR)
+                sizeof(response.software_version_string)) != CHIP_NO_ERROR)
         {
             snprintf(response.software_version_string, sizeof(response.software_version_string),
                      CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
@@ -339,7 +339,7 @@ public:
         }
 
         if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetSerialNumber(response.serial_number, sizeof(response.serial_number)) !=
-            CHIP_NO_ERROR)
+                CHIP_NO_ERROR)
         {
             snprintf(response.serial_number, sizeof(response.serial_number), CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
         }
@@ -407,7 +407,7 @@ public:
     virtual pw::Status SetPairingInfo(const chip_rpc_PairingInfo & request, pw_protobuf_Empty & response)
     {
         if (mCommissionableDataProvider.SetSetupPasscode(request.code) != CHIP_NO_ERROR ||
-            mCommissionableDataProvider.SetSetupDiscriminator(request.discriminator) != CHIP_NO_ERROR)
+                mCommissionableDataProvider.SetSetupDiscriminator(request.discriminator) != CHIP_NO_ERROR)
         {
             return pw::Status::Unknown();
         }

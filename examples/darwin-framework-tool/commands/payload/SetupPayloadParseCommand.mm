@@ -139,4 +139,6 @@ CHIP_ERROR SetupPayloadParseCommand::Print(CHIPSetupPayload * payload)
     return CHIP_NO_ERROR;
 }
 
-bool SetupPayloadParseCommand::IsQRCode(NSString * codeString) { return [codeString hasPrefix:@"MT:"]; }
+bool SetupPayloadParseCommand::IsQRCode(NSString * codeString) {
+    return [codeString hasPrefix:@"MT:"];
+}

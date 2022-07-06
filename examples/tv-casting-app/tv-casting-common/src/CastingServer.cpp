@@ -69,7 +69,7 @@ CHIP_ERROR CastingServer::InitBindingHandlers()
 {
     auto & server = chip::Server::GetInstance();
     chip::BindingManager::GetInstance().Init(
-        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+    { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     return CHIP_NO_ERROR;
 }
 
@@ -83,7 +83,7 @@ CHIP_ERROR CastingServer::DiscoverCommissioners()
 {
     // Send discover commissioners request
     return mCommissionableNodeController.DiscoverCommissioners(
-        Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(35)));
+               Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(35)));
 }
 
 CHIP_ERROR CastingServer::OpenBasicCommissioningWindow(std::function<void(CHIP_ERROR)> commissioningCompleteCallback)
@@ -142,13 +142,13 @@ void CastingServer::ReadServerClusters(EndpointId endpointId)
     }
 
     chip::Controller::DescriptorCluster cluster(*operationalDeviceProxy->GetExchangeManager(),
-                                                operationalDeviceProxy->GetSecureSession().Value(), endpointId);
+            operationalDeviceProxy->GetSecureSession().Value(), endpointId);
 
     TargetEndpointInfo * endpointInfo = mTargetVideoPlayerInfo.GetOrAddEndpoint(endpointId);
 
     if (cluster.ReadAttribute<app::Clusters::Descriptor::Attributes::ServerList::TypeInfo>(
-            endpointInfo, CastingServer::OnDescriptorReadSuccessResponse, CastingServer::OnDescriptorReadFailureResponse) !=
-        CHIP_NO_ERROR)
+                endpointInfo, CastingServer::OnDescriptorReadSuccessResponse, CastingServer::OnDescriptorReadFailureResponse) !=
+            CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Could not read Descriptor cluster ServerList");
     }
@@ -179,7 +179,7 @@ void CastingServer::OnDescriptorReadFailureResponse(void * context, CHIP_ERROR e
 }
 
 CHIP_ERROR CastingServer::ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr,
-                                                   std::function<void(CHIP_ERROR)> launchURLResponseCallback)
+        std::function<void(CHIP_ERROR)> launchURLResponseCallback)
 {
     OperationalDeviceProxy * operationalDeviceProxy = mTargetVideoPlayerInfo.GetOperationalDeviceProxy();
     if (operationalDeviceProxy == nullptr)
@@ -223,7 +223,7 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
     else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
         CHIP_ERROR err = CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->Initialize(
-            event->CommissioningComplete.nodeId, event->CommissioningComplete.fabricIndex);
+                             event->CommissioningComplete.nodeId, event->CommissioningComplete.fabricIndex);
 
         CastingServer::GetInstance()->mCommissioningCompleteCallback(err);
     }

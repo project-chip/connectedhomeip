@@ -272,10 +272,10 @@ CHIP_ERROR FabricInfo::SetExternallyOwnedOperationalKeypair(P256Keypair * keyPai
 }
 
 CHIP_ERROR FabricTable::ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
-                                                 FabricId existingFabricId, Credentials::CertificateValidityPolicy * policy,
-                                                 CompressedFabricId & outCompressedFabricId, FabricId & outFabricId,
-                                                 NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-                                                 Crypto::P256PublicKey & outRootPubkey)
+        FabricId existingFabricId, Credentials::CertificateValidityPolicy * policy,
+        CompressedFabricId & outCompressedFabricId, FabricId & outFabricId,
+        NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
+        Crypto::P256PublicKey & outRootPubkey)
 {
     Credentials::ValidationContext validContext;
 
@@ -303,7 +303,7 @@ CHIP_ERROR FabricTable::ValidateIncomingNOCChain(const ByteSpan & noc, const Byt
 
     ChipLogProgress(FabricProvisioning, "Validating NOC chain");
     CHIP_ERROR err = FabricTable::VerifyCredentials(noc, icac, rcac, validContext, outCompressedFabricId, outFabricId, outNodeId,
-                                                    outNocPubkey, &outRootPubkey);
+                     outNocPubkey, &outRootPubkey);
     if (err != CHIP_NO_ERROR && err != CHIP_ERROR_WRONG_NODE_ID)
     {
         err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT;
@@ -339,9 +339,9 @@ CHIP_ERROR FabricInfo::FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) con
 }
 
 CHIP_ERROR FabricTable::VerifyCredentials(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
-                                          ValidationContext & context, CompressedFabricId & outCompressedFabricId,
-                                          FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-                                          Crypto::P256PublicKey * outRootPublicKey) const
+        ValidationContext & context, CompressedFabricId & outCompressedFabricId,
+        FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
+        Crypto::P256PublicKey * outRootPublicKey) const
 {
     uint8_t rootCertBuf[kMaxCHIPCertLength];
     MutableByteSpan rootCertSpan{ rootCertBuf };
@@ -351,9 +351,9 @@ CHIP_ERROR FabricTable::VerifyCredentials(FabricIndex fabricIndex, const ByteSpa
 }
 
 CHIP_ERROR FabricTable::VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
-                                          ValidationContext & context, CompressedFabricId & outCompressedFabricId,
-                                          FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-                                          Crypto::P256PublicKey * outRootPublicKey)
+        ValidationContext & context, CompressedFabricId & outCompressedFabricId,
+        FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
+        Crypto::P256PublicKey * outRootPublicKey)
 {
     // TODO - Optimize credentials verification logic
     //        The certificate chain construction and verification is a compute and memory intensive operation.
@@ -642,7 +642,7 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric, FabricIndex newFabr
 }
 
 CHIP_ERROR FabricTable::AddNewFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
-                                            const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
+        const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
 {
     VerifyOrReturnError(outFabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -664,7 +664,7 @@ CHIP_ERROR FabricTable::AddNewFabricForTest(const ByteSpan & rootCert, const Byt
 
     SuccessOrExit(err = AddNewPendingTrustedRootCert(rootCert));
     SuccessOrExit(err = AddNewPendingFabricWithProvidedOpKey(nocCert, icacCert, VendorId::TestVendor1, opKey,
-                                                             /*isExistingOpKeyExternallyOwned =*/false, outFabricIndex));
+                        /*isExistingOpKeyExternallyOwned =*/false, outFabricIndex));
     SuccessOrExit(err = CommitPendingFabricData());
 exit:
     if (err != CHIP_NO_ERROR)
@@ -693,7 +693,7 @@ class NotBeforeCollector : public Credentials::CertificateValidityPolicy
 public:
     NotBeforeCollector() : mLatestNotBefore(0) {}
     CHIP_ERROR ApplyCertificateValidityPolicy(const ChipCertificateData * cert, uint8_t depth,
-                                              CertificateValidityResult result) override
+            CertificateValidityResult result) override
     {
         if (cert->mNotBeforeTime > mLatestNotBefore.count())
         {
@@ -802,8 +802,8 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::
         ReturnErrorOnFailure(FetchRootCert(fabricIndex, rcacSpan));
 
         ReturnErrorOnFailure(ValidateIncomingNOCChain(nocSpan, icacSpan, rcacSpan, fabricIdToValidate, &notBeforeCollector,
-                                                      newFabricInfo.compressedFabricId, newFabricInfo.fabricId,
-                                                      newFabricInfo.nodeId, nocPubKey, newFabricInfo.rootPublicKey));
+                             newFabricInfo.compressedFabricId, newFabricInfo.fabricId,
+                             newFabricInfo.nodeId, nocPubKey, newFabricInfo.rootPublicKey));
     }
 
     if (existingOpKey != nullptr)
@@ -1218,7 +1218,7 @@ void FabricTable::UpdateNextAvailableFabricIndex()
 {
     // Only called when mNextAvailableFabricIndex.HasValue()
     for (FabricIndex candidate = NextFabricIndex(mNextAvailableFabricIndex.Value()); candidate != mNextAvailableFabricIndex.Value();
-         candidate             = NextFabricIndex(candidate))
+            candidate             = NextFabricIndex(candidate))
     {
         if (!FindFabricWithIndex(candidate))
         {
@@ -1553,7 +1553,7 @@ CHIP_ERROR FabricTable::AddNewPendingTrustedRootCert(const ByteSpan & rcac)
 }
 
 CHIP_ERROR FabricTable::FindExistingFabricByNocChaining(FabricIndex pendingFabricIndex, const ByteSpan & noc,
-                                                        FabricIndex & outMatchingFabricIndex) const
+        FabricIndex & outMatchingFabricIndex) const
 {
     // Check whether we already have a matching fabric from a cert chain perspective.
     // To do so we have to extract the FabricID from the NOC and the root public key from the RCAC.
@@ -1597,8 +1597,8 @@ CHIP_ERROR FabricTable::FindExistingFabricByNocChaining(FabricIndex pendingFabri
 }
 
 CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
-                                                  Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
-                                                  FabricIndex * outNewFabricIndex)
+        Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
+        FabricIndex * outNewFabricIndex)
 {
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(outNewFabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -1632,7 +1632,7 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
         VerifyOrReturnError(mOperationalKeystore != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
         // Make sure we have an operational key, pending or not
         VerifyOrReturnError(mOperationalKeystore->HasOpKeypairForFabric(fabricIndexToUse) ||
-                                mOperationalKeystore->HasPendingOpKeypair(),
+                            mOperationalKeystore->HasPendingOpKeypair(),
                             CHIP_ERROR_KEY_NOT_FOUND);
     }
 
@@ -1668,7 +1668,7 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
 }
 
 CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
-                                                  Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned)
+        Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned)
 {
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1755,7 +1755,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
     if (isUpdating && hasPending && !hasInvalidInternalState)
     {
         if (!mPendingFabric.IsInitialized() || (mPendingFabric.GetFabricIndex() != fabricIndexBeingCommitted) ||
-            (pendingFabricEntry == nullptr))
+                (pendingFabricEntry == nullptr))
         {
             ChipLogError(FabricProvisioning, "Missing pending fabric on update during commit!");
             hasInvalidInternalState = true;
@@ -1861,7 +1861,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
         // We can only manage commissionable pending fail-safe state if we have a keystore
         CHIP_ERROR keyErr = CHIP_NO_ERROR;
         if ((mOperationalKeystore != nullptr) && mOperationalKeystore->HasOpKeypairForFabric(fabricIndexBeingCommitted) &&
-            mOperationalKeystore->HasPendingOpKeypair())
+                mOperationalKeystore->HasPendingOpKeypair())
         {
             keyErr = mOperationalKeystore->CommitOpKeypairForFabric(fabricIndexBeingCommitted);
             if (keyErr != CHIP_NO_ERROR)
