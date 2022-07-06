@@ -25,9 +25,15 @@ import base
 import chip.logging
 import click
 import coloredlogs
-from base import (BaseTestHelper, FailIfNot, SetTestSet, TestFail,
-                  TestIsEnabled, TestTimeout, logger)
-from cluster_objects import NODE_ID, ClusterObjectTests
+from base import BaseTestHelper
+from base import FailIfNot
+from base import logger
+from base import SetTestSet
+from base import TestFail
+from base import TestIsEnabled
+from base import TestTimeout
+from cluster_objects import ClusterObjectTests
+from cluster_objects import NODE_ID
 from network_commissioning import NetworkCommissioningTests
 
 # Commissioning test.

@@ -15,22 +15,52 @@ import os
 from itertools import combinations
 from typing import List
 
-from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
-from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
-from builders.bl602 import Bl602App, Bl602Board, Bl602Builder
-from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
-from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
-from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
-from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
-from builders.host import HostApp, HostBoard, HostBuilder
-from builders.imx import IMXApp, IMXBuilder
-from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
-from builders.k32w import K32WApp, K32WBuilder
-from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
-from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
-from builders.qpg import QpgApp, QpgBoard, QpgBuilder
-from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
-from builders.tizen import TizenApp, TizenBoard, TizenBuilder
+from builders.ameba import AmebaApp
+from builders.ameba import AmebaBoard
+from builders.ameba import AmebaBuilder
+from builders.android import AndroidApp
+from builders.android import AndroidBoard
+from builders.android import AndroidBuilder
+from builders.bl602 import Bl602App
+from builders.bl602 import Bl602Board
+from builders.bl602 import Bl602Builder
+from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App
+from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7Builder
+from builders.cyw30739 import Cyw30739App
+from builders.cyw30739 import Cyw30739Board
+from builders.cyw30739 import Cyw30739Builder
+from builders.efr32 import Efr32App
+from builders.efr32 import Efr32Board
+from builders.efr32 import Efr32Builder
+from builders.esp32 import Esp32App
+from builders.esp32 import Esp32Board
+from builders.esp32 import Esp32Builder
+from builders.host import HostApp
+from builders.host import HostBoard
+from builders.host import HostBuilder
+from builders.imx import IMXApp
+from builders.imx import IMXBuilder
+from builders.infineon import InfineonApp
+from builders.infineon import InfineonBoard
+from builders.infineon import InfineonBuilder
+from builders.k32w import K32WApp
+from builders.k32w import K32WBuilder
+from builders.mbed import MbedApp
+from builders.mbed import MbedBoard
+from builders.mbed import MbedBuilder
+from builders.mbed import MbedProfile
+from builders.nrf import NrfApp
+from builders.nrf import NrfBoard
+from builders.nrf import NrfConnectBuilder
+from builders.qpg import QpgApp
+from builders.qpg import QpgBoard
+from builders.qpg import QpgBuilder
+from builders.telink import TelinkApp
+from builders.telink import TelinkBoard
+from builders.telink import TelinkBuilder
+from builders.tizen import TizenApp
+from builders.tizen import TizenBoard
+from builders.tizen import TizenBuilder
 
 
 class Target:
