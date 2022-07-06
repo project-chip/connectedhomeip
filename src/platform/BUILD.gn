@@ -118,13 +118,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
-    if (chip_device_platform == "ameba" || chip_device_platform == "darwin" ||
-        chip_device_platform == "esp32" || chip_device_platform == "linux" ||
-        chip_device_platform == "mbed" || chip_device_platform == "qpg" ||
-        chip_device_platform == "tizen" || chip_device_platform == "webos") {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_NETWORK_COMMISSIONING=${chip_enable_network_commissioning}" ]
-    }
-
     if (chip_enable_nfc) {
       defines += [
         "CHIP_DEVICE_CONFIG_ENABLE_NFC=1",

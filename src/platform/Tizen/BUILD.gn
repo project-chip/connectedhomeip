@@ -53,6 +53,9 @@ static_library("Tizen") {
     "Logging.cpp",
     "MainLoop.cpp",
     "MainLoop.h",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningThreadDriver.cpp",
+    "NetworkCommissioningWiFiDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
@@ -76,14 +79,6 @@ static_library("Tizen") {
     sources += [ "DnssdImpl.cpp" ]
 
     deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
-  }
-
-  if (chip_network_commissioning) {
-    sources += [
-      "NetworkCommissioningDriver.h",
-      "NetworkCommissioningThreadDriver.cpp",
-      "NetworkCommissioningWiFiDriver.cpp",
-    ]
   }
 
   if (chip_enable_openthread) {

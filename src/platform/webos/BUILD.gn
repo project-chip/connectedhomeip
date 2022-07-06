@@ -92,6 +92,9 @@ static_library("webos") {
     "Logging.cpp",
     "MainLoop.cpp",
     "MainLoop.h",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningThreadDriver.cpp",
+    "NetworkCommissioningWiFiDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
@@ -125,14 +128,9 @@ static_library("webos") {
     ]
   }
 
-  if (chip_enable_network_commissioning) {
-    sources += [ "NetworkCommissioningDriver.h" ]
-  }
-
   if (chip_enable_openthread) {
     sources += [
       "GlibTypeDeleter.h",
-      "NetworkCommissioningThreadDriver.cpp",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
@@ -141,7 +139,6 @@ static_library("webos") {
   }
 
   if (chip_enable_wifi) {
-    sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
     # TBD: Use webOS specific Wi-Fi resource
     #public_deps += [ "dbus/wpa" ]
   }

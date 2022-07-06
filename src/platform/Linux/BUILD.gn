@@ -68,6 +68,8 @@ static_library("Linux") {
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningEthernetDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
@@ -78,13 +80,6 @@ static_library("Linux") {
 
   if (chip_enable_openthread) {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]
-  }
-
-  if (chip_enable_network_commissioning) {
-    sources += [
-      "NetworkCommissioningDriver.h",
-      "NetworkCommissioningEthernetDriver.cpp",
-    ]
   }
 
   if (chip_enable_ble) {

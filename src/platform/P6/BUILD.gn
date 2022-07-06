@@ -47,6 +47,8 @@ static_library("P6") {
     "LwIPCoreLock.cpp",
     "MTBKeyValueStore.cpp",
     "MTBKeyValueStore.h",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningWiFiDriver.cpp",
     "OTAImageProcessorImpl.cpp",
     "OTAImageProcessorImpl.h",
     "P6Config.cpp",
@@ -66,14 +68,6 @@ static_library("P6") {
     "cycfg_gatt_db.c",
     "cycfg_gatt_db.h",
   ]
-
-  if (chip_enable_network_commissioning) {
-    sources += [ "NetworkCommissioningDriver.h" ]
-  }
-
-  if (chip_enable_wifi) {
-    sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
-  }
 
   deps = [
     "${chip_root}/src/lib/dnssd:platform_header",

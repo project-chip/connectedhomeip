@@ -61,6 +61,7 @@ static_library("Darwin") {
     "Logging.cpp",
     "MdnsError.cpp",
     "MdnsError.h",
+    "NetworkCommissioningDriver.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
@@ -68,10 +69,6 @@ static_library("Darwin") {
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
   ]
-
-  if (chip_enable_network_commissioning) {
-    sources += [ "NetworkCommissioningDriver.h" ]
-  }
 
   if (chip_enable_wifi) {
     sources += [

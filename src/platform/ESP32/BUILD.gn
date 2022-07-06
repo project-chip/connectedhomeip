@@ -74,15 +74,12 @@ static_library("ESP32") {
     ]
   }
 
-  if (chip_enable_network_commissioning) {
+  if (chip_enable_wifi) {
     sources += [
+      "ConnectivityManagerImpl_WiFi.cpp",
       "NetworkCommissioningDriver.cpp",
       "NetworkCommissioningDriver.h",
     ]
-  }
-
-  if (chip_enable_wifi) {
-    sources += [ "ConnectivityManagerImpl_WiFi.cpp" ]
     if (chip_mdns == "platform") {
       sources += [
         "DnssdImpl.cpp",
