@@ -34,6 +34,28 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label:
+          "Reads the Lineup attribute from the DUT and Verify that the response
+          contains a lineup info object"
+      PICS: MC_CHANNEL.S.A0001 && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool channel read lineup 1 1
+          [1653999659095] [94964:7676726] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0504 Attribute 0x0000_0001 DataVersion: 3623945891
+          [1653999659097] [94964:7676726] CHIP: [TOO]   Lineup: {
+          [1653999659097] [94964:7676726] CHIP: [TOO]     OperatorName: Comcast
+          [1653999659097] [94964:7676726] CHIP: [TOO]     LineupName: Comcast King County
+          [1653999659097] [94964:7676726] CHIP: [TOO]     PostalCode: 98052
+          [1653999659097] [94964:7676726] CHIP: [TOO]     LineupInfoType: 0
+          [1653999659097] [94964:7676726] CHIP: [TOO]    }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "Reads the ChannelList attribute from the DUT"
       PICS: MC_CHANNEL.S.A0000
       command: "readAttribute"
