@@ -34,6 +34,8 @@ public:
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
     bool SyncDoesKeyExist(const char * key) override;
 
+    void DumpKeys() const;
+
     uint16_t GetListenPort();
     chip::Logging::LogCategory GetLoggingLevel();
 

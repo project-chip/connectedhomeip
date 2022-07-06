@@ -32,8 +32,7 @@ tests:
     - label: "DUT_CR1 starts a commissioning process with TH_CE"
       PICS: PICS_MF
       verification: |
-          "1. Provision the device using DUT controller chip tool(use above instructions) ,
-          "
+          "1. Provision the device using DUT controller chip tool(use above instructions)"
       disabled: true
 
     - label:
@@ -46,7 +45,7 @@ tests:
           Below is the example when using chip tool as controller
 
 
-          ./chip-tool pairing open-commissioning-window 1 1 100 1000 3840
+          ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
 
           [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
           [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
@@ -97,7 +96,7 @@ tests:
           Below is the example when using chip tool as controller
 
 
-          ./chip-tool pairing open-commissioning-window 1 1 100 1000 3840
+          ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
 
           [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
           [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
@@ -250,7 +249,7 @@ tests:
 
           Below is the example when using chip tool as controller
 
-          ./chip-tool pairing open-commissioning-window 1 1 100 1000 3840
+          ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
 
           [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
           [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!

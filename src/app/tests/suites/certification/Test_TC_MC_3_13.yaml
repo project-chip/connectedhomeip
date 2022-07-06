@@ -51,7 +51,7 @@ tests:
           [1651055193.215585][155444:155449] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MC_MEDIAINPUT.S.A0000
       arguments:
           values:
               - name: "message"
@@ -60,6 +60,7 @@ tests:
                 value: "y"
 
     - label: "Rename Input Command"
+      PICS: MC_MEDIAINPUT.S.C0003
       command: "RenameInput"
       arguments:
           values:
@@ -90,7 +91,7 @@ tests:
           [1651055193.215585][155444:155449] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MC_MEDIAINPUT.S.A0000
       arguments:
           values:
               - name: "message"

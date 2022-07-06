@@ -22,6 +22,7 @@ config:
 
 tests:
     - label: "DUT reads LabelList from the TH"
+      PICS: FLABEL.S.A0000
       verification: |
           ./chip-tool fixedlabel read label-list 1 0
 

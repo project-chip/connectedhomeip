@@ -120,14 +120,6 @@ void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
     switch (event->Type)
     {
-    case DeviceEventType::kSessionEstablished: {
-        if (event->SessionEstablished.IsCommissioner)
-        {
-            PLAT_LOG("Commissioning session established");
-        }
-    }
-    break;
-
     case DeviceEventType::kCHIPoBLEConnectionEstablished:
         PLAT_LOG("CHIPoBLE connection established");
         break;
