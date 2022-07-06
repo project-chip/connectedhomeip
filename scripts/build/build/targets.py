@@ -305,9 +305,9 @@ def HostTargets():
     yield target_native.Extend('all-clusters-app-nodeps', app=HostApp.ALL_CLUSTERS, **nodeps_args)
 
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
-    for board in [HostBoard.NATIVE, HostBoard.FAKE]:
-        yield test_target.Extend(board.BoardName() + '-tests', board=board, app=HostApp.TESTS)
-        yield test_target.Extend(board.BoardName() + '-tests-clang', board=board, app=HostApp.TESTS, use_clang=True)
+    yield test_target.Extend(HostBoard.NATIVE.BoardName() + '-tests', board=HostBoard.NATIVE, app=HostApp.TESTS)
+    yield test_target.Extend(HostBoard.NATIVE.BoardName() + '-tests-clang', board=HostBoard.NATIVE, app=HostApp.TESTS, use_clang=True)
+    yield test_target.Extend(HostBoard.FAKE.BoardName() + '-tests', board=HostBoard.FAKE, app=HostApp.TESTS)
 
 
 def Esp32Targets():

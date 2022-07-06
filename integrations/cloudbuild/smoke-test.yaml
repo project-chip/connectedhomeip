@@ -69,7 +69,7 @@ steps:
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
-              --target-glob 'linux-*' --skip-target-glob '*-tests' build
+              --target-glob 'linux-*' --skip-target-glob '*-tests*' build
               --create-archives /workspace/artifacts/
       waitFor:
           - Bootstrap
