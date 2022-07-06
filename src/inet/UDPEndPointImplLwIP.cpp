@@ -63,7 +63,7 @@ namespace chip {
 namespace Inet {
 
 CHIP_ERROR UDPEndPointImplLwIP::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port,
-        InterfaceId interfaceId)
+                                         InterfaceId interfaceId)
 {
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -337,7 +337,7 @@ CHIP_ERROR UDPEndPointImplLwIP::GetPCB(IPAddressType addrType)
 }
 
 void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr,
-        u16_t port)
+                                                u16_t port)
 {
     UDPEndPointImplLwIP * ep       = static_cast<UDPEndPointImplLwIP *>(arg);
     IPPacketInfo * pktInfo         = nullptr;
