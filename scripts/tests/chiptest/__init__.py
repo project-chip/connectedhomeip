@@ -48,9 +48,10 @@ def tests_with_command(chip_tool: str, is_manual: bool):
 
         target = target_for_name(name)
 
-        yield TestDefinition(
-            run_name=name, name=name, target=target, is_manual=is_manual
-        )
+        yield TestDefinition(run_name=name,
+                             name=name,
+                             target=target,
+                             is_manual=is_manual)
 
 
 def AllTests(chip_tool: str):
