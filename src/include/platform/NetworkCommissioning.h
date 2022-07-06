@@ -79,7 +79,7 @@ protected:
 struct Network
 {
     uint8_t networkID[kMaxNetworkIDLen];
-    uint8_t networkIDLen;
+    size_t networkIDLen;
     bool connected;
 };
 

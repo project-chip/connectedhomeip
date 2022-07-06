@@ -68,8 +68,6 @@ static_library("Linux") {
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
-    "NetworkCommissioningDriver.h",
-    "NetworkCommissioningEthernetDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
