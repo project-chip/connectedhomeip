@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 57.3.1. [TC-I-3.1] Attributes with client as DUT
+name: 58.3.1. [TC-I-3.1] Attributes with Client as DUT
 
 config:
     nodeId: 0x12344321
@@ -22,8 +22,8 @@ config:
 
 tests:
     - label:
-          "DUT reads all supported mandatory attributes from TH once at a time
-          in a manufacturer specific order"
+          "DUT reads all supported mandatory attributes from TH one at a time in
+          a manufacturer specific order"
       verification: |
           ./chip-tool identify read identify-time 1 1
 
@@ -66,15 +66,15 @@ tests:
       disabled: true
 
     - label:
-          "DUT reads all supported optional attributes from TH once at a time in
+          "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          see above
+          There is no optional attibute for this cluster
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
-          the TH once at a time in a manufacturer specific order"
+          the TH one at a time in a manufacturer specific order"
       verification: |
           On TestHarnes (all-cluster-app) a received write request looks like this (f.e identify-time (id 0) value 60):
            ./chip-tool identify  write   identify-time  1 1 1
@@ -108,7 +108,80 @@ tests:
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
-          the TH once at a time in a manufacturer specific order"
+          the TH one at a time in a manufacturer specific order"
       verification: |
-          see above
+          There is no optional attibute for this cluster
+      disabled: true
+
+    - label:
+          "Configure TH such that it implements mandatory and none of the
+          optional attributes of the server-side of the cluster, and that it
+          also reflects this in global attributes such as FeatureMap and
+          AttributeList. Commission DUT to TH again"
+      verification: |
+          ./chip-tool identify read attribute-list 1 1
+
+          [1654242827039] [91286:3990827] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 2002457420
+          [1654242827039] [91286:3990827] CHIP: [TOO]   AttributeList: 7 entries
+          [1654242827039] [91286:3990827] CHIP: [TOO]     [1]: 0
+          [1654242827039] [91286:3990827] CHIP: [TOO]     [2]: 1
+          [1654242827039] [91286:3990827] CHIP: [TOO]     [3]: 65528
+          [1654242827039] [91286:3990827] CHIP: [TOO]     [4]: 65529
+          [1654242827040] [91286:3990827] CHIP: [TOO]     [5]: 65531
+          [1654242827040] [91286:3990827] CHIP: [TOO]     [6]: 65532
+          [1654242827040] [91286:3990827] CHIP: [TOO]     [7]: 65533
+
+
+          "./chip-tool identify read identify-time 1 1
+
+          [1648015371.159715][2506:2506] CHIP:IM: Received Read request
+          [1648015371.159805][2506:2506] CHIP:DMG: ReadRequestMessage =
+          [1648015371.159840][2506:2506] CHIP:DMG: {
+          [1648015371.159866][2506:2506] CHIP:DMG:         AttributePathIBs =
+          [1648015371.159903][2506:2506] CHIP:DMG:         [
+          [1648015371.159932][2506:2506] CHIP:DMG:                 AttributePathIB =
+          [1648015371.159968][2506:2506] CHIP:DMG:                 {
+          [1648015371.160006][2506:2506] CHIP:DMG:                         Endpoint = 0x1,
+          [1648015371.160047][2506:2506] CHIP:DMG:                         Cluster = 0x3,
+          [1648015371.160087][2506:2506] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1648015371.160127][2506:2506] CHIP:DMG:                 }
+          [1648015371.160164][2506:2506] CHIP:DMG:
+          [1648015371.160201][2506:2506] CHIP:DMG:         ],
+          [1648015371.160238][2506:2506] CHIP:DMG:
+          [1648015371.160270][2506:2506] CHIP:DMG:         isFabricFiltered = true,
+          [1648015371.160300][2506:2506] CHIP:DMG:         InteractionModelRevision = 1
+          [1648015371.160324][2506:2506] CHIP:DMG: },
+
+           ./chip-tool identify  read   identify-type 1 1
+          [1648015519.017225][2506:2506] CHIP:IM: Received Read request
+          [1648015519.017293][2506:2506] CHIP:DMG: ReadRequestMessage =
+          [1648015519.017332][2506:2506] CHIP:DMG: {
+          [1648015519.017363][2506:2506] CHIP:DMG:         AttributePathIBs =
+          [1648015519.017403][2506:2506] CHIP:DMG:         [
+          [1648015519.017437][2506:2506] CHIP:DMG:                 AttributePathIB =
+          [1648015519.017577][2506:2506] CHIP:DMG:                 {
+          [1648015519.017624][2506:2506] CHIP:DMG:                         Endpoint = 0x1,
+          [1648015519.017673][2506:2506] CHIP:DMG:                         Cluster = 0x3,
+          [1648015519.017721][2506:2506] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1648015519.017768][2506:2506] CHIP:DMG:                 }
+          [1648015519.017813][2506:2506] CHIP:DMG:
+          [1648015519.017853][2506:2506] CHIP:DMG:         ],
+          [1648015519.017894][2506:2506] CHIP:DMG:
+          [1648015519.017932][2506:2506] CHIP:DMG:         isFabricFiltered = true,
+          [1648015519.017969][2506:2506] CHIP:DMG:         InteractionModelRevision = 1
+          [1648015519.018003][2506:2506] CHIP:DMG: },"
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          There is no optional attibute for this cluster
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          There is no optional attibute for this cluster
       disabled: true

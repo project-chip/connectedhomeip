@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    19.1.1. [TC-IDM-1.1] Invoke Request Action from DUT to TH [DUT - Controller]
+    20.1.1. [TC-IDM-1.1] Invoke Request Action from DUT to TH [DUT - Controller]
 
 config:
     nodeId: 0x12344321
@@ -30,6 +30,37 @@ tests:
           In case of chip tool, here is an example command to use
 
           sudo ./chip-tool identify  identify 0 1 1
+
+          Verify we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
+
+          [1648721385.183101][2528:2528] CHIP:EM: Handling via exchange: 37235r, Delegate: 0xaaaaca773368
+          [1648721385.183190][2528:2528] CHIP:DMG: InvokeRequestMessage =
+          [1648721385.183229][2528:2528] CHIP:DMG: {
+          [1648721385.183263][2528:2528] CHIP:DMG:         suppressResponse = false,
+          [1648721385.183301][2528:2528] CHIP:DMG:         timedRequest = false,
+          [1648721385.183342][2528:2528] CHIP:DMG:         InvokeRequests =
+          [1648721385.183386][2528:2528] CHIP:DMG:         [
+          [1648721385.183423][2528:2528] CHIP:DMG:                 CommandDataIB =
+          [1648721385.183467][2528:2528] CHIP:DMG:                 {
+          [1648721385.183505][2528:2528] CHIP:DMG:                         CommandPathIB =
+          [1648721385.183553][2528:2528] CHIP:DMG:                         {
+          [1648721385.183605][2528:2528] CHIP:DMG:                                 EndpointId = 0x1,
+          [1648721385.183661][2528:2528] CHIP:DMG:                                 ClusterId = 0x3,
+          [1648721385.183716][2528:2528] CHIP:DMG:                                 CommandId = 0x0,
+          [1648721385.183769][2528:2528] CHIP:DMG:                         },
+          [1648721385.183818][2528:2528] CHIP:DMG:
+          [1648721385.183861][2528:2528] CHIP:DMG:                         CommandData =
+          [1648721385.183911][2528:2528] CHIP:DMG:                         {
+          [1648721385.183959][2528:2528] CHIP:DMG:                                 0x0 = 0,
+          [1648721385.184012][2528:2528] CHIP:DMG:                         },
+          [1648721385.184060][2528:2528] CHIP:DMG:                 },
+          [1648721385.184108][2528:2528] CHIP:DMG:
+          [1648721385.184142][2528:2528] CHIP:DMG:         ],
+          [1648721385.184186][2528:2528] CHIP:DMG:
+          [1648721385.184221][2528:2528] CHIP:DMG:         InteractionModelRevision = 1
+          [1648721385.184256][2528:2528] CHIP:DMG: },
+          [1648721385.184347][2528:2528] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=o
+          [1648721385.184403][2528:2528] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label:
@@ -57,14 +88,60 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
           sudo ./chip-tool  identify identify 10 1 1
+
+          Verify we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
+
+
+          [1648721578.295986][2528:2528] CHIP:DMG: InvokeRequestMessage =
+          [1648721578.296016][2528:2528] CHIP:DMG: {
+          [1648721578.296039][2528:2528] CHIP:DMG:         suppressResponse = false,
+          [1648721578.296066][2528:2528] CHIP:DMG:         timedRequest = false,
+          [1648721578.296091][2528:2528] CHIP:DMG:         InvokeRequests =
+          [1648721578.296120][2528:2528] CHIP:DMG:         [
+          [1648721578.296145][2528:2528] CHIP:DMG:                 CommandDataIB =
+          [1648721578.296180][2528:2528] CHIP:DMG:                 {
+          [1648721578.296208][2528:2528] CHIP:DMG:                         CommandPathIB =
+          [1648721578.296238][2528:2528] CHIP:DMG:                         {
+          [1648721578.296268][2528:2528] CHIP:DMG:                                 EndpointId = 0x1,
+          [1648721578.296299][2528:2528] CHIP:DMG:                                 ClusterId = 0x3,
+          [1648721578.296328][2528:2528] CHIP:DMG:                                 CommandId = 0x0,
+          [1648721578.296357][2528:2528] CHIP:DMG:                         },
+          [1648721578.296386][2528:2528] CHIP:DMG:
+          [1648721578.296412][2528:2528] CHIP:DMG:                         CommandData =
+          [1648721578.296440][2528:2528] CHIP:DMG:                         {
+          [1648721578.296470][2528:2528] CHIP:DMG:                                 0x0 = 10,
+          [1648721578.296499][2528:2528] CHIP:DMG:                         },
+          [1648721578.296525][2528:2528] CHIP:DMG:                 },
+          [1648721578.296554][2528:2528] CHIP:DMG:
+          [1648721578.296577][2528:2528] CHIP:DMG:         ],
+          [1648721578.296607][2528:2528] CHIP:DMG:
+          [1648721578.296630][2528:2528] CHIP:DMG:         InteractionModelRevision = 1
+          [1648721578.296653][2528:2528] CHIP:DMG: },
+          [1648721578.296718][2528:2528] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=o
+          [1648721578.296758][2528:2528] CHIP:DMG: AccessControl: allowed
+          [1648721578.296786][2528:2528] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0003 Command=0x0000_0000
+          [1648721578.296828][2528:2528] CHIP:DMG: Endpoint 1, Cluster 0x0000_0003 update version to f25efe02
+          [1648721578.296868][2528:2528] CHIP:ZCL: OnIdentifyStart
+          [1648721578.296917][2528:2528] CHIP:DMG: ICR moving to [AddingComm]
+          [1648721578.296950][2528:2528] CHIP:DMG: ICR moving to [AddedComma]
+
+          sudo ./chip-tool  identify identify 10 1 1
           sudo ./chip-tool  identify identify 10 1 1
       disabled: true
 
     - label:
-          "DUT sends the Invoke Request Message to the TH. The message should
-          contain a command that will return a data type of list as a response."
+          "DUT sends the Invoke Request Message to the TH. + The Message should
+          contain one valid CommandDataIB, which has the specific Endpoint,
+          Specific Cluster and Specific Command."
       verification: |
-          In case of chip tool, here is an example command to use
 
-          sudo ./chip-tool modeselect read  supported-modes 1 1
+      disabled: true
+
+    - label:
+          "DUT sends the Invoke Request Message to the TH. + The Message should
+          contain one valid CommandDataIB, which has the specific Endpoint,
+          Specific Cluster and Specific Command. + Send 2 more Invoke Request
+          Messages to the TH."
+      verification: |
+          can be tested by using the command scan networks
       disabled: true

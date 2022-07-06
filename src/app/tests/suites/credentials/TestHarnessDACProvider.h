@@ -42,7 +42,7 @@ public:
     CHIP_ERROR GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer) override;
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer) override;
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer) override;
-    CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_signature_buffer) override;
+    CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_signature_buffer) override;
 
     void Init(const char * filepath);
     void Init(const TestHarnessDACProviderData & data);

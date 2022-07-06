@@ -50,7 +50,6 @@ tests:
           constraints:
               type: uint16
 
-    #Issue 13414
     - label: "Reads the OnLevel attribute from the DUT"
       command: "readAttribute"
       attribute: "on level"
@@ -74,7 +73,6 @@ tests:
               type: uint8
               notValue: OnLevelValue
 
-    #Issue 13414
     - label: "Reads the OnTransitionTime attribute from the DUT"
       command: "readAttribute"
       attribute: "on transition time"
@@ -98,7 +96,6 @@ tests:
               type: uint16
               notValue: OnTransitionTimeValue
 
-    #Issue -13414
     - label: "Reads the OffTransitionTime attribute from the DUT"
       command: "readAttribute"
       attribute: "off transition time"
@@ -144,7 +141,6 @@ tests:
           constraints:
               type: uint8
 
-    #issue -13414
     - label: "Reads the StartUpCurrentLevel attribute from the DUT"
       command: "readAttribute"
       attribute: "start up current level"

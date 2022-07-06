@@ -95,6 +95,10 @@ chip_test_suite("tests") {
     "TestWriteInteraction.cpp",
   ]
 
+  if (!chip_fake_platform) {
+    test_sources += [ "TestFailSafeContext.cpp" ]
+  }
+
   #
   # On NRF platforms, the allocation of a large number of pbufs in this test
   # to exercise chunking causes it to run out of memory. For now, disable it there.

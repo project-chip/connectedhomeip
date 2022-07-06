@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.3. [TC-TFL-2.1]Read and Write Time Format Localization Cluster Attributes
+    3.3. [TC-TFL-2.1] Read and Write Time Format Localization Cluster Attributes
     [DUT as Client]
 
 config:
@@ -24,6 +24,7 @@ config:
 
 tests:
     - label: "DUT reads HourFormat attribute from TH"
+      PICS: LTIME.C.A0000
       verification: |
           ./chip-tool timeformatlocalization read hour-format 1 0
           [1651194182.833570][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -44,7 +45,8 @@ tests:
           [1651194182.834010][4306:4306] CHIP:DMG: },
       disabled: true
 
-    - label: "If (PICS_A_12HR) DUT writes 0 to HourFormat attribute"
+    - label: "If (LTIME.C.A0000.12HR) DUT writes 0 to HourFormat attribute"
+      PICS: LTIME.C.A0000.12HR
       verification: |
           ./chip-tool timeformatlocalization write hour-format 0 1 0
           [1651192743.617047][4306:4306] CHIP:DMG: WriteRequestMessage =
@@ -73,6 +75,7 @@ tests:
       disabled: true
 
     - label: "DUT reads HourFormat attribute"
+      PICS: LTIME.C.A0000
       verification: |
           ./chip-tool timeformatlocalization read hour-format 1 0
           [1651194182.833570][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -93,7 +96,8 @@ tests:
           [1651194182.834010][4306:4306] CHIP:DMG: },
       disabled: true
 
-    - label: "If (PICS_A_24HR) DUT writes 1 to HourFormat attribute"
+    - label: "If (LTIME.C.A0000.24HR) DUT writes 1 to HourFormat attribute"
+      PICS: LTIME.C.A0000.24HR
       verification: |
           ./chip-tool timeformatlocalization write hour-format 1 1 0
           [1651193043.068804][4306:4306] CHIP:DMG: WriteRequestMessage =
@@ -122,27 +126,16 @@ tests:
       disabled: true
 
     - label: "DUT reads HourFormat attribute"
+      PICS: LTIME.C.A0000
       verification: |
           ./chip-tool timeformatlocalization read hour-format 1 0
-          [1651194182.833570][4306:4306] CHIP:DMG: ReadRequestMessage =
-          [1651194182.833598][4306:4306] CHIP:DMG: {
-          [1651194182.833620][4306:4306] CHIP:DMG:         AttributePathIBs =
-          [1651194182.833654][4306:4306] CHIP:DMG:         [
-          [1651194182.833679][4306:4306] CHIP:DMG:                 AttributePathIB =
-          [1651194182.833704][4306:4306] CHIP:DMG:                 {
-          [1651194182.833736][4306:4306] CHIP:DMG:                         Endpoint = 0x0,
-          [1651194182.833774][4306:4306] CHIP:DMG:                         Cluster = 0x2c,
-          [1651194182.833806][4306:4306] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1651194182.833837][4306:4306] CHIP:DMG:                 }
-          [1651194182.833869][4306:4306] CHIP:DMG:
-          [1651194182.833901][4306:4306] CHIP:DMG:         ],
-          [1651194182.833929][4306:4306] CHIP:DMG:
-          [1651194182.833959][4306:4306] CHIP:DMG:         isFabricFiltered = true,
-          [1651194182.833985][4306:4306] CHIP:DMG:         InteractionModelRevision = 1
-          [1651194182.834010][4306:4306] CHIP:DMG: },
+          [1654605170.332304][7266:7271] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3185003975
+          [1654605170.332388][7266:7271] CHIP:TOO:   HourFormat: 1
+          [1654605170.332493][7266:7271] CHIP:EM: Sending Standalone Ack for MessageCounter:6045450 on exchange 44106i
       disabled: true
 
     - label: "DUT reads ActiveCalendarType attribute from DUT"
+      PICS: LTIME.C.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
           [1651194266.987675][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -164,6 +157,7 @@ tests:
       disabled: true
 
     - label: "DUT reads SupportedCalendarTypes attribute from DUT"
+      PICS: LTIME.C.A0002
       verification: |
           ./chip-tool timeformatlocalization read supported-calendar-types 1 0
           [1651194334.847912][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -184,7 +178,10 @@ tests:
           [1651194334.848952][4306:4306] CHIP:DMG: },
       disabled: true
 
-    - label: "If (PICS_A_Buddhist) DUT writes 0 to ActiveCalendarType attribute"
+    - label:
+          "If (0 in LTIME.C.A0002.SCT) DUT writes 0 to ActiveCalendarType
+          attribute"
+      PICS: LTIME.C.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 0 1 0
 
@@ -214,6 +211,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveCalendarType attribute"
+      PICS: LTIME.C.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
           [1651194544.718348][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -234,7 +232,10 @@ tests:
           [1651194544.718911][4306:4306] CHIP:DMG: },
       disabled: true
 
-    - label: "If (PICS_A_Chinese) DUT writes 1 to ActiveCalendarType attribute"
+    - label:
+          "If (1 in LTIME.C.A0002.SCT) DUT writes 1 to ActiveCalendarType
+          attribute"
+      PICS: LTIME.C.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 1 1 0
 
@@ -264,6 +265,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveCalendarType attribute"
+      PICS: LTIME.C.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
           [1651194544.718348][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -284,7 +286,10 @@ tests:
           [1651194544.718911][4306:4306] CHIP:DMG: },
       disabled: true
 
-    - label: "If (PICS_A_Coptic) DUT writes 2 to ActiveCalendarType attribute"
+    - label:
+          "If (2 in LTIME.C.A0002.SCT) DUT writes 2 to ActiveCalendarType
+          attribute"
+      PICS: LTIME.C.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 2 1 0
 
@@ -314,6 +319,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveCalendarType attribute"
+      PICS: LTIME.C.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
           [1651194544.718348][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -335,7 +341,9 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_A_Ethiopian) DUT writes 3 to ActiveCalendarType attribute"
+          "If (3 in LTIME.C.A0002.SCT) DUT writes 3 to ActiveCalendarType
+          attribute"
+      PICS: LTIME.C.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 3 1 0
 
@@ -365,6 +373,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveCalendarType attribute"
+      PICS: LTIME.C.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
           [1651194544.718348][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -386,7 +395,9 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_A_Gregorian) DUT writes 4 to ActiveCalendarType attribute"
+          "If (4 in LTIME.C.A0002.SCT) DUT writes 4 to ActiveCalendarType
+          attribute"
+      PICS: LTIME.C.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 4 1 0
 
@@ -416,6 +427,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveCalendarType attribute"
+      PICS: LTIME.C.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
           [1651194544.718348][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -436,7 +448,10 @@ tests:
           [1651194544.718911][4306:4306] CHIP:DMG: },
       disabled: true
 
-    - label: "If (PICS_A_Hebrew) DUT writes 5 to ActiveCalendarType attribute"
+    - label:
+          "If (5 in LTIME.C.A0002.SCT) DUT writes 5 to ActiveCalendarType
+          attribute"
+      PICS: LTIME.C.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 5 1 0
 
@@ -466,6 +481,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveCalendarType attribute"
+      PICS: LTIME.C.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
           [1651194544.718348][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -486,7 +502,10 @@ tests:
           [1651194544.718911][4306:4306] CHIP:DMG: },
       disabled: true
 
-    - label: "If (PICS_A_Indian) DUT writes 6 to ActiveCalendarType attribute"
+    - label:
+          "If (6 in LTIME.C.A0002.SCT) DUT writes 6 to ActiveCalendarType
+          attribute"
+      PICS: LTIME.C.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 6 1 0
 
@@ -516,6 +535,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveCalendarType attribute"
+      PICS: LTIME.C.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
           [1651194544.718348][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -536,7 +556,10 @@ tests:
           [1651194544.718911][4306:4306] CHIP:DMG: },
       disabled: true
 
-    - label: "If (PICS_A_Islamic) DUT writes 7 to ActiveCalendarType attribute"
+    - label:
+          "If (7 in LTIME.C.A0002.SCT) DUT writes 7 to ActiveCalendarType
+          attribute"
+      PICS: LTIME.C.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 7 1 0
 
@@ -566,6 +589,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveCalendarType attribute"
+      PICS: LTIME.C.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
           [1651194544.718348][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -586,7 +610,10 @@ tests:
           [1651194544.718911][4306:4306] CHIP:DMG: },
       disabled: true
 
-    - label: "If (PICS_A_Japanese) DUT writes 8 to ActiveCalendarType attribute"
+    - label:
+          "If (8 in LTIME.C.A0002.SCT) DUT writes 8 to ActiveCalendarType
+          attribute"
+      PICS: LTIME.C.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 8 1 0
 
@@ -616,6 +643,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveCalendarType attribute"
+      PICS: LTIME.C.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
           [1651194544.718348][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -636,7 +664,10 @@ tests:
           [1651194544.718911][4306:4306] CHIP:DMG: },
       disabled: true
 
-    - label: "If (PICS_A_Korean) DUT writes 9 to ActiveCalendarType attribute"
+    - label:
+          "If (9 in LTIME.C.A0002.SCT) DUT writes 9 to ActiveCalendarType
+          attribute"
+      PICS: LTIME.C.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 9 1 0
 
@@ -666,6 +697,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveCalendarType attribute"
+      PICS: LTIME.C.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
           [1651194544.718348][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -686,7 +718,10 @@ tests:
           [1651194544.718911][4306:4306] CHIP:DMG: },
       disabled: true
 
-    - label: "If (PICS_A_Persian) DUT writes 10 to ActiveCalendarType attribute"
+    - label:
+          "If (10 in LTIME.C.A0002.SCT) DUT writes 10 to ActiveCalendarType
+          attribute"
+      PICS: LTIME.C.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 10 1 0
 
@@ -716,6 +751,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveCalendarType attribute"
+      PICS: LTIME.C.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
           [1651194544.718348][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -737,7 +773,9 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_A_Taiwanese) DUT writes 11 to ActiveCalendarType attribute"
+          "If (11 in LTIME.C.A0002.SCT) DUT writes 11 to ActiveCalendarType
+          attribute"
+      PICS: LTIME.C.A0002.SCT
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 11 1 0
 
@@ -767,6 +805,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveCalendarType attribute"
+      PICS: LTIME.C.A0001
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
           [1651194544.718348][4306:4306] CHIP:DMG: ReadRequestMessage =

@@ -167,13 +167,13 @@ public:
     /**
      *  Mark any open session with the device as expired.
      */
-    CHIP_ERROR Disconnect() override;
+    void Disconnect() override;
 
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
 
     PeerId GetPeerId() const { return mPeerId; }
 
-    CHIP_ERROR ShutdownSubscriptions() override;
+    void ShutdownSubscriptions() override;
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
 

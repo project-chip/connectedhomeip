@@ -178,5 +178,17 @@ size_t UppercaseHexToUint32(const char * src_hex, const size_t src_size, uint32_
 /** Same as UppercaseHexToUint64() but for uint16_t. */
 size_t UppercaseHexToUint16(const char * src_hex, const size_t src_size, uint16_t & dest);
 
+/**
+ * Computes the hex encoded length for a given input length.
+ * Left shift to generate optimized equivalent of LEN*2.
+ */
+#define HEX_ENCODED_LENGTH(LEN) ((LEN) << 1)
+
+/**
+ * Computes the maximum possible decoded length for a given hex string input length.
+ * Right shift to generate optimized equivalent of LEN/2.
+ */
+#define HEX_MAX_DECODED_LENGTH(LEN) ((LEN) >> 1)
+
 } // namespace Encoding
 } // namespace chip

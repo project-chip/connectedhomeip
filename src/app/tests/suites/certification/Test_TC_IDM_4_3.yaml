@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    19.4.3. [TC-IDM-4.3] Report Data Messages post Subscription Activation from
+    20.4.3. [TC-IDM-4.3] Report Data Messages post Subscription Activation from
     DUT Test Cases
 
 config:
@@ -985,29 +985,30 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a subscription request action for multiple
-          attributes/events. (1 attribute, 1 event). Change the value of the
-          attribute and trigger an action on the DUT to trigger the event."
+          'TH sends a subscription request action for an attribute and all
+          events. Set the MinIntervalFloor to some value say "N"(seconds).
+          Change the value of the attribute and trigger an action on the DUT to
+          trigger any event.'
       verification: |
 
       disabled: true
 
     - label:
-          "TH sends a subscription request action for attribute wildcard -
-          AttributePath = [[Endpoint = EndpointID, Cluster = ClusterID]]. Change
-          all or few of the attributes on the DUT"
+          'TH sends a subscription request action for attribute wildcard -
+          AttributePath = [[Endpoint = EndpointID, Cluster = ClusterID]]. Set
+          the MinIntervalFloor to some value say "N"(seconds). Change all or few
+          of the attributes on the DUT'
       verification: |
-          out of scope for V1.0
+
       disabled: true
 
     - label:
-          "TH sends a subscription request action for an attribute without the
-          DataVersionFilters field set to the version of the cluster instance.
-          DUT sends a report data action with the data of the attribute along
-          with the data version. Tear down the subscription for that attribute.
-          Start another subscription with the DataVersionFilter field set to the
-          data version received above."
+          'TH sends a subscription request to subscribe to an attribute on a
+          specific cluster from all endpoints AttributePath = [[Attribute =
+          Attribute, Cluster = ClusterID ]]. Set the MinIntervalFloor to some
+          value say "N"(seconds). Change the attribute on the DUT'
       verification: |
+          This test case has been modified, please update the verification step
           Use interactive mode to verify this
           ./chip-tool start interactive mood
 
@@ -1052,10 +1053,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a subscription request action for attribute and sets the
-          MinIntervalFloor value to be same as MaxIntervalCeiling. Activate the
-          Subscription between TH and DUT. Modify the attribute which has been
-          subscribed to on the DUT."
+          'TH sends a subscription request to subscribe to all attributes from
+          all clusters from all endpoints. AttributePath = [[]]. Set the
+          MinIntervalFloor to some value say "N"(seconds). Change all or few of
+          the attributes on the DUT'
       verification: |
           Use interactive mode to verify this
           ./chip-tool start interactive mood
@@ -1129,8 +1130,28 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a subscription request action for attribute and set the
-          MinIntervalFloor value to be greater than MaxIntervalCeiling."
+          'TH sends a subscription request to subscribe to all attributes from
+          all clusters on an endpoint. AttributePath = [[Endpoint =
+          EndpointID]]. Set the MinIntervalFloor to some value say "N"(seconds).
+          Change all or few of the attributes on the DUT'
+      verification: |
+          sudo ./chip-tool thermostatuserinterfaceconfiguration subscribe temperature-display-mode 10000 1000 1 1
+
+          [1654863279.009335][32383:32388] CHIP:DMG: StatusResponseMessage =
+          [1654863279.009366][32383:32388] CHIP:DMG: {
+          [1654863279.009402][32383:32388] CHIP:DMG: 	Status = 0x01 (FAILURE),
+          [1654863279.009430][32383:32388] CHIP:DMG: 	InteractionModelRevision = 1
+          [1654863279.009455][32383:32388] CHIP:DMG: }
+          [1654863279.009491][32383:32388] CHIP:IM: Received status response, status is 0x01 (FAILURE)
+          [1654863279.009531][32383:32388] CHIP:DMG: mResubscribePolicy is null
+          [1654863279.009562][32383:32388] CHIP:TOO: Error: IM Error 0x00000501: General error: 0x01 (FAILURE)
+      disabled: true
+
+    - label:
+          'TH sends a subscription request to subscribe to all attributes from a
+          specific cluster on all endpoints. AttributePath = [[Cluster =
+          ClusterID]]. Set the MinIntervalFloor to some value say "N"(seconds).
+          Change all or few of the attributes on the DUT'
       verification: |
 
       disabled: true

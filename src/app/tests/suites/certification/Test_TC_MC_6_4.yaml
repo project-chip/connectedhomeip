@@ -32,24 +32,28 @@ tests:
           "Precondition: Media content in a paused state at the beginning of the
           content"
       command: "Pause"
+      PICS: MC_MEDIAPLAYBACK.S.C0001
       response:
           values:
               - name: "status"
                 value: 0
 
     - label: "Reads the CurrentState attribute from the DUT"
+      PICS: MC_MEDIAPLAYBACK.S.A0000
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
+      PICS: MC_MEDIAPLAYBACK.S.A0004
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: 0
 
     - label: "Sends a FastForward command"
+      PICS: MC_MEDIAPLAYBACK.S.C0007
       command: "FastForward"
       response:
           values:
@@ -57,18 +61,21 @@ tests:
                 value: 0
 
     - label: "Reads the CurrentState attribute"
+      PICS: MC_MEDIAPLAYBACK.S.A0000
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 0
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
+      PICS: MC_MEDIAPLAYBACK.S.A0004
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: 1
 
     - label: "Sends a FastForward command"
+      PICS: MC_MEDIAPLAYBACK.S.C0007
       command: "FastForward"
       response:
           values:
@@ -76,12 +83,14 @@ tests:
                 value: 0
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
+      PICS: MC_MEDIAPLAYBACK.S.A0004
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: 2
 
     - label: "Sends a Rewind command to the DUT"
+      PICS: MC_MEDIAPLAYBACK.S.C0006
       command: "Rewind"
       response:
           values:
@@ -89,6 +98,7 @@ tests:
                 value: 0
 
     - label: "Reads the CurrentState attribute"
+      PICS: MC_MEDIAPLAYBACK.S.A0000
       command: "readAttribute"
       attribute: "CurrentState"
       response:
@@ -103,7 +113,7 @@ tests:
           [1655114487.018421][41855:41860] CHIP:EM: Sending Standalone Ack for MessageCounter:163883813 on exchange 24959
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.C0007
       arguments:
           values:
               - name: "message"
@@ -112,6 +122,7 @@ tests:
                 value: "y"
 
     - label: "Sends a Rewind command to the DUT"
+      PICS: MC_MEDIAPLAYBACK.S.C0006
       command: "Rewind"
       response:
           values:
@@ -127,7 +138,7 @@ tests:
           [1655114711.400853][41871:41876] CHIP:EM: Sending Standalone Ack for MessageCounter:17386470 on exchange 38376
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.A0004
       arguments:
           values:
               - name: "message"
@@ -136,6 +147,7 @@ tests:
                 value: "y"
 
     - label: "Sends a Play command"
+      PICS: MC_MEDIAPLAYBACK.S.C0000
       command: "Play"
       response:
           values:
@@ -145,6 +157,7 @@ tests:
     - label: "Reads the PlaybackSpeed attribute from the DUT"
       command: "readAttribute"
       attribute: "PlaybackSpeed"
+      PICS: MC_MEDIAPLAYBACK.S.A0004
       response:
           value: 1
 
@@ -162,7 +175,7 @@ tests:
           [1655460522.133751][12273:12278] CHIP:TOO:    }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.C0007
       arguments:
           values:
               - name: "message"
@@ -182,7 +195,7 @@ tests:
           [1655460483.177228][12225:12230] CHIP:TOO:    }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.C0006
       arguments:
           values:
               - name: "message"

@@ -66,7 +66,8 @@ void ModelCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CH
 
 void ModelCommand::Shutdown()
 {
-    ResetArguments();
     mOnDeviceConnectedCallback.Cancel();
     mOnDeviceConnectionFailureCallback.Cancel();
+
+    CHIPCommand::Shutdown();
 }

@@ -126,8 +126,6 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
                                           size_t offset_bytes) const
 {
     VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(value != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint32_t nvm3Key;
     CHIP_ERROR err = MapKvsKeyToNvm3(key, nvm3Key);
@@ -146,7 +144,6 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
     VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint32_t nvm3Key;
     CHIP_ERROR err = MapKvsKeyToNvm3(key, nvm3Key, /* isSlotNeeded */ true);

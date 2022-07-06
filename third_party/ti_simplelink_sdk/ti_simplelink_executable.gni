@@ -46,8 +46,14 @@ template("ti_simplelink_executable") {
   }
   output_base_name = get_path_info(invoker.output_name, "name")
 
-  objcopy_image_name = output_base_name + ".hex"
-  objcopy_image_format = "ihex"
+  #used for OTA image creator for the cc13xx
+  if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+    objcopy_image_name = output_base_name + ".hex"
+    objcopy_image_format = "ihex"
+  } else {
+    objcopy_image_name = output_base_name + ".bin"
+    objcopy_image_format = "binary"
+  }
   objcopy = "arm-none-eabi-objcopy"
 
   config("${simplelink_target_name}_config") {
@@ -79,17 +85,19 @@ template("ti_simplelink_executable") {
       } else {
         ldscript = "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/cc13x2x7_cc26x2x7.lds"
       }
-
-      inputs = [ ldscript ]
-
-      ldflags = [
-        "-L" + rebase_path(ti_simplelink_sdk_root + "/source", root_build_dir),
-        rebase_path(
-            "${target_gen_dir}/sysconfig/ti_utils_build_linker.cmd.genlibs",
-            root_build_dir),
-        "-T" + rebase_path(ldscript, root_build_dir),
-      ]
+    } else if (ti_simplelink_device_family == "cc32xx") {
+      ldscript = "${ti_simplelink_sdk_root}/source/ti/boards/cc32xxsf/cc32xxsf_freertos.lds"
     }
+
+    inputs = [ ldscript ]
+
+    ldflags = [
+      "-L" + rebase_path(ti_simplelink_sdk_root + "/source", root_build_dir),
+      rebase_path(
+          "${target_gen_dir}/sysconfig/ti_utils_build_linker.cmd.genlibs",
+          root_build_dir),
+      "-T" + rebase_path(ldscript, root_build_dir),
+    ]
   }
 
   if (chip_enable_ota_requestor &&

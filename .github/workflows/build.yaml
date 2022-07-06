@@ -32,10 +32,10 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.79
+            image: connectedhomeip/chip-build:0.5.84
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
-            options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
@@ -57,12 +57,17 @@ jobs:
                   attempt_delay: 2000
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
+            - name: Try to ensure the directories for core dumping exist and we
+                  can write them.
+              run: |
+                  mkdir /tmp/cores || true
+                  sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
+              if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
@@ -99,6 +104,22 @@ jobs:
             - name: Run Build Without Error Logging
               timeout-minutes: 20
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Uploading core files
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() && !env.ACT }}
+              with:
+                  name: crash-core-linux-gcc-debug
+                  path: /tmp/cores/
+                  # Cores are big; don't hold on to them too long.
+                  retention-days: 5
+            - name: Uploading objdir for debugging
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() && !env.ACT }}
+              with:
+                  name: crash-objdir-linux-gcc-debug
+                  path: out/
+                  # objdirs are big; don't hold on to them too long.
+                  retention-days: 5
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
         timeout-minutes: 120
@@ -107,10 +128,10 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.79
+            image: connectedhomeip/chip-build:0.5.84
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
-            options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
@@ -137,12 +158,17 @@ jobs:
             #      languages: "cpp"
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
+            - name: Try to ensure the directories for core dumping exist and we
+                  can write them.
+              run: |
+                  mkdir /tmp/cores || true
+                  sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
+              if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
@@ -211,6 +237,22 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --no-log-timestamps --target linux-fake-tests build"
+            - name: Uploading core files
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() && !env.ACT }}
+              with:
+                  name: crash-core-linux
+                  path: /tmp/cores/
+                  # Cores are big; don't hold on to them too long.
+                  retention-days: 5
+            - name: Uploading objdir for debugging
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() && !env.ACT }}
+              with:
+                  name: crash-objdir-linux
+                  path: out/
+                  # objdirs are big; don't hold on to them too long.
+                  retention-days: 5
 
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
@@ -237,7 +279,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.79
+            image: connectedhomeip/chip-build:0.5.84
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -317,7 +359,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
+              if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
@@ -365,7 +407,7 @@ jobs:
                     "
             - name: Uploading diagnostic logs
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }} && ${{ !env.ACT }}
+              if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin
                   path: ~/Library/Logs/DiagnosticReports/

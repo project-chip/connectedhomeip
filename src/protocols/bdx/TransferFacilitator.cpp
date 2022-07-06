@@ -78,7 +78,15 @@ void TransferFacilitator::PollForOutput()
     HandleTransferSessionOutput(outEvent);
 
     VerifyOrReturn(mSystemLayer != nullptr, ChipLogError(BDX, "%s mSystemLayer is null", __FUNCTION__));
-    mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
+    if (!mStopPolling)
+    {
+        mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
+    }
+    else
+    {
+        mSystemLayer->CancelTimer(PollTimerHandler, this);
+        mStopPolling = false;
+    }
 }
 
 void TransferFacilitator::ScheduleImmediatePoll()

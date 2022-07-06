@@ -92,19 +92,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
- *
- * Enable the device factory provisioning feature.
- *
- * The factory provisioning feature allows factory or developer-supplied provisioning information
- * to be injected into a device at boot time and automatically stored in persistent storage.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-// We don't have platform/internal/FactoryProvisioning.ipp for now, so set it to 0 by default.
-#define CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING 0
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
  *
  * Compute and log a hash of the device's provisioning data on boot.
@@ -582,18 +569,6 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME
 #define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME 30000
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
- *
- * The amount of time in miliseconds after which BLE advertisement should be disabled, counting
- * from the moment of advertisement commencement.
- *
- * Defaults to 9000000 (15 minutes).
- */
-#ifndef CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
-#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)
 #endif
 
 // -------------------- Time Sync Configuration --------------------

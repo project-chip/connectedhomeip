@@ -33,35 +33,46 @@ namespace Controller {
 class DLL_EXPORT IdentifyCluster : public ClusterBase
 {
 public:
-    IdentifyCluster() : ClusterBase(app::Clusters::Identify::Id) {}
+    IdentifyCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Identify::Id, endpoint)
+    {}
     ~IdentifyCluster() {}
 };
 
 class DLL_EXPORT ScenesCluster : public ClusterBase
 {
 public:
-    ScenesCluster() : ClusterBase(app::Clusters::Scenes::Id) {}
+    ScenesCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Scenes::Id, endpoint)
+    {}
     ~ScenesCluster() {}
 };
 
 class DLL_EXPORT OnOffCluster : public ClusterBase
 {
 public:
-    OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
+    OnOffCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OnOff::Id, endpoint)
+    {}
     ~OnOffCluster() {}
 };
 
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
-    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
+    OtaSoftwareUpdateProviderCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                     EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OtaSoftwareUpdateProvider::Id, endpoint)
+    {}
     ~OtaSoftwareUpdateProviderCluster() {}
 };
 
 class DLL_EXPORT ColorControlCluster : public ClusterBase
 {
 public:
-    ColorControlCluster() : ClusterBase(app::Clusters::ColorControl::Id) {}
+    ColorControlCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::ColorControl::Id, endpoint)
+    {}
     ~ColorControlCluster() {}
 };
 

@@ -611,19 +611,6 @@ static inline const EC_KEY * to_const_EC_KEY(const P256KeypairContext * context)
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
-    VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
-
-    uint8_t digest[kSHA256_Hash_Length];
-    memset(&digest[0], 0, sizeof(digest));
-
-    ReturnErrorOnFailure(Hash_SHA256(msg, msg_length, &digest[0]));
-    return ECDSA_sign_hash(&digest[0], sizeof(digest), out_signature);
-}
-
-CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_length, P256ECDSASignature & out_signature) const
-{
-    ERR_clear_error();
-
     CHIP_ERROR error = CHIP_NO_ERROR;
     int nid          = NID_undef;
     EC_KEY * ec_key  = nullptr;
@@ -631,17 +618,24 @@ CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_
     const BIGNUM * r = nullptr;
     const BIGNUM * s = nullptr;
 
+    VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
+
+    uint8_t digest[kSHA256_Hash_Length];
+    memset(&digest[0], 0, sizeof(digest));
+
+    ReturnErrorOnFailure(Hash_SHA256(msg, msg_length, &digest[0]));
+
+    ERR_clear_error();
+
     static_assert(P256ECDSASignature::Capacity() >= kP256_ECDSA_Signature_Length_Raw, "P256ECDSASignature must be large enough");
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(hash_length == kSHA256_Hash_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
     nid = _nidForCurve(MapECName(mPublicKey.Type()));
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     ec_key = to_EC_KEY(&mKeypair);
     VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    sig = ECDSA_do_sign(Uint8::to_const_uchar(hash), static_cast<int>(hash_length), ec_key);
+    sig = ECDSA_do_sign(Uint8::to_const_uchar(&digest[0]), static_cast<int>(sizeof(digest)), ec_key);
 
     VerifyOrExit(sig != nullptr, error = CHIP_ERROR_INTERNAL);
     ECDSA_SIG_get0(sig, &r, &s);

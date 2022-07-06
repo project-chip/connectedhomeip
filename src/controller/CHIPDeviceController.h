@@ -153,7 +153,7 @@ public:
      *  This will also not stop the CHIP event queue / thread (if one exists).  Consumers are expected to
      *  ensure this happened before calling this method.
      */
-    virtual CHIP_ERROR Shutdown();
+    virtual void Shutdown();
 
     SessionManager * SessionMgr()
     {
@@ -408,7 +408,7 @@ public:
      *
      *  Please see implementation for more details.
      */
-    CHIP_ERROR Shutdown() override;
+    void Shutdown() override;
 
     // ----- Connection Management -----
     /**
@@ -582,9 +582,8 @@ public:
      *   Once we have finished all commissioning work, the Controller should close the BLE
      *   connection to the device and establish CASE session / another PASE session to the device
      *   if needed.
-     * @return CHIP_ERROR   The return status
      */
-    CHIP_ERROR CloseBleConnection();
+    void CloseBleConnection();
 #endif
     /**
      * @brief
@@ -648,7 +647,8 @@ public:
     // Commissioner will establish new device connections after PASE.
     OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId) override;
 
-    // Issue an NOC chain using the associated OperationalCredentialsDelegate.
+    // Issue an NOC chain using the associated OperationalCredentialsDelegate. The NOC chain will
+    // be provided in X509 DER format.
     // NOTE: This is only valid assuming that `mOperationalCredentialsDelegate` is what is desired
     // to issue the NOC chain.
     CHIP_ERROR IssueNOCChain(const ByteSpan & NOCSRElements, NodeId nodeId,
@@ -830,8 +830,7 @@ private:
                            CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
                            CommandResponseFailureCallback failureCb, EndpointId endpoint, Optional<System::Clock::Timeout> timeout)
     {
-        ClusterObjectT cluster;
-        cluster.Associate(device, endpoint);
+        ClusterObjectT cluster(*device->GetExchangeManager(), device->GetSecureSession().Value(), endpoint);
         cluster.SetCommandTimeout(timeout);
 
         return cluster.InvokeCommand(request, this, successCb, failureCb);

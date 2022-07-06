@@ -57,10 +57,6 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         OnInternetConnectivityChange(event);
         break;
 
-    case DeviceEventType::kSessionEstablished:
-        OnSessionEstablished(event);
-        break;
-
     case DeviceEventType::kCHIPoBLEConnectionEstablished:
         log_info("CHIPoBLE connection established\r\n");
         break;
@@ -152,14 +148,6 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     }
 }
 
-void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
-{
-    if (event->SessionEstablished.IsCommissioner)
-    {
-        log_info("Commissioner detected!\r\n");
-    }
-}
-
 void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, log_info("Unhandled Attribute ID: '0x%04x\r\n", attributeId));
@@ -167,7 +155,7 @@ void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, 
 
     // At this point we can assume that value points to a bool value.
     mEndpointOnOffState[endpointId - 1] = *value;
-    statusLED1.Set(*value);
+    GetAppTask().LightStateUpdateEventHandler();
 
 exit:
     return;
@@ -182,7 +170,7 @@ void DeviceCallbacks::OnLevelControlAttributeChangeCallback(EndpointId endpointI
     VerifyOrExit(endpointId == 1 || endpointId == 2, log_error("Unexpected EndPoint ID: `0x%02x'\r\n", endpointId));
 
     // At this point we can assume that value points to a bool value.
-    statusLED1.SetBrightness(brightness);
+    GetAppTask().LightStateUpdateEventHandler();
 
 exit:
     return;

@@ -3026,4 +3026,372 @@ public final class ChipIdLookup {
     }
     return "";
   }
+
+  /**
+   * Translates cluster ID and event ID to an attribute name in upper camel case. If no matching IDs
+   * are found, returns an empty string.
+   */
+  public static String eventIdToName(long clusterId, long eventId) {
+    if (clusterId == 3L) {
+      return "";
+    }
+    if (clusterId == 4L) {
+      return "";
+    }
+    if (clusterId == 5L) {
+      return "";
+    }
+    if (clusterId == 6L) {
+      return "";
+    }
+    if (clusterId == 7L) {
+      return "";
+    }
+    if (clusterId == 8L) {
+      return "";
+    }
+    if (clusterId == 15L) {
+      return "";
+    }
+    if (clusterId == 29L) {
+      return "";
+    }
+    if (clusterId == 30L) {
+      return "";
+    }
+    if (clusterId == 31L) {
+      if (eventId == 0L) {
+        return "AccessControlEntryChanged";
+      }
+      if (eventId == 1L) {
+        return "AccessControlExtensionChanged";
+      }
+      return "";
+    }
+    if (clusterId == 37L) {
+      if (eventId == 0L) {
+        return "StateChanged";
+      }
+      if (eventId == 1L) {
+        return "ActionFailed";
+      }
+      return "";
+    }
+    if (clusterId == 40L) {
+      if (eventId == 0L) {
+        return "StartUp";
+      }
+      if (eventId == 1L) {
+        return "ShutDown";
+      }
+      if (eventId == 2L) {
+        return "Leave";
+      }
+      if (eventId == 3L) {
+        return "ReachableChanged";
+      }
+      return "";
+    }
+    if (clusterId == 41L) {
+      return "";
+    }
+    if (clusterId == 42L) {
+      if (eventId == 0L) {
+        return "StateTransition";
+      }
+      if (eventId == 1L) {
+        return "VersionApplied";
+      }
+      if (eventId == 2L) {
+        return "DownloadError";
+      }
+      return "";
+    }
+    if (clusterId == 43L) {
+      return "";
+    }
+    if (clusterId == 44L) {
+      return "";
+    }
+    if (clusterId == 45L) {
+      return "";
+    }
+    if (clusterId == 46L) {
+      return "";
+    }
+    if (clusterId == 47L) {
+      return "";
+    }
+    if (clusterId == 48L) {
+      return "";
+    }
+    if (clusterId == 49L) {
+      return "";
+    }
+    if (clusterId == 50L) {
+      return "";
+    }
+    if (clusterId == 51L) {
+      if (eventId == 0L) {
+        return "HardwareFaultChange";
+      }
+      if (eventId == 1L) {
+        return "RadioFaultChange";
+      }
+      if (eventId == 2L) {
+        return "NetworkFaultChange";
+      }
+      if (eventId == 3L) {
+        return "BootReason";
+      }
+      return "";
+    }
+    if (clusterId == 52L) {
+      if (eventId == 0L) {
+        return "SoftwareFault";
+      }
+      return "";
+    }
+    if (clusterId == 53L) {
+      if (eventId == 0L) {
+        return "ConnectionStatus";
+      }
+      return "";
+    }
+    if (clusterId == 54L) {
+      if (eventId == 0L) {
+        return "Disconnection";
+      }
+      if (eventId == 1L) {
+        return "AssociationFailure";
+      }
+      if (eventId == 2L) {
+        return "ConnectionStatus";
+      }
+      return "";
+    }
+    if (clusterId == 55L) {
+      return "";
+    }
+    if (clusterId == 57L) {
+      if (eventId == 0L) {
+        return "StartUp";
+      }
+      if (eventId == 1L) {
+        return "ShutDown";
+      }
+      if (eventId == 2L) {
+        return "Leave";
+      }
+      if (eventId == 3L) {
+        return "ReachableChanged";
+      }
+      return "";
+    }
+    if (clusterId == 59L) {
+      if (eventId == 0L) {
+        return "SwitchLatched";
+      }
+      if (eventId == 1L) {
+        return "InitialPress";
+      }
+      if (eventId == 2L) {
+        return "LongPress";
+      }
+      if (eventId == 3L) {
+        return "ShortRelease";
+      }
+      if (eventId == 4L) {
+        return "LongRelease";
+      }
+      if (eventId == 5L) {
+        return "MultiPressOngoing";
+      }
+      if (eventId == 6L) {
+        return "MultiPressComplete";
+      }
+      return "";
+    }
+    if (clusterId == 60L) {
+      return "";
+    }
+    if (clusterId == 62L) {
+      return "";
+    }
+    if (clusterId == 63L) {
+      return "";
+    }
+    if (clusterId == 64L) {
+      return "";
+    }
+    if (clusterId == 65L) {
+      return "";
+    }
+    if (clusterId == 69L) {
+      if (eventId == 0L) {
+        return "StateChange";
+      }
+      return "";
+    }
+    if (clusterId == 80L) {
+      return "";
+    }
+    if (clusterId == 257L) {
+      if (eventId == 0L) {
+        return "DoorLockAlarm";
+      }
+      if (eventId == 1L) {
+        return "DoorStateChange";
+      }
+      if (eventId == 2L) {
+        return "LockOperation";
+      }
+      if (eventId == 3L) {
+        return "LockOperationError";
+      }
+      if (eventId == 4L) {
+        return "LockUserChange";
+      }
+      return "";
+    }
+    if (clusterId == 258L) {
+      return "";
+    }
+    if (clusterId == 259L) {
+      return "";
+    }
+    if (clusterId == 512L) {
+      if (eventId == 0L) {
+        return "SupplyVoltageLow";
+      }
+      if (eventId == 1L) {
+        return "SupplyVoltageHigh";
+      }
+      if (eventId == 2L) {
+        return "PowerMissingPhase";
+      }
+      if (eventId == 3L) {
+        return "SystemPressureLow";
+      }
+      if (eventId == 4L) {
+        return "SystemPressureHigh";
+      }
+      if (eventId == 5L) {
+        return "DryRunning";
+      }
+      if (eventId == 6L) {
+        return "MotorTemperatureHigh";
+      }
+      if (eventId == 7L) {
+        return "PumpMotorFatalFailure";
+      }
+      if (eventId == 8L) {
+        return "ElectronicTemperatureHigh";
+      }
+      if (eventId == 9L) {
+        return "PumpBlocked";
+      }
+      if (eventId == 10L) {
+        return "SensorFailure";
+      }
+      if (eventId == 11L) {
+        return "ElectronicNonFatalFailure";
+      }
+      if (eventId == 12L) {
+        return "ElectronicFatalFailure";
+      }
+      if (eventId == 13L) {
+        return "GeneralFault";
+      }
+      if (eventId == 14L) {
+        return "Leakage";
+      }
+      if (eventId == 15L) {
+        return "AirDetection";
+      }
+      if (eventId == 16L) {
+        return "TurbineOperation";
+      }
+      return "";
+    }
+    if (clusterId == 513L) {
+      return "";
+    }
+    if (clusterId == 514L) {
+      return "";
+    }
+    if (clusterId == 516L) {
+      return "";
+    }
+    if (clusterId == 768L) {
+      return "";
+    }
+    if (clusterId == 1024L) {
+      return "";
+    }
+    if (clusterId == 1026L) {
+      return "";
+    }
+    if (clusterId == 1027L) {
+      return "";
+    }
+    if (clusterId == 1028L) {
+      return "";
+    }
+    if (clusterId == 1029L) {
+      return "";
+    }
+    if (clusterId == 1030L) {
+      return "";
+    }
+    if (clusterId == 1283L) {
+      return "";
+    }
+    if (clusterId == 1284L) {
+      return "";
+    }
+    if (clusterId == 1285L) {
+      return "";
+    }
+    if (clusterId == 1286L) {
+      return "";
+    }
+    if (clusterId == 1287L) {
+      return "";
+    }
+    if (clusterId == 1288L) {
+      return "";
+    }
+    if (clusterId == 1289L) {
+      return "";
+    }
+    if (clusterId == 1290L) {
+      return "";
+    }
+    if (clusterId == 1291L) {
+      return "";
+    }
+    if (clusterId == 1292L) {
+      return "";
+    }
+    if (clusterId == 1293L) {
+      return "";
+    }
+    if (clusterId == 1294L) {
+      return "";
+    }
+    if (clusterId == 2820L) {
+      return "";
+    }
+    if (clusterId == 4294048773L) {
+      if (eventId == 1L) {
+        return "TestEvent";
+      }
+      if (eventId == 2L) {
+        return "TestFabricScopedEvent";
+      }
+      return "";
+    }
+    return "";
+  }
 }

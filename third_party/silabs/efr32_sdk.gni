@@ -26,6 +26,8 @@ declare_args() {
   sdk_support_root = "${chip_root}/third_party/silabs/matter_support"
   enable_openthread_cli = true
   kvs_max_entries = 75
+
+  use_external_flash = true
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -103,6 +105,13 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/config",
       "${efr32_sdk_root}/platform/service/system/inc",
       "${efr32_sdk_root}/platform/service/udelay/inc",
+      "${efr32_sdk_root}/platform/service/legacy_hal/inc",
+      "${efr32_sdk_root}/platform/service/token_manager/config",
+      "${efr32_sdk_root}/platform/service/token_manager/inc",
+      "${efr32_sdk_root}/platform/service/token_manager/test",
+      "${efr32_sdk_root}/platform/service/token_manager/test/include",
+      "${efr32_sdk_root}/platform/service/token_manager/test/stack/config",
+      "${efr32_sdk_root}/platform/service/token_manager/test/stack/include",
       "${efr32_sdk_root}/platform/middleware/glib",
       "${efr32_sdk_root}/platform/middleware/glib/glib",
       "${efr32_sdk_root}/platform/middleware/glib/dmd",
@@ -153,6 +162,8 @@ template("efr32_sdk") {
       "MBEDTLS_THREADING_ALT=1",
       "SL_THREADING_ALT=1",
       "SL_COMPONENT_CATALOG_PRESENT",
+      "PLATFORM_HEADER=\"platform-header.h\"",
+      "USE_NVM3=1",
 
       #"__STACK_SIZE=0",
     ]
@@ -185,30 +196,20 @@ template("efr32_sdk") {
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
         chip_build_libshell || enable_openthread_cli ||
         (defined(invoker.show_qr_code) && invoker.show_qr_code) ||
-        (defined(invoker.disable_lcd) && !invoker.disable_lcd)) {
+        (defined(invoker.disable_lcd) && !invoker.disable_lcd) ||
+        (defined(invoker.use_external_flash) && use_external_flash)) {
       defines += [ "CONFIG_ENABLE_UART" ]
+
+      if (defined(invoker.use_external_flash) && use_external_flash) {
+        defines += [ "CONFIG_USE_EXTERNAL_FLASH" ]
+      }
 
       _include_dirs += [
         "${efr32_sdk_root}/platform/emdrv/uartdrv/inc",
         "${efr32_sdk_root}/platform/emdrv/uartdrv/config",
+        "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
+        "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_usart",
       ]
-
-      if (efr32_family == "efr32mg12") {
-        _include_dirs += [
-          "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
-          "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_usart",
-        ]
-      } else if (efr32_family == "efr32mg21") {
-        _include_dirs += [
-          "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
-          "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_usart",
-        ]
-      } else if (efr32_family == "efr32mg24") {
-        _include_dirs += [
-          "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
-          "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_usart",
-        ]
-      }
     }
 
     if (efr32_family == "efr32mg12") {
@@ -346,6 +347,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti/sl_rail_util_pti.c",
       "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_nvic.c",
       "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager.c",
+      "${efr32_sdk_root}/platform/service/legacy_hal/src/token_legacy.c",
       "${efr32_sdk_root}/platform/service/mpu/src/sl_mpu.c",
       "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager.c",
       "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager_debug.c",
@@ -357,6 +359,9 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/system/src/sl_system_init.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_kernel.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_process_action.c",
+      "${efr32_sdk_root}/platform/service/token_manager/src/sl_token_def.c",
+      "${efr32_sdk_root}/platform/service/token_manager/src/sl_token_manager.c",
+      "${efr32_sdk_root}/platform/service/token_manager/src/sl_token_manufacturing.c",
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay.c",
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay_armv6m_gcc.S",
       "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_mbedtls_context.c",
@@ -498,31 +503,17 @@ template("efr32_sdk") {
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
         chip_build_libshell || enable_openthread_cli ||
         (defined(invoker.show_qr_code) && invoker.show_qr_code) ||
-        (defined(invoker.disable_lcd) && !invoker.disable_lcd)) {
+        (defined(invoker.disable_lcd) && !invoker.disable_lcd) ||
+        (defined(invoker.use_external_flash) && use_external_flash)) {
       sources += [
+        "${efr32_sdk_root}/hardware/driver/memlcd/src/memlcd_usart/sl_memlcd_spi.c",
+        "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/src/sl_mx25_flash_shutdown_usart/sl_mx25_flash_shutdown.c",
         "${efr32_sdk_root}/platform/emdrv/uartdrv/src/uartdrv.c",
         "${efr32_sdk_root}/platform/emlib/src/em_eusart.c",
         "${efr32_sdk_root}/platform/emlib/src/em_leuart.c",
         "${efr32_sdk_root}/platform/emlib/src/em_usart.c",
         "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}/autogen/sl_uartdrv_init.c",
       ]
-
-      if (efr32_family == "efr32mg12") {
-        sources += [
-          "${efr32_sdk_root}/hardware/driver/memlcd/src/memlcd_usart/sl_memlcd_spi.c",
-          "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/src/sl_mx25_flash_shutdown_usart/sl_mx25_flash_shutdown.c",
-        ]
-      } else if (efr32_family == "efr32mg21") {
-        sources += [
-          "${efr32_sdk_root}/hardware/driver/memlcd/src/memlcd_usart/sl_memlcd_spi.c",
-          "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/src/sl_mx25_flash_shutdown_usart/sl_mx25_flash_shutdown.c",
-        ]
-      } else if (efr32_family == "efr32mg24") {
-        sources += [
-          "${efr32_sdk_root}/hardware/driver/memlcd/src/memlcd_usart/sl_memlcd_spi.c",
-          "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/src/sl_mx25_flash_shutdown_usart/sl_mx25_flash_shutdown.c",
-        ]
-      }
     }
 
     if ((defined(invoker.show_qr_code) && invoker.show_qr_code) ||
@@ -544,6 +535,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_string.c",
       ]
     }
+
     if (use_wf200) {
       sources += [
         "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/bus/sl_wfx_bus.c",

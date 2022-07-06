@@ -37,7 +37,9 @@ class ContentLauncherViewModel: ObservableObject {
                                               launchUrlResponseCallback:
                                                 { (result: Bool) -> () in
                         self.Log.info("ContentLauncherViewModel.launchUrl.launchUrlResponseCallback result \(result)")
-                        self.status = result ? "Launched URL successfully" : "Launch URL failure!"
+                        DispatchQueue.main.async {
+                            self.status = result ? "Launched URL successfully" : "Launch URL failure!"
+                        }
                     },
                                               clientQueue: DispatchQueue.main,
                                               launchUrlRequestSentHandler:

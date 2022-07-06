@@ -36,11 +36,10 @@ public:
     }
 
     // Shutdown all layers, finalize operations
-    CHIP_ERROR Shutdown()
+    void Shutdown()
     {
         GetLoopback().ShutdownLoopbackTransport();
-        ReturnErrorOnFailure(mIOContext.Shutdown());
-        return CHIP_NO_ERROR;
+        mIOContext.Shutdown();
     }
 
     System::Layer & GetSystemLayer() { return mIOContext.GetSystemLayer(); }

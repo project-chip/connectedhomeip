@@ -73,7 +73,6 @@ tests:
               type: list
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

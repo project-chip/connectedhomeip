@@ -107,15 +107,10 @@ CHIP_ERROR InitRandomStaticAddress()
     int error = 0;
     bt_addr_le_t addr;
 
-#if CONFIG_BT_HOST_CRYPTO
-    // When CONFIG_BT_HOST_CRYPTO is enabled, bt_addr_le_create_static() depends on HCI transport
-    // which is not yet started at this point, so use a different method for generating the address
+    // generating the address
     addr.type = BT_ADDR_LE_RANDOM;
     error     = sys_csrand_get(addr.a.val, sizeof(addr.a.val));
     BT_ADDR_SET_STATIC(&addr.a);
-#else
-    error = bt_addr_le_create_static(&addr);
-#endif
 
     if (error)
     {
@@ -324,14 +319,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
                 System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME),
                 HandleBLEAdvertisementIntervalChange, this);
         }
-
-        // Start timer to disable CHIPoBLE advertisement after timeout expiration only if it isn't advertising rerun (in that case
-        // timer is already running).
-        if (!isAdvertisingRerun)
-        {
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT),
-                                                  HandleBLEAdvertisementTimeout, this);
-        }
     }
 
     return CHIP_NO_ERROR;
@@ -357,9 +344,6 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
             advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
             ReturnErrorOnFailure(PlatformMgr().PostEvent(&advChange));
         }
-
-        // Cancel timer event disabling CHIPoBLE advertisement after timeout expiration
-        DeviceLayer::SystemLayer().CancelTimer(HandleBLEAdvertisementTimeout, this);
 
         // Cancel timer event changing CHIPoBLE advertisement interval
         DeviceLayer::SystemLayer().CancelTimer(HandleBLEAdvertisementIntervalChange, this);
@@ -605,12 +589,6 @@ exit:
 }
 #endif
 
-void BLEManagerImpl::HandleBLEAdvertisementTimeout(System::Layer * layer, void * param)
-{
-    BLEMgr().SetAdvertisingEnabled(false);
-    ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because of timeout expired");
-}
-
 void BLEManagerImpl::HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param)
 {
     BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
@@ -644,8 +622,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kServiceProvisioningChange:
-    case DeviceEventType::kAccountPairingChange:
-
         // If CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled, and there is a change to the
         // device's provisioning state, then automatically disable CHIPoBLE advertising if the device
         // is now fully provisioned.

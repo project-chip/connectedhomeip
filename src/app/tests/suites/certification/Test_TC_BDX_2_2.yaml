@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 28.2.2. [TC-BDX-2.2] Synchronous file receiving
+name: 30.2.2. [TC-BDX-2.2] Synchronous File Receiving
 
 config:
     nodeId: 0x12344321
@@ -22,9 +22,18 @@ config:
 
 tests:
     - label:
+          "TH sends a SendInit message to DUT + DUT sends a SendAccept message
+          back to TH + TH sends a Block message to DUT + DUT sends a BlockAck
+          message back to TH"
+      verification: |
+          Out of scope for V1.0
+      disabled: true
+
+    - label:
           "IF (PICS_DT_Receiver_Driver) TH sends a SendInit message to DUT + DUT
           sends a SendAccept message back to TH + DUT sends a BlockQuery message
           to TH + TH sends a Block message back to DUT"
+      PICS: MCORE.BDX.Driver
       verification: |
           1. Verify that the OTA Reference Provider App logs show BlockQuery message from DUT
 
@@ -36,6 +45,7 @@ tests:
     - label:
           "IF (PICS_DT_Receiver_Driver) DUT sends a BlockQuery message to TH +
           TH sends a Block message back to DUT"
+      PICS: MCORE.BDX.Driver
       verification: |
           1. Verify from the OTA Reference Provider App logs that the BlockQuery messages are sent in ascending and sequential block counter order.
 
@@ -46,6 +56,14 @@ tests:
           [1636410925977] [59203:62969337] CHIP: [ATM]   Block Counter: 2
 
           and so on
+      disabled: true
+
+    - label:
+          "IF (PICS_DT_Receiver_Driver) DUT sends a BlockQueryWithSkip message
+          to TH + TH sends a Block message back to DUT"
+      PICS: MCORE.BDX.BlockQueryWithSkip
+      verification: |
+          Out of scope for V1.0
       disabled: true
 
     - label:

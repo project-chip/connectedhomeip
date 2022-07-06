@@ -46,16 +46,14 @@ tests:
           constraints:
               type: map32
 
-    #Issue 10988
     - label: "Read the global attribute: AttributeList"
-      PICS:
-          PICS_SKIP_SAMPLE_APP && MC_MEDIAINPUT.S.A0000 && MC_MEDIAINPUT.S.A0001
+      PICS: MC_MEDIAINPUT.S.A0000 && MC_MEDIAINPUT.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [65528, 65529, 65531, 65532, 65533]
           constraints:
               type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"

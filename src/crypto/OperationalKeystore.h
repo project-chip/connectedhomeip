@@ -168,6 +168,32 @@ public:
      */
     virtual CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
                                          Crypto::P256ECDSASignature & outSignature) const = 0;
+
+    /**
+     * @brief Create an ephemeral keypair for use in session establishment.
+     *
+     * The caller must Initialize() the P256Keypair if needed. It is not done by this method.
+     *
+     * This method MUST ONLY be used for CASESession ephemeral keys.
+     *
+     * NOTE: The stack will allocate as many of these as there are CASE sessions which
+     *       can be concurrently in the process of establishment. Implementations must
+     *       support more than one such keypair, or be implemented to match the limitations
+     *       enforced by a given product on its concurrent CASE session establishment limits.
+     *
+     * WARNING: The return value MUST be released by `ReleaseEphemeralKeypair`. This is because
+     *          Matter CHIPMem.h does not properly support UniquePtr in a way that would
+     *          safely allow classes derived from Crypto::P256Keypair to be released properly.
+     *
+     * @return a pointer to a P256Keypair (or derived class thereof), which may evaluate to nullptr
+     *         if running out of memory.
+     */
+    virtual Crypto::P256Keypair * AllocateEphemeralKeypairForCASE() = 0;
+
+    /**
+     * @brief Release an ephemeral keypair previously provided by `AllocateEphemeralKeypairForCASE()`
+     */
+    virtual void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) = 0;
 };
 
 } // namespace Crypto

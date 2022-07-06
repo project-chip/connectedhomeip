@@ -18,11 +18,13 @@
 #pragma once
 #include "PairingCommandBridge.h"
 
-@interface CHIPToolPairingDelegate : NSObject <CHIPDevicePairingDelegate>
+#import <Matter/Matter.h>
+
+@interface CHIPToolPairingDelegate : NSObject <MTRDevicePairingDelegate>
 @property PairingCommandBridge * commandBridge;
 @property chip::NodeId deviceID;
-@property CHIPDeviceController * commissioner;
-@property CHIPCommissioningParameters * params;
+@property MTRDeviceController * commissioner;
+@property MTRCommissioningParameters * params;
 
 - (void)onPairingComplete:(NSError *)error;
 - (void)onPairingDeleted:(NSError *)error;

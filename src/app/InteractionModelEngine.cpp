@@ -28,6 +28,7 @@
 #include <cinttypes>
 
 #include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CodeUtils.h>
 
 extern bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
@@ -231,7 +232,7 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(SubscriptionId aSubscrip
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
+void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
 {
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
@@ -241,8 +242,6 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricInde
             readClient->Close(CHIP_NO_ERROR);
         }
     }
-
-    return CHIP_NO_ERROR;
 }
 
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
@@ -1372,19 +1371,14 @@ bool InteractionModelEngine::HasActiveRead()
     }) == Loop::Break));
 }
 
-uint16_t InteractionModelEngine::GetMinSubscriptionsPerFabric() const
+uint16_t InteractionModelEngine::GetMinGuaranteedSubscriptionsPerFabric() const
 {
-    uint8_t fabricCount                  = mpFabricTable->FabricCount();
-    const size_t readHandlerPoolCapacity = GetReadHandlerPoolCapacityForSubscriptions();
-
-    if (fabricCount == 0)
-    {
-        return kMinSupportedSubscriptionsPerFabric;
-    }
-
-    size_t perFabricSubscriptionCapacity = readHandlerPoolCapacity / fabricCount;
-
-    return static_cast<uint16_t>(perFabricSubscriptionCapacity);
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    return UINT16_MAX;
+#else
+    return static_cast<uint16_t>(
+        min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(), static_cast<size_t>(UINT16_MAX)));
+#endif
 }
 
 size_t InteractionModelEngine::GetNumDirtySubscriptions() const

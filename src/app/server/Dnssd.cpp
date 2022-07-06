@@ -80,6 +80,13 @@ void DnssdServer::SetExtendedDiscoveryTimeoutSecs(int32_t secs)
 {
     ChipLogDetail(Discovery, "Setting extended discovery timeout to %" PRId32 "s", secs);
     mExtendedDiscoveryTimeoutSecs = MakeOptional(secs);
+
+    if (mExtendedDiscoveryExpiration != kTimeoutCleared &&
+        mExtendedDiscoveryExpiration > mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds32(secs))
+    {
+        // Reset our timer to the new (shorter) timeout.
+        ScheduleExtendedDiscoveryExpiration();
+    }
 }
 
 int32_t DnssdServer::GetExtendedDiscoveryTimeoutSecs()
@@ -95,119 +102,15 @@ void HandleExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aApp
 
 void DnssdServer::OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
 {
-    if (!DnssdServer::OnExpiration(mExtendedDiscoveryExpiration))
-    {
-        ChipLogDetail(Discovery, "Extended discovery timeout cancelled");
-        return;
-    }
-
     ChipLogDetail(Discovery, "Extended discovery timed out");
 
     mExtendedDiscoveryExpiration = kTimeoutCleared;
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
-/// Callback from Discovery Expiration timer
-void HandleDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
-{
-    DnssdServer::Instance().OnDiscoveryExpiration(aSystemLayer, aAppState);
+    // Reset our advertising, now that we have flagged ourselves as possibly not
+    // needing extended discovery anymore.
+    StartServer();
 }
 
-bool DnssdServer::OnExpiration(System::Clock::Timestamp expirationMs)
-{
-    if (expirationMs == kTimeoutCleared)
-    {
-        ChipLogDetail(Discovery, "OnExpiration callback for cleared session");
-        return false;
-    }
-    System::Clock::Timestamp now = mTimeSource.GetMonotonicTimestamp();
-    if (expirationMs > now)
-    {
-        ChipLogDetail(Discovery, "OnExpiration callback for reset session");
-        return false;
-    }
-
-    ChipLogDetail(Discovery, "OnExpiration - valid time out");
-
-    CHIP_ERROR err = Dnssd::ServiceAdvertiser::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to initialize advertiser: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
-    // reset advertising
-    err = Dnssd::ServiceAdvertiser::Instance().RemoveServices();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to remove advertised services: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
-    // restart operational (if needed)
-    err = AdvertiseOperational();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to advertise operational node: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-    err = AdvertiseCommissioner();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to advertise commissioner: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-
-    err = Dnssd::ServiceAdvertiser::Instance().FinalizeServiceUpdate();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to finalize service update: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
-    return true;
-}
-
-void DnssdServer::OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
-{
-    if (!DnssdServer::OnExpiration(mDiscoveryExpiration))
-    {
-        ChipLogDetail(Discovery, "OnDiscoveryExpiration callback for cleared session");
-        return;
-    }
-
-    ChipLogDetail(Discovery, "OnDiscoveryExpiration callback for valid session");
-
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    int32_t extTimeout = GetExtendedDiscoveryTimeoutSecs();
-    if (extTimeout != CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED)
-    {
-        CHIP_ERROR err = AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode::kDisabled);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Failed to advertise extended commissionable node: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        // set timeout
-        ScheduleExtendedDiscoveryExpiration();
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-
-    mDiscoveryExpiration = kTimeoutCleared;
-}
-
-CHIP_ERROR DnssdServer::ScheduleDiscoveryExpiration()
-{
-    if (mDiscoveryTimeoutSecs == CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT)
-    {
-        return CHIP_NO_ERROR;
-    }
-    ChipLogDetail(Discovery, "Scheduling discovery timeout in %ds", mDiscoveryTimeoutSecs);
-
-    mDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds16(mDiscoveryTimeoutSecs);
-
-    return DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(mDiscoveryTimeoutSecs), HandleDiscoveryExpiration,
-                                                 nullptr);
-}
-
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 CHIP_ERROR DnssdServer::ScheduleExtendedDiscoveryExpiration()
 {
     int32_t extendedDiscoveryTimeoutSecs = GetExtendedDiscoveryTimeoutSecs();
@@ -409,6 +312,16 @@ CHIP_ERROR DnssdServer::AdvertiseCommissioner()
 
 CHIP_ERROR DnssdServer::AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode mode)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    mCurrentCommissioningMode = mode;
+    if (mode != Dnssd::CommissioningMode::kDisabled)
+    {
+        // We're not doing extended discovery right now.
+        DeviceLayer::SystemLayer().CancelTimer(HandleExtendedDiscoveryExpiration, nullptr);
+        mExtendedDiscoveryExpiration = kTimeoutCleared;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+
     return Advertise(true /* commissionableNode */, mode);
 }
 
@@ -425,8 +338,6 @@ void DnssdServer::StartServer()
 void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
 {
     ChipLogProgress(Discovery, "Updating services using commissioning mode %d", static_cast<int>(mode));
-
-    ClearTimeouts();
 
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, 0);
 
@@ -448,31 +359,38 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
         ChipLogError(Discovery, "Failed to advertise operational node: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    if (mode != chip::Dnssd::CommissioningMode::kDisabled)
+    if (mode != Dnssd::CommissioningMode::kDisabled)
     {
         err = AdvertiseCommissionableNode(mode);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Failed to advertise commissionable node: %" CHIP_ERROR_FORMAT, err.Format());
         }
-
-        // If any fabrics exist, the commissioning window must have been opened by the administrator
-        // commissioning cluster commands which take care of the timeout.
-        if (!HaveOperationalCredentials())
-        {
-            ScheduleDiscoveryExpiration();
-        }
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     else if (GetExtendedDiscoveryTimeoutSecs() != CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED)
     {
-        err = AdvertiseCommissionableNode(mode);
-        if (err != CHIP_NO_ERROR)
+        bool alwaysAdvertiseExtended = (GetExtendedDiscoveryTimeoutSecs() == CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT);
+        // We do extended discovery advertising in three cases:
+        // 1) We don't have a timeout for extended discovery.
+        // 2) We are transitioning out of commissioning mode (basic or enhanced)
+        //    and should therefore start extended discovery.
+        // 3) We are resetting advertising while we are in the middle of an
+        //    existing extended discovery advertising period.
+        if (alwaysAdvertiseExtended || mCurrentCommissioningMode != Dnssd::CommissioningMode::kDisabled ||
+            mExtendedDiscoveryExpiration != kTimeoutCleared)
         {
-            ChipLogError(Discovery, "Failed to advertise extended commissionable node: %" CHIP_ERROR_FORMAT, err.Format());
+            err = AdvertiseCommissionableNode(mode);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Discovery, "Failed to advertise extended commissionable node: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+            if (mExtendedDiscoveryExpiration == kTimeoutCleared)
+            {
+                // set timeout
+                ScheduleExtendedDiscoveryExpiration();
+            }
         }
-        // set timeout
-        ScheduleExtendedDiscoveryExpiration();
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 

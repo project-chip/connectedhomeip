@@ -213,6 +213,11 @@ efr32_executable("light_switch_app") {
     }
   }
 
+  # Attestation Credentials
+  if (chip_build_platform_attestation_credentials_provider) {
+    deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
+  }
+
   if (chip_enable_ota_requestor) {
     defines += [ "EFR32_OTA_ENABLED" ]
     sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]

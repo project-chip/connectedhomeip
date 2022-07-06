@@ -32,18 +32,21 @@ tests:
           "Precondition: Media content in a paused state at the beginning of the
           content"
       command: "Pause"
+      PICS: MC_MEDIAPLAYBACK.S.C0001
       response:
           values:
               - name: "status"
                 value: 0
 
     - label: "Reads the CurrentState attribute from the DUT"
+      PICS: MC_MEDIAPLAYBACK.S.A0000
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
     - label: "Sends a Play command to the DUT"
+      PICS: MC_MEDIAPLAYBACK.S.C0000
       command: "Play"
       response:
           values:
@@ -62,12 +65,14 @@ tests:
                 value: "y"
 
     - label: "Reads the CurrentState attribute"
+      PICS: MC_MEDIAPLAYBACK.S.A0000
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 0
 
     - label: "Sends a StartOver command to the DUT"
+      PICS: MC_MEDIAPLAYBACK.S.C0003
       command: "StartOver"
       response:
           values:
@@ -86,6 +91,7 @@ tests:
                 value: "y"
 
     - label: "Sends a Next command to the DUT"
+      PICS: MC_MEDIAPLAYBACK.S.C0005
       command: "Next"
       response:
           values:
@@ -105,6 +111,7 @@ tests:
                 value: "y"
 
     - label: "Sends a Previous command to the DUT"
+      PICS: MC_MEDIAPLAYBACK.S.C0004
       command: "Previous"
       response:
           values:
@@ -125,6 +132,7 @@ tests:
                 value: "y"
 
     - label: "Sends a SkipForward command to the DUT "
+      PICS: MC_MEDIAPLAYBACK.S.C0008
       command: "SkipForward"
       arguments:
           values:
@@ -148,12 +156,14 @@ tests:
                 value: "y"
 
     - label: "Reads the SampledPosition attribute from the DUT"
+      PICS: MC_MEDIAPLAYBACK.S.A0003
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
           value: 10000
 
     - label: "Sends a SkipBackward command to the DUT "
+      PICS: MC_MEDIAPLAYBACK.S.C0009
       command: "SkipBackward"
       arguments:
           values:
@@ -177,6 +187,7 @@ tests:
                 value: "y"
 
     - label: "Reads the SampledPosition attribute from the DUT"
+      PICS: MC_MEDIAPLAYBACK.S.A0003
       command: "readAttribute"
       attribute: "SampledPosition"
       response:

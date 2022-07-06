@@ -28,13 +28,20 @@ tests:
 
     - label: "Scan for DNS-SD advertising"
       verification: |
-          avahi-browse -rt _matter._tcp
-          +   eth0 IPv6 C6C15E13BDC03C7B-0000000000000001             _matter._tcp         local
-          =   eth0 IPv6 C6C15E13BDC03C7B-0000000000000001             _matter._tcp         local
-             hostname = [E45F010EBE440000.local]
-             address = [fe80::e65f:1ff:fe0e:be44]
+          ubuntu@ubuntu:~$ avahi-browse _matter._tcp -r
+
+          + veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+          +   eth0 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+          = veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::28e0:95ff:fed9:3085]
              port = [5540]
-             txt = ["T=1" "CRA=300" "CRI=5000"]
+             txt = ["T=1" "SAI=300" "SII=5000"]
+          =   eth0 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::e65f:1ff:fe49:ae29]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
       disabled: true
 
     - label: "DUT is instructed to advertise its service"
@@ -44,31 +51,42 @@ tests:
 
     - label: "Scan for DNS-SD advertising"
       verification: |
-          avahi-browse -rt _matter._tcp
-          +   eth0 IPv6 C6C15E13BDC03C7B-0000000000000001             _matter._tcp         local
-          =   eth0 IPv6 C6C15E13BDC03C7B-0000000000000001             _matter._tcp         local
-             hostname = [E45F010EBE440000.local]
-             address = [fe80::e65f:1ff:fe0e:be44]
+          avahi-browse _matter._tcp -r
+          + veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+          +   eth0 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+          = veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::28e0:95ff:fed9:3085]
              port = [5540]
-             txt = ["T=1" "CRA=300" "CRI=5000"]
+             txt = ["T=1" "SAI=300" "SII=5000"]
+          =   eth0 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::e65f:1ff:fe49:ae29]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
       disabled: true
 
-    - label: "DUT is instructed to query the TH for its servicesm"
-      verification: |
-
-      disabled: true
-
-    - label: "DUT is instructed to query the TH for its services again"
+    - label: "DUT is instructed to query the TH for its services"
       verification: |
 
       disabled: true
 
     - label: "Change its IP address by any means"
       verification: |
-
+          change the IP address
+          1.we have to take two routers
+          2.execute the above steps using the 1st router
+          3.switch the connection to 2nd router and execute the below steps and check the ipaddress of the routers.
       disabled: true
 
     - label: "DUT is instructed to query the TH for its services"
       verification: |
+          ubuntu@ubuntu:~$ avahi-browse _matter._tcp -r
 
+          + veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+          = veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::28e0:95ff:fed9:3085]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
       disabled: true

@@ -4,4 +4,7 @@
    <FileRef
       location = "group:TvCasting/TvCasting.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:MatterTvCastingBridge/MatterTvCastingBridge.xcodeproj">
+   </FileRef>
 </Workspace>

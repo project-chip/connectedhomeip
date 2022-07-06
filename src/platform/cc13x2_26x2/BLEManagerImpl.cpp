@@ -873,10 +873,6 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
 
     case BLEManagerIMPL_CHIPOBLE_TX_IND_EVT: {
         uint8_t dataLen = ((CHIPoBLEIndEvt_t *) (pMsg->pData))->len;
-        uint16_t i      = 0;
-        void * connHandle;
-        ConnRec_t * activeConnObj = NULL;
-        ChipDeviceEvent event;
 
         CHIPoBLEProfile_SetParameter(CHIPOBLEPROFILE_TX_CHAR, dataLen, (void *) (((CHIPoBLEIndEvt_t *) (pMsg->pData))->pData),
                                      BLEManagerImpl::sSelfEntity);
@@ -884,21 +880,6 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
         BLEMGR_LOG("BLEMGR: BLE Process Application Message: BLEManagerIMPL_CHIPOBLE_TX_IND_EVT: Length: %d", dataLen);
 
         ICall_free((void *) (((CHIPoBLEIndEvt_t *) (pMsg->pData))->pData));
-
-        // Find active connection
-        for (i = 0; i < MAX_NUM_BLE_CONNS; i++)
-        {
-            if (sInstance.connList[i].connHandle != 0xffff)
-            {
-                activeConnObj = &sInstance.connList[i];
-            }
-        }
-
-        connHandle = (void *) &activeConnObj->connHandle;
-
-        event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
-        event.CHIPoBLEIndicateConfirm.ConId = connHandle;
-        PlatformMgr().PostEventOrDie(&event);
 
         dealloc = TRUE;
     }
@@ -967,7 +948,7 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
             CHIPoBLEProfile_GetParameter(CHIPOBLEPROFILE_CCCWrite, &cccValue, 1);
 
             // Check whether it is a sub/unsub event. 0x1 = Notifications enabled, 0x2 = Indications enabled
-            if (cccValue & 1)
+            if (cccValue & 0x2)
             {
                 // Post event to CHIP
                 BLEMGR_LOG("BLEMGR: BLE Process Application Message: CHIPOBLE_CHAR_CHANGE_EVT, Subscrbe");

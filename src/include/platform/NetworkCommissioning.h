@@ -154,7 +154,7 @@ public:
     /**
      * @brief Shuts down the driver, this function will be called when shutting down the network commissioning cluster.
      */
-    virtual CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
+    virtual void Shutdown() {}
 
     /**
      * @brief Returns maximum number of network configs can be added to the driver.

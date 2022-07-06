@@ -36,7 +36,9 @@ class CommissioningViewModel: ObservableObject {
                 { (result: Bool) -> () in
                     // commissioning complete handler code
                     self.Log.info("Commissioning status: \(result)")
-                    self.commisisoningComplete = result
+                    DispatchQueue.main.async {
+                        self.commisisoningComplete = result
+                    }
                 },
                 clientQueue: DispatchQueue.main,
                 commissioningWindowRequestedHandler: { (result: Bool) -> () in
