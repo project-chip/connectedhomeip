@@ -18,8 +18,7 @@
 
 #include "InteractiveCommands.h"
 
-#include <readline/history.h>
-#include <readline/readline.h>
+#include <editline.h>
 
 char kInteractiveModeName[]                            = "";
 constexpr const char * kInteractiveModePrompt          = ">>> ";

@@ -19,6 +19,10 @@ import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/examples/chip-tool/chip-tool.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
+if (config_use_interactive_mode) {
+  import("//build_overrides/editline.gni")
+}
+
 assert(chip_build_tools)
 
 config("config") {
@@ -35,10 +39,6 @@ config("config") {
   ]
 
   cflags = [ "-Wconversion" ]
-
-  if (config_use_interactive_mode) {
-    libs = [ "readline" ]
-  }
 }
 
 static_library("chip-tool-utils") {
@@ -71,8 +71,11 @@ static_library("chip-tool-utils") {
     "config/PersistentStorage.cpp",
   ]
 
+  deps = []
+
   if (config_use_interactive_mode) {
     sources += [ "commands/interactive/InteractiveCommands.cpp" ]
+    deps += [ "${editline_root}:editline" ]
   }
 
   if (config_enable_yaml_tests) {

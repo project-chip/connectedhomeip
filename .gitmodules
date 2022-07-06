@@ -250,3 +250,6 @@
 	url = https://github.com/bouffalolab/bl_iot_sdk_matter.git
 	branch = bl602_release
 	platforms = bl602
+[submodule "editline"]
+	path = third_party/editline/repo
+	url = https://github.com/troglobit/editline.git
