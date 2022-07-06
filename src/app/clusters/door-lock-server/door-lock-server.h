@@ -119,15 +119,25 @@ public:
 
     bool HasFeature(chip::EndpointId endpointId, DoorLockFeature feature);
 
-    inline bool SupportsPIN(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kPINCredentials); }
+    inline bool SupportsPIN(chip::EndpointId endpointId) {
+        return HasFeature(endpointId, DoorLockFeature::kPINCredentials);
+    }
 
-    inline bool SupportsRFID(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kRFIDCredentials); }
+    inline bool SupportsRFID(chip::EndpointId endpointId) {
+        return HasFeature(endpointId, DoorLockFeature::kRFIDCredentials);
+    }
 
-    inline bool SupportsFingers(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kFingerCredentials); }
+    inline bool SupportsFingers(chip::EndpointId endpointId) {
+        return HasFeature(endpointId, DoorLockFeature::kFingerCredentials);
+    }
 
-    inline bool SupportsFace(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kFaceCredentials); }
+    inline bool SupportsFace(chip::EndpointId endpointId) {
+        return HasFeature(endpointId, DoorLockFeature::kFaceCredentials);
+    }
 
-    inline bool SupportsSchedules(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kAccessSchedules); }
+    inline bool SupportsSchedules(chip::EndpointId endpointId) {
+        return HasFeature(endpointId, DoorLockFeature::kAccessSchedules);
+    }
 
     inline bool SupportsCredentialsOTA(chip::EndpointId endpointId)
     {
@@ -194,7 +204,7 @@ private:
                                         const DlCredential & credential, const chip::ByteSpan & credentialData,
                                         uint16_t & createdUserIndex);
     DlStatus createNewCredentialAndAddItToUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
-                                               const DlCredential & credential, const chip::ByteSpan & credentialData);
+            const DlCredential & credential, const chip::ByteSpan & credentialData);
 
     DlStatus addCredentialToUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
                                  const DlCredential & credential);
@@ -595,7 +605,7 @@ struct EmberAfPluginDoorLockHolidaySchedule
  * @retval DlStatus::kFailure in case of any other failure
  */
 DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-                                          EmberAfPluginDoorLockWeekDaySchedule & schedule);
+        EmberAfPluginDoorLockWeekDaySchedule & schedule);
 /**
  * @brief This callback is called when Door Lock cluster needs to access the Year Day schedule in the schedules database.
  *
@@ -611,7 +621,7 @@ DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t w
  * @retval DlStatus::kFailure in case of any other failure
  */
 DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
-                                          EmberAfPluginDoorLockYearDaySchedule & schedule);
+        EmberAfPluginDoorLockYearDaySchedule & schedule);
 
 /**
  * @brief This callback is called when Door Lock cluster needs to access the Holiday schedule in the schedules database.
@@ -626,7 +636,7 @@ DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t y
  * @retval DlStatus::kFailure in case of any other failure
  */
 DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex,
-                                          EmberAfPluginDoorLockHolidaySchedule & schedule);
+        EmberAfPluginDoorLockHolidaySchedule & schedule);
 
 /**
  * @brief This callback is called when Door Lock cluster needs to create, modify or clear the week day schedule in schedules
@@ -651,8 +661,8 @@ DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t h
  * @retval DlStatus::kFailure in case of any other failure
  */
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-                                          DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
-                                          uint8_t endHour, uint8_t endMinute);
+        DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
+        uint8_t endHour, uint8_t endMinute);
 /**
  * @brief This callback is called when Door Lock cluster needs to create, modify or clear the year day schedule in schedules
  * database.
@@ -675,7 +685,7 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t w
  * @retval DlStatus::kFailure in case of any other failure
  */
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
-                                          DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime);
+        DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime);
 
 /**
  * @brief This callback is called when Door Lock cluster needs to create, modify or clear the holiday schedule in schedules
@@ -698,7 +708,7 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t y
  * @retval DlStatus::kFailure in case of any other failure
  */
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
-                                          uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode);
+        uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode);
 
 // =============================================================================
 // Pre-change callbacks for cluster attributes
@@ -713,7 +723,7 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t h
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
 chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnLanguageChange(chip::EndpointId EndpointId,
-                                                                                chip::CharSpan newLanguage);
+        chip::CharSpan newLanguage);
 
 /** @brief 'AutoRelockTime' attribute pre-change callback
  *
@@ -724,7 +734,7 @@ chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnLanguageChange(
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
 chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnAutoRelockTimeChange(chip::EndpointId EndpointId,
-                                                                                      uint32_t newTime);
+        uint32_t newTime);
 
 /** @brief 'SoundVolume' attribute pre-change callback
  *
@@ -755,7 +765,7 @@ chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnOperatingModeCh
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
 chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnEnableOneTouchLockingChange(chip::EndpointId EndpointId,
-                                                                                             bool enable);
+        bool enable);
 
 /** @brief 'EnablePrivacyModeButton' attribute pre-change callback
  *
@@ -766,7 +776,7 @@ chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnEnableOneTouchL
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
 chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnEnablePrivacyModeButtonChange(chip::EndpointId EndpointId,
-                                                                                               bool enable);
+        bool enable);
 
 /** @brief 'WrongCodeEntryLimit' attribute pre-change callback
  *
@@ -777,7 +787,7 @@ chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnEnablePrivacyMo
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
 chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnWrongCodeEntryLimitChange(chip::EndpointId EndpointId,
-                                                                                           uint8_t newLimit);
+        uint8_t newLimit);
 
 /** @brief 'UserCodeTemporaryDisableTime' attribute pre-change callback
  *
@@ -788,7 +798,7 @@ chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnWrongCodeEntryL
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
 chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUserCodeTemporaryDisableTimeChange(chip::EndpointId EndpointId,
-                                                                                                    uint8_t newTime);
+        uint8_t newTime);
 
 /** @note This callback is called for any cluster attribute that has no predefined callback above
  *
@@ -805,7 +815,7 @@ chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUserCodeTempora
  */
 chip::Protocols::InteractionModel::Status
 emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, const chip::app::ConcreteAttributePath & attributePath,
-                                                EmberAfAttributeType attrType, uint16_t attrSize, uint8_t * attrValue);
+        EmberAfAttributeType attrType, uint16_t attrSize, uint8_t * attrValue);
 
 // =============================================================================
 // Plugin callbacks that are called by cluster server and should be implemented
@@ -823,7 +833,7 @@ emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, con
  * @retval false if error happenned (err should be set to appropriate error code)
  */
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
-                                            DlOperationError & err);
+        DlOperationError & err);
 
 /**
  * @brief User handler for UnlockDoor command (server)
@@ -836,7 +846,7 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const O
  * @retval false if error happenned (err should be set to appropriate error code)
  */
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
-                                              DlOperationError & err);
+        DlOperationError & err);
 
 /**
  * @brief This callback is called when Door Lock cluster needs to access the users database.
