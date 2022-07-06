@@ -254,8 +254,7 @@ def do_tests(
     "-a",
     default="",
     type=str,
-    help=
-    "Skip commissionee discovery, commission the device with the IP directly.",
+    help="Skip commissionee discovery, commission the device with the IP directly.",
 )
 @click.option(
     "--timeout",
@@ -279,16 +278,14 @@ def do_tests(
     default=["all"],
     type=str,
     multiple=True,
-    help=
-    "The tests to be executed. By default, all tests will be executed, use this option to run a specific set of tests. Use --print-test-list for a list of appliable tests.",
+    help="The tests to be executed. By default, all tests will be executed, use this option to run a specific set of tests. Use --print-test-list for a list of appliable tests.",
 )
 @click.option(
     "--disable-test",
     default=[],
     type=str,
     multiple=True,
-    help=
-    "The tests to be excluded from the set of enabled tests. Use --print-test-list for a list of appliable tests.",
+    help="The tests to be excluded from the set of enabled tests. Use --print-test-list for a list of appliable tests.",
 )
 @click.option(
     "--log-level",
@@ -303,8 +300,7 @@ def do_tests(
 @click.option(
     "--print-test-list",
     is_flag=True,
-    help=
-    "Print a list of test cases and test sets that can be toggled via --enable-test and --disable-test, then exit",
+    help="Print a list of test cases and test sets that can be toggled via --enable-test and --disable-test, then exit",
 )
 @click.option(
     "--paa-trust-store-path",
