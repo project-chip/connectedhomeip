@@ -26,8 +26,8 @@
 class ConstraintsChecker
 {
 public:
-    ConstraintsChecker(){};
-    virtual ~ConstraintsChecker(){};
+    ConstraintsChecker() {};
+    virtual ~ConstraintsChecker() {};
 
 protected:
     virtual void Exit(std::string message, CHIP_ERROR err = CHIP_ERROR_INTERNAL) = 0;
