@@ -161,7 +161,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         return NO;
     }
 
-    dispatch_sync(_chipWorkQueue, ^ {
+    dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
             return;
         }
@@ -183,8 +183,8 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         }
 
         if (startupParams.operationalCertificate != nil && startupParams.operationalKeypair == nil
-                && (!startupParams.fabricIndex.HasValue()
-                    || !startupParams.keystore->HasOpKeypairForFabric(startupParams.fabricIndex.Value()))) {
+            && (!startupParams.fabricIndex.HasValue()
+                || !startupParams.keystore->HasOpKeypairForFabric(startupParams.fabricIndex.Value()))) {
             MTR_LOG_ERROR("Have no operational keypair for our operational certificate");
             return;
         }
@@ -201,7 +201,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
             signingKeypair = &_signingKeypairBridge;
         }
         errorCode = _operationalCredentialsDelegate->Init(_factory.storageDelegateBridge, signingKeypair, startupParams.ipk,
-                    startupParams.rootCertificate, startupParams.intermediateCertificate);
+            startupParams.rootCertificate, startupParams.intermediateCertificate);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
             return;
         }
@@ -241,7 +241,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
             if (commissionerParams.operationalKeypair != nullptr) {
                 errorCode = _operationalCredentialsDelegate->GenerateNOC([startupParams.nodeId unsignedLongLongValue],
-                            startupParams.fabricId, chip::kUndefinedCATs, commissionerParams.operationalKeypair->Pubkey(), noc);
+                    startupParams.fabricId, chip::kUndefinedCATs, commissionerParams.operationalKeypair->Pubkey(), noc);
 
                 if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorGenerateNOC]) {
                     return;
@@ -262,7 +262,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
                 }
 
                 errorCode = _operationalCredentialsDelegate->GenerateNOC(
-                                [startupParams.nodeId unsignedLongLongValue], startupParams.fabricId, chip::kUndefinedCATs, pubKey, noc);
+                    [startupParams.nodeId unsignedLongLongValue], startupParams.fabricId, chip::kUndefinedCATs, pubKey, noc);
 
                 if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorGenerateNOC]) {
                     return;
@@ -290,7 +290,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         }
 
         errorCode = chip::Credentials::SetSingleIpkEpochKey(
-                        _factory.groupData, fabricIdx, _operationalCredentialsDelegate->GetIPK(), compressedId);
+            _factory.groupData, fabricIdx, _operationalCredentialsDelegate->GetIPK(), compressedId);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorIPKInit]) {
             return;
         }
@@ -312,7 +312,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         return nil;
     }
     __block NSNumber * nodeID;
-    dispatch_sync(_chipWorkQueue, ^ {
+    dispatch_sync(_chipWorkQueue, ^{
         if (![self isRunning]) {
             MTR_LOG_ERROR("A controller has no node id if it has not been started");
             nodeID = nil;
@@ -324,9 +324,9 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID
-    discriminator:(uint16_t)discriminator
-    setupPINCode:(uint32_t)setupPINCode
-    error:(NSError * __autoreleasing *)error
+     discriminator:(uint16_t)discriminator
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     __block BOOL success = NO;
@@ -334,7 +334,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
         return success;
     }
-    dispatch_sync(_chipWorkQueue, ^ {
+    dispatch_sync(_chipWorkQueue, ^{
         std::string manualPairingCode;
         chip::SetupPayload payload;
         payload.discriminator = discriminator;
@@ -356,10 +356,10 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID
-    address:(NSString *)address
-    port:(uint16_t)port
-    setupPINCode:(uint32_t)setupPINCode
-    error:(NSError * __autoreleasing *)error
+           address:(NSString *)address
+              port:(uint16_t)port
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     __block BOOL success = NO;
@@ -367,7 +367,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
         return success;
     }
-    dispatch_sync(_chipWorkQueue, ^ {
+    dispatch_sync(_chipWorkQueue, ^{
         chip::Inet::IPAddress addr;
         chip::Inet::IPAddress::FromString([address UTF8String], addr);
         chip::Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(addr, port);
@@ -391,7 +391,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
         return success;
     }
-    dispatch_sync(_chipWorkQueue, ^ {
+    dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
             _operationalCredentialsDelegate->SetDeviceID(deviceID);
             errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, [onboardingPayload UTF8String]);
@@ -402,8 +402,8 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 }
 
 - (BOOL)commissionDevice:(uint64_t)deviceId
-    commissioningParams:(MTRCommissioningParameters *)commissioningParams
-    error:(NSError * __autoreleasing *)error
+     commissioningParams:(MTRCommissioningParameters *)commissioningParams
+                   error:(NSError * __autoreleasing *)error
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     __block BOOL success = NO;
@@ -411,7 +411,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
         return success;
     }
-    dispatch_sync(_chipWorkQueue, ^ {
+    dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
             chip::Controller::CommissioningParameters params;
             if (commissioningParams.CSRNonce) {
@@ -420,11 +420,11 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
             }
             if (commissioningParams.attestationNonce) {
                 params.SetAttestationNonce(chip::ByteSpan(
-                                               (uint8_t *) commissioningParams.attestationNonce.bytes, commissioningParams.attestationNonce.length));
+                    (uint8_t *) commissioningParams.attestationNonce.bytes, commissioningParams.attestationNonce.length));
             }
             if (commissioningParams.threadOperationalDataset) {
                 params.SetThreadOperationalDataset(chip::ByteSpan((uint8_t *) commissioningParams.threadOperationalDataset.bytes,
-                                                   commissioningParams.threadOperationalDataset.length));
+                    commissioningParams.threadOperationalDataset.length));
             }
             if (commissioningParams.wifiSSID && commissioningParams.wifiCredentials) {
                 chip::ByteSpan ssid((uint8_t *) commissioningParams.wifiSSID.bytes, commissioningParams.wifiSSID.length);
@@ -439,7 +439,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
                 chip::Optional<uint16_t> timeoutSecs;
                 if (commissioningParams.failSafeExpiryTimeoutSecs) {
                     timeoutSecs = chip::MakeOptional(
-                                      static_cast<uint16_t>([commissioningParams.failSafeExpiryTimeoutSecs unsignedIntValue]));
+                        static_cast<uint16_t>([commissioningParams.failSafeExpiryTimeoutSecs unsignedIntValue]));
                 }
                 _deviceAttestationDelegateBridge = new MTRDeviceAttestationDelegateBridge(
                     self, commissioningParams.deviceAttestationDelegate, _chipWorkQueue, timeoutSecs);
@@ -455,8 +455,8 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 }
 
 - (BOOL)continueCommissioningDevice:(void *)device
-    ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
-    error:(NSError * __autoreleasing *)error
+           ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
+                              error:(NSError * __autoreleasing *)error
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     __block BOOL success = NO;
@@ -464,15 +464,15 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
         return success;
     }
-    dispatch_sync(_chipWorkQueue, ^ {
+    dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
             auto lastAttestationResult = _deviceAttestationDelegateBridge
-            ? _deviceAttestationDelegateBridge->attestationVerificationResult()
-            : chip::Credentials::AttestationVerificationResult::kSuccess;
+                ? _deviceAttestationDelegateBridge->attestationVerificationResult()
+                : chip::Credentials::AttestationVerificationResult::kSuccess;
 
             chip::DeviceProxy * deviceProxy = static_cast<chip::DeviceProxy *>(device);
             errorCode = self.cppCommissioner->ContinueCommissioningAfterDeviceAttestationFailure(deviceProxy,
-                    ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
+                ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
@@ -487,7 +487,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
         return success;
     }
-    dispatch_sync(_chipWorkQueue, ^ {
+    dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
             _operationalCredentialsDelegate->ResetDeviceID();
             errorCode = self.cppCommissioner->StopPairing(deviceID);
@@ -523,13 +523,13 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     if (![self isRunning]) {
         NSError * error;
         [self checkForError:errorCode logMsg:kErrorNotRunning error:&error];
-        dispatch_async(queue, ^ {
+        dispatch_async(queue, ^{
             completionHandler(nil, error);
         });
         return NO;
     }
 
-    dispatch_async(_chipWorkQueue, ^ {
+    dispatch_async(_chipWorkQueue, ^{
         if ([self isRunning]) {
             MTRDeviceConnectionBridge * connectionBridge = new MTRDeviceConnectionBridge(completionHandler, queue);
             errorCode = connectionBridge->connect(self->_cppCommissioner, deviceID);
@@ -559,7 +559,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     }
 
     err = chip::Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(
-              self.cppCommissioner, deviceID, chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)));
+        self.cppCommissioner, deviceID, chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)));
 
     if (err != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
@@ -573,10 +573,10 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 }
 
 - (NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
-    duration:(NSUInteger)duration
-    discriminator:(NSUInteger)discriminator
-    setupPIN:(NSUInteger)setupPIN
-    error:(NSError * __autoreleasing *)error
+                              duration:(NSUInteger)duration
+                         discriminator:(NSUInteger)discriminator
+                              setupPIN:(NSUInteger)setupPIN
+                                 error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -600,9 +600,9 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
     chip::SetupPayload setupPayload;
     err = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self.cppCommissioner, deviceID,
-            chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), chip::Crypto::kSpake2p_Min_PBKDF_Iterations,
-            static_cast<uint16_t>(discriminator), chip::MakeOptional(static_cast<uint32_t>(setupPIN)), chip::NullOptional,
-            setupPayload);
+        chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), chip::Crypto::kSpake2p_Min_PBKDF_Iterations,
+        static_cast<uint16_t>(discriminator), chip::MakeOptional(static_cast<uint32_t>(setupPIN)), chip::NullOptional,
+        setupPayload);
 
     if (err != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
@@ -627,7 +627,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
 - (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue
 {
-    dispatch_async(_chipWorkQueue, ^ {
+    dispatch_async(_chipWorkQueue, ^{
         self->_pairingDelegateBridge->setDelegate(delegate, queue);
     });
 }
@@ -709,8 +709,8 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 }
 
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
-    fabricIndex:(chip::FabricIndex)fabricIndex
-    isRunning:(BOOL *)isRunning
+                    fabricIndex:(chip::FabricIndex)fabricIndex
+                      isRunning:(BOOL *)isRunning
 {
     if (![self isRunning]) {
         *isRunning = NO;
