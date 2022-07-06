@@ -114,12 +114,12 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
     UIToolbar * keyboardDoneButtonView = [[UIToolbar alloc] init];
     [keyboardDoneButtonView sizeToFit];
     UIBarButtonItem * doneButton = [[UIBarButtonItem alloc] initWithTitle:@"Done"
-                                                                    style:UIBarButtonItemStylePlain
-                                                                   target:self
-                                                                   action:@selector(pickerDoneClicked:)];
+                                                            style:UIBarButtonItemStylePlain
+                                                            target:self
+                                                            action:@selector(pickerDoneClicked:)];
     UIBarButtonItem * flexible = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                                                                               target:self
-                                                                               action:nil];
+                                                          target:self
+                                                          action:nil];
     [keyboardDoneButtonView setItems:[NSArray arrayWithObjects:flexible, doneButton, nil]];
     _numLightsTextField.inputAccessoryView = keyboardDoneButtonView;
 
@@ -164,7 +164,7 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
         [toggleButton addTarget:self action:@selector(toggleButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 
         UIStackView * stackViewButtons = [CHIPUIViewUtils stackViewWithLabel:labelLight
-                                                                     buttons:@[ onButton, offButton, toggleButton ]];
+                                                          buttons:@[ onButton, offButton, toggleButton ]];
         stackViewButtons.axis = UILayoutConstraintAxisHorizontal;
         stackViewButtons.distribution = UIStackViewDistributionEqualSpacing;
         stackViewButtons.alignment = UIStackViewAlignmentLeading;
@@ -237,21 +237,21 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [self updateResult:[NSString stringWithFormat:@"On command sent on endpoint %@", @(endpoint)]];
 
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
-                if (chipDevice) {
-                    MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
-                                                                                     endpoint:endpoint
-                                                                                        queue:dispatch_get_main_queue()];
-                    [onOff onWithCompletionHandler:^(NSError * error) {
-                        NSString * resultString = (error != nil)
-                            ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
-                            : @"On command success";
-                        [self updateResult:resultString];
-                    }];
-                } else {
-                    [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]];
-                }
-            })) {
+                        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
+                            if (chipDevice) {
+                                MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
+                                               endpoint:endpoint
+                                               queue:dispatch_get_main_queue()];
+                [onOff onWithCompletionHandler:^(NSError * error) {
+                          NSString * resultString = (error != nil)
+                                              ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
+                                              : @"On command success";
+                    [self updateResult:resultString];
+                }];
+            } else {
+                [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]];
+            }
+        })) {
             [self updateResult:[NSString stringWithFormat:@"Waiting for connection with the device"]];
         } else {
             [self updateResult:[NSString stringWithFormat:@"Failed to trigger the connection with the device"]];
@@ -266,21 +266,21 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [self updateResult:[NSString stringWithFormat:@"Off command sent on endpoint %@", @(endpoint)]];
 
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
-                if (chipDevice) {
-                    MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
-                                                                                     endpoint:endpoint
-                                                                                        queue:dispatch_get_main_queue()];
-                    [onOff offWithCompletionHandler:^(NSError * error) {
-                        NSString * resultString = (error != nil)
-                            ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
-                            : @"Off command success";
-                        [self updateResult:resultString];
-                    }];
-                } else {
-                    [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]];
-                }
-            })) {
+                        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
+                            if (chipDevice) {
+                                MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
+                                               endpoint:endpoint
+                                               queue:dispatch_get_main_queue()];
+                [onOff offWithCompletionHandler:^(NSError * error) {
+                          NSString * resultString = (error != nil)
+                                              ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
+                                              : @"Off command success";
+                    [self updateResult:resultString];
+                }];
+            } else {
+                [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]];
+            }
+        })) {
             [self updateResult:[NSString stringWithFormat:@"Waiting for connection with the device"]];
         } else {
             [self updateResult:[NSString stringWithFormat:@"Failed to trigger the connection with the device"]];
@@ -295,21 +295,21 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [self updateResult:[NSString stringWithFormat:@"Toggle command sent on endpoint %@", @(endpoint)]];
 
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
-                if (chipDevice) {
-                    MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
-                                                                                     endpoint:endpoint
-                                                                                        queue:dispatch_get_main_queue()];
-                    [onOff toggleWithCompletionHandler:^(NSError * error) {
-                        NSString * resultString = (error != nil)
-                            ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
-                            : @"Toggle command success";
-                        [self updateResult:resultString];
-                    }];
-                } else {
-                    [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]];
-                }
-            })) {
+                        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
+                            if (chipDevice) {
+                                MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
+                                               endpoint:endpoint
+                                               queue:dispatch_get_main_queue()];
+                [onOff toggleWithCompletionHandler:^(NSError * error) {
+                          NSString * resultString = (error != nil)
+                                              ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
+                                              : @"Toggle command success";
+                    [self updateResult:resultString];
+                }];
+            } else {
+                [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]];
+            }
+        })) {
             [self updateResult:[NSString stringWithFormat:@"Waiting for connection with the device"]];
         } else {
             [self updateResult:[NSString stringWithFormat:@"Failed to trigger the connection with the device"]];

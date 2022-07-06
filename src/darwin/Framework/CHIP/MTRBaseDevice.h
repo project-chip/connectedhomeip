@@ -127,24 +127,24 @@ extern NSString * const MTRArrayValueType;
  * automatically resubscribe this can end up being called more than once.
  */
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(uint16_t)minInterval
-                maxInterval:(uint16_t)maxInterval
-                     params:(nullable MTRSubscribeParams *)params
-             cacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
-     attributeReportHandler:(nullable void (^)(NSArray * value))attributeReportHandler
-         eventReportHandler:(nullable void (^)(NSArray * value))eventReportHandler
-               errorHandler:(void (^)(NSError * error))errorHandler
+    minInterval:(uint16_t)minInterval
+    maxInterval:(uint16_t)maxInterval
+    params:(nullable MTRSubscribeParams *)params
+    cacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
+    attributeReportHandler:(nullable void (^)(NSArray * value))attributeReportHandler
+    eventReportHandler:(nullable void (^)(NSArray * value))eventReportHandler
+    errorHandler:(void (^)(NSError * error))errorHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
 
 /**
  * Read attribute in a designated attribute path
  */
 - (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                          clusterId:(NSNumber * _Nullable)clusterId
-                        attributeId:(NSNumber * _Nullable)attributeId
-                             params:(MTRReadParams * _Nullable)params
-                        clientQueue:(dispatch_queue_t)clientQueue
-                         completion:(MTRDeviceResponseHandler)completion;
+    clusterId:(NSNumber * _Nullable)clusterId
+    attributeId:(NSNumber * _Nullable)attributeId
+    params:(MTRReadParams * _Nullable)params
+    clientQueue:(dispatch_queue_t)clientQueue
+    completion:(MTRDeviceResponseHandler)completion;
 
 /**
  * Write to attribute in a designated attribute path
@@ -160,12 +160,12 @@ extern NSString * const MTRArrayValueType;
  *                    readAttributeWithEndpointId:clusterId:attributeId:clientQueue:completion:.
  */
 - (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
-                           clusterId:(NSNumber *)clusterId
-                         attributeId:(NSNumber *)attributeId
-                               value:(id)value
-                   timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
-                         clientQueue:(dispatch_queue_t)clientQueue
-                          completion:(MTRDeviceResponseHandler)completion;
+    clusterId:(NSNumber *)clusterId
+    attributeId:(NSNumber *)attributeId
+    value:(id)value
+    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+    clientQueue:(dispatch_queue_t)clientQueue
+    completion:(MTRDeviceResponseHandler)completion;
 
 /**
  * Invoke a command with a designated command path
@@ -180,25 +180,25 @@ extern NSString * const MTRArrayValueType;
  * @param completion  response handler will receive either values or error.
  */
 - (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
-                          clusterId:(NSNumber *)clusterId
-                          commandId:(NSNumber *)commandId
-                      commandFields:(id)commandFields
-                 timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
-                        clientQueue:(dispatch_queue_t)clientQueue
-                         completion:(MTRDeviceResponseHandler)completion;
+    clusterId:(NSNumber *)clusterId
+    commandId:(NSNumber *)commandId
+    commandFields:(id)commandFields
+    timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+    clientQueue:(dispatch_queue_t)clientQueue
+    completion:(MTRDeviceResponseHandler)completion;
 
 /**
  * Subscribe an attribute in a designated attribute path
  */
 - (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                               clusterId:(NSNumber * _Nullable)clusterId
-                             attributeId:(NSNumber * _Nullable)attributeId
-                             minInterval:(NSNumber *)minInterval
-                             maxInterval:(NSNumber *)maxInterval
-                                  params:(MTRSubscribeParams * _Nullable)params
-                             clientQueue:(dispatch_queue_t)clientQueue
-                           reportHandler:(MTRDeviceResponseHandler)reportHandler
-                 subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
+    clusterId:(NSNumber * _Nullable)clusterId
+    attributeId:(NSNumber * _Nullable)attributeId
+    minInterval:(NSNumber *)minInterval
+    maxInterval:(NSNumber *)maxInterval
+    params:(MTRSubscribeParams * _Nullable)params
+    clientQueue:(dispatch_queue_t)clientQueue
+    reportHandler:(MTRDeviceResponseHandler)reportHandler
+    subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
 
 /**
  * Deregister all local report handlers for a remote device
@@ -217,8 +217,8 @@ extern NSString * const MTRArrayValueType;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * attribute;
 
 + (instancetype)attributePathWithEndpointId:(NSNumber *)endpoint
-                                  clusterId:(NSNumber *)clusterId
-                                attributeId:(NSNumber *)attributeId;
+    clusterId:(NSNumber *)clusterId
+    attributeId:(NSNumber *)attributeId;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
