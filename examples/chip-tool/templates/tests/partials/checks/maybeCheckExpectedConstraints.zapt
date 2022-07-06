@@ -40,6 +40,18 @@
         {{/chip_tests_iterate_expected_list}}
     {{/if}}
 
+    {{~#if (hasProperty expectedConstraints "hasMasksSet")}}
+        {{#chip_tests_iterate_expected_list expectedConstraints.hasMasksSet}}
+    VerifyOrReturn(CheckConstraintHasMasksSet("{{asPropertyValue}}", {{asPropertyValue}}, {{asTypedLiteral value type}}));
+        {{/chip_tests_iterate_expected_list}}
+    {{/if}}
+
+    {{~#if (hasProperty expectedConstraints "hasMasksClear")}}
+        {{#chip_tests_iterate_expected_list expectedConstraints.hasMasksClear}}
+    VerifyOrReturn(CheckConstraintHasMasksClear("{{asPropertyValue}}", {{asPropertyValue}}, {{asTypedLiteral value type}}));
+        {{/chip_tests_iterate_expected_list}}
+    {{/if}}
+
     {{~#if (hasProperty expectedConstraints "notValue")}}
         {{#if (isLiteralNull expectedConstraints.notValue)}}
             VerifyOrReturn(CheckValueNonNull("{{asPropertyValue}}", {{asPropertyValue}}));
@@ -53,4 +65,3 @@
         {{/unless}}
     {{/if}}
 {{/if}}
-
