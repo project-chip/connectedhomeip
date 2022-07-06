@@ -180,8 +180,8 @@ public:
 
         // Public, but cannot be accessed via NetworkIterator interface.
         uint8_t interfaceName[kMaxNetworkIDLen];
-        uint8_t interfaceNameLen = 0;
-        bool exhausted           = false;
+        size_t interfaceNameLen = 0;
+        bool exhausted          = false;
     };
 
     uint8_t GetMaxNetworks() override { return 1; };
