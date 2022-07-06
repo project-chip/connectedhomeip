@@ -16,16 +16,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
 #
 #    @file
 #      Python interface for Chip Device Manager
 #
-
 """Chip Device Controller interface
 """
-
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import
+from __future__ import print_function
 
 import asyncio
 import builtins
@@ -47,8 +45,8 @@ from .clusters import Command as ClusterCommand
 from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import *
 from .exceptions import *
-from .interaction_model import InteractionModelError
 from .interaction_model import delegate as im
+from .interaction_model import InteractionModelError
 
 __all__ = ["ChipDeviceController"]
 

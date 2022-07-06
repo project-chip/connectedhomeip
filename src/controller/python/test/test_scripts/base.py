@@ -14,7 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
 import asyncio
 import copy
 import ctypes
@@ -34,7 +33,8 @@ import chip.clusters as Clusters
 import chip.clusters.Attribute as Attribute
 import chip.FabricAdmin
 import chip.interaction_model as IM
-from chip import ChipCommissionableNodeCtrl, ChipDeviceCtrl
+from chip import ChipCommissionableNodeCtrl
+from chip import ChipDeviceCtrl
 from chip.ChipStack import *
 
 logger = logging.getLogger("PythonMatterControllerTEST")

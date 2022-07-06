@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 #
 #    Copyright (c) 2020-2021 Project CHIP Authors
 #    Copyright (c) 2013-2018 Nest Labs, Inc.
@@ -17,13 +16,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
 #
 #    @file
 #      This file implements the Python-based Chip Device Controller Shell.
 #
-
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import
+from __future__ import print_function
 
 import argparse
 import base64
@@ -40,15 +38,20 @@ import time
 import traceback
 import warnings
 from cmd import Cmd
-from optparse import OptionParser, OptionValueError
+from optparse import OptionParser
+from optparse import OptionValueError
 
 import chip.logging
 import coloredlogs
 import deprecation
-from chip import (ChipCommissionableNodeCtrl, ChipDeviceCtrl, ChipStack,
-                  FabricAdmin, exceptions)
+from chip import ChipCommissionableNodeCtrl
+from chip import ChipDeviceCtrl
+from chip import ChipStack
+from chip import exceptions
+from chip import FabricAdmin
 from chip.setup_payload import SetupPayload
-from rich import pretty, print
+from rich import pretty
+from rich import print
 from rich.pretty import pprint
 
 # Extend sys.path with one or more directories, relative to the location of the
