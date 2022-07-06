@@ -746,10 +746,9 @@ chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUserCodeTempora
  * @retval InteractionModel::Status::Success if attribute change is possible
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
-chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId,
-                                                                                          const chip::app::ConcreteAttributePath & attributePath,
-                                                                                          EmberAfAttributeType attrType,
-                                                                                          uint16_t attrSize, uint8_t * attrValue);
+chip::Protocols::InteractionModel::Status
+emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, const chip::app::ConcreteAttributePath & attributePath,
+                                                EmberAfAttributeType attrType, uint16_t attrSize, uint8_t * attrValue);
 
 // =============================================================================
 // Plugin callbacks that are called by cluster server and should be implemented
