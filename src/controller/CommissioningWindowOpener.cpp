@@ -36,7 +36,7 @@ namespace chip {
 namespace Controller {
 
 CHIP_ERROR CommissioningWindowOpener::OpenBasicCommissioningWindow(NodeId deviceId, Seconds16 timeout,
-        Callback::Callback<OnOpenBasicCommissioningWindow> * callback)
+                                                                   Callback::Callback<OnOpenBasicCommissioningWindow> * callback)
 {
     VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
     mSetupPayload = SetupPayload();
@@ -54,10 +54,10 @@ CHIP_ERROR CommissioningWindowOpener::OpenBasicCommissioningWindow(NodeId device
 }
 
 CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, Seconds16 timeout, uint32_t iteration,
-        uint16_t discriminator, Optional<uint32_t> setupPIN,
-        Optional<ByteSpan> salt,
-        Callback::Callback<OnOpenCommissioningWindow> * callback,
-        SetupPayload & payload, bool readVIDPIDAttributes)
+                                                              uint16_t discriminator, Optional<uint32_t> setupPIN,
+                                                              Optional<ByteSpan> salt,
+                                                              Callback::Callback<OnOpenCommissioningWindow> * callback,
+                                                              SetupPayload & payload, bool readVIDPIDAttributes)
 {
     VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
 
@@ -65,7 +65,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
                         CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(
         !salt.HasValue() ||
-        (salt.Value().size() >= kSpake2p_Min_PBKDF_Salt_Length && salt.Value().size() <= kSpake2p_Max_PBKDF_Salt_Length),
+            (salt.Value().size() >= kSpake2p_Min_PBKDF_Salt_Length && salt.Value().size() <= kSpake2p_Max_PBKDF_Salt_Length),
         CHIP_ERROR_INVALID_ARGUMENT);
 
     mSetupPayload = SetupPayload();
@@ -126,7 +126,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Operationa
     constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
 
     AdministratorCommissioningCluster cluster(*device->GetExchangeManager(), device->GetSecureSession().Value(),
-            kAdministratorCommissioningClusterEndpoint);
+                                              kAdministratorCommissioningClusterEndpoint);
 
     if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {
@@ -142,14 +142,14 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Operationa
         request.salt                 = mPBKDFSalt;
 
         ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenCommissioningWindowSuccess,
-                             OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
+                                                   OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
     }
     else
     {
         AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type request;
         request.commissioningTimeout = mCommissioningWindowTimeout.count();
         ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenCommissioningWindowSuccess,
-                             OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
+                                                   OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
     }
 
     return CHIP_NO_ERROR;
@@ -200,7 +200,7 @@ void CommissioningWindowOpener::OnOpenCommissioningWindowSuccess(void * context,
     if (self->mCommissioningWindowCallback != nullptr)
     {
         self->mCommissioningWindowCallback->mCall(self->mCommissioningWindowCallback->mContext, self->mNodeId, CHIP_NO_ERROR,
-                self->mSetupPayload);
+                                                  self->mSetupPayload);
 
         char payloadBuffer[QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
 
@@ -229,7 +229,7 @@ void CommissioningWindowOpener::OnOpenCommissioningWindowSuccess(void * context,
     else if (self->mBasicCommissioningWindowCallback != nullptr)
     {
         self->mBasicCommissioningWindowCallback->mCall(self->mBasicCommissioningWindowCallback->mContext, self->mNodeId,
-                CHIP_NO_ERROR);
+                                                       CHIP_NO_ERROR);
     }
 }
 
@@ -241,7 +241,7 @@ void CommissioningWindowOpener::OnOpenCommissioningWindowFailure(void * context,
     if (self->mCommissioningWindowCallback != nullptr)
     {
         self->mCommissioningWindowCallback->mCall(self->mCommissioningWindowCallback->mContext, self->mNodeId, error,
-                SetupPayload());
+                                                  SetupPayload());
     }
     else if (self->mBasicCommissioningWindowCallback != nullptr)
     {
@@ -264,7 +264,7 @@ void CommissioningWindowOpener::OnDeviceConnectedCallback(void * context, Operat
         constexpr EndpointId kBasicClusterEndpoint = 0;
         BasicCluster cluster(*device->GetExchangeManager(), device->GetSecureSession().Value(), kBasicClusterEndpoint);
         err = cluster.ReadAttribute<app::Clusters::Basic::Attributes::VendorID::TypeInfo>(context, OnVIDReadResponse,
-                OnVIDPIDReadFailureResponse);
+                                                                                          OnVIDPIDReadFailureResponse);
 #if CHIP_ERROR_LOGGING
         messageIfError = "Could not read VID for opening commissioning window";
 #endif // CHIP_ERROR_LOGGING
@@ -274,7 +274,7 @@ void CommissioningWindowOpener::OnDeviceConnectedCallback(void * context, Operat
         constexpr EndpointId kBasicClusterEndpoint = 0;
         BasicCluster cluster(*device->GetExchangeManager(), device->GetSecureSession().Value(), kBasicClusterEndpoint);
         err = cluster.ReadAttribute<app::Clusters::Basic::Attributes::ProductID::TypeInfo>(context, OnPIDReadResponse,
-                OnVIDPIDReadFailureResponse);
+                                                                                           OnVIDPIDReadFailureResponse);
 #if CHIP_ERROR_LOGGING
         messageIfError = "Could not read PID for opening commissioning window";
 #endif // CHIP_ERROR_LOGGING
@@ -314,7 +314,7 @@ AutoCommissioningWindowOpener::AutoCommissioningWindowOpener(DeviceController * 
 {}
 
 CHIP_ERROR AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(DeviceController * controller, NodeId deviceId,
-        Seconds16 timeout)
+                                                                       Seconds16 timeout)
 {
     // Not using Platform::New because we want to keep our constructor private.
     auto * opener = new AutoCommissioningWindowOpener(controller);
@@ -324,7 +324,7 @@ CHIP_ERROR AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(DeviceCon
     }
 
     CHIP_ERROR err = opener->CommissioningWindowOpener::OpenBasicCommissioningWindow(
-                         deviceId, timeout, &opener->mOnOpenBasicCommissioningWindowCallback);
+        deviceId, timeout, &opener->mOnOpenBasicCommissioningWindowCallback);
     if (err != CHIP_NO_ERROR)
     {
         delete opener;
@@ -334,9 +334,9 @@ CHIP_ERROR AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(DeviceCon
 }
 
 CHIP_ERROR AutoCommissioningWindowOpener::OpenCommissioningWindow(DeviceController * controller, NodeId deviceId, Seconds16 timeout,
-        uint32_t iteration, uint16_t discriminator,
-        Optional<uint32_t> setupPIN, Optional<ByteSpan> salt,
-        SetupPayload & payload, bool readVIDPIDAttributes)
+                                                                  uint32_t iteration, uint16_t discriminator,
+                                                                  Optional<uint32_t> setupPIN, Optional<ByteSpan> salt,
+                                                                  SetupPayload & payload, bool readVIDPIDAttributes)
 {
     // Not using Platform::New because we want to keep our constructor private.
     auto * opener = new AutoCommissioningWindowOpener(controller);
@@ -346,8 +346,8 @@ CHIP_ERROR AutoCommissioningWindowOpener::OpenCommissioningWindow(DeviceControll
     }
 
     CHIP_ERROR err = opener->CommissioningWindowOpener::OpenCommissioningWindow(
-                         deviceId, timeout, iteration, discriminator, setupPIN, salt, &opener->mOnOpenCommissioningWindowCallback, payload,
-                         readVIDPIDAttributes);
+        deviceId, timeout, iteration, discriminator, setupPIN, salt, &opener->mOnOpenCommissioningWindowCallback, payload,
+        readVIDPIDAttributes);
     if (err != CHIP_NO_ERROR)
     {
         delete opener;
@@ -357,7 +357,7 @@ CHIP_ERROR AutoCommissioningWindowOpener::OpenCommissioningWindow(DeviceControll
 }
 
 void AutoCommissioningWindowOpener::OnOpenCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status,
-        chip::SetupPayload payload)
+                                                                      chip::SetupPayload payload)
 {
     auto * self = static_cast<AutoCommissioningWindowOpener *>(context);
     delete self;

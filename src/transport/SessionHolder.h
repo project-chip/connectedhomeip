@@ -32,9 +32,7 @@ class SessionHolder : public IntrusiveListNodeBase<>
 {
 public:
     SessionHolder() {}
-    SessionHolder(const SessionHandle & handle) {
-        Grab(handle);
-    }
+    SessionHolder(const SessionHandle & handle) { Grab(handle); }
     virtual ~SessionHolder();
 
     SessionHolder(const SessionHolder &);
@@ -42,9 +40,7 @@ public:
     SessionHolder & operator=(const SessionHolder &);
     SessionHolder & operator=(SessionHolder && that);
 
-    virtual void SessionReleased() {
-        Release();
-    }
+    virtual void SessionReleased() { Release(); }
     virtual void ShiftToSession(const SessionHandle & session)
     {
         Release();
@@ -60,9 +56,7 @@ public:
     bool Grab(const SessionHandle & session);
     void Release();
 
-    explicit operator bool() const {
-        return mSession.HasValue();
-    }
+    explicit operator bool() const { return mSession.HasValue(); }
     Optional<SessionHandle> Get() const
     {
         //
@@ -72,12 +66,10 @@ public:
         // So, construct a new Optional<SessionHandle> from the underlying Transport::Session reference.
         //
         return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(mSession.Value().Get())
-               : chip::Optional<SessionHandle>::Missing();
+                                   : chip::Optional<SessionHandle>::Missing();
     }
 
-    Transport::Session * operator->() const {
-        return &mSession.Value().Get();
-    }
+    Transport::Session * operator->() const { return &mSession.Value().Get(); }
 
     // There is not delegate, nothing to do here
     virtual void DispatchSessionEvent(SessionDelegate::Event event) {}
@@ -96,9 +88,7 @@ public:
     SessionHolderWithDelegate(SessionDelegate & delegate) : mDelegate(delegate) {}
     SessionHolderWithDelegate(const SessionHandle & handle, SessionDelegate & delegate) : SessionHolder(handle), mDelegate(delegate)
     {}
-    operator bool() const {
-        return SessionHolder::operator bool();
-    }
+    operator bool() const { return SessionHolder::operator bool(); }
 
     void SessionReleased() override
     {
@@ -114,9 +104,7 @@ public:
             SessionHolder::ShiftToSession(session);
     }
 
-    void DispatchSessionEvent(SessionDelegate::Event event) override {
-        (mDelegate.*event)();
-    }
+    void DispatchSessionEvent(SessionDelegate::Event event) override { (mDelegate.*event)(); }
 
 private:
     SessionDelegate & mDelegate;

@@ -32,23 +32,23 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 - (void)handleQueryImage:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
-    completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-    NSError * _Nullable error))completionHandler;
+       completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                             NSError * _Nullable error))completionHandler;
 
 /**
  * Notify the delegate when apply update request command is received
  *
  */
 - (void)handleApplyUpdateRequest:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-    completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-    NSError * _Nullable error))completionHandler;
+               completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler;
 
 /**
  * Notify the delegate when notify update applied command is received
  *
  */
 - (void)handleNotifyUpdateApplied:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
-    completionHandler:(StatusCompletion)completionHandler;
+                completionHandler:(StatusCompletion)completionHandler;
 
 @end
 

@@ -88,7 +88,7 @@ bool sIsWiFiEnabled     = false;
 bool sIsWiFiAttached    = false;
 
 app::Clusters::NetworkCommissioning::Instance
-sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif /* SL_WIFI */
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -133,12 +133,12 @@ void OnTriggerIdentifyEffect(Identify * identify)
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
         (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
-                identify);
+                                                           identify);
         break;
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
         (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
         (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
-                identify);
+                                                           identify);
         break;
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
         (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
@@ -203,7 +203,7 @@ CHIP_ERROR AppTask::Init()
                                   false,            // no timer reload (==one-shot)
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
-                                 );
+    );
     if (sFunctionTimer == NULL)
     {
         EFR32_LOG("funct timer create failed");
@@ -332,12 +332,8 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 sStatusLED.Blink(950, 50);
             }
-            else if (sHaveBLEConnections) {
-                sStatusLED.Blink(100, 100);
-            }
-            else {
-                sStatusLED.Blink(50, 950);
-            }
+            else if (sHaveBLEConnections) { sStatusLED.Blink(100, 100); }
+            else { sStatusLED.Blink(50, 950); }
         }
 
         sStatusLED.Animate();
@@ -487,9 +483,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
                 ConnectivityMgr().SetBLEAdvertisingEnabled(true);
                 ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
             }
-            else {
-                EFR32_LOG("Network is already provisioned, Ble advertissement not enabled");
-            }
+            else { EFR32_LOG("Network is already provisioned, Ble advertissement not enabled"); }
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {

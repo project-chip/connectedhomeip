@@ -74,51 +74,29 @@ static_assert(kUndefinedFabricIndex < chip::kMinValidFabricIndex, "Undefined fab
 class DLL_EXPORT FabricInfo
 {
 public:
-    FabricInfo() {
-        Reset();
-    }
-    ~FabricInfo() {
-        Reset();
-    }
+    FabricInfo() { Reset(); }
+    ~FabricInfo() { Reset(); }
 
     // Non-copyable
     FabricInfo(FabricInfo const &) = delete;
     void operator=(FabricInfo const &) = delete;
 
     // Returns a span into our internal storage.
-    CharSpan GetFabricLabel() const {
-        return CharSpan(mFabricLabel, strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes));
-    }
+    CharSpan GetFabricLabel() const { return CharSpan(mFabricLabel, strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes)); }
     CHIP_ERROR SetFabricLabel(const CharSpan & fabricLabel);
 
-    NodeId GetNodeId() const {
-        return mNodeId;
-    }
-    ScopedNodeId GetScopedNodeId() const {
-        return ScopedNodeId(mNodeId, mFabricIndex);
-    }
-    ScopedNodeId GetScopedNodeIdForNode(const NodeId node) const {
-        return ScopedNodeId(node, mFabricIndex);
-    }
+    NodeId GetNodeId() const { return mNodeId; }
+    ScopedNodeId GetScopedNodeId() const { return ScopedNodeId(mNodeId, mFabricIndex); }
+    ScopedNodeId GetScopedNodeIdForNode(const NodeId node) const { return ScopedNodeId(node, mFabricIndex); }
 
     // TODO(#15049): Refactor/rename PeerId to OperationalId or OpId throughout source
-    PeerId GetPeerId() const {
-        return PeerId(mCompressedFabricId, mNodeId);
-    }
-    PeerId GetPeerIdForNode(const NodeId node) const {
-        return PeerId(mCompressedFabricId, node);
-    }
+    PeerId GetPeerId() const { return PeerId(mCompressedFabricId, mNodeId); }
+    PeerId GetPeerIdForNode(const NodeId node) const { return PeerId(mCompressedFabricId, node); }
 
-    FabricId GetFabricId() const {
-        return mFabricId;
-    }
-    FabricIndex GetFabricIndex() const {
-        return mFabricIndex;
-    }
+    FabricId GetFabricId() const { return mFabricId; }
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
-    CompressedFabricId GetCompressedFabricId() const {
-        return mCompressedFabricId;
-    }
+    CompressedFabricId GetCompressedFabricId() const { return mCompressedFabricId; }
     CHIP_ERROR GetCompressedFabricIdBytes(MutableByteSpan & compressedFabricId) const
     {
         ReturnErrorCodeIf(compressedFabricId.size() != sizeof(uint64_t), CHIP_ERROR_INVALID_ARGUMENT);
@@ -126,17 +104,11 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    uint16_t GetVendorId() const {
-        return mVendorId;
-    }
+    uint16_t GetVendorId() const { return mVendorId; }
 
-    bool IsInitialized() const {
-        return (mFabricIndex != kUndefinedFabricIndex) && IsOperationalNodeId(mNodeId);
-    }
+    bool IsInitialized() const { return (mFabricIndex != kUndefinedFabricIndex) && IsOperationalNodeId(mNodeId); }
 
-    bool HasOperationalKey() const {
-        return mOperationalKey != nullptr;
-    }
+    bool HasOperationalKey() const { return mOperationalKey != nullptr; }
 
     friend class FabricTable;
 
@@ -297,9 +269,7 @@ public:
     ConstFabricIterator(const ConstFabricIterator &) = default;
     ConstFabricIterator & operator=(const ConstFabricIterator &) = default;
 
-    ConstFabricIterator & operator++() {
-        return Advance();
-    }
+    ConstFabricIterator & operator++() { return Advance(); }
     ConstFabricIterator operator++(int)
     {
         ConstFabricIterator other(*this);
@@ -330,13 +300,9 @@ public:
         // Pending entry does not participate in finding this.
         return (mStart == other.mStart) && (mIndex == other.mIndex) && (mMaxSize == other.mMaxSize);
     }
-    bool operator!=(const ConstFabricIterator & other) {
-        return !(*this == other);
-    }
+    bool operator!=(const ConstFabricIterator & other) { return !(*this == other); }
 
-    bool IsAtEnd() const {
-        return (mIndex == mMaxSize);
-    }
+    bool IsAtEnd() const { return (mIndex == mMaxSize); }
 
 private:
     const FabricInfo * mStart;
@@ -402,14 +368,14 @@ public:
         /**
          * Gets called when a fabric in Fabric Table is persisted to storage, by CommitPendingFabricData.
          **/
-        virtual void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) {};
+        virtual void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex){};
 
         /**
          * Gets called when operational credentials are changed, which may not be persistent.
          *
          * Can be used to affect what is needed for UpdateNOC prior to commit.
          **/
-        virtual void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) {};
+        virtual void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex){};
 
         // Intrusive list pointer for FabricTable to manage the entries.
         Delegate * next = nullptr;
@@ -430,9 +396,7 @@ public:
     // TODO this #if CONFIG_BUILD_FOR_HOST_UNIT_TEST is temporary. There is a change incoming soon
     // that will allow triggering NOC update directly.
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    void SendUpdateFabricNotificationForTest(FabricIndex fabricIndex) {
-        NotifyFabricUpdated(fabricIndex);
-    }
+    void SendUpdateFabricNotificationForTest(FabricIndex fabricIndex) { NotifyFabricUpdated(fabricIndex); }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     const FabricInfo * FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId) const;
@@ -511,9 +475,7 @@ public:
     /**
      * @return the number of fabrics currently accessible/usable/iterable.
      */
-    uint8_t FabricCount() const {
-        return mFabricCount;
-    }
+    uint8_t FabricCount() const { return mFabricCount; }
 
     ConstFabricIterator cbegin() const
     {
@@ -524,12 +486,8 @@ public:
     {
         return ConstFabricIterator(mStates, nullptr, CHIP_CONFIG_MAX_FABRICS, CHIP_CONFIG_MAX_FABRICS);
     }
-    ConstFabricIterator begin() const {
-        return cbegin();
-    }
-    ConstFabricIterator end() const {
-        return cend();
-    }
+    ConstFabricIterator begin() const { return cbegin(); }
+    ConstFabricIterator end() const { return cend(); }
 
     /**
      * @brief Get a mutable FabricInfo entry from the table by FabricIndex.
@@ -741,7 +699,7 @@ public:
      * @retval other CHIP_ERROR_* on internal errors or certificate validation errors.
      */
     CHIP_ERROR AddNewPendingFabricWithOperationalKeystore(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
-            FabricIndex * outNewFabricIndex)
+                                                          FabricIndex * outNewFabricIndex)
     {
         return AddNewPendingFabricCommon(noc, icac, vendorId, nullptr, false, outNewFabricIndex);
     };
@@ -774,8 +732,8 @@ public:
      * @retval other CHIP_ERROR_* on internal errors or certificate validation errors.
      */
     CHIP_ERROR AddNewPendingFabricWithProvidedOpKey(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
-            Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
-            FabricIndex * outNewFabricIndex)
+                                                    Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
+                                                    FabricIndex * outNewFabricIndex)
     {
         return AddNewPendingFabricCommon(noc, icac, vendorId, existingOpKey, isExistingOpKeyExternallyOwned, outNewFabricIndex);
     };
@@ -843,7 +801,7 @@ public:
      */
 
     CHIP_ERROR UpdatePendingFabricWithProvidedOpKey(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
-            Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned)
+                                                    Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned)
     {
         return UpdatePendingFabricCommon(fabricIndex, noc, icac, existingOpKey, isExistingOpKeyExternallyOwned);
     }
@@ -901,7 +859,7 @@ public:
     // Same as AddNewFabricForTest, but ignore if we are colliding with same <Root Public Key, Fabric Id>, so
     // that a single fabric table can have N nodes for same fabric. This usually works, but is bad form.
     CHIP_ERROR AddNewFabricForTestIgnoringCollisions(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
-            const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
+                                                     const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
     {
         mStateFlags.Set(StateFlags::kAreCollidingFabricsIgnored);
         CHIP_ERROR err = AddNewFabricForTest(rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
@@ -1025,7 +983,7 @@ private:
      * @return CHIP_NO_ERROR on successful update of outMatchingFabricIndex or other CHIP_ERROR on internal errors
      */
     CHIP_ERROR FindExistingFabricByNocChaining(FabricIndex currentFabricIndex, const ByteSpan & noc,
-            FabricIndex & outMatchingFabricIndex) const;
+                                               FabricIndex & outMatchingFabricIndex) const;
 
     /**
      * @brief Get the shadow FabricInfo entry that is pending for updates, if an
@@ -1033,15 +991,13 @@ private:
      *
      * @return a pointer to the shadow pending fabric or nullptr if none is active.
      */
-    const FabricInfo * GetShadowPendingFabricEntry() const {
-        return HasPendingFabricUpdate() ? &mPendingFabric : nullptr;
-    }
+    const FabricInfo * GetShadowPendingFabricEntry() const { return HasPendingFabricUpdate() ? &mPendingFabric : nullptr; }
 
     // Returns true if we have a shadow entry pending for a fabruc update.
     bool HasPendingFabricUpdate() const
     {
         return mPendingFabric.IsInitialized() &&
-               mStateFlags.HasAll(StateFlags::kIsPendingFabricDataPresent, StateFlags::kIsUpdatePending);
+            mStateFlags.HasAll(StateFlags::kIsPendingFabricDataPresent, StateFlags::kIsUpdatePending);
     }
 
     // Verifies credentials, using the provided root certificate.
@@ -1056,10 +1012,10 @@ private:
     // not trying to change FabricID with UpdateNOC. If set to kUndefinedFabricId, we are doing AddNOC and
     // we don't need to check match to pre-existing fabric.
     static CHIP_ERROR ValidateIncomingNOCChain(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
-            FabricId existingFabricId, Credentials::CertificateValidityPolicy * policy,
-            CompressedFabricId & outCompressedFabricId, FabricId & outFabricId,
-            NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-            Crypto::P256PublicKey & outRootPubkey);
+                                               FabricId existingFabricId, Credentials::CertificateValidityPolicy * policy,
+                                               CompressedFabricId & outCompressedFabricId, FabricId & outFabricId,
+                                               NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
+                                               Crypto::P256PublicKey & outRootPubkey);
 
     /**
      * Read our fabric index info from the given TLV reader and set up the

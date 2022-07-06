@@ -47,8 +47,8 @@ using GetSetupPINResponseType = app::Clusters::AccountLogin::Commands::GetSetupP
 #define DEVICE_VERSION_DEFAULT 1
 
 EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-        const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-        uint16_t maxReadLength)
+                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   uint16_t maxReadLength)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -66,7 +66,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 }
 
 EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-        const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -87,8 +87,8 @@ namespace chip {
 namespace AppPlatform {
 
 EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,
-        const Span<DataVersion> & dataVersionStorage,
-        const Span<const EmberAfDeviceType> & deviceTypeList)
+                                             const Span<DataVersion> & dataVersionStorage,
+                                             const Span<const EmberAfDeviceType> & deviceTypeList)
 {
     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
 
@@ -181,7 +181,7 @@ void ContentAppPlatform::SetupAppPlatform()
     // Set starting endpoint id where dynamic endpoints will be assigned, which
     // will be the next consecutive endpoint id after the last fixed endpoint.
     mFirstDynamicEndpointId = static_cast<EndpointId>(
-                                  static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
+        static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
     mCurrentEndpointId = mFirstDynamicEndpointId;
 
     if (mCurrentEndpointId < emberAfFixedEndpointCount())
@@ -407,8 +407,8 @@ constexpr ClusterId kClusterIdAudioOutput     = 0x050b;
 // constexpr ClusterId kClusterIdAccountLogin        = 0x050e;
 
 CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targetDeviceProxy, uint16_t targetVendorId,
-        NodeId localNodeId, Controller::WriteResponseSuccessCallback successCb,
-        Controller::WriteResponseFailureCallback failureCb)
+                                                  NodeId localNodeId, Controller::WriteResponseSuccessCallback successCb,
+                                                  Controller::WriteResponseFailureCallback failureCb)
 {
     VerifyOrReturnError(targetDeviceProxy != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(successCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -440,16 +440,14 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
     {
         std::list<ClusterId> allowedClusterList = { kClusterIdDescriptor,      kClusterIdOnOff,      kClusterIdWakeOnLAN,
                                                     kClusterIdMediaPlayback,   kClusterIdLowPower,   kClusterIdKeypadInput,
-                                                    kClusterIdContentLauncher, kClusterIdAudioOutput
-                                                  };
+                                                    kClusterIdContentLauncher, kClusterIdAudioOutput };
 
         for (const auto & clusterId : allowedClusterList)
         {
             Access::AccessControl::Entry::Target target = { .flags = Access::AccessControl::Entry::Target::kCluster |
-                                                            Access::AccessControl::Entry::Target::kEndpoint,
+                                                                Access::AccessControl::Entry::Target::kEndpoint,
                                                             .cluster  = clusterId,
-                                                            .endpoint = kLocalVideoPlayerEndpointId
-                                                          };
+                                                            .endpoint = kLocalVideoPlayerEndpointId };
             ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
         }
 
@@ -465,8 +463,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
     ChipLogProgress(Controller, "Create speaker endpoint ACL and binding");
     {
         Access::AccessControl::Entry::Target target = { .flags    = Access::AccessControl::Entry::Target::kEndpoint,
-                                                        .endpoint = kLocalSpeakerEndpointId
-                                                      };
+                                                        .endpoint = kLocalSpeakerEndpointId };
         ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
 
         bindings.push_back(Binding::Structs::TargetStruct::Type{
@@ -494,8 +491,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
                 if (allowedVendor == targetVendorId)
                 {
                     Access::AccessControl::Entry::Target target = { .flags    = Access::AccessControl::Entry::Target::kEndpoint,
-                                                                    .endpoint = app->GetEndpointId()
-                                                                  };
+                                                                    .endpoint = app->GetEndpointId() };
                     ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
 
                     bindings.push_back(Binding::Structs::TargetStruct::Type{
@@ -517,7 +513,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
     BindingListType bindingList(bindings.data(), bindings.size());
 
     chip::Controller::BindingCluster cluster(*targetDeviceProxy->GetExchangeManager(),
-            targetDeviceProxy->GetSecureSession().Value(), kTargetBindingClusterEndpointId);
+                                             targetDeviceProxy->GetSecureSession().Value(), kTargetBindingClusterEndpointId);
 
     ReturnErrorOnFailure(
         cluster.WriteAttribute<Binding::Attributes::Binding::TypeInfo>(bindingList, nullptr, successCb, failureCb));

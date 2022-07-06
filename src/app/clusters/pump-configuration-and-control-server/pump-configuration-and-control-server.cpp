@@ -94,7 +94,7 @@ static void updateAttributeLinks(EndpointId endpoint)
         // the post attribute change callback for the operation mode attribute
         const EmberAfAttributeMetadata * effectiveControlModeMetaData;
         effectiveControlModeMetaData = GetAttributeMetadata(
-                                           app::ConcreteAttributePath(endpoint, PumpConfigurationAndControl::Id, Attributes::EffectiveControlMode::Id));
+            app::ConcreteAttributePath(endpoint, PumpConfigurationAndControl::Id, Attributes::EffectiveControlMode::Id));
         controlMode = static_cast<PumpControlMode>(effectiveControlModeMetaData->defaultValue.defaultValue);
     }
 
@@ -166,8 +166,8 @@ static void updateAttributeLinks(EndpointId endpoint)
     }
     break;
 
-    // The pump is controlled by the OperationMode attribute.
-    // Maximum, Minimum or Local
+        // The pump is controlled by the OperationMode attribute.
+        // Maximum, Minimum or Local
 
     case PumpOperationMode::kMaximum: {
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
@@ -298,7 +298,7 @@ bool IsFeatureSupported(EndpointId endpoint, EmberAfStatus (*getFn1)(chip::Endpo
 
 template <typename T1, typename T2>
 const char * FeatureSupportedDebugString(EndpointId endpoint, EmberAfStatus (*getFn1)(chip::EndpointId endpointId, T1 & value),
-        EmberAfStatus (*getFn2)(chip::EndpointId endpointId, T2 & value))
+                                         EmberAfStatus (*getFn2)(chip::EndpointId endpointId, T2 & value))
 {
     return IsFeatureSupported(endpoint, getFn1, getFn2) ? "Supported" : "Not Supported";
 }

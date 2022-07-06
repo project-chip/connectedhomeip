@@ -211,7 +211,7 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
             requestorCore->mFileDesignator = fileDesignator;
 
             requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
-                    System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+                                                                System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         }
         else
         {
@@ -219,7 +219,7 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
                           update.softwareVersion, requestorCore->mCurrentVersion);
 
             requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kUpToDate,
-                    System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+                                                               System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
             requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         }
 
@@ -227,7 +227,7 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
     }
     case OTAQueryStatus::kBusy: {
         CHIP_ERROR status = requestorCore->mOtaRequestorDriver->UpdateNotFound(
-                                UpdateNotFoundReason::kBusy, System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+            UpdateNotFoundReason::kBusy, System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         if ((status == CHIP_ERROR_MAX_RETRY_EXCEEDED) || (status == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED))
         {
             requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
@@ -241,7 +241,7 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
     }
     case OTAQueryStatus::kNotAvailable: {
         requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kNotAvailable,
-                System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+                                                           System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         break;
     }
@@ -324,7 +324,7 @@ void DefaultOTARequestor::Reset()
 }
 
 void DefaultOTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-        const AnnounceOtaProvider::DecodableType & commandData)
+                                                    const AnnounceOtaProvider::DecodableType & commandData)
 {
     VerifyOrReturn(commandObj != nullptr, ChipLogError(SoftwareUpdate, "Invalid commandObj, cannot handle AnnounceOTAProvider"));
 
@@ -334,8 +334,7 @@ void DefaultOTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comman
 
     ProviderLocationType providerLocation = { .providerNodeID = commandData.providerNodeId,
                                               .endpoint       = commandData.endpoint,
-                                              .fabricIndex    = commandObj->GetAccessingFabricIndex()
-                                            };
+                                              .fabricIndex    = commandObj->GetAccessingFabricIndex() };
 
     ChipLogDetail(SoftwareUpdate, "  FabricIndex: %u", providerLocation.fabricIndex);
     ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: 0x" ChipLogFormatX64, ChipLogValueX64(providerLocation.providerNodeID));
@@ -380,7 +379,7 @@ void DefaultOTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
                   ChipLogValueX64(mProviderLocation.Value().providerNodeID), mProviderLocation.Value().fabricIndex);
 
     mCASESessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID),
-            &mOnConnectedCallback, &mOnConnectionFailureCallback);
+                                                &mOnConnectedCallback, &mOnConnectionFailureCallback);
 }
 
 void DefaultOTARequestor::DisconnectFromProvider()
@@ -688,7 +687,7 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
     // Log the StateTransition event
     Nullable<uint32_t> targetSoftwareVersion;
     if ((newState == OTAUpdateStateEnum::kDownloading) || (newState == OTAUpdateStateEnum::kApplying) ||
-            (newState == OTAUpdateStateEnum::kRollingBack))
+        (newState == OTAUpdateStateEnum::kRollingBack))
     {
         targetSoftwareVersion.SetNonNull(mTargetVersion);
     }
@@ -777,13 +776,13 @@ CHIP_ERROR DefaultOTARequestor::SendQueryImageRequest(OperationalDeviceProxy & d
     }
 
     Controller::OtaSoftwareUpdateProviderCluster cluster(*deviceProxy.GetExchangeManager(), deviceProxy.GetSecureSession().Value(),
-            mProviderLocation.Value().endpoint);
+                                                         mProviderLocation.Value().endpoint);
 
     return cluster.InvokeCommand(args, this, OnQueryImageResponse, OnQueryImageFailure);
 }
 
 CHIP_ERROR DefaultOTARequestor::ExtractUpdateDescription(const QueryImageResponseDecodableType & response,
-        UpdateDescription & update) const
+                                                         UpdateDescription & update) const
 {
     NodeId nodeId;
     CharSpan fileDesignator;
@@ -847,7 +846,7 @@ CHIP_ERROR DefaultOTARequestor::SendApplyUpdateRequest(OperationalDeviceProxy & 
     args.newVersion  = mTargetVersion;
 
     Controller::OtaSoftwareUpdateProviderCluster cluster(*deviceProxy.GetExchangeManager(), deviceProxy.GetSecureSession().Value(),
-            mProviderLocation.Value().endpoint);
+                                                         mProviderLocation.Value().endpoint);
 
     return cluster.InvokeCommand(args, this, OnApplyUpdateResponse, OnApplyUpdateFailure);
 }
@@ -862,7 +861,7 @@ CHIP_ERROR DefaultOTARequestor::SendNotifyUpdateAppliedRequest(OperationalDevice
     args.softwareVersion = mCurrentVersion;
 
     Controller::OtaSoftwareUpdateProviderCluster cluster(*deviceProxy.GetExchangeManager(), deviceProxy.GetSecureSession().Value(),
-            mProviderLocation.Value().endpoint);
+                                                         mProviderLocation.Value().endpoint);
 
     // There is no response for a notify so consider this OTA complete. Clear the provider location and reset any states to indicate
     // so.
