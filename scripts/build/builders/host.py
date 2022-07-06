@@ -72,10 +72,10 @@ class HostApp(Enum):
         elif self == HostApp.OTA_REQUESTOR:
             return "ota-requestor-app/linux"
         elif self in [
-            HostApp.ADDRESS_RESOLVE,
-            HostApp.TESTS,
-            HostApp.PYTHON_BINDINGS,
-            HostApp.CERT_TOOL,
+                HostApp.ADDRESS_RESOLVE,
+                HostApp.TESTS,
+                HostApp.PYTHON_BINDINGS,
+                HostApp.CERT_TOOL,
         ]:
             return "../"
         elif self == HostApp.NL_TEST_RUNNER:
@@ -196,6 +196,7 @@ class HostBoard(Enum):
 
 
 class HostBuilder(GnBuilder):
+
     def __init__(
         self,
         root,
@@ -215,9 +216,10 @@ class HostBuilder(GnBuilder):
         use_platform_mdns=False,
         enable_rpcs=False,
     ):
-        super(HostBuilder, self).__init__(
-            root=os.path.join(root, "examples", app.ExamplePath()), runner=runner
-        )
+        super(HostBuilder,
+              self).__init__(root=os.path.join(root, "examples",
+                                               app.ExamplePath()),
+                             runner=runner)
 
         self.app = app
         self.board = board
@@ -263,7 +265,8 @@ class HostBuilder(GnBuilder):
 
         if extra_tests:
             # Flag for testing purpose
-            self.extra_gn_options.append("chip_im_force_fabric_quota_check=true")
+            self.extra_gn_options.append(
+                "chip_im_force_fabric_quota_check=true")
 
         if app == HostApp.TESTS:
             self.extra_gn_options.append("chip_build_tests=true")
@@ -277,7 +280,8 @@ class HostBuilder(GnBuilder):
             if self.board == HostBoard.ARM64:
                 # OpenSSL and mbedTLS conflicts.
                 # We only cross compile with mbedTLS.
-                raise Exception("Cannot cross compile CERT TOOL: ssl library conflict")
+                raise Exception(
+                    "Cannot cross compile CERT TOOL: ssl library conflict")
             self.extra_gn_options.append('chip_crypto="openssl"')
             self.build_command = "src/tools/chip-cert"
         elif app == HostApp.ADDRESS_RESOLVE:
@@ -285,33 +289,28 @@ class HostBuilder(GnBuilder):
         elif app == HostApp.PYTHON_BINDINGS:
             self.extra_gn_options.append("enable_rtti=false")
             self.extra_gn_options.append(
-                'chip_project_config_include_dirs=["//config/python"]'
-            )
+                'chip_project_config_include_dirs=["//config/python"]')
             self.build_command = "python"
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
             return self.extra_gn_options
         elif self.board == HostBoard.ARM64:
-            self.extra_gn_options.extend(
-                [
-                    'target_cpu="arm64"',
-                    "is_clang=true",
-                    'chip_crypto="mbedtls"',
-                    'sysroot="%s"' % self.SysRootPath("SYSROOT_AARCH64"),
-                ]
-            )
+            self.extra_gn_options.extend([
+                'target_cpu="arm64"',
+                "is_clang=true",
+                'chip_crypto="mbedtls"',
+                'sysroot="%s"' % self.SysRootPath("SYSROOT_AARCH64"),
+            ])
 
             return self.extra_gn_options
         elif self.board == HostBoard.FAKE:
-            self.extra_gn_options.extend(
-                [
-                    'custom_toolchain="//build/toolchain/fake:fake_x64_gcc"',
-                    "chip_link_tests=true",
-                    'chip_device_platform="fake"',
-                    "chip_fake_platform=true",
-                ]
-            )
+            self.extra_gn_options.extend([
+                'custom_toolchain="//build/toolchain/fake:fake_x64_gcc"',
+                "chip_link_tests=true",
+                'chip_device_platform="fake"',
+                "chip_fake_platform=true",
+            ])
             return self.extra_gn_options
         else:
             raise Exception("Unknown host board type: %r" % self)
@@ -323,7 +322,8 @@ class HostBuilder(GnBuilder):
             return None
         elif self.board == HostBoard.ARM64:
             return {
-                "PKG_CONFIG_PATH": os.path.join(
+                "PKG_CONFIG_PATH":
+                os.path.join(
                     self.SysRootPath("SYSROOT_AARCH64"),
                     "lib/aarch64-linux-gnu/pkgconfig",
                 ),
