@@ -1,0 +1,37 @@
+name: Cherry-Pick Merges
+
+on:
+  pull_request:
+    branches:
+      - master
+    types: ["closed"]
+
+jobs:
+  cherry_pick_release_v1_0:
+    runs-on: ubuntu-latest
+    name: Cherry-Pick into SVE
+    if: |
+      (github.event.pull_request.merged == true)
+      && (
+             (contains(github.event.pull_request.labels.*.name, 'sve'))
+          || (contains(github.event.pull_request.labels.*.name, 'cert blocker'))
+          || (contains(github.event.pull_request.labels.*.name, 'spec'))
+          || (contains(github.event.pull_request.labels.*.name, 'platform'))
+          || (contains(github.event.pull_request.labels.*.name, 'darwin'))
+          || (contains(github.event.pull_request.labels.*.name, 'android'))
+          || (contains(github.event.pull_request.labels.*.name, 'sve cherry-pick'))
+      )
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Cherry-Pick into sve branch
+        uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
+        with:
+          branch: sve
+          reviewers: |
+            woody-apple
+            andy31415
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
