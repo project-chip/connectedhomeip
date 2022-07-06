@@ -517,7 +517,9 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     return [[MTRBaseDevice alloc] initWithDevice:deviceProxy];
 }
 
-- (BOOL)getDevice:(uint64_t)deviceID queue:(dispatch_queue_t)queue completionHandler:(MTRDeviceConnectionCallback)completionHandler
+- (BOOL)getBaseDevice:(uint64_t)deviceID
+                queue:(dispatch_queue_t)queue
+    completionHandler:(MTRDeviceConnectionCallback)completionHandler
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     if (![self isRunning]) {
